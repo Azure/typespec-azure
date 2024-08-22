@@ -902,7 +902,10 @@ export interface SdkHttpOperation {
   kind: "http";
   // raw HTTP operation output from typespec/http
   __raw: HttpOperation;
+  // route path for the target operation. TypeSpec suggest to use `uriTemplate` instead as `path` will not work for complex cases like not-escaping reserved chars.
   path: string;
+  // the fully resolved URI template for the target operation as defined by [RFC 6570](https://datatracker.ietf.org/doc/html/rfc6570).
+  uriTemplate: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam: SdkBodyParameter;
@@ -923,6 +926,7 @@ const sdkHttpOperation = {
     // raw HttpOperation from @typespec/http;
   },
   path: "/widgets",
+  uriTemplate: "/widgets",
   verb: "get",
   parameters: [
     {
@@ -1063,13 +1067,24 @@ Currently we only support HTTP service parameters.
 This represents an HTTP query parameter.
 
 ```ts
-export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+// different collection format to use to separate each value in array
+// - multi: no separator, treat each value in array as a separate query parameter
+// - csv: , as separator
+// - ssv: space as separator
+// - tsv: tab as separator
+// - pipes: | as separator
+// - simple: , as separator
+// - form: no separator, treat each value in array as a separate query parameter
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
 export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
+  // the collection format to use to separate each value in array of a query parameter
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
+  // if true, send each value in array or object as a separate query parameter, default is `false`
+  explode: boolean;
 }
 ```
 
@@ -1078,7 +1093,15 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
 This is an HTTP header parameter.
 
 ```ts
-export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+// different collection format to use to separate each value in array
+// - multi: no separator, treat each value in array as a separate header parameter
+// - csv: , as separator
+// - ssv: space as separator
+// - tsv: tab as separator
+// - pipes: | as separator
+// - simple: , as separator
+// - form: no separator, treat each value in array as a separate header parameter
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
 export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
@@ -1093,7 +1116,17 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
 ```ts
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
-  urlEncode: boolean;
+  // when interpolating this parameter in the case of array or object, expand each value using the given style, default is `false`
+  explode: boolean;
+  // different interpolating styles for the path parameter, default is `"simple"`
+  // - simple: no separator
+  // - label: . as separator
+  // - matrix: ; as separator
+  // - fragment: # as separator
+  // - path: / as separator
+  style: "simple" | "label" | "matrix" | "fragment" | "path";
+  // when interpolating this parameter, do not encode reserved characters, default is `false`
+  allowReserved: boolean;
   serializedName: string;
   optional: false;
   correspondingMethodParams: SdkModelPropertyType[];

@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -32,7 +31,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(models.length, 1);
     const model = models[0];
     strictEqual(model.kind, "model");
-    strictEqual(model.isFormDataType, true);
+    strictEqual(model.isFormDataType, true); // eslint-disable-line deprecation/deprecation
     ok((model.usage & UsageFlags.MultipartFormData) > 0);
     strictEqual(model.name, "MultiPartRequest");
     strictEqual(model.properties.length, 2);
@@ -82,10 +81,10 @@ describe("typespec-client-generator-core: multipart types", () => {
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
-    const modelA = models.find((x) => x.name === "MultipartOperationRequest");
+    const modelA = models.find((x) => x.name === "A");
     ok(modelA);
     strictEqual(modelA.kind, "model");
-    strictEqual(modelA.isFormDataType, true);
+    strictEqual(modelA.isFormDataType, true); // eslint-disable-line deprecation/deprecation
     strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Spread);
     strictEqual(modelA.properties.length, 1);
     const modelAProp = modelA.properties[0];
@@ -94,10 +93,10 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(modelAProp.multipartOptions);
     strictEqual(modelAProp.multipartOptions.isFilePart, true);
 
-    const modelB = models.find((x) => x.name === "NormalOperationRequest");
+    const modelB = models.find((x) => x.name === "B");
     ok(modelB);
     strictEqual(modelB.kind, "model");
-    strictEqual(modelB.isFormDataType, false);
+    strictEqual(modelB.isFormDataType, false); // eslint-disable-line deprecation/deprecation
     strictEqual(modelB.usage, UsageFlags.Spread | UsageFlags.Json);
     strictEqual(modelB.properties.length, 1);
     strictEqual(modelB.properties[0].type.kind, "bytes");
@@ -115,7 +114,6 @@ describe("typespec-client-generator-core: multipart types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AddressSecondAppearance {
           address: Address;
         }
@@ -187,13 +185,13 @@ describe("typespec-client-generator-core: multipart types", () => {
 
     const pictureWrapper = models.find((x) => x.name === "PictureWrapper");
     ok(pictureWrapper);
-    strictEqual(pictureWrapper.isFormDataType, true);
+    strictEqual(pictureWrapper.isFormDataType, true); // eslint-disable-line deprecation/deprecation
     ok((pictureWrapper.usage & UsageFlags.MultipartFormData) > 0);
 
     const errorResponse = models.find((x) => x.name === "ErrorResponse");
     ok(errorResponse);
     strictEqual(errorResponse.kind, "model");
-    strictEqual(errorResponse.isFormDataType, false);
+    strictEqual(errorResponse.isFormDataType, false); // eslint-disable-line deprecation/deprecation
     ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
   });
 
@@ -619,5 +617,41 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(nameProperty);
     strictEqual(nameProperty.name, "name");
     strictEqual((nameProperty as SdkBodyModelPropertyType).serializedName, "serializedName");
+  });
+
+  it("multipart in client customization", async () => {
+    const testCode = [
+      `
+        @service({title: "Test Service"}) namespace TestService;
+        model MultiPartRequest {
+          profileImage: bytes;
+        }
+  
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+    `,
+      `
+      namespace Customizations;
+      
+      @client({name: "FirstOrderClient", service: TestService})
+      interface FirstOrder {}
+
+      @client({name: "SecondOrderClient", service: TestService})
+      interface SecondOrder {
+        myOp is TestService.multipartUse
+      }
+    `,
+    ];
+
+    await runner.compileWithCustomization(testCode[0], testCode[1]);
+
+    const models = runner.context.sdkPackage.models;
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const property = MultiPartRequest.properties.find((x) => x.name === "profileImage");
+    ok(property);
+    strictEqual(property.kind, "property");
+    strictEqual(property.isMultipartFileInput, true);
+    ok(property.multipartOptions);
+    strictEqual(property.multipartOptions.isFilePart, true);
   });
 });

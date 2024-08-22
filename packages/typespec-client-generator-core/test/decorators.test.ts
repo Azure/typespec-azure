@@ -457,6 +457,65 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clientAccessor.response.kind, "client");
       strictEqual(clientAccessor.response.name, "ClientModel");
     });
+
+    it("@operationGroup with diagnostics", async () => {
+      const testCode = [
+        `
+        @service({
+          title: "DeviceUpdateClient",
+        })
+        namespace Azure.IoT.DeviceUpdate;
+      `,
+        `
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
+        namespace Customizations;
+
+        @operationGroup("java")
+        interface SubClientOnlyForJava {
+        }
+
+        @operationGroup("python")
+        interface SubClientOnlyForPython {
+        }
+      `,
+      ];
+
+      // java should report disgnostics
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
+        expectDiagnostics(diagnostics, {
+          code: "@azure-tools/typespec-client-generator-core/client-service",
+        });
+      }
+
+      // python should have one sub client
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
+        expectDiagnostics(diagnostics, {});
+        const client = listClients(runner.context)[0];
+        strictEqual(listOperationGroups(runner.context, client).length, 1);
+      }
+
+      // csharp should only have one root client
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
+        expectDiagnostics(diagnostics, {});
+        const client = listClients(runner.context)[0];
+        strictEqual(listOperationGroups(runner.context, client).length, 0);
+      }
+    });
   });
 
   describe("listOperationGroups without @client and @operationGroup", () => {
@@ -2364,7 +2423,6 @@ describe("typespec-client-generator-core: decorators", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           enum Enum1{
             one,
             two,
@@ -2380,7 +2438,6 @@ describe("typespec-client-generator-core: decorators", () => {
 
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Model1{ prop: string }
 
           @test
@@ -3974,14 +4031,10 @@ describe("typespec-client-generator-core: decorators", () => {
         "stableFunctionality"
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
-      strictEqual(
-        runnerWithVersion.context.sdkPackage.models[0].name,
-        "PreviewFunctionalityRequest"
-      );
-      strictEqual(
-        runnerWithVersion.context.sdkPackage.models[1].name,
-        "StableFunctionalityRequest"
-      );
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "PreviewModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[1].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[1].access, "internal");
 
       runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
@@ -3996,9 +4049,11 @@ describe("typespec-client-generator-core: decorators", () => {
         "stableFunctionality"
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
       strictEqual(
-        runnerWithVersion.context.sdkPackage.models[0].name,
-        "StableFunctionalityRequest"
+        runnerWithVersion.context.sdkPackage.models[0].usage,
+        UsageFlags.Spread | UsageFlags.Json
       );
     });
     it("add client", async () => {
@@ -4492,7 +4547,7 @@ describe("typespec-client-generator-core: decorators", () => {
       await runner.compileWithCustomization(mainCode, customizationCode);
       // runner has python scope, so shouldn't be overridden
 
-      ok(!runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
       strictEqual(client.methods.length, 1);

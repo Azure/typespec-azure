@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
@@ -19,7 +18,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: string;
       }
@@ -35,7 +33,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: boolean;
       }
@@ -63,7 +60,6 @@ describe("typespec-client-generator-core: built-in types", () => {
       await runner.compileWithBuiltInService(
         `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           prop: ${type};
         }
@@ -82,7 +78,6 @@ describe("typespec-client-generator-core: built-in types", () => {
       await runner.compileWithBuiltInService(
         `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           prop: ${type};
         }
@@ -99,7 +94,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: decimal;
       }
@@ -115,7 +109,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: decimal128;
       }
@@ -131,7 +124,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: unknown;
       }
@@ -145,7 +137,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: bytes;
       }
@@ -161,7 +152,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         @encode(BytesKnownEncoding.base64)
         prop: bytes;
@@ -178,7 +168,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         @encode(BytesKnownEncoding.base64url)
         prop: bytes;
@@ -198,7 +187,6 @@ describe("typespec-client-generator-core: built-in types", () => {
       scalar Base64UrlBytes extends bytes;
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         value: Base64UrlBytes[];
       }
@@ -224,7 +212,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runnerWithCore.compileWithBuiltInAzureCoreService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         id: Azure.Core.armResourceIdentifier<[
           {
@@ -251,7 +238,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runnerWithCore.compileWithBuiltInAzureCoreService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         urlScalar: url;
 
@@ -313,7 +299,6 @@ describe("typespec-client-generator-core: built-in types", () => {
       scalar Derived extends Base;
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: Derived;
       }
@@ -338,7 +323,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     await runner.compileWithBuiltInService(
       `
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         @format("unknown")
         unknownProp: string;
@@ -402,7 +386,6 @@ describe("typespec-client-generator-core: built-in types", () => {
       scalar TestScalar extends string;
       
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: TestScalar;
       }
@@ -413,8 +396,44 @@ describe("typespec-client-generator-core: built-in types", () => {
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "TestScalar");
-    strictEqual(type.description, "title");
-    strictEqual(type.details, "doc");
+    strictEqual(type.description, "title"); // eslint-disable-line deprecation/deprecation
+    strictEqual(type.details, "doc"); // eslint-disable-line deprecation/deprecation
+    strictEqual(type.doc, "doc");
+    strictEqual(type.summary, "title");
     strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
+  });
+
+  it("integer model property encoded as string", async function () {
+    await runner.compileWithBuiltInService(
+      `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(string)
+        value: safeint;
+      }
+      `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "safeint");
+    strictEqual(sdkType.encode, "string");
+    strictEqual(sdkType.baseType, undefined);
+  });
+
+  it("integer scalar encoded as string", async function () {
+    await runner.compileWithBuiltInService(
+      `
+      @encode(string)
+      scalar int32EncodedAsString extends int32;
+
+      @usage(Usage.input | Usage.output)
+      model Test {
+        value: int32EncodedAsString;
+      }
+      `
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "int32");
+    strictEqual(sdkType.encode, "string");
+    strictEqual(sdkType.baseType?.kind, "int32");
   });
 });

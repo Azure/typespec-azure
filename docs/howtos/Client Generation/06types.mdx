@@ -162,7 +162,7 @@ public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
 </TabItem>
 <TabItem value="java" label="Java" >
 
-In Java, `@flattenProperty` have no effect on data-plane libraries.
+In Java, `@flattenProperty` have no effect on generated libraries.
 
 ```java
 @Fluent
@@ -247,7 +247,7 @@ model Animal is Record<unknown> {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python DPG model is original designed to support adding any additional properties.
+Python models are designed to support adding any additional properties.
 
 ```python
 from .. import _model_base
@@ -396,7 +396,7 @@ model Animal {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python DPG model is original designed to support adding any additional properties.
+Python models are designed to support adding any additional properties.
 
 ```python
 from typing import Any
@@ -606,7 +606,7 @@ model Animal {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python DPG model is original designed to support adding any additional properties.
+Python models are designed to support adding any additional properties.
 
 ```python
 from .. import _model_base
@@ -726,7 +726,7 @@ model Animal {
 </TabItem>
 <TabItem value="python" label="Python">
 
-Python DPG model is original designed to support adding any additional properties.
+Python models are designed to support adding any additional properties.
 
 ```python
 from .. import _model_base
@@ -2372,7 +2372,8 @@ TODO;
 <TabItem value="java" label="Java" >
 
 ```java
-TODO
+// Internal implementation
+jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 ```
 
 </TabItem>

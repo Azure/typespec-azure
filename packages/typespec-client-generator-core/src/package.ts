@@ -2,8 +2,10 @@ import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core
 import {
   createDiagnosticCollector,
   Diagnostic,
+  getDoc,
   getNamespaceFullName,
   getService,
+  getSummary,
   ignoreDiagnostics,
   Operation,
   Type,
@@ -255,6 +257,8 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
+    doc: getDoc(context.program, operation),
+    summary: getSummary(context.program, operation),
     operation: serviceOperation,
     response,
     apiVersions,
@@ -338,6 +342,7 @@ function getSdkInitializationType(
   return diagnostics.wrap({
     __raw: client.service,
     description: "Initialization class for the client",
+    doc: "Initialization class for the client",
     kind: "model",
     properties,
     name,
@@ -368,6 +373,8 @@ function getSdkMethodParameter(
       kind: "method",
       description: getDocHelper(context, type).description,
       details: getDocHelper(context, type).details,
+      doc: getDoc(context.program, type),
+      summary: getSummary(context.program, type),
       apiVersions,
       type: propertyType,
       name,
@@ -409,6 +416,8 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       name,
       description: getDocHelper(context, operationGroup.type).description,
       details: getDocHelper(context, operationGroup.type).details,
+      doc: getDoc(context.program, operationGroup.type),
+      summary: getSummary(context.program, operationGroup.type),
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
@@ -434,9 +443,13 @@ function getEndpointTypeFromSingleServer(
         name: "endpoint",
         isGeneratedName: true,
         description: "Service host",
+        doc: "Service host",
         kind: "path",
         onClient: true,
         urlEncode: false,
+        explode: false,
+        style: "simple",
+        allowReserved: false,
         optional: false,
         serializedName: "endpoint",
         correspondingMethodParams: [],
@@ -452,7 +465,9 @@ function getEndpointTypeFromSingleServer(
   const types: SdkEndpointType[] = [];
   if (!server) return diagnostics.wrap([defaultOverridableEndpointType]);
   for (const param of server.parameters.values()) {
-    const sdkParam = diagnostics.pipe(getSdkHttpParameter(context, param, undefined, "path"));
+    const sdkParam = diagnostics.pipe(
+      getSdkHttpParameter(context, param, undefined, undefined, "path")
+    );
     if (sdkParam.kind === "path") {
       templateArguments.push(sdkParam);
       sdkParam.onClient = true;
@@ -514,7 +529,7 @@ function getSdkEndpointParameter(
       types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, server)));
     }
   }
-  let type: SdkEndpointType | SdkUnionType;
+  let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
     type = {
       kind: "union",
@@ -523,7 +538,7 @@ function getSdkEndpointParameter(
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
       decorators: [],
-    };
+    } as SdkUnionType<SdkEndpointType>;
   } else {
     type = types[0];
   }
@@ -533,6 +548,7 @@ function getSdkEndpointParameter(
     name: "endpoint",
     isGeneratedName: true,
     description: "Service host",
+    doc: "Service host",
     onClient: true,
     urlEncode: false,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
@@ -562,6 +578,8 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     name,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, client.type),
+    summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,

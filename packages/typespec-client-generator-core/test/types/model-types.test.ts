@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -132,7 +131,6 @@ describe("typespec-client-generator-core: model types", () => {
   it("recursive model", async () => {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model RecursiveModel {
         prop: RecursiveModel
       }
@@ -188,7 +186,8 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
+    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
@@ -200,7 +199,8 @@ describe("typespec-client-generator-core: model types", () => {
     const sharktypeProperty = shark.properties[0];
     ok(sharktypeProperty);
     strictEqual(sharktypeProperty.name, "sharktype");
-    strictEqual(sharktypeProperty.description, "Discriminator property for Shark.");
+    strictEqual(sharktypeProperty.description, "Discriminator property for Shark."); // eslint-disable-line deprecation/deprecation
+    strictEqual(sharktypeProperty.doc, "Discriminator property for Shark.");
     strictEqual(sharktypeProperty.kind, "property");
     strictEqual(sharktypeProperty.discriminator, true);
     strictEqual(sharktypeProperty.type.kind, "string");
@@ -231,7 +231,8 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
+    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
@@ -263,7 +264,8 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
+    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
@@ -366,7 +368,8 @@ describe("typespec-client-generator-core: model types", () => {
     const catValue = values.find((x) => x.name === "Cat");
     ok(catValue);
     strictEqual(catValue.value, "cat");
-    strictEqual(catValue.description, "Cat");
+    strictEqual(catValue.description, "Cat"); // eslint-disable-line deprecation/deprecation
+    strictEqual(catValue.doc, "Cat");
     strictEqual(catValue.enumType, petKind);
     strictEqual(catValue.valueType, petKind.valueType);
     strictEqual(catValue.kind, "enumvalue");
@@ -374,7 +377,8 @@ describe("typespec-client-generator-core: model types", () => {
     const dogValue = values.find((x) => x.name === "Dog");
     ok(dogValue);
     strictEqual(dogValue.value, "dog");
-    strictEqual(dogValue.description, "Dog");
+    strictEqual(dogValue.description, "Dog"); // eslint-disable-line deprecation/deprecation
+    strictEqual(dogValue.doc, "Dog");
     strictEqual(dogValue.enumType, petKind);
     strictEqual(dogValue.valueType, petKind.valueType);
     strictEqual(dogValue.kind, "enumvalue");
@@ -495,7 +499,8 @@ describe("typespec-client-generator-core: model types", () => {
     const dogKindProperty = dog.properties[0];
     ok(dogKindProperty);
     strictEqual(dogKindProperty.type, dogKind);
-    strictEqual(dogKindProperty.description, "Discriminator property for Dog.");
+    strictEqual(dogKindProperty.description, "Discriminator property for Dog."); // eslint-disable-line deprecation/deprecation
+    strictEqual(dogKindProperty.doc, "Discriminator property for Dog.");
   });
 
   it("discriminator", async () => {
@@ -1131,23 +1136,19 @@ describe("typespec-client-generator-core: model types", () => {
   it("additionalProperties of same type", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel extends Record<string> {
           prop: string;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel2 is Record<unknown> {
           prop: string;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel3 {
           prop: string;
           ...Record<string>;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model NoAdditionalPropertiesModel {
           prop: string;
         }
@@ -1235,14 +1236,12 @@ describe("typespec-client-generator-core: model types", () => {
   it("additionalProperties of different types", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel {
           prop: string;
           ...Record<float32>;
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel2 {
           prop: string;
           ...Record<boolean | float32>;
@@ -1266,11 +1265,9 @@ describe("typespec-client-generator-core: model types", () => {
         @service({})
         namespace MyService {
           @usage(Usage.input)
-          @access(Access.public)
           model InputModel {}
 
           @usage(Usage.output)
-          @access(Access.public)
           model OutputModel {}
         }
       `);
@@ -1287,7 +1284,6 @@ describe("typespec-client-generator-core: model types", () => {
   it("template model", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Catalog is TrackedResource<CatalogProperties> {
           @pattern("^[A-Za-z0-9_-]{1,50}$")
           @key("catalogName")
@@ -1296,7 +1292,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model CatalogProperties {
           test?: string;
         }
@@ -1306,7 +1301,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Deployment is TrackedResource<DeploymentProperties> {
           @key("deploymentName")
           @segment("deployments")
@@ -1314,7 +1308,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model DeploymentProperties {
           deploymentId?: string;
           deploymentDateUtc?: utcDateTime;
@@ -1351,7 +1344,6 @@ describe("typespec-client-generator-core: model types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Model1{}
 
           model Model2{}
@@ -1473,7 +1465,6 @@ describe("typespec-client-generator-core: model types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Test{
             prop1: never;
             prop2: void;
