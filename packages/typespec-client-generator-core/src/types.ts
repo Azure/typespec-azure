@@ -21,9 +21,11 @@ import {
   Union,
   createDiagnosticCollector,
   getDiscriminator,
+  getDoc,
   getEncode,
   getFormat,
   getKnownValues,
+  getSummary,
   getVisibility,
   ignoreDiagnostics,
   isErrorModel,
@@ -85,6 +87,7 @@ import {
   filterApiVersionsInEnum,
   getAvailableApiVersions,
   getDocHelper,
+  getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getNonNullOptions,
@@ -93,6 +96,7 @@ import {
   getTypeDecorators,
   intOrFloat,
   isAzureCoreModel,
+  isHttpBodySpread,
   isJsonContentType,
   isMultipartOperation,
   isNeverOrVoidType,
@@ -110,7 +114,6 @@ import {
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
-import { UnionEnumVariant } from "../../typespec-azure-core/dist/src/helpers/union-enums.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 
 export function getTypeSpecBuiltInType(
@@ -264,6 +267,8 @@ function getSdkBuiltInTypeWithDiagnostics(
     encode: getEncodeHelper(context, type, kind),
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     baseType:
       type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
         ? diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type.baseScalar, kind))
@@ -334,6 +339,8 @@ function getSdkDateTimeType(
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
@@ -433,6 +440,8 @@ function getSdkDurationTypeWithDiagnostics(
     baseType: baseType,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
@@ -680,6 +689,7 @@ function addDiscriminatorToModelType(
     model.properties.splice(0, 0, {
       kind: "property",
       description: `Discriminator property for ${model.name}.`,
+      doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
       serializedName: discriminatorProperty
@@ -731,6 +741,8 @@ export function getSdkModelWithDiagnostics(
       isGeneratedName: !type.name,
       description: docWrapper.description,
       details: docWrapper.details,
+      doc: getDoc(context.program, type),
+      summary: getSummary(context.program, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
@@ -777,20 +789,17 @@ export function getSdkModelWithDiagnostics(
 
 function getSdkEnumValueType(
   context: TCGCContext,
-  values:
-    | IterableIterator<EnumMember>
-    | IterableIterator<UnionEnumVariant<string>>
-    | IterableIterator<UnionEnumVariant<number>>
+  values: (string | number | undefined)[]
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let kind: "string" | "int32" | "float32" = "string";
   for (const value of values) {
-    if (typeof value.value === "number") {
-      kind = intOrFloat(value.value);
+    if (typeof value === "number") {
+      kind = intOrFloat(value);
       if (kind === "float32") {
         break;
       }
-    } else if (typeof value.value === "string") {
+    } else if (typeof value === "string") {
       kind = "string";
       break;
     }
@@ -839,6 +848,8 @@ function getSdkEnumValueWithDiagnostics(
     value: type.value ?? type.name,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     enumType,
     valueType: enumType.valueType,
   });
@@ -863,7 +874,14 @@ function getSdkEnumWithDiagnostics(
       isGeneratedName: false,
       description: docWrapper.description,
       details: docWrapper.details,
-      valueType: diagnostics.pipe(getSdkEnumValueType(context, type.members.values())),
+      doc: getDoc(context.program, type),
+      summary: getSummary(context.program, type),
+      valueType: diagnostics.pipe(
+        getSdkEnumValueType(
+          context,
+          [...type.members.values()].map((v) => v.value)
+        )
+      ),
       values: [],
       isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
       isFlags: false,
@@ -898,6 +916,8 @@ function getSdkUnionEnumValues(
       name: name ? name : `${member.value}`,
       description: docWrapper.description,
       details: docWrapper.details,
+      doc: getDoc(context.program, member.type),
+      summary: getSummary(context.program, member.type),
       value: member.value,
       valueType: enumType.valueType,
       enumType,
@@ -927,9 +947,16 @@ export function getSdkUnionEnumWithDiagnostics(
       isGeneratedName: !type.union.name,
       description: docWrapper.description,
       details: docWrapper.details,
+      doc: getDoc(context.program, union),
+      summary: getSummary(context.program, union),
       valueType:
         diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
-        diagnostics.pipe(getSdkEnumValueType(context, type.flattenedMembers.values())),
+        diagnostics.pipe(
+          getSdkEnumValueType(
+            context,
+            [...type.flattenedMembers.values()].map((v) => v.value)
+          )
+        ),
       values: [],
       isFixed: !type.open,
       isFlags: false,
@@ -968,7 +995,14 @@ function getKnownValuesEnum(
         isGeneratedName: false,
         description: docWrapper.description,
         details: docWrapper.details,
-        valueType: diagnostics.pipe(getSdkEnumValueType(context, knownValues.members.values())),
+        doc: getDoc(context.program, type),
+        summary: getSummary(context.program, type),
+        valueType: diagnostics.pipe(
+          getSdkEnumValueType(
+            context,
+            [...knownValues.members.values()].map((v) => v.value)
+          )
+        ),
         values: [],
         isFixed: false,
         isFlags: false,
@@ -1150,6 +1184,7 @@ export function getSdkCredentialParameter(
     name,
     isGeneratedName: true,
     description: "Credential used to authenticate requests to the service.",
+    doc: "Credential used to authenticate requests to the service.",
     apiVersions: getAvailableApiVersions(context, client.service, client.type),
     onClient: true,
     optional: false,
@@ -1180,6 +1215,8 @@ export function getSdkModelPropertyTypeBase(
     __raw: type,
     description: docWrapper.description,
     details: docWrapper.details,
+    doc: getDoc(context.program, type),
+    summary: getSummary(context.program, type),
     apiVersions,
     type: propertyType,
     name,
@@ -1279,8 +1316,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-          )
+          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+        )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1341,15 +1378,17 @@ export function getSdkModelPropertyType(
     isMultipartFileInput: false,
     flatten: shouldFlattenProperty(context, type),
   };
-  if (operation) {
+  if (operation && type.model) {
     const httpOperation = getHttpOperationWithCache(context, operation);
-    if (
-      type.model &&
-      httpOperation.parameters.body &&
-      httpOperation.parameters.body.type === type.model
-    ) {
-      // only add multipartOptions for property of multipart body
-      diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+    const httpBody = httpOperation.parameters.body;
+    if (httpBody) {
+      const httpBodyType = isHttpBodySpread(httpBody)
+        ? getHttpBodySpreadModel(httpBody.type as Model)
+        : httpBody.type;
+      if (type.model === httpBodyType) {
+        // only try to add multipartOptions for property of body
+        diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+      }
     }
   }
   return diagnostics.wrap(result);
@@ -1399,6 +1438,7 @@ function updateModelsMap(context: TCGCContext, type: Type, sdkType: SdkType) {
 interface ModelUsageOptions {
   seenModelNames?: Set<SdkType>;
   propagation?: boolean;
+  skipFirst?: boolean;
   // this is used to prevent propagation usage from subtype to base type's other subtypes
   ignoreSubTypeStack?: boolean[];
   isOverride?: boolean;
@@ -1440,44 +1480,48 @@ function updateUsageOrAccessOfModel(
   if (type.kind !== "model" && type.kind !== "enum") return diagnostics.wrap(undefined);
   options.seenModelNames.add(type);
 
-  if (typeof value === "number") {
-    // usage set
-    if (options.isOverride) {
-      // when a type has usage, it could not be override to narrow usage
-      if (
-        ((type.usage & UsageFlags.Input) > 0 && (value & UsageFlags.Input) === 0) ||
-        ((type.usage & UsageFlags.Output) > 0 && (value & UsageFlags.Output) === 0)
-      ) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "conflict-usage-override",
-            target: type.__raw!,
-          })
-        );
-        return diagnostics.wrap(undefined);
+  if (!options.skipFirst) {
+    if (typeof value === "number") {
+      // usage set
+      if (options.isOverride) {
+        // when a type has usage, it could not be override to narrow usage
+        if (
+          ((type.usage & UsageFlags.Input) > 0 && (value & UsageFlags.Input) === 0) ||
+          ((type.usage & UsageFlags.Output) > 0 && (value & UsageFlags.Output) === 0)
+        ) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflict-usage-override",
+              target: type.__raw!,
+            })
+          );
+          return diagnostics.wrap(undefined);
+        }
       }
-    }
-    type.usage |= value;
-  } else {
-    // access set
-    if (options.isOverride) {
-      // when a type has access set to public, it could not be override to internal
-      if (value === "internal" && type.access === "public" && type.__accessSet) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "conflict-access-override",
-            target: type.__raw!,
-          })
-        );
-      } else {
-        type.access = value;
-      }
+      type.usage |= value;
     } else {
-      if (!type.__accessSet || type.access !== "public") {
-        type.access = value;
+      // access set
+      if (options.isOverride) {
+        // when a type has access set to public, it could not be override to internal
+        if (value === "internal" && type.access === "public" && type.__accessSet) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflict-access-override",
+              target: type.__raw!,
+            })
+          );
+        } else {
+          type.access = value;
+        }
+      } else {
+        if (!type.__accessSet || type.access !== "public") {
+          type.access = value;
+        }
       }
+      type.__accessSet = true;
     }
-    type.__accessSet = true;
+  } else {
+    options.skipFirst = false;
   }
 
   if (type.kind === "enum") return diagnostics.wrap(undefined);
@@ -1548,9 +1592,20 @@ function updateTypesFromOperation(
   }
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
-    const sdkType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, httpBody.type, operation)
-    );
+    const spread = isHttpBodySpread(httpBody);
+    let sdkType: SdkType;
+    if (spread) {
+      sdkType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(
+          context,
+          getHttpBodySpreadModel(httpBody.type as Model),
+          operation
+        )
+      );
+    } else {
+      sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, httpBody.type, operation));
+    }
+
     const multipartOperation = isMultipartOperation(context, operation);
     // this part should be put before setting current body's usage because it is based on the previous usage
     if (
@@ -1571,29 +1626,14 @@ function updateTypesFromOperation(
         })
       );
     }
+
     if (generateConvenient) {
-      // Special logic for spread body model:
-      // If body is from spread, then it should be an anonymous model.
-      // Also all model properties should be
-      // either equal to one of operation parameters (for case spread from model without property with metadata decorator)
-      // or its source property equal to one of operation parameters (for case spread from model with property with metadata decorator)
-      if (
-        httpBody.type.kind === "Model" &&
-        httpBody.type.name === "" &&
-        [...httpBody.type.properties.keys()].every(
-          (k) =>
-            operation.parameters.properties.has(k) &&
-            (operation.parameters.properties.get(k) ===
-              (httpBody.type as Model).properties.get(k) ||
-              operation.parameters.properties.get(k) ===
-                (httpBody.type as Model).properties.get(k)?.sourceProperty)
-        )
-      ) {
-        if (!context.spreadModels?.has(httpBody.type)) {
-          context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
-        }
+      if (spread) {
+        updateUsageOrAccessOfModel(context, UsageFlags.Spread, sdkType, { propagation: false });
+        updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType, { skipFirst: true });
+      } else {
+        updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType);
       }
-      diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType));
       if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
         diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Json, sdkType));
       }
@@ -1707,10 +1747,14 @@ function updateUsageOverrideOfModel(context: TCGCContext): [void, readonly Diagn
 }
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
-  for (const sdkType of context.spreadModels?.values() ?? []) {
-    // if a type has spread usage, then it must be internal
-    sdkType.access = "internal";
-    sdkType.usage = (sdkType.usage & ~UsageFlags.Input) | UsageFlags.Spread;
+  for (const [_, sdkType] of context.modelsMap?.entries() ?? []) {
+    if (
+      (sdkType.usage & UsageFlags.Spread) > 0 &&
+      (sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) === 0
+    ) {
+      // if a type has spread usage, but not used in any other operation, then set it to be internal
+      sdkType.access = "internal";
+    }
   }
 }
 
@@ -1765,9 +1809,6 @@ export function getAllModelsWithDiagnostics(
   if (context.unionsMap === undefined) {
     context.unionsMap = new Map<Union, SdkUnionType>();
   }
-  if (context.spreadModels === undefined) {
-    context.spreadModels = new Map<Model, SdkModelType>();
-  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
@@ -1783,18 +1824,6 @@ export function getAllModelsWithDiagnostics(
       if (operationGroup?.subOperationGroups) {
         ogs.push(...operationGroup.subOperationGroups);
       }
-    }
-    // orphan models
-    for (const model of client.service.models.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, model));
-    }
-    // orphan enums
-    for (const enumType of client.service.enums.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, enumType));
-    }
-    // orphan unions
-    for (const unionType of client.service.unions.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, unionType));
     }
     // server parameters
     const servers = getServers(context.program, client.service);
@@ -1815,6 +1844,21 @@ export function getAllModelsWithDiagnostics(
       diagnostics.pipe(
         updateUsageOrAccessOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum)
       );
+    }
+  }
+  // update for orphan models/enums/unions
+  for (const client of listClients(context)) {
+    // orphan models
+    for (const model of client.service.models.values()) {
+      diagnostics.pipe(handleServiceOrphanType(context, model));
+    }
+    // orphan enums
+    for (const enumType of client.service.enums.values()) {
+      diagnostics.pipe(handleServiceOrphanType(context, enumType));
+    }
+    // orphan unions
+    for (const unionType of client.service.unions.values()) {
+      diagnostics.pipe(handleServiceOrphanType(context, unionType));
     }
   }
   // update access

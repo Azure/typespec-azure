@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -79,7 +78,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
-    const modelA = models.find((x) => x.name === "MultipartOperationRequest");
+    const modelA = models.find((x) => x.name === "A");
     ok(modelA);
     strictEqual(modelA.kind, "model");
     strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Spread);
@@ -90,7 +89,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(modelAProp.multipartOptions);
     strictEqual(modelAProp.multipartOptions.isFilePart, true);
 
-    const modelB = models.find((x) => x.name === "NormalOperationRequest");
+    const modelB = models.find((x) => x.name === "B");
     ok(modelB);
     strictEqual(modelB.kind, "model");
     strictEqual(modelB.usage, UsageFlags.Spread | UsageFlags.Json);
@@ -611,5 +610,41 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(nameProperty);
     strictEqual(nameProperty.name, "name");
     strictEqual((nameProperty as SdkBodyModelPropertyType).serializedName, "serializedName");
+  });
+
+  it("multipart in client customization", async () => {
+    const testCode = [
+      `
+        @service({title: "Test Service"}) namespace TestService;
+        model MultiPartRequest {
+          profileImage: bytes;
+        }
+  
+        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+    `,
+      `
+      namespace Customizations;
+      
+      @client({name: "FirstOrderClient", service: TestService})
+      interface FirstOrder {}
+
+      @client({name: "SecondOrderClient", service: TestService})
+      interface SecondOrder {
+        myOp is TestService.multipartUse
+      }
+    `,
+    ];
+
+    await runner.compileWithCustomization(testCode[0], testCode[1]);
+
+    const models = runner.context.sdkPackage.models;
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    const property = MultiPartRequest.properties.find((x) => x.name === "profileImage");
+    ok(property);
+    strictEqual(property.kind, "property");
+    strictEqual(property.isMultipartFileInput, true);
+    ok(property.multipartOptions);
+    strictEqual(property.multipartOptions.isFilePart, true);
   });
 });
