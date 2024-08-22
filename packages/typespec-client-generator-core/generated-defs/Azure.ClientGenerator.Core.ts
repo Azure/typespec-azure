@@ -507,6 +507,24 @@ export type UseSystemTextJsonConverterDecorator = (
   scope?: string
 ) => void;
 
+/**
+ * Whether a model should be modeled as a struct.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * @modelAsStruct
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ */
+export type ModelAsStructDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  scope?: string
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -522,4 +540,5 @@ export type AzureClientGeneratorCoreDecorators = {
   flattenProperty: FlattenPropertyDecorator;
   override: OverrideDecorator;
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
+  modelAsStruct: ModelAsStructDecorator;
 };

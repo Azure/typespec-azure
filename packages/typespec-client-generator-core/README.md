@@ -26,6 +26,7 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@protocolAPI`](#@protocolapi)
 - [`@usage`](#@usage)
 - [`@useSystemTextJsonConverter`](#@usesystemtextjsonconverter)
+- [`@modelAsStruct`](#@modelAsStruct)
 
 #### `@access`
 
@@ -654,6 +655,33 @@ Whether a model needs the custom JSON converter, this is only used for backward 
 
 ```typespec
 @useSystemTextJsonConverter
+model MyModel {
+  prop: string;
+}
+```
+
+#### `@modelAsStruct`
+
+Whether a model should be modeled as a struct.
+
+```typespec
+@Azure.ClientGenerator.Core.modelAsStruct(scope?: valueof string)
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+##### Examples
+
+```typespec
+@modelAsStruct
 model MyModel {
   prop: string;
 }

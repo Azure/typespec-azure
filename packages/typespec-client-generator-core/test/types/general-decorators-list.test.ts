@@ -355,4 +355,32 @@ describe("typespec-client-generator-core: general decorators list", () => {
       expectDiagnostics(runner.context.diagnostics, []);
     });
   });
+
+  describe("model as struct decorator", () => {
+    it("@modelAsStruct", async function () {
+      runner = await createSdkTestRunner(
+        {},
+        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@modelAsStruct"] }
+      );
+
+      await runner.compileWithBuiltInService(`
+        @modelAsStruct("csharp")
+        model A {
+          id: string;
+        }
+
+        op test(): A;
+      `);
+
+      const models = runner.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      deepStrictEqual(models[0].decorators, [
+        {
+          name: "Azure.ClientGenerator.Core.@modelAsStruct",
+          arguments: { scope: "csharp" },
+        },
+      ]);
+      expectDiagnostics(runner.context.diagnostics, []);
+    });
+  });
 });

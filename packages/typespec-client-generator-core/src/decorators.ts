@@ -1159,3 +1159,9 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   entity: Model,
   scope?: LanguageScopes
 ) => {};
+
+export const $modelAsStruct: DecoratorFunction = (
+  context: DecoratorContext,
+  entity: Model,
+  scope?: LanguageScopes
+) => {};
