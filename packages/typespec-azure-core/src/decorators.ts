@@ -58,6 +58,7 @@ import {
   LroFailedDecorator,
   LroStatusDecorator,
   LroSucceededDecorator,
+  ModelAsStructDecorator,
   NextLinkDecorator,
   NextPageOperationDecorator,
   OperationLinkDecorator,
@@ -92,6 +93,12 @@ export const $fixed: FixedDecorator = (context: DecoratorContext, target: Enum) 
 export function isFixed(program: Program, target: Enum): boolean {
   return program.stateMap(AzureCoreStateKeys.fixed).get(target) !== undefined;
 }
+
+// @modelAsStruct
+
+export const $modelAsStruct: ModelAsStructDecorator = (context: DecoratorContext, target: Enum) => {
+  context.program.stateMap(AzureCoreStateKeys.modelAsStruct).set(target, true);
+};
 
 // pagedResult
 
