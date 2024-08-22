@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -142,7 +141,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(templateArg.kind, "path");
       strictEqual(templateArg.name, "endpoint");
       strictEqual(templateArg.serializedName, "endpoint");
-      strictEqual(templateArg.urlEncode, false);
+      strictEqual(templateArg.urlEncode, false); // eslint-disable-line deprecation/deprecation
       strictEqual(templateArg.type.kind, "string");
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
@@ -334,11 +333,12 @@ describe("typespec-client-generator-core: package", () => {
       const templateArg = endpointParam.type.templateArguments[0];
       strictEqual(templateArg.kind, "path");
       strictEqual(templateArg.name, "endpointInput");
-      strictEqual(templateArg.urlEncode, false);
+      strictEqual(templateArg.urlEncode, false); // eslint-disable-line deprecation/deprecation
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
       strictEqual(templateArg.clientDefaultValue, undefined);
-      strictEqual(templateArg.description, undefined);
+      strictEqual(templateArg.description, undefined); // eslint-disable-line deprecation/deprecation
+      strictEqual(templateArg.doc, undefined);
 
       const credentialParam = client.initialization.properties.filter(
         (p): p is SdkCredentialParameter => p.kind === "credential"
@@ -422,7 +422,7 @@ describe("typespec-client-generator-core: package", () => {
 
       const apiVersionParam = templatedEndpoint.templateArguments[1];
       strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-      strictEqual(apiVersionParam.urlEncode, true);
+      strictEqual(apiVersionParam.urlEncode, true); // eslint-disable-line deprecation/deprecation
       strictEqual(apiVersionParam.name, "apiVersion");
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.optional, false);
