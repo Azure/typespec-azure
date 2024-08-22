@@ -423,7 +423,10 @@ describe("typespec-client-generator-core: @usage", () => {
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
-    strictEqual(models.find((m) => m.name === "B")?.usage, UsageFlags.Spread | UsageFlags.Output | UsageFlags.Json);
+    strictEqual(
+      models.find((m) => m.name === "B")?.usage,
+      UsageFlags.Spread | UsageFlags.Output | UsageFlags.Json
+    );
     strictEqual(
       models.find((m) => m.name === "X")?.usage,
       UsageFlags.Input | UsageFlags.Output | UsageFlags.Json

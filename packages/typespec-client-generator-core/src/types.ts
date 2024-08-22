@@ -1316,8 +1316,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-        )
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+          )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
