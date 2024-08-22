@@ -230,7 +230,6 @@ export const $lib = createTypeSpecLibrary({
   state: {
     fixed: { description: "Data for `@fixed` decorator" },
     pagedResult: { description: "Data for `@pagedResult` decorator" },
-    modelAsStruct: { description: "Data for `@modelAsStruct` decorator" },
     items: { description: "Data for `@items` decorator" },
     nextLink: { description: "Data for `@nextLink` decorator" },
     lroStatus: { description: "Data for `@lroStatus` decorator" },

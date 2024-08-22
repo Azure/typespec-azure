@@ -51,11 +51,6 @@ export type PollingLocationDecorator = (
 export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
 
 /**
- * Marks that a model should be modeled as a struct.
- */
-export type ModelAsStructDecorator = (context: DecoratorContext, entity: Model) => void;
-
-/**
  * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
  */
 export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
@@ -202,7 +197,6 @@ export type AzureCoreDecorators = {
   items: ItemsDecorator;
   nextLink: NextLinkDecorator;
   fixed: FixedDecorator;
-  modelAsStruct: ModelAsStructDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;

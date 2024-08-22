@@ -13,11 +13,6 @@ namespace Azure.Core {
   extern dec pagedResult(entity: Model);
 
   /**
-   * Marks that a model should be modeled as a struct.
-   */
-  extern dec modelAsStruct(entity: Model);
-
-  /**
    * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
    */
   extern dec items(entity: ModelProperty);
