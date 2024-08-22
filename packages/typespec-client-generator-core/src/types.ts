@@ -1318,8 +1318,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-          )
+          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+        )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1619,9 +1619,7 @@ function updateTypesFromOperation(
     }
     if (generateConvenient) {
       if (spread) {
-        if (!context.spreadModels?.has(httpBody.type as Model)) {
-          context.spreadModels?.set(httpBody.type as Model, sdkType as SdkModelType);
-        }
+        updateUsageOfModel(context, UsageFlags.Spread, sdkType, { propagation: false });
         updateUsageOfModel(context, UsageFlags.Input, sdkType, { skipFirst: true });
       } else {
         updateUsageOfModel(context, UsageFlags.Input, sdkType);
@@ -1731,9 +1729,8 @@ function updateAccessOfModel(context: TCGCContext): void {
 }
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
-  for (const sdkType of context.spreadModels?.values() ?? []) {
-    sdkType.usage |= UsageFlags.Spread;
-    if ((sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) === 0) {
+  for (const [_, sdkType] of context.modelsMap?.entries() ?? []) {
+    if ((sdkType.usage & UsageFlags.Spread) > 0 && (sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) === 0) {
       // if a type has spread usage, but not used in any other operation, then set it to be internal
       sdkType.access = "internal";
     }
@@ -1818,9 +1815,6 @@ export function getAllModelsWithDiagnostics(
   }
   if (context.operationModelsMap === undefined) {
     context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
-  }
-  if (context.spreadModels === undefined) {
-    context.spreadModels = new Map<Model, SdkModelType>();
   }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
