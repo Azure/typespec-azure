@@ -395,38 +395,6 @@ model ModelToInclude {
 }
 ```
 
-### `@internal` {#@Azure.ClientGenerator.Core.internal}
-
-:::warning
-**Deprecated**: @internal decorator is deprecated. Use `@access` decorator instead.
-:::
-
-DEPRECATED: Use `@access` decorator instead.
-
-Whether to mark an operation as internal for specific languages,
-meaning it should not be exposed to end SDK users
-
-```typespec
-@Azure.ClientGenerator.Core.internal(scope?: valueof string)
-```
-
-#### Target
-
-`Operation`
-
-#### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-#### Examples
-
-```typespec
-@internal("python")
-op test: void;
-```
-
 ### `@modelAsStruct` {#@Azure.ClientGenerator.Core.modelAsStruct}
 
 Whether a model should be modeled as a struct.

@@ -20,7 +20,6 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@exclude`](#@exclude)
 - [`@flattenProperty`](#@flattenproperty)
 - [`@include`](#@include)
-- [`@internal`](#@internal)
 - [`@modelAsStruct`](#@modelasstruct)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
@@ -405,36 +404,6 @@ all models that are included in operations.
 model ModelToInclude {
   prop: string;
 }
-```
-
-#### `@internal`
-
-_Deprecated: @internal decorator is deprecated. Use `@access` decorator instead._
-
-DEPRECATED: Use `@access` decorator instead.
-
-Whether to mark an operation as internal for specific languages,
-meaning it should not be exposed to end SDK users
-
-```typespec
-@Azure.ClientGenerator.Core.internal(scope?: valueof string)
-```
-
-##### Target
-
-`Operation`
-
-##### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-##### Examples
-
-```typespec
-@internal("python")
-op test: void;
 ```
 
 #### `@modelAsStruct`
