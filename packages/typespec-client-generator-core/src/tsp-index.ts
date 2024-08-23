@@ -9,12 +9,12 @@ import {
   $flattenProperty,
   $include,
   $internal,
+  $modelAsStruct,
   $operationGroup,
   $override,
   $protocolAPI,
   $usage,
   $useSystemTextJsonConverter,
-  $modelAsStruct
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -42,6 +42,6 @@ export const $decorators = {
     flattenProperty: $flattenProperty,
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
-    modelAsStruct: $modelAsStruct
+    modelAsStruct: $modelAsStruct,
   } as AzureClientGeneratorCoreDecorators,
 };

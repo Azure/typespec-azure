@@ -427,6 +427,33 @@ meaning it should not be exposed to end SDK users
 op test: void;
 ```
 
+### `@modelAsStruct` {#@Azure.ClientGenerator.Core.modelAsStruct}
+
+Whether a model should be modeled as a struct.
+
+```typespec
+@Azure.ClientGenerator.Core.modelAsStruct(scope?: valueof string)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+#### Examples
+
+```typespec
+@modelAsStruct
+model MyModel {
+  prop: string;
+}
+```
+
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Create a ClientGenerator.Core operation group out of a namespace or interface

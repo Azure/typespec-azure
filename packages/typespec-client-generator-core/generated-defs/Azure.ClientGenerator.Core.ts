@@ -509,8 +509,8 @@ export type UseSystemTextJsonConverterDecorator = (
 
 /**
  * Whether a model should be modeled as a struct.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * @example
  * ```typespec
  * @modelAsStruct
