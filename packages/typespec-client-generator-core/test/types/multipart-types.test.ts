@@ -81,7 +81,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
-    const modelA = models.find((x) => x.name === "MultipartOperationRequest");
+    const modelA = models.find((x) => x.name === "A");
     ok(modelA);
     strictEqual(modelA.kind, "model");
     strictEqual(modelA.isFormDataType, true); // eslint-disable-line deprecation/deprecation
@@ -93,7 +93,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(modelAProp.multipartOptions);
     strictEqual(modelAProp.multipartOptions.isFilePart, true);
 
-    const modelB = models.find((x) => x.name === "NormalOperationRequest");
+    const modelB = models.find((x) => x.name === "B");
     ok(modelB);
     strictEqual(modelB.kind, "model");
     strictEqual(modelB.isFormDataType, false); // eslint-disable-line deprecation/deprecation
