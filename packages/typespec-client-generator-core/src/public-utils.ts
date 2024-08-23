@@ -63,7 +63,7 @@ export function getDefaultApiVersion(
  * @param parameter
  * @returns
  */
-export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
+export function isApiVersion(type: { name: string }): boolean {
   return (
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")

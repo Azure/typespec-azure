@@ -234,7 +234,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       const queryParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func))
         .parameters.parameters[0];
-      ok(isApiVersion(runner.context, queryParam));
+      ok(isApiVersion(queryParam));
     });
 
     it("is api version path", async () => {
@@ -244,7 +244,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
         .parameters[0];
-      ok(isApiVersion(runner.context, pathParam));
+      ok(isApiVersion(pathParam));
     });
 
     it("not api version param", async () => {
@@ -254,7 +254,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
         .parameters[0];
-      ok(!isApiVersion(runner.context, pathParam));
+      ok(!isApiVersion(pathParam));
     });
 
     it("api version in host param", async () => {
@@ -282,7 +282,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       const server = getServers(runner.context.program, serviceNamespace)?.[0];
       const hostParam = server?.parameters.get("ApiVersion");
 
-      ok(hostParam && isApiVersion(runner.context, hostParam));
+      ok(hostParam && isApiVersion(hostParam));
     });
   });
   describe("getClientNamespaceString", () => {
