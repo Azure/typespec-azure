@@ -8,7 +8,6 @@ import {
   $exclude,
   $flattenProperty,
   $include,
-  $internal,
   $modelAsStruct,
   $operationGroup,
   $override,
@@ -34,8 +33,6 @@ export const $decorators = {
     include: $include,
     // eslint-disable-next-line deprecation/deprecation
     clientFormat: $clientFormat,
-    // eslint-disable-next-line deprecation/deprecation
-    internal: $internal,
     usage: $usage,
     access: $access,
     // eslint-disable-next-line deprecation/deprecation
