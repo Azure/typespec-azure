@@ -44,7 +44,6 @@ import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
-  getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
@@ -437,27 +436,6 @@ export function createGeneratedName(
   suffix: string
 ): string {
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
-}
-
-function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
-  if (type.kind !== "Model") return false;
-  if (!isHttpOperation(context, operation)) return false;
-  const httpBody = operation
-    ? getHttpOperationWithCache(context, operation).parameters.body
-    : undefined;
-  return Boolean(
-    httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
-  );
-}
-
-export function isMultipartFormData(
-  context: TCGCContext,
-  type: Type,
-  operation?: Operation
-): boolean {
-  return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
 }
 
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {

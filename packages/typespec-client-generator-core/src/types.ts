@@ -48,7 +48,6 @@ import {
   getUsageOverride,
   isExclude,
   isInclude,
-  isInternal,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -56,6 +55,7 @@ import {
   shouldGenerateConvenient,
 } from "./decorators.js";
 import {
+  AccessFlags,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkBuiltInKinds,
@@ -98,7 +98,6 @@ import {
   isAzureCoreModel,
   isHttpBodySpread,
   isJsonContentType,
-  isMultipartFormData,
   isMultipartOperation,
   isNeverOrVoidType,
   isXmlContentType,
@@ -731,7 +730,7 @@ export function getSdkModelWithDiagnostics(
   let sdkType = context.modelsMap?.get(type) as SdkModelType | undefined;
 
   if (sdkType) {
-    updateModelsMap(context, type, sdkType, operation);
+    updateModelsMap(context, type, sdkType);
   } else {
     const docWrapper = getDocHelper(context, type);
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
@@ -750,7 +749,6 @@ export function getSdkModelWithDiagnostics(
       usage,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
-      isFormDataType: isMultipartFormData(context, type, operation),
     };
     updateModelsMap(context, type, sdkType);
 
@@ -784,7 +782,7 @@ export function getSdkModelWithDiagnostics(
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
 
-    updateModelsMap(context, type, sdkType, operation);
+    updateModelsMap(context, type, sdkType);
   }
   return diagnostics.wrap(sdkType);
 }
@@ -899,7 +897,7 @@ function getSdkEnumWithDiagnostics(
       );
     }
   }
-  updateModelsMap(context, type, sdkType, operation);
+  updateModelsMap(context, type, sdkType);
   return diagnostics.wrap(sdkType);
 }
 
@@ -970,7 +968,7 @@ export function getSdkUnionEnumWithDiagnostics(
     };
     sdkType.values = diagnostics.pipe(getSdkUnionEnumValues(context, type, sdkType));
   }
-  updateModelsMap(context, type.union, sdkType, operation);
+  updateModelsMap(context, type.union, sdkType);
   return diagnostics.wrap(sdkType);
 }
 
@@ -1020,7 +1018,7 @@ function getKnownValuesEnum(
         );
       }
     }
-    updateModelsMap(context, type, sdkType, operation);
+    updateModelsMap(context, type, sdkType);
     return diagnostics.wrap(sdkType);
   }
 }
@@ -1421,12 +1419,7 @@ function addPropertiesToModelType(
   return diagnostics.wrap(undefined);
 }
 
-function updateModelsMap(
-  context: TCGCContext,
-  type: Type,
-  sdkType: SdkType,
-  operation?: Operation
-) {
+function updateModelsMap(context: TCGCContext, type: Type, sdkType: SdkType) {
   if (sdkType.kind !== "model" && sdkType.kind !== "enum") {
     return;
   }
@@ -1434,61 +1427,11 @@ function updateModelsMap(
   if (context.modelsMap === undefined) {
     context.modelsMap = new Map<Type, SdkModelType | SdkEnumType>();
   }
-  if (context.operationModelsMap === undefined) {
-    context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
-  }
   const value = context.modelsMap.get(type);
   if (value) {
     sdkType = value;
   } else {
     context.modelsMap.set(type, sdkType);
-  }
-  if (operation) {
-    if (context.operationModelsMap.has(operation)) {
-      if (context.operationModelsMap.get(operation)?.has(type)) {
-        return;
-      }
-      context.operationModelsMap.get(operation)?.set(type, sdkType);
-    } else {
-      context.operationModelsMap.set(operation, new Map([[type, sdkType]]));
-    }
-    // TODO: it seems duplicate calculation, need to optimize later
-    if (sdkType.kind === "model") {
-      for (const prop of sdkType.properties) {
-        if (prop.type.kind === "model" || prop.type.kind === "enum") {
-          updateModelsMap(context, prop.type.__raw as any, prop.type, operation);
-        }
-        if (prop.type.kind === "array" || prop.type.kind === "dict") {
-          updateModelsMap(
-            context,
-            prop.type.valueType.__raw as any,
-            prop.type.valueType,
-            operation
-          );
-        }
-        if (prop.type.kind === "union") {
-          for (const unionType of prop.type.values) {
-            updateModelsMap(context, unionType.__raw as any, unionType, operation);
-          }
-        }
-      }
-      if (sdkType.baseModel) {
-        updateModelsMap(context, sdkType.baseModel.__raw as any, sdkType.baseModel, operation);
-      }
-      if (sdkType.additionalProperties) {
-        updateModelsMap(
-          context,
-          sdkType.additionalProperties.__raw as any,
-          sdkType.additionalProperties,
-          operation
-        );
-      }
-      if (sdkType.discriminatedSubtypes) {
-        for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
-          updateModelsMap(context, subtype.__raw as any, subtype, operation);
-        }
-      }
-    }
   }
 }
 
@@ -1498,58 +1441,94 @@ interface ModelUsageOptions {
   skipFirst?: boolean;
   // this is used to prevent propagation usage from subtype to base type's other subtypes
   ignoreSubTypeStack?: boolean[];
+  isOverride?: boolean;
 }
 
-function updateUsageOfModel(
+function updateUsageOrAccessOfModel(
   context: TCGCContext,
-  usage: UsageFlags,
+  value: UsageFlags | AccessFlags,
   type?: SdkType,
   options?: ModelUsageOptions
-): void {
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   options = options ?? {};
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
-  if (!type) return;
+  if (!type) return diagnostics.wrap(undefined);
   if (options?.seenModelNames === undefined) {
     options.seenModelNames = new Set<SdkType>();
   }
-  if (type.kind === "model" && options.seenModelNames.has(type)) return; // avoid circular references
+  if (type.kind === "model" && options.seenModelNames.has(type)) return diagnostics.wrap(undefined); // avoid circular references
   if (type.kind === "array" || type.kind === "dict") {
-    return updateUsageOfModel(context, usage, type.valueType, options);
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, value, type.valueType, options));
+    return diagnostics.wrap(undefined);
   }
   if (type.kind === "union") {
     for (const unionType of type.values) {
-      updateUsageOfModel(context, usage, unionType, options);
+      diagnostics.pipe(updateUsageOrAccessOfModel(context, value, unionType, options));
     }
-    return;
+    return diagnostics.wrap(undefined);
   }
   if (type.kind === "enumvalue") {
-    updateUsageOfModel(context, usage, type.enumType, options);
-    return;
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, value, type.enumType, options));
+    return diagnostics.wrap(undefined);
   }
   if (type.kind === "nullable") {
-    updateUsageOfModel(context, usage, type.type, options);
-    return;
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, value, type.type, options));
+    return diagnostics.wrap(undefined);
   }
-  if (type.kind !== "model" && type.kind !== "enum") return;
+  if (type.kind !== "model" && type.kind !== "enum") return diagnostics.wrap(undefined);
   options.seenModelNames.add(type);
 
   if (!options.skipFirst) {
-    const usageOverride = getUsageOverride(context, type.__raw as any);
-    if (usageOverride) {
-      type.usage |= usageOverride | usage;
+    if (typeof value === "number") {
+      // usage set
+      if (options.isOverride) {
+        // when a type has usage, it could not be override to narrow usage
+        if (
+          ((type.usage & UsageFlags.Input) > 0 && (value & UsageFlags.Input) === 0) ||
+          ((type.usage & UsageFlags.Output) > 0 && (value & UsageFlags.Output) === 0)
+        ) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflict-usage-override",
+              target: type.__raw!,
+            })
+          );
+          return diagnostics.wrap(undefined);
+        }
+      }
+      type.usage |= value;
     } else {
-      type.usage |= usage;
+      // access set
+      if (options.isOverride) {
+        // when a type has access set to public, it could not be override to internal
+        if (value === "internal" && type.access === "public" && type.__accessSet) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflict-access-override",
+              target: type.__raw!,
+            })
+          );
+        } else {
+          type.access = value;
+        }
+      } else {
+        if (!type.__accessSet || type.access !== "public") {
+          type.access = value;
+        }
+      }
+      type.__accessSet = true;
     }
   } else {
     options.skipFirst = false;
   }
 
-  if (type.kind === "enum") return;
-  if (!options.propagation) return;
+  if (type.kind === "enum") return diagnostics.wrap(undefined);
+  if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.baseModel) {
     options.ignoreSubTypeStack.push(true);
-    updateUsageOfModel(context, usage, type.baseModel, options);
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, value, type.baseModel, options));
     options.ignoreSubTypeStack.pop();
   }
   if (
@@ -1558,23 +1537,26 @@ function updateUsageOfModel(
   ) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
       options.ignoreSubTypeStack.push(false);
-      updateUsageOfModel(context, usage, discriminatedSubtype, options);
+      diagnostics.pipe(updateUsageOrAccessOfModel(context, value, discriminatedSubtype, options));
       options.ignoreSubTypeStack.pop();
     }
   }
   if (type.additionalProperties) {
     options.ignoreSubTypeStack.push(false);
-    updateUsageOfModel(context, usage, type.additionalProperties, options);
+    diagnostics.pipe(
+      updateUsageOrAccessOfModel(context, value, type.additionalProperties, options)
+    );
     options.ignoreSubTypeStack.pop();
   }
   for (const property of type.properties) {
     options.ignoreSubTypeStack.push(false);
-    if (property.kind === "property" && isReadOnly(property) && usage === UsageFlags.Input) {
+    if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
       continue;
     }
-    updateUsageOfModel(context, usage, property.type, options);
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, value, property.type, options));
     options.ignoreSubTypeStack.pop();
   }
+  return diagnostics.wrap(undefined);
 }
 
 function updateTypesFromOperation(
@@ -1588,10 +1570,14 @@ function updateTypesFromOperation(
   const overriddenClientMethod = getOverriddenClientMethod(context, operation);
   for (const param of (overriddenClientMethod ?? operation).parameters.properties.values()) {
     if (isNeverOrVoidType(param.type)) continue;
+    // if it is a body model, skip
+    if (httpOperation.parameters.body?.property === param) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
     if (generateConvenient) {
-      updateUsageOfModel(context, UsageFlags.Input, sdkType);
+      diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType));
     }
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
   }
   for (const param of httpOperation.parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
@@ -1599,8 +1585,10 @@ function updateTypesFromOperation(
       getClientTypeWithDiagnostics(context, param.param.type, operation)
     );
     if (generateConvenient) {
-      updateUsageOfModel(context, UsageFlags.Input, sdkType);
+      diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType));
     }
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
   }
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
@@ -1617,30 +1605,55 @@ function updateTypesFromOperation(
     } else {
       sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, httpBody.type, operation));
     }
+
+    const multipartOperation = isMultipartOperation(context, operation);
+    // this part should be put before setting current body's usage because it is based on the previous usage
+    if (
+      sdkType.kind === "model" &&
+      ((!multipartOperation && (sdkType.usage & UsageFlags.MultipartFormData) > 0) ||
+        (multipartOperation &&
+          (sdkType.usage & UsageFlags.Input) > 0 &&
+          (sdkType.usage & UsageFlags.Input & UsageFlags.MultipartFormData) === 0))
+    ) {
+      // This means we have a model that is used both for formdata input and for regular body input
+      diagnostics.add(
+        createDiagnostic({
+          code: "conflicting-multipart-model-usage",
+          target: httpBody.type,
+          format: {
+            modelName: sdkType.name,
+          },
+        })
+      );
+    }
+
     if (generateConvenient) {
       if (spread) {
-        updateUsageOfModel(context, UsageFlags.Spread, sdkType, { propagation: false });
-        updateUsageOfModel(context, UsageFlags.Input, sdkType, { skipFirst: true });
+        updateUsageOrAccessOfModel(context, UsageFlags.Spread, sdkType, { propagation: false });
+        updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType, { skipFirst: true });
       } else {
-        updateUsageOfModel(context, UsageFlags.Input, sdkType);
+        updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType);
       }
-
       if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
-        updateUsageOfModel(context, UsageFlags.Json, sdkType);
+        diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Json, sdkType));
       }
       if (httpBody.contentTypes.some((x) => isXmlContentType(x))) {
-        updateUsageOfModel(context, UsageFlags.Xml, sdkType);
+        diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Xml, sdkType));
       }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
         // will also have Json type
-        updateUsageOfModel(context, UsageFlags.JsonMergePatch, sdkType);
+        diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.JsonMergePatch, sdkType));
       }
     }
-    if (isMultipartFormData(context, httpBody.type, operation)) {
-      updateUsageOfModel(context, UsageFlags.MultipartFormData, sdkType, {
-        propagation: false,
-      });
+    if (multipartOperation) {
+      diagnostics.pipe(
+        updateUsageOrAccessOfModel(context, UsageFlags.MultipartFormData, sdkType, {
+          propagation: false,
+        })
+      );
     }
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
@@ -1651,11 +1664,13 @@ function updateTypesFromOperation(
             : innerResponse.body.type;
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
-          updateUsageOfModel(context, UsageFlags.Output, sdkType);
+          diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Output, sdkType));
         }
         if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
-          updateUsageOfModel(context, UsageFlags.Json, sdkType);
+          diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Json, sdkType));
         }
+        const access = getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
       }
       const headers = getHttpOperationResponseHeaders(innerResponse);
       if (headers) {
@@ -1665,8 +1680,10 @@ function updateTypesFromOperation(
             getClientTypeWithDiagnostics(context, header.type, operation)
           );
           if (generateConvenient) {
-            updateUsageOfModel(context, UsageFlags.Output, sdkType);
+            diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Output, sdkType));
           }
+          const access = getAccessOverride(context, operation) ?? "public";
+          diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
         }
       }
     }
@@ -1677,7 +1694,9 @@ function updateTypesFromOperation(
       const sdkType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, lroMetaData.finalResult, operation)
       );
-      updateUsageOfModel(context, UsageFlags.Output, sdkType);
+      diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Output, sdkType));
+      const access = getAccessOverride(context, operation) ?? "public";
+      diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
 
       if (!context.arm) {
         // TODO: currently skipping adding of envelopeResult due to arm error
@@ -1685,47 +1704,46 @@ function updateTypesFromOperation(
         const sdkType = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, lroMetaData.envelopeResult, operation)
         );
-        updateUsageOfModel(context, UsageFlags.Output, sdkType);
+        diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Output, sdkType));
+        const access = getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
       }
     }
   }
   return diagnostics.wrap(undefined);
 }
 
-function updateAccessOfModel(context: TCGCContext): void {
-  for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
-    const internal = isInternal(context, type as any); // eslint-disable-line deprecation/deprecation
-    if (internal) {
-      sdkType.access = "internal";
-      continue;
-    }
-
+function updateAccessOverrideOfModel(context: TCGCContext): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  // set access for all orphan model without override
+  for (const sdkType of context.modelsMap?.values() ?? []) {
     const accessOverride = getAccessOverride(context, sdkType.__raw as any);
-    if (accessOverride) {
-      sdkType.access = accessOverride;
-      continue;
-    }
-
-    let referredByInternal = false;
-    let referredByPublic = false;
-    let referredByUndefined = false;
-    for (const [operation, modelMap] of context.operationModelsMap!) {
-      const access = getAccessOverride(context, operation);
-      if (access === "internal" && modelMap.get(type)) {
-        referredByInternal = true;
-      } else if (access === "public" && modelMap.get(type)) {
-        referredByPublic = true;
-        break;
-      } else if (access === undefined && modelMap.get(type)) {
-        referredByUndefined = true;
-      }
-    }
-    if (referredByPublic) {
-      sdkType.access = "public";
-    } else if (referredByInternal && !referredByUndefined) {
-      sdkType.access = "internal";
+    if (!sdkType.__accessSet && accessOverride === undefined) {
+      diagnostics.pipe(updateUsageOrAccessOfModel(context, "public", sdkType));
     }
   }
+  for (const sdkType of context.modelsMap?.values() ?? []) {
+    const accessOverride = getAccessOverride(context, sdkType.__raw as any);
+    if (accessOverride) {
+      diagnostics.pipe(
+        updateUsageOrAccessOfModel(context, accessOverride, sdkType, { isOverride: true })
+      );
+    }
+  }
+  return diagnostics.wrap(undefined);
+}
+
+function updateUsageOverrideOfModel(context: TCGCContext): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  for (const sdkType of context.modelsMap?.values() ?? []) {
+    const usageOverride = getUsageOverride(context, sdkType.__raw as any);
+    if (usageOverride) {
+      diagnostics.pipe(
+        updateUsageOrAccessOfModel(context, usageOverride, sdkType, { isOverride: true })
+      );
+    }
+  }
+  return diagnostics.wrap(undefined);
 }
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
@@ -1745,46 +1763,21 @@ interface GetAllModelsOptions {
   output?: boolean;
 }
 
-function handleServiceOrphanType(context: TCGCContext, type: Model | Enum | Union) {
+function handleServiceOrphanType(
+  context: TCGCContext,
+  type: Model | Enum | Union
+): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // eslint-disable-next-line deprecation/deprecation
   if (type.kind === "Model" && isInclude(context, type)) {
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-    updateUsageOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkType);
+    diagnostics.pipe(
+      updateUsageOrAccessOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkType)
+    );
   }
   const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-  updateUsageOfModel(context, UsageFlags.None, sdkType);
-}
-
-function verifyNoConflictingMultipartModelUsage(
-  context: TCGCContext
-): [void, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  for (const [operation, modelMap] of context.operationModelsMap!) {
-    for (const [type, sdkType] of modelMap.entries()) {
-      const isMultipartFormData = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
-      if (
-        sdkType.kind === "model" &&
-        isMultipartFormData !== isMultipartOperation(context, operation)
-      ) {
-        // This means we have a model that is used both for formdata input and for regular body input
-        diagnostics.add(
-          createDiagnostic({
-            code: "conflicting-multipart-model-usage",
-            target: type,
-            format: {
-              modelName: sdkType.name,
-            },
-          })
-        );
-      }
-    }
-  }
+  diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.None, sdkType));
   return diagnostics.wrap(undefined);
-}
-
-function modelChecks(context: TCGCContext): [void, readonly Diagnostic[]] {
-  return verifyNoConflictingMultipartModelUsage(context);
 }
 
 function filterOutModels(context: TCGCContext) {
@@ -1816,9 +1809,6 @@ export function getAllModelsWithDiagnostics(
   if (context.unionsMap === undefined) {
     context.unionsMap = new Map<Union, SdkUnionType>();
   }
-  if (context.operationModelsMap === undefined) {
-    context.operationModelsMap = new Map<Operation, Map<Type, SdkModelType | SdkEnumType>>();
-  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
@@ -1840,7 +1830,7 @@ export function getAllModelsWithDiagnostics(
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
-        updateUsageOfModel(context, UsageFlags.Input, sdkType);
+        diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkType));
       }
     }
     // versioned enums
@@ -1851,26 +1841,30 @@ export function getAllModelsWithDiagnostics(
         getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum)
       );
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
-      updateUsageOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum);
+      diagnostics.pipe(
+        updateUsageOrAccessOfModel(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum)
+      );
     }
   }
   // update for orphan models/enums/unions
   for (const client of listClients(context)) {
     // orphan models
     for (const model of client.service.models.values()) {
-      handleServiceOrphanType(context, model);
+      diagnostics.pipe(handleServiceOrphanType(context, model));
     }
     // orphan enums
     for (const enumType of client.service.enums.values()) {
-      handleServiceOrphanType(context, enumType);
+      diagnostics.pipe(handleServiceOrphanType(context, enumType));
     }
     // orphan unions
     for (const unionType of client.service.unions.values()) {
-      handleServiceOrphanType(context, unionType);
+      diagnostics.pipe(handleServiceOrphanType(context, unionType));
     }
   }
   // update access
-  updateAccessOfModel(context);
+  diagnostics.pipe(updateAccessOverrideOfModel(context));
+  // update usage
+  diagnostics.pipe(updateUsageOverrideOfModel(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
   // filter out models
@@ -1883,7 +1877,6 @@ export function getAllModelsWithDiagnostics(
   } else if (options.output) {
     filter += UsageFlags.Output;
   }
-  diagnostics.pipe(modelChecks(context));
   return diagnostics.wrap(
     [...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0)
   );

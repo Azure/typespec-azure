@@ -253,7 +253,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     __raw: operation,
     kind: "basic",
     name,
-    access: getAccess(context, operation),
+    access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
@@ -592,7 +592,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
       usage: UsageFlags.None,
       crossLanguageDefinitionId: "",
       apiVersions: [],
-      isFormDataType: false,
       decorators: [],
     },
     // eslint-disable-next-line deprecation/deprecation
