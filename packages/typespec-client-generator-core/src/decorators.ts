@@ -63,6 +63,7 @@ import {
   AllScopes,
   clientNameKey,
   getValidApiVersion,
+  isAzureCoreModel,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -1072,7 +1073,7 @@ function collectParams(
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
-        if (!isApiVersion(value)) {
+        if (!isAzureCoreModel(value)) {
           params.push(value);
         }
       }

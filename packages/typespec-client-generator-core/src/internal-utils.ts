@@ -113,7 +113,7 @@ export function updateWithApiVersionInformation(
   clientDefaultValue?: unknown;
   onClient: boolean;
 } {
-  const isApiVersionParam = isApiVersion(type);
+  const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
     clientDefaultValue:
@@ -458,7 +458,7 @@ export function isSubscriptionId(context: TCGCContext, parameter: { name: string
 }
 
 export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
-  return isSubscriptionId(context, parameter) || isApiVersion(parameter);
+  return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
 }
 
 export function getLocationOfOperation(operation: Operation): Namespace | Interface {
