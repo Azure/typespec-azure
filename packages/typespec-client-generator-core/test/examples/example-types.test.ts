@@ -645,6 +645,7 @@ describe("typespec-client-generator-core: example types", () => {
           b: int32;
           @clientName("renamedProp")
           prop: string;
+          nullProp?: {};
         }
 
         op getModel(): Test;
