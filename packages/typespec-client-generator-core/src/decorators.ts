@@ -316,7 +316,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
   // if there is no explicit client, we will treat namespaces with service decorator as clients
   const services = listServices(context.program);
 
-  const clients = services.map((service) => {
+  const clients: SdkClient[] = services.map((service) => {
     let originalName = service.type.name;
     const clientNameOverride = getClientNameOverride(context, service.type);
     if (clientNameOverride) {
@@ -331,9 +331,8 @@ export function listClients(context: TCGCContext): SdkClient[] {
       name: clientName,
       service: service.type,
       type: service.type,
-      arm: isArm(service.type),
       crossLanguageDefinitionId: getNamespaceFullName(service.type),
-    } as SdkClient;
+    };
   });
 
   context.__rawClients = getClientsWithVersioning(context, clients);
