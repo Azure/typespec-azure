@@ -68,7 +68,7 @@ import {
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
-import { getLibraryName, isApiVersion } from "./public-utils.js";
+import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -1073,7 +1073,11 @@ function collectParams(
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
-        if (!isAzureCoreModel(value)) {
+        if (value.sourceProperty?.model) {
+          if (!isAzureCoreModel(value.sourceProperty.model)) {
+            params.push(value);
+          }
+        } else {
           params.push(value);
         }
       }

@@ -9,6 +9,8 @@ import {
   Interface,
   isNeverType,
   isNullType,
+  isTemplateDeclaration,
+  isTemplateInstance,
   isVoidType,
   ModelProperty,
   Namespace,
@@ -42,6 +44,7 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
+import { isTemplateDeclarationType } from "../../typespec-azure-core/src/rules/utils.js";
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -352,11 +355,17 @@ export function intOrFloat(value: number): "int32" | "float32" {
  * @returns
  */
 export function isAzureCoreModel(t: Type): boolean {
-  return (
-    (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
-    t.namespace !== undefined &&
-    ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
-  );
+  if (t.kind !== "Model"  && t.kind !== "Union") return false;
+  let a = "b";
+  if (isTemplateInstance(t)) {
+    a = "b";
+  } else if (t.kind === "Model" && isTemplateDeclarationType(t)) {
+    a = "b";
+  } else if (isTemplateDeclaration(t)) {
+    a = "b";
+  }
+  if (!isTemplateDeclaration(t)) return false; // skip template instances
+  return (t.namespace !== undefined && ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace)));
 }
 
 export function isAcceptHeader(param: SdkModelPropertyType): boolean {
