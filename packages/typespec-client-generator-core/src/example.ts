@@ -230,7 +230,11 @@ function handleHttpParameters(
 ): [SdkHttpParameterExample[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const parameterExamples = [] as SdkHttpParameterExample[];
-  if ("parameters" in example && typeof example.parameters === "object" && example.parameters !== null) {
+  if (
+    "parameters" in example &&
+    typeof example.parameters === "object" &&
+    example.parameters !== null
+  ) {
     for (const name of Object.keys(example.parameters)) {
       let parameter = parameters.find(
         (p) => (p.kind !== "body" && p.serializedName === name) || p.name === name
@@ -268,7 +272,11 @@ function handleHttpResponses(
 ): [Map<number, SdkHttpResponseExample>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const responseExamples = new Map<number, SdkHttpResponseExample>();
-  if ("responses" in example && typeof example.responses === "object" && example.responses !== null) {
+  if (
+    "responses" in example &&
+    typeof example.responses === "object" &&
+    example.responses !== null
+  ) {
     for (const code of Object.keys(example.responses)) {
       const statusCode = parseInt(code, 10);
       let found = false;
