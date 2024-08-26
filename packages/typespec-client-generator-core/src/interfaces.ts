@@ -81,10 +81,6 @@ export interface SdkClient {
   name: string;
   service: Namespace;
   type: Namespace | Interface;
-  /**
-   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
-   */
-  arm: boolean;
   crossLanguageDefinitionId: string;
 }
 
@@ -111,10 +107,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   apiVersions: string[];
   nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
-  /**
-   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
-   */
-  arm: boolean;
   parent?: SdkClientType<TServiceOperation>;
 }
 
@@ -300,21 +292,6 @@ interface SdkOffsetDateTimeType extends SdkDateTimeTypeBase {
 }
 
 export type SdkDateTimeType = SdkUtcDateTimeType | SdkOffsetDateTimeType;
-
-/**
- * @deprecated: Use SdkDateTimeType instead.
- */
-export type SdkDatetimeType = SdkDateTimeType;
-
-/**
- * @deprecated: Use SdkUtcDateTimeType instead.
- */
-export type SdkUtcDatetimeType = SdkUtcDateTimeType;
-
-/**
- * @deprecated Use SdkOffsetDateTimeType instead.
- */
-export type SdkOffsetDatetimeType = SdkOffsetDateTimeType;
 
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
@@ -620,17 +597,8 @@ interface SdkMethodBase extends DecoratedType {
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
-  /**
-   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead.
-   * @param serviceParam
-   */
-  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
-  /**
-   * @deprecated This property is deprecated. Access .resultPath on the method response instead.
-   */
-  getResponseMapping(): string | undefined;
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
   generateConvenient: boolean;

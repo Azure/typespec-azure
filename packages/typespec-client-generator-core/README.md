@@ -14,12 +14,9 @@ npm install @azure-tools/typespec-client-generator-core
 
 - [`@access`](#@access)
 - [`@client`](#@client)
-- [`@clientFormat`](#@clientformat)
 - [`@clientName`](#@clientname)
 - [`@convenientAPI`](#@convenientapi)
-- [`@exclude`](#@exclude)
 - [`@flattenProperty`](#@flattenproperty)
-- [`@include`](#@include)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@protocolAPI`](#@protocolapi)
@@ -219,38 +216,6 @@ interface MyInterface {}
 interface MyInterface {}
 ```
 
-#### `@clientFormat`
-
-_Deprecated: @clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/compiler` instead._
-
-DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
-
-Can be used to explain the client type that the current TYPESPEC
-type should map to.
-
-```typespec
-@Azure.ClientGenerator.Core.clientFormat(value: valueof "unixtime" | "iso8601" | "rfc1123" | "seconds")
-```
-
-##### Target
-
-`ModelProperty`
-
-##### Parameters
-
-| Name  | Type                                                        | Description                 |
-| ----- | ----------------------------------------------------------- | --------------------------- |
-| value | `valueof "unixtime" \| "iso8601" \| "rfc1123" \| "seconds"` | The client format to apply. |
-
-##### Examples
-
-```typespec
-model MyModel {
-  @clientFormat("unixtime")
-  created_at?: int64;
-}
-```
-
 #### `@clientName`
 
 Changes the name of a method, parameter, property, or model generated in the client SDK
@@ -311,38 +276,6 @@ Whether you want to generate an operation as a convenient operation.
 op test: void;
 ```
 
-#### `@exclude`
-
-_Deprecated: @exclude decorator is deprecated. Use `@usage` and `@access` decorator instead._
-
-DEPRECATED: Use `@usage` and `@access` decorator instead.
-
-Whether to exclude a model from generation for specific languages. By default we generate
-all models that are included in operations.
-
-```typespec
-@Azure.ClientGenerator.Core.exclude(scope?: valueof string)
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-##### Examples
-
-```typespec
-@exclude("python")
-model ModelToExclude {
-  prop: string;
-}
-```
-
 #### `@flattenProperty`
 
 _Deprecated: @flattenProperty decorator is not recommended to use._
@@ -371,38 +304,6 @@ model Foo {
   prop: Bar;
 }
 model Bar {}
-```
-
-#### `@include`
-
-_Deprecated: @include decorator is deprecated. Use `@usage` and `@access` decorator instead._
-
-DEPRECATED: Use `@usage` and `@access` decorator instead.
-
-Whether to include a model in generation for specific languages. By default we generate
-all models that are included in operations.
-
-```typespec
-@Azure.ClientGenerator.Core.include(scope?: valueof string)
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-##### Examples
-
-```typespec
-@include("python")
-model ModelToInclude {
-  prop: string;
-}
 ```
 
 #### `@operationGroup`

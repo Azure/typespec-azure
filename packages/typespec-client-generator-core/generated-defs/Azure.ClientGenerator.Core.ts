@@ -123,61 +123,6 @@ export type OperationGroupDecorator = (
 ) => void;
 
 /**
- * DEPRECATED: Use `@usage` and `@access` decorator instead.
- *
- * Whether to exclude a model from generation for specific languages. By default we generate
- * all models that are included in operations.
- *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- * @example
- * ```typespec
- * @exclude("python")
- * model ModelToExclude {
- *   prop: string;
- * }
- * ```
- */
-export type ExcludeDecorator = (context: DecoratorContext, target: Model, scope?: string) => void;
-
-/**
- * DEPRECATED: Use `@usage` and `@access` decorator instead.
- *
- * Whether to include a model in generation for specific languages. By default we generate
- * all models that are included in operations.
- *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- * @example
- * ```typespec
- * @include("python")
- * model ModelToInclude {
- *   prop: string;
- * }
- * ```
- */
-export type IncludeDecorator = (context: DecoratorContext, target: Model, scope?: string) => void;
-
-/**
- * DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
- *
- * Can be used to explain the client type that the current TYPESPEC
- * type should map to.
- *
- * @param value The client format to apply.
- * @example
- * ```typespec
- * model MyModel {
- *   @clientFormat("unixtime")
- *   created_at?: int64
- * }
- * ```
- */
-export type ClientFormatDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-  value: "unixtime" | "iso8601" | "rfc1123" | "seconds"
-) => void;
-
-/**
  * Override usage for models/enums.
  * A model/enum's default usage info is always calculated by the operations that use it.
  * You could use this decorator to override the default usage info.
@@ -494,9 +439,6 @@ export type AzureClientGeneratorCoreDecorators = {
   protocolAPI: ProtocolAPIDecorator;
   client: ClientDecorator;
   operationGroup: OperationGroupDecorator;
-  exclude: ExcludeDecorator;
-  include: IncludeDecorator;
-  clientFormat: ClientFormatDecorator;
   usage: UsageDecorator;
   access: AccessDecorator;
   flattenProperty: FlattenPropertyDecorator;

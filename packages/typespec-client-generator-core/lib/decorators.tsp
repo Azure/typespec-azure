@@ -92,61 +92,6 @@ extern dec client(target: Namespace | Interface, value?: Model, scope?: valueof 
 extern dec operationGroup(target: Namespace | Interface, scope?: valueof string);
 
 /**
- * DEPRECATED: Use `@usage` and `@access` decorator instead.
- *
- * Whether to exclude a model from generation for specific languages. By default we generate
- * all models that are included in operations.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
- * @example
- * ```typespec
- * @exclude("python")
- * model ModelToExclude {
- *   prop: string;
- * }
- * ```
- */
-#deprecated "@exclude decorator is deprecated. Use `@usage` and `@access` decorator instead."
-extern dec exclude(target: Model, scope?: valueof string);
-
-/**
- * DEPRECATED: Use `@usage` and `@access` decorator instead.
- *
- * Whether to include a model in generation for specific languages. By default we generate
- * all models that are included in operations.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
- *
- * @example
- * ```typespec
- * @include("python")
- * model ModelToInclude {
- *   prop: string;
- * }
- * ```
- */
-#deprecated "@include decorator is deprecated. Use `@usage` and `@access` decorator instead."
-extern dec include(target: Model, scope?: valueof string);
-
-alias ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
-
-/**
- * DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
- *
- * Can be used to explain the client type that the current TYPESPEC
- * type should map to.
- * @param value The client format to apply.
- * @example
- * ```typespec
- * model MyModel {
- *   @clientFormat("unixtime")
- *   created_at?: int64
- * }
- * ```
- */
-#deprecated "@clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/compiler` instead."
-extern dec clientFormat(target: ModelProperty, value: valueof ClientFormat);
-
-/**
  * Usage value.
  */
 enum Usage {

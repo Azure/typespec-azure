@@ -143,9 +143,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           )
         )
       : undefined,
-    getResponseMapping(): string | undefined {
-      return basic.response.resultPath;
-    },
   });
 }
 
@@ -180,9 +177,6 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
         basicServiceMethod.parameters
       )
     ),
-    getResponseMapping(): string | undefined {
-      return this.response.resultPath;
-    },
   });
 }
 
@@ -608,8 +602,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
       apiVersions: [],
       decorators: [],
     },
-    // eslint-disable-next-line deprecation/deprecation
-    arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
