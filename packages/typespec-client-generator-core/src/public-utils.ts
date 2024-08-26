@@ -28,11 +28,18 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
-import { SdkHttpOperationExample, TCGCContext } from "./interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperationExample,
+  SdkServiceOperation,
+  TCGCContext,
+} from "./interfaces.js";
 import {
   TspLiteralType,
   getClientNamespaceStringHelper,
+  getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
+  isHttpBodySpread,
   parseEmitterName,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
@@ -165,7 +172,12 @@ export function getLibraryName(
   if (friendlyName) return friendlyName;
 
   // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
-  if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
+  if (
+    typeof type.name === "string" &&
+    type.name !== "" &&
+    type.kind === "Model" &&
+    type.templateMapper?.args
+  ) {
     return (
       type.name +
       type.templateMapper.args
@@ -369,7 +381,13 @@ function getContextPath(
     if (httpOperation.parameters.body) {
       visited.clear();
       result = [{ name: root.name }];
-      if (dfsModelProperties(typeToFind, httpOperation.parameters.body.type, "Request")) {
+      let bodyType: Type;
+      if (isHttpBodySpread(httpOperation.parameters.body)) {
+        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
+      } else {
+        bodyType = httpOperation.parameters.body.type;
+      }
+      if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
       }
     }
@@ -623,4 +641,26 @@ export function getHttpOperationExamples(
   operation: HttpOperation
 ): SdkHttpOperationExample[] {
   return context.__httpOperationExamples?.get(operation) ?? [];
+}
+
+/**
+ * Get all the sub clients from current client.
+ *
+ * @param client
+ * @param listNestedClients determine if nested clients should be listed
+ * @returns
+ */
+export function listSubClients<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+  listNestedClients: boolean = false
+): SdkClientType<TServiceOperation>[] {
+  const subClients: SdkClientType<TServiceOperation>[] = client.methods
+    .filter((c) => c.kind === "clientaccessor")
+    .map((c) => c.response as SdkClientType<TServiceOperation>);
+  if (listNestedClients) {
+    for (const subClient of [...subClients]) {
+      subClients.push(...listSubClients(subClient, listNestedClients));
+    }
+  }
+  return subClients;
 }

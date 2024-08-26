@@ -89,3 +89,12 @@ export type EnsureTraitsPresentDecorator = (
   traitModel: Model,
   expectedTraits: Type
 ) => void;
+
+export type AzureCoreTraitsPrivateDecorators = {
+  applyTraitOverride: ApplyTraitOverrideDecorator;
+  ensureAllQueryParams: EnsureAllQueryParamsDecorator;
+  ensureAllHeaderParams: EnsureAllHeaderParamsDecorator;
+  addTraitProperties: AddTraitPropertiesDecorator;
+  traitSource: TraitSourceDecorator;
+  ensureTraitsPresent: EnsureTraitsPresentDecorator;
+};

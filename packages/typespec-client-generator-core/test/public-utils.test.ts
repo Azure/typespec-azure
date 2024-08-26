@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import {
   Model,
@@ -1525,7 +1524,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = runner.context.sdkPackage.models;
-        strictEqual(models.length, 1);
+        strictEqual(models.length, 2);
         strictEqual(models[0].properties[0].crossLanguageDefinitionId, "TestService.A.pForA");
         const propType = models[0].properties[0].type;
         strictEqual(propType.kind, "model");

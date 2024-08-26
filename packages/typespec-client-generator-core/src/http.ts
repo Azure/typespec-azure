@@ -1,9 +1,12 @@
 import {
   Diagnostic,
+  Model,
   ModelProperty,
   Operation,
   Type,
   createDiagnosticCollector,
+  getDoc,
+  getSummary,
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
@@ -44,11 +47,13 @@ import {
 import {
   getAvailableApiVersions,
   getDocHelper,
+  getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
+  isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
 } from "./internal-utils.js";
@@ -153,9 +158,21 @@ function getSdkHttpParameters(
       }
       retval.bodyParam = bodyParam;
     } else if (!isNeverOrVoidType(tspBody.type)) {
-      const type = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
-      );
+      const spread = isHttpBodySpread(tspBody);
+      let type: SdkType;
+      if (spread) {
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(
+            context,
+            getHttpBodySpreadModel(tspBody.type as Model),
+            httpOperation.operation
+          )
+        );
+      } else {
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
+        );
+      }
       const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
         kind: "body",
@@ -163,6 +180,8 @@ function getSdkHttpParameters(
         isGeneratedName: true,
         description: getDocHelper(context, tspBody.type).description,
         details: getDocHelper(context, tspBody.type).details,
+        doc: getDoc(context.program, tspBody.type),
+        summary: getSummary(context.program, tspBody.type),
         onClient: false,
         contentTypes: [],
         defaultContentType: "application/json", // actual content type info is added later
@@ -192,6 +211,7 @@ function getSdkHttpParameters(
     const contentTypeBase = {
       ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
       description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
+      doc: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
       methodParameters.push({
@@ -412,6 +432,8 @@ function getSdkHttpResponseAndExceptions(
           __raw: header,
           description: getDocHelper(context, header).description,
           details: getDocHelper(context, header).details,
+          doc: getDoc(context.program, header),
+          summary: getSummary(context.program, header),
           serializedName: getHeaderFieldName(context.program, header),
           type: clientType,
         });
@@ -568,8 +590,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      (methodParam.__raw === serviceParam.__raw ||
-        methodParam.__raw === serviceParam.__raw.sourceProperty)
+      methodParam.__raw.node === serviceParam.__raw.node
     ) {
       return methodParam;
     }

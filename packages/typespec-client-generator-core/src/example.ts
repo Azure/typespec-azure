@@ -1,4 +1,5 @@
 import {
+  CompilerHost,
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
@@ -42,6 +43,14 @@ interface LoadedExample {
   readonly data: any;
 }
 
+async function checkExamplesDirExists(host: CompilerHost, dir: string) {
+  try {
+    return (await host.stat(dir)).isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
 /**
  * Load all examples for a client
  *
@@ -55,25 +64,23 @@ async function loadExamples(
   apiVersion: string | undefined
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
-  if (!context.examplesDir) {
-    return diagnostics.wrap(new Map());
-  }
+  const examplesBaseDir =
+    context.examplesDir ?? resolvePath(context.program.projectRoot, "examples");
 
   const exampleDir = apiVersion
-    ? resolvePath(context.examplesDir, apiVersion)
-    : resolvePath(context.examplesDir);
-  try {
-    if (!(await context.program.host.stat(exampleDir)).isDirectory())
-      return diagnostics.wrap(new Map());
-  } catch (err) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "example-loading",
-        messageId: "noDirectory",
-        format: { directory: exampleDir },
-        target: NoTarget,
-      })
-    );
+    ? resolvePath(examplesBaseDir, apiVersion)
+    : resolvePath(examplesBaseDir);
+  if (!(await checkExamplesDirExists(context.program.host, exampleDir))) {
+    if (context.examplesDir) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "noDirectory",
+          format: { directory: exampleDir },
+          target: NoTarget,
+        })
+      );
+    }
     return diagnostics.wrap(new Map());
   }
 
@@ -223,7 +230,11 @@ function handleHttpParameters(
 ): [SdkHttpParameterExample[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const parameterExamples = [] as SdkHttpParameterExample[];
-  if ("parameters" in example && typeof example.parameters === "object") {
+  if (
+    "parameters" in example &&
+    typeof example.parameters === "object" &&
+    example.parameters !== null
+  ) {
     for (const name of Object.keys(example.parameters)) {
       let parameter = parameters.find(
         (p) => (p.kind !== "body" && p.serializedName === name) || p.name === name
@@ -234,7 +245,7 @@ function handleHttpParameters(
       }
       if (parameter) {
         const value = diagnostics.pipe(
-          getSdkTypeExample(parameter.type, example.parameters[parameter.name], relativePath)
+          getSdkTypeExample(parameter.type, example.parameters[name], relativePath)
         );
         if (value) {
           parameterExamples.push({
@@ -261,7 +272,11 @@ function handleHttpResponses(
 ): [Map<number, SdkHttpResponseExample>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const responseExamples = new Map<number, SdkHttpResponseExample>();
-  if ("responses" in example && typeof example.responses === "object") {
+  if (
+    "responses" in example &&
+    typeof example.responses === "object" &&
+    example.responses !== null
+  ) {
     for (const code of Object.keys(example.responses)) {
       const statusCode = parseInt(code, 10);
       let found = false;
@@ -275,6 +290,7 @@ function handleHttpResponses(
           break;
         } else if (
           typeof responseCode === "object" &&
+          responseCode !== null &&
           responseCode.start <= statusCode &&
           responseCode.end >= statusCode
         ) {
@@ -308,7 +324,7 @@ function handleHttpResponse(
     response,
     headers: [],
   } as SdkHttpResponseExample;
-  if (typeof example === "object") {
+  if (typeof example === "object" && example !== null) {
     for (const name of Object.keys(example)) {
       if (name === "description") {
         continue;
@@ -497,6 +513,9 @@ function getSdkDictionaryExample(
 ): [SdkDictionaryExample | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
+    if (example === null) {
+      return diagnostics.wrap(undefined);
+    }
     const dictionaryExample = {} as Record<string, SdkTypeExample>;
     for (const key of Object.keys(example)) {
       const result = diagnostics.pipe(
@@ -524,6 +543,9 @@ function getSdkModelExample(
 ): [SdkModelExample | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
+    if (example === null) {
+      return diagnostics.wrap(undefined);
+    }
     // handle discriminated model
     if (type.discriminatorProperty) {
       if (

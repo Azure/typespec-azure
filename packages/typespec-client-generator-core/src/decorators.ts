@@ -1,3 +1,4 @@
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   AugmentDecoratorStatementNode,
   DecoratorContext,
@@ -40,7 +41,6 @@ import {
   ExcludeDecorator,
   FlattenPropertyDecorator,
   IncludeDecorator,
-  InternalDecorator,
   OperationGroupDecorator,
   ProtocolAPIDecorator,
   UsageDecorator,
@@ -69,7 +69,7 @@ import {
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion, getSdkUnionEnumWithDiagnostics } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -828,63 +828,12 @@ export function getClientFormat(
 
   return retval;
 }
-const internalKey = createStateSymbol("internal");
-
-/**
- * Whether a operation is internal and should not be exposed
- * to end customers
- *
- * @param context DecoratorContext
- * @param target Operation to mark as internal
- * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
- * @deprecated Use `access` decorator instead.
- *
- * @internal
- */
-export const $internal: InternalDecorator = (
-  context: DecoratorContext,
-  target: Operation,
-  scope?: LanguageScopes
-) => {
-  setScopedDecoratorData(context, $internal, internalKey, target, true, scope); // eslint-disable-line deprecation/deprecation
-};
-
-/**
- * Whether a model / operation is internal or not. If it's internal, emitters
- * should not expose them to users
- *
- * @param context TCGCContext
- * @param entity model / operation that we want to check is internal or not
- * @returns whether the entity is internal
- * @deprecated This function is unused and will be removed in a future release.
- */
-export function isInternal(
-  context: TCGCContext,
-  entity: Model | Operation | Enum | Union
-): boolean {
-  const found = getScopedDecoratorData(context, internalKey, entity) ?? false;
-  if (entity.kind === "Operation" || found) {
-    return found;
-  }
-  const operationModels = context.operationModelsMap!;
-  let referredByInternal = false;
-  for (const [operation, modelMap] of operationModels) {
-    // eslint-disable-next-line deprecation/deprecation
-    if (isInternal(context, operation) && modelMap.get(entity)) {
-      referredByInternal = true;
-      // eslint-disable-next-line deprecation/deprecation
-    } else if (!isInternal(context, operation) && modelMap.get(entity)) {
-      return false;
-    }
-  }
-  return referredByInternal;
-}
 
 const usageKey = createStateSymbol("usage");
 
 export const $usage: UsageDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Union,
+  entity: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
   scope?: LanguageScopes
 ) => {
@@ -923,21 +872,33 @@ export const $usage: UsageDecorator = (
 export function getUsageOverride(
   context: TCGCContext,
   entity: Model | Enum | Union
-): UsageFlags | undefined {
-  return getScopedDecoratorData(context, usageKey, entity);
+): number | undefined {
+  const usageFlags = getScopedDecoratorData(context, usageKey, entity);
+  if (usageFlags || entity.namespace === undefined) return usageFlags;
+  return getScopedDecoratorData(context, usageKey, entity.namespace);
 }
 
-export function getUsage(context: TCGCContext, entity: Model | Enum): UsageFlags {
-  return entity.kind === "Model"
-    ? getSdkModel(context, entity).usage
-    : getSdkEnum(context, entity).usage;
+export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
+  const diagnostics = createDiagnosticCollector();
+  switch (entity.kind) {
+    case "Union":
+      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(entity));
+      if (unionAsEnum) {
+        return diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum)).usage;
+      }
+      return UsageFlags.None;
+    case "Model":
+      return getSdkModel(context, entity).usage;
+    case "Enum":
+      return getSdkEnum(context, entity).usage;
+  }
 }
 
 const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union,
+  entity: Model | Enum | Operation | Union | Namespace,
   value: EnumMember,
   scope?: LanguageScopes
 ) => {
@@ -953,16 +914,19 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union
+  entity: Model | Enum | Operation | Union | Namespace
 ): AccessFlags | undefined {
-  return getScopedDecoratorData(context, accessKey, entity);
+  const accessOverride = getScopedDecoratorData(context, accessKey, entity);
+
+  if (!accessOverride && entity.namespace) {
+    return getAccessOverride(context, entity.namespace);
+  }
+
+  return accessOverride;
 }
 
-export function getAccess(
-  context: TCGCContext,
-  entity: Model | Enum | Operation | Union
-): AccessFlags {
-  const override = getScopedDecoratorData(context, accessKey, entity);
+export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+  const override = getAccessOverride(context, entity);
   if (override || entity.kind === "Operation") {
     return override || "public";
   }
@@ -972,12 +936,13 @@ export function getAccess(
       return getSdkModel(context, entity).access;
     case "Enum":
       return getSdkEnum(context, entity).access;
-    case "Union":
+    case "Union": {
       const type = getSdkUnion(context, entity);
       if (type.kind === "enum" || type.kind === "model") {
         return type.access;
       }
       return "public";
+    }
   }
 }
 
@@ -1096,12 +1061,12 @@ function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProp
   );
 }
 
-export function $override(
+export const $override = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,
   scope?: LanguageScopes
-) {
+) => {
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
     a.name.localeCompare(b.name)
@@ -1127,7 +1092,7 @@ export function $override(
     });
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope); // eslint-disable-line deprecation/deprecation
-}
+};
 
 /**
  * Gets additional information on how to serialize / deserialize TYPESPEC standard types depending

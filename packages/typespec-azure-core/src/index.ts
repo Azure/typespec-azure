@@ -10,4 +10,6 @@ export * from "./rules/prevent-rest-library.js";
 export * from "./rules/use-standard-ops.js";
 export * from "./traits.js";
 export * from "./utils.js";
-export * from "./validate.js";
+
+/** @internal */
+export { $decorators } from "./tsp-index.js";

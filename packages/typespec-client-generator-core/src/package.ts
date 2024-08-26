@@ -2,8 +2,10 @@ import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core
 import {
   createDiagnosticCollector,
   Diagnostic,
+  getDoc,
   getNamespaceFullName,
   getService,
+  getSummary,
   ignoreDiagnostics,
   Operation,
   Type,
@@ -72,6 +74,7 @@ import {
   getLibraryName,
 } from "./public-utils.js";
 import {
+  addEncodeInfo,
   getAllModelsWithDiagnostics,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
@@ -245,16 +248,31 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters)
   );
+  // set the correct encode for body parameter according to the content-type
+  if (
+    serviceOperation.bodyParam &&
+    serviceOperation.bodyParam.correspondingMethodParams.length === 1
+  ) {
+    const methodBodyParam = serviceOperation.bodyParam.correspondingMethodParams[0];
+    const contentTypes = serviceOperation.__raw.parameters.body?.contentTypes;
+    const defaultContentType =
+      contentTypes && contentTypes.length > 0 ? contentTypes[0] : "application/json";
+    diagnostics.pipe(
+      addEncodeInfo(context, methodBodyParam.__raw!, methodBodyParam.type, defaultContentType)
+    );
+  }
   const response = getSdkMethodResponse(context, operation, serviceOperation);
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
     kind: "basic",
     name,
-    access: getAccess(context, operation),
+    access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
+    doc: getDoc(context.program, operation),
+    summary: getSummary(context.program, operation),
     operation: serviceOperation,
     response,
     apiVersions,
@@ -338,6 +356,7 @@ function getSdkInitializationType(
   return diagnostics.wrap({
     __raw: client.service,
     description: "Initialization class for the client",
+    doc: "Initialization class for the client",
     kind: "model",
     properties,
     name,
@@ -368,6 +387,8 @@ function getSdkMethodParameter(
       kind: "method",
       description: getDocHelper(context, type).description,
       details: getDocHelper(context, type).details,
+      doc: getDoc(context.program, type),
+      summary: getSummary(context.program, type),
       apiVersions,
       type: propertyType,
       name,
@@ -389,7 +410,8 @@ function getSdkMethodParameter(
 
 function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup
+  client: SdkClient | SdkOperationGroup,
+  sdkClientType: SdkClientType<TServiceOperation>
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
@@ -399,7 +421,7 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
     const operationGroupClient = diagnostics.pipe(
-      createSdkClientType<TServiceOperation>(context, operationGroup)
+      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType)
     );
     const name = `get${operationGroup.type.name}`;
     retval.push({
@@ -408,6 +430,8 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       name,
       description: getDocHelper(context, operationGroup.type).description,
       details: getDocHelper(context, operationGroup.type).details,
+      doc: getDoc(context.program, operationGroup.type),
+      summary: getSummary(context.program, operationGroup.type),
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
@@ -433,6 +457,7 @@ function getEndpointTypeFromSingleServer(
         name: "endpoint",
         isGeneratedName: true,
         description: "Service host",
+        doc: "Service host",
         kind: "path",
         onClient: true,
         urlEncode: false,
@@ -537,6 +562,7 @@ function getSdkEndpointParameter(
     name: "endpoint",
     isGeneratedName: true,
     description: "Service host",
+    doc: "Service host",
     onClient: true,
     urlEncode: false,
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
@@ -549,7 +575,8 @@ function getSdkEndpointParameter(
 
 function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup
+  client: SdkClient | SdkOperationGroup,
+  parent?: SdkClientType<TServiceOperation>
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const isClient = client.kind === "SdkClient";
@@ -559,24 +586,41 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   } else {
     name = getClientNameOverride(context, client.type) ?? client.type.name;
   }
-  // NOTE: getSdkMethods recursively calls createSdkClientType
-  const methods = diagnostics.pipe(getSdkMethods<TServiceOperation>(context, client));
   const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     kind: "client",
     name,
     description: docWrapper.description,
     details: docWrapper.details,
-    methods: methods,
+    doc: getDoc(context.program, client.type),
+    summary: getSummary(context.program, client.type),
+    methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    initialization: diagnostics.pipe(getSdkInitializationType(context, client)), // MUST call this after getSdkMethods has been called
+    initialization: {
+      kind: "model",
+      properties: [],
+      name: "",
+      isGeneratedName: true,
+      access: "internal",
+      usage: UsageFlags.None,
+      crossLanguageDefinitionId: "",
+      apiVersions: [],
+      decorators: [],
+    },
     // eslint-disable-next-line deprecation/deprecation
     arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
+    parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type),
   };
+  // NOTE: getSdkMethods recursively calls createSdkClientType
+  sdkClientType.methods = diagnostics.pipe(
+    getSdkMethods<TServiceOperation>(context, client, sdkClientType)
+  );
+  sdkClientType.initialization = diagnostics.pipe(getSdkInitializationType(context, client)); // MUST call this after getSdkMethods has been called
+
   return diagnostics.wrap(sdkClientType);
 }
 

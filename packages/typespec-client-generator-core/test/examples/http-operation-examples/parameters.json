@@ -5,7 +5,10 @@
     "a": "header",
     "b": "path",
     "c": "query",
-    "d": "body"
+    "d": "body",
+    "test-header": "test-header",
+    "testQuery": "testQuery",
+    "renamePath": "renamePath"
   },
   "responses": {}
 }
