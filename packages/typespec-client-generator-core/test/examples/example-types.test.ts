@@ -643,6 +643,8 @@ describe("typespec-client-generator-core: example types", () => {
         model Test {
           a: string;
           b: int32;
+          @clientName("renamedProp")
+          prop: string;
         }
 
         op getModel(): Test;
@@ -659,13 +661,16 @@ describe("typespec-client-generator-core: example types", () => {
     strictEqual(example.kind, "model");
     strictEqual(example.type.kind, "model");
     strictEqual(example.type.name, "Test");
-    strictEqual(Object.keys(example.value).length, 2);
+    strictEqual(Object.keys(example.value).length, 3);
     strictEqual(example.value["a"].value, "a");
     strictEqual(example.value["a"].kind, "string");
     strictEqual(example.value["a"].type.kind, "string");
     strictEqual(example.value["b"].value, 2);
     strictEqual(example.value["b"].kind, "number");
     strictEqual(example.value["b"].type.kind, "int32");
+    strictEqual(example.value["prop"].value, "prop");
+    strictEqual(example.value["prop"].kind, "string");
+    strictEqual(example.value["prop"].type.kind, "string");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });

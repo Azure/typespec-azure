@@ -241,7 +241,7 @@ function handleHttpParameters(
       }
       if (parameter) {
         const value = diagnostics.pipe(
-          getSdkTypeExample(parameter.type, example.parameters[parameter.name], relativePath)
+          getSdkTypeExample(parameter.type, example.parameters[name], relativePath)
         );
         if (value) {
           parameterExamples.push({
