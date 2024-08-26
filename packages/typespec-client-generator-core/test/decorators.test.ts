@@ -47,7 +47,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyClient",
           service: MyClient,
           type: MyClient,
-          arm: false,
           crossLanguageDefinitionId: "MyClient.MyClient",
         },
       ]);
@@ -68,7 +67,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyClient",
           service: MyService,
           type: MyClient,
-          arm: false,
           crossLanguageDefinitionId: "MyService.MyClient",
         },
       ]);
@@ -168,7 +166,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyServiceClient",
           service: MyService,
           type: MyService,
-          arm: false,
           crossLanguageDefinitionId: "MyService",
         },
       ]);
@@ -422,7 +419,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyServiceClient",
           service: MyService,
           type: MyService,
-          arm: false,
           crossLanguageDefinitionId: "MyService",
         },
       ]);

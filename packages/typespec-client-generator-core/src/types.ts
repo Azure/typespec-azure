@@ -46,8 +46,6 @@ import {
   getAccessOverride,
   getOverriddenClientMethod,
   getUsageOverride,
-  isExclude,
-  isInclude,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -1768,13 +1766,6 @@ function handleServiceOrphanType(
   type: Model | Enum | Union
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // eslint-disable-next-line deprecation/deprecation
-  if (type.kind === "Model" && isInclude(context, type)) {
-    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-    diagnostics.pipe(
-      updateUsageOrAccessOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkType)
-    );
-  }
   const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
   diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.None, sdkType));
   return diagnostics.wrap(undefined);
@@ -1782,9 +1773,6 @@ function handleServiceOrphanType(
 
 function filterOutModels(context: TCGCContext) {
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
-    if (type.kind === "Model") {
-      if (isExclude(context, type)) sdkType.usage = UsageFlags.None; // eslint-disable-line deprecation/deprecation
-    }
     if (type.kind === "Enum" || type.kind === "Model" || type.kind === "Union") {
       if (context.filterOutCoreModels && isAzureCoreModel(type)) {
         sdkType.usage = UsageFlags.None;
