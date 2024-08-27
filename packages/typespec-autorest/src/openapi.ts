@@ -106,9 +106,9 @@ import {
   OAuth2FlowType,
   Visibility,
   createMetadataInfo,
-  getAllHttpServices,
   getAuthentication,
   getHeaderFieldOptions,
+  getHttpService,
   getServers,
   getStatusCodeDescription,
   getVisibilitySuffix,
@@ -341,8 +341,8 @@ export async function getOpenAPIForService(
   const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
   program.reportDiagnostics(diagnostics);
 
-  const services = ignoreDiagnostics(getAllHttpServices(program));
-  const routes = services[0].operations;
+  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
+  const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
   routes.forEach(emitOperation);
