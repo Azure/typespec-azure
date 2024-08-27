@@ -885,11 +885,10 @@ function getSdkEnumWithDiagnostics(
       details: docWrapper.details,
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
-      valueType:
-        getSdkEnumValueType(
-          context,
-          [...type.members.values()].map((v) => v.value)
-        ),
+      valueType: getSdkEnumValueType(
+        context,
+        [...type.members.values()].map((v) => v.value)
+      ),
       values: [],
       isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
       isFlags: false,
@@ -1320,8 +1319,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
-        )
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation)
+          )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
