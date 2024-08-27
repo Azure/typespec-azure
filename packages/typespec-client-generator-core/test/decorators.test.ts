@@ -4036,5 +4036,29 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(containerNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
     });
+
+    it("@operationGroup without same model on parent client", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace MyService;
+
+        @operationGroup
+        interface MyInterface {
+          op download(@path blobName: string, @path containerName: string): void;
+        }
+
+        model MyClientInitialization {
+          blobName: string;
+          containerName: string;
+        }
+
+        @@clientInitialization(MyService.MyInterface, MyClientInitialization);
+        `
+      );
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/assigning-public-params-to-internal-client",
+      });
+    });
   });
 });
