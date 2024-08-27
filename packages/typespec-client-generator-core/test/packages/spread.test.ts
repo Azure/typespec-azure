@@ -898,4 +898,44 @@ describe("typespec-client-generator-core: spread", () => {
     strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Input | UsageFlags.Json);
     strictEqual(sdkPackage.models[0].access, "public");
   });
+
+  it("model used as simple spread with versioning", async () => {
+    await runner.compile(`
+      @server("http://localhost:3000", "endpoint")
+      @service({})
+      @versioned(ServiceApiVersions)
+      namespace My.Service;
+      
+      enum ServiceApiVersions {
+        v2022_06_01_preview: "2022-06-01-preview",
+      }
+      
+      model Test {
+        name: string;
+      }
+      
+      model Ref {
+        prop: Test;
+      }
+      
+      @route("modelref1")
+      @post
+      op ref1(...Test): void;
+    
+      @route("modelref2")
+      @post
+      op ref2(@body body: Ref): void;
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.models.length, 2);
+    getAllModels(runner.context);
+
+    strictEqual(sdkPackage.models[0].name, "Test");
+    strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Input | UsageFlags.Json);
+    strictEqual(sdkPackage.models[0].access, "public");
+
+    strictEqual(sdkPackage.models[1].name, "Ref");
+    strictEqual(sdkPackage.models[1].usage, UsageFlags.Input | UsageFlags.Json);
+    strictEqual(sdkPackage.models[1].access, "public");
+  });
 });
