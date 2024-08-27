@@ -554,7 +554,9 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
     const projectedProgram = context.program as ProjectedProgram;
     // for case: `op test(...Model):void;`
     if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
-      return projectedProgram.projector ? projectedProgram.projector.projectedTypes.get(innerModel) as Model : innerModel;
+      return projectedProgram.projector
+        ? (projectedProgram.projector.projectedTypes.get(innerModel) as Model)
+        : innerModel;
     }
     // for case: `op test(@header h: string, @query q: string, ...Model): void;`
     if (
@@ -563,7 +565,9 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
       innerModel.sourceModels[0].model.name !== "" &&
       innerModel.sourceModels[0].model.properties.size === type.properties.size
     ) {
-      return projectedProgram.projector ? projectedProgram.projector.projectedTypes.get(innerModel.sourceModels[0].model) as Model : innerModel.sourceModels[0].model;
+      return projectedProgram.projector
+        ? (projectedProgram.projector.projectedTypes.get(innerModel.sourceModels[0].model) as Model)
+        : innerModel.sourceModels[0].model;
     }
   }
   return type;
