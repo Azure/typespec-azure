@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.4
+
+### Bug Fixes
+
+- [#1392](https://github.com/Azure/typespec-azure/pull/1392) Fix multipart for client customization
+
+
 ## 0.45.3
 
 ### Bug Fixes

@@ -37,7 +37,9 @@ import {
 import {
   TspLiteralType,
   getClientNamespaceStringHelper,
+  getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
+  isHttpBodySpread,
   parseEmitterName,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
@@ -126,7 +128,7 @@ export function getEmitterTargetName(context: TCGCContext): string {
 }
 
 /**
- * Get the library and wire name of a model property. Takes @clientName and @encodedName into account
+ * Get the library and wire name of a model property. Takes `@clientName` and `@encodedName` into account
  * @param context
  * @param property
  * @returns a tuple of the library and wire name for a model property
@@ -379,7 +381,13 @@ function getContextPath(
     if (httpOperation.parameters.body) {
       visited.clear();
       result = [{ name: root.name }];
-      if (dfsModelProperties(typeToFind, httpOperation.parameters.body.type, "Request")) {
+      let bodyType: Type;
+      if (isHttpBodySpread(httpOperation.parameters.body)) {
+        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
+      } else {
+        bodyType = httpOperation.parameters.body.type;
+      }
+      if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
       }
     }

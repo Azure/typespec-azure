@@ -38,7 +38,6 @@ op GetModel is ResourceRead<OutputModel>;
 class OutputModel:
   name: str = rest_field(readonly=True)
 response: OutputModel = client.get(name="name")
-FIXME
 ```
 
 </TabItem>
@@ -198,9 +197,8 @@ The two possible value for the `Access` enum are `internal` and `public`.
 <TabItem value="python" label="Python">
 
 ```python
-class _GetModel:
-  ...
-# FIXME
+# can't import form models directly
+from petstorenamespace.models import GetModel # will report error
 ```
 
 </TabItem>
