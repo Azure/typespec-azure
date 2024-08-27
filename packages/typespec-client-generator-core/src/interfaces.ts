@@ -35,9 +35,7 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  spreadModels?: Map<Model, SdkModelType>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
@@ -82,10 +80,6 @@ export interface SdkClient {
   name: string;
   service: Namespace;
   type: Namespace | Interface;
-  /**
-   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
-   */
-  arm: boolean;
   crossLanguageDefinitionId: string;
 }
 
@@ -109,10 +103,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   apiVersions: string[];
   nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
-  /**
-   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
-   */
-  arm: boolean;
   parent?: SdkClientType<TServiceOperation>;
 }
 
@@ -152,6 +142,7 @@ interface SdkTypeBase extends DecoratedType {
   details?: string;
   doc?: string;
   summary?: string;
+  __accessSet?: boolean;
 }
 
 export type SdkType =
@@ -298,21 +289,6 @@ interface SdkOffsetDateTimeType extends SdkDateTimeTypeBase {
 
 export type SdkDateTimeType = SdkUtcDateTimeType | SdkOffsetDateTimeType;
 
-/**
- * @deprecated: Use SdkDateTimeType instead.
- */
-export type SdkDatetimeType = SdkDateTimeType;
-
-/**
- * @deprecated: Use SdkUtcDateTimeType instead.
- */
-export type SdkUtcDatetimeType = SdkUtcDateTimeType;
-
-/**
- * @deprecated Use SdkOffsetDateTimeType instead.
- */
-export type SdkOffsetDatetimeType = SdkOffsetDateTimeType;
-
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
@@ -390,10 +366,6 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
-  /**
-   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
-   */
-  isFormDataType: boolean;
   isGeneratedName: boolean;
   access: AccessFlags;
   usage: UsageFlags;
@@ -625,17 +597,8 @@ interface SdkMethodBase extends DecoratedType {
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
-  /**
-   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead.
-   * @param serviceParam
-   */
-  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
-  /**
-   * @deprecated This property is deprecated. Access .resultPath on the method response instead.
-   */
-  getResponseMapping(): string | undefined;
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
   generateConvenient: boolean;

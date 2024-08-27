@@ -2,14 +2,10 @@ import { AzureClientGeneratorCoreDecorators } from "../generated-defs/Azure.Clie
 import {
   $access,
   $client,
-  $clientFormat,
   $clientInitialization,
   $clientName,
   $convenientAPI,
-  $exclude,
   $flattenProperty,
-  $include,
-  $internal,
   $operationGroup,
   $override,
   $protocolAPI,
@@ -28,14 +24,6 @@ export const $decorators = {
     protocolAPI: $protocolAPI,
     client: $client,
     operationGroup: $operationGroup,
-    // eslint-disable-next-line deprecation/deprecation
-    exclude: $exclude,
-    // eslint-disable-next-line deprecation/deprecation
-    include: $include,
-    // eslint-disable-next-line deprecation/deprecation
-    clientFormat: $clientFormat,
-    // eslint-disable-next-line deprecation/deprecation
-    internal: $internal,
     usage: $usage,
     access: $access,
     // eslint-disable-next-line deprecation/deprecation

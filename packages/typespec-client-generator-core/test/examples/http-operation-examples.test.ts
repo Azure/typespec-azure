@@ -59,6 +59,10 @@ describe("typespec-client-generator-core: http operation examples", () => {
           @path b: string,
           @query c: string,
           @body d: string,
+          @header testHeader: string,
+          @clientName("renameQuery")
+          @query testQuery: string,
+          @path("renamePath") testPath: string,
         ): void;
       }
     `);
@@ -72,7 +76,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
 
     const parameters = operation.examples[0].parameters;
     ok(parameters);
-    strictEqual(parameters.length, 4);
+    strictEqual(parameters.length, 7);
 
     strictEqual(parameters[0].value.kind, "string");
     strictEqual(parameters[0].value.value, "header");
@@ -89,6 +93,18 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(parameters[3].value.kind, "string");
     strictEqual(parameters[3].value.value, "body");
     strictEqual(parameters[3].value.type.kind, "string");
+
+    strictEqual(parameters[4].value.kind, "string");
+    strictEqual(parameters[4].value.value, "test-header");
+    strictEqual(parameters[4].value.type.kind, "string");
+
+    strictEqual(parameters[5].value.kind, "string");
+    strictEqual(parameters[5].value.value, "testQuery");
+    strictEqual(parameters[5].value.type.kind, "string");
+
+    strictEqual(parameters[6].value.kind, "string");
+    strictEqual(parameters[6].value.value, "renamePath");
+    strictEqual(parameters[6].value.type.kind, "string");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });

@@ -1,5 +1,6 @@
 import {
   Diagnostic,
+  Model,
   ModelProperty,
   Operation,
   Type,
@@ -46,11 +47,13 @@ import {
 import {
   getAvailableApiVersions,
   getDocHelper,
+  getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
   getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
+  isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
   twoParamsEquivalent,
@@ -160,9 +163,21 @@ function getSdkHttpParameters(
       }
       retval.bodyParam = bodyParam;
     } else if (!isNeverOrVoidType(tspBody.type)) {
-      const type = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
-      );
+      const spread = isHttpBodySpread(tspBody);
+      let type: SdkType;
+      if (spread) {
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(
+            context,
+            getHttpBodySpreadModel(context, tspBody.type as Model),
+            httpOperation.operation
+          )
+        );
+      } else {
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
+        );
+      }
       const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
         kind: "body",
@@ -590,8 +605,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      (methodParam.__raw === serviceParam.__raw ||
-        methodParam.__raw === serviceParam.__raw.sourceProperty)
+      methodParam.__raw.node === serviceParam.__raw.node
     ) {
       return methodParam;
     }

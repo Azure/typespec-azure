@@ -6,7 +6,9 @@
     "200": {
       "body": {
         "a": "a",
-        "b": 2
+        "b": 2,
+        "prop": "prop",
+        "nullProp": null
       }
     }
   }
