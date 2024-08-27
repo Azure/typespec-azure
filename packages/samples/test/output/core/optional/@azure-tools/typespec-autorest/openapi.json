@@ -38,8 +38,7 @@
             "schema": {
               "type": "integer",
               "format": "int64"
-            },
-            "default": 123
+            }
           }
         ],
         "responses": {
@@ -103,7 +102,7 @@
           ],
           "x-ms-enum": {
             "name": "MyEnum",
-            "modelAsString": true
+            "modelAsString": false
           }
         }
       }
@@ -116,7 +115,7 @@
       ],
       "x-ms-enum": {
         "name": "MyEnum",
-        "modelAsString": true
+        "modelAsString": false
       }
     }
   },

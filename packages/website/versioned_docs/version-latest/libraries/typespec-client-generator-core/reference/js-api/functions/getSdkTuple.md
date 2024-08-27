@@ -4,7 +4,7 @@ title: "[F] getSdkTuple"
 
 ---
 ```ts
-getSdkTuple(
+function getSdkTuple(
    context, 
    type, 
    operation?): SdkTupleType
@@ -13,8 +13,8 @@ getSdkTuple(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Tuple` |
 | `operation`? | `Operation` |
 

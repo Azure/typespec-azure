@@ -4,7 +4,7 @@ title: "[F] getSdkArrayOrDict"
 
 ---
 ```ts
-getSdkArrayOrDict(
+function getSdkArrayOrDict(
    context, 
    type, 
    operation?): SdkDictionaryType | SdkArrayType | undefined
@@ -13,8 +13,8 @@ getSdkArrayOrDict(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Model` |
 | `operation`? | `Operation` |
 

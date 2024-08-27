@@ -4,15 +4,15 @@ title: "[F] getUsageOverride"
 
 ---
 ```ts
-getUsageOverride(context, entity): UsageFlags | undefined
+function getUsageOverride(context, entity): UsageFlags | undefined
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
-| `entity` | `Model` \| `Enum` \| `Union` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
+| `entity` | `Enum` \| `Model` \| `Union` |
 
 ## Returns
 

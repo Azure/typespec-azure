@@ -55,7 +55,7 @@ enum TraitContext {
  */
 @added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.applyTraitOverride(Trait)
-model TraitOverride<Trait> {}
+model TraitOverride<Trait extends Model> {}
 
 /**
  * Declares a trait that is applied as a query parameter.
@@ -220,7 +220,7 @@ model NoRepeatableRequests {
  * @param traitName An optional name to uniquely identify the trait.  If unspecified,
  *        the model type name is used.
  */
-extern dec trait(target: unknown, traitName?: valueof string);
+extern dec trait(target: Model, traitName?: valueof string);
 
 /**
  * `@traitContext` sets the applicable context for a trait on its envelope property.
@@ -247,7 +247,7 @@ extern dec traitLocation(target: ModelProperty, contexts: EnumMember);
  */
 extern dec traitAdded(target: Model | ModelProperty, addedVersion: EnumMember | null);
 
-namespace Azure.Core.Traits.Private {
+namespace Private {
   @added(Azure.Core.Versions.v1_0_Preview_2)
   @Private.addTraitProperties(Traits, Location, Contexts)
   model TraitProperties<
@@ -264,76 +264,67 @@ namespace Azure.Core.Traits.Private {
     @doc("The diagnostic to be raised when the trait is not present.")
     diagnostic: string;
   }
-}
 
-// These decorators are not meant to be used by TypeSpec authors
-namespace Azure {
-  namespace Core {
-    namespace Traits {
-      namespace Private {
-        /**
-         * `@traitSource` stores the `traitName` of its original trait on the envelope property.
-         *
-         * @param target The trait envelope property where `traitName` will be stored.
-         * @param traitName The name of the original trait to which this property belongs.
-         */
-        extern dec traitSource(target: ModelProperty, traitName: valueof string);
+  /**
+   * `@traitSource` stores the `traitName` of its original trait on the envelope property.
+   *
+   * @param target The trait envelope property where `traitName` will be stored.
+   * @param traitName The name of the original trait to which this property belongs.
+   */
+  extern dec traitSource(target: ModelProperty, traitName: valueof string);
 
-        /**
-         * Copies trait properties from `traitModel` into `target` which conform to the
-         * specified location and contexts.
-         * @param traitModel The trait model type to be applied.
-         * @param traitLocation The trait location to use for selecting trait properties.
-         * @param traitContexts The trait contexts to use for selecting trait properties.
-         */
-        extern dec addTraitProperties(
-          target: Model,
-          traitModel: Model,
-          traitLocation: EnumMember,
-          traitContexts: EnumMember | Union | unknown
-        );
+  /**
+   * Copies trait properties from `traitModel` into `target` which conform to the
+   * specified location and contexts.
+   * @param traitModel The trait model type to be applied.
+   * @param traitLocation The trait location to use for selecting trait properties.
+   * @param traitContexts The trait contexts to use for selecting trait properties.
+   */
+  extern dec addTraitProperties(
+    target: Model,
+    traitModel: Model,
+    traitLocation: EnumMember,
+    traitContexts: EnumMember | Union | unknown
+  );
 
-        /**
-         * `@applyTraitOverride` copies the `traitModel` into `target` and renames its envelope
-         * property to enable the trait to override another trait sharing the same name.
-         *
-         * @param target The model into which the trait will be copied.
-         * @param traitModel The trait model type to be overridden.
-         */
-        extern dec applyTraitOverride(target: unknown, traitModel: unknown);
+  /**
+   * `@applyTraitOverride` copies the `traitModel` into `target` and renames its envelope
+   * property to enable the trait to override another trait sharing the same name.
+   *
+   * @param target The model into which the trait will be copied.
+   * @param traitModel The trait model type to be overridden.
+   */
+  extern dec applyTraitOverride(target: Model, traitModel: Model);
 
-        /**
-         * `@ensureTraitsPresent` checks the envelope properties of `traitModel` to ensure all
-         * of the `expectedTraits` are present as envelope properties.
-         *
-         * @param target The interface or operation where the `traitModel` should be checked.
-         * @param traitModel The trait model type to check.
-         * @param expectedTraits The array of `ExpectedTrait` models which describe each expected trait.
-         */
-        extern dec ensureTraitsPresent(
-          target: Interface | TypeSpec.Reflection.Operation,
-          traitModel: Model,
-          expectedTraits: ExpectedTrait[]
-        );
+  /**
+   * `@ensureTraitsPresent` checks the envelope properties of `traitModel` to ensure all
+   * of the `expectedTraits` are present as envelope properties.
+   *
+   * @param target The interface or operation where the `traitModel` should be checked.
+   * @param traitModel The trait model type to check.
+   * @param expectedTraits The array of `ExpectedTrait` models which describe each expected trait.
+   */
+  extern dec ensureTraitsPresent(
+    target: Interface | TypeSpec.Reflection.Operation,
+    traitModel: Model,
+    expectedTraits: ExpectedTrait[]
+  );
 
-        /**
-         * `@ensureAllQueryParams` checks the properties of `paramModel` to ensure they all are marked
-         * with the `@query` decorator.
-         *
-         * @param target The model type where this check will be established.
-         * @param paramModel The actual model type to check for query parameters.
-         */
-        extern dec ensureAllQueryParams(target: unknown, paramModel: Model);
+  /**
+   * `@ensureAllQueryParams` checks the properties of `paramModel` to ensure they all are marked
+   * with the `@query` decorator.
+   *
+   * @param target The model type where this check will be established.
+   * @param paramModel The actual model type to check for query parameters.
+   */
+  extern dec ensureAllQueryParams(target: Model, paramModel: Model);
 
-        /**
-         * `@ensureAllHeaderParams` checks the properties of `paramModel` to ensure they all are marked
-         * with the `@header` decorator.
-         *
-         * @param target The model type where this check will be established.
-         * @param paramModel The actual model type to check for header properties.
-         */
-        extern dec ensureAllHeaderParams(target: unknown, paramModel: Model);
-      }
-    }
-  }
+  /**
+   * `@ensureAllHeaderParams` checks the properties of `paramModel` to ensure they all are marked
+   * with the `@header` decorator.
+   *
+   * @param target The model type where this check will be established.
+   * @param paramModel The actual model type to check for header properties.
+   */
+  extern dec ensureAllHeaderParams(target: Model, paramModel: Model);
 }

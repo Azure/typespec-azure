@@ -4,19 +4,15 @@ title: "[F] getRef"
 
 ---
 ```ts
-getRef(
-   program, 
-   entity, 
-   params?): string | undefined
+function getRef(program, entity): string | undefined
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Type` |
-| `params`? | [`RefProducerParams`](../interfaces/RefProducerParams.md) |
 
 ## Returns
 

@@ -4,27 +4,27 @@ title: "[F] createSdkContext"
 
 ---
 ```ts
-createSdkContext<TOptions, TServiceOperation>(
+function createSdkContext<TOptions, TServiceOperation>(
    context, 
    emitterName?, 
-options?): SdkContext<TOptions, TServiceOperation>
+options?): Promise<SdkContext<TOptions, TServiceOperation>>
 ```
 
-## Type parameters
+## Type Parameters
 
-| Type parameter | Value |
-| :------ | :------ |
-| `TOptions` extends `Record`<`string`, `any`\> | [`SdkEmitterOptions`](../interfaces/SdkEmitterOptions.md) |
-| `TServiceOperation` extends [`SdkHttpOperation`](../interfaces/SdkHttpOperation.md) | [`SdkHttpOperation`](../interfaces/SdkHttpOperation.md) |
+| Type Parameter | Default type |
+| ------ | ------ |
+| `TOptions` *extends* `Record`<`string`, `any`\> | [`SdkEmitterOptions`](../interfaces/SdkEmitterOptions.md) |
+| `TServiceOperation` *extends* [`SdkHttpOperation`](../interfaces/SdkHttpOperation.md) | [`SdkHttpOperation`](../interfaces/SdkHttpOperation.md) |
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `EmitContext`<`TOptions`\> |
 | `emitterName`? | `string` |
-| `options`? | `CreateSdkContextOptions` |
+| `options`? | [`CreateSdkContextOptions`](../interfaces/CreateSdkContextOptions.md) |
 
 ## Returns
 
-[`SdkContext`](../interfaces/SdkContext.md)<`TOptions`, `TServiceOperation`\>
+`Promise`<[`SdkContext`](../interfaces/SdkContext.md)<`TOptions`, `TServiceOperation`\>\>

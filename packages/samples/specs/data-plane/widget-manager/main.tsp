@@ -173,7 +173,11 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 interface Widgets {
   // Operation Status
   @doc("Gets status of a Widget operation.")
+  @sharedRoute
   getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+  @doc("Gets status of a Widget delete operation.")
+  @sharedRoute
+  getWidgetDeleteOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
   // Widget Operations
   @doc("Creates or updates a Widget asynchronously")
@@ -184,7 +188,7 @@ interface Widgets {
   getWidget is Operations.ResourceRead<Widget>;
 
   @doc("Delete a Widget asynchronously.")
-  @pollingOperation(Widgets.getWidgetOperationStatus)
+  @pollingOperation(Widgets.getWidgetDeleteOperationStatus)
   deleteWidget is Operations.LongRunningResourceDelete<Widget>;
 
   @doc("List Widget resources")
@@ -207,7 +211,7 @@ interface Widgets {
   getRepairStatus is Foundations.GetOperationStatus<WidgetRepairStatusParams, WidgetRepairRequest>;
 
   @doc("Schedule a widget for repairs.")
-  @pollingOperation(Widgets.getWidgetOperationStatus)
+  @pollingOperation(Widgets.getRepairStatus)
   scheduleRepairs is Operations.LongRunningResourceAction<
     Widget,
     WidgetRepairRequest,
@@ -217,7 +221,7 @@ interface Widgets {
 
 interface WidgetParts {
   @doc("Gets status of a WidgetPart operation.")
-  getWidgetPartOperationStatus is Operations.GetResourceOperationStatus<WidgetPart>;
+  getWidgetPartReorderOperationStatus is Operations.GetResourceOperationStatus<WidgetPart, never>;
 
   @doc("Creates a WidgetPart")
   createWidgetPart is Operations.ResourceCreateWithServiceProvidedName<WidgetPart>;
@@ -232,7 +236,7 @@ interface WidgetParts {
   listWidgetParts is Operations.ResourceList<WidgetPart>;
 
   @doc("Reorder all parts for the widget.")
-  @pollingOperation(WidgetParts.getWidgetPartOperationStatus)
+  @pollingOperation(WidgetParts.getWidgetPartReorderOperationStatus)
   reorderParts is Operations.LongRunningResourceCollectionAction<
     WidgetPart,
     WidgetPartReorderRequest,
@@ -241,8 +245,11 @@ interface WidgetParts {
 }
 
 interface Manufacturers {
-  @doc("Gets status of a Manufacturer operation.")
-  getManufacturerOperationStatus is Operations.GetResourceOperationStatus<Manufacturer>;
+  @doc("Gets status of a Manufacturer delete operation.")
+  getManufacturerDeleteOperationStatus is Operations.GetResourceOperationStatus<
+    Manufacturer,
+    never
+  >;
 
   @doc("Creates or replaces a Manufacturer")
   createOrReplaceManufacturer is Operations.ResourceCreateOrReplace<Manufacturer>;
@@ -251,7 +258,7 @@ interface Manufacturers {
   getManufacturer is Operations.ResourceRead<Manufacturer>;
 
   @doc("Delete a Manufacturer asynchronously.")
-  @pollingOperation(Manufacturers.getManufacturerOperationStatus)
+  @pollingOperation(Manufacturers.getManufacturerDeleteOperationStatus)
   deleteManufacturer is Operations.LongRunningResourceDelete<Manufacturer>;
 
   @doc("List Manufacturer resources")

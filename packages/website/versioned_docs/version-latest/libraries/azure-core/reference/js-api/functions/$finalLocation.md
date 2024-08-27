@@ -4,7 +4,7 @@ title: "[F] $finalLocation"
 
 ---
 ```ts
-$finalLocation(
+function $finalLocation(
    context, 
    entity, 
    finalResult?): void
@@ -13,10 +13,10 @@ $finalLocation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
-| `finalResult`? | `Model` \| `IntrinsicType` |
+| `finalResult`? | `Type` |
 
 ## Returns
 

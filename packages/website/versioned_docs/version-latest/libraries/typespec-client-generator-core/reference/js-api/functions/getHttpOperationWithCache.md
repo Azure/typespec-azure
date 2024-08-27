@@ -4,14 +4,14 @@ title: "[F] getHttpOperationWithCache"
 
 ---
 ```ts
-getHttpOperationWithCache(context, operation): HttpOperation
+function getHttpOperationWithCache(context, operation): HttpOperation
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `operation` | `Operation` |
 
 ## Returns

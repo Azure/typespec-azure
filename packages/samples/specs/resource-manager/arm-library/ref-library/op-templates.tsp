@@ -11,6 +11,7 @@ using Azure.ResourceManager;
 
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint" "cuz"
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@useDependency(Azure.ResourceManager.CommonTypes.Versions.v3)
 @armLibraryNamespace
 namespace Microsoft.OperationsTest;
 

@@ -4,7 +4,7 @@ title: "[F] checkIsValidApiVersion"
 
 ---
 ```ts
-checkIsValidApiVersion(
+function checkIsValidApiVersion(
    program, 
    target, 
    version): boolean
@@ -13,7 +13,7 @@ checkIsValidApiVersion(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `target` | `Model` |
 | `version` | `string` |

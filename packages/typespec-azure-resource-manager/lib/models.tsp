@@ -11,22 +11,27 @@ namespace Azure.ResourceManager;
  * Spread this model into ARM resource models to specify resource name parameter for its operations. If `Resource` parameter
  * is specified, the resource name will be properly camel cased and pluralized for `@key` and `@segment`
  * automatically. You can also apply explicit override with `KeyName` and `SegmentName` template parameters.
+ *
+ * For additional decorators such as @minLength, you can use either augment decorator on `[Resource].name` or passing in a scalar string type with decorators.
+ *
  * @template Resource The ARM resource this name parameter is applying to.
  * @template KeyName Override default key name of the resource.
  * @template SegmentName Override default segment name of the resource.
  * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
+ * @template Type The type of the name property. Default type is string. However you can pass an union with string values.
  */
 model ResourceNameParameter<
   Resource extends Foundations.Resource,
   KeyName extends valueof string = "",
   SegmentName extends valueof string = "",
-  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$"
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$",
+  Type extends string = string
 > {
   @doc("The name of the {name}", Resource)
   @pattern(NamePattern)
   @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
   @path
-  name: string;
+  name: Type;
 }
 
 //#region Standard Resource Operation Interfaces
@@ -35,14 +40,16 @@ model ResourceNameParameter<
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
+ * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
  */
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model TrackedResource<Properties extends {}> extends Foundations.TrackedResource {
+model TrackedResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
+  extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
-  @visibility("read", "create")
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
+  @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
 
@@ -51,14 +58,16 @@ model TrackedResource<Properties extends {}> extends Foundations.TrackedResource
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
+ * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
  */
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
+model ProxyResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
+  extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
-  @visibility("read", "create")
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
+  @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
 
@@ -67,15 +76,17 @@ model ProxyResource<Properties extends {}> extends Foundations.ProxyResource {
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
+ * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
  */
 @extensionResource
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
 @includeInapplicableMetadataInPayload(false)
-model ExtensionResource<Properties extends {}> extends Foundations.ExtensionResource {
+model ExtensionResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
+  extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
-  @visibility("read", "create")
-  @extension("x-ms-client-flatten", true)
+  @conditionalClientFlatten
+  @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
 //#region
@@ -345,6 +356,24 @@ alias ManagedBy = ManagedByProperty;
 model ManagedByProperty {
   @doc("The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.")
   managedBy?: string;
+}
+
+/** Please use the spread model EncryptionProperty */
+alias Encryption = EncryptionProperty;
+/**
+ * Model used only to spread in the `encryption` envelope property for a resource.
+ * @example
+ *
+ * ```typespec
+ * model Foo is TrackedResource<FooProperties> {
+ *   ...Encryption;
+ * }
+ * ```
+ */
+/** All encryption configuration for a resource. */
+model EncryptionProperty {
+  /** All encryption configuration for a resource. */
+  encryption: EncryptionConfiguration;
 }
 
 //#endregion

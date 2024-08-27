@@ -4,13 +4,13 @@ title: "[F] getMarketplaceOfferId"
 
 ---
 ```ts
-getMarketplaceOfferId(program, target): any
+function getMarketplaceOfferId(program, target): any
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `target` | `Type` |
 

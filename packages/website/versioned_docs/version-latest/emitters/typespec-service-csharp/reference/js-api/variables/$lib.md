@@ -4,18 +4,18 @@ title: "[V] $lib"
 
 ---
 ```ts
-const $lib: TypeSpecLibrary<Object, CSharpServiceEmitterOptions, never>;
+const $lib: TypeSpecLibrary<object, CSharpServiceEmitterOptions, never>;
 ```
 
 ## Type declaration
 
-| Member | Type | Value |
-| :------ | :------ | :------ |
-| `invalid-identifier` | `Object` | - |
-| `invalid-identifier.default` | `CallableMessage`<[`string`, `string`]\> | - |
-| `missing-type-parent` | `Object` | - |
-| `missing-type-parent.default` | `CallableMessage`<[`string`, `string`]\> | - |
-| `no-numeric` | `Object` | - |
-| `no-numeric.default` | `CallableMessage`<[`string`, `string`]\> | - |
-| `unrecognized-scalar` | `Object` | - |
-| `unrecognized-scalar.default` | `CallableMessage`<[`string`]\> | - |
+| Name | Type |
+| ------ | ------ |
+| `invalid-identifier` | `object` |
+| `invalid-identifier.default` | `CallableMessage`<[`"identifier"`, `"location"`]\> |
+| `missing-type-parent` | `object` |
+| `missing-type-parent.default` | `CallableMessage`<[`"type"`, `"name"`]\> |
+| `no-numeric` | `object` |
+| `no-numeric.default` | `CallableMessage`<[`"sourceType"`, `"targetType"`]\> |
+| `unrecognized-scalar` | `object` |
+| `unrecognized-scalar.default` | `CallableMessage`<[`"typeName"`]\> |

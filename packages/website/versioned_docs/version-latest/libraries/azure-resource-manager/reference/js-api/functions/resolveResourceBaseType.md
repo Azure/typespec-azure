@@ -4,13 +4,13 @@ title: "[F] resolveResourceBaseType"
 
 ---
 ```ts
-resolveResourceBaseType(type?): ResourceBaseType
+function resolveResourceBaseType(type?): ResourceBaseType
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `type`? | `string` |
 
 ## Returns

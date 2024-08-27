@@ -57,7 +57,7 @@ extends:
                       --source "./packages/website/build/" \
                       --overwrite
 
-              - script: node core/eng/tsp-core/scripts/create-tryit-comment.js "typespec-azure"
+              - script: npx tsx core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
                 displayName: Check already commented
                 env:
                   GH_TOKEN: $(azuresdk-github-pat)

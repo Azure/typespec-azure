@@ -4,16 +4,16 @@ title: "[F] getSdkBuiltInType"
 
 ---
 ```ts
-getSdkBuiltInType(context, type): SdkBuiltInType
+function getSdkBuiltInType(context, type): SdkDateTimeType | SdkDurationType | SdkBuiltInType
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
-| `type` |  \| `Scalar` \| `StringLiteral` \| `NumericLiteral` \| `BooleanLiteral` \| `IntrinsicType` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
+| `type` | \| `BooleanLiteral` \| `IntrinsicType` \| `NumericLiteral` \| `Scalar` \| `StringLiteral` |
 
 ## Returns
 
-[`SdkBuiltInType`](../interfaces/SdkBuiltInType.md)
+[`SdkDateTimeType`](../type-aliases/SdkDateTimeType.md) \| [`SdkDurationType`](../interfaces/SdkDurationType.md) \| [`SdkBuiltInType`](../interfaces/SdkBuiltInType.md)

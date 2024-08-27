@@ -27,6 +27,14 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`StatusMonitor has more than one ${"resultType"} property marked with '${"decorator"}'.  Ensure that only one property in the model is marked with this decorator.`,
       },
     },
+    "invalid-final-state": {
+      severity: "warning",
+      messages: {
+        badValue: paramMessage`Specified final state value '${"finalStateValue"}' is not valid. It must be one of ("operation-location", "original-uri", "location", "azure-async-operation")`,
+        notPut: "The final state value 'original-uri' can only be used in http PUT operations",
+        noHeader: paramMessage`There was no header corresponding to the desired final-state-via value '${"finalStateValue"}'.`,
+      },
+    },
     "bad-record-type": {
       severity: "warning",
       messages: {
@@ -218,6 +226,39 @@ export const $lib = createTypeSpecLibrary({
       },
     },
   },
+
+  state: {
+    fixed: { description: "Data for `@fixed` decorator" },
+    pagedResult: { description: "Data for `@pagedResult` decorator" },
+    items: { description: "Data for `@items` decorator" },
+    nextLink: { description: "Data for `@nextLink` decorator" },
+    lroStatus: { description: "Data for `@lroStatus` decorator" },
+    lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
+    lroCanceled: { description: "Data for `@lroCanceled` decorator" },
+    lroFailed: { description: "Data for `@lroFailed` decorator" },
+    lroResult: { description: "Data for `@lroResult` decorator" },
+    lroErrorResult: { description: "Data for `@lroErrorResult` decorator" },
+    pollingOperationParameter: { description: "Data for `@pollingOperationParameter` decorator" },
+    pollingLocationInfo: { description: "Data for `@pollingLocationInfo` decorator" },
+    finalLocations: { description: "Data for `@finalLocations` decorator" },
+    finalLocationResults: { description: "Data for `@finalLocationResults` decorator" },
+    finalStateOverride: { description: "Data for `@finalStateOverride` decorator" },
+    needsRoute: { description: "Data for `@needsRoute` decorator" },
+    ensureVerb: { description: "Data for `@ensureVerb` decorator" },
+    embeddingVector: { description: "Data for `@embeddingVector` decorator" },
+    armResourceIdentifierConfig: {
+      description: "Data for `@armResourceIdentifierConfig` decorator",
+    },
+    operationLink: { description: "Data for `@operationLink` decorator" },
+    requestParameter: { description: "Data for `@requestParameter` decorator" },
+    responseParameter: { description: "Data for `@responseParameter` decorator" },
+    resourceOperation: { description: "Data for `@resourceOperation` decorator" },
+    traitSource: { description: "Data for `@traitSource` decorator" },
+    trait: { description: "Data for `@trait` decorator" },
+    traitContext: { description: "Data for `@traitContext` decorator" },
+    traitLocation: { description: "Data for `@traitLocation` decorator" },
+  },
+  // AzureCoreStateKeys.traitLocation
 });
 
-export const { reportDiagnostic, createDiagnostic, createStateSymbol } = $lib;
+export const { reportDiagnostic, createDiagnostic, stateKeys: AzureCoreStateKeys } = $lib;

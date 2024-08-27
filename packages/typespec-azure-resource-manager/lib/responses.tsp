@@ -3,6 +3,7 @@ using TypeSpec.Rest;
 using TypeSpec.OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
+using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager;
 
@@ -131,15 +132,18 @@ model ArmOperationStatus<
 /**
  * The standard header for asynchronous operation polling
  *  @template StatusMonitor The status monitor type for lro polling
- *  @template UrlValue The value type of the Azure-AsyncOperation  header
+ *  @template UrlValue The value type of the Azure-AsyncOperation header
+ *  @template FinalResult The logical final result of the operation
  */
 model ArmAsyncOperationHeader<
   StatusMonitor extends {} = ArmOperationStatus,
-  UrlValue extends string = string
+  UrlValue extends string = string,
+  FinalResult extends {} | void = never
 > {
   /** A link to the status monitor */
   @header("Azure-AsyncOperation")
-  @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<StatusMonitor>)
+  @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<PollingModel = StatusMonitor>)
+  @Azure.Core.finalLocation(FinalResult)
   azureAsyncOperation?: UrlValue;
 }
 
@@ -150,7 +154,7 @@ model ArmAsyncOperationHeader<
  * @template UrlValue The value type for the location header
  */
 model ArmLroLocationHeader<
-  LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+  LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<PollingModel = ArmOperationStatus>,
   FinalResult extends {} | void = void,
   UrlValue extends string = string
 > {
@@ -237,19 +241,6 @@ model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foun
   @doc("The body type of the operation request or response.")
   @bodyRoot
   body: Resource;
-}
-
-/**
- * The standard Azure Resource Manager error response
- */
-@error
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v3)
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v4)
-@armCommonDefinition("ErrorResponse", Azure.ResourceManager.CommonTypes.Versions.v5)
-@doc("Common error response for all Azure Resource Manager APIs to return error details for failed operations.")
-model ErrorResponse {
-  @doc("The error object.")
-  error?: ErrorDetail;
 }
 
 /**

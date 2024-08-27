@@ -101,7 +101,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
       responses:
         '200':
@@ -147,7 +146,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
       responses:
         '200':
@@ -182,7 +180,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
       responses:
         '200':
@@ -464,7 +461,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/LabelField'
-          style: form
           explode: true
       responses:
         '200':
@@ -570,7 +566,6 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
-          style: form
           explode: true
         - name: label
           in: query
@@ -737,14 +732,16 @@ components:
         key:
           type: string
     KeyField:
-      type: string
-      enum:
-        - key
-        - label
-        - content_type
-        - value
-        - last_modified
-        - tags
+      anyOf:
+        - type: string
+          enum:
+            - key
+            - label
+            - content_type
+            - value
+            - last_modified
+            - tags
+        - type: string
     KeyValue:
       type: object
       required:
@@ -770,9 +767,11 @@ components:
         name:
           type: string
     LabelField:
-      type: string
-      enum:
-        - name
+      anyOf:
+        - type: string
+          enum:
+            - name
+        - type: string
     LastModifiedHeader:
       type: object
     PagedKey:

@@ -1,5 +1,3 @@
-import { definePackageFlags } from "@typespec/compiler";
-
 export const namespace = "Azure.ResourceManager";
 
 export {
@@ -19,6 +17,7 @@ export * from "./resource.js";
 export { $lib } from "./lib.js";
 export { $linter } from "./linter.js";
 
-export const $flags = definePackageFlags({
-  decoratorArgMarshalling: "new",
-});
+export { isAzureResource, isConditionallyFlattened } from "./private.decorators.js";
+
+/** @internal */
+export { $decorators } from "./tsp-index.js";

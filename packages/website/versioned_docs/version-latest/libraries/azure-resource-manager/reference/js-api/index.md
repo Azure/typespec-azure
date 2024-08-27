@@ -10,6 +10,7 @@ title: "[P] JS API"
 ## Interfaces
 
 - [ArmCommonTypeVersions](interfaces/ArmCommonTypeVersions.md)
+- [ArmCommonTypesResolutionOptions](interfaces/ArmCommonTypesResolutionOptions.md)
 - [ArmLifecycleOperations](interfaces/ArmLifecycleOperations.md)
 - [ArmResourceDetails](interfaces/ArmResourceDetails.md)
 - [ArmResourceDetailsBase](interfaces/ArmResourceDetailsBase.md)
@@ -24,6 +25,7 @@ title: "[P] JS API"
 
 ## Variables
 
+- [$flags](variables/$flags.md)
 - [$lib](variables/$lib.md)
 - [$linter](variables/$linter.md)
 - [namespace](variables/namespace.md)
@@ -34,7 +36,6 @@ title: "[P] JS API"
 - [$armLibraryNamespace](functions/$armLibraryNamespace.md)
 - [$armProviderNameValue](functions/$armProviderNameValue.md)
 - [$armProviderNamespace](functions/$armProviderNamespace.md)
-- [$armRenameListByOperation](functions/$armRenameListByOperation.md)
 - [$armResourceAction](functions/$armResourceAction.md)
 - [$armResourceCollectionAction](functions/$armResourceCollectionAction.md)
 - [$armResourceCreateOrUpdate](functions/$armResourceCreateOrUpdate.md)
@@ -52,6 +53,8 @@ title: "[P] JS API"
 - [$subscriptionResource](functions/$subscriptionResource.md)
 - [$tenantResource](functions/$tenantResource.md)
 - [$useLibraryNamespace](functions/$useLibraryNamespace.md)
+- [armRenameListByOperationInternal](functions/armRenameListByOperationInternal.md)
+- [getArmCommonTypeOpenAPIRef](functions/getArmCommonTypeOpenAPIRef.md)
 - [getArmCommonTypesVersion](functions/getArmCommonTypesVersion.md)
 - [getArmCommonTypesVersions](functions/getArmCommonTypesVersions.md)
 - [getArmProviderNamespace](functions/getArmProviderNamespace.md)
@@ -66,6 +69,8 @@ title: "[P] JS API"
 - [isArmCommonType](functions/isArmCommonType.md)
 - [isArmLibraryNamespace](functions/isArmLibraryNamespace.md)
 - [isArmVirtualResource](functions/isArmVirtualResource.md)
+- [isAzureResource](functions/isAzureResource.md)
+- [isConditionallyFlattened](functions/isConditionallyFlattened.md)
 - [isSingletonResource](functions/isSingletonResource.md)
 - [resolveResourceBaseType](functions/resolveResourceBaseType.md)
 - [resolveResourceOperations](functions/resolveResourceOperations.md)

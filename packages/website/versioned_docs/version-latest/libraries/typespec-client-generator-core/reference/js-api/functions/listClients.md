@@ -4,7 +4,7 @@ title: "[F] listClients"
 
 ---
 ```ts
-listClients(context): SdkClient[]
+function listClients(context): SdkClient[]
 ```
 
 List all the clients.
@@ -12,8 +12,8 @@ List all the clients.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | TCGCContext |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | TCGCContext |
 
 ## Returns
 

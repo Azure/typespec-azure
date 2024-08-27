@@ -4,7 +4,7 @@ title: "[F] isArmVirtualResource"
 
 ---
 ```ts
-isArmVirtualResource(program, target): boolean
+function isArmVirtualResource(program, target): boolean
 ```
 
 Determine if the given model is an external resource.
@@ -12,7 +12,7 @@ Determine if the given model is an external resource.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program to process. |
 | `target` | `Model` | The model to check. |
 

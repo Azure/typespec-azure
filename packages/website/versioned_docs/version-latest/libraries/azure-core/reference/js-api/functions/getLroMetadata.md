@@ -4,13 +4,13 @@ title: "[F] getLroMetadata"
 
 ---
 ```ts
-getLroMetadata(program, operation): LroMetadata | undefined
+function getLroMetadata(program, operation): LroMetadata | undefined
 ```
 
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program being processed |
 | `operation` | `Operation` | The operation to get Lwo Metadata for |
 

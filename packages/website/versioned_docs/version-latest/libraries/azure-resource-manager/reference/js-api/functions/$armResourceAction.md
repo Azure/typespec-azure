@@ -4,7 +4,7 @@ title: "[F] $armResourceAction"
 
 ---
 ```ts
-$armResourceAction(
+function $armResourceAction(
    context, 
    target, 
    resourceType): void
@@ -13,7 +13,7 @@ $armResourceAction(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
 | `resourceType` | `Model` |

@@ -13,9 +13,15 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securit
 
 - [`Extensions`](../type-aliases/Extensions.md)
 
+## Extended by
+
+- [`OpenAPI2BasicAuthenticationSecurityScheme`](OpenAPI2BasicAuthenticationSecurityScheme.md)
+- [`OpenAPI2ApiKeySecurityScheme`](OpenAPI2ApiKeySecurityScheme.md)
+- [`OpenAPI2OAuthSecurityBase`](OpenAPI2OAuthSecurityBase.md)
+
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `description?` | `string` | A short description for security scheme. |
 | `type` | `"basic"` \| `"apiKey"` \| `"oauth2"` | The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2". |

@@ -4,7 +4,7 @@ title: "[F] getClientTypeWithDiagnostics"
 
 ---
 ```ts
-getClientTypeWithDiagnostics(
+function getClientTypeWithDiagnostics(
    context, 
    type, 
    operation?): [SdkType, readonly Diagnostic[]]
@@ -13,8 +13,8 @@ getClientTypeWithDiagnostics(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Type` |
 | `operation`? | `Operation` |
 

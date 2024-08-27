@@ -110,7 +110,7 @@ export type JsonType = "array" | "boolean" | "integer" | "number" | "object" | "
  * Autorest allows a few properties to be next to $ref of a property.
  */
 export type OpenAPI2SchemaRefProperty = Ref<OpenAPI2Schema> &
-  Pick<OpenAPI2Schema, "readOnly" | "description" | "default" | "x-ms-mutability"> & {
+  Pick<OpenAPI2Schema, "readOnly" | "description" | "default" | "x-ms-mutability" | "title"> & {
     /**
      * Provide a different name to be used in the client.
      */
@@ -285,14 +285,26 @@ export type OpenAPI2Schema = Extensions & {
   "x-ms-mutability"?: string[];
 };
 
+export type OpenAPI2FileSchema = {
+  type: "file";
+  format?: string;
+  title?: string;
+  description?: string;
+  default?: unknown;
+  required?: string[];
+  readonly?: boolean;
+  externalDocs?: OpenAPI2ExternalDocs;
+  example?: unknown;
+};
+
 export type OpenAPI2ParameterType = OpenAPI2Parameter["in"];
 
 export interface OpenAPI2HeaderDefinition {
   type: "string" | "number" | "integer" | "boolean" | "array";
-  items?: OpenAPI2Schema;
   collectionFormat?: "csv" | "ssv" | "tsv" | "pipes";
   description?: string;
   format?: string;
+  items?: PrimitiveItems;
 }
 
 export type OpenAPI2Parameter =
@@ -303,6 +315,10 @@ export type OpenAPI2Parameter =
   | OpenAPI2PathParameter;
 
 export interface OpenAPI2ParameterBase extends Extensions {
+  name: string;
+  description?: string;
+  required?: boolean;
+
   /**
    * Provide a different name to be used in the client.
    */
@@ -311,11 +327,8 @@ export interface OpenAPI2ParameterBase extends Extensions {
 }
 
 export interface OpenAPI2BodyParameter extends OpenAPI2ParameterBase {
-  name: string;
   in: "body";
   schema: OpenAPI2Schema;
-  description?: string;
-  required?: boolean;
   allowEmptyValue?: boolean;
   example?: unknown;
 
@@ -326,6 +339,7 @@ export interface OpenAPI2HeaderParameter extends OpenAPI2HeaderDefinition, OpenA
   name: string;
   in: "header";
   required?: boolean;
+  default?: unknown;
 }
 
 export interface OpenAPI2FormDataParameter extends OpenAPI2ParameterBase {
@@ -347,7 +361,7 @@ export interface OpenAPI2FormDataParameter extends OpenAPI2ParameterBase {
   "x-ms-client-flatten"?: boolean;
 }
 
-export interface PrimitiveItems extends OpenAPI2ParameterBase {
+export interface PrimitiveItems {
   type: "string" | "number" | "integer" | "boolean" | "array" | "file";
   format?: string;
   items?: PrimitiveItems;
@@ -364,7 +378,9 @@ export interface OpenAPI2PathParameter extends OpenAPI2ParameterBase {
   required?: boolean;
   format?: string;
   enum?: string[];
+  items?: PrimitiveItems;
   "x-ms-skip-url-encoding"?: boolean;
+  default?: unknown;
 }
 
 export interface OpenAPI2QueryParameter extends OpenAPI2ParameterBase {
@@ -377,6 +393,8 @@ export interface OpenAPI2QueryParameter extends OpenAPI2ParameterBase {
   required?: boolean;
   format?: string;
   enum?: string[];
+  items?: PrimitiveItems;
+  default?: unknown;
 }
 
 export type HttpMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
@@ -439,6 +457,21 @@ export type OpenAPI2Operation = Extensions & {
   "x-ms-examples"?: Record<string, Ref<unknown>>;
 
   "x-ms-long-running-operation"?: boolean;
+
+  "x-ms-long-running-operation-options"?: XMSLongRunningOperationOptions;
+};
+
+export type XMSLongRunningFinalState =
+  | "azure-async-operation"
+  | "location"
+  | "original-uri"
+  | "operation-location"
+  | "final-state-schema";
+
+export type XMSLongRunningOperationOptions = {
+  "final-state-via": XMSLongRunningFinalState;
+
+  "final-state-schema"?: string;
 };
 
 export type OpenAPI2StatusCode = string | "default" | "1XX" | "2XX" | "3XX" | "4XX" | "5XX";
@@ -465,7 +498,7 @@ export interface OpenAPI2Response {
   /** A short description of the response. Commonmark syntax can be used for rich text representation */
   description: string;
   /** A definition of the response structure. It can be a primitive, an array or an object. If this field does not exist, it means no content is returned as part of the response. As an extension to the Schema Object, its root type value may also be "file". This SHOULD be accompanied by a relevant produces mime-type. */
-  schema?: OpenAPI2Schema;
+  schema?: OpenAPI2Schema | OpenAPI2FileSchema;
   /** A list of headers that are sent with the response. */
   headers?: Record<string, OpenAPI2HeaderDefinition>;
   /** An example of the response message. */

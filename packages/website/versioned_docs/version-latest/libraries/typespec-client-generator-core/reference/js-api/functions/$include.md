@@ -4,18 +4,18 @@ title: "[F] $include"
 
 ---
 ```ts
-$include(
+function $include(
    context, 
-   entity, 
+   target, 
    scope?): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 | `scope`? | `string` |
 
 ## Returns

@@ -4,7 +4,7 @@ title: "[F] getSdkTupleWithDiagnostics"
 
 ---
 ```ts
-getSdkTupleWithDiagnostics(
+function getSdkTupleWithDiagnostics(
    context, 
    type, 
    operation?): [SdkTupleType, readonly Diagnostic[]]
@@ -13,8 +13,8 @@ getSdkTupleWithDiagnostics(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Tuple` |
 | `operation`? | `Operation` |
 

@@ -4,7 +4,7 @@ title: "[F] $useRef"
 
 ---
 ```ts
-$useRef(
+function $useRef(
    context, 
    entity, 
    jsonRef): void
@@ -15,9 +15,9 @@ $useRef(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `ModelProperty` \| `Model` |
+| `entity` | `Model` \| `ModelProperty` |
 | `jsonRef` | `string` |
 
 ## Returns

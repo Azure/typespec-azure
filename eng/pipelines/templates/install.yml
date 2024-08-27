@@ -9,7 +9,7 @@ parameters:
 steps:
   - task: UseDotNet@2
     inputs:
-      version: 6.0.x
+      version: 8.0.x
 
   - task: NodeTool@0
     inputs:
@@ -24,7 +24,7 @@ steps:
     displayName: Cache pnpm store
   - script: |
       corepack enable
-      corepack prepare pnpm@latest-8 --activate
+      corepack prepare pnpm --activate
     displayName: Install pnpm
   - script: pnpm config set store-dir ${{ parameters.pnpmStorePath }}
     displayName: Setup pnpm cache dir

@@ -1,5 +1,83 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1187](https://github.com/Azure/typespec-azure/pull/1187) Replace deprecated LocationParameter with LocationResourceParameter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+
+## 0.44.0
+
+### Bug Fixes
+
+- [#1166](https://github.com/Azure/typespec-azure/pull/1166) Fix #1048 Allow void in final result for Azure-AsyncOperation header
+- [#1156](https://github.com/Azure/typespec-azure/pull/1156) Minor fix to make foundations and common-type more consistent.
+- [#1102](https://github.com/Azure/typespec-azure/pull/1102) Fixing typo
+- [#1139](https://github.com/Azure/typespec-azure/pull/1139) LocationResourceParameter should be azureLocation instead of string
+- [#1111](https://github.com/Azure/typespec-azure/pull/1111) Fix the type discrepancy issue for property userAssignedIdentities in common types V5 ManagedServiceIdentity
+- [#927](https://github.com/Azure/typespec-azure/pull/927) Remove explicit `all` rulesets
+- [#1081](https://github.com/Azure/typespec-azure/pull/1081) Fix ArmResourcePatch templates and incorporate common-types updates
+- [#1144](https://github.com/Azure/typespec-azure/pull/1144) Tweak regex to validate Arm keys
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+### Features
+
+- [#1116](https://github.com/Azure/typespec-azure/pull/1116) Link CommonTypes enums and unions to the swagger common types
+- [#1161](https://github.com/Azure/typespec-azure/pull/1161) Added an optional template parameter on `TrackedResource`, `ProxyResource`, and `ExtensionResource` ARM templates that allows brownfield services to customize the optionality of the ARM resource `properties` field.
+- [#1123](https://github.com/Azure/typespec-azure/pull/1123) Removed direct reference to OpenAPI extension `x-ms-azure-resource` in ARM library and replaced with `@Azure.ResourceManager.Private.azureResourceBase` decorator. It is only used internally on base resource types. `autorest` emitter has been updated to check the decorator and still emit `x-ms-azure-resource` extension in swagger.
+
+### Breaking Changes
+
+- [#1093](https://github.com/Azure/typespec-azure/pull/1093) Removing $armRenameListByOperation decorator so operation id is directly derived from operation name. Previously operation id is statically resolved and fixed :
+
+- For top level resources, `[Resource]_ListByResourceGroup`
+- For child resources, `[Resource]_ListBy[ParentResource]`
+
+With this change, the operation name will form the second part of the operation id, just like other ARM operation templates.
+
+```diff
+-list is ArmResourceListByParent<Employee>;
++listByLocation is ArmResourceListByParent<Employee>;
+```
+
+You can modify the operation name to match existing spec to avoid breaking changes.
+- [#1146](https://github.com/Azure/typespec-azure/pull/1146) Moved `@armRenameListByOperation` into `Azure.ResourceManager.Private` namespace. Adding back original listByParent doc resolution logic to keep swagger changes to minimal.
+- [#1105](https://github.com/Azure/typespec-azure/pull/1105) `x-ms-client-flatten` extension on some of resource properties property is now configurable to be emitted by autorest emitter. Default is false which will skip emission of that extension.
+
+
+## 0.43.0
+
+### Bug Fixes
+
+- [#998](https://github.com/Azure/typespec-azure/pull/998) Adding legacy v4 ManagedServiceIdentity model to avoid breaking changes in specs with mixed v3 and v4 common type reference
+- [#955](https://github.com/Azure/typespec-azure/pull/955) Remove OpenAPI dependencies from ARM LRO templates and test LRO overrides
+- [#929](https://github.com/Azure/typespec-azure/pull/929) Adding an overload parameter to ResourceNameParameter that allows `name` type to be set to string union type.
+- [#860](https://github.com/Azure/typespec-azure/pull/860) Fix `percentComplete` property on `OperationStatus` should be a float not an int
+- [#979](https://github.com/Azure/typespec-azure/pull/979) Make Resource Properties Bag Updatable
+
+### Bump dependencies
+
+- [#867](https://github.com/Azure/typespec-azure/pull/867) Update dependencies - May 2024
+
+### Features
+
+- [#811](https://github.com/Azure/typespec-azure/pull/811) Remove dependency on `typespec-autorest` emitter
+- [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
+
+## 0.42.1
+
+### Bug Fixes
+
+- [#868](https://github.com/Azure/typespec-azure/pull/868) Changing back `ManagedServiceIdentity.userAssignedIdentities` back to `Record<UserAssignedIdentity`. Adding ARM common-type references for on all Managed Identity models.
+
 ## 0.42.0
 
 ### Bug Fixes
@@ -23,7 +101,7 @@
 ### Deprecations
 
 - [#762](https://github.com/Azure/typespec-azure/pull/762) Renaming internal TypeSpec ARM foundation model names to be consistent with ARM common-type definitions.
-However, these are `Azure.Resource.Manager.Foundations` models that would not normally be used directly in service specs.
+  However, these are `Azure.Resource.Manager.Foundations` models that would not normally be used directly in service specs.
 
 - Deprecate `Foundations.ArmResource`. `Foundations.Resource` should be used instead.
 
@@ -41,6 +119,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ManagedServiceIdentity`. `ManagedServiceIdentityProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ManagedServiceIdentity;
   +...ManagedServiceIdentityProperty;
@@ -49,6 +128,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ManagedSystemAssignedIdentity`. `ManagedSystemAssignedIdentityProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ManagedSystemAssignedIdentity;
   +...ManagedSystemAssignedIdentityProperty;
@@ -57,6 +137,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `EntityTag`. `EntityTagProperty` should be used instead.
 
   Example:
+
   ```diff
   -...EntityTag;
   +...EntityTagProperty;
@@ -65,6 +146,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ResourceKind`. `ResourceKindProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ResourceKind;
   +...ResourceKindProperty;
@@ -73,6 +155,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ResourcePlan`. `ResourcePlanProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ResourcePlan;
   +...ResourcePlanProperty;
@@ -81,6 +164,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ResourceSku`. `ResourceSkuProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ResourceSku;
   +...ResourceSkuProperty;
@@ -89,6 +173,7 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - Deprecate `ManagedBy`. `ManagedByProperty` should be used instead.
 
   Example:
+
   ```diff
   -...ManagedBy;
   +...ManagedByProperty;
@@ -97,7 +182,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 ### Breaking Changes
 
 - [#521](https://github.com/Azure/typespec-azure/pull/521) Switching ProvisioningState from enum to Open union
-
 
 ## 0.41.0
 
@@ -121,7 +205,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 
 - [#407](https://github.com/Azure/typespec-azure/pull/407) Deprecate `ResourceIdentifier` in favor of new `Azure.Core.armResourceIdentifier`
 
-
 ## 0.40.0
 
 ### Bug Fixes
@@ -140,7 +223,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 - [#298](https://github.com/Azure/typespec-azure/pull/298) ARM: add `arm-delete-response-codes` rule.
 - [#317](https://github.com/Azure/typespec-azure/pull/317) Add ruleset `canonical-versioning` to Azure Resource Manager library.
 
-
 ## 0.39.1
 
 ### Patch Changes
@@ -153,7 +235,6 @@ However, these are `Azure.Resource.Manager.Foundations` models that would not no
 
 - ebfe639: Fix Location resource issue, add mechanism for additional path segments
 - 148eee4: Update references to ARM, Add template customization parameters, add migration docs
-
 
 ## 0.38.0
 

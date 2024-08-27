@@ -4,16 +4,11 @@ title: "[T] SdkServiceMethod"
 
 ---
 ```ts
-type SdkServiceMethod<TServiceOperation>: 
-  | SdkBasicServiceMethod<TServiceOperation>
-  | SdkPagingServiceMethod<TServiceOperation>
-  | SdkLroServiceMethod<TServiceOperation>
-  | SdkLroPagingServiceMethod<TServiceOperation>
-| SdkLroPagingServiceMethod<TServiceOperation>;
+type SdkServiceMethod<TServiceOperation>: SdkBasicServiceMethod<TServiceOperation> | SdkPagingServiceMethod<TServiceOperation> | SdkLroServiceMethod<TServiceOperation> | SdkLroPagingServiceMethod<TServiceOperation>;
 ```
 
-## Type parameters
+## Type Parameters
 
-| Type parameter |
-| :------ |
-| `TServiceOperation` extends [`SdkServiceOperation`](SdkServiceOperation.md) |
+| Type Parameter |
+| ------ |
+| `TServiceOperation` *extends* [`SdkServiceOperation`](SdkServiceOperation.md) |

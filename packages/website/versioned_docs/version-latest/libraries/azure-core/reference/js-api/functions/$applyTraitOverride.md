@@ -4,7 +4,7 @@ title: "[F] $applyTraitOverride"
 
 ---
 ```ts
-$applyTraitOverride(
+function $applyTraitOverride(
    context, 
    target, 
    traitModel): void
@@ -13,7 +13,7 @@ $applyTraitOverride(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `traitModel` | `Model` |

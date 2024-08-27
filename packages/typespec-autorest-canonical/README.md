@@ -25,6 +25,16 @@ emit:
   - "@azure-tools/typespec-autorest-canonical"
 ```
 
+The config can be extended with options as follows:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-autorest-canonical"
+options:
+  "@azure-tools/typespec-autorest-canonical":
+    option: value
+```
+
 ### Emitter options
 
 #### `output-file`
@@ -37,7 +47,7 @@ Output file will interpolate the following values:
 - service-name: Name of the service if multiple
 - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
 
-Default: `{azure-resource-provider-folder}/{service-name}/{version}/openapi.json`
+Default: `{azure-resource-provider-folder}/{service-name}/canonical/openapi.json`
 
 Example: Single service
 

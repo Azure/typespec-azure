@@ -4,7 +4,7 @@ title: "[F] getArmResources"
 
 ---
 ```ts
-getArmResources(program): ArmResourceDetails[]
+function getArmResources(program): ArmResourceDetails[]
 ```
 
 This function returns fully-resolved details about all ARM resources
@@ -16,7 +16,7 @@ This function returns fully-resolved details about all ARM resources
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 
 ## Returns

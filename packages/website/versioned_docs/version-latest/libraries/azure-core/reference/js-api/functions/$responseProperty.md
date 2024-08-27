@@ -4,7 +4,7 @@ title: "[F] $responseProperty"
 
 ---
 ```ts
-$responseProperty(
+function $responseProperty(
    context, 
    entity, 
    name): void
@@ -13,7 +13,7 @@ $responseProperty(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
 | `name` | `string` |

@@ -4,13 +4,13 @@ title: "[F] isSingletonResource"
 
 ---
 ```ts
-isSingletonResource(program, resourceType): boolean
+function isSingletonResource(program, resourceType): boolean
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resourceType` | `Model` |
 

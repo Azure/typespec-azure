@@ -4,7 +4,7 @@ title: "[F] $marketplaceOffer"
 
 ---
 ```ts
-$marketplaceOffer(
+function $marketplaceOffer(
    context, 
    target, 
    options): void
@@ -13,7 +13,7 @@ $marketplaceOffer(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `options` | `Model` |

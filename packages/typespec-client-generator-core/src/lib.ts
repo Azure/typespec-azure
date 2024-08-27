@@ -132,19 +132,82 @@ export const $lib = createTypeSpecLibrary({
     "no-corresponding-method-param": {
       severity: "error",
       messages: {
-        default: `Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
+        default: paramMessage`Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
       },
     },
     "unsupported-protocol": {
       severity: "error",
       messages: {
-        default: paramMessage`Currently we only support HTTP and HTTPS protocols`,
+        default: "Currently we only support HTTP and HTTPS protocols",
       },
     },
     "no-emitter-name": {
       severity: "warning",
       messages: {
-        default: paramMessage`Can not find name for your emitter, please check your emitter name.`,
+        default: "Can not find name for your emitter, please check your emitter name.",
+      },
+    },
+    "unsupported-generic-decorator-arg-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Can not parse the arg type for decorator "${"decoratorName"}".`,
+      },
+    },
+    "empty-client-name": {
+      severity: "warning",
+      messages: {
+        default: `Cannot pass an empty value to the @clientName decorator`,
+      },
+    },
+    "override-method-parameters-mismatch": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
+      },
+    },
+    "duplicate-client-name": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
+      },
+    },
+    "example-loading": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Skipped loading invalid example file: ${"filename"}. Error: ${"error"}`,
+        noDirectory: paramMessage`Skipping example loading from ${"directory"} because there was an error reading the directory.`,
+        noOperationId: paramMessage`Skipping example file ${"filename"} because it does not contain an operationId and/or title.`,
+      },
+    },
+    "duplicate-example-file": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Example file ${"filename"} uses duplicate title '${"title"}' for operationId '${"operationId"}'`,
+      },
+    },
+    "example-value-no-mapping": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Value in example file '${"relativePath"}' does not follow its definition:\n${"value"}`,
+      },
+    },
+    "flatten-polymorphism": {
+      severity: "error",
+      messages: {
+        default: `Cannot flatten property of polymorphic type.`,
+      },
+    },
+    "conflict-access-override": {
+      severity: "warning",
+      messages: {
+        default: `@access override conflicts with the access calculated from operation or other @access override.`,
+      },
+    },
+    "conflict-usage-override": {
+      severity: "warning",
+      messages: {
+        default: `@usage override conflicts with the usage calculated from operation or other @usage override.`,
       },
     },
   },

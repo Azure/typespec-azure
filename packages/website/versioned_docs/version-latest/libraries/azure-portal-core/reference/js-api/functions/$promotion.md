@@ -4,7 +4,7 @@ title: "[F] $promotion"
 
 ---
 ```ts
-$promotion(
+function $promotion(
    context, 
    target, 
    options): void
@@ -13,7 +13,7 @@ $promotion(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Model` |
 | `options` | `Model` |

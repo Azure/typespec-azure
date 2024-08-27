@@ -4,13 +4,13 @@ title: "[F] getArmResource"
 
 ---
 ```ts
-getArmResource(program, resourceType): ArmResourceDetails | undefined
+function getArmResource(program, resourceType): ArmResourceDetails | undefined
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resourceType` | `Model` |
 

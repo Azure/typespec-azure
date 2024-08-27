@@ -4,7 +4,7 @@ title: "[F] getOperationResponse"
 
 ---
 ```ts
-getOperationResponse(program, operation): Model | undefined
+function getOperationResponse(program, operation): Model | undefined
 ```
 
 Get the main success response from an operation
@@ -12,7 +12,7 @@ Get the main success response from an operation
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | Get success responses for an operation |
 | `operation` | `Operation` | The operation to process |
 

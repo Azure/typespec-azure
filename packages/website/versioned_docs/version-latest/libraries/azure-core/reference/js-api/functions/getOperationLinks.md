@@ -4,7 +4,7 @@ title: "[F] getOperationLinks"
 
 ---
 ```ts
-getOperationLinks(program, entity): Map<string, OperationLinkMetadata> | undefined
+function getOperationLinks(program, entity): Map<string, OperationLinkMetadata> | undefined
 ```
 
 Returns the collection of `OperationLinkMetadata` for a given operation, if any, or undefined.
@@ -12,7 +12,7 @@ Returns the collection of `OperationLinkMetadata` for a given operation, if any,
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Operation` |
 

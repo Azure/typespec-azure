@@ -4,21 +4,19 @@ title: "[F] $clientFormat"
 
 ---
 ```ts
-$clientFormat(
+function $clientFormat(
    context, 
    target, 
-   format, 
-   scope?): void
+   value): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
-| `format` | [`ClientFormat`](../type-aliases/ClientFormat.md) |
-| `scope`? | `string` |
+| `value` | `"seconds"` \| `"unixtime"` \| `"iso8601"` \| `"rfc1123"` |
 
 ## Returns
 

@@ -4,13 +4,13 @@ title: "[F] $lroSucceeded"
 
 ---
 ```ts
-$lroSucceeded(context, entity): void
+function $lroSucceeded(context, entity): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `EnumMember` \| `UnionVariant` |
 

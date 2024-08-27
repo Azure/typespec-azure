@@ -119,6 +119,15 @@ namespace Azure.Core {
   extern dec finalOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
 
   /**
+   * Overrides the final state value for an operation
+   * @param finalState The desired final state value
+   */
+  extern dec useFinalStateVia(
+    entity: Operation,
+    finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation"
+  );
+
+  /**
    * Identifies that an operation is used to retrieve the next page for paged operations.
    * @param linkedOperation The linked Operation
    * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
@@ -151,13 +160,13 @@ namespace Azure.Core.Foundations.Private {
    * Provides a Model describing parameter customizations to spread into the target.
    * @param customizations Model describing the customization to spread
    */
-  extern dec spreadCustomParameters(entity: Model, customizations: {});
+  extern dec spreadCustomParameters(entity: Model, customizations: Model);
 
   /**
    * Provides a Model describing response property customizations to spread into the target.
    * @param customizations Model describing the customization to spread
    */
-  extern dec spreadCustomResponseProperties(entity: Model, customizations: {});
+  extern dec spreadCustomResponseProperties(entity: Model, customizations: Model);
 
   /**
    * Checks the Resource parameter of an operation signature to ensure it's a valid resource type.
@@ -196,5 +205,14 @@ namespace Azure.Core.Foundations.Private {
   extern dec armResourceIdentifierConfig(
     target: Scalar,
     options: ArmResourceIdentifierConfigOptions
+  );
+
+  /**
+   * Sets the priority order of default final-state-via options for an operation
+   * @param states: list of final-state-via options in priority order
+   */
+  extern dec defaultFinalStateVia(
+    target: TypeSpec.Reflection.Operation,
+    states: valueof ("operation-location" | "location" | "azure-async-operation")[]
   );
 }

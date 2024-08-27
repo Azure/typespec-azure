@@ -4,13 +4,13 @@ title: "[F] getResourceBaseType"
 
 ---
 ```ts
-getResourceBaseType(program, resource): ResourceBaseType
+function getResourceBaseType(program, resource): ResourceBaseType
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `resource` | `Model` |
 

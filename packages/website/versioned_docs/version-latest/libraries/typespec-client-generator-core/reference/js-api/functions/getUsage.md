@@ -4,15 +4,15 @@ title: "[F] getUsage"
 
 ---
 ```ts
-getUsage(context, entity): UsageFlags
+function getUsage(context, entity): UsageFlags
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
-| `entity` | `Model` \| `Enum` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
+| `entity` | `Enum` \| `Model` |
 
 ## Returns
 

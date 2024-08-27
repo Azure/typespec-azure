@@ -30,7 +30,7 @@ Available ruleSets:
 
 | Name                                                                                                                                                                                                     | Description                                                                                                                                                                                                                                          |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-record)                                             | Don't use Record types for ARM resources.                                                                                                                                                                                                            |
+| [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-record)                                         | Don't use Record types for ARM resources.                                                                                                                                                                                                            |
 | `@azure-tools/typespec-azure-resource-manager/arm-common-types-version`                                                                                                                                  | Specify the ARM common-types version using @armCommonTypesVersion.                                                                                                                                                                                   |
 | [`@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/delete-operation-response-codes) | Ensure delete operations have the appropriate status codes.                                                                                                                                                                                          |
 | [`@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/put-operation-response-codes)       | Ensure put operations have the appropriate status codes.                                                                                                                                                                                             |
@@ -69,7 +69,6 @@ Available ruleSets:
 - [`@armLibraryNamespace`](#@armlibrarynamespace)
 - [`@armProviderNamespace`](#@armprovidernamespace)
 - [`@armProviderNameValue`](#@armprovidernamevalue)
-- [`@armRenameListByOperation`](#@armrenamelistbyoperation)
 - [`@armResourceAction`](#@armresourceaction)
 - [`@armResourceCollectionAction`](#@armresourcecollectionaction)
 - [`@armResourceCreateOrUpdate`](#@armresourcecreateorupdate)
@@ -103,9 +102,9 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 
 ##### Parameters
 
-| Name    | Type                           | Description                                                                                                        |
-| ------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value. |
+| Name    | Type                           | Description                                                                                                                  |
+| ------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value like "v5". |
 
 #### `@armLibraryNamespace`
 
@@ -172,31 +171,11 @@ property to the type of the Azure Resource Manager resource.
 
 ##### Target
 
-`Operation | Model`
-
-##### Parameters
-
-None
-
-#### `@armRenameListByOperation`
-
-Marks the operation as being a collection action
-
-```typespec
-@Azure.ResourceManager.armRenameListByOperation(resourceType: Model, parentTypeName?: valueof string, parentFriendlyTypeName?: valueof string)
-```
-
-##### Target
-
 `Operation`
 
 ##### Parameters
 
-| Name                   | Type             | Description               |
-| ---------------------- | ---------------- | ------------------------- |
-| resourceType           | `Model`          | Resource                  |
-| parentTypeName         | `valueof string` | : Parent type name.       |
-| parentFriendlyTypeName | `valueof string` | Friendly name for parent. |
+None
 
 #### `@armResourceAction`
 

@@ -4,13 +4,13 @@ title: "[F] getAllProperties"
 
 ---
 ```ts
-getAllProperties(model, collection?): Map<string, ModelProperty>
+function getAllProperties(model, collection?): Map<string, ModelProperty>
 ```
 
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `model` | `Model` | The model to process |
 | `collection`? | `Map`<`string`, `ModelProperty`\> | The set of ModelProperties found so far |
 

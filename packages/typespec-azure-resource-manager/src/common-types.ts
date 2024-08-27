@@ -10,15 +10,17 @@ import {
   Program,
   Service,
   Type,
+  Union,
   isTypeSpecValueTypeOf,
 } from "@typespec/compiler";
-import { getVersion } from "@typespec/versioning";
-import { createDiagnostic } from "./lib.js";
+import { $useDependency, getVersion } from "@typespec/versioning";
+import { ArmCommonTypesVersionDecorator } from "../generated-defs/Azure.ResourceManager.js";
 import {
   ArmCommonTypeRecord,
   ArmCommonTypesDefaultVersion,
   getCommonTypeRecords,
-} from "./private.decorators.js";
+} from "./commontypes.private.decorators.js";
+import { createDiagnostic } from "./lib.js";
 import { ArmStateKeys } from "./state.js";
 
 export interface ArmCommonTypeVersions {
@@ -26,11 +28,40 @@ export interface ArmCommonTypeVersions {
   allVersions: EnumMember[];
 }
 
-export function getArmCommonTypesVersions(program: Program): ArmCommonTypeVersions | undefined {
+export function getArmCommonTypesVersions(program: Program): ArmCommonTypeVersions {
   // There is a single instance of ArmCommonTypeVersions stored inside of the
   // state map so just pull the first (only) item from the map.
   const map: Map<Type, any> = program.stateMap(ArmStateKeys.armCommonTypesVersions);
   return map?.values().next().value as any;
+}
+
+export function getArmCommonTypesVersionFromString(
+  program: Program,
+  entity: Namespace | EnumMember,
+  versionStr: string
+): [EnumMember | undefined, readonly Diagnostic[]] {
+  const commonTypeVersionEnum = program.resolveTypeReference(
+    `Azure.ResourceManager.CommonTypes.Versions.${versionStr}`
+  )[0] as EnumMember;
+  if (commonTypeVersionEnum === undefined) {
+    return [
+      undefined,
+      [
+        createDiagnostic({
+          code: "arm-common-types-invalid-version",
+          target: entity,
+          format: {
+            versionString: versionStr,
+            supportedVersions: [...getArmCommonTypesVersions(program).type.members.keys()].join(
+              ", "
+            ),
+          },
+        }),
+      ],
+    ];
+  } else {
+    return [commonTypeVersionEnum, []];
+  }
 }
 
 /**
@@ -40,7 +71,7 @@ export function getArmCommonTypesVersions(program: Program): ArmCommonTypeVersio
  */
 export function isArmCommonType(entity: Type): boolean {
   const commonDecorators = ["$armCommonDefinition", "$armCommonParameter"];
-  if (isTypeSpecValueTypeOf(entity, ["Model", "ModelProperty"])) {
+  if (isTypeSpecValueTypeOf(entity, ["Model", "ModelProperty", "Enum", "Union"])) {
     return commonDecorators.some((commonDecorator) =>
       entity.decorators.some((d) => d.decorator.name === commonDecorator)
     );
@@ -53,15 +84,40 @@ export function isArmCommonType(entity: Type): boolean {
  * @param {DecoratorContext} context DecoratorContext object
  * @param {type} entity Target of the decorator. Must be `Namespace` or `EnumMember` type
  */
-export function $armCommonTypesVersion(
+export const $armCommonTypesVersion: ArmCommonTypesVersionDecorator = (
   context: DecoratorContext,
   entity: Namespace | EnumMember,
   version: string | EnumValue
-) {
-  context.program
-    .stateMap(ArmStateKeys.armCommonTypesVersion)
-    .set(entity, typeof version === "string" ? version : version.value.name);
-}
+) => {
+  // try convert string to EnumMember
+  let versionEnum: EnumMember;
+  if (typeof version === "string") {
+    const [foundEnumMember, diagnostics] = getArmCommonTypesVersionFromString(
+      context.program,
+      entity,
+      version
+    );
+    if (!foundEnumMember) {
+      context.program.reportDiagnostics(diagnostics);
+      return;
+    }
+    versionEnum = foundEnumMember as EnumMember;
+  } else {
+    versionEnum = version.value;
+  }
+
+  context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, versionEnum.name);
+
+  if (entity.kind === "Namespace") {
+    const versioned = entity.decorators.find((x) => x.definition?.name === "@versioned");
+    // If it is versioned namespace, we will skip adding @useDependency to namespace
+    if (versioned) {
+      return;
+    }
+  }
+  // Add @useDependency on version enum members or on unversioned namespace
+  context.call($useDependency, entity, versionEnum);
+};
 
 /**
  * Returns the ARM common-types version used by the service.
@@ -80,7 +136,7 @@ export function getArmCommonTypesVersion(
  */
 export function getArmCommonTypeOpenAPIRef(
   program: Program,
-  entity: Model | ModelProperty,
+  entity: Model | ModelProperty | Enum | Union,
   params: ArmCommonTypesResolutionOptions
 ): string | undefined {
   const [record, diagnostics] = findArmCommonTypeRecord(program, entity, params);
@@ -107,7 +163,7 @@ export interface ArmCommonTypesResolutionOptions {
 
 export function findArmCommonTypeRecord(
   program: Program,
-  entity: Model | ModelProperty,
+  entity: Model | ModelProperty | Enum | Union,
   params: ArmCommonTypesResolutionOptions
 ): [ArmCommonTypeRecord | undefined, readonly Diagnostic[]] {
   const { records, defaultKey } = getCommonTypeRecords(program, entity);
@@ -133,11 +189,13 @@ export function findArmCommonTypeRecord(
         break;
       }
     }
-  } else {
+  }
+  if (record === undefined) {
     // If no version was found, use the default version
     record = records[defaultKey ?? ArmCommonTypesDefaultVersion];
   }
 
+  // If after resolve version AND unable to load default version, report diagnostic
   if (record === undefined) {
     return [
       undefined,

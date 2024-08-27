@@ -4,7 +4,7 @@ title: "[F] getClientNamespaceString"
 
 ---
 ```ts
-getClientNamespaceString(context): string | undefined
+function getClientNamespaceString(context): string | undefined
 ```
 
 Get the client's namespace for generation. If package-name is passed in config, we return
@@ -13,8 +13,8 @@ that value as our namespace. Otherwise, we default to the TypeSpec service names
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` |  |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 
 ## Returns
 

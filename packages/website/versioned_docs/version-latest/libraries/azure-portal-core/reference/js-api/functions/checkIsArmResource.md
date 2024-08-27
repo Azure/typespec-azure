@@ -4,7 +4,7 @@ title: "[F] checkIsArmResource"
 
 ---
 ```ts
-checkIsArmResource(
+function checkIsArmResource(
    program, 
    target, 
    decoratorName): boolean
@@ -13,7 +13,7 @@ checkIsArmResource(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `target` | `Model` |
 | `decoratorName` | `"about"` \| `"marketplaceOffer"` \| `"promotion"` |

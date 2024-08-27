@@ -15,8 +15,11 @@ import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { operationIdRule } from "./rules/no-operation-id.js";
+import { noPrivateUsage } from "./rules/no-private-usage.js";
+import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
+import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
 import { preventFormatUse } from "./rules/prevent-format.js";
@@ -28,6 +31,7 @@ import { recordTypeRule } from "./rules/record-types.js";
 import { bodyArrayRule } from "./rules/request-body-array.js";
 import { requireDocumentation } from "./rules/require-docs.js";
 import { requireKeyVisibility } from "./rules/require-key-visibility.js";
+import { requireVersionedRule } from "./rules/require-versioned.js";
 import { responseSchemaMultiStatusCodeRule } from "./rules/response-schema-multi-status-code.js";
 import { rpcOperationRequestBodyRule } from "./rules/rpc-operation-request-body.js";
 import { spreadDiscriminatedModelRule } from "./rules/spread-discriminated-model.js";
@@ -68,52 +72,19 @@ const rules = [
   spreadDiscriminatedModelRule,
   useStandardNames,
   useStandardOperations,
+  noStringDiscriminatorRule,
+  requireVersionedRule,
+  friendlyNameRule,
+  noPrivateUsage,
+  noQueryExplodeRule,
 ];
 
 export const $linter = defineLinter({
   rules,
   ruleSets: {
-    all: {
-      enable: {
-        [`@azure-tools/typespec-azure-core/${apiVersionRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${authRequiredRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${operationIdRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${bodyArrayRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${byosRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${casingRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${compositionOverInheritanceRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${spreadDiscriminatedModelRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${preferCsvCollectionFormatRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${knownEncodingRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${useStandardOperations.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noErrorStatusCodesRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noNullableRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noOffsetDateTimeRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noRpcPathParamsRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noExplicitRoutesResourceOps.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noResponseBodyRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${preventFormatUse.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${preventMultipleDiscriminator.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${preventRestLibraryInterfaces.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${preventUnknownType.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${recordTypeRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${responseSchemaMultiStatusCodeRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${propertyNameRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${rpcOperationRequestBodyRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${requireDocumentation.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${requireKeyVisibility.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${longRunningOperationsRequirePollingOperation.name}`]:
-          true,
-        [`@azure-tools/typespec-azure-core/${useStandardNames.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${friendlyNameRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noEnumRule.name}`]: true,
-        [`@azure-tools/typespec-azure-core/${noClosedLiteralUnionRule.name}`]: true,
-      },
-      extends: ["@typespec/http/all"],
-    },
     "canonical-versioning": {
       enable: {
-        [`@azure-tools/typespec-azure-core/${nonBreakingVersioningRule.name}`]: false,
+        [`@azure-tools/typespec-azure-core/${nonBreakingVersioningRule.name}`]: true,
       },
     },
   },

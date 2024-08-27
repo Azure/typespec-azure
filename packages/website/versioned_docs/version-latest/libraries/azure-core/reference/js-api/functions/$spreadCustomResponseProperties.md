@@ -4,7 +4,7 @@ title: "[F] $spreadCustomResponseProperties"
 
 ---
 ```ts
-$spreadCustomResponseProperties(
+function $spreadCustomResponseProperties(
    context, 
    entity, 
    customizations): void
@@ -13,10 +13,10 @@ $spreadCustomResponseProperties(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
-| `customizations` | `Model` |
+| `customizations` | `Type` |
 
 ## Returns
 

@@ -30,7 +30,8 @@
     "test:watch": "vitest -w",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "test:regen": "cross-env RECORD=true vitest run",
-    "regen-samples": "cross-env RECORD=true vitest run"
+    "regen-common-types": "tsx ./common-types/gen.ts",
+    "regen-samples": "pnpm regen-common-types && cross-env RECORD=true vitest run"
   },
   "files": [
     "lib/*.tsp",
@@ -41,6 +42,7 @@
     "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
+    "@azure-tools/typespec-azure-rulesets": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
@@ -53,12 +55,12 @@
     "@types/node": "~18.11.19",
     "@typespec/internal-build-utils": "workspace:~",
     "@typespec/samples": "workspace:~",
-    "@vitest/coverage-v8": "^1.6.0",
-    "@vitest/ui": "^1.6.0",
+    "@vitest/coverage-v8": "^2.0.4",
+    "@vitest/ui": "^2.0.4",
     "autorest": "~3.7.1",
     "cross-env": "~7.0.3",
-    "rimraf": "~5.0.7",
-    "typescript": "~5.4.5",
-    "vitest": "^1.6.0"
+    "rimraf": "~6.0.1",
+    "typescript": "~5.5.4",
+    "vitest": "^2.0.4"
   }
 }

@@ -4,7 +4,7 @@ title: "[F] shouldFlattenProperty"
 
 ---
 ```ts
-shouldFlattenProperty(context, target): boolean
+function shouldFlattenProperty(context, target): boolean
 ```
 
 Whether a model property should be flattened or not.
@@ -12,8 +12,8 @@ Whether a model property should be flattened or not.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | TCGCContext |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | TCGCContext |
 | `target` | `ModelProperty` | ModelProperty that we want to check whether it should be flattened or not |
 
 ## Returns

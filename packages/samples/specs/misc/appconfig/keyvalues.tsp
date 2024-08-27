@@ -44,9 +44,7 @@ namespace KeyValuesResource {
     After: plainDate,
 
     @doc("Used to select what fields are present in the returned resource(s).")
-    @query({
-      format: "multi",
-    })
+    @query(#{ explode: true })
     $Select?: KeyField[],
   ): {
     ...Response<200>;
@@ -70,9 +68,7 @@ namespace KeyValuesResource {
     After: plainDate,
 
     @doc("Used to select what fields are present in the returned resource(s).")
-    @query({
-      format: "multi",
-    })
+    @query(#{ explode: true })
     $Select?: KeyField[],
   ): {
     ...Response<200>;
@@ -88,9 +84,7 @@ namespace KeyValuesResource {
     ...KeyWithFilters,
 
     @doc("Used to select what fields are present in the returned resource(s).")
-    @query({
-      format: "multi",
-    })
+    @query(#{ explode: true })
     $Select?: KeyField[],
   ): {
     ...Response<200>;

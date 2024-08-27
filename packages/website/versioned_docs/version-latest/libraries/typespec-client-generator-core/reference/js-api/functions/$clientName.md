@@ -4,20 +4,20 @@ title: "[F] $clientName"
 
 ---
 ```ts
-$clientName(
+function $clientName(
    context, 
-   entity, 
-   value, 
+   target, 
+   rename, 
    scope?): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Type` |
-| `value` | `string` |
+| `target` | `Type` |
+| `rename` | `string` |
 | `scope`? | `string` |
 
 ## Returns

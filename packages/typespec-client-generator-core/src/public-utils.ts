@@ -6,6 +6,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  Scalar,
   Type,
   Union,
   createDiagnosticCollector,
@@ -14,20 +15,12 @@ import {
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
-  isErrorModel,
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
-import {
-  HttpOperation,
-  getHeaderFieldName,
-  getHttpOperation,
-  getPathParamName,
-  getQueryParamName,
-  isStatusCode,
-} from "@typespec/http";
+import { HttpOperation, getHttpOperation, isMetadata } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
-import { capitalCase, pascalCase } from "change-case";
+import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
   getClientNameOverride,
@@ -36,10 +29,19 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  SdkClientType,
+  SdkHttpOperationExample,
+  SdkServiceOperation,
   TCGCContext,
+} from "./interfaces.js";
+import {
   TspLiteralType,
   getClientNamespaceStringHelper,
+  getHttpBodySpreadModel,
+  getHttpOperationResponseHeaders,
+  isHttpBodySpread,
   parseEmitterName,
+  removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
@@ -54,18 +56,8 @@ export function getDefaultApiVersion(
   serviceNamespace: Namespace
 ): Version | undefined {
   try {
-    let versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
-    // filter with specific api version
-    if (
-      context.apiVersion !== undefined &&
-      context.apiVersion !== "latest" &&
-      context.apiVersion !== "all"
-    ) {
-      const index = versions.findIndex((version) => version.value === context.apiVersion);
-      if (index >= 0) {
-        versions = versions.slice(0, index + 1);
-      }
-    }
+    const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
     // follow versioning principals of the versioning library and return last in list
     return versions[versions.length - 1];
   } catch (e) {
@@ -118,16 +110,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return type;
   }
 
-  function isSchemaProperty(property: ModelProperty) {
-    const program = context.program;
-    const headerInfo = getHeaderFieldName(program, property);
-    const queryInfo = getQueryParamName(program, property);
-    const pathInfo = getPathParamName(program, property);
-    const statusCodeinfo = isStatusCode(program, property);
-    return !(headerInfo || queryInfo || pathInfo || statusCodeinfo);
-  }
-
-  const effective = getEffectiveModelType(program, type, isSchemaProperty);
+  const effective = getEffectiveModelType(program, type, (t) => !isMetadata(context.program, t));
   if (effective.name) {
     return effective;
   }
@@ -145,7 +128,7 @@ export function getEmitterTargetName(context: TCGCContext): string {
 }
 
 /**
- * Get the library and wire name of a model property. Takes @clientName and @encodedName into account
+ * Get the library and wire name of a model property. Takes `@clientName` and `@encodedName` into account
  * @param context
  * @param property
  * @returns a tuple of the library and wire name for a model property
@@ -189,7 +172,12 @@ export function getLibraryName(
   if (friendlyName) return friendlyName;
 
   // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
-  if (typeof type.name === "string" && type.kind === "Model" && type.templateMapper?.args) {
+  if (
+    typeof type.name === "string" &&
+    type.name !== "" &&
+    type.kind === "Model" &&
+    type.templateMapper?.args
+  ) {
     return (
       type.name +
       type.templateMapper.args
@@ -228,20 +216,48 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  * @returns
  */
 export function getCrossLanguageDefinitionId(
-  type: {
-    name?: string;
-    kind: string;
-    interface?: Interface;
-    namespace?: Namespace;
-  },
-  name?: string
+  context: TCGCContext,
+  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  operation?: Operation,
+  appendNamespace: boolean = true
 ): string {
-  let retval = type.name ? type.name : name ?? "";
-  if (type.kind === "Operation" && type.interface) {
-    retval = `${type.interface.name}.${retval}`;
+  let retval = type.name || "anonymous";
+  const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
+  switch (type.kind) {
+    case "Union":
+    case "Model":
+      // Enum and Scalar will always have a name
+      if (type.name) {
+        break;
+      }
+      const contextPath = operation
+        ? getContextPath(context, operation, type)
+        : findContextPath(context, type);
+      retval =
+        contextPath
+          .slice(findLastNonAnonymousModelNode(contextPath))
+          .map((x) =>
+            x.type?.kind === "Model" || x.type?.kind === "Union"
+              ? x.type.name || x.name
+              : x.name || "anonymous"
+          )
+          .join(".") +
+        "." +
+        retval;
+      break;
+    case "ModelProperty":
+      if (type.model) {
+        retval = `${getCrossLanguageDefinitionId(context, type.model, undefined, false)}.${retval}`;
+      }
+      break;
+    case "Operation":
+      if (type.interface) {
+        retval = `${getCrossLanguageDefinitionId(context, type.interface, undefined, false)}.${retval}`;
+      }
+      break;
   }
-  if (type.namespace) {
-    retval = `${getNamespaceFullName(type.namespace!)}.${retval}`;
+  if (appendNamespace && namespace && getNamespaceFullName(namespace)) {
+    retval = `${getNamespaceFullName(namespace)}.${retval}`;
   }
   return retval;
 }
@@ -302,27 +318,36 @@ function findContextPath(
   type: Model | Union | TspLiteralType
 ): ContextNode[] {
   for (const client of listClients(context)) {
+    // orphan models
+    if (client.service) {
+      for (const model of client.service.models.values()) {
+        if (
+          [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+        )
+          continue;
+        const result = getContextPath(context, model, type);
+        if (result.length > 0) {
+          return result;
+        }
+      }
+    }
     for (const operation of listOperationsInOperationGroup(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
         return result;
       }
     }
-    for (const operationGroup of listOperationGroups(context, client)) {
-      for (const operation of listOperationsInOperationGroup(context, operationGroup)) {
+    const ogs = listOperationGroups(context, client);
+    while (ogs.length) {
+      const operationGroup = ogs.pop();
+      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
         }
       }
-    }
-    // orphan models
-    if (client.service) {
-      for (const model of client.service.models.values()) {
-        const result = getContextPath(context, model, type);
-        if (result.length > 0) {
-          return result;
-        }
+      if (operationGroup?.subOperationGroups) {
+        ogs.push(...operationGroup.subOperationGroups);
       }
     }
   }
@@ -330,7 +355,7 @@ function findContextPath(
 }
 
 interface ContextNode {
-  displayName: string;
+  name: string;
   type?: Model | Union | TspLiteralType;
 }
 
@@ -355,16 +380,24 @@ function getContextPath(
 
     if (httpOperation.parameters.body) {
       visited.clear();
-      result = [{ displayName: pascalCase(root.name) }];
-      if (dfsModelProperties(typeToFind, httpOperation.parameters.body.type, "Request")) {
+      result = [{ name: root.name }];
+      let bodyType: Type;
+      if (isHttpBodySpread(httpOperation.parameters.body)) {
+        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
+      } else {
+        bodyType = httpOperation.parameters.body.type;
+      }
+      if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
       }
     }
 
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
       visited.clear();
-      result = [{ displayName: pascalCase(root.name) }];
-      if (dfsModelProperties(typeToFind, parameter.param.type, "Request")) {
+      result = [{ name: root.name }];
+      if (
+        dfsModelProperties(typeToFind, parameter.param.type, `Request${pascalCase(parameter.name)}`)
+      ) {
         return result;
       }
     }
@@ -372,18 +405,23 @@ function getContextPath(
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
+          const body =
+            innerResponse.body.type.kind === "Model"
+              ? getEffectivePayloadType(context, innerResponse.body.type)
+              : innerResponse.body.type;
           visited.clear();
-          result = [{ displayName: pascalCase(root.name) }];
-          if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response")) {
+          result = [{ name: root.name }];
+          if (dfsModelProperties(typeToFind, body, "Response")) {
             return result;
           }
         }
 
-        if (innerResponse.headers) {
-          for (const header of Object.values(innerResponse.headers)) {
+        const headers = getHttpOperationResponseHeaders(innerResponse);
+        if (headers) {
+          for (const header of Object.values(headers)) {
             visited.clear();
-            result = [{ displayName: pascalCase(root.name) }];
-            if (dfsModelProperties(typeToFind, header.type, "Response")) {
+            result = [{ name: root.name }];
+            if (dfsModelProperties(typeToFind, header.type, `Response${pascalCase(header.name)}`)) {
               return result;
             }
           }
@@ -430,7 +468,7 @@ function getContextPath(
     visited.add(currentType);
 
     if (currentType === expectedType) {
-      result.push({ displayName: pascalCase(displayName), type: currentType });
+      result.push({ name: displayName, type: currentType });
       return true;
     } else if (
       currentType.kind === "Model" &&
@@ -443,9 +481,8 @@ function getContextPath(
       const dictOrArrayItemType: Type = currentType.indexer.value;
       return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
     } else if (currentType.kind === "Model") {
-      currentType = getEffectivePayloadType(context, currentType);
       // handle model
-      result.push({ displayName: pascalCase(displayName), type: currentType });
+      result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {
         // traverse model property
         // use property.name as displayName
@@ -510,6 +547,23 @@ function getContextPath(
   }
 }
 
+function findLastNonAnonymousModelNode(contextPath: ContextNode[]): number {
+  let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
+  while (lastNonAnonymousModelNodeIndex >= 0) {
+    const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
+    if (
+      !contextPath[lastNonAnonymousModelNodeIndex].type ||
+      (currType?.kind === "Model" && currType.name)
+    ) {
+      // it's nonanonymous model node (if no type defined, it's the operation node)
+      break;
+    } else {
+      --lastNonAnonymousModelNodeIndex;
+    }
+  }
+  return lastNonAnonymousModelNodeIndex;
+}
+
 /**
  * The logic is basically three steps:
  * 1. find the last nonanonymous model node, this node can be operation node or model node which is not anonymous
@@ -529,19 +583,7 @@ function buildNameFromContextPaths(
   }
 
   // 1. find the last nonanonymous model node
-  let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
-  while (lastNonAnonymousModelNodeIndex >= 0) {
-    const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
-    if (
-      !contextPath[lastNonAnonymousModelNodeIndex].type ||
-      (currType?.kind === "Model" && currType.name)
-    ) {
-      // it's nonanonymous model node (if no type defined, it's the operation node)
-      break;
-    } else {
-      --lastNonAnonymousModelNodeIndex;
-    }
-  }
+  const lastNonAnonymousModelNodeIndex = findLastNonAnonymousModelNode(contextPath);
   // 2. build name
   let createName: string = "";
   for (let j = lastNonAnonymousModelNodeIndex; j < contextPath.length; j++) {
@@ -551,10 +593,11 @@ function buildNameFromContextPaths(
       currContextPathType?.kind === "Number" ||
       currContextPathType?.kind === "Boolean"
     ) {
-      createName = `${createName}${contextPath[j].displayName}${capitalCase(String(currContextPathType.value))}`;
+      // constant type
+      createName = `${createName}${pascalCase(contextPath[j].name)}`;
     } else if (!currContextPathType?.name) {
       // is anonymous model node
-      createName = `${createName}${contextPath[j].displayName}`;
+      createName = `${createName}${pascalCase(contextPath[j].name)}`;
     } else {
       // is non-anonymous model, use type name
       createName = `${createName}${currContextPathType!.name!}`;
@@ -575,21 +618,6 @@ function buildNameFromContextPaths(
   return createName;
 }
 
-/**
- *
- * @deprecated This function is deprecated. You should use isErrorModel from the standard TypeSpec library
- */
-export function isErrorOrChildOfError(context: TCGCContext, model: Model): boolean {
-  const errorDecorator = isErrorModel(context.program, model);
-  if (errorDecorator) return true;
-  let baseModel = model.baseModel;
-  while (baseModel) {
-    if (isErrorModel(context.program, baseModel)) return true;
-    baseModel = baseModel.baseModel;
-  }
-  return false;
-}
-
 export function getHttpOperationWithCache(
   context: TCGCContext,
   operation: Operation
@@ -603,4 +631,36 @@ export function getHttpOperationWithCache(
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
   context.httpOperationCache.set(operation, httpOperation);
   return httpOperation;
+}
+
+/**
+ * Get the examples for a given http operation.
+ */
+export function getHttpOperationExamples(
+  context: TCGCContext,
+  operation: HttpOperation
+): SdkHttpOperationExample[] {
+  return context.__httpOperationExamples?.get(operation) ?? [];
+}
+
+/**
+ * Get all the sub clients from current client.
+ *
+ * @param client
+ * @param listNestedClients determine if nested clients should be listed
+ * @returns
+ */
+export function listSubClients<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+  listNestedClients: boolean = false
+): SdkClientType<TServiceOperation>[] {
+  const subClients: SdkClientType<TServiceOperation>[] = client.methods
+    .filter((c) => c.kind === "clientaccessor")
+    .map((c) => c.response as SdkClientType<TServiceOperation>);
+  if (listNestedClients) {
+    for (const subClient of [...subClients]) {
+      subClients.push(...listSubClients(subClient, listNestedClients));
+    }
+  }
+  return subClients;
 }

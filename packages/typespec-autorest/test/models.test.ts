@@ -90,6 +90,21 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it("using @summary sets the title on definitions and properties", async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `
+      @summary("FooModel")
+      model Foo {
+        @summary("YProp")
+        y: int32;
+      };
+      `
+    );
+    strictEqual(res.defs.Foo.title, "FooModel");
+    strictEqual(res.defs.Foo.properties.y.title, "YProp");
+  });
+
   it("uses json name specified via @encodedName", async () => {
     const res = await oapiForModel(
       "Foo",
@@ -299,7 +314,7 @@ describe("typespec-autorest: model definitions", () => {
           enum: ["a-value", "b"],
           "x-ms-enum": {
             name: "MyEnum",
-            modelAsString: true,
+            modelAsString: false,
             values: [
               { name: "a", value: "a-value" },
               { name: "b", value: "b" },
@@ -694,7 +709,7 @@ describe("typespec-autorest: model definitions", () => {
         type: "string",
         enum: ["dog", "cat"],
         "x-ms-enum": {
-          modelAsString: true,
+          modelAsString: false,
           name: "PetKind",
         },
       });

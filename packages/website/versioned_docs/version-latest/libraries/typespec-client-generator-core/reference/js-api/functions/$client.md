@@ -4,20 +4,20 @@ title: "[F] $client"
 
 ---
 ```ts
-$client(
+function $client(
    context, 
    target, 
-   options?, 
+   value?, 
    scope?): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `Interface` \| `Namespace` |
-| `options`? | `Model` |
+| `target` | `Namespace` \| `Interface` |
+| `value`? | `Model` |
 | `scope`? | `string` |
 
 ## Returns

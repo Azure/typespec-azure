@@ -2,8 +2,6 @@ import {
   $key,
   $visibility,
   DecoratorContext,
-  Enum,
-  EnumValue,
   Interface,
   Model,
   ModelProperty,
@@ -11,14 +9,31 @@ import {
   Program,
   StringLiteral,
   Tuple,
+  Type,
   getKeyName,
   getTypeName,
 } from "@typespec/compiler";
 import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
+import {
+  ArmRenameListByOperationDecorator,
+  ArmResourceInternalDecorator,
+  ArmResourcePropertiesOptionalityDecorator,
+  ArmUpdateProviderNamespaceDecorator,
+  AssignProviderNameValueDecorator,
+  AzureResourceBaseDecorator,
+  AzureResourceManagerPrivateDecorators,
+  ConditionalClientFlattenDecorator,
+  DefaultResourceKeySegmentNameDecorator,
+  EnforceConstraintDecorator,
+  OmitIfEmptyDecorator,
+  ResourceBaseParametersOfDecorator,
+  ResourceParameterBaseForDecorator,
+} from "../generated-defs/Azure.ResourceManager.Private.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
+import { armRenameListByOperationInternal } from "./operations.js";
 import {
   ArmResourceDetails,
   ResourceBaseType,
@@ -31,9 +46,12 @@ import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
-export const ArmCommonTypesDefaultVersion = "v3";
-
-export function $omitIfEmpty(context: DecoratorContext, entity: Model, propertyName: string) {
+/** @internal */
+const $omitIfEmpty: OmitIfEmptyDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  propertyName: string
+) => {
   const modelProp = getProperty(entity, propertyName);
 
   if (
@@ -43,14 +61,14 @@ export function $omitIfEmpty(context: DecoratorContext, entity: Model, propertyN
   ) {
     entity.properties.delete(propertyName);
   }
-}
+};
 
-export function $enforceConstraint(
+const $enforceConstraint: EnforceConstraintDecorator = (
   context: DecoratorContext,
   entity: Operation | Model,
   sourceType: Model,
   constraintType: Model
-) {
+) => {
   if (sourceType !== undefined && constraintType !== undefined) {
     // walk the baseModel chain until find a match or fail
     let baseType: Model | undefined = sourceType;
@@ -69,13 +87,13 @@ export function $enforceConstraint(
       },
     });
   }
-}
+};
 
-export function $resourceBaseParametersOf(
+const $resourceBaseParametersOf: ResourceBaseParametersOfDecorator = (
   context: DecoratorContext,
   entity: Model,
   resourceType: Model
-) {
+) => {
   const targetResourceBaseType: ResourceBaseType = getResourceBaseType(
     context.program,
     resourceType
@@ -89,30 +107,31 @@ export function $resourceBaseParametersOf(
   for (const removedProperty of removedProperties) {
     entity.properties.delete(removedProperty);
   }
-}
+};
 
-export function $resourceParameterBaseFor(
+const $resourceParameterBaseFor: ResourceParameterBaseForDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  values: Tuple
-) {
+  values: Type
+) => {
   const resolvedValues: string[] = [];
-  for (const value of values.values) {
+  // TODO this will crash if passed anything other than a tuple
+  for (const value of (values as Tuple).values) {
     if (value.kind !== "EnumMember") {
       return;
     }
     resolvedValues.push(value.name);
   }
   context.program.stateMap(ArmStateKeys.armResourceCollection).set(entity, resolvedValues);
-}
+};
 
-export function $defaultResourceKeySegmentName(
+const $defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   resource: Model,
   keyName: string,
   segment: string
-) {
+) => {
   const modelName = camelCase(resource.name);
   const pluralName = pluralize(modelName);
   if (keyName.length > 0) {
@@ -125,7 +144,7 @@ export function $defaultResourceKeySegmentName(
   } else {
     context.call($segment, entity, pluralName);
   }
-}
+};
 
 export function getResourceParameterBases(
   program: Program,
@@ -160,121 +179,6 @@ function isResourceParameterBaseForInternal(
   return false;
 }
 
-function getArmTypesPath(program: Program): string {
-  return program.getOption("arm-types-path") || "{arm-types-dir}";
-}
-
-function storeCommonTypeRecord(
-  context: DecoratorContext,
-  entity: Model | ModelProperty,
-  kind: "definitions" | "parameters",
-  name: string,
-  version?: string | EnumValue | ArmCommonTypeVersionSpec,
-  referenceFile?: string
-): void {
-  const basePath: string = getArmTypesPath(context.program).trim();
-
-  // NOTE: Right now we don't try to prevent multiple versions from declaring that they are the default
-  let isDefault = false;
-  if (version && typeof version !== "string" && !("valueKind" in version)) {
-    isDefault = !!version.isDefault;
-    version = version.version;
-  }
-
-  // for backward compatibility, skip if we are trying to access a non-default file and emit the type
-  if ((version || referenceFile) && basePath.endsWith(".json")) return;
-  if (!version) version = ArmCommonTypesDefaultVersion;
-  if (!referenceFile) referenceFile = "types.json";
-
-  const versionStr = typeof version === "string" ? version : version.value.name;
-  const records = getCommonTypeRecords(context.program, entity);
-
-  records.records[versionStr] = {
-    name,
-    kind,
-    version: versionStr,
-    basePath,
-    referenceFile,
-  };
-  if (isDefault) {
-    records.defaultKey = versionStr;
-  }
-  context.program.stateMap(ArmStateKeys.armCommonDefinitions).set(entity, records);
-}
-
-export interface ArmCommonTypeRecord {
-  name: string;
-  kind: "definitions" | "parameters";
-  version: string;
-  basePath: string;
-  referenceFile?: string;
-}
-
-export interface ArmCommonTypeRecords {
-  records: { [key: string]: ArmCommonTypeRecord };
-  defaultKey?: string;
-}
-
-export function getCommonTypeRecords(
-  program: Program,
-  entity: Model | ModelProperty
-): ArmCommonTypeRecords {
-  return program.stateMap(ArmStateKeys.armCommonDefinitions).get(entity) ?? { records: {} };
-}
-
-interface ArmCommonTypeVersionSpec {
-  version: string | EnumValue;
-  isDefault: boolean;
-}
-
-/**
- * Refer an model property to be a common ARM parameter
- * @param {DecoratorContext} context DecoratorContext object
- * @param {Type} entity Decorator target type. Must be `Model`
- * @param {string?} definitionName Optional definition name
- * @param {string?} version Optional version
- * @param {string?} referenceFile Optional common file path
- * @returns void
- */
-export function $armCommonParameter(
-  context: DecoratorContext,
-  entity: ModelProperty,
-  parameterName?: string,
-  version?: string | EnumValue | ArmCommonTypeVersionSpec,
-  referenceFile?: string
-): void {
-  // Use the name of the model type if not specified
-  if (!parameterName) {
-    parameterName = entity.name;
-  }
-
-  storeCommonTypeRecord(context, entity, "parameters", parameterName, version, referenceFile);
-}
-
-/**
- * Using ARM common definition for a Model
- * @param {DecoratorContext} context DecoratorContext object
- * @param {Type} entity Decorator target type. Must be `Model`
- * @param {string?} definitionName Optional definition name
- * @param {string?} version Optional version
- * @param {string?} referenceFile Optional common file path
- * @returns {void}
- */
-export function $armCommonDefinition(
-  context: DecoratorContext,
-  entity: Model,
-  definitionName?: string,
-  version?: string | EnumValue | ArmCommonTypeVersionSpec,
-  referenceFile?: string
-): void {
-  // Use the name of the model type if not specified
-  if (!definitionName) {
-    definitionName = entity.name;
-  }
-
-  storeCommonTypeRecord(context, entity, "definitions", definitionName, version, referenceFile);
-}
-
 /**
  * This decorator dynamically assigns the serviceNamespace from the containing
  * namespace to the string literal value of the path parameter to which this
@@ -284,18 +188,18 @@ export function $armCommonDefinition(
  * @param {Type} target Target of this decorator. Must be a string `ModelProperty`.
  * @param {Type} resourceType Must be a `Model`.
  */
-export function $assignProviderNameValue(
+const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   resourceType: Model
-): void {
+) => {
   const { program } = context;
 
   const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
   if (armProviderNamespace) {
     (target.type as StringLiteral).value = armProviderNamespace;
   }
-}
+};
 
 /**
  * Update the ARM provider namespace for a given entity.
@@ -303,7 +207,10 @@ export function $assignProviderNameValue(
  * @param {Type} entity Entity to set namespace. Must be a `Operation`.
  * @returns
  */
-export function $armUpdateProviderNamespace(context: DecoratorContext, entity: Operation) {
+const $armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator = (
+  context: DecoratorContext,
+  entity: Operation
+) => {
   const { program } = context;
 
   const operation = entity as Operation;
@@ -327,7 +234,7 @@ export function $armUpdateProviderNamespace(context: DecoratorContext, entity: O
       }
     }
   }
-}
+};
 
 /**
  * Check if an interface is extending the Azure.ResourceManager.Operations interface.
@@ -356,11 +263,11 @@ export function isArmOperationsListInterface(program: Program, type: Interface):
  * decorator, so it also gets applied to the type which absorbs the `TrackedResource<T>`
  * definition by using the `is` keyword.
  */
-export function $armResourceInternal(
+const $armResourceInternal: ArmResourceInternalDecorator = (
   context: DecoratorContext,
   resourceType: Model,
   propertiesType: Model
-) {
+) => {
   const { program } = context;
 
   if (resourceType.namespace && getTypeName(resourceType.namespace) === "Azure.ResourceManager") {
@@ -442,7 +349,7 @@ export function $armResourceInternal(
   };
 
   program.stateMap(ArmStateKeys.armResources).set(resourceType, armResourceDetails);
-}
+};
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
   return [...program.stateMap(ArmStateKeys.armResources).values()];
@@ -470,9 +377,78 @@ function hasProperty(program: Program, model: Model): boolean {
   return false;
 }
 
-export function $armCommonTypesVersions(context: DecoratorContext, enumType: Enum) {
-  context.program.stateMap(ArmStateKeys.armCommonTypesVersions).set(enumType, {
-    type: enumType,
-    allVersions: Array.from(enumType.members.values()).reverse(),
-  });
+const $azureResourceBase: AzureResourceBaseDecorator = (
+  context: DecoratorContext,
+  resourceType: Model
+) => {
+  context.program.stateMap(ArmStateKeys.azureResourceBase).set(resourceType, true);
+};
+
+export function isAzureResource(program: Program, resourceType: Model): boolean {
+  const isResourceBase = program.stateMap(ArmStateKeys.azureResourceBase).get(resourceType);
+  return isResourceBase ?? false;
 }
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+const $conditionalClientFlatten: ConditionalClientFlattenDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty
+) => {
+  context.program.stateMap(ArmStateKeys.armConditionalClientFlatten).set(entity, true);
+};
+
+export function isConditionallyFlattened(program: Program, entity: ModelProperty): boolean {
+  const flatten = program.stateMap(ArmStateKeys.armConditionalClientFlatten).get(entity);
+  return flatten ?? false;
+}
+
+const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
+  context: DecoratorContext,
+  entity: Operation,
+  resourceType: Model,
+  parentTypeName?: string,
+  parentFriendlyTypeName?: string,
+  applyOperationRename?: boolean
+) => {
+  armRenameListByOperationInternal(
+    context,
+    entity,
+    resourceType,
+    parentTypeName,
+    parentFriendlyTypeName,
+    applyOperationRename
+  );
+};
+
+const $armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isOptional: boolean
+) => {
+  if (target.name === "properties") {
+    target.optional = isOptional;
+  }
+};
+
+/** @internal */
+export const $decorators = {
+  "Azure.ResourceManager.Private": {
+    resourceBaseParametersOf: $resourceBaseParametersOf,
+    resourceParameterBaseFor: $resourceParameterBaseFor,
+    azureResourceBase: $azureResourceBase,
+    omitIfEmpty: $omitIfEmpty,
+    conditionalClientFlatten: $conditionalClientFlatten,
+    assignProviderNameValue: $assignProviderNameValue,
+    armUpdateProviderNamespace: $armUpdateProviderNamespace,
+    armResourceInternal: $armResourceInternal,
+    defaultResourceKeySegmentName: $defaultResourceKeySegmentName,
+    enforceConstraint: $enforceConstraint,
+    armRenameListByOperation: $armRenameListByOperation,
+    armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
+  } satisfies AzureResourceManagerPrivateDecorators,
+};

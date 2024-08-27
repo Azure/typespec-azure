@@ -4,15 +4,15 @@ title: "[F] isSdkIntKind"
 
 ---
 ```ts
-isSdkIntKind(kind): kind is "numeric" | "integer" | "int8" | "uint8" | "int16" | "uint16" | "int32" | "uint32" | "int64" | "uint64" | "safeint"
+function isSdkIntKind(kind): kind is "numeric" | "integer" | "int8" | "uint8" | "int16" | "uint16" | "int32" | "uint32" | "int64" | "uint64" | "safeint"
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `kind` | `string` |
 
 ## Returns
 
-`kind is "numeric" | "integer" | "int8" | "uint8" | "int16" | "uint16" | "int32" | "uint32" | "int64" | "uint64" | "safeint"`
+kind is "numeric" \| "integer" \| "int8" \| "uint8" \| "int16" \| "uint16" \| "int32" \| "uint32" \| "int64" \| "uint64" \| "safeint"

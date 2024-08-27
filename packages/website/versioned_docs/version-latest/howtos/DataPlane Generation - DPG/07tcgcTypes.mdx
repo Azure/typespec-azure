@@ -68,13 +68,29 @@ const sdkContext = {
             {
               kind: "endpoint",
               type: {
-                kind: "endpoint",
-                serverUrl: "{endpoint}/widget",
-                templateArguments: [
+                kind: "union",
+                values: [
                   {
-                    name: "endpoint",
-                    kind: "path",
-                    ...
+                    kind: "endpoint",
+                    serverUrl: "{endpoint}",
+                    templateArguments: [
+                      {
+                        name: "endpoint",
+                        kind: "path",
+                        ...
+                      }
+                    ]
+                  },
+                  {
+                    kind: "endpoint",
+                    serverUrl: "{endpoint}/widget",
+                    templateArguments: [
+                      {
+                        name: "endpoint",
+                        kind: "path",
+                        ...
+                      }
+                    ]
                   }
                 ]
               }
@@ -488,7 +504,7 @@ They each extend from the shared `SdkMethodBase`
 interface SdkMethodBase<TServiceOperation extends SdkServiceOperation> {
   __raw?: Operation;
   name: string;
-  access: AccessFlags | undefined;
+  access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
   description?: string;
@@ -973,15 +989,21 @@ These are parameters to client initialization and method son the client. These w
 
 #### SdkEndpointParameter
 
-An `SdkEndpointParameter` represents a parameter to a client's endpoint. If the client is not parameterized, the endpoint parameter represents the entire endpoint input for the client. For parameterized clients, there will be as many `SdkEndpointParameter`s as needed to parameterize the client endpoint.
+An `SdkEndpointParameter` represents a parameter to a client's endpoint.
 
-```ts
+TCGC will always give it to you as overridable:
+
+If the server URL is a constant, we will return a templated endpoint with a default value of the constant server URL.
+In the case where the endpoint has extra template arguments, the type is a union of a completely-overridable endpoint, and an endpoint that accepts template arguments.
+If there are multiple servers, we will return the union of all of the possibilities.
+
+```tsp
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   kind: "endpoint";
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType;
+  type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
 }
 ```
 
@@ -1219,7 +1241,9 @@ interface SdkTypeBase {
   // created by tcgc. Those won't have an original type
   __raw?: Type;
   kind: string;
-  deprecations?: string;
+  deprecation?: string;
+  description?: string;
+  details?: string;
 }
 ```
 
@@ -1236,6 +1260,9 @@ There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuil
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
   encode: string;
+  name: string;
+  baseType?: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1243,9 +1270,12 @@ export interface SdkBuiltInType extends SdkTypeBase {
 
 ```ts
 interface SdkDatetimeTypeBase extends SdkTypeBase {
+  name: string;
+  baseType?: SdkDateTimeType;
   encode: DateTimeKnownEncoding;
   // what we send over the wire. Often it's string
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 
 interface SdkUtcDatetimeType extends SdkDatetimeTypeBase {
@@ -1262,9 +1292,12 @@ interface SdkOffsetDatetimeType extends SdkDatetimeTypeBase {
 ```ts
 interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
+  name: string;
+  baseType?: SdkDurationType;
   encode: DurationKnownEncoding;
   // What we send over the wire. It's usually either a string or a float
   wireType: SdkBuiltInType;
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1273,8 +1306,9 @@ interface SdkDurationType extends SdkTypeBase {
 ```ts
 interface SdkArrayType extends SdkTypeBase {
   kind: "array";
+  name: string;
   valueType: SdkType;
-  nullableValues: boolean;
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1285,7 +1319,6 @@ interface SdkDictionaryType extends SdkTypeBase {
   kind: "dict";
   keyType: SdkType; // currently can only be string
   valueType: SdkType;
-  nullableValues: boolean;
 }
 ```
 
@@ -1296,17 +1329,16 @@ export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   // Determines whether the name was generated or not
-  generatedName: boolean;
+  isGeneratedName: boolean;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
-  description?: string;
-  details?: string;
   isFlags: boolean;
   usage: UsageFlags;
   access: AccessFlags;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  isUnionAsEnum: boolean;
 }
 ```
 
@@ -1318,9 +1350,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
   name: string;
   value: string | number;
   enumType: SdkEnumType;
-  valueType: SdkType;
-  description?: string;
-  details?: string;
+  valueType: SdkBuiltInType;
 }
 ```
 
@@ -1331,6 +1361,8 @@ export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
   value: string | number | boolean | null;
   valueType: SdkBuiltInType;
+  name: string;
+  isGeneratedName: boolean;
 }
 ```
 
@@ -1340,9 +1372,10 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType extends SdkTypeBase {
   name: string;
   // determines if the union name was generated or not
-  generatedName: boolean;
+  isGeneratedName: boolean;
   kind: "union";
   values: SdkType[];
+  crossLanguageDefinitionId: string;
 }
 ```
 
@@ -1353,14 +1386,10 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   // purposely can also be header / query params for fidelity with TypeSpec
   properties: SdkModelPropertyType[];
-  isFormDataType: boolean;
-  isError: boolean;
   // we will always have a name. generatedName determines if it's generated or not.
   name: string;
-  generatedName: string;
-  description?: string;
-  details?: string;
-  access?: AccessFlags;
+  isGeneratedName: boolean;
+  access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
   discriminatorValue?: string;
@@ -1387,7 +1416,9 @@ export enum UsageFlags {
 
 ### AccessFlags
 
-We have the `.access` property on a model etc. as optional, so emitters can choose what to default to.
+We default the value of `.access` property on model, enum, and method types to be `"public"`. So if the `@access` decorator isn't explicitly applied to one of these definitions, its value will be `"public"`.
+
+If you want to know if a tsp author explicitly set the value with an `@access` decorator, you can call `getAccessOverride`
 
 ```ts
 export type AccessFlags = "internal" | "public";
@@ -1398,7 +1429,7 @@ export type AccessFlags = "internal" | "public";
 ```ts
 export interface SdkEndpointType {
   kind: "endpoint";
-  serverUrl?: string;
+  serverUrl: string;
   templateArguments: SdkPathParameter[];
 }
 ```

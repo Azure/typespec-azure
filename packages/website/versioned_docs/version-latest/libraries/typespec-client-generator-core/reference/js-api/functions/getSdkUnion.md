@@ -4,7 +4,7 @@ title: "[F] getSdkUnion"
 
 ---
 ```ts
-getSdkUnion(
+function getSdkUnion(
    context, 
    type, 
    operation?): SdkType
@@ -13,8 +13,8 @@ getSdkUnion(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Union` |
 | `operation`? | `Operation` |
 

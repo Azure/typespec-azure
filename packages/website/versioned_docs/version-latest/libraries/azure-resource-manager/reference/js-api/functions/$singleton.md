@@ -4,10 +4,10 @@ title: "[F] $singleton"
 
 ---
 ```ts
-$singleton(
+function $singleton(
    context, 
-   resourceType, 
-   keyValue): void
+   target, 
+   keyValue?): void
 ```
 
 This decorator is used to mark a resource type as a "singleton", a type with
@@ -17,11 +17,11 @@ lists.
 
 ## Parameters
 
-| Parameter | Type | Default value |
-| :------ | :------ | :------ |
-| `context` | `DecoratorContext` | `undefined` |
-| `resourceType` | `Model` | `undefined` |
-| `keyValue` | `string` | `"default"` |
+| Parameter | Type |
+| ------ | ------ |
+| `context` | `DecoratorContext` |
+| `target` | `Model` |
+| `keyValue`? | `string` |
 
 ## Returns
 

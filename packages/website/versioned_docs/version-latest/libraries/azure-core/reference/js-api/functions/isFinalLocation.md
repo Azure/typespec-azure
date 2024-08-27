@@ -4,7 +4,7 @@ title: "[F] isFinalLocation"
 
 ---
 ```ts
-isFinalLocation(program, entity): boolean
+function isFinalLocation(program, entity): boolean
 ```
 
 Returns `true` if the property is marked with @finalLocation.
@@ -12,7 +12,7 @@ Returns `true` if the property is marked with @finalLocation.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `ModelProperty` |
 

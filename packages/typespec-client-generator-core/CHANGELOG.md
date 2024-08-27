@@ -1,5 +1,188 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.4
+
+### Bug Fixes
+
+- [#1392](https://github.com/Azure/typespec-azure/pull/1392) Fix multipart for client customization
+
+
+## 0.45.3
+
+### Bug Fixes
+
+- [#1328](https://github.com/Azure/typespec-azure/pull/1328) change example file path to relative file path
+- [#1338](https://github.com/Azure/typespec-azure/pull/1338) consider scope when find service of a client
+- [#1376](https://github.com/Azure/typespec-azure/pull/1376) no need to add access override along with usage override for orphan model
+
+### Features
+
+- [#1363](https://github.com/Azure/typespec-azure/pull/1363) URI template support
+
+
+## 0.45.2
+
+### Bug Fixes
+
+- [#1336](https://github.com/Azure/typespec-azure/pull/1336) Add `@hasJsonConverter` for csharp only to indicate if JSON converter is needed
+- [#1350](https://github.com/Azure/typespec-azure/pull/1350) Bug fix for encode as string on ModelProperty.
+- [#1343](https://github.com/Azure/typespec-azure/pull/1343) Add generic parameter inputs to `SdkUnionType` to clearly define the union types of `endpoint` and `credential` params
+
+
+## 0.45.1
+
+### Bug Fixes
+
+- [#1330](https://github.com/Azure/typespec-azure/pull/1330) Fix collectionFormat for "csv"
+
+
+## 0.45.0
+
+### Bug Fixes
+
+- [#1238](https://github.com/Azure/typespec-azure/pull/1238) TCGC, add `crossLanguageDefinitionId` to `SdkClientType`
+- [#1266](https://github.com/Azure/typespec-azure/pull/1266) expose default values for endpoint template arguments through `.clientDefaultValue`
+- [#1281](https://github.com/Azure/typespec-azure/pull/1281) Support @multipartBody for `bodyParam` of `SdkHttpOperation`
+- [#1233](https://github.com/Azure/typespec-azure/pull/1233) don't move server description onto endpoints parameter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1258](https://github.com/Azure/typespec-azure/pull/1258) add support for encoding an int as a string
+- [#1155](https://github.com/Azure/typespec-azure/pull/1155) Make literal endpoints overridable
+- [#1148](https://github.com/Azure/typespec-azure/pull/1148) add `@override` decorator that allows authors to explicitly describe their desired client method
+
+
+## 0.44.3
+
+### Bug Fixes
+
+- [#1244](https://github.com/Azure/typespec-azure/pull/1244) The baseType will be undefined if the `SdkBuiltInType`, `SdkDateTimeType`, `SdkDurationType` is a std type
+- [#1251](https://github.com/Azure/typespec-azure/pull/1251) Change output for `HttpPart<T>[]`
+
+
+## 0.44.2
+
+### Bug Fixes
+
+- [#1231](https://github.com/Azure/typespec-azure/pull/1231) Fix the duplicate usageflags values for json and xml
+- [#1203](https://github.com/Azure/typespec-azure/pull/1203) Have `@clientName` work for operation groups as well
+- [#1222](https://github.com/Azure/typespec-azure/pull/1222) Validate `@clientName` conflict for operations inside interface
+
+### Features
+
+- [#1090](https://github.com/Azure/typespec-azure/pull/1090) Support model format of `@multipartBody`
+- [#1237](https://github.com/Azure/typespec-azure/pull/1237) Expose createTcgcContext, which is the minimal context object that handles scope
+- [#1223](https://github.com/Azure/typespec-azure/pull/1223) Report error diagnostic when trying to flattening a model with polymorphism
+- [#1076](https://github.com/Azure/typespec-azure/pull/1076) Add example types support
+- [#1204](https://github.com/Azure/typespec-azure/pull/1204) Add xml usage and change enumvalue arg representation in generic decorators
+
+### Breaking Changes
+
+- [#1015](https://github.com/Azure/typespec-azure/pull/1015) Refactor tcgc build-in types, please refer pr's description for details and migration guides
+
+
+## 0.44.1
+
+### Bug Fixes
+
+- [#1186](https://github.com/Azure/typespec-azure/pull/1186) fix access and usage calculation for nested model/enum in spread model
+- [#1185](https://github.com/Azure/typespec-azure/pull/1185) fix idempotent issue for spread
+
+### Features
+
+- [#1119](https://github.com/Azure/typespec-azure/pull/1119) Report diagnostics on `@clientName` conflicts
+
+
+## 0.44.0
+
+### Bug Fixes
+
+- [#1142](https://github.com/Azure/typespec-azure/pull/1142) TCGC, Add description to `SdkHttpResponse`
+- [#1102](https://github.com/Azure/typespec-azure/pull/1102) Fixing typo
+- [#1157](https://github.com/Azure/typespec-azure/pull/1157) findContextPath need to handle nested operation group, also refine the logic for naming and composing cross language definition id
+
+### Bump dependencies
+
+- [#1104](https://github.com/Azure/typespec-azure/pull/1104) Dependency updates July 2024
+
+### Features
+
+- [#1152](https://github.com/Azure/typespec-azure/pull/1152) add `.generateConvenient` and `.generateProtocol` for service methods. These booleans tell emitters whether to generate convenient and protocol versions for the method
+- [#1129](https://github.com/Azure/typespec-azure/pull/1129) add `UsageFlags.Json`. Will be set if a model is used with a JSON content type
+- [#1045](https://github.com/Azure/typespec-azure/pull/1045) filter api versions enum to only include GA versions if default value is GA
+
+### Breaking Changes
+
+- [#1078](https://github.com/Azure/typespec-azure/pull/1078) remove `experimental_` prefix from `sdkPackage`. Now it's just called `sdkPackage`.
+
+
+## 0.43.2
+
+### Bug Fixes
+
+- [#1120](https://github.com/Azure/typespec-azure/pull/1120) fix wrong client resolving from multiple call of context creation for versioning tsp
+- [#1067](https://github.com/Azure/typespec-azure/pull/1067) Unify casing of datetime spelling to `DateTime`. Change interface names to `SdkDateTimeType`, `SdkUtcDateTimeType`, and `SdkOffsetDateTimeType`
+- [#1113](https://github.com/Azure/typespec-azure/pull/1113) Add `Content-Type` to response headers
+- [#1135](https://github.com/Azure/typespec-azure/pull/1135) fix wrong handling for one variant union
+
+### Features
+
+- [#966](https://github.com/Azure/typespec-azure/pull/966) export decorators in allow list to all sdk types
+- [#1075](https://github.com/Azure/typespec-azure/pull/1075) Replace `tspNamespace` with `crossLanguageDefinitionId`.
+- Remove `tspNamespace` in `SdkEnumType`, `SdkModelType`, `SdkUnionType`, `SdkArrayType`.
+- Add `crossLanguageDefinitionId` to `SdkUnionType` and `SdkArrayType`.
+- [#1069](https://github.com/Azure/typespec-azure/pull/1069) Add `Error` usage to `UsageFlags`
+
+### Breaking Changes
+
+- [#886](https://github.com/Azure/typespec-azure/pull/886) always spread models and aliases with `...`
+
+
+## 0.43.1
+
+### Bug Fixes
+
+- [#1000](https://github.com/Azure/typespec-azure/pull/1000) Add `name` and `tspNamespace` to `SdkArrayType`
+- [#1009](https://github.com/Azure/typespec-azure/pull/1009) add `tspNamespace` to `SdkModelType`, `SdkEnumType`, `SdkEnumValueType` and `SdkUnionType`
+- [#1033](https://github.com/Azure/typespec-azure/pull/1033) only expose top level client in `SdkPackage`
+- [#1070](https://github.com/Azure/typespec-azure/pull/1070) don't let optional `.contentTypes` on response body be empty. If it's empty, just set it to undefined
+- [#873](https://github.com/Azure/typespec-azure/pull/873) add description for created discriminator property
+- [#947](https://github.com/Azure/typespec-azure/pull/947) support new typespec emitter naming rule
+- [#990](https://github.com/Azure/typespec-azure/pull/990) export `SdkClientAccessor`
+- [#1032](https://github.com/Azure/typespec-azure/pull/1032) Fix armId not set for scalar type armResourceIdentifier.
+- [#1038](https://github.com/Azure/typespec-azure/pull/1038) add support for list of scopes
+- [#1064](https://github.com/Azure/typespec-azure/pull/1064) remove deprecated `.nameInClient` property from `SdkModelPropertyType`s
+- [#1050](https://github.com/Azure/typespec-azure/pull/1050) Fix SdkContext.arm
+- [#1066](https://github.com/Azure/typespec-azure/pull/1066) Add linter for empty `@clientName` values
+
+
+## 0.43.0
+
+### Bug Fixes
+
+- [#904](https://github.com/Azure/typespec-azure/pull/904) don't add constant value to generated name
+- [#873](https://github.com/Azure/typespec-azure/pull/873) add description for created discriminator property
+- [#947](https://github.com/Azure/typespec-azure/pull/947) support new typespec emitter naming rule
+- [#930](https://github.com/Azure/typespec-azure/pull/930) expose enums on response headers
+- [#962](https://github.com/Azure/typespec-azure/pull/962) refine logic of core model filtering
+- [#950](https://github.com/Azure/typespec-azure/pull/950) remove duplicated types in TCGC
+- [#936](https://github.com/Azure/typespec-azure/pull/936) enhance cross language definition id logic
+- [#935](https://github.com/Azure/typespec-azure/pull/935) add read only logic to usage propagation
+
+### Bump dependencies
+
+- [#867](https://github.com/Azure/typespec-azure/pull/867) Update dependencies - May 2024
+
+### Breaking Changes
+
+- [#925](https://github.com/Azure/typespec-azure/pull/925) change default of `.access` on a model or enum to `"public"` instead of `undefined`
+- [#870](https://github.com/Azure/typespec-azure/pull/870) return nullable types as a new type called `SdkNullableType`
+
+
 ## 0.42.3
 
 ### Bug Fixes

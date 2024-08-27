@@ -4,7 +4,7 @@ title: "[F] $traitSource"
 
 ---
 ```ts
-$traitSource(
+function $traitSource(
    context, 
    target, 
    traitName): void
@@ -13,7 +13,7 @@ $traitSource(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
 | `traitName` | `string` |

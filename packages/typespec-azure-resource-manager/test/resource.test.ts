@@ -652,4 +652,112 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     strictEqual(resources.length, 1);
     ok(resources[0].typespecType.properties.has("extendedLocation"));
   });
+
+  it("emits correct fixed union name parameter for resource", async () => {
+    const { program, diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+         ...ResourceNameParameter<Widget, Type=WidgetNameType>;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+         size: int32;
+      }
+
+      /** different type of widget used on resource path */
+      union WidgetNameType {
+        string,
+        /** small widget */
+        Small: "Small",
+        /** large widget */        
+        Large: "Large"
+      }
+  `);
+    const resources = getArmResources(program);
+    expectDiagnosticEmpty(diagnostics);
+    strictEqual(resources.length, 1);
+    ok(resources[0].typespecType.properties.has("name"));
+    const nameProperty = resources[0].typespecType.properties.get("name");
+    strictEqual(nameProperty?.type.kind, "Union");
+    strictEqual(nameProperty?.type.name, "WidgetNameType");
+  });
+
+  it("emits a scalar string with decorator parameter for resource", async () => {
+    const { program, diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+         ...ResourceNameParameter<Widget, Type=WidgetNameType>;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+         size: int32;
+      }
+
+      @minLength(1)
+      @maxLength(10)
+      @pattern("xxxxxx")
+      scalar WidgetNameType extends string;
+  `);
+    const resources = getArmResources(program);
+    expectDiagnosticEmpty(diagnostics);
+    strictEqual(resources.length, 1);
+    ok(resources[0].typespecType.properties.has("name"));
+    const nameProperty = resources[0].typespecType.properties.get("name");
+    strictEqual(nameProperty?.type.kind, "Scalar");
+    strictEqual(nameProperty?.type.name, "WidgetNameType");
+  });
+});
+
+it("emits default optional properties for resource", async () => {
+  const { program, diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    model Widget is TrackedResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget>;
+    }
+
+    @doc("The properties of a widget")
+    model WidgetProperties {
+       size: int32;
+    }
+`);
+  const resources = getArmResources(program);
+  expectDiagnosticEmpty(diagnostics);
+  strictEqual(resources.length, 1);
+  strictEqual(resources[0].typespecType.properties.get("properties")?.optional, true);
+});
+
+it("emits required properties for resource with @armResourcePropertiesOptionality override ", async () => {
+  const { program, diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    model Widget is ProxyResource<WidgetProperties, false> {
+       ...ResourceNameParameter<Widget>;
+    }
+
+    @doc("The properties of a widget")
+    model WidgetProperties {
+       size: int32;
+    }
+`);
+  const resources = getArmResources(program);
+  expectDiagnosticEmpty(diagnostics);
+  strictEqual(resources.length, 1);
+  strictEqual(resources[0].typespecType.properties.get("properties")?.optional, false);
 });

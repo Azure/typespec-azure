@@ -9,13 +9,14 @@ title: "[I] SdkArrayType"
 
 ## Properties
 
-| Property | Type | Description | Overrides | Inherited from |
-| :------ | :------ | :------ | :------ | :------ |
-| `__raw?` | `Type` | - | `SdkTypeBase.__raw` | `SdkTypeBase.__raw` |
-| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` | `SdkTypeBase.deprecation` |
-| `description?` | `string` | - | `SdkTypeBase.description` | `SdkTypeBase.description` |
-| `details?` | `string` | - | `SdkTypeBase.details` | `SdkTypeBase.details` |
-| `kind` | `"array"` | - | `SdkTypeBase.kind` | `SdkTypeBase.kind` |
-| ~~`nullable`~~ | `boolean` | **Deprecated**<br />Moving `.nullable` onto the parameter itself for fidelity.<br />https://github.com/Azure/typespec-azure/issues/448 | `SdkTypeBase.nullable` | `SdkTypeBase.nullable` |
-| `nullableValues` | `boolean` | - | - | - |
-| `valueType` | [`SdkType`](../type-aliases/SdkType.md) | - | - | - |
+| Property | Type | Overrides | Inherited from |
+| ------ | ------ | ------ | ------ |
+| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
+| `crossLanguageDefinitionId` | `string` | - | - |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
+| `description?` | `string` | - | `SdkTypeBase.description` |
+| `details?` | `string` | - | `SdkTypeBase.details` |
+| `kind` | `"array"` | `SdkTypeBase.kind` | - |
+| `name` | `string` | - | - |
+| `valueType` | [`SdkType`](../type-aliases/SdkType.md) | - | - |

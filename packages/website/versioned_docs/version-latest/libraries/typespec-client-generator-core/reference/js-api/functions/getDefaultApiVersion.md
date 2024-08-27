@@ -4,7 +4,7 @@ title: "[F] getDefaultApiVersion"
 
 ---
 ```ts
-getDefaultApiVersion(context, serviceNamespace): Version | undefined
+function getDefaultApiVersion(context, serviceNamespace): Version | undefined
 ```
 
 Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -12,8 +12,8 @@ Return the default api version for a versioned service. Will return undefined if
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | - |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | - |
 | `serviceNamespace` | `Namespace` |  |
 
 ## Returns

@@ -1,48 +1,57 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
-  Diagnostic,
-  Interface,
-  Model,
-  Namespace,
-  NumericLiteral,
-  Operation,
-  Program,
-  ProjectedProgram,
-  StringLiteral,
-  Type,
-  Union,
   createDiagnosticCollector,
+  Diagnostic,
   getDeprecationDetails,
   getDoc,
   getNamespaceFullName,
   getSummary,
-  ignoreDiagnostics,
+  Interface,
   isNeverType,
   isNullType,
   isVoidType,
+  Model,
+  ModelProperty,
+  Namespace,
+  Numeric,
+  NumericLiteral,
+  Operation,
+  Program,
+  StringLiteral,
+  Type,
+  Union,
+  Value,
 } from "@typespec/compiler";
-import { HttpOperation, HttpStatusCodeRange } from "@typespec/http";
+import {
+  HttpOperation,
+  HttpOperationBody,
+  HttpOperationMultipartBody,
+  HttpOperationResponseContent,
+  HttpStatusCodeRange,
+} from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
-  SdkBuiltInKinds,
+  DecoratorInfo,
+  SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkModelType,
-  SdkParameter,
-  SdkServiceOperation,
   SdkType,
-  SdkUnionType,
+  TCGCContext,
 } from "./interfaces.js";
-import { createDiagnostic } from "./lib.js";
+import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
-  getEffectivePayloadType,
+  getDefaultApiVersion,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
+
+export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
+
+export const clientNameKey = createStateSymbol("clientName");
 
 /**
  *
@@ -64,7 +73,7 @@ export function parseEmitterName(
     );
     return diagnostics.wrap("none");
   }
-  const regex = /(?:cadl|typespec)-([^\\/]*)/;
+  const regex = /(?:cadl|typespec|client|server)-([^\\/-]*)/;
   const match = emitterName.match(regex);
   if (!match || match.length < 2) return diagnostics.wrap("none");
   const language = match[1];
@@ -242,26 +251,101 @@ export function getHashForType(type: SdkType): string {
 
 interface DefaultSdkTypeBase<TKind> {
   __raw: Type;
-  nullable: boolean;
   deprecation?: string;
   kind: TKind;
+  decorators: DecoratorInfo[];
 }
 
 /**
- * Helper function to return default values for nullable, encode etc
+ * Helper function to return default values for encode etc
  * @param type
  */
 export function getSdkTypeBaseHelper<TKind>(
   context: TCGCContext,
   type: Type,
   kind: TKind
-): DefaultSdkTypeBase<TKind> {
-  return {
+): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
     __raw: type,
-    nullable: false,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
-  };
+    decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+  });
+}
+
+export function getNamespacePrefix(namespace: Namespace): string {
+  return namespace ? getNamespaceFullName(namespace) + "." : "";
+}
+
+export function getTypeDecorators(
+  context: TCGCContext,
+  type: Type
+): [DecoratorInfo[], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const retval: DecoratorInfo[] = [];
+  if ("decorators" in type) {
+    for (const decorator of type.decorators) {
+      // only process explicitly defined decorators
+      if (decorator.definition) {
+        const decoratorName = `${getNamespacePrefix(decorator.definition?.namespace)}${decorator.definition?.name}`;
+        // white list filtering
+        if (
+          !context.decoratorsAllowList ||
+          !context.decoratorsAllowList.some((x) => new RegExp(x).test(decoratorName))
+        ) {
+          continue;
+        }
+
+        const decoratorInfo: DecoratorInfo = {
+          name: decoratorName,
+          arguments: {},
+        };
+        for (let i = 0; i < decorator.args.length; i++) {
+          decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
+            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName)
+          );
+        }
+        retval.push(decoratorInfo);
+      }
+    }
+  }
+  return diagnostics.wrap(retval);
+}
+
+function getDecoratorArgValue(
+  context: TCGCContext,
+  arg:
+    | Type
+    | Record<string, unknown>
+    | Value
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | Numeric
+    | null,
+  type: Type,
+  decoratorName: string
+): [any, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if (typeof arg === "object" && arg !== null && "kind" in arg) {
+    if (arg.kind === "EnumMember") {
+      return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
+    }
+    if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
+      return diagnostics.wrap(arg.value);
+    }
+    diagnostics.add(
+      createDiagnostic({
+        code: "unsupported-generic-decorator-arg-type",
+        target: type,
+        format: { decoratorName },
+      })
+    );
+    return diagnostics.wrap(undefined);
+  }
+  return diagnostics.wrap(arg);
 }
 
 export function intOrFloat(value: number): "int32" | "float32" {
@@ -269,13 +353,13 @@ export function intOrFloat(value: number): "int32" | "float32" {
 }
 
 /**
- * Whether a model is an Azure.Core model or not
+ * Whether a model or enum or union as enum is in Azure.Core[.Foundations] namespace
  * @param t
  * @returns
  */
 export function isAzureCoreModel(t: Type): boolean {
   return (
-    t.kind === "Model" &&
+    (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&
     ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
   );
@@ -305,49 +389,15 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
 
-export interface TCGCContext {
-  program: Program;
-  emitterName: string;
-  generateProtocolMethods?: boolean;
-  generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
-  __subscriptionIdParameter?: SdkParameter;
-  __rawClients?: SdkClient[];
-  apiVersion?: string;
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
-  originalProgram: Program;
-}
-
-export function createTCGCContext(program: Program): TCGCContext {
-  return {
-    program,
-    emitterName: "__TCGC_INTERNAL__",
-    diagnostics: [],
-    originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
-  };
-}
-
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
 
-function getAllResponseBodiesAndNonBodyExists(
+export function getNullOption(type: Union): Type | undefined {
+  return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
+}
+
+export function getAllResponseBodiesAndNonBodyExists(
   responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
 ): {
   allResponseBodies: SdkType[];
@@ -357,7 +407,7 @@ function getAllResponseBodiesAndNonBodyExists(
   let nonBodyExists = false;
   for (const response of responses.values()) {
     if (response.type) {
-      if (response.nullable) {
+      if (response.type.kind === "nullable") {
         nonBodyExists = true;
       }
       allResponseBodies.push(response.type);
@@ -375,49 +425,17 @@ export function getAllResponseBodies(
 }
 
 /**
- * Determines if a type is nullable.
- * @param type
- * @returns
- */
-export function isNullable(type: Type | SdkServiceOperation): boolean {
-  if (type.kind === "Union") {
-    if (getNonNullOptions(type).length < type.variants.size) return true;
-    return Boolean(ignoreDiagnostics(getUnionAsEnum(type))?.nullable);
-  }
-  if (type.kind === "http") {
-    return getAllResponseBodiesAndNonBodyExists(type.responses).nonBodyExists;
-  }
-  return false;
-}
-/**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.
  *
  * Otherwise, you should use the `getGeneratedName` function.
  * @param context
  */
-export function createGeneratedName(type: Namespace | Operation, suffix: string): string {
-  return `${getCrossLanguageDefinitionId(type).split(".").at(-1)}${suffix}`;
-}
-
-function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
-  if (type.kind !== "Model") return false;
-  if (!isHttpOperation(context, operation)) return false;
-  const httpBody = operation
-    ? getHttpOperationWithCache(context, operation).parameters.body
-    : undefined;
-  return Boolean(
-    httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
-  );
-}
-
-export function isMultipartFormData(
+export function createGeneratedName(
   context: TCGCContext,
-  type: Type,
-  operation?: Operation
-): boolean {
-  return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
+  type: Namespace | Operation,
+  suffix: string
+): string {
+  return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
@@ -435,4 +453,116 @@ export function getLocationOfOperation(operation: Operation): Namespace | Interf
 
 export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
+}
+
+export function getAnyType(
+  context: TCGCContext,
+  type: Type
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  return diagnostics.wrap({
+    kind: "any",
+    name: "any",
+    encode: "string",
+    crossLanguageDefinitionId: "",
+    decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+  });
+}
+
+export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
+  let apiVersion = context.apiVersion;
+  if (apiVersion === "all") {
+    return apiVersion;
+  }
+  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
+    apiVersion = versions[versions.length - 1];
+  }
+  return apiVersion;
+}
+
+export function getHttpOperationResponseHeaders(
+  response: HttpOperationResponseContent
+): ModelProperty[] {
+  const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];
+  if (response.body?.contentTypeProperty) {
+    headers.push(response.body.contentTypeProperty);
+  }
+  return headers;
+}
+
+export function removeVersionsLargerThanExplicitlySpecified(
+  context: TCGCContext,
+  versions: { value: string | number }[]
+): void {
+  // filter with specific api version
+  if (
+    context.apiVersion !== undefined &&
+    context.apiVersion !== "latest" &&
+    context.apiVersion !== "all"
+  ) {
+    const index = versions.findIndex((version) => version.value === context.apiVersion);
+    if (index >= 0) {
+      versions.splice(index + 1, versions.length - index - 1);
+    }
+  }
+}
+
+export function filterApiVersionsInEnum(
+  context: TCGCContext,
+  client: SdkClient,
+  sdkVersionsEnum: SdkEnumType
+): void {
+  // if they explicitly set an api version, remove larger versions
+  removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
+  const defaultApiVersion = getDefaultApiVersion(context, client.service);
+  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
+      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value)
+    );
+  }
+}
+
+export function isJsonContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
+  return regex.test(contentType);
+}
+
+export function isXmlContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
+  return regex.test(contentType);
+}
+
+/**
+ * If body is from spread, then it does not directly from a model property.
+ * @param httpBody
+ * @param parameters
+ * @returns
+ */
+export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
+  return httpBody.property === undefined;
+}
+
+/**
+ * If body is from simple spread, then we use the original model as body model.
+ * @param type
+ * @returns
+ */
+export function getHttpBodySpreadModel(type: Model): Model {
+  if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
+    const innerModel = type.sourceModels[0].model;
+    // for case: `op test(...Model):void;`
+    if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
+      return innerModel;
+    }
+    // for case: `op test(@header h: string, @query q: string, ...Model): void;`
+    if (
+      innerModel.sourceModels.length === 1 &&
+      innerModel.sourceModels[0].usage === "spread" &&
+      innerModel.sourceModels[0].model.name !== "" &&
+      innerModel.sourceModels[0].model.properties.size === type.properties.size
+    ) {
+      return innerModel.sourceModels[0].model;
+    }
+  }
+  return type;
 }

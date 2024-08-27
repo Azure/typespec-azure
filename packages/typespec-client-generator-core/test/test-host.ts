@@ -2,6 +2,7 @@ import { Diagnostic, EmitContext, Program, Type } from "@typespec/compiler";
 import {
   BasicTestRunner,
   StandardTestLibrary,
+  TestHost,
   TypeSpecTestLibrary,
   createTestHost,
   createTestWrapper,
@@ -9,7 +10,7 @@ import {
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { createSdkContext } from "../src/decorators.js";
+import { CreateSdkContextOptions, createSdkContext } from "../src/decorators.js";
 import {
   SdkContext,
   SdkEmitterOptions,
@@ -29,6 +30,7 @@ export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}
 }
 
 export interface SdkTestRunner extends BasicTestRunner {
+  host: TestHost;
   context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
@@ -40,21 +42,25 @@ export interface SdkTestRunner extends BasicTestRunner {
   ): Promise<[Record<string, Type>, readonly Diagnostic[]]>;
 }
 
-export function createSdkContextTestHelper<
-  TOptions extends object = CreateSdkTestRunnerOptions,
+export async function createSdkContextTestHelper<
+  TOptions extends Record<string, any> = CreateSdkTestRunnerOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   program: Program,
   options: TOptions,
-  emitterName?: string
-): SdkContext<TOptions, TServiceOperation> {
+  sdkContextOption?: CreateSdkContextOptions
+): Promise<SdkContext<TOptions, TServiceOperation>> {
   const emitContext: EmitContext<TOptions> = {
     program: program,
     emitterOutputDir: "dummy",
     options: options,
     getAssetEmitter: null as any,
   };
-  return createSdkContext(emitContext, emitterName ?? "@azure-tools/typespec-csharp");
+  return await createSdkContext(
+    emitContext,
+    options.emitterName ?? "@azure-tools/typespec-csharp",
+    sdkContextOption
+  );
 }
 
 export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
@@ -65,7 +71,8 @@ export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
 }
 
 export async function createSdkTestRunner(
-  options: CreateSdkTestRunnerOptions = {}
+  options: CreateSdkTestRunnerOptions = {},
+  sdkContextOption?: CreateSdkContextOptions
 ): Promise<SdkTestRunner> {
   const host = await createSdkTestHost(options);
   let autoUsings = [
@@ -81,14 +88,16 @@ export async function createSdkTestRunner(
     autoUsings: autoUsings,
   }) as SdkTestRunner;
 
+  sdkTestRunner.host = host;
+
   // compile
   const baseCompile = sdkTestRunner.compile;
   sdkTestRunner.compile = async function compile(code, compileOptions?) {
     const result = await baseCompile(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -97,10 +106,10 @@ export async function createSdkTestRunner(
   const baseDiagnose = sdkTestRunner.diagnose;
   sdkTestRunner.diagnose = async function diagnose(code, compileOptions?) {
     const result = await baseDiagnose(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -109,10 +118,10 @@ export async function createSdkTestRunner(
   const baseCompileAndDiagnose = sdkTestRunner.compileAndDiagnose;
   sdkTestRunner.compileAndDiagnose = async function compileAndDiagnose(code, compileOptions?) {
     const result = await baseCompileAndDiagnose(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -126,10 +135,10 @@ export async function createSdkTestRunner(
         noEmit: true,
       }
     );
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -148,10 +157,10 @@ export async function createSdkTestRunner(
           noEmit: true,
         }
       );
-      sdkTestRunner.context = createSdkContextTestHelper(
+      sdkTestRunner.context = await createSdkContextTestHelper(
         sdkTestRunner.program,
         options,
-        options.emitterName
+        sdkContextOption
       );
       return result;
     };
@@ -178,10 +187,10 @@ export async function createSdkTestRunner(
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compile("./client.tsp");
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -211,10 +220,10 @@ export async function createSdkTestRunner(
         noEmit: true,
       }
     );
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };
@@ -224,10 +233,10 @@ export async function createSdkTestRunner(
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compileAndDiagnose("./client.tsp");
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      options.emitterName
+      sdkContextOption
     );
     return result;
   };

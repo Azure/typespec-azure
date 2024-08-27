@@ -4,7 +4,7 @@ title: "[F] $traitAdded"
 
 ---
 ```ts
-$traitAdded(
+function $traitAdded(
    context, 
    target, 
    addedVersion): void
@@ -13,10 +13,10 @@ $traitAdded(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `ModelProperty` \| `Model` |
-| `addedVersion` | `EnumMember` \| `NullType` |
+| `target` | `Model` \| `ModelProperty` |
+| `addedVersion` | `Type` |
 
 ## Returns
 

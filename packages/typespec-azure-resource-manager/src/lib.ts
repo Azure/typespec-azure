@@ -76,6 +76,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`No ARM common-types version for this type satisfies the expected version ${"selectedVersion"}.  This type only supports the following version(s): ${"supportedVersions"}`,
       },
     },
+    "arm-common-types-invalid-version": {
+      severity: "error",
+      messages: {
+        default: paramMessage`No ARM common-types version matches the version string ${"versionString"}.  The following versions are supported: ${"supportedVersions"}`,
+      },
+    },
     "decorator-in-namespace": {
       severity: "error",
       messages: {

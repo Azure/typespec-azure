@@ -4,7 +4,7 @@ title: "[F] getSdkModel"
 
 ---
 ```ts
-getSdkModel(
+function getSdkModel(
    context, 
    type, 
    operation?): SdkModelType
@@ -13,8 +13,8 @@ getSdkModel(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Model` |
 | `operation`? | `Operation` |
 

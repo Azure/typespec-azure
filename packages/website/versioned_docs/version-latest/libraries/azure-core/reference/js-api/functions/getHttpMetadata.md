@@ -4,7 +4,7 @@ title: "[F] getHttpMetadata"
 
 ---
 ```ts
-getHttpMetadata(program, operation): HttpOperation
+function getHttpMetadata(program, operation): HttpOperation
 ```
 
 Get the Http metadata for this operation
@@ -12,7 +12,7 @@ Get the Http metadata for this operation
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` | The program being processed |
 | `operation` | `Operation` | The operation to get http metadata for |
 

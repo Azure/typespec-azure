@@ -4,7 +4,7 @@ title: "[F] $ensureVerb"
 
 ---
 ```ts
-$ensureVerb(
+function $ensureVerb(
    context, 
    entity, 
    templateName, 
@@ -14,7 +14,7 @@ $ensureVerb(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `templateName` | `string` |

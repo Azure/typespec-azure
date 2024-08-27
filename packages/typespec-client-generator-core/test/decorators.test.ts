@@ -1,27 +1,26 @@
-import {
-  Enum,
-  Interface,
-  Model,
-  Namespace,
-  Operation,
-  ignoreDiagnostics,
-} from "@typespec/compiler";
+import { Interface, Model, Namespace, Operation, ignoreDiagnostics } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
+  createSdkContext,
   getAccess,
   getClient,
   getClientNameOverride,
   getOperationGroup,
-  getUsage,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "../src/decorators.js";
-import { SdkMethodResponse, SdkOperationGroup, UsageFlags } from "../src/interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperation,
+  SdkMethodResponse,
+  SdkOperationGroup,
+  UsageFlags,
+} from "../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
@@ -48,7 +47,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyClient",
           service: MyClient,
           type: MyClient,
-          arm: false,
           crossLanguageDefinitionId: "MyClient.MyClient",
         },
       ]);
@@ -69,7 +67,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyClient",
           service: MyService,
           type: MyClient,
-          arm: false,
           crossLanguageDefinitionId: "MyService.MyClient",
         },
       ]);
@@ -169,8 +166,7 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyServiceClient",
           service: MyService,
           type: MyService,
-          arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
     });
@@ -279,7 +275,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @test op one(): void;
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.one");
     });
 
     it("crossLanguageDefinitionId with interface", async () => {
@@ -293,7 +289,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.Widgets.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
     });
 
     it("crossLanguageDefinitionId with subnamespace", async () => {
@@ -307,7 +303,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.Widgets.one");
+      strictEqual(getCrossLanguageDefinitionId(runner.context, one), "MyClient.Widgets.one");
     });
 
     it("crossLanguageDefinitionId with subnamespace and interface", async () => {
@@ -323,7 +319,10 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `)) as { one: Operation };
 
-      strictEqual(getCrossLanguageDefinitionId(one), "MyClient.SubNamespace.Widgets.one");
+      strictEqual(
+        getCrossLanguageDefinitionId(runner.context, one),
+        "MyClient.SubNamespace.Widgets.one"
+      );
     });
 
     it("crossLanguagePackageId", async () => {
@@ -420,10 +419,89 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyServiceClient",
           service: MyService,
           type: MyService,
-          arm: false,
-          crossLanguageDefinitionId: "MyService.MyServiceClient",
+          crossLanguageDefinitionId: "MyService",
         },
       ]);
+    });
+
+    it("with @clientName", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        @operationGroup
+        @clientName("ClientModel")
+        interface Model {
+          op foo(): void;
+        }
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+      const mainClient = sdkPackage.clients[0];
+      strictEqual(mainClient.methods.length, 1);
+
+      const clientAccessor = mainClient.methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      strictEqual(clientAccessor.response.kind, "client");
+      strictEqual(clientAccessor.response.name, "ClientModel");
+    });
+
+    it("@operationGroup with diagnostics", async () => {
+      const testCode = [
+        `
+        @service({
+          title: "DeviceUpdateClient",
+        })
+        namespace Azure.IoT.DeviceUpdate;
+      `,
+        `
+        @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
+        namespace Customizations;
+
+        @operationGroup("java")
+        interface SubClientOnlyForJava {
+        }
+
+        @operationGroup("python")
+        interface SubClientOnlyForPython {
+        }
+      `,
+      ];
+
+      // java should report disgnostics
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
+        expectDiagnostics(diagnostics, {
+          code: "@azure-tools/typespec-client-generator-core/client-service",
+        });
+      }
+
+      // python should have one sub client
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
+        expectDiagnostics(diagnostics, {});
+        const client = listClients(runner.context)[0];
+        strictEqual(listOperationGroups(runner.context, client).length, 1);
+      }
+
+      // csharp should only have one root client
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+        const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+          testCode[0],
+          testCode[1]
+        );
+        expectDiagnostics(diagnostics, {});
+        const client = listClients(runner.context)[0];
+        strictEqual(listOperationGroups(runner.context, client).length, 0);
+      }
     });
   });
 
@@ -1301,16 +1379,21 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
-      createSdkContextTestHelper(runner.context.program, {
+      await createSdkContextTestHelper(runner.context.program, {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
       test as Operation
     );
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
     strictEqual(actual, protocolValue);
+    strictEqual(method.generateProtocol, protocolValue);
   }
   describe("@protocolAPI", () => {
     it("generateProtocolMethodsTrue, operation marked protocolAPI true", async () => {
@@ -1337,16 +1420,21 @@ describe("typespec-client-generator-core: decorators", () => {
           @test
           op test(): void;
         `;
-    const { test } = await runner.compile(testCode);
+    const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
-      createSdkContextTestHelper(runner.program, {
+      await createSdkContextTestHelper(runner.program, {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
       test as Operation
     );
     strictEqual(actual, convenientValue);
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "basic");
+    strictEqual(method.generateConvenient, convenientValue);
   }
 
   describe("@convenientAPI", () => {
@@ -1364,20 +1452,24 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
-      const { test } = await runner.compile(`
+      const { test } = await runner.compileWithBuiltInService(`
         @convenientAPI
         @test
         op test(): void;
       `);
 
       const actual = shouldGenerateConvenient(
-        createSdkContextTestHelper(runner.program, {
+        await createSdkContextTestHelper(runner.program, {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
         test as Operation
       );
       strictEqual(actual, true);
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.generateConvenient, true);
     });
   });
 
@@ -1393,25 +1485,41 @@ describe("typespec-client-generator-core: decorators", () => {
       // java should get protocolAPI=true and convenientAPI=false
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(shouldGenerateProtocol(runner.context, test), true);
+        strictEqual(method.generateProtocol, true);
+
         strictEqual(
           shouldGenerateConvenient(runner.context, test),
           false,
           "convenientAPI should be false for java"
         );
+        strictEqual(method.generateConvenient, false, "convenientAPI should be false for java");
       }
 
       // csharp should get protocolAPI=false and convenientAPI=true
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-        const { test } = (await runner.compile(testCode)) as { test: Operation };
+        const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "test");
+        strictEqual(method.kind, "basic");
+
         strictEqual(
           shouldGenerateProtocol(runner.context, test),
           false,
           "protocolAPI should be false for csharp"
         );
+        strictEqual(method.generateProtocol, false, "protocolAPI should be false for csharp");
+
         strictEqual(shouldGenerateConvenient(runner.context, test), true);
+        strictEqual(method.generateConvenient, true);
       }
     });
   });
@@ -1433,17 +1541,22 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("emitter different scope from decorator", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @access(Access.internal, "csharp")
-        op func(
-          @query("createdAt")
-          createdAt: utcDateTime;
-        ): void;
-      `)) as { func: Operation };
+      const code = `
+      @test
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+    `;
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "public");
 
-      const actual = getAccess(runner.context, func);
-      strictEqual(actual, undefined);
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
     });
 
     it("emitter first in decorator scope list", async () => {
@@ -1479,18 +1592,23 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("emitter excluded from decorator scope list", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @access(Access.internal, "java")
-        @access(Access.internal, "csharp")
-        op func(
-          @query("createdAt")
-          createdAt: utcDateTime;
-        ): void;
-      `)) as { func: Operation };
+      const code = `
+      @test
+      @access(Access.internal, "java")
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+    `;
+      const { func } = (await runner.compile(code)) as { func: Operation };
 
-      const actual = getAccess(runner.context, func);
-      strictEqual(actual, undefined);
+      strictEqual(getAccess(runner.context, func), "public");
+      const runnerWithJava = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const { func: funcJava } = (await runnerWithJava.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithJava.context, funcJava), "internal");
     });
 
     it("duplicate-decorator diagnostic for first non-scoped decorator then scoped decorator", async () => {
@@ -1524,6 +1642,7 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "duplicate-decorator",
       });
     });
+
     it("duplicate-decorator diagnostic for multiple same scope", async () => {
       const diagnostics = await runner.diagnose(`
       @test
@@ -1539,798 +1658,81 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "duplicate-decorator",
       });
     });
-  });
 
-  describe("@access", () => {
-    it("mark an operation as internal", async () => {
-      const { test } = (await runner.compile(`
-        @service({title: "Test Service"}) namespace TestService;
-        @test
-        @access(Access.internal)
-        op test(): void;
-      `)) as { test: Operation };
+    it("csv scope list", async () => {
+      function getCodeTemplate(language: string) {
+        return `
+          @test
+          @access(Access.internal, "${language}")
+          model Test {
+            prop: string;
+          }
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
 
-      const actual = getAccess(runner.context, test);
-      strictEqual(actual, "internal");
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
     });
 
-    it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
-      const { test, Test } = (await runner.compile(`
-        @test
-        model Test{}
-
-        @test
-        op test(): void;
-      `)) as { test: Operation; Test: Model };
-
-      let actual = getAccess(runner.context, test);
-      strictEqual(actual, undefined);
-      actual = getAccess(runner.context, Test);
-      strictEqual(actual, undefined);
-    });
-
-    it("model access calculated by operation", async () => {
-      const { Test, func } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
+    it("csv scope list augment", async () => {
+      function getCodeTemplate(language: string) {
+        return `
           @test
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
-          op func(
-            @body body: Test
-          ): void;
-        }
-      `)) as { Test: Model; func: Operation };
 
-      let actual = getAccess(runner.context, Test);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, func);
-      strictEqual(actual, "internal");
+          @@access(Test, Access.public, "java, ts");
+          @@access(Test, Access.internal, "${language}");
+          `;
+      }
+      const pythonRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const csharpRunner = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+
+      const testCode = getCodeTemplate("python,csharp");
+      const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+
+      const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+
+      const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
+      strictEqual(getAccess(javaRunner.context, TestJava), "public");
     });
 
-    it("override calculated model with public access", async () => {
-      const { Test, func } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @access(Access.public)
-          model Test {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          op func(
-            @body body: Test
-          ): void;
-        }
-      `)) as { Test: Model; func: Operation };
-
-      let actual = getAccess(runner.context, Test);
-      strictEqual(actual, "public");
-      actual = getAccess(runner.context, func);
-      strictEqual(actual, "internal");
-    });
-
-    it("override calculated model with internal access", async () => {
-      const { Test, func } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @access(Access.internal) // This is an incorrect usage. We will have linter to ban.
-          model Test {
-            prop: string;
-          }
-          @test
-          op func(
-            @body body: Test
-          ): void;
-        }
-        `)) as { Test: Model; func: Operation };
-
-      let actual = getAccess(runner.context, Test);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, func);
-      strictEqual(actual, undefined);
-    });
-
-    it("access propagation", async () => {
-      const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @discriminator("sharktype")
-          @test
-          model Shark extends Fish {
-            kind: "shark";
-            origin: Origin;
-          }
-
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-          }
-
-          @test
-          model SawShark extends Shark {
-            sharktype: "saw";
-          }
-
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
-
-          @get
-          @access(Access.internal)
-          op getModel(): Fish;
-        }
-      `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
-
-      let actual = getAccess(runner.context, Fish);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, Shark);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, Salmon);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, SawShark);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, Origin);
-      strictEqual(actual, "internal");
-    });
-
-    it("complicated access propagation", async () => {
-      const { Test1, Test2, Test3, Test4, Test5, Test6, func1, func2, func3, func4, func5 } =
-        (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Test1 {
-            prop: Test2;
-          }
-          @test
-          model Test2 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Test1
-          ): void;
-
-          @test
-          model Test3 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func2")
-          op func2(
-            @body body: Test3
-          ): void;
-          @test
-          @route("/func3")
-          op func3(
-            @body body: Test3
-          ): void;
-
-          @test
-          model Test4 {
-            prop: Test5;
-          }
-          @test
-          model Test5 {
-            prop: Test6;
-          }
-          @test
-          model Test6 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func4")
-          op func4(
-            @body body: Test4
-          ): void;
-          @test
-          @route("/func5")
-          op func5(
-            @body body: Test6
-          ): void;
-        }
-      `)) as {
-          Test1: Model;
-          Test2: Model;
-          Test3: Model;
-          Test4: Model;
-          Test5: Model;
-          Test6: Model;
-          func1: Operation;
-          func2: Operation;
-          func3: Operation;
-          func4: Operation;
-          func5: Operation;
-        };
-
-      const func1Actual = getAccess(runner.context, func1);
-      strictEqual(func1Actual, "internal");
-      const func2Actual = getAccess(runner.context, func2);
-      strictEqual(func2Actual, "internal");
-      const func3Actual = getAccess(runner.context, func3);
-      strictEqual(func3Actual, undefined);
-      const func4Actual = getAccess(runner.context, func4);
-      strictEqual(func4Actual, "internal");
-      const func5Actual = getAccess(runner.context, func5);
-      strictEqual(func5Actual, undefined);
-
-      const test1Actual = getAccess(runner.context, Test1);
-      strictEqual(test1Actual, "internal");
-      const test2Actual = getAccess(runner.context, Test2);
-      strictEqual(test2Actual, "internal");
-      const test3Actual = getAccess(runner.context, Test3);
-      strictEqual(test3Actual, undefined);
-      const test4Actual = getAccess(runner.context, Test4);
-      strictEqual(test4Actual, "internal");
-      const test5Actual = getAccess(runner.context, Test5);
-      strictEqual(test5Actual, "internal");
-      const test6Actual = getAccess(runner.context, Test6);
-      strictEqual(test6Actual, undefined);
-    });
-
-    it("access propagation for properties, base models and sub models", async () => {
-      const {
-        Fish,
-        Salmon,
-        Origin,
-        BaseModel,
-        ModelA,
-        ModelB,
-        ModelC,
-        ModelD,
-        ModelE,
-        ModelF,
-        EnumA,
-        func1,
-        func2,
-        func3,
-        func4,
-      } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
-
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-            origin: Origin;
-          }
-
-          @test
-          model BaseModel {
-            base: string;
-          }
-
-          @test
-          model ModelA extends BaseModel {
-            prop1: ModelB;
-            prop2: ModelC[];
-            prop3: Record<ModelD>;
-            prop4: EnumA;
-            prop5: ModelE | ModelF;
-          }
-
-          @test
-          model ModelB {
-            prop: string;
-          }
-
-          @test
-          model ModelC {
-            prop: string;
-          }
-
-          @test
-          model ModelD {
-            prop: string;
-          }
-
-          @test
-          model ModelE {
-            prop: string;
-          }
-
-          @test
-          model ModelF {
-            prop: string;
-          }
-
-          @test
-          enum EnumA {
-            one,
-            two,
-            three,
-          }
-
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Fish
-          ): void;
-          @test
-          @route("/func2")
-          op func2(
-            @body body: Fish
-          ): void;
-
-          @test
-          @access(Access.internal)
-          @route("/func3")
-          op func3(
-            @body body: ModelA
-          ): void;
-          @test
-          @route("/func4")
-          op func4(
-            @body body: ModelA
-          ): void;
-        }
-      `)) as {
-        Fish: Model;
-        Salmon: Model;
-        Origin: Model;
-        BaseModel: Model;
-        ModelA: Model;
-        ModelB: Model;
-        ModelC: Model;
-        ModelD: Model;
-        ModelE: Model;
-        ModelF: Model;
-        EnumA: Model;
-        func1: Operation;
-        func2: Operation;
-        func3: Operation;
-        func4: Operation;
-      };
-
-      strictEqual(getAccess(runner.context, func1), "internal");
-      strictEqual(getAccess(runner.context, func2), undefined);
-      strictEqual(getAccess(runner.context, func3), "internal");
-      strictEqual(getAccess(runner.context, func4), undefined);
-
-      strictEqual(getAccess(runner.context, Fish), undefined);
-      strictEqual(getAccess(runner.context, Salmon), undefined);
-      strictEqual(getAccess(runner.context, Origin), undefined);
-      strictEqual(getAccess(runner.context, BaseModel), undefined);
-      strictEqual(getAccess(runner.context, ModelA), undefined);
-      strictEqual(getAccess(runner.context, ModelB), undefined);
-      strictEqual(getAccess(runner.context, ModelC), undefined);
-      strictEqual(getAccess(runner.context, ModelD), undefined);
-      strictEqual(getAccess(runner.context, ModelE), undefined);
-      strictEqual(getAccess(runner.context, ModelF), undefined);
-      strictEqual(getAccess(runner.context, EnumA), undefined);
-
-      strictEqual(runner.context.operationModelsMap?.get(func1)?.size, 3);
-      strictEqual(runner.context.operationModelsMap?.get(func2)?.size, 3);
-      strictEqual(runner.context.operationModelsMap?.get(func3)?.size, 8);
-      strictEqual(runner.context.operationModelsMap?.get(func4)?.size, 8);
-    });
-
-    it("access propagation with override", async () => {
-      const {
-        Test1,
-        Test2,
-        Test3,
-        Test4,
-        Test5,
-        func1,
-        func2,
-        func3,
-        func4,
-        func5,
-        func6,
-        func7,
-        func8,
-      } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Test1 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Test1
-          ): void;
-
-          @test
-          model Test2 {
-          }
-          @test
-          @route("/func2")
-          op func2(
-            @body body: Test2
-          ): void;
-
-          @test
-          model Test3 {
-          }
-          @test
-          @access(Access.public)
-          @route("/func3")
-          op func3(
-            @body body: Test3
-          ): void;
-
-
-          @test
-          model Test4 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func4")
-          op func4(
-            @body body: Test4
-          ): void;
-          @test
-          @route("/func5")
-          op func5(
-            @body body: Test4
-          ): void;
-
-          @test
-          model Test5 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func6")
-          op func6(
-            @body body: Test5
-          ): void;
-          @test
-          @route("/func7")
-          op func7(
-            @body body: Test5
-          ): void;
-          @test
-          @access(Access.public)
-          @route("/func8")
-          op func8(
-            @body body: Test5
-          ): void;
-        }
-      `)) as {
-        Test1: Model;
-        Test2: Model;
-        Test3: Model;
-        Test4: Model;
-        Test5: Model;
-        func1: Operation;
-        func2: Operation;
-        func3: Operation;
-        func4: Operation;
-        func5: Operation;
-        func6: Operation;
-        func7: Operation;
-        func8: Operation;
-      };
-
-      const func1Actual = getAccess(runner.context, func1);
-      strictEqual(func1Actual, "internal");
-      const func2Actual = getAccess(runner.context, func2);
-      strictEqual(func2Actual, undefined);
-      const func3Actual = getAccess(runner.context, func3);
-      strictEqual(func3Actual, "public");
-      const func4Actual = getAccess(runner.context, func4);
-      strictEqual(func4Actual, "internal");
-      const func5Actual = getAccess(runner.context, func5);
-      strictEqual(func5Actual, undefined);
-      const func6Actual = getAccess(runner.context, func6);
-      strictEqual(func6Actual, "internal");
-      const func7Actual = getAccess(runner.context, func7);
-      strictEqual(func7Actual, undefined);
-      const func8Actual = getAccess(runner.context, func8);
-      strictEqual(func8Actual, "public");
-
-      const test1Actual = getAccess(runner.context, Test1);
-      strictEqual(test1Actual, "internal");
-      const test2Actual = getAccess(runner.context, Test2);
-      strictEqual(test2Actual, undefined);
-      const test3Actual = getAccess(runner.context, Test3);
-      strictEqual(test3Actual, "public");
-      const test4Actual = getAccess(runner.context, Test4);
-      strictEqual(test4Actual, undefined);
-      const test5Actual = getAccess(runner.context, Test5);
-      strictEqual(test5Actual, "public");
-    });
-
-    it("access propagation with nullable", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        model RunStep {
-          id: string;
-          lastError: RunStepError | null;
-        }
-
-        model RunStepError {
-          code: string;
-          message: string;
-        }
-
-        @get
-        @route("/threads/{threadId}/runs/{runId}/steps/{stepId}")
-        op getRunStep(
-          @path threadId: string,
-          @path runId: string,
-          @path stepId: string,
-        ): RunStep;
-
-        @get
-        @route("/threads/{threadId}/runs/{runId}/steps")
-        op listRunSteps(
-          @path threadId: string,
-          @path runId: string,
-        ): RunStep[];
-        @@access(listRunSteps, Access.internal);
-        `
-      );
-      const models = runner.context.experimental_sdkPackage.models;
-      strictEqual(models.length, 2);
-      strictEqual(models[0].access, undefined);
-      strictEqual(models[1].access, undefined);
-    });
-  });
-
-  describe("@usage", () => {
-    it("defaults calculated usage", async () => {
-      const { Model1, Model2, Model3, Model4 } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Model1{ prop: string }
-
-          @test
-          model Model2{ prop: string }
-
-          @test
-          model Model3{ prop: string }
-
-          @test
-          model Model4 { prop: string }
-
-          @test
-          @route("/func1")
-          op func1(@body body: Model1): void;
-
-          @test
-          @route("/func2")
-          op func2(): Model2;
-
-          @test
-          @route("/func3")
-          op func3(@body body: Model3): Model3;
-        }
-      `)) as { Model1: Model; Model2: Model; Model3: Model; Model4: Model };
-
-      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input);
-      strictEqual(getUsage(runner.context, Model2), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model3), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
-    });
-
-    it("usage override", async () => {
-      const { Model1, Model2, Model3, Model4, Enum1, Enum2 } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @usage(Usage.input | Usage.output)
-          @access(Access.public)
-          enum Enum1{
-            one,
-            two,
-            three
-          }
-
-          @test
-          enum Enum2{
-            one,
-            two,
-            three
-          }
-
-          @test
-          @usage(Usage.input | Usage.output)
-          @access(Access.public)
-          model Model1{ prop: string }
-
-          @test
-          model Model4{ prop: string }
-
-          @test
-          @usage(Usage.output)
-          model Model2{ prop: string }
-
-          @test
-          @usage(Usage.input)
-          model Model3{ prop: string }
-
-          @test
-          @route("/func1")
-          op func1(@body body: Model2): void;
-
-          @test
-          @route("/func2")
-          op func2(): Model3;
-        }
-      `)) as {
-        Model1: Model;
-        Model2: Model;
-        Model3: Model;
-        Model4: Model;
-        Enum1: Enum;
-        Enum2: Enum;
-      };
-
-      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model2), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model3), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
-      strictEqual(getUsage(runner.context, Enum1), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Enum2), UsageFlags.None);
-    });
-
-    it("wrong usage value", async () => {
+    it("duplicate-decorator diagnostic for csv scope list", async () => {
       const diagnostics = await runner.diagnose(`
-        @test
-        @usage(1)
-        model Model1{}
+      @test
+      @access(Access.internal, "csharp,ts")
+      @access(Access.internal, "csharp")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "invalid-argument",
+        code: "duplicate-decorator",
       });
-    });
-
-    it("usage propagation", async () => {
-      const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @discriminator("sharktype")
-          @test
-          @usage(Usage.input)
-          model Shark extends Fish {
-            kind: "shark";
-            origin: Origin;
-          }
-
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-          }
-
-          @test
-          model SawShark extends Shark {
-            sharktype: "saw";
-          }
-
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
-
-          @get
-          op getModel(): Fish;
-        }
-      `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
-
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Shark), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, SawShark), UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Origin), UsageFlags.Output);
-    });
-
-    it("usage and convenience", async () => {
-      const { Fish } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @put
-          @convenientAPI(true)
-          op putModel(@body body: Fish): void;
-
-          @get
-          @convenientAPI(false)
-          op getModel(): Fish;
-        }
-      `)) as { Fish: Model };
-
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Input);
-
-      const { Dog } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Dog {
-            age: int32;
-          }
-
-          @put
-          @convenientAPI(false)
-          op putModel(@body body: Dog): void;
-
-          @get
-          @convenientAPI(true)
-          op getModel(): Dog;
-        }
-      `)) as { Dog: Model };
-
-      strictEqual(getUsage(runner.context, Dog), UsageFlags.Output);
-    });
-
-    it("patch usage", async () => {
-      const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model PatchModel {
-            age: int32;
-          }
-
-          @test
-          model JsonMergePatchModel {
-            prop: string
-          }
-
-          @patch
-          @route("/patch")
-          op patchModel(@body body: PatchModel): void;
-
-          @patch
-          @route("/jsonMergePatch")
-          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
-        }
-      `)) as { PatchModel: Model; JsonMergePatchModel: Model };
-
-      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input);
-      strictEqual(
-        getUsage(runner.context, JsonMergePatchModel),
-        UsageFlags.JsonMergePatch | UsageFlags.Input
-      );
     });
   });
 
@@ -2434,6 +1836,30 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "decorator-wrong-target",
       });
     });
+
+    it("throws error when used on a polymorphism type", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service
+        @test namespace MyService {
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          @discriminator("kind")
+          model Model2{
+            kind: string;
+          }
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",
+      });
+    });
   });
 
   describe("@clientName", () => {
@@ -2522,21 +1948,21 @@ describe("typespec-client-generator-core: decorators", () => {
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
       }
 
       // csharp
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
       }
 
       // python
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
         await runner.compile(testCode);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+        strictEqual(runner.context.sdkPackage.models[0].name, "Test");
       }
     });
 
@@ -2569,21 +1995,21 @@ describe("typespec-client-generator-core: decorators", () => {
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestJava");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
       }
 
       // csharp
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "TestCSharp");
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
       }
 
       // python
       {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
         await runner.compileWithCustomization(testCode, customization);
-        strictEqual(runner.context.experimental_sdkPackage.models[0].name, "Test");
+        strictEqual(runner.context.sdkPackage.models[0].name, "Test");
       }
     });
 
@@ -2611,10 +2037,407 @@ describe("typespec-client-generator-core: decorators", () => {
         
       `);
 
-      strictEqual(
-        runner.context.experimental_sdkPackage.clients[0].methods[0].parameters[0].name,
-        "body"
+      strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
+    });
+
+    it("empty client name", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service({})
+        namespace MyService;
+        
+        @clientName(" ")
+        model Test {
+          id: string;
+          prop: string;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/empty-client-name",
+      });
+    });
+
+    it("duplicate model client name with a random language scope", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      @clientName("Test", "random")
+      model Widget {
+        @key
+        id: int32;
+      }
+
+      model Test {
+        prop1: string;
+      }
+      `
       );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "random"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "random"',
+        },
+      ]);
+    });
+
+    it("duplicate model, enum, union client name with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("B")
+      enum A {
+        one
+      }
+
+      model B {}
+
+      @clientName("B")
+      union C {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate operation in interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      interface C {
+        @clientName("b")
+        @route("/a")
+        op a(): void;
+
+        @route("/b")
+        op b(): void;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate scalar with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+        
+      @clientName("b")
+      scalar a extends string;
+
+      scalar b extends string;
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate interface with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      @clientName("B")
+      @route("/a")
+      interface A {
+      }
+
+      @route("/b")
+      interface B {
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model property with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      model A {
+        @clientName("prop2")
+        prop1: string;
+        prop2: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "prop2" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "prop2" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate enum member with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+
+      enum A {
+        @clientName("two")
+        one,
+        two
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "two" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "two" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate union variant with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace Contoso.WidgetManager;
+
+        union Foo { 
+          @clientName("b")
+          a: {}, 
+          b: {} 
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate namespace with all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace A{
+          namespace B {}
+          @clientName("B")
+          namespace C {}
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate enum and model within nested namespace for all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        @service
+        namespace A{
+          namespace B {
+            @clientName("B")
+            enum A {
+              one
+            }
+
+            model B {}
+          }
+
+          @clientName("B")
+          model A {}
+        }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "B" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model with model only generation for all language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+        model Foo {}
+
+        @clientName("Foo")
+        model Bar {}
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Foo" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Foo" is duplicated in language scope: "AllScopes"',
+        },
+      ]);
+    });
+
+    it("duplicate model client name with multiple language scopes", async () => {
+      const diagnostics = await runner.diagnose(
+        `
+      @service
+      namespace Contoso.WidgetManager;
+      
+      @clientName("Test", "csharp,python,java")
+      model Widget {
+        @key
+        id: int32;
+      }
+
+      @clientName("Widget", "java")
+      model Test {
+        prop1: string;
+      }
+      `
+      );
+
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "csharp"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "Test" is duplicated in language scope: "python"',
+        },
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message:
+            'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "python"',
+        },
+      ]);
     });
   });
 
@@ -2671,7 +2494,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2770,7 +2593,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2868,7 +2691,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -2966,7 +2789,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
       `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3067,7 +2890,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
     `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3156,7 +2979,7 @@ describe("typespec-client-generator-core: decorators", () => {
       op get(...Resource.KeysOf<Widget>): Widget | Error;
     `);
 
-      const sdkPackage = runnerWithVersion.context.experimental_sdkPackage;
+      const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
@@ -3241,19 +3064,21 @@ describe("typespec-client-generator-core: decorators", () => {
 
       await runnerWithVersion.compile(tsp);
 
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 2);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 2);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "previewFunctionality"
       );
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[1].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[1].name,
         "stableFunctionality"
       );
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 2);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "PreviewModel");
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[1].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "PreviewModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[1].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[1].access, "internal");
 
       runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
@@ -3261,14 +3086,19 @@ describe("typespec-client-generator-core: decorators", () => {
 
       await runnerWithVersion.compile(tsp);
 
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.clients[0].methods.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 1);
       strictEqual(
-        runnerWithVersion.context.experimental_sdkPackage.clients[0].methods[0].name,
+        runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
         "stableFunctionality"
       );
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models.length, 1);
-      strictEqual(runnerWithVersion.context.experimental_sdkPackage.models[0].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
+      strictEqual(
+        runnerWithVersion.context.sdkPackage.models[0].usage,
+        UsageFlags.Spread | UsageFlags.Json
+      );
     });
     it("add client", async () => {
       await runner.compile(
@@ -3298,8 +3128,8 @@ describe("typespec-client-generator-core: decorators", () => {
         }
         `
       );
-      const sdkPackage = runner.context.experimental_sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
       const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
       ok(versioningClient);
       strictEqual(versioningClient.methods.length, 2);
@@ -3321,7 +3151,8 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clientAccessor.name, "getInterfaceV2");
       deepStrictEqual(clientAccessor.apiVersions, ["v2"]);
 
-      const interfaceV2 = sdkPackage.clients.find((x) => x.name === "InterfaceV2");
+      const interfaceV2 = versioningClient.methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
       ok(interfaceV2);
       strictEqual(interfaceV2.methods.length, 1);
 
@@ -3337,6 +3168,115 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(test2Method);
       strictEqual(test2Method.name, "test2");
       deepStrictEqual(test2Method.apiVersions, ["v2"]);
+    });
+    it("default latest GA version with preview", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2022_10_01_preview: "2022-10-01-preview",
+          v2024_10_01: "2024-10-01",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 1);
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+    });
+    it("default latest preview version with GA", async () => {
+      await runner.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2024-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-11-01-preview");
+    });
+
+    it("specify api version with preview filter", async () => {
+      const runnerWithVersion = await createSdkTestRunner({
+        "api-version": "2024-10-01",
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(
+        `
+        @service
+        @versioned(Versions)
+        @server(
+          "{endpoint}",
+          "Testserver endpoint",
+          {
+            endpoint: url,
+          }
+        )
+        namespace Versioning;
+        enum Versions {
+          v2023_10_01: "2023-10-01",
+          v2023_11_01_preview: "2023-11-01-preview",
+          v2024_10_01: "2024-10-01",
+          v2024_11_01_preview: "2024-11-01-preview",
+        }
+        op test(): void;
+
+        @route("/interface-v2")
+        interface InterfaceV2 {
+          @post
+          @route("/v2")
+          test2(): void;
+        }
+        `
+      );
+      const sdkVersionsEnum = runnerWithVersion.context.sdkPackage.enums[0];
+      strictEqual(sdkVersionsEnum.name, "Versions");
+      strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+      strictEqual(sdkVersionsEnum.values.length, 2);
+      strictEqual(sdkVersionsEnum.values[0].value, "2023-10-01");
+      strictEqual(sdkVersionsEnum.values[1].value, "2024-10-01");
     });
   });
 
@@ -3548,6 +3488,301 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(aOps.length, 1);
       a = aOps.find((x) => x.name === "a");
       ok(a);
+    });
+  });
+
+  describe("createSdkContext", () => {
+    it("multiple call with versioning", async () => {
+      const tsp = `
+        @service({
+          title: "Contoso Widget Manager",
+        })
+        @versioned(Contoso.WidgetManager.Versions)
+        namespace Contoso.WidgetManager;
+        
+        enum Versions {
+          v1,
+        }
+
+        @client({name: "TestClient"})
+        @test
+        interface Test {}
+      `;
+
+      const runnerWithVersion = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+
+      await runnerWithVersion.compile(tsp);
+      let clients = listClients(runnerWithVersion.context);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
+
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
+      clients = listClients(newSdkContext);
+      strictEqual(clients.length, 1);
+      ok(clients[0].type);
+    });
+  });
+
+  describe("@override", () => {
+    it("basic", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        op func(params: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+      strictEqual(paramsModel, paramsParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
+    });
+
+    it("basic with scope", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        op func(params: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func, "csharp");
+        `;
+      await runner.compileWithCustomization(mainCode, customizationCode);
+      // runner has python scope, so shouldn't be overridden
+
+      ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 3);
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+
+      const fooParam = method.parameters.find((x) => x.name === "foo");
+      ok(fooParam);
+
+      const barParam = method.parameters.find((x) => x.name === "bar");
+      ok(barParam);
+
+      const httpOp = method.operation;
+      strictEqual(httpOp.parameters.length, 1);
+      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+      ok(httpOp.bodyParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], fooParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], barParam);
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCsharp.compileWithCustomization(mainCode, customizationCode);
+      ok(runnerWithCsharp.context.sdkPackage.models.find((x) => x.name === "Params"));
+
+      const sdkPackageWithCsharp = runnerWithCsharp.context.sdkPackage;
+      strictEqual(sdkPackageWithCsharp.clients.length, 1);
+
+      strictEqual(sdkPackageWithCsharp.clients[0].methods.length, 1);
+      const methodWithCsharp = sdkPackageWithCsharp.clients[0].methods[0];
+      strictEqual(methodWithCsharp.kind, "basic");
+      strictEqual(methodWithCsharp.name, "func");
+      strictEqual(methodWithCsharp.parameters.length, 2);
+      const contentTypeParamWithCsharp = methodWithCsharp.parameters.find(
+        (x) => x.name === "contentType"
+      );
+      ok(contentTypeParamWithCsharp);
+
+      const paramsParamWithCsharp = methodWithCsharp.parameters.find((x) => x.name === "params");
+      ok(paramsParamWithCsharp);
+      strictEqual(
+        sdkPackageWithCsharp.models.find((x) => x.name === "Params"),
+        paramsParamWithCsharp.type
+      );
+
+      const httpOpWithCsharp = methodWithCsharp.operation;
+      strictEqual(httpOpWithCsharp.parameters.length, 1);
+      strictEqual(
+        httpOpWithCsharp.parameters[0].correspondingMethodParams[0],
+        contentTypeParamWithCsharp
+      );
+      ok(httpOpWithCsharp.bodyParam);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
+    });
+
+    it("regrouping", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+          fooBar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        model ParamsCustomized {
+          ...PickProperties<MyService.Params, "foo" | "bar">;
+        }
+
+        op func(params: MyCustomizations.ParamsCustomized, ...PickProperties<MyService.Params, "fooBar">): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `;
+      await runner.compileWithCustomization(mainCode, customizationCode);
+      // runner has python scope, so shouldn't be overridden
+
+      ok(!runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 3);
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+
+      const fooBarParam = method.parameters.find((x) => x.name === "fooBar");
+      ok(fooBarParam);
+
+      const httpOp = method.operation;
+      strictEqual(httpOp.parameters.length, 1);
+      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+      ok(httpOp.bodyParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], paramsParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], fooBarParam);
+    });
+
+    it("params mismatch", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        model ParamsCustomized {
+          foo: string;
+          bar: string;
+        }
+
+        op func(params: MyCustomizations.ParamsCustomized): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `;
+      const diagnostics = (
+        await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
+      )[1];
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/override-method-parameters-mismatch",
+      });
+    });
+
+    it("recursive params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        op func(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        op func(input: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      const inputParam = method.parameters.find((x) => x.name === "input");
+      ok(inputParam);
+      strictEqual(paramsModel, inputParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
     });
   });
 });

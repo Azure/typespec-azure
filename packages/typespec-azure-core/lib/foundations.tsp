@@ -15,21 +15,23 @@ namespace Azure.Core.Foundations;
  * Enum describing allowed operation states.
  */
 @lroStatus
-enum OperationState {
+union OperationState {
   @doc("The operation has not started.")
-  NotStarted,
+  NotStarted: "NotStarted",
 
   @doc("The operation is in progress.")
-  Running,
+  Running: "Running",
 
   @doc("The operation has completed successfully.")
-  Succeeded,
+  Succeeded: "Succeeded",
 
   @doc("The operation has failed.")
-  Failed,
+  Failed: "Failed",
 
   @doc("The operation has been canceled by the user.")
-  Canceled,
+  Canceled: "Canceled",
+
+  string,
 }
 
 /**

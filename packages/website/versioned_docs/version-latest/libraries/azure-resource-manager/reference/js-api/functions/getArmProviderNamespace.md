@@ -4,7 +4,7 @@ title: "[F] getArmProviderNamespace"
 
 ---
 ```ts
-getArmProviderNamespace(program, entity): string | undefined
+function getArmProviderNamespace(program, entity): string | undefined
 ```
 
 Get the ARM provider namespace for a given entity
@@ -12,9 +12,9 @@ Get the ARM provider namespace for a given entity
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `program` | `Program` |  |
-| `entity` | `Model` \| `Namespace` |  |
+| `entity` | `Namespace` \| `Model` |  |
 
 ## Returns
 

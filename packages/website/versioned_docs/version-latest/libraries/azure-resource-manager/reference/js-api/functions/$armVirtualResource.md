@@ -4,7 +4,7 @@ title: "[F] $armVirtualResource"
 
 ---
 ```ts
-$armVirtualResource(context, entity): void
+function $armVirtualResource(context, target): void
 ```
 
 Marks the given resource as an external resource
@@ -12,9 +12,9 @@ Marks the given resource as an external resource
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | The decorator context |
-| `entity` | `Model` | The resource model |
+| `target` | `Model` | - |
 
 ## Returns
 

@@ -4,7 +4,7 @@ title: "[F] getClientFormat"
 
 ---
 ```ts
-getClientFormat(context, entity): ClientFormat | undefined
+function getClientFormat(context, entity): ClientFormat | undefined
 ```
 
 Gets additional information on how to serialize / deserialize TYPESPEC standard types depending
@@ -13,8 +13,8 @@ on whether additional serialization information is provided or needed
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | the Sdk Context |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | the Sdk Context |
 | `entity` | `ModelProperty` | the entity whose client format we are going to get |
 
 ## Returns

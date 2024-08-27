@@ -4,7 +4,7 @@ title: "[F] filterResponseModels"
 
 ---
 ```ts
-filterResponseModels(operation, predicate): Model[] | undefined
+function filterResponseModels(operation, predicate): Model[] | undefined
 ```
 
 Filter operation responses using a predicate
@@ -12,7 +12,7 @@ Filter operation responses using a predicate
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `operation` | `HttpOperation` | The operation containign the response models to filter |
 | `predicate` | (`model`) => `boolean` | A predicate function to apply to each response model |
 

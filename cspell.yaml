@@ -16,10 +16,10 @@ ignorePaths:
   - pnpm-lock.yaml
   - eng/feeds/**/examples/**
   - packages/samples/test/output/**
-  - ".git/**"
-  - ".gitignore"
-  - ".vscode/**"
-  - ".editorconfig"
+  - .git/**
+  - .gitignore
+  - .vscode/**
+  - .editorconfig
   - .github/CODEOWNERS
 useGitignore: true
 enableFiletypes:
@@ -34,6 +34,7 @@ words:
   - Bazs
   - byos
   - clsx
+  - contosowidgetmanager
   - DMSS
   - Donezo
   - dynatrace
@@ -48,11 +49,14 @@ words:
   - LINUXNEXTVMIMAGE
   - LINUXOS
   - LINUXVMIMAGE
+  - locationyaml
   - logz
   - LRO
   - lropaging
   - Lucene
   - MACVMIMAGE
+  - mgmt
+  - mobo
   - msazure
   - msdata
   - mylocation
@@ -60,9 +64,10 @@ words:
   - odata
   - Onco
   - oncophenotype
-  - psscriptanalyzer
   - PAYG
   - prismjs
+  - psscriptanalyzer
+  - pytest
   - qnas
   - regionality
   - Reranker
@@ -71,4 +76,5 @@ words:
   - SERVICERP
   - tcgc
   - userrp
+  - vnet
   - WINDOWSVMIMAGE

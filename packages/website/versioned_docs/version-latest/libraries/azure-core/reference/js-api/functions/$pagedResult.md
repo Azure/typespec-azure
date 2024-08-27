@@ -4,13 +4,13 @@ title: "[F] $pagedResult"
 
 ---
 ```ts
-$pagedResult(context, entity): void
+function $pagedResult(context, entity): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
 

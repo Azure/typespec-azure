@@ -4,7 +4,7 @@ title: "[F] $ensureTraitsPresent"
 
 ---
 ```ts
-$ensureTraitsPresent(
+function $ensureTraitsPresent(
    context, 
    target, 
    traitModel, 
@@ -14,11 +14,11 @@ $ensureTraitsPresent(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Interface` \| `Operation` |
 | `traitModel` | `Model` |
-| `expectedTraits` | `Tuple` |
+| `expectedTraits` | `Type` |
 
 ## Returns
 

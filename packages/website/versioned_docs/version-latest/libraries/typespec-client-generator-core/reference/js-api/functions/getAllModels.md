@@ -4,14 +4,14 @@ title: "[F] getAllModels"
 
 ---
 ```ts
-getAllModels(context, options): (SdkModelType | SdkEnumType)[]
+function getAllModels(context, options): (SdkModelType | SdkEnumType)[]
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `options` | `GetAllModelsOptions` |
 
 ## Returns

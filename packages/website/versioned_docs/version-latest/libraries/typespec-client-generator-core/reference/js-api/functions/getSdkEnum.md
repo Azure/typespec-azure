@@ -4,7 +4,7 @@ title: "[F] getSdkEnum"
 
 ---
 ```ts
-getSdkEnum(
+function getSdkEnum(
    context, 
    type, 
    operation?): SdkEnumType
@@ -13,8 +13,8 @@ getSdkEnum(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Enum` |
 | `operation`? | `Operation` |
 

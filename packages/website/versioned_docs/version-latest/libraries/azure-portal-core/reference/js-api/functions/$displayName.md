@@ -4,7 +4,7 @@ title: "[F] $displayName"
 
 ---
 ```ts
-$displayName(
+function $displayName(
    context, 
    target, 
    name): void
@@ -13,7 +13,7 @@ $displayName(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
 | `name` | `string` |

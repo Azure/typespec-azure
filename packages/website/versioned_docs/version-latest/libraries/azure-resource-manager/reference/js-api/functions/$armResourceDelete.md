@@ -4,7 +4,7 @@ title: "[F] $armResourceDelete"
 
 ---
 ```ts
-$armResourceDelete(
+function $armResourceDelete(
    context, 
    target, 
    resourceType): void
@@ -13,7 +13,7 @@ $armResourceDelete(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
 | `resourceType` | `Model` |

@@ -4,7 +4,7 @@ title: "[F] getOperationLink"
 
 ---
 ```ts
-getOperationLink(
+function getOperationLink(
    program, 
    entity, 
    linkType): OperationLinkMetadata | undefined
@@ -15,7 +15,7 @@ Returns the `OperationLinkMetadata` for a given operation and link type, or unde
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Operation` |
 | `linkType` | `string` |

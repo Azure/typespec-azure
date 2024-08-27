@@ -4,22 +4,22 @@ title: "[F] reportDiagnostic"
 
 ---
 ```ts
-reportDiagnostic<C, M>(program, diag): void
+function reportDiagnostic<C, M>(program, diag): void
 ```
 
-## Type parameters
+## Type Parameters
 
-| Type parameter |
-| :------ |
-| `C` extends `"invalid-identifier"` \| `"missing-type-parent"` \| `"no-numeric"` \| `"unrecognized-scalar"` |
-| `M` extends `string` \| `number` \| `symbol` |
+| Type Parameter |
+| ------ |
+| `C` *extends* `"invalid-identifier"` \| `"missing-type-parent"` \| `"no-numeric"` \| `"unrecognized-scalar"` |
+| `M` *extends* `string` \| `number` \| `symbol` |
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
-| `diag` | `DiagnosticReport`<`Object`, `C`, `M`\> |
+| `diag` | `DiagnosticReport`<`object`, `C`, `M`\> |
 
 ## Returns
 

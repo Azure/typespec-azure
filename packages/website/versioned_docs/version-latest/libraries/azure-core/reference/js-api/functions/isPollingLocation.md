@@ -4,7 +4,7 @@ title: "[F] isPollingLocation"
 
 ---
 ```ts
-isPollingLocation(program, entity): boolean
+function isPollingLocation(program, entity): boolean
 ```
 
 Returns `true` if the property is marked with @pollingLocation.
@@ -12,7 +12,7 @@ Returns `true` if the property is marked with @pollingLocation.
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `ModelProperty` |
 

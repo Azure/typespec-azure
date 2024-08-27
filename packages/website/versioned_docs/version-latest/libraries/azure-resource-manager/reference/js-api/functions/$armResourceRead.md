@@ -4,7 +4,7 @@ title: "[F] $armResourceRead"
 
 ---
 ```ts
-$armResourceRead(
+function $armResourceRead(
    context, 
    target, 
    resourceType): void
@@ -13,7 +13,7 @@ $armResourceRead(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `Operation` |
 | `resourceType` | `Model` |

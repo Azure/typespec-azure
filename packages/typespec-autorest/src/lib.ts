@@ -84,6 +84,23 @@ export interface AutorestEmitterOptions {
    * @default false
    */
   "use-read-only-status-schema"?: boolean;
+
+  /**
+   * Determines whether and how to emit the x-ms-long-running-operation-options
+   * @default "final-state-only"
+   */
+  "emit-lro-options"?: "none" | "final-state-only" | "all";
+
+  /**
+   * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
+   * ARM resource properties.
+   */
+  "arm-resource-flattening"?: boolean;
+  /**
+   * Determines whether and how to emit schemas for common-types
+   * @default "for-visibility-changes"
+   */
+  "emit-common-types-schema"?: "never" | "for-visibility-changes";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -179,11 +196,34 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: false,
       description: "Create read-only property schema for lro status",
     },
+    "emit-lro-options": {
+      type: "string",
+      enum: ["none", "final-state-only", "all"],
+      nullable: true,
+      default: "final-state-only",
+      description:
+        "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
+    },
+    "arm-resource-flattening": {
+      type: "boolean",
+      nullable: true,
+      default: false,
+      description:
+        "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
+    },
+    "emit-common-types-schema": {
+      type: "string",
+      enum: ["never", "for-visibility-changes"],
+      nullable: true,
+      default: "for-visibility-changes",
+      description:
+        "Determine whether and how to emit schemas for common-types rather than referencing them",
+    },
   },
   required: [],
 };
 
-const libDef = {
+export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-autorest",
   diagnostics: {
     "duplicate-body-types": {
@@ -303,7 +343,11 @@ const libDef = {
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<AutorestEmitterOptions>,
   },
-} as const;
 
-export const $lib = createTypeSpecLibrary(libDef);
-export const { reportDiagnostic, createDiagnostic, createStateSymbol, getTracer } = $lib;
+  state: {
+    example: { description: "State for the @example decorator" },
+    useRef: { description: "State for the @useRef decorator" },
+  },
+} as const);
+
+export const { reportDiagnostic, createDiagnostic, stateKeys: AutorestStateKeys, getTracer } = $lib;

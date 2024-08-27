@@ -4,9 +4,9 @@ title: "[F] $example"
 
 ---
 ```ts
-$example(
+function $example(
    context, 
-   entity, 
+   target, 
    pathOrUri, 
    title): void
 ```
@@ -16,9 +16,9 @@ $example(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Type` |
+| `target` | `Operation` |
 | `pathOrUri` | `string` |
 | `title` | `string` |
 

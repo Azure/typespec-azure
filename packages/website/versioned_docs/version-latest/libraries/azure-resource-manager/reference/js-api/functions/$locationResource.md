@@ -4,15 +4,15 @@ title: "[F] $locationResource"
 
 ---
 ```ts
-$locationResource(context, entity): void
+function $locationResource(context, target): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` |
+| `target` | `Model` |
 
 ## Returns
 

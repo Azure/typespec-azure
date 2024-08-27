@@ -13,13 +13,17 @@ using Azure.ResourceManager;
 @service({
   title: "ContosoProviderHubClient",
 })
-@OpenAPI.info({
-  version: "2021-10-01-preview",
-})
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-@armCommonTypesVersion(CommonTypes.Versions.v5)
+@versioned(Versions)
 @doc("Contoso Resource Provider management API.")
 namespace Microsoft.ContosoProviderHub;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  `2021-10-01-preview`,
+}
 
 interface Operations extends Azure.ResourceManager.Operations {}
 

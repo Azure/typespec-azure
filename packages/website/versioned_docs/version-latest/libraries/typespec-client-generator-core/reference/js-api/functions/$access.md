@@ -4,9 +4,9 @@ title: "[F] $access"
 
 ---
 ```ts
-$access(
+function $access(
    context, 
-   entity, 
+   target, 
    value, 
    scope?): void
 ```
@@ -14,9 +14,9 @@ $access(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Model` \| `Enum` \| `Operation` \| `Union` |
+| `target` | `Enum` \| `Model` \| `Operation` \| `Union` |
 | `value` | `EnumMember` |
 | `scope`? | `string` |
 

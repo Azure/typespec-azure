@@ -4,12 +4,12 @@ title: "[V] $lib"
 
 ---
 ```ts
-const $lib: TypeSpecLibrary<Object, AutorestCanonicalEmitterOptions, never>;
+const $lib: TypeSpecLibrary<object, AutorestCanonicalEmitterOptions, never>;
 ```
 
 ## Type declaration
 
-| Member | Type | Value |
-| :------ | :------ | :------ |
-| `unsupported-versioning-decorator` | `Object` | - |
-| `unsupported-versioning-decorator.default` | `CallableMessage`<[`"decorator"`]\> | - |
+| Name | Type |
+| ------ | ------ |
+| `unsupported-versioning-decorator` | `object` |
+| `unsupported-versioning-decorator.default` | `CallableMessage`<[`"decorator"`]\> |

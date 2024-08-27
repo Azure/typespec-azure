@@ -4,13 +4,13 @@ title: "[F] isFileExist"
 
 ---
 ```ts
-isFileExist(host, filePath): Promise<boolean>
+function isFileExist(host, filePath): Promise<boolean>
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `host` | `CompilerHost` |
 | `filePath` | `string` |
 

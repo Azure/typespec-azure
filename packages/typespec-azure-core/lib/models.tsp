@@ -90,9 +90,7 @@ model FilterParameter {
 @doc("Provides the standard 'orderby' query parameter for list operations.")
 model OrderByQueryParameter {
   #suppress "@azure-tools/typespec-azure-core/prefer-csv-collection-format" "By design"
-  @query({
-    format: "multi",
-  })
+  @query(#{ explode: true })
   @doc("Expressions that specify the order of returned results.")
   orderby?: string[];
 }
@@ -107,9 +105,7 @@ model FilterQueryParameter {
 @doc("Provides the standard 'select' query parameter for list operations.")
 model SelectQueryParameter {
   #suppress "@azure-tools/typespec-azure-core/prefer-csv-collection-format" "By design"
-  @query({
-    format: "multi",
-  })
+  @query(#{ explode: true })
   @doc("Select the specified fields to be included in the response.")
   select?: string[];
 }
@@ -117,9 +113,7 @@ model SelectQueryParameter {
 @doc("Provides the standard 'expand' query parameter for list operations.")
 model ExpandQueryParameter {
   #suppress "@azure-tools/typespec-azure-core/prefer-csv-collection-format" "By design"
-  @query({
-    format: "multi",
-  })
+  @query(#{ explode: true })
   @doc("Expand the indicated resources into the response.")
   expand?: string[];
 }
@@ -157,9 +151,9 @@ model ConditionalRequestHeaders {
 }
 
 @doc("""
-Provides the 'ETag' field to enable conditional (cached) requests.  This model can be spread
-into responses and item models to convey the ETag when it cannot simply conveyed in a header.
-""")
+  Provides the 'ETag' field to enable conditional (cached) requests.  This model can be spread
+  into responses and item models to convey the ETag when it cannot simply conveyed in a header.
+  """)
 model EtagProperty {
   @visibility("read")
   @doc("The entity tag for this resource.")
@@ -358,11 +352,18 @@ scalar azureLocation extends string;
 /**
  * A type definition that refers the id to an Azure Resource Manager resource.
  *
- * Sample usage:
- *   otherArmId: ResourceIdentifier;
- *   networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
- *   vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
  * @template AllowedResourceTypes An array of allowed resource types for the resource reference
+ *
+ * @example
+ *
+ * ```tsp
+ * model MyModel {
+ *   otherArmId: armResourceIdentifier;
+ *   networkId: armResourceIdentifier<[{type:"Microsoft.Network/vnet"}]>
+ *   vmIds: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["*"]}]>
+ *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["tenant", "resourceGroup"]}]>
+ * }
+ * ```
  */
 @doc("A type definition that refers the id to an Azure Resource Manager resource.")
 @format("arm-id")

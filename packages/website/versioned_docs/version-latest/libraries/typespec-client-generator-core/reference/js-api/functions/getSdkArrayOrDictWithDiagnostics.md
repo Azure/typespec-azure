@@ -4,7 +4,7 @@ title: "[F] getSdkArrayOrDictWithDiagnostics"
 
 ---
 ```ts
-getSdkArrayOrDictWithDiagnostics(
+function getSdkArrayOrDictWithDiagnostics(
    context, 
    type, 
    operation?): [SdkDictionaryType | SdkArrayType | undefined, readonly Diagnostic[]]
@@ -13,8 +13,8 @@ getSdkArrayOrDictWithDiagnostics(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Model` |
 | `operation`? | `Operation` |
 

@@ -9,7 +9,7 @@ Provides the names of terminal long-running operation states plus any
 ## Properties
 
 | Property | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `canceledState` | `string`[] |
 | `failedState` | `string`[] |
 | `states` | `string`[] |

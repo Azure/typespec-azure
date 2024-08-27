@@ -4,15 +4,15 @@ title: "[F] $armProviderNameValue"
 
 ---
 ```ts
-$armProviderNameValue(context, entity): void
+function $armProviderNameValue(context, target): void
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `entity` | `Operation` |
+| `target` | `Operation` |
 
 ## Returns
 

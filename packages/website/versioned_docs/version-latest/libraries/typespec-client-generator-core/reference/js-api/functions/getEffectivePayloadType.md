@@ -4,7 +4,7 @@ title: "[F] getEffectivePayloadType"
 
 ---
 ```ts
-getEffectivePayloadType(context, type): Model
+function getEffectivePayloadType(context, type): Model
 ```
 
 If the given type is an anonymous model and all of its properties excluding
@@ -14,8 +14,8 @@ Otherwise the given type is returned unchanged.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` |  |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 | `type` | `Model` |  |
 
 ## Returns

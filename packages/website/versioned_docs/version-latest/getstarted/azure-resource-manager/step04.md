@@ -2,7 +2,7 @@
 
 Some resources will provide more than the standard CRUD operations and will need to define a custom action endpoint. Additional resource operations can be added to the `interface` where you defined standard resource operations, using the `ArmResourceAction` templates.
 
-For example, to add an additional `POST` action called `/notify` to the standard operations of `UserResource`:
+For example, to add an additional `POST` action called `/notify` to the standard operations of `User`:
 
 ```typespec
 @doc("The details of a user notification.")
@@ -15,10 +15,10 @@ model NotificationDetails {
 }
 
 @armResourceOperations
-interface Users extends TrackedResourceOperations<UserResource, UserResourceProperties> {
+interface Users extends TrackedResourceOperations<User, UserProperties> {
   @doc("Send a notification to the user")
   @segment("notify")
-  NotifyUser is ArmResourceActionNoContentSync<UserResource, NotificationDetails>;
+  NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 ```
 
@@ -43,7 +43,7 @@ In a custom operation, you define the operation parameters, responses, http verb
 @doc("Send a notification to the user")
 @segment("notify")
 op NotifyUser(
-  ...ResourceInstanceParameters<UserResource>,
+  ...ResourceInstanceParameters<User>,
   @body notification: NotificationDetails,
 ): ArmResponse<string> | ErrorResponse;
 ```
@@ -91,9 +91,9 @@ These templates have default values so that they are normally used without speci
 
 The above templates are specializations of the following template in the `Azure.ResourceManager.Foundations` namespace:
 
-| Template                                                                         | Description                                                      |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `checkNameAvailability<TScopeParamters, TRequest, TResponse, TAdditionalParams>` | Checks name availability based on the provided scope parameters. |
+| Template                                                                          | Description                                                      |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `checkNameAvailability<TScopeParameters, TRequest, TResponse, TAdditionalParams>` | Checks name availability based on the provided scope parameters. |
 
 For reference, the standard templates use the following `TScopeParameters`:
 

@@ -4,13 +4,13 @@ title: "[F] isTraitModel"
 
 ---
 ```ts
-isTraitModel(program, model): boolean
+function isTraitModel(program, model): boolean
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `model` | `Model` |
 

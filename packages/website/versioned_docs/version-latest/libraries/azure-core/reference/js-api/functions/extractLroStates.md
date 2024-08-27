@@ -4,13 +4,13 @@ title: "[F] extractLroStates"
 
 ---
 ```ts
-extractLroStates(program, entity): [LongRunningStates | undefined, readonly Diagnostic[]]
+function extractLroStates(program, entity): [LongRunningStates | undefined, readonly Diagnostic[]]
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `program` | `Program` |
 | `entity` | `Type` |
 

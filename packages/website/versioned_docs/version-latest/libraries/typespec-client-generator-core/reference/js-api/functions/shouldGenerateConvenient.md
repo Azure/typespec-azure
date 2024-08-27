@@ -4,14 +4,14 @@ title: "[F] shouldGenerateConvenient"
 
 ---
 ```ts
-shouldGenerateConvenient(context, entity): boolean
+function shouldGenerateConvenient(context, entity): boolean
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Operation` |
 
 ## Returns

@@ -4,7 +4,7 @@ title: "[F] $operationGroup"
 
 ---
 ```ts
-$operationGroup(
+function $operationGroup(
    context, 
    target, 
    scope?): void
@@ -13,9 +13,9 @@ $operationGroup(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `Interface` \| `Namespace` |
+| `target` | `Namespace` \| `Interface` |
 | `scope`? | `string` |
 
 ## Returns

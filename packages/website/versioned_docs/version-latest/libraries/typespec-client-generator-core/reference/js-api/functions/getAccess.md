@@ -4,16 +4,16 @@ title: "[F] getAccess"
 
 ---
 ```ts
-getAccess(context, entity): AccessFlags | undefined
+function getAccess(context, entity): AccessFlags
 ```
 
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
-| `entity` | `Model` \| `Enum` \| `Operation` \| `Union` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
+| `entity` | `Enum` \| `Model` \| `Operation` \| `Union` |
 
 ## Returns
 
-[`AccessFlags`](../type-aliases/AccessFlags.md) \| `undefined`
+[`AccessFlags`](../type-aliases/AccessFlags.md)

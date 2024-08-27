@@ -4,7 +4,7 @@ title: "[F] addFormatInfo"
 
 ---
 ```ts
-addFormatInfo(
+function addFormatInfo(
    context, 
    type, 
    propertyType): void
@@ -17,9 +17,9 @@ type.
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | sdk context |
-| `type` | `Scalar` \| `ModelProperty` | the original typespec type. Used to grab the format decorator off of |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | sdk context |
+| `type` | `ModelProperty` \| `Scalar` | the original typespec type. Used to grab the format decorator off of |
 | `propertyType` | [`SdkType`](../type-aliases/SdkType.md) | the type of the property, i.e. the internal type that we add the format info onto |
 
 ## Returns

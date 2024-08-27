@@ -20,5 +20,5 @@ A step in a logical operation that involves multiple calls
 ## Properties
 
 | Property | Type | Description |
-| :------ | :------ | :------ |
-| `responseModel` | `Model` \| `IntrinsicType` | The TypeSpec type that is returned by following a link or calling a lined operation |
+| ------ | ------ | ------ |
+| `responseModel` | `IntrinsicType` \| `Model` | The TypeSpec type that is returned by following a link or calling a lined operation |

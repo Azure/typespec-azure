@@ -4,7 +4,7 @@ title: "[F] getSdkModelPropertyType"
 
 ---
 ```ts
-getSdkModelPropertyType(
+function getSdkModelPropertyType(
    context, 
    type, 
    operation?): [SdkModelPropertyType, readonly Diagnostic[]]
@@ -13,8 +13,8 @@ getSdkModelPropertyType(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
-| `context` | `TCGCContext` |
+| ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `ModelProperty` |
 | `operation`? | `Operation` |
 

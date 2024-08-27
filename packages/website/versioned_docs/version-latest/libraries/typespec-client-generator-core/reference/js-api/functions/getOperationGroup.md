@@ -4,7 +4,7 @@ title: "[F] getOperationGroup"
 
 ---
 ```ts
-getOperationGroup(context, type): SdkOperationGroup | undefined
+function getOperationGroup(context, type): SdkOperationGroup | undefined
 ```
 
 Return the operation group object for the given namespace or interface or undefined is not an operation group.
@@ -12,9 +12,9 @@ Return the operation group object for the given namespace or interface or undefi
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
-| `context` | `TCGCContext` | TCGCContext |
-| `type` | `Interface` \| `Namespace` | Type to check |
+| ------ | ------ | ------ |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | TCGCContext |
+| `type` | `Namespace` \| `Interface` | Type to check |
 
 ## Returns
 

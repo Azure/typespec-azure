@@ -63,7 +63,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -85,7 +85,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -113,12 +113,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
       requestBody:
-        description: The resource instance.
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Manufacturer'
+        description: The resource instance.
     get:
       operationId: Manufacturers_getManufacturer
       description: Get a Manufacturer
@@ -197,7 +197,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -237,8 +237,8 @@ paths:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
   /manufacturers/{manufacturerId}/operations/{operationId}:
     get:
-      operationId: Manufacturers_getManufacturerOperationStatus
-      description: Gets status of a Manufacturer operation.
+      operationId: Manufacturers_getManufacturerDeleteOperationStatus
+      description: Gets status of a Manufacturer delete operation.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: manufacturerId
@@ -275,10 +275,6 @@ paths:
                     allOf:
                       - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
                     description: Error object that describes the error when status is "Failed".
-                  result:
-                    allOf:
-                      - $ref: '#/components/schemas/Manufacturer'
-                    description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
           description: An unexpected error response.
@@ -444,7 +440,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -472,7 +468,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -506,12 +502,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
       requestBody:
-        description: The resource instance.
         required: true
         content:
           application/merge-patch+json:
             schema:
               $ref: '#/components/schemas/WidgetCreateOrUpdate'
+        description: The resource instance.
     get:
       operationId: Widgets_getWidget
       description: Get a Widget
@@ -590,7 +586,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -701,7 +697,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -723,7 +719,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -751,16 +747,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
       requestBody:
-        description: The resource instance.
         required: true
         content:
           application/merge-patch+json:
             schema:
               $ref: '#/components/schemas/WidgetAnalyticsCreateOrUpdate'
+        description: The resource instance.
   /widgets/{widgetName}/operations/{operationId}:
     get:
-      operationId: Widgets_getWidgetOperationStatus
-      description: Gets status of a Widget operation.
+      operationId: Widgets_getWidgetOperationStatus_Widgets_getWidgetDeleteOperationStatus
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
         - name: widgetName
@@ -775,33 +770,52 @@ paths:
           description: The unique ID of the operation.
           schema:
             type: string
+      description: Gets status of a Widget operation. Gets status of a Widget delete operation.
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - status
-                properties:
-                  id:
-                    type: string
-                    description: The unique ID of the operation.
-                  status:
-                    allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
-                    description: The status of the operation
-                  error:
-                    allOf:
-                      - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
-                    description: Error object that describes the error when status is "Failed".
-                  result:
-                    allOf:
-                      - $ref: '#/components/schemas/Widget'
-                    description: The result of the operation.
-                description: Provides status details for long running operations.
+                anyOf:
+                  - type: object
+                    required:
+                      - id
+                      - status
+                    properties:
+                      id:
+                        type: string
+                        description: The unique ID of the operation.
+                      status:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                        description: The status of the operation
+                      error:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                        description: Error object that describes the error when status is "Failed".
+                      result:
+                        allOf:
+                          - $ref: '#/components/schemas/Widget'
+                        description: The result of the operation.
+                    description: Provides status details for long running operations.
+                  - type: object
+                    required:
+                      - id
+                      - status
+                    properties:
+                      id:
+                        type: string
+                        description: The unique ID of the operation.
+                      status:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                        description: The status of the operation
+                      error:
+                        allOf:
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                        description: Error object that describes the error when status is "Failed".
+                    description: Provides status details for long running operations.
         default:
           description: An unexpected error response.
           headers:
@@ -846,7 +860,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -870,12 +884,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
       requestBody:
-        description: The resource instance.
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/WidgetPart'
+        description: The resource instance.
     get:
       operationId: WidgetParts_listWidgetParts
       description: List WidgetPart resources
@@ -998,7 +1012,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -1018,7 +1032,7 @@ paths:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
   /widgets/{widgetName}/parts/{widgetPartName}/operations/{operationId}:
     get:
-      operationId: WidgetParts_getWidgetPartOperationStatus
+      operationId: WidgetParts_getWidgetPartReorderOperationStatus
       description: Gets status of a WidgetPart operation.
       parameters:
         - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
@@ -1062,10 +1076,6 @@ paths:
                     allOf:
                       - $ref: '#/components/schemas/Azure.Core.Foundations.Error'
                     description: Error object that describes the error when status is "Failed".
-                  result:
-                    allOf:
-                      - $ref: '#/components/schemas/WidgetPart'
-                    description: The result of the operation.
                 description: Provides status details for long running operations.
         default:
           description: An unexpected error response.
@@ -1108,7 +1118,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -1171,6 +1181,11 @@ paths:
         '202':
           description: The request has been accepted for processing, but processing has not yet completed.
           headers:
+            x-ms-request-id:
+              required: false
+              description: An opaque, globally-unique, server-generated string identifier for the request.
+              schema:
+                $ref: '#/components/schemas/Azure.Core.uuid'
             Operation-Location:
               required: true
               description: The location for monitoring the operation state.
@@ -1181,15 +1196,10 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
-              schema:
-                $ref: '#/components/schemas/Azure.Core.uuid'
-            x-ms-request-id:
-              required: false
-              description: An opaque, globally-unique, server-generated string identifier for the request.
               schema:
                 $ref: '#/components/schemas/Azure.Core.uuid'
           content:
@@ -1339,7 +1349,6 @@ components:
         type: array
         items:
           type: string
-      style: form
       explode: true
     Azure.Core.SkipQueryParameter:
       name: skip
@@ -1413,14 +1422,22 @@ components:
           description: Inner error.
       description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.
     Azure.Core.Foundations.OperationState:
+      anyOf:
+        - type: string
+          enum:
+            - NotStarted
+            - Running
+            - Succeeded
+            - Failed
+            - Canceled
+        - type: string
+      description: Enum describing allowed operation states.
+    Azure.Core.RepeatabilityResult:
       type: string
       enum:
-        - NotStarted
-        - Running
-        - Succeeded
-        - Failed
-        - Canceled
-      description: Enum describing allowed operation states.
+        - accepted
+        - rejected
+      description: Repeatability Result header options
     Azure.Core.eTag:
       type: string
       format: eTag
@@ -1502,12 +1519,6 @@ components:
           format: uri
           description: The link to the next page of items
       description: Paged collection of WidgetPart items
-    RepeatabilityResult:
-      type: string
-      enum:
-        - accepted
-        - rejected
-      description: Repeatability Result header options
     Versions:
       type: string
       enum:

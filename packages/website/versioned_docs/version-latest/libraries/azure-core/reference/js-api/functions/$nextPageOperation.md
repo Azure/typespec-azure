@@ -4,7 +4,7 @@ title: "[F] $nextPageOperation"
 
 ---
 ```ts
-$nextPageOperation(
+function $nextPageOperation(
    context, 
    entity, 
    linkedOperation, 
@@ -14,11 +14,11 @@ $nextPageOperation(
 ## Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Operation` |
 | `linkedOperation` | `Operation` |
-| `parameters`? | `Model` |
+| `parameters`? | `Type` |
 
 ## Returns
 

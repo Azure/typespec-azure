@@ -292,4 +292,181 @@ op test(): void;
       strictEqual(prop["x-typespec-name"], `string[]`);
     });
   });
+
+  describe("'emit-lro-options' option", () => {
+    const lroCode = `
+      @armProviderNamespace
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The state of the resource")
+      enum ResourceState {
+       Succeeded,
+       Canceled,
+       Failed
+     }
+
+      @doc("The widget properties")
+      model WidgetProperties {
+        @doc("I am a simple Resource Identifier")
+        simpleArmId: Azure.Core.armResourceIdentifier;
+
+        @doc("The provisioning State")
+        provisioningState: ResourceState;
+      }
+
+      @doc("Foo resource")
+      model Widget is TrackedResource<WidgetProperties> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+      @armResourceOperations(Widget)
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        @Azure.Core.useFinalStateVia("azure-async-operation")
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteSync<Widget>;
+        listByResourceGroup is ArmResourceListByParent<Widget>;
+        listBySubscription is ArmListBySubscription<Widget>;
+      }
+      `;
+
+    it("emits all x-ms-long-running-operation-options", async () => {
+      const output = await openapiWithOptions(lroCode, { "emit-lro-options": "all" });
+      const itemPath =
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+      ok(output.paths[itemPath]);
+      ok(output.paths[itemPath].put);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation"], true);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation-options"], {
+        "final-state-via": "azure-async-operation",
+        "final-state-schema": "#/definitions/Widget",
+      });
+    });
+
+    it("emits final-state-via by default", async () => {
+      const output = await openapiWithOptions(lroCode, {});
+      const itemPath =
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+      ok(output.paths[itemPath]);
+      ok(output.paths[itemPath].put);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation"], true);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation-options"], {
+        "final-state-via": "azure-async-operation",
+      });
+    });
+
+    it("emits final-state-via when configured", async () => {
+      const output = await openapiWithOptions(lroCode, { "emit-lro-options": "final-state-only" });
+      const itemPath =
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+      ok(output.paths[itemPath]);
+      ok(output.paths[itemPath].put);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation"], true);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation-options"], {
+        "final-state-via": "azure-async-operation",
+      });
+    });
+
+    it("suppress x-ms-long-running operation options when configured", async () => {
+      const output = await openapiWithOptions(lroCode, { "emit-lro-options": "none" });
+      const itemPath =
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
+      ok(output.paths[itemPath]);
+      ok(output.paths[itemPath].put);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation"], true);
+      deepStrictEqual(output.paths[itemPath].put["x-ms-long-running-operation-options"], undefined);
+    });
+  });
+
+  describe("'emit-common-types-schema' option", () => {
+    const commonTypesPath = "../../common-types/resource-management/v3/types.json";
+    const commonCode = `
+      @armProviderNamespace
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The state of the resource")
+      enum ResourceState {
+       Succeeded,
+       Canceled,
+       Failed
+     }
+
+      @doc("The widget properties")
+      model WidgetProperties {
+        @doc("I am a simple Resource Identifier")
+        simpleArmId: Azure.Core.armResourceIdentifier;
+
+        @doc("The provisioning State")
+        provisioningState: ResourceState;
+      }
+
+      @doc("Foo resource")
+      model Widget is TrackedResource<WidgetProperties> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+      @armResourceOperations(Widget)
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        @Azure.Core.useFinalStateVia("azure-async-operation")
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader & ArmAsyncOperationHeader>;
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteSync<Widget>;
+        listByResourceGroup is ArmResourceListByParent<Widget>;
+        listBySubscription is ArmListBySubscription<Widget>;
+      }
+      `;
+
+    it("emits only schema references with 'never' setting", async () => {
+      const output = await openapiWithOptions(commonCode, {
+        "emit-common-types-schema": "never",
+      });
+      ok(output.definitions);
+      ok(output.definitions["WidgetUpdate"]);
+      deepStrictEqual(output.definitions["WidgetUpdate"].allOf, [
+        {
+          $ref: `${commonTypesPath}#/definitions/TrackedResource`,
+        },
+      ]);
+    });
+
+    it("emits an update schema for TrackedResource by default", async () => {
+      const output = await openapiWithOptions(commonCode, {});
+      ok(output.definitions);
+      ok(output.definitions["WidgetUpdate"]);
+      deepStrictEqual(output.definitions["WidgetUpdate"].allOf, [
+        {
+          $ref: `#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate`,
+        },
+      ]);
+    });
+
+    it("emits update schema when set to `for-visibility-changes`", async () => {
+      const output = await openapiWithOptions(commonCode, {
+        "emit-common-types-schema": "for-visibility-changes",
+      });
+      ok(output.definitions);
+      ok(output.definitions["WidgetUpdate"]);
+      deepStrictEqual(output.definitions["WidgetUpdate"].allOf, [
+        {
+          $ref: `#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate`,
+        },
+      ]);
+    });
+  });
 });

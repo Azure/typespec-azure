@@ -4,9 +4,9 @@ title: "[F] $armCommonTypesVersion"
 
 ---
 ```ts
-$armCommonTypesVersion(
+function $armCommonTypesVersion(
    context, 
-   entity, 
+   target, 
    version): void
 ```
 
@@ -15,10 +15,10 @@ $armCommonTypesVersion(
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `context` | `DecoratorContext` | DecoratorContext object |
-| `entity` | `EnumMember` \| `Namespace` | Target of the decorator. Must be `Namespace` or `EnumMember` type |
-| `version` | `string` \| `EnumMember` | - |
+| `target` | `Namespace` \| `EnumMember` | - |
+| `version` | `string` \| `EnumValue` | - |
 
 ## Returns
 

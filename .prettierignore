@@ -5,8 +5,6 @@
 **/out/
 **/obj/
 **/.vs/
-**/common/temp/
-**/common/scripts/
 **/.chronus/changes/
 
 # Pnpm lock file
@@ -74,6 +72,9 @@ core/packages/compiler/templates/__snapshots__/
 # Tm Grammars generated files
 core/grammars/
 
+# Generated openapi files
+packages/samples/common-types/**/*.json
 
 # Client emitters not part of workspace that shouldn't be needed in this repo
 core/packages/http-client-csharp/
+core/packages/http-client-java/
