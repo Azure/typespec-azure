@@ -3,11 +3,14 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
+  Operation,
   createDiagnosticCollector,
+  isGlobalNamespace,
+  isService,
   resolvePath,
 } from "@typespec/compiler";
 import { HttpStatusCodeRange } from "@typespec/http";
-import { resolveOperationId } from "@typespec/openapi";
+import { getOperationId } from "@typespec/openapi";
 import {
   SdkAnyExample,
   SdkArrayExample,
@@ -37,6 +40,7 @@ import {
 } from "./interfaces.js";
 import { getValidApiVersion } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getLibraryName } from "./public-utils.js";
 
 interface LoadedExample {
   readonly relativePath: string;
@@ -139,6 +143,30 @@ async function loadExamples(
   return diagnostics.wrap(map);
 }
 
+function resolveOperationId(context: TCGCContext, operation: Operation) {
+  const { program } = context;
+  // if @operationId was specified use that value
+  const explicitOperationId = getOperationId(program, operation);
+  if (explicitOperationId) {
+    return explicitOperationId;
+  }
+
+  const operationName = getLibraryName(context, operation);
+  if (operation.interface) {
+    return `${getLibraryName(context, operation.interface)}_${operationName}`;
+  }
+  const namespace = operation.namespace;
+  if (
+    namespace === undefined ||
+    isGlobalNamespace(program, namespace) ||
+    isService(program, namespace)
+  ) {
+    return operationName;
+  }
+
+  return `${getLibraryName(context, namespace)}_${operationName}`;
+}
+
 export async function handleClientExamples(
   context: TCGCContext,
   client: SdkClientType<SdkServiceOperation>
@@ -157,7 +185,7 @@ export async function handleClientExamples(
       // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
       let operation = method.__raw;
       while (operation && operation.templateMapper === undefined) {
-        const operationId = resolveOperationId(context.program, operation).toLowerCase();
+        const operationId = resolveOperationId(context, operation).toLowerCase();
         if (examples.has(operationId)) {
           diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
           break;
