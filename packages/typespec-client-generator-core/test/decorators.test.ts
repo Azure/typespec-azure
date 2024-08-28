@@ -3859,6 +3859,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       const client = clients[0];
       strictEqual(client.name, "StorageClient");
+      strictEqual(client.initialization.access, "public");
       strictEqual(client.initialization.properties.length, 1);
       strictEqual(client.initialization.properties[0].kind, "endpoint");
 
@@ -3887,6 +3888,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(blobClient.kind, "client");
       strictEqual(blobClient.name, "BlobClient");
+      strictEqual(blobClient.initialization.access, "public");
       strictEqual(blobClient.initialization.properties.length, 2);
 
       ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));

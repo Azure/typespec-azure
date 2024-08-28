@@ -994,23 +994,13 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
-function isOperationGroupNoScopeCheck(
-  context: { program: Program },
-  target: Namespace | Interface
-): boolean {
-  if (hasExplicitClientOrOperationGroup(context)) {
-    return Boolean(context.program.stateMap(operationGroupKey).get(target));
-  }
-  return isOperationGroupWithNoExplicitDecorator(target);
-}
-
 export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Model,
   scope?: LanguageScopes
 ) => {
-  if (isOperationGroupNoScopeCheck(context, target)) {
+  if (context.program.stateMap(operationGroupKey).get(target)) {
     if (
       target.namespace &&
       context.program.stateMap(clientInitializationKey).get(target.namespace) === options
