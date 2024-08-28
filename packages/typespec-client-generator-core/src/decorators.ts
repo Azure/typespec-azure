@@ -1036,3 +1036,18 @@ export function getClientInitialization(
     properties: initializationProps,
   };
 }
+
+const aliasKey = createStateSymbol("alias");
+
+export const $alias: DecoratorFunction = (
+  context: DecoratorContext,
+  original: ModelProperty,
+  alias: string,
+  scope?: LanguageScopes
+) => {
+  setScopedDecoratorData(context, $alias, aliasKey, original, alias, scope);
+};
+
+export function getAlias(context: TCGCContext, original: ModelProperty): string | undefined {
+  return getScopedDecoratorData(context, aliasKey, original);
+}
