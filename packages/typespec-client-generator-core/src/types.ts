@@ -1771,12 +1771,16 @@ function handleServiceOrphanType(
   return diagnostics.wrap(undefined);
 }
 
-function filterOutModels(context: TCGCContext, filter: number): (SdkModelType | SdkEnumType)[]{
+function filterOutModels(context: TCGCContext, filter: number): (SdkModelType | SdkEnumType)[] {
   const result = new Set<SdkModelType | SdkEnumType>();
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
     // filter models/enums/union of Core
-    if (context.filterOutCoreModels && ["Enum", "Model", "Union"].includes(type.kind) && isAzureCoreModel(type)) {
-        continue;
+    if (
+      context.filterOutCoreModels &&
+      ["Enum", "Model", "Union"].includes(type.kind) &&
+      isAzureCoreModel(type)
+    ) {
+      continue;
     }
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
@@ -1869,9 +1873,7 @@ export function getAllModelsWithDiagnostics(
   } else if (options.output) {
     filter += UsageFlags.Output;
   }
-  return diagnostics.wrap(
-    filterOutModels(context, filter)
-  );
+  return diagnostics.wrap(filterOutModels(context, filter));
 }
 
 export function getAllModels(
