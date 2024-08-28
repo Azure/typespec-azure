@@ -1381,7 +1381,7 @@ export function getSdkModelPropertyType(
     const httpBody = httpOperation.parameters.body;
     if (httpBody) {
       const httpBodyType = isHttpBodySpread(httpBody)
-        ? getHttpBodySpreadModel(httpBody.type as Model)
+        ? getHttpBodySpreadModel(context, httpBody.type as Model)
         : httpBody.type;
       if (type.model === httpBodyType) {
         // only try to add multipartOptions for property of body
@@ -1596,7 +1596,7 @@ function updateTypesFromOperation(
       sdkType = diagnostics.pipe(
         getClientTypeWithDiagnostics(
           context,
-          getHttpBodySpreadModel(httpBody.type as Model),
+          getHttpBodySpreadModel(context, httpBody.type as Model),
           operation
         )
       );

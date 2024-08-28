@@ -383,7 +383,7 @@ function getContextPath(
       result = [{ name: root.name }];
       let bodyType: Type;
       if (isHttpBodySpread(httpOperation.parameters.body)) {
-        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
+        bodyType = getHttpBodySpreadModel(context, httpOperation.parameters.body.type as Model);
       } else {
         bodyType = httpOperation.parameters.body.type;
       }
