@@ -7,7 +7,6 @@ This page outlines the steps to build a client library based on your TypeSpec sp
 
 The best documentation on how to generate can be found using those links:
 
-
 - https://aka.ms/azsdk/dpcodegen/net
 - https://aka.ms/azsdk/dpcodegen/python
 - https://aka.ms/azsdk/dpcodegen/java
@@ -19,8 +18,7 @@ At a glance, add your emitter name to your `package.json`, along with the right 
 > **NOTE:** Generating all languages from the same folder may be complicated due to the preview status of the emitters and TypeSpec libraries, such as `typespec-azure-core` and `typespec-resource-manager`.
 > It is recommended to have a unique language emitter in each `package.json` to avoid conflicts until all emitters and the TypeSpec libraries reach their first stable release.
 
-Modify your `package.json` to include the necessary dependencies for the language emitter(s). Remember to run `npm install` after making changes to the file: 
-
+Modify your `package.json` to include the necessary dependencies for the language emitter(s). Remember to run `npm install` after making changes to the file:
 
 ```json
 {
