@@ -90,7 +90,11 @@ function getScopedDecoratorData(
   return retval[AllScopes]; // in this case it applies to all languages
 }
 
-function listScopedDecoratorData(context: {program: Program}, key: symbol, emitterName?: string): any[] {
+function listScopedDecoratorData(
+  context: { program: Program },
+  key: symbol,
+  emitterName?: string
+): any[] {
   const scope = emitterName || AllScopes;
   const retval = [...context.program.stateMap(key).values()];
   return retval
@@ -232,7 +236,10 @@ export function getClient(
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup(context: {program: Program, emitterName?: string}): boolean {
+function hasExplicitClientOrOperationGroup(context: {
+  program: Program;
+  emitterName?: string;
+}): boolean {
   return (
     listScopedDecoratorData(context, clientKey, context.emitterName).length > 0 ||
     listScopedDecoratorData(context, operationGroupKey, context.emitterName).length > 0
@@ -987,7 +994,10 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
-function isOperationGroupNoScopeCheck(context: {program: Program}, target: Namespace | Interface): boolean {
+function isOperationGroupNoScopeCheck(
+  context: { program: Program },
+  target: Namespace | Interface
+): boolean {
   if (hasExplicitClientOrOperationGroup(context)) {
     return Boolean(context.program.stateMap(operationGroupKey).get(target));
   }
@@ -1001,7 +1011,10 @@ export const $clientInitialization: ClientInitializationDecorator = (
   scope?: LanguageScopes
 ) => {
   if (isOperationGroupNoScopeCheck(context, target)) {
-    if (target.namespace && context.program.stateMap(clientInitializationKey).get(target.namespace) === options) {
+    if (
+      target.namespace &&
+      context.program.stateMap(clientInitializationKey).get(target.namespace) === options
+    ) {
       setScopedDecoratorData(context, $override, clientInitializationKey, target, options, scope);
     } else {
       reportDiagnostic(context.program, {
