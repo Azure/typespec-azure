@@ -465,10 +465,9 @@ export async function getOpenAPIForService(
     };
   }
 
-  function parseNextLinkName(paged: PagedResultMetadata): string | undefined {
-    const pathComponents = paged.nextLinkSegments;
-    if (pathComponents) {
-      return pathComponents[pathComponents.length - 1];
+  function getLastSegment(segments: string[] | undefined): string | undefined {
+    if (segments) {
+      return segments[segments.length - 1];
     }
     return undefined;
   }
@@ -507,10 +506,12 @@ export async function getOpenAPIForService(
     for (const response of operation.responses) {
       const paged = extractPagedMetadataNested(program, response.type as Model);
       if (paged) {
-        const nextLinkName = parseNextLinkName(paged);
-        if (nextLinkName) {
+        const nextLinkName = getLastSegment(paged.nextLinkSegments);
+        const itemName = getLastSegment(paged.itemsSegments);
+        if (nextLinkName || itemName) {
           currentEndpoint["x-ms-pageable"] = {
             nextLinkName,
+            itemName,
           };
         }
         // Once we find paged metadata, we don't need to processes any further.

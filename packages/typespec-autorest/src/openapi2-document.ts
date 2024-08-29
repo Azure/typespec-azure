@@ -455,6 +455,7 @@ export type OpenAPI2Operation = Extensions & {
   tags?: Array<string>;
 
   "x-ms-examples"?: Record<string, Ref<unknown>>;
+  "x-ms-pageable"?: XmsPageable;
 
   "x-ms-long-running-operation"?: boolean;
 
@@ -472,6 +473,10 @@ export type XMSLongRunningOperationOptions = {
   "final-state-via": XMSLongRunningFinalState;
 
   "final-state-schema"?: string;
+};
+export type XmsPageable = {
+  nextLinkName?: string;
+  itemName?: string;
 };
 
 export type OpenAPI2StatusCode = string | "default" | "1XX" | "2XX" | "3XX" | "4XX" | "5XX";
