@@ -15,7 +15,7 @@ op myResourceRead(): MyResource;
 op myResourceCreate(@body resource: MyResource);
 ```
 
-Using operations from `Azure.Core.Foundations` it not acceptable either.
+Using operations from `Azure.Core.Foundations` is not acceptable either.
 
 ```tsp
 op myResourceRead is Azure.Core.Foundations.Operation<{}, MyResource>;
