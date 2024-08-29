@@ -27,7 +27,7 @@ import {
   isQueryParam,
 } from "@typespec/http";
 import { camelCase } from "change-case";
-import { getAlias } from "./decorators.js";
+import { getParamAlias } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -509,8 +509,8 @@ export function getCorrespondingMethodParams(
 
   const correspondingClientParams = clientParams.filter(
     (x) =>
-      twoParamsEquivalent(x, serviceParam) ||
-      (x.__raw?.kind === "ModelProperty" && getAlias(context, x.__raw) === serviceParam.name)
+      twoParamsEquivalent(context, x.__raw, serviceParam.__raw) ||
+      (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name)
   );
   if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
 

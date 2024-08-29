@@ -463,6 +463,37 @@ export type ClientInitializationDecorator = (
   scope?: string
 ) => void;
 
+/**
+ * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ *
+ * op upload(blobName: string): void;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ * model MyServiceClientOptions {
+ *   blob: string;
+ * }
+ *
+ * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@paramAlias(MyServiceClientOptions.blob, "blobName")
+ *
+ * // The generated client will have `blobName` on it. We will also
+ * // elevate the existing `blob` parameter to the client level.
+ * ```
+ */
+export type ParamAliasDecorator = (
+  context: DecoratorContext,
+  original: ModelProperty,
+  paramAlias: string,
+  scope?: string
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -475,4 +506,5 @@ export type AzureClientGeneratorCoreDecorators = {
   override: OverrideDecorator;
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
   clientInitialization: ClientInitializationDecorator;
+  paramAlias: ParamAliasDecorator;
 };

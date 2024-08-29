@@ -448,3 +448,34 @@ extern dec clientInitialization(
   options: Model,
   scope?: valueof string
 );
+
+/**
+ * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ *
+ * op upload(blobName: string): void;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ * model MyServiceClientOptions {
+ *   blob: string;
+ * }
+ *
+ * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@paramAlias(MyServiceClientOptions.blob, "blobName")
+ * 
+ * // The generated client will have `blobName` on it. We will also
+ * // elevate the existing `blob` parameter to the client level.
+ * ```
+ */
+extern dec paramAlias(
+  original: ModelProperty,
+  paramAlias: valueof string,
+  scope?: valueof string
+);
+

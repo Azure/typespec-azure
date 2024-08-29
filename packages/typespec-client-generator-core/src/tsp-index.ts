@@ -8,6 +8,7 @@ import {
   $flattenProperty,
   $operationGroup,
   $override,
+  paramAliasDecorator,
   $protocolAPI,
   $usage,
   $useSystemTextJsonConverter,
@@ -31,5 +32,6 @@ export const $decorators = {
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
+    paramAlias: paramAliasDecorator,
   } as AzureClientGeneratorCoreDecorators,
 };

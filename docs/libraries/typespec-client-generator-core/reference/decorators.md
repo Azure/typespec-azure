@@ -417,6 +417,46 @@ op myOperationCustomization(params: Params): void;
 // method signature is now `op myOperation(params: Params)` just for csharp
 ```
 
+### `@paramAlias` {#@Azure.ClientGenerator.Core.paramAlias}
+
+Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+
+```typespec
+@Azure.ClientGenerator.Core.paramAlias(paramAlias: valueof string, scope?: valueof string)
+```
+
+#### Target
+
+`ModelProperty`
+
+#### Parameters
+
+| Name       | Type             | Description                                                                                                   |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| paramAlias | `valueof string` |                                                                                                               |
+| scope      | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+#### Examples
+
+```typespec
+// main.tsp
+namespace MyService;
+
+op upload(blobName: string): void;
+
+// client.tsp
+namespace MyCustomizations;
+model MyServiceClientOptions {
+  blob: string;
+}
+
+@@clientInitialization(MyService, MyServiceClientOptions)
+@@paramAlias(MyServiceClientOptions.blob, "blobName")
+
+// The generated client will have `blobName` on it. We will also
+// elevate the existing `blob` parameter to the client level.
+```
+
 ### `@protocolAPI` {#@Azure.ClientGenerator.Core.protocolAPI}
 
 Whether you want to generate an operation as a protocol operation.

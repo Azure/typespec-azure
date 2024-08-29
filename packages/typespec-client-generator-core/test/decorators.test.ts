@@ -4062,5 +4062,57 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "@azure-tools/typespec-client-generator-core/assigning-public-params-to-internal-client",
       });
     });
+
+    it("@paramAlias", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(@path blob: string): void;
+        op upload(@path blobName: string): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          @paramAlias("blob")
+          blobName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 2);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 2);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 1);
+
+      const downloadBlobNameParam = download.parameters.find((x) => x.name === "blobName");
+      ok(downloadBlobNameParam);
+      strictEqual(downloadBlobNameParam.onClient, true);
+
+      const upload = methods[1];
+      strictEqual(upload.name, "upload");
+      strictEqual(upload.kind, "basic");
+      strictEqual(upload.parameters.length, 1);
+
+      const uploadBlobNameParam = upload.parameters.find((x) => x.name === "blobName");
+      ok(uploadBlobNameParam);
+      strictEqual(uploadBlobNameParam.onClient, true);
+    });
   });
 });

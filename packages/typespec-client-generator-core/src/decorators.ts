@@ -39,6 +39,7 @@ import {
   ConvenientAPIDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
+  ParamAliasDecorator,
   ProtocolAPIDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
@@ -1037,17 +1038,17 @@ export function getClientInitialization(
   };
 }
 
-const aliasKey = createStateSymbol("alias");
+const paramAliasKey = createStateSymbol("paramAlias");
 
-export const $alias: DecoratorFunction = (
+export const paramAliasDecorator: ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
-  alias: string,
+  paramAlias: string,
   scope?: LanguageScopes
 ) => {
-  setScopedDecoratorData(context, $alias, aliasKey, original, alias, scope);
+  setScopedDecoratorData(context, paramAliasDecorator, paramAliasKey, original, paramAlias, scope);
 };
 
-export function getAlias(context: TCGCContext, original: ModelProperty): string | undefined {
-  return getScopedDecoratorData(context, aliasKey, original);
+export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
+  return getScopedDecoratorData(context, paramAliasKey, original);
 }

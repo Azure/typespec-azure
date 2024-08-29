@@ -99,6 +99,7 @@ import {
   isJsonContentType,
   isMultipartOperation,
   isNeverOrVoidType,
+  isOnClient,
   isSubscriptionId,
   isXmlContentType,
   twoParamsEquivalent,
@@ -1225,13 +1226,7 @@ export function getSdkModelPropertyTypeBase(
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
-  const namespace = type.model?.namespace;
-  const onClient =
-    isSubscriptionId(context, type) ||
-    isApiVersion(context, type) ||
-    Boolean(
-      namespace && context.__clientToParameters.get(namespace)?.find((x) => x.name === type.name)
-    );
+  const onClient = isOnClient(context, type);
   return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,
@@ -1391,7 +1386,7 @@ export function getSdkModelPropertyType(
   const clientParams = operation
     ? context.__clientToParameters.get(getLocationOfOperation(operation))
     : undefined;
-  const correspondingClientParams = clientParams?.find((x) => twoParamsEquivalent(x, type));
+  const correspondingClientParams = clientParams?.find((x) => twoParamsEquivalent(context, x.__raw, type));
   if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
