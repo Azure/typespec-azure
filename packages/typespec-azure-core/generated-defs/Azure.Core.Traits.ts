@@ -47,3 +47,10 @@ export type TraitAddedDecorator = (
   target: Model | ModelProperty,
   addedVersion: Type
 ) => void;
+
+export type AzureCoreTraitsDecorators = {
+  trait: TraitDecorator;
+  traitLocation: TraitLocationDecorator;
+  traitContext: TraitContextDecorator;
+  traitAdded: TraitAddedDecorator;
+};

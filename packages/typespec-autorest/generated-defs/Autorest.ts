@@ -27,3 +27,8 @@ export type UseRefDecorator = (
   entity: Model | ModelProperty,
   jsonRef: string
 ) => void;
+
+export type AutorestDecorators = {
+  example: ExampleDecorator;
+  useRef: UseRefDecorator;
+};

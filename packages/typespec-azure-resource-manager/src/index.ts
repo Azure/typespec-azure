@@ -1,5 +1,3 @@
-import { definePackageFlags } from "@typespec/compiler";
-
 export const namespace = "Azure.ResourceManager";
 
 export {
@@ -8,8 +6,8 @@ export {
   getArmCommonTypesVersion,
   getArmCommonTypesVersions,
   isArmCommonType,
-  type ArmCommonTypesResolutionOptions,
   type ArmCommonTypeVersions,
+  type ArmCommonTypesResolutionOptions,
 } from "./common-types.js";
 
 export * from "./namespace.js";
@@ -21,6 +19,5 @@ export { $linter } from "./linter.js";
 
 export { isAzureResource, isConditionallyFlattened } from "./private.decorators.js";
 
-export const $flags = definePackageFlags({
-  decoratorArgMarshalling: "new",
-});
+/** @internal */
+export { $decorators } from "./tsp-index.js";

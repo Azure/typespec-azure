@@ -1,0 +1,10 @@
+{
+  "operationId": "bodyTest",
+  "title": "bodyTest",
+  "parameters": {
+    "body": {
+      "prop": "body"
+    }
+  },
+  "responses": {}
+}

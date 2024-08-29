@@ -10,7 +10,7 @@ describe("typespec-client-generator-core: helper", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-java",
-      "examples-directory": `./examples`,
+      "examples-dir": `./examples`,
     });
   });
 

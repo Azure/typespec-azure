@@ -15,7 +15,6 @@ describe("typespec-client-generator-core: union types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: string | int32;
         }
@@ -33,7 +32,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("nullable", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: float32 | null;
         }
@@ -49,7 +47,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("nullable with more types", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: string | float32 | null;
         }
@@ -68,7 +65,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("record with nullable", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: Record<float32 | null>;
         }
@@ -84,7 +80,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("record with nullable with more types", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: Record<string | float32 | null>;
         }
@@ -105,7 +100,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("array with nullable", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: (float32 | null)[];
         }
@@ -121,7 +115,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("array with nullable with more types", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: (string | float32 | null)[];
         }
@@ -141,19 +134,16 @@ describe("typespec-client-generator-core: union types", () => {
   it("additional property is nullable", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model TestExtends extends Record<string|null> {
           name: string;
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model TestIs is Record<string|null> {
           name: string;
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model TestSpread {
           name: string;
           ...Record<string|null>
@@ -191,19 +181,16 @@ describe("typespec-client-generator-core: union types", () => {
   it("additional property nullable with more types", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model TestExtends extends Record<string|float32|null> {
           name: string;
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model TestIs is Record<string|float32|null> {
           name: string;
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model TestSpread {
           name: string;
           ...Record<string|float32|null>
@@ -263,7 +250,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("model with simple union property", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-        @access(Access.public)
       model ModelWithSimpleUnionProperty {
         prop: int32 | int32[];
       }
@@ -283,29 +269,24 @@ describe("typespec-client-generator-core: union types", () => {
   it("model with named union", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model BaseModel {
         name: string;
       }
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Model1 extends BaseModel {
         prop1: int32;
       }
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Model2 extends BaseModel {
         prop2: int32;
       }
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       union MyNamedUnion {
         one: Model1,
         two: Model2,
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model ModelWithNamedUnionProperty {
         prop: MyNamedUnion;
       }
@@ -344,7 +325,6 @@ describe("typespec-client-generator-core: union types", () => {
         dog, cat, bird
       }
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Home {
         pet: PetKind | null;
       }
@@ -365,7 +345,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("model with nullable union as enum", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Home {
         pet: "dog" | "cat" | "bird" | string | null;
       }
@@ -386,13 +365,11 @@ describe("typespec-client-generator-core: union types", () => {
   it("model with nullable model property", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model PropertyModel {
         internalProp: string;
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: PropertyModel | null;
       }
@@ -413,19 +390,16 @@ describe("typespec-client-generator-core: union types", () => {
   it("mix types", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model ModelType {
         name: string;
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: "none" | "auto" | ModelType;
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model TestNullable {
         prop: "none" | "auto" | ModelType | null;
       }
@@ -556,7 +530,6 @@ describe("typespec-client-generator-core: union types", () => {
   it("usage override for orphan union as enum", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       union UnionAsEnum {
         "A",
         "B",
@@ -588,7 +561,6 @@ describe("typespec-client-generator-core: union types", () => {
     await runner.compileWithBuiltInService(
       `
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: TestUnion;
         }
