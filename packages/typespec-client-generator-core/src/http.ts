@@ -514,8 +514,7 @@ export function getCorrespondingMethodParams(
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!context.__subscriptionIdParameter) {
-      const subscriptionIdParam = methodParameters.find((x) => isSubscriptionId(context, x));
-      if (!subscriptionIdParam) {
+      if (!context.__subscriptionIdParameter) {
         diagnostics.add(
           createDiagnostic({
             code: "no-corresponding-method-param",
@@ -528,7 +527,6 @@ export function getCorrespondingMethodParams(
         );
         return diagnostics.wrap([]);
       }
-      context.__subscriptionIdParameter = subscriptionIdParam;
     }
     return diagnostics.wrap([context.__subscriptionIdParameter]);
   }
