@@ -6,7 +6,7 @@ title: "no-multiple-discriminator"
 @azure-tools/typespec-azure-core/no-multiple-discriminator
 ```
 
-Using a nested polymophic relationship is now allowed in Azure services. Most JSON serializer and deserializer do not support this feature.
+Using a nested polymophic relationship is not allowed in Azure services. Most JSON serializers and deserializers do not support this feature.
 
 #### ❌ Incorrect
 
