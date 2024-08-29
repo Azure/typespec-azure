@@ -474,9 +474,18 @@ export type XMSLongRunningOperationOptions = {
 
   "final-state-schema"?: string;
 };
+
+/**
+ * Model for x-ms-pageable extension.
+ * https://github.com/Azure/autorest/blob/main/docs/extensions/readme.md#x-ms-pageable
+ */
 export type XmsPageable = {
-  nextLinkName?: string;
+  /** Name of the property containing url to the next link.  */
+  nextLinkName: string;
+  /** Name of the property containing the page items. Default: "value" */
   itemName?: string;
+  /** Specifies the name (operationId) of the operation for retrieving the next page. Default: "<operationId>Next" */
+  operationName?: string;
 };
 
 export type OpenAPI2StatusCode = string | "default" | "1XX" | "2XX" | "3XX" | "4XX" | "5XX";

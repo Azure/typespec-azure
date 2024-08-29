@@ -508,7 +508,7 @@ export async function getOpenAPIForService(
       if (paged) {
         const nextLinkName = getLastSegment(paged.nextLinkSegments);
         const itemName = getLastSegment(paged.itemsSegments);
-        if (nextLinkName || itemName) {
+        if (nextLinkName) {
           currentEndpoint["x-ms-pageable"] = {
             nextLinkName,
             itemName,
