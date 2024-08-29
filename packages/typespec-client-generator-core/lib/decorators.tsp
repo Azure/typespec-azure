@@ -468,14 +468,9 @@ extern dec clientInitialization(
  *
  * @@clientInitialization(MyService, MyServiceClientOptions)
  * @@paramAlias(MyServiceClientOptions.blob, "blobName")
- * 
+ *
  * // The generated client will have `blobName` on it. We will also
  * // elevate the existing `blob` parameter to the client level.
  * ```
  */
-extern dec paramAlias(
-  original: ModelProperty,
-  paramAlias: valueof string,
-  scope?: valueof string
-);
-
+extern dec paramAlias(original: ModelProperty, paramAlias: valueof string, scope?: valueof string);

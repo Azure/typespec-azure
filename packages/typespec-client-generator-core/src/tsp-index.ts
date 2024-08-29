@@ -8,10 +8,10 @@ import {
   $flattenProperty,
   $operationGroup,
   $override,
-  paramAliasDecorator,
   $protocolAPI,
   $usage,
   $useSystemTextJsonConverter,
+  paramAliasDecorator,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";

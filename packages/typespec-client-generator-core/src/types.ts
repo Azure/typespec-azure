@@ -100,7 +100,6 @@ import {
   isMultipartOperation,
   isNeverOrVoidType,
   isOnClient,
-  isSubscriptionId,
   isXmlContentType,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
@@ -113,7 +112,6 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
-  isApiVersion,
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
@@ -1386,7 +1384,9 @@ export function getSdkModelPropertyType(
   const clientParams = operation
     ? context.__clientToParameters.get(getLocationOfOperation(operation))
     : undefined;
-  const correspondingClientParams = clientParams?.find((x) => twoParamsEquivalent(context, x.__raw, type));
+  const correspondingClientParams = clientParams?.find((x) =>
+    twoParamsEquivalent(context, x.__raw, type)
+  );
   if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 

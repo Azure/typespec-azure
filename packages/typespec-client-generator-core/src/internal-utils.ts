@@ -31,6 +31,7 @@ import {
   HttpStatusCodeRange,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -49,7 +50,6 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
-import { getParamAlias } from "./decorators.js";
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -528,11 +528,19 @@ export function isXmlContentType(contentType: string): boolean {
   return regex.test(contentType);
 }
 
-export function twoParamsEquivalent(context: TCGCContext, param1?: ModelProperty, param2?: ModelProperty): boolean {
+export function twoParamsEquivalent(
+  context: TCGCContext,
+  param1?: ModelProperty,
+  param2?: ModelProperty
+): boolean {
   if (!param1 || !param2) {
     return false;
   }
-  return param1.name === param2.name || getParamAlias(context, param1) === param2.name || param1.name === getParamAlias(context, param2);
+  return (
+    param1.name === param2.name ||
+    getParamAlias(context, param1) === param2.name ||
+    param1.name === getParamAlias(context, param2)
+  );
 }
 /**
  * If body is from spread, then it does not directly from a model property.
@@ -576,9 +584,14 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
 
 export function isOnClient(context: TCGCContext, type: ModelProperty): boolean {
   const namespace = type.model?.namespace;
-  return isSubscriptionId(context, type) ||
+  return (
+    isSubscriptionId(context, type) ||
     isApiVersion(context, type) ||
     Boolean(
-      namespace && context.__clientToParameters.get(namespace)?.find((x) => twoParamsEquivalent(context, x.__raw, type))
-    );
+      namespace &&
+        context.__clientToParameters
+          .get(namespace)
+          ?.find((x) => twoParamsEquivalent(context, x.__raw, type))
+    )
+  );
 }
