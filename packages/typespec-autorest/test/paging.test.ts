@@ -45,6 +45,7 @@ it("define a custom paged operation with custom item name", async () => {
       @items
       itemList?: string[];
 
+      @nextLink
       nextLink?: string;
     }
       
@@ -54,5 +55,5 @@ it("define a custom paged operation with custom item name", async () => {
 
   const listThings = res.paths["/"].get;
   ok(listThings);
-  deepStrictEqual(listThings["x-ms-pageable"], { itemName: "itemList" });
+  deepStrictEqual(listThings["x-ms-pageable"], { itemName: "itemList", nextLinkName: "nextLink" });
 });

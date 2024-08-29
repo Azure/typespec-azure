@@ -511,7 +511,7 @@ export async function getOpenAPIForService(
         if (nextLinkName) {
           currentEndpoint["x-ms-pageable"] = {
             nextLinkName,
-            itemName,
+            itemName: itemName !== "value" ? itemName : undefined,
           };
         }
         // Once we find paged metadata, we don't need to processes any further.
