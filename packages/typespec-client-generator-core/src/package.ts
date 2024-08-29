@@ -74,6 +74,7 @@ import {
   getLibraryName,
 } from "./public-utils.js";
 import {
+  addEncodeInfo,
   getAllModelsWithDiagnostics,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
@@ -142,9 +143,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           )
         )
       : undefined,
-    getResponseMapping(): string | undefined {
-      return basic.response.resultPath;
-    },
   });
 }
 
@@ -179,9 +177,6 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
         basicServiceMethod.parameters
       )
     ),
-    getResponseMapping(): string | undefined {
-      return this.response.resultPath;
-    },
   });
 }
 
@@ -247,13 +242,26 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   const serviceOperation = diagnostics.pipe(
     getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters)
   );
+  // set the correct encode for body parameter according to the content-type
+  if (
+    serviceOperation.bodyParam &&
+    serviceOperation.bodyParam.correspondingMethodParams.length === 1
+  ) {
+    const methodBodyParam = serviceOperation.bodyParam.correspondingMethodParams[0];
+    const contentTypes = serviceOperation.__raw.parameters.body?.contentTypes;
+    const defaultContentType =
+      contentTypes && contentTypes.length > 0 ? contentTypes[0] : "application/json";
+    diagnostics.pipe(
+      addEncodeInfo(context, methodBodyParam.__raw!, methodBodyParam.type, defaultContentType)
+    );
+  }
   const response = getSdkMethodResponse(context, operation, serviceOperation);
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
     kind: "basic",
     name,
-    access: getAccess(context, operation),
+    access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
     description: getDocHelper(context, operation).description,
     details: getDocHelper(context, operation).details,
@@ -592,11 +600,8 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
       usage: UsageFlags.None,
       crossLanguageDefinitionId: "",
       apiVersions: [],
-      isFormDataType: false,
       decorators: [],
     },
-    // eslint-disable-next-line deprecation/deprecation
-    arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}

@@ -59,6 +59,10 @@ describe("typespec-client-generator-core: http operation examples", () => {
           @path b: string,
           @query c: string,
           @body d: string,
+          @header testHeader: string,
+          @clientName("renameQuery")
+          @query testQuery: string,
+          @path("renamePath") testPath: string,
         ): void;
       }
     `);
@@ -72,7 +76,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
 
     const parameters = operation.examples[0].parameters;
     ok(parameters);
-    strictEqual(parameters.length, 4);
+    strictEqual(parameters.length, 7);
 
     strictEqual(parameters[0].value.kind, "string");
     strictEqual(parameters[0].value.value, "header");
@@ -89,6 +93,49 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(parameters[3].value.kind, "string");
     strictEqual(parameters[3].value.value, "body");
     strictEqual(parameters[3].value.type.kind, "string");
+
+    strictEqual(parameters[4].value.kind, "string");
+    strictEqual(parameters[4].value.value, "test-header");
+    strictEqual(parameters[4].value.type.kind, "string");
+
+    strictEqual(parameters[5].value.kind, "string");
+    strictEqual(parameters[5].value.value, "testQuery");
+    strictEqual(parameters[5].value.type.kind, "string");
+
+    strictEqual(parameters[6].value.kind, "string");
+    strictEqual(parameters[6].value.value, "renamePath");
+    strictEqual(parameters[6].value.type.kind, "string");
+
+    expectDiagnostics(runner.context.diagnostics, []);
+  });
+
+  it("body fallback", async () => {
+    await runner.host.addRealTypeSpecFile(
+      "./examples/parameters.json",
+      `${__dirname}/http-operation-examples/bodyFallback.json`
+    );
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op bodyTest(prop: string): void;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples[0].kind, "http");
+
+    const parameters = operation.examples[0].parameters;
+    ok(parameters);
+    strictEqual(parameters.length, 1);
+
+    strictEqual(parameters[0].value.kind, "model");
+    strictEqual(parameters[0].value.value["prop"].kind, "string");
+    strictEqual(parameters[0].value.value["prop"].value, "body");
+    strictEqual(parameters[0].value.type.kind, "model");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });

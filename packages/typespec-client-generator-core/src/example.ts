@@ -3,11 +3,14 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
+  Operation,
   createDiagnosticCollector,
+  isGlobalNamespace,
+  isService,
   resolvePath,
 } from "@typespec/compiler";
 import { HttpStatusCodeRange } from "@typespec/http";
-import { resolveOperationId } from "@typespec/openapi";
+import { getOperationId } from "@typespec/openapi";
 import {
   SdkAnyExample,
   SdkArrayExample,
@@ -37,6 +40,7 @@ import {
 } from "./interfaces.js";
 import { getValidApiVersion } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getLibraryName } from "./public-utils.js";
 
 interface LoadedExample {
   readonly relativePath: string;
@@ -139,6 +143,30 @@ async function loadExamples(
   return diagnostics.wrap(map);
 }
 
+function resolveOperationId(context: TCGCContext, operation: Operation) {
+  const { program } = context;
+  // if @operationId was specified use that value
+  const explicitOperationId = getOperationId(program, operation);
+  if (explicitOperationId) {
+    return explicitOperationId;
+  }
+
+  const operationName = getLibraryName(context, operation);
+  if (operation.interface) {
+    return `${getLibraryName(context, operation.interface)}_${operationName}`;
+  }
+  const namespace = operation.namespace;
+  if (
+    namespace === undefined ||
+    isGlobalNamespace(program, namespace) ||
+    isService(program, namespace)
+  ) {
+    return operationName;
+  }
+
+  return `${getLibraryName(context, namespace)}_${operationName}`;
+}
+
 export async function handleClientExamples(
   context: TCGCContext,
   client: SdkClientType<SdkServiceOperation>
@@ -157,7 +185,7 @@ export async function handleClientExamples(
       // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
       let operation = method.__raw;
       while (operation && operation.templateMapper === undefined) {
-        const operationId = resolveOperationId(context.program, operation).toLowerCase();
+        const operationId = resolveOperationId(context, operation).toLowerCase();
         if (examples.has(operationId)) {
           diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
           break;
@@ -230,7 +258,11 @@ function handleHttpParameters(
 ): [SdkHttpParameterExample[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const parameterExamples = [] as SdkHttpParameterExample[];
-  if ("parameters" in example && typeof example.parameters === "object") {
+  if (
+    "parameters" in example &&
+    typeof example.parameters === "object" &&
+    example.parameters !== null
+  ) {
     for (const name of Object.keys(example.parameters)) {
       let parameter = parameters.find(
         (p) => (p.kind !== "body" && p.serializedName === name) || p.name === name
@@ -241,7 +273,7 @@ function handleHttpParameters(
       }
       if (parameter) {
         const value = diagnostics.pipe(
-          getSdkTypeExample(parameter.type, example.parameters[parameter.name], relativePath)
+          getSdkTypeExample(parameter.type, example.parameters[name], relativePath)
         );
         if (value) {
           parameterExamples.push({
@@ -268,7 +300,11 @@ function handleHttpResponses(
 ): [Map<number, SdkHttpResponseExample>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const responseExamples = new Map<number, SdkHttpResponseExample>();
-  if ("responses" in example && typeof example.responses === "object") {
+  if (
+    "responses" in example &&
+    typeof example.responses === "object" &&
+    example.responses !== null
+  ) {
     for (const code of Object.keys(example.responses)) {
       const statusCode = parseInt(code, 10);
       let found = false;
@@ -282,6 +318,7 @@ function handleHttpResponses(
           break;
         } else if (
           typeof responseCode === "object" &&
+          responseCode !== null &&
           responseCode.start <= statusCode &&
           responseCode.end >= statusCode
         ) {
@@ -315,7 +352,7 @@ function handleHttpResponse(
     response,
     headers: [],
   } as SdkHttpResponseExample;
-  if (typeof example === "object") {
+  if (typeof example === "object" && example !== null) {
     for (const name of Object.keys(example)) {
       if (name === "description") {
         continue;
@@ -504,6 +541,9 @@ function getSdkDictionaryExample(
 ): [SdkDictionaryExample | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
+    if (example === null) {
+      return diagnostics.wrap(undefined);
+    }
     const dictionaryExample = {} as Record<string, SdkTypeExample>;
     for (const key of Object.keys(example)) {
       const result = diagnostics.pipe(
@@ -531,6 +571,9 @@ function getSdkModelExample(
 ): [SdkModelExample | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
+    if (example === null) {
+      return diagnostics.wrap(undefined);
+    }
     // handle discriminated model
     if (type.discriminatorProperty) {
       if (

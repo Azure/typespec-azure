@@ -128,7 +128,7 @@ export function getEmitterTargetName(context: TCGCContext): string {
 }
 
 /**
- * Get the library and wire name of a model property. Takes @clientName and @encodedName into account
+ * Get the library and wire name of a model property. Takes `@clientName` and `@encodedName` into account
  * @param context
  * @param property
  * @returns a tuple of the library and wire name for a model property
@@ -383,7 +383,7 @@ function getContextPath(
       result = [{ name: root.name }];
       let bodyType: Type;
       if (isHttpBodySpread(httpOperation.parameters.body)) {
-        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
+        bodyType = getHttpBodySpreadModel(context, httpOperation.parameters.body.type as Model);
       } else {
         bodyType = httpOperation.parameters.body.type;
       }

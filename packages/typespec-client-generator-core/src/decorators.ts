@@ -30,18 +30,13 @@ import {
   projectProgram,
   validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
-import { isHeader } from "@typespec/http";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   ClientDecorator,
-  ClientFormatDecorator,
   ClientNameDecorator,
   ConvenientAPIDecorator,
-  ExcludeDecorator,
   FlattenPropertyDecorator,
-  IncludeDecorator,
-  InternalDecorator,
   OperationGroupDecorator,
   ProtocolAPIDecorator,
   UsageDecorator,
@@ -188,7 +183,6 @@ export const $client: ClientDecorator = (
     name,
     service,
     type: target,
-    arm: isArm(service),
     crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
@@ -322,7 +316,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
   // if there is no explicit client, we will treat namespaces with service decorator as clients
   const services = listServices(context.program);
 
-  const clients = services.map((service) => {
+  const clients: SdkClient[] = services.map((service) => {
     let originalName = service.type.name;
     const clientNameOverride = getClientNameOverride(context, service.type);
     if (clientNameOverride) {
@@ -337,9 +331,8 @@ export function listClients(context: TCGCContext): SdkClient[] {
       name: clientName,
       service: service.type,
       type: service.type,
-      arm: isArm(service.type),
       crossLanguageDefinitionId: getNamespaceFullName(service.type),
-    } as SdkClient;
+    };
   });
 
   context.__rawClients = getClientsWithVersioning(context, clients);
@@ -703,183 +696,6 @@ export function shouldGenerateConvenient(context: TCGCContext, entity: Operation
   return value ?? Boolean(context.generateConvenienceMethods);
 }
 
-const excludeKey = createStateSymbol("exclude");
-
-/**
- * @deprecated Use `usage` and `access` decorator instead.
- */
-export const $exclude: ExcludeDecorator = (
-  context: DecoratorContext,
-  entity: Model,
-  scope?: LanguageScopes
-) => {
-  setScopedDecoratorData(context, $exclude, excludeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
-};
-
-const includeKey = createStateSymbol("include");
-
-/**
- * @deprecated Use `usage` and `access` decorator instead.
- */
-export const $include: IncludeDecorator = (
-  context: DecoratorContext,
-  entity: Model,
-  scope?: LanguageScopes
-) => {
-  modelTransitiveSet(context, $include, includeKey, entity, true, scope); // eslint-disable-line deprecation/deprecation
-};
-
-/**
- * @deprecated This function is unused and will be removed in a future release.
- */
-export function isExclude(context: TCGCContext, entity: Model): boolean {
-  return getScopedDecoratorData(context, excludeKey, entity) ?? false;
-}
-
-/**
- * @deprecated This function is unused and will be removed in a future release.
- */
-export function isInclude(context: TCGCContext, entity: Model): boolean {
-  return getScopedDecoratorData(context, includeKey, entity) ?? false;
-}
-
-function modelTransitiveSet(
-  context: DecoratorContext,
-  decorator: DecoratorFunction,
-  key: symbol,
-  entity: Model,
-  value: unknown,
-  scope?: LanguageScopes,
-  transitivity: boolean = false
-) {
-  if (!setScopedDecoratorData(context, decorator, key, entity, value, scope, transitivity)) {
-    return;
-  }
-
-  if (entity.baseModel) {
-    modelTransitiveSet(context, decorator, key, entity.baseModel, value, scope, true);
-  }
-
-  entity.properties.forEach((p) => {
-    if (p.kind === "ModelProperty" && p.type.kind === "Model") {
-      modelTransitiveSet(context, decorator, key, p.type, value, scope, true);
-    }
-  });
-}
-
-const clientFormatKey = createStateSymbol("clientFormat");
-
-const allowedClientFormatToTargetTypeMap: Record<ClientFormat, string[]> = {
-  unixtime: ["int32", "int64"],
-  iso8601: ["utcDateTime", "offsetDateTime", "duration"],
-  rfc1123: ["utcDateTime", "offsetDateTime"],
-  seconds: ["duration"],
-};
-
-export type ClientFormat = "unixtime" | "iso8601" | "rfc1123" | "seconds";
-
-/**
- * @deprecated Use `encode` decorator in `@typespec/core` instead.
- */
-export const $clientFormat: ClientFormatDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-  format: ClientFormat,
-  scope?: LanguageScopes
-) => {
-  const expectedTargetTypes = allowedClientFormatToTargetTypeMap[format];
-  if (
-    context.program.checker.isStdType(target.type) &&
-    expectedTargetTypes.includes(target.type.name)
-  ) {
-    setScopedDecoratorData(context, $clientFormat, clientFormatKey, target, format, scope); // eslint-disable-line deprecation/deprecation
-  } else {
-    reportDiagnostic(context.program, {
-      code: "incorrect-client-format",
-      format: { format, expectedTargetTypes: expectedTargetTypes.join('", "') },
-      target: context.decoratorTarget,
-    });
-  }
-};
-
-/**
- * Gets additional information on how to serialize / deserialize TYPESPEC standard types depending
- * on whether additional serialization information is provided or needed
- *
- * @param context the Sdk Context
- * @param entity the entity whose client format we are going to get
- * @returns the format in which to serialize the typespec type or undefined
- * @deprecated This function is unused and will be removed in a future release.
- */
-export function getClientFormat(
-  context: TCGCContext,
-  entity: ModelProperty
-): ClientFormat | undefined {
-  let retval: ClientFormat | undefined = getScopedDecoratorData(context, clientFormatKey, entity);
-  if (retval === undefined && context.program.checker.isStdType(entity.type)) {
-    if (entity.type.name === "utcDateTime" || entity.type.name === "offsetDateTime") {
-      // if it's a date-time we have the following defaults
-      retval = isHeader(context.program, entity) ? "rfc1123" : "iso8601";
-      context.program.stateMap(clientFormatKey).set(entity, retval);
-    } else if (entity.type.name === "duration") {
-      retval = "iso8601";
-    }
-  }
-
-  return retval;
-}
-const internalKey = createStateSymbol("internal");
-
-/**
- * Whether a operation is internal and should not be exposed
- * to end customers
- *
- * @param context DecoratorContext
- * @param target Operation to mark as internal
- * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
- * @deprecated Use `access` decorator instead.
- *
- * @internal
- */
-export const $internal: InternalDecorator = (
-  context: DecoratorContext,
-  target: Operation,
-  scope?: LanguageScopes
-) => {
-  setScopedDecoratorData(context, $internal, internalKey, target, true, scope); // eslint-disable-line deprecation/deprecation
-};
-
-/**
- * Whether a model / operation is internal or not. If it's internal, emitters
- * should not expose them to users
- *
- * @param context TCGCContext
- * @param entity model / operation that we want to check is internal or not
- * @returns whether the entity is internal
- * @deprecated This function is unused and will be removed in a future release.
- */
-export function isInternal(
-  context: TCGCContext,
-  entity: Model | Operation | Enum | Union
-): boolean {
-  const found = getScopedDecoratorData(context, internalKey, entity) ?? false;
-  if (entity.kind === "Operation" || found) {
-    return found;
-  }
-  const operationModels = context.operationModelsMap!;
-  let referredByInternal = false;
-  for (const [operation, modelMap] of operationModels) {
-    // eslint-disable-next-line deprecation/deprecation
-    if (isInternal(context, operation) && modelMap.get(entity)) {
-      referredByInternal = true;
-      // eslint-disable-next-line deprecation/deprecation
-    } else if (!isInternal(context, operation) && modelMap.get(entity)) {
-      return false;
-    }
-  }
-  return referredByInternal;
-}
-
 const usageKey = createStateSymbol("usage");
 
 export const $usage: UsageDecorator = (
@@ -923,7 +739,7 @@ export const $usage: UsageDecorator = (
 export function getUsageOverride(
   context: TCGCContext,
   entity: Model | Enum | Union
-): UsageFlags | undefined {
+): number | undefined {
   const usageFlags = getScopedDecoratorData(context, usageKey, entity);
   if (usageFlags || entity.namespace === undefined) return usageFlags;
   return getScopedDecoratorData(context, usageKey, entity.namespace);
