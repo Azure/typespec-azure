@@ -701,7 +701,6 @@ components:
       schema:
         type: integer
         format: int32
-      explode: false
     Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent:
       name: Repeatability-First-Sent
       in: header
@@ -726,6 +725,7 @@ components:
         type: array
         items:
           type: string
+      explode: true
     Azure.Core.SkipQueryParameter:
       name: skip
       in: query
@@ -735,7 +735,6 @@ components:
         type: integer
         format: int32
         default: 0
-      explode: false
     Azure.Core.TopQueryParameter:
       name: top
       in: query
@@ -744,7 +743,6 @@ components:
       schema:
         type: integer
         format: int32
-      explode: false
   schemas:
     Azure.Core.Foundations.Error:
       type: object
