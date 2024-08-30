@@ -3847,11 +3847,12 @@ describe("typespec-client-generator-core: decorators", () => {
         }
         `,
         `
-        model BlobClientInitialization {
+        model ClientInitialization {
           blobName: string
         };
 
-        @@clientInitialization(StorageClient.BlobClient, BlobClientInitialization);
+        @@clientInitialization(StorageClient, ClientInitialization);
+        @@clientInitialization(StorageClient.BlobClient, ClientInitialization);
         `
       );
       const sdkPackage = runner.context.sdkPackage;
@@ -3860,8 +3861,11 @@ describe("typespec-client-generator-core: decorators", () => {
       const client = clients[0];
       strictEqual(client.name, "StorageClient");
       strictEqual(client.initialization.access, "public");
-      strictEqual(client.initialization.properties.length, 1);
-      strictEqual(client.initialization.properties[0].kind, "endpoint");
+      strictEqual(client.initialization.properties.length, 2);
+      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.onClient, true);
 
       const methods = client.methods;
       strictEqual(methods.length, 2);
@@ -3871,7 +3875,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(mainClientDownload);
       strictEqual(mainClientDownload.parameters.length, 1);
       strictEqual(mainClientDownload.parameters[0].name, "blobName");
-      strictEqual(mainClientDownload.parameters[0].onClient, false);
+      strictEqual(mainClientDownload.parameters[0].onClient, true);
 
       const getBlobClient = methods.find((x) => x.kind === "clientaccessor");
       ok(getBlobClient);

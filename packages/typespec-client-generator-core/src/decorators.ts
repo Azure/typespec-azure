@@ -1001,10 +1001,15 @@ export const $clientInitialization: ClientInitializationDecorator = (
   options: Model,
   scope?: LanguageScopes
 ) => {
-  if (context.program.stateMap(operationGroupKey).get(target)) {
+  let isOg = isOperationGroupWithNoExplicitDecorator(target);
+  if (hasExplicitClientOrOperationGroup(context)) {
+    isOg = context.program.stateMap(operationGroupKey).get(target) !== undefined;
+  }
+  if (isOg) {
     if (
       target.namespace &&
-      context.program.stateMap(clientInitializationKey).get(target.namespace) === options
+      context.program.stateMap(clientInitializationKey).get(target.namespace) &&
+      context.program.stateMap(clientInitializationKey).get(target.namespace)[AllScopes] === options
     ) {
       setScopedDecoratorData(context, $override, clientInitializationKey, target, options, scope);
     } else {
