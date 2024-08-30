@@ -17,7 +17,6 @@ paths:
           required: true
           schema:
             type: string
-          explode: false
         - name: after
           in: header
           required: true
@@ -57,7 +56,6 @@ paths:
           required: true
           schema:
             type: string
-          explode: false
         - name: after
           in: header
           required: true
@@ -95,7 +93,6 @@ paths:
           schema:
             type: string
             format: date
-          explode: false
         - name: $Select
           in: query
           required: false
@@ -104,6 +101,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
+          explode: true
       responses:
         '200':
           description: The request has succeeded.
@@ -140,7 +138,6 @@ paths:
           schema:
             type: string
             format: date
-          explode: false
         - name: $Select
           in: query
           required: false
@@ -149,6 +146,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
+          explode: true
       responses:
         '200':
           description: The request has succeeded.
@@ -182,6 +180,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
+          explode: true
       responses:
         '200':
           description: The request has succeeded.
@@ -411,13 +410,11 @@ paths:
           required: false
           schema:
             type: string
-          explode: false
         - name: after
           in: query
           required: false
           schema:
             type: string
-          explode: false
       responses:
         '200':
           description: The request has succeeded.
@@ -452,13 +449,11 @@ paths:
           required: false
           schema:
             type: string
-          explode: false
         - name: after
           in: query
           required: false
           schema:
             type: string
-          explode: false
         - name: $Select
           in: query
           required: false
@@ -466,6 +461,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/LabelField'
+          explode: true
       responses:
         '200':
           description: The request has succeeded.
@@ -497,7 +493,6 @@ paths:
           required: true
           schema:
             type: string
-          explode: false
         - $ref: '#/components/parameters/ETagHeaders.ifMatch'
         - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
       responses:
@@ -534,7 +529,6 @@ paths:
           required: true
           schema:
             type: string
-          explode: false
         - $ref: '#/components/parameters/ETagHeaders.ifMatch'
         - $ref: '#/components/parameters/ETagHeaders.ifNoneMatch'
       responses:
@@ -572,20 +566,19 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/KeyField'
+          explode: true
         - name: label
           in: query
           required: true
           description: A filter used to match labels
           schema:
             type: string
-          explode: false
         - name: key
           in: query
           required: true
           description: A filter used to match keys.
           schema:
             type: string
-          explode: false
       responses:
         '200':
           description: The request has succeeded.
@@ -620,13 +613,11 @@ paths:
           required: true
           schema:
             type: string
-          explode: false
         - name: after
           in: query
           required: true
           schema:
             type: string
-          explode: false
       responses:
         '200':
           description: The request has succeeded.
@@ -657,7 +648,6 @@ components:
       required: true
       schema:
         type: string
-      explode: false
     ETagHeaders.ifMatch:
       name: if-match
       in: header
@@ -677,7 +667,6 @@ components:
       description: A filter for the name of the returned keys.
       schema:
         type: string
-      explode: false
     KeyFilters.label:
       name: label
       in: query
@@ -685,7 +674,6 @@ components:
       description: A filter used to match labels
       schema:
         type: string
-      explode: false
     KeyWithFilters.key:
       name: key
       in: path
@@ -700,7 +688,6 @@ components:
       description: A filter used to match labels
       schema:
         type: string
-      explode: false
     SyncTokenHeader:
       name: sync-token
       in: header
