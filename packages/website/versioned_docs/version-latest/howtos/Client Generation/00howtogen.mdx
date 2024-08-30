@@ -1,9 +1,9 @@
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# How to generate DPG
+# How to generate client libraries
 
-This page documents how to build a Data-Plane SDK from your TYPESPEC specification. For an overview of the whole process from initial API design to shipping SDKs, please visit https://aka.ms/azsdk/dpcodegen.
+This page documents how to build a client library from your TYPESPEC specification. For an overview of the whole process from initial API design to shipping SDKs, please visit https://aka.ms/azsdk/dpcodegen.
 
 The best documentation on how to generate can found using those links:
 
@@ -15,11 +15,11 @@ The best documentation on how to generate can found using those links:
 
 At a glance, add your emitter name to your `package.json`, along with the right options in the `tspconfig.yaml`.
 
-> **NOTE:** It may be complicated to generate all languages from the same folder at the moment as DPG and `typespec-azure-core` are still in preview.
-> It's recommended that you keep each `package.json` with a unique language emitter, as they are likely to conflict, until all emitters and `typespec-azure-core`
+> **NOTE:** It may be complicated to generate all languages from the same folder at the moment as the emitters and TypeSpec libraries, such as `typespec-azure-core` and `typespec-resource-manager` are still in preview.
+> It's recommended that you keep each `package.json` with a unique language emitter, as they are likely to conflict, until all emitters and the TypeSpec libraries
 > reach their first stable release.
 
-Update your `package.json` to contain dependencies on DPG language emitter(s). Don't forget to do `npm install` after an update of the file:
+Update your `package.json` to contain dependencies on the language emitter(s). Don't forget to do `npm install` after an update of the file:
 
 ```json
 {
