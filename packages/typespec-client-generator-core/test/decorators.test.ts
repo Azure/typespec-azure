@@ -1,3 +1,4 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Interface, Model, Namespace, Operation, ignoreDiagnostics } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -3784,6 +3785,50 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
       strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
     });
+
+    it("core template", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compileWithCustomization(
+        `
+        @useDependency(Versions.v1_0_Preview_2)
+        @server("http://localhost:3000", "endpoint")
+        @service()
+        namespace My.Service;
+
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        @route("/template")
+        op templateOp is Azure.Core.RpcOperation<
+          Params,
+          Params
+        >;
+        `,
+        `
+        namespace My.Customizations;
+
+        op templateOp(params: My.Service.Params): My.Service.Params;
+
+        @@override(My.Service.templateOp, My.Customizations.templateOp);
+        `
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const method = sdkPackage.clients[0].methods[0];
+      strictEqual(method.parameters.length, 3);
+      ok(method.parameters.find((x) => x.name === "contentType"));
+      ok(method.parameters.find((x) => x.name === "accept"));
+
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+      strictEqual(paramsParam.type.kind, "model");
+      strictEqual(paramsParam.type.name, "Params");
+    });
   });
   describe("@clientInitialization", () => {
     it("main client", async () => {
@@ -3820,9 +3865,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const download = methods[0];
       strictEqual(download.name, "download");
       strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 1);
-      strictEqual(download.parameters[0].name, "blobName");
-      strictEqual(download.parameters[0].onClient, true);
+      strictEqual(download.parameters.length, 0);
 
       const downloadOp = download.operation;
       strictEqual(downloadOp.parameters.length, 1);
@@ -3873,9 +3916,7 @@ describe("typespec-client-generator-core: decorators", () => {
       // the main client's function should not have `blobName` as a client method parameter
       const mainClientDownload = methods.find((x) => x.kind === "basic" && x.name === "download");
       ok(mainClientDownload);
-      strictEqual(mainClientDownload.parameters.length, 1);
-      strictEqual(mainClientDownload.parameters[0].name, "blobName");
-      strictEqual(mainClientDownload.parameters[0].onClient, true);
+      strictEqual(mainClientDownload.parameters.length, 0);
 
       const getBlobClient = methods.find((x) => x.kind === "clientaccessor");
       ok(getBlobClient);
@@ -3907,9 +3948,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const download = blobClient.methods[0];
       strictEqual(download.name, "download");
       strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 1);
-      strictEqual(download.parameters[0].name, "blobName");
-      strictEqual(download.parameters[0].onClient, true);
+      strictEqual(download.parameters.length, 0);
 
       const downloadOp = download.operation;
       strictEqual(downloadOp.parameters.length, 1);
@@ -3953,11 +3992,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const download = methods[0];
       strictEqual(download.name, "download");
       strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 2);
-
-      const blobNameParam = download.parameters.find((x) => x.name === "blobName");
-      ok(blobNameParam);
-      strictEqual(blobNameParam.onClient, true);
+      strictEqual(download.parameters.length, 1);
 
       const headerParam = download.parameters.find((x) => x.name === "header");
       ok(headerParam);
@@ -4020,15 +4055,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const download = methods[0];
       strictEqual(download.name, "download");
       strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 2);
-
-      const blobNameParam = download.parameters.find((x) => x.name === "blobName");
-      ok(blobNameParam);
-      strictEqual(blobNameParam.onClient, true);
-
-      const containerNameParam = download.parameters.find((x) => x.name === "containerName");
-      ok(containerNameParam);
-      strictEqual(containerNameParam.onClient, true);
+      strictEqual(download.parameters.length, 0);
 
       const downloadOp = download.operation;
       strictEqual(downloadOp.parameters.length, 2);
@@ -4103,20 +4130,24 @@ describe("typespec-client-generator-core: decorators", () => {
       const download = methods[0];
       strictEqual(download.name, "download");
       strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 1);
+      strictEqual(download.parameters.length, 0);
 
-      const downloadBlobNameParam = download.parameters.find((x) => x.name === "blobName");
-      ok(downloadBlobNameParam);
-      strictEqual(downloadBlobNameParam.onClient, true);
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 1);
+      strictEqual(downloadOp.parameters[0].name, "blob");
+      strictEqual(downloadOp.parameters[0].correspondingMethodParams.length, 1);
+      strictEqual(downloadOp.parameters[0].correspondingMethodParams[0], blobName);
 
       const upload = methods[1];
       strictEqual(upload.name, "upload");
       strictEqual(upload.kind, "basic");
-      strictEqual(upload.parameters.length, 1);
+      strictEqual(upload.parameters.length, 0);
 
-      const uploadBlobNameParam = upload.parameters.find((x) => x.name === "blobName");
-      ok(uploadBlobNameParam);
-      strictEqual(uploadBlobNameParam.onClient, true);
+      const uploadOp = upload.operation;
+      strictEqual(uploadOp.parameters.length, 1);
+      strictEqual(uploadOp.parameters[0].name, "blobName");
+      strictEqual(uploadOp.parameters[0].correspondingMethodParams.length, 1);
+      strictEqual(uploadOp.parameters[0].correspondingMethodParams[0], blobName);
     });
   });
 });

@@ -517,50 +517,36 @@ export function getCorrespondingMethodParams(
   if (serviceParam.isApiVersionParam) {
     const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
-      const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
-      if (!apiVersionParam) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "no-corresponding-method-param",
-            target: serviceParam.__raw!,
-            format: {
-              paramName: "apiVersion",
-              methodName: operation.name,
-            },
-          })
-        );
-        return diagnostics.wrap([]);
-      }
-      const apiVersionParamUpdated: SdkParameter = {
-        ...apiVersionParam,
-        name: "apiVersion",
-        isGeneratedName: apiVersionParam.name !== "apiVersion",
-        optional: false,
-        clientDefaultValue: context.__clientToApiVersionClientDefaultValue.get(operationLocation),
-      };
-      clientParams.push(apiVersionParamUpdated); // TODO:
+      diagnostics.add(
+        createDiagnostic({
+          code: "no-corresponding-method-param",
+          target: serviceParam.__raw!,
+          format: {
+            paramName: "apiVersion",
+            methodName: operation.name,
+          },
+        })
+      );
+      return diagnostics.wrap([]);
     }
     return diagnostics.wrap(clientParams.filter((x) => isApiVersion(context, x)));
   }
   if (isSubscriptionId(context, serviceParam)) {
-    if (!clientParams.find((x) => isSubscriptionId(context, x))) {
-      const subscriptionIdParam = methodParameters.find((x) => isSubscriptionId(context, x));
-      if (!subscriptionIdParam) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "no-corresponding-method-param",
-            target: serviceParam.__raw!,
-            format: {
-              paramName: "subscriptionId",
-              methodName: operation.name,
-            },
-          })
-        );
-        return diagnostics.wrap([]);
-      }
-      clientParams.push(subscriptionIdParam);
+    const subId = clientParams.find((x) => isSubscriptionId(context, x));
+    if (!subId) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "no-corresponding-method-param",
+          target: serviceParam.__raw!,
+          format: {
+            paramName: "subscriptionId",
+            methodName: operation.name,
+          },
+        })
+      );
+      return diagnostics.wrap([]);
     }
-    return diagnostics.wrap(clientParams.filter((x) => isSubscriptionId(context, x)));
+    return diagnostics.wrap(subId ? [subId] : []);
   }
 
   // to see if the service parameter is a method parameter or a property of a method parameter

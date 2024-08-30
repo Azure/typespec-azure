@@ -228,18 +228,39 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   const methodParameters: SdkMethodParameter[] = [];
   // we have to calculate apiVersions first, so that the information is put
   // in __tspTypeToApiVersions before we call parameters since method wraps parameter
+  const operationLocation = getLocationOfOperation(operation);
   const apiVersions = getAvailableApiVersions(
     context,
     operation,
-    getLocationOfOperation(operation)
+    operationLocation,
   );
+
+  let clientParams = context.__clientToParameters.get(operationLocation);
+  if (!clientParams) {
+    clientParams = [];
+    context.__clientToParameters.set(operationLocation, clientParams);
+  }
 
   const override = getOverriddenClientMethod(context, operation);
   const params = (override ?? operation).parameters.properties.values();
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
+    const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
+    if (sdkMethodParam.onClient) {
+      const operationLocation = getLocationOfOperation(operation);
+      if (sdkMethodParam.isApiVersionParam) {
+        if (!context.__clientToParameters.get(operationLocation)?.find((x) => x.isApiVersionParam)) {
+          clientParams.push(sdkMethodParam);
+        }
+      } else if (isSubscriptionId(context, param)) {
+        if (!context.__clientToParameters.get(operationLocation)?.find((x) => isSubscriptionId(context, x))) {
+          clientParams.push(sdkMethodParam);
+        }
+      }
+    } else {
+      methodParameters.push(sdkMethodParam);
+    }
   }
 
   const serviceOperation = diagnostics.pipe(

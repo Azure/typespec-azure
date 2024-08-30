@@ -1,4 +1,3 @@
-import { __unsupported_enable_checkStandardOperations } from "@azure-tools/typespec-azure-core";
 import {
   BasicTestRunner,
   LinterRuleTester,
@@ -13,7 +12,6 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    __unsupported_enable_checkStandardOperations(false);
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,

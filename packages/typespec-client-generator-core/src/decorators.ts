@@ -64,6 +64,7 @@ import {
   AllScopes,
   clientNameKey,
   getValidApiVersion,
+  isAzureCoreModel,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -922,7 +923,20 @@ function collectParams(
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
-        params.push(value);
+        let sourceProp = value;
+        while (sourceProp.sourceProperty) {
+          sourceProp = sourceProp.sourceProperty;
+        }
+        if (sourceProp.model && !isAzureCoreModel(sourceProp.model)) {
+          params.push(value);
+        } else if (!sourceProp.model) {
+          params.push(value);
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(
+            `We are not counting "${sourceProp.name}" as part of a method parameter because it's been added by Azure.Core templates`
+          );
+        }
       }
     }
   });

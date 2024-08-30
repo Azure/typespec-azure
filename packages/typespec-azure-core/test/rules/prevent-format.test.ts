@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { preventFormatUse } from "../../src/rules/prevent-format.js";
+import { preventFormatRule } from "../../src/rules/prevent-format.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: no-format rule", () => {
@@ -13,15 +13,13 @@ describe("typespec-azure-core: no-format rule", () => {
 
   beforeEach(async () => {
     runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
-    tester = createLinterRuleTester(runner, preventFormatUse, "@azure-tools/typespec-azure-core");
+    tester = createLinterRuleTester(runner, preventFormatRule, "@azure-tools/typespec-azure-core");
   });
 
   it("emits a warning diagnostic for string properties that use `@format`", async () => {
     await tester
       .expect(
         `
-        namespace Azure.Widget;
-
         model Widget {
           @format("abc123")
           name: string;
@@ -40,8 +38,6 @@ describe("typespec-azure-core: no-format rule", () => {
     await tester
       .expect(
         `
-        namespace Azure.Widget;
-
         @format("abc123")
         scalar CoolString extends string;
         `
