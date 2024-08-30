@@ -4,6 +4,7 @@ import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
+import { isAzureCoreModel } from "../../src/internal-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -690,6 +691,12 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
+
+    for (const [type, sdkType] of runnerWithCore.context.modelsMap?.entries() ?? []) {
+      if (isAzureCoreModel(type)) {
+        ok(sdkType.usage !== UsageFlags.None);
+      }
+    }
   });
 
   it("filterOutCoreModels false", async () => {

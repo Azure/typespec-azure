@@ -1744,17 +1744,24 @@ function modelChecks(context: TCGCContext): [void, readonly Diagnostic[]] {
   return verifyNoConflictingMultipartModelUsage(context);
 }
 
-function filterOutModels(context: TCGCContext) {
+function filterOutModels(context: TCGCContext, filter: number): (SdkModelType | SdkEnumType)[] {
+  const result = new Set<SdkModelType | SdkEnumType>();
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
-    if (type.kind === "Model") {
-      if (isExclude(context, type)) sdkType.usage = UsageFlags.None; // eslint-disable-line deprecation/deprecation
+    // filter models/enums/union of Core
+    if (
+      context.filterOutCoreModels &&
+      ["Enum", "Model", "Union"].includes(type.kind) &&
+      isAzureCoreModel(type)
+    ) {
+      continue;
     }
-    if (type.kind === "Enum" || type.kind === "Model" || type.kind === "Union") {
-      if (context.filterOutCoreModels && isAzureCoreModel(type)) {
-        sdkType.usage = UsageFlags.None;
-      }
+    // filter models with unexpected usage
+    if ((sdkType.usage & filter) === 0) {
+      continue;
     }
+    result.add(sdkType);
   }
+  return [...result];
 }
 
 export function getAllModelsWithDiagnostics(
@@ -1833,8 +1840,6 @@ export function getAllModelsWithDiagnostics(
   updateAccessOfModel(context);
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-  // filter out models
-  filterOutModels(context);
   let filter = 0;
   if (options.input && options.output) {
     filter = Number.MAX_SAFE_INTEGER;
@@ -1844,9 +1849,7 @@ export function getAllModelsWithDiagnostics(
     filter += UsageFlags.Output;
   }
   diagnostics.pipe(modelChecks(context));
-  return diagnostics.wrap(
-    [...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0)
-  );
+  return diagnostics.wrap(filterOutModels(context, filter));
 }
 
 export function getAllModels(
