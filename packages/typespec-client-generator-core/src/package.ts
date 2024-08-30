@@ -229,11 +229,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   // we have to calculate apiVersions first, so that the information is put
   // in __tspTypeToApiVersions before we call parameters since method wraps parameter
   const operationLocation = getLocationOfOperation(operation);
-  const apiVersions = getAvailableApiVersions(
-    context,
-    operation,
-    operationLocation,
-  );
+  const apiVersions = getAvailableApiVersions(context, operation, operationLocation);
 
   let clientParams = context.__clientToParameters.get(operationLocation);
   if (!clientParams) {
@@ -250,11 +246,17 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     if (sdkMethodParam.onClient) {
       const operationLocation = getLocationOfOperation(operation);
       if (sdkMethodParam.isApiVersionParam) {
-        if (!context.__clientToParameters.get(operationLocation)?.find((x) => x.isApiVersionParam)) {
+        if (
+          !context.__clientToParameters.get(operationLocation)?.find((x) => x.isApiVersionParam)
+        ) {
           clientParams.push(sdkMethodParam);
         }
       } else if (isSubscriptionId(context, param)) {
-        if (!context.__clientToParameters.get(operationLocation)?.find((x) => isSubscriptionId(context, x))) {
+        if (
+          !context.__clientToParameters
+            .get(operationLocation)
+            ?.find((x) => isSubscriptionId(context, x))
+        ) {
           clientParams.push(sdkMethodParam);
         }
       }
