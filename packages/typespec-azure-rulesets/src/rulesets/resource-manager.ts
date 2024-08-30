@@ -35,7 +35,6 @@ export default {
     "@azure-tools/typespec-azure-core/rpc-operation-request-body": true,
     "@azure-tools/typespec-azure-core/spread-discriminated-model": true,
     "@azure-tools/typespec-azure-core/use-standard-names": true,
-    "@azure-tools/typespec-azure-core/use-standard-operations": true,
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
     "@azure-tools/typespec-azure-core/require-versioned": true,
     "@azure-tools/typespec-azure-core/no-private-usage": true,
@@ -44,6 +43,7 @@ export default {
 
     // Azure core not enabled - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/bad-record-type": false,
+    "@azure-tools/typespec-azure-core/use-standard-operations": false,
 
     // Azure core rules enabled via an optional rulesets
     "@azure-tools/typespec-azure-core/non-breaking-versioning": false,

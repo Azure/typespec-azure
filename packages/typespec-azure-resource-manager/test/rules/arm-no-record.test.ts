@@ -86,7 +86,7 @@ it("emits diagnostic when a model is Record type", async () => {
     });
 });
 
-it("does not emit diagnostic when Record is used but not referenced by an ARM resource", async () => {
+it("emits diagnostic when Record is used but not referenced by an ARM resource", async () => {
   await tester
     .expect(
       `
@@ -96,10 +96,14 @@ it("does not emit diagnostic when Record is used but not referenced by an ARM re
     model WidgetProperties is Record<string>;
     `
     )
-    .toBeValid();
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
+      message:
+        "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
+    });
 });
 
-it("does not emit diagnostic when Record is used outside an ARM namespace", async () => {
+it("emits diagnostic when Record is used outside an ARM namespace", async () => {
   await tester
     .expect(
       `
@@ -114,7 +118,11 @@ it("does not emit diagnostic when Record is used outside an ARM namespace", asyn
     }
     `
     )
-    .toBeValid();
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-no-record",
+      message:
+        "Models should not equate to type Record. ARM requires Resource provider teams to define types explicitly.",
+    });
 });
 
 it("emits diagnostic if an ARM Resource references a model that uses Record type", async () => {

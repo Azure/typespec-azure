@@ -20,7 +20,6 @@ describe("typespec-client-generator-core: enum types", () => {
   it("string extensible", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       enum DaysOfWeekExtensibleEnum {
           Monday,
           Tuesday,
@@ -32,7 +31,6 @@ describe("typespec-client-generator-core: enum types", () => {
         }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: DaysOfWeekExtensibleEnum
       }
@@ -67,7 +65,6 @@ describe("typespec-client-generator-core: enum types", () => {
   it("int extensible", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       enum Integers {
         one: 1,
         two: 2,
@@ -77,7 +74,6 @@ describe("typespec-client-generator-core: enum types", () => {
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: Integers
       }
@@ -105,7 +101,6 @@ describe("typespec-client-generator-core: enum types", () => {
   it("float extensible", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       enum Floats {
         a: 1,
         b: 2.1,
@@ -113,7 +108,6 @@ describe("typespec-client-generator-core: enum types", () => {
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: Floats
       }
@@ -140,7 +134,6 @@ describe("typespec-client-generator-core: enum types", () => {
   it("union as enum float type", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       union Floats {
         float,
         a: 1,
@@ -149,7 +142,6 @@ describe("typespec-client-generator-core: enum types", () => {
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: Floats
       }
@@ -175,14 +167,12 @@ describe("typespec-client-generator-core: enum types", () => {
   it("union of union as enum float type", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       union BaseEnum {
         int32,
         a: 1,
       }
       
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       union ExtendedEnum {
         BaseEnum,
         b: 2,
@@ -190,7 +180,6 @@ describe("typespec-client-generator-core: enum types", () => {
       }
 
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         prop: ExtendedEnum
       }
@@ -221,7 +210,6 @@ describe("typespec-client-generator-core: enum types", () => {
       @doc(".")
       @fixed
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       enum DaysOfWeekFixedEnum {
         @doc("Monday") Monday,
         @doc("Tuesday") Tuesday,
@@ -234,7 +222,6 @@ describe("typespec-client-generator-core: enum types", () => {
 
       @doc(".")
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model Test {
         @doc(".")
         prop: DaysOfWeekFixedEnum
@@ -287,7 +274,6 @@ describe("typespec-client-generator-core: enum types", () => {
         @service({})
         namespace MyService {
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           enum Integers {
             one: 1,
             two: 2,
@@ -297,7 +283,6 @@ describe("typespec-client-generator-core: enum types", () => {
           }
 
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Test {
             prop: Integers
           }
@@ -330,7 +315,6 @@ describe("typespec-client-generator-core: enum types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           enum Enum1{
             one,
             two,
@@ -355,7 +339,6 @@ describe("typespec-client-generator-core: enum types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           @projectedName("java", "JavaEnum1")
           enum Enum1{
             @projectedName("java", "JavaOne")
@@ -374,7 +357,6 @@ describe("typespec-client-generator-core: enum types", () => {
           #suppress "deprecated" "for testing"
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           @projectedName("java", "JavaEnum1")
           enum Enum1{
             #suppress "deprecated" "for testing"

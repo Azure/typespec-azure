@@ -1,4 +1,3 @@
-import { __unsupported_enable_checkStandardOperations } from "@azure-tools/typespec-azure-core";
 import {
   DecoratorContext,
   Enum,
@@ -59,10 +58,6 @@ export const $armLibraryNamespace: ArmLibraryNamespaceDecorator = (
   entity: Namespace
 ) => {
   const { program } = context;
-
-  // HACK HACK HACK: Disable the linter rule that raises `use-standard-operations`
-  // until Azure.Core-compatible operations are implemented for Azure.ResourceManager
-  __unsupported_enable_checkStandardOperations(false);
 
   program.stateMap(ArmStateKeys.armLibraryNamespaces).set(entity, true);
 
@@ -147,10 +142,6 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
     });
     return;
   }
-
-  // HACK HACK HACK: Disable the linter rule that raises `use-standard-operations`
-  // until Azure.Core-compatible operations are implemented for Azure.ResourceManager
-  __unsupported_enable_checkStandardOperations(false);
 
   // armProviderNamespace will set the service namespace if it's not done already
   if (!override) {
