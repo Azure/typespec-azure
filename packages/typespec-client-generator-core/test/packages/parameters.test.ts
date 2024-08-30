@@ -709,11 +709,21 @@ describe("typespec-client-generator-core: parameters", () => {
     const sdkPackage = runnerWithCore.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
 
-    strictEqual(method.parameters.length, 4);
-    deepStrictEqual(
-      method.parameters.map((x) => x.name),
-      ["apiVersion", "prompt", "contentType", "accept"]
-    );
+    strictEqual(method.parameters.length, 3);
+    deepStrictEqual(method.parameters.map((x) => x.name).sort(), [
+      "accept",
+      "contentType",
+      "prompt",
+    ]);
+    strictEqual(method.operation.parameters.length, 3);
+    deepStrictEqual(method.operation.parameters.map((x) => x.name).sort(), [
+      "accept",
+      "apiVersion",
+      "contentType",
+    ]);
+    strictEqual(method.operation.bodyParam?.type.kind, "model");
+    strictEqual(method.operation.bodyParam.type.properties.length, 1);
+    strictEqual(method.operation.bodyParam.type.properties[0].name, "prompt");
   });
 
   it("never void parameter or response", async () => {

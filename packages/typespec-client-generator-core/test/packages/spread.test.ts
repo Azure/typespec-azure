@@ -253,7 +253,7 @@ describe("typespec-client-generator-core: spread", () => {
     const createOrReplace = client.methods[1];
     strictEqual(createOrReplace.kind, "basic");
     strictEqual(createOrReplace.name, "createOrReplaceDataConnection");
-    strictEqual(createOrReplace.parameters.length, 6);
+    strictEqual(createOrReplace.parameters.length, 5);
     ok(
       createOrReplace.parameters.find(
         (x) => x.name === "dataConnectionName" && x.type.kind === "string"
@@ -267,7 +267,6 @@ describe("typespec-client-generator-core: spread", () => {
     );
     ok(createOrReplace.parameters.find((x) => x.name === "contentType"));
     ok(createOrReplace.parameters.find((x) => x.name === "accept"));
-    ok(createOrReplace.parameters.find((x) => x.isApiVersionParam && x.onClient));
 
     const opParams = createOrReplace.operation.parameters;
     strictEqual(opParams.length, 4);
@@ -280,13 +279,13 @@ describe("typespec-client-generator-core: spread", () => {
       createOrReplace.operation.bodyParam?.type.name,
       "CreateOrReplaceDataConnectionRequest"
     );
-    deepStrictEqual(
+    strictEqual(
       createOrReplace.operation.bodyParam.correspondingMethodParams[0],
-      createOrReplace.parameters[2]
+      createOrReplace.parameters[1]
     );
-    deepStrictEqual(
+    strictEqual(
       createOrReplace.operation.bodyParam.correspondingMethodParams[1],
-      createOrReplace.parameters[3]
+      createOrReplace.parameters[2]
     );
     strictEqual(createOrReplace.operation.responses.size, 1);
     const response200 = createOrReplace.operation.responses.get(200);
