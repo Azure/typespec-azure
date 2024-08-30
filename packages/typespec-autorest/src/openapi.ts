@@ -880,6 +880,7 @@ export async function getOpenAPIForService(
     );
     delete header.in;
     delete header.name;
+    delete header["x-ms-client-name"];
     delete header.required;
     return header;
   }
@@ -1260,10 +1261,8 @@ export async function getOpenAPIForService(
     };
 
     const clientName = getClientName(context, param);
-    if (clientName) {
+    if (name !== clientName) {
       base["x-ms-client-name"] = clientName;
-    } else if (param.name !== base.name) {
-      base["x-ms-client-name"] = param.name;
     }
 
     attachExtensions(param, base);
