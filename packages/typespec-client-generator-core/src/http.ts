@@ -514,19 +514,17 @@ export function getCorrespondingMethodParams(
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!context.__subscriptionIdParameter) {
-      if (!context.__subscriptionIdParameter) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "no-corresponding-method-param",
-            target: serviceParam.__raw!,
-            format: {
-              paramName: "subscriptionId",
-              methodName: operation.name,
-            },
-          })
-        );
-        return diagnostics.wrap([]);
-      }
+      diagnostics.add(
+        createDiagnostic({
+          code: "no-corresponding-method-param",
+          target: serviceParam.__raw!,
+          format: {
+            paramName: "subscriptionId",
+            methodName: operation.name,
+          },
+        })
+      );
+      return diagnostics.wrap([]);
     }
     return diagnostics.wrap([context.__subscriptionIdParameter]);
   }

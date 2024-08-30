@@ -1,5 +1,5 @@
 ---
-changeKind: fix
+changeKind: breaking
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
