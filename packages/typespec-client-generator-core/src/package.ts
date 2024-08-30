@@ -332,10 +332,12 @@ function getSdkInitializationType(
     clientParams = [];
     context.__clientToParameters.set(client.type, clientParams);
   }
+  const access = client.kind === "SdkClient" ? "public" : "internal";
   if (initializationModel) {
     for (const prop of initializationModel.properties) {
       clientParams.push(prop);
     }
+    initializationModel.access = access;
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
@@ -346,7 +348,7 @@ function getSdkInitializationType(
       properties: [],
       name,
       isGeneratedName: true,
-      access: client.kind === "SdkClient" ? "public" : "internal",
+      access,
       usage: UsageFlags.Input,
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
       apiVersions: context.__tspTypeToApiVersions.get(client.type)!,

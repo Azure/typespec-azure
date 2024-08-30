@@ -3888,7 +3888,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(blobClient.kind, "client");
       strictEqual(blobClient.name, "BlobClient");
-      strictEqual(blobClient.initialization.access, "public");
+      strictEqual(blobClient.initialization.access, "internal");
       strictEqual(blobClient.initialization.properties.length, 2);
 
       ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
