@@ -431,7 +431,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(contentTypeParam.serializedName, "Content-Type");
     strictEqual(contentTypeParam.clientDefaultValue, undefined);
     strictEqual(contentTypeParam.onClient, false);
-    strictEqual(contentTypeParam.optional, false);
+    strictEqual(contentTypeParam.optional, true);
 
     const correspondingContentTypeMethodParams = contentTypeParam.correspondingMethodParams;
     strictEqual(correspondingContentTypeMethodParams.length, 1);
