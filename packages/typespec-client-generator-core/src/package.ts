@@ -62,6 +62,7 @@ import {
   getLocationOfOperation,
   getTypeDecorators,
   isNeverOrVoidType,
+  isSubscriptionId,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -236,7 +237,19 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
+    const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
+    if (sdkMethodParam.onClient) {
+      const operationLocation = getLocationOfOperation(operation);
+      if (sdkMethodParam.isApiVersionParam) {
+        if (!context.__namespaceToApiVersionParameter.has(operationLocation)) {
+          context.__namespaceToApiVersionParameter.set(operationLocation, sdkMethodParam);
+        }
+      } else if (isSubscriptionId(context, param)) {
+        context.__subscriptionIdParameter = sdkMethodParam;
+      }
+    } else {
+      methodParameters.push(sdkMethodParam);
+    }
   }
 
   const serviceOperation = diagnostics.pipe(
