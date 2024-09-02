@@ -64,6 +64,14 @@ def upload(
 <TabItem value="java" label="Java">
 
 ```java
+// Model class
+@Immutable
+public final class MultipartRequest {
+    public MultipartRequest(String id, Address address, ProfileImageFileDetails profileImage, List<PicturesFileDetails> pictures);
+}
+
+// Client API
+public void upload(MultipartRequest body);
 ```
 
 </TabItem>
@@ -132,6 +140,14 @@ def upload(
 <TabItem value="java" label="Java">
 
 ```java
+// Model class
+@Immutable
+public final class MultipartRequest {
+    public MultipartRequest(String id, Address address, FileDetails profileImage, List<Address> previousAddresses, List<FileDetails> pictures);
+}
+
+// Client API
+public void upload(MultipartRequest body);
 ```
 
 </TabItem>
