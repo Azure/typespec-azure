@@ -400,3 +400,9 @@ model ArmResourceIdentifierAllowedResource {
    */
   scopes?: ArmResourceDeploymentScope[];
 }
+
+@doc("Used in file part of multipart request body")
+model MultiPartFile extends File {
+  filename: string;
+  contentType: string;
+}

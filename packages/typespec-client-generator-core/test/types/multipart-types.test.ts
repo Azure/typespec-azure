@@ -1,3 +1,4 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -424,6 +425,50 @@ describe("typespec-client-generator-core: multipart types", () => {
         `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
+    const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    ok(MultiPartRequest);
+    ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
+    const fileOptionalFileName = MultiPartRequest.properties.find(
+      (x) => x.name === "fileOptionalFileName"
+    ) as SdkBodyModelPropertyType;
+    ok(fileOptionalFileName);
+    strictEqual(fileOptionalFileName.optional, false);
+    ok(fileOptionalFileName.multipartOptions);
+    strictEqual(fileOptionalFileName.name, "fileOptionalFileName");
+    strictEqual(fileOptionalFileName.multipartOptions.isFilePart, true);
+    ok(fileOptionalFileName.multipartOptions.filename);
+    strictEqual(fileOptionalFileName.multipartOptions.filename.optional, true);
+    ok(fileOptionalFileName.multipartOptions.contentType);
+    strictEqual(fileOptionalFileName.multipartOptions.contentType.optional, true);
+
+    const fileRequiredFileName = MultiPartRequest.properties.find(
+      (x) => x.name === "fileRequiredFileName"
+    ) as SdkBodyModelPropertyType;
+    ok(fileRequiredFileName);
+    strictEqual(fileRequiredFileName.optional, false);
+    ok(fileRequiredFileName.multipartOptions);
+    strictEqual(fileRequiredFileName.name, "fileRequiredFileName");
+    strictEqual(fileRequiredFileName.multipartOptions.isFilePart, true);
+    ok(fileRequiredFileName.multipartOptions.filename);
+    strictEqual(fileRequiredFileName.multipartOptions.filename.optional, false);
+    ok(fileRequiredFileName.multipartOptions.contentType);
+    strictEqual(fileRequiredFileName.multipartOptions.contentType.optional, false);
+  });
+
+  it("with MultiPartFile of Azure.Core", async function () {
+    const runnerCore = await createSdkTestRunner({ 
+      librariesToAdd: [AzureCoreTestLibrary],
+      emitterName: "@azure-tools/typespec-java" , autoUsings: ["Azure.Core"]});
+    await runnerCore.compileWithBuiltInService(`
+        model MultiPartRequest{
+            fileOptionalFileName: HttpPart<File>;
+            fileRequiredFileName: HttpPart<MultiPartFile>;
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const models = runnerCore.context.sdkPackage.models;
+    strictEqual(models.length, 2);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
     ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
