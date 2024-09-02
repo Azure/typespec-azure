@@ -220,6 +220,21 @@ model Azure.Core.MaxPageSizeQueryParameter
 | ------------ | ------- | -------------------------------------------- |
 | maxpagesize? | `int32` | The maximum number of result items per page. |
 
+### `MultiPartFile` {#Azure.Core.MultiPartFile}
+
+Used in file part of multipart request body
+
+```typespec
+model Azure.Core.MultiPartFile
+```
+
+#### Properties
+
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| filename    | `string` |             |
+| contentType | `string` |             |
+
 ### `OrderByQueryParameter` {#Azure.Core.OrderByQueryParameter}
 
 Provides the standard 'orderby' query parameter for list operations.
