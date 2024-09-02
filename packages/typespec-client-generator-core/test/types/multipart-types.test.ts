@@ -456,9 +456,11 @@ describe("typespec-client-generator-core: multipart types", () => {
   });
 
   it("with MultiPartFile of Azure.Core", async function () {
-    const runnerCore = await createSdkTestRunner({ 
+    const runnerCore = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
-      emitterName: "@azure-tools/typespec-java" , autoUsings: ["Azure.Core"]});
+      emitterName: "@azure-tools/typespec-java",
+      autoUsings: ["Azure.Core"],
+    });
     await runnerCore.compileWithBuiltInService(`
         model MultiPartRequest{
             fileOptionalFileName: HttpPart<File>;
