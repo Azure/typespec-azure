@@ -62,6 +62,7 @@ import {
   getLocationOfOperation,
   getTypeDecorators,
   isNeverOrVoidType,
+  isSubscriptionId,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -143,9 +144,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           )
         )
       : undefined,
-    getResponseMapping(): string | undefined {
-      return basic.response.resultPath;
-    },
   });
 }
 
@@ -180,9 +178,6 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
         basicServiceMethod.parameters
       )
     ),
-    getResponseMapping(): string | undefined {
-      return this.response.resultPath;
-    },
   });
 }
 
@@ -242,7 +237,19 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
-    methodParameters.push(diagnostics.pipe(getSdkMethodParameter(context, param, operation)));
+    const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
+    if (sdkMethodParam.onClient) {
+      const operationLocation = getLocationOfOperation(operation);
+      if (sdkMethodParam.isApiVersionParam) {
+        if (!context.__namespaceToApiVersionParameter.has(operationLocation)) {
+          context.__namespaceToApiVersionParameter.set(operationLocation, sdkMethodParam);
+        }
+      } else if (isSubscriptionId(context, param)) {
+        context.__subscriptionIdParameter = sdkMethodParam;
+      }
+    } else {
+      methodParameters.push(sdkMethodParam);
+    }
   }
 
   const serviceOperation = diagnostics.pipe(
@@ -608,8 +615,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
       apiVersions: [],
       decorators: [],
     },
-    // eslint-disable-next-line deprecation/deprecation
-    arm: client.kind === "SdkClient" ? client.arm : false,
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}

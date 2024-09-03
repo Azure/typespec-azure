@@ -164,7 +164,7 @@ function getSdkHttpParameters(
         type = diagnostics.pipe(
           getClientTypeWithDiagnostics(
             context,
-            getHttpBodySpreadModel(tspBody.type as Model),
+            getHttpBodySpreadModel(context, tspBody.type as Model),
             httpOperation.operation
           )
         );
@@ -281,6 +281,7 @@ function createContentTypeOrAcceptHeader(
       decorators: [],
     };
   }
+  const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
@@ -289,7 +290,7 @@ function createContentTypeOrAcceptHeader(
     apiVersions: bodyObject.apiVersions,
     isApiVersionParam: false,
     onClient: false,
-    optional: false,
+    optional: optional,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
   };
@@ -498,49 +499,33 @@ export function getCorrespondingMethodParams(
   if (serviceParam.isApiVersionParam) {
     const existingApiVersion = context.__namespaceToApiVersionParameter.get(operationLocation);
     if (!existingApiVersion) {
-      const apiVersionParam = methodParameters.find((x) => x.name.includes("apiVersion"));
-      if (!apiVersionParam) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "no-corresponding-method-param",
-            target: serviceParam.__raw!,
-            format: {
-              paramName: "apiVersion",
-              methodName: operation.name,
-            },
-          })
-        );
-        return diagnostics.wrap([]);
-      }
-      const apiVersionParamUpdated: SdkParameter = {
-        ...apiVersionParam,
-        name: "apiVersion",
-        isGeneratedName: apiVersionParam.name !== "apiVersion",
-        optional: false,
-        clientDefaultValue:
-          context.__namespaceToApiVersionClientDefaultValue.get(operationLocation),
-      };
-      context.__namespaceToApiVersionParameter.set(operationLocation, apiVersionParamUpdated);
+      diagnostics.add(
+        createDiagnostic({
+          code: "no-corresponding-method-param",
+          target: serviceParam.__raw!,
+          format: {
+            paramName: "apiVersion",
+            methodName: operation.name,
+          },
+        })
+      );
+      return diagnostics.wrap([]);
     }
     return diagnostics.wrap([context.__namespaceToApiVersionParameter.get(operationLocation)!]);
   }
   if (isSubscriptionId(context, serviceParam)) {
     if (!context.__subscriptionIdParameter) {
-      const subscriptionIdParam = methodParameters.find((x) => isSubscriptionId(context, x));
-      if (!subscriptionIdParam) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "no-corresponding-method-param",
-            target: serviceParam.__raw!,
-            format: {
-              paramName: "subscriptionId",
-              methodName: operation.name,
-            },
-          })
-        );
-        return diagnostics.wrap([]);
-      }
-      context.__subscriptionIdParameter = subscriptionIdParam;
+      diagnostics.add(
+        createDiagnostic({
+          code: "no-corresponding-method-param",
+          target: serviceParam.__raw!,
+          format: {
+            paramName: "subscriptionId",
+            methodName: operation.name,
+          },
+        })
+      );
+      return diagnostics.wrap([]);
     }
     return diagnostics.wrap([context.__subscriptionIdParameter]);
   }

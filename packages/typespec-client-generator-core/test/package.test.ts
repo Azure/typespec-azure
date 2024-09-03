@@ -846,9 +846,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.clients[0].methods.length, 1);
       const withApiVersion = sdkPackage.clients[0].methods[0];
       strictEqual(withApiVersion.kind, "basic");
-      strictEqual(withApiVersion.parameters.length, 1);
-      strictEqual(withApiVersion.operation.parameters[0].name, "apiVersion");
-      strictEqual(withApiVersion.operation.parameters[0].isApiVersionParam, true);
+      strictEqual(withApiVersion.parameters.length, 0);
       strictEqual(withApiVersion.operation.parameters.length, 1);
 
       const apiVersionParam = withApiVersion.operation.parameters[0];
@@ -858,6 +856,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.type.kind, "string");
       strictEqual(apiVersionParam.clientDefaultValue, undefined);
+      strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
+      strictEqual(
+        apiVersionParam.correspondingMethodParams[0],
+        client.initialization.properties.find((x) => x.isApiVersionParam)
+      );
     });
 
     it("service with default api version, method without api version param", async () => {
@@ -927,10 +930,8 @@ describe("typespec-client-generator-core: package", () => {
         withApiVersion.crossLanguageDefintionId,
         "Server.Versions.Versioned.withQueryApiVersion"
       );
-      strictEqual(withApiVersion.parameters.length, 1);
+      strictEqual(withApiVersion.parameters.length, 0);
       strictEqual(withApiVersion.operation.parameters.length, 1);
-      strictEqual(withApiVersion.parameters[0].isApiVersionParam, true);
-      strictEqual(withApiVersion.parameters[0].name, "apiVersion");
 
       const apiVersionParam = withApiVersion.operation.parameters[0];
       strictEqual(apiVersionParam.kind, "query");
@@ -939,6 +940,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.type.kind, "string");
       strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
+      strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
+      strictEqual(
+        apiVersionParam.correspondingMethodParams[0],
+        client.initialization.properties.find((x) => x.isApiVersionParam)
+      );
     });
 
     it("service with default api version, method with path api version param", async () => {
@@ -978,9 +984,7 @@ describe("typespec-client-generator-core: package", () => {
         withApiVersion.crossLanguageDefintionId,
         "Server.Versions.Versioned.withPathApiVersion"
       );
-      strictEqual(withApiVersion.parameters.length, 1);
-      strictEqual(withApiVersion.parameters[0].isApiVersionParam, true);
-      strictEqual(withApiVersion.parameters[0].name, "apiVersion");
+      strictEqual(withApiVersion.parameters.length, 0);
       strictEqual(withApiVersion.operation.parameters.length, 1);
 
       const apiVersionParam = withApiVersion.operation.parameters[0];
@@ -992,6 +996,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.onClient, true);
       strictEqual(apiVersionParam.type.kind, "string");
       strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
+      strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
+      strictEqual(
+        apiVersionParam.correspondingMethodParams[0],
+        client.initialization.properties.find((x) => x.isApiVersionParam)
+      );
     });
   });
 
@@ -1718,7 +1727,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(parentClient.name, "WidgetManagerClient");
       strictEqual(method.name, "getWidget");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 8);
+      strictEqual(method.parameters.length, 7);
 
       // TODO: what should we do with eTags and client request id?
       const methodWidgetName = method.parameters.find((p) => p.name === "widgetName");
@@ -1746,7 +1755,10 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(queryParam.name, "apiVersion");
       strictEqual(queryParam.serializedName, "api-version");
       strictEqual(queryParam.onClient, true);
-      strictEqual(queryParam.correspondingMethodParams.length, 1);
+      strictEqual(
+        queryParam.correspondingMethodParams[0],
+        parentClient.initialization.properties.find((x) => x.isApiVersionParam)
+      );
       ok(parentClient.initialization);
       strictEqual(
         queryParam.correspondingMethodParams[0],
@@ -1814,7 +1826,7 @@ describe("typespec-client-generator-core: package", () => {
         getStatus.crossLanguageDefintionId,
         "Contoso.WidgetManager.Widgets.getWidgetOperationStatus"
       );
-      strictEqual(getStatus.parameters.length, 4);
+      strictEqual(getStatus.parameters.length, 3);
 
       const methodWidgetName = getStatus.parameters.find((p) => p.name === "widgetName");
       ok(methodWidgetName);
@@ -1886,48 +1898,41 @@ describe("typespec-client-generator-core: package", () => {
       const createOrUpdate = client.methods.find((x) => x.name === "createOrUpdateWidget");
       ok(createOrUpdate);
       strictEqual(createOrUpdate.kind, "lro");
-      strictEqual(createOrUpdate.parameters.length, 12);
+      strictEqual(createOrUpdate.parameters.length, 11);
       strictEqual(
         createOrUpdate.crossLanguageDefintionId,
         "Contoso.WidgetManager.Widgets.createOrUpdateWidget"
       );
-      deepStrictEqual(
-        createOrUpdate.parameters.map((x) => x.name),
-        [
-          "apiVersion",
-          "widgetName",
-          "contentType",
-          "resource",
-          "repeatabilityRequestId",
-          "repeatabilityFirstSent",
-          "ifMatch",
-          "ifNoneMatch",
-          "ifUnmodifiedSince",
-          "ifModifiedSince",
-          "clientRequestId",
-          "accept",
-        ]
-      );
+      deepStrictEqual(createOrUpdate.parameters.map((x) => x.name).sort(), [
+        "accept",
+        "clientRequestId",
+        "contentType",
+        "ifMatch",
+        "ifModifiedSince",
+        "ifNoneMatch",
+        "ifUnmodifiedSince",
+        "repeatabilityFirstSent",
+        "repeatabilityRequestId",
+        "resource",
+        "widgetName",
+      ]);
 
       const serviceOperation = createOrUpdate.operation;
       strictEqual(serviceOperation.verb, "patch");
       const headerParams = serviceOperation.parameters.filter(
         (x): x is SdkHeaderParameter => x.kind === "header"
       );
-      deepStrictEqual(
-        headerParams.map((x) => x.name),
-        [
-          "contentType",
-          "repeatabilityRequestId",
-          "repeatabilityFirstSent",
-          "ifMatch",
-          "ifNoneMatch",
-          "ifUnmodifiedSince",
-          "ifModifiedSince",
-          "clientRequestId",
-          "accept",
-        ]
-      );
+      deepStrictEqual(headerParams.map((x) => x.name).sort(), [
+        "accept",
+        "clientRequestId",
+        "contentType",
+        "ifMatch",
+        "ifModifiedSince",
+        "ifNoneMatch",
+        "ifUnmodifiedSince",
+        "repeatabilityFirstSent",
+        "repeatabilityRequestId",
+      ]);
       strictEqual(headerParams.length, 9);
       const pathParam = serviceOperation.parameters.find((x) => x.kind === "path");
       ok(pathParam);
@@ -2020,7 +2025,13 @@ describe("typespec-client-generator-core: package", () => {
       const widgetClient = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
       ok(widgetClient);
+
       strictEqual(widgetClient.initialization.properties.length, 3);
+      const apiVersionClientParam = widgetClient.initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionClientParam);
+
       strictEqual(widgetClient.initialization.access, "internal");
       strictEqual(widgetClient.methods.length, 1);
       const listManufacturers = widgetClient.methods[0];
@@ -2031,11 +2042,11 @@ describe("typespec-client-generator-core: package", () => {
         "Contoso.WidgetManager.Widgets.listManufacturers"
       );
       strictEqual(listManufacturers.kind, "paging");
-      strictEqual(listManufacturers.parameters.length, 3);
-      deepStrictEqual(
-        listManufacturers.parameters.map((x) => x.name),
-        ["apiVersion", "clientRequestId", "accept"]
-      );
+      strictEqual(listManufacturers.parameters.length, 2);
+      deepStrictEqual(listManufacturers.parameters.map((x) => x.name).sort(), [
+        "accept",
+        "clientRequestId",
+      ]);
       const methodResponse = listManufacturers.response.type;
       ok(methodResponse);
       strictEqual(methodResponse.kind, "array");
@@ -2052,19 +2063,17 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersion.name, "apiVersion");
       strictEqual(apiVersion.serializedName, "api-version");
       strictEqual(apiVersion.onClient, true);
+      strictEqual(apiVersion.correspondingMethodParams[0], apiVersionClientParam);
 
       const clientRequestId = operation.parameters.find((x) => x.name === "clientRequestId");
       ok(clientRequestId);
       strictEqual(clientRequestId.kind, "header");
-      deepStrictEqual(
-        clientRequestId.correspondingMethodParams[0],
-        listManufacturers.parameters[1]
-      );
+      strictEqual(clientRequestId.correspondingMethodParams[0], listManufacturers.parameters[0]);
 
       const accept = operation.parameters.find((x) => x.name === "accept");
       ok(accept);
       strictEqual(accept.kind, "header");
-      deepStrictEqual(accept.correspondingMethodParams[0], listManufacturers.parameters[2]);
+      strictEqual(accept.correspondingMethodParams[0], listManufacturers.parameters[1]);
 
       strictEqual(operation.responses.size, 1);
       const response200 = operation.responses.get(200);
@@ -2151,7 +2160,20 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
-      strictEqual(client.methods[0].parameters[0].clientDefaultValue, "v2");
+      const apiVersionClientParam = client.initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(apiVersionClientParam);
+      strictEqual(apiVersionClientParam.clientDefaultValue, "v2");
+
+      const method = client.methods[0];
+      strictEqual(method.parameters.length, 0);
+      strictEqual(method.kind, "basic");
+
+      const apiVersionOpParam = method.operation.parameters.find((x) => x.isApiVersionParam);
+      ok(apiVersionOpParam);
+      strictEqual(apiVersionOpParam.clientDefaultValue, "v2");
+      strictEqual(apiVersionOpParam.correspondingMethodParams[0], apiVersionClientParam);
     });
 
     it("default api version for operation is", async () => {
@@ -2176,7 +2198,21 @@ describe("typespec-client-generator-core: package", () => {
       `);
 
       const sdkPackage = runner.context.sdkPackage;
-      strictEqual(sdkPackage.clients[0].methods[0].parameters[0].clientDefaultValue, "v2");
+      const client = sdkPackage.clients[0];
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 0); // api-version will be on the client
+      strictEqual(method.operation.parameters.length, 1);
+      const apiVersionParam = method.operation.parameters[0];
+      strictEqual(apiVersionParam.isApiVersionParam, true);
+      strictEqual(apiVersionParam.clientDefaultValue, "v2");
+      strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
+      const clientApiVersionParam = client.initialization.properties.find(
+        (x) => x.isApiVersionParam
+      );
+      ok(clientApiVersionParam);
+      strictEqual(apiVersionParam.correspondingMethodParams[0], clientApiVersionParam);
+      strictEqual(clientApiVersionParam.clientDefaultValue, "v2");
     });
     it("add method", async () => {
       await runner.compileWithVersionedService(`

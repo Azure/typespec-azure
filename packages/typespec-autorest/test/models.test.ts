@@ -22,6 +22,12 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it("change definition name with @clientName", async () => {
+    const res = await openApiFor(`@clientName("ClientFoo") model Foo {};`);
+    expect(res.definitions).toHaveProperty("ClientFoo");
+    expect(res.definitions).not.toHaveProperty("Foo");
+  });
+
   it(`@projectedName("json", <>) updates the property name and set "x-ms-client-name" with the original name  - (LEGACY)`, async () => {
     const res = await oapiForModel(
       "Foo",

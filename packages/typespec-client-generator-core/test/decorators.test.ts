@@ -1,3 +1,4 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Interface, Model, Namespace, Operation, ignoreDiagnostics } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -47,7 +48,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyClient",
           service: MyClient,
           type: MyClient,
-          arm: false,
           crossLanguageDefinitionId: "MyClient.MyClient",
         },
       ]);
@@ -68,7 +68,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyClient",
           service: MyService,
           type: MyClient,
-          arm: false,
           crossLanguageDefinitionId: "MyService.MyClient",
         },
       ]);
@@ -168,7 +167,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyServiceClient",
           service: MyService,
           type: MyService,
-          arm: false,
           crossLanguageDefinitionId: "MyService",
         },
       ]);
@@ -422,7 +420,6 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "MyServiceClient",
           service: MyService,
           type: MyService,
-          arm: false,
           crossLanguageDefinitionId: "MyService",
         },
       ]);
@@ -3787,6 +3784,50 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(method.operation.bodyParam);
       strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
       strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
+    });
+
+    it("core template", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compileWithCustomization(
+        `
+        @useDependency(Versions.v1_0_Preview_2)
+        @server("http://localhost:3000", "endpoint")
+        @service()
+        namespace My.Service;
+
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        @route("/template")
+        op templateOp is Azure.Core.RpcOperation<
+          Params,
+          Params
+        >;
+        `,
+        `
+        namespace My.Customizations;
+
+        op templateOp(params: My.Service.Params): My.Service.Params;
+
+        @@override(My.Service.templateOp, My.Customizations.templateOp);
+        `
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const method = sdkPackage.clients[0].methods[0];
+      strictEqual(method.parameters.length, 3);
+      ok(method.parameters.find((x) => x.name === "contentType"));
+      ok(method.parameters.find((x) => x.name === "accept"));
+
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+      strictEqual(paramsParam.type.kind, "model");
+      strictEqual(paramsParam.type.name, "Params");
     });
   });
 });

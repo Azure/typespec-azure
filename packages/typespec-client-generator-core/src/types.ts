@@ -46,8 +46,6 @@ import {
   getAccessOverride,
   getOverriddenClientMethod,
   getUsageOverride,
-  isExclude,
-  isInclude,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -1383,7 +1381,7 @@ export function getSdkModelPropertyType(
     const httpBody = httpOperation.parameters.body;
     if (httpBody) {
       const httpBodyType = isHttpBodySpread(httpBody)
-        ? getHttpBodySpreadModel(httpBody.type as Model)
+        ? getHttpBodySpreadModel(context, httpBody.type as Model)
         : httpBody.type;
       if (type.model === httpBodyType) {
         // only try to add multipartOptions for property of body
@@ -1598,7 +1596,7 @@ function updateTypesFromOperation(
       sdkType = diagnostics.pipe(
         getClientTypeWithDiagnostics(
           context,
-          getHttpBodySpreadModel(httpBody.type as Model),
+          getHttpBodySpreadModel(context, httpBody.type as Model),
           operation
         )
       );
@@ -1768,29 +1766,29 @@ function handleServiceOrphanType(
   type: Model | Enum | Union
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  // eslint-disable-next-line deprecation/deprecation
-  if (type.kind === "Model" && isInclude(context, type)) {
-    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
-    diagnostics.pipe(
-      updateUsageOrAccessOfModel(context, UsageFlags.Input | UsageFlags.Output, sdkType)
-    );
-  }
   const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
   diagnostics.pipe(updateUsageOrAccessOfModel(context, UsageFlags.None, sdkType));
   return diagnostics.wrap(undefined);
 }
 
-function filterOutModels(context: TCGCContext) {
+function filterOutModels(context: TCGCContext, filter: number): (SdkModelType | SdkEnumType)[] {
+  const result = new Set<SdkModelType | SdkEnumType>();
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
-    if (type.kind === "Model") {
-      if (isExclude(context, type)) sdkType.usage = UsageFlags.None; // eslint-disable-line deprecation/deprecation
+    // filter models/enums/union of Core
+    if (
+      context.filterOutCoreModels &&
+      ["Enum", "Model", "Union"].includes(type.kind) &&
+      isAzureCoreModel(type)
+    ) {
+      continue;
     }
-    if (type.kind === "Enum" || type.kind === "Model" || type.kind === "Union") {
-      if (context.filterOutCoreModels && isAzureCoreModel(type)) {
-        sdkType.usage = UsageFlags.None;
-      }
+    // filter models with unexpected usage
+    if ((sdkType.usage & filter) === 0) {
+      continue;
     }
+    result.add(sdkType);
   }
+  return [...result];
 }
 
 export function getAllModelsWithDiagnostics(
@@ -1867,8 +1865,6 @@ export function getAllModelsWithDiagnostics(
   diagnostics.pipe(updateUsageOverrideOfModel(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-  // filter out models
-  filterOutModels(context);
   let filter = 0;
   if (options.input && options.output) {
     filter = Number.MAX_SAFE_INTEGER;
@@ -1877,9 +1873,7 @@ export function getAllModelsWithDiagnostics(
   } else if (options.output) {
     filter += UsageFlags.Output;
   }
-  return diagnostics.wrap(
-    [...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0)
-  );
+  return diagnostics.wrap(filterOutModels(context, filter));
 }
 
 export function getAllModels(

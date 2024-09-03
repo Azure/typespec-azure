@@ -109,6 +109,37 @@ describe("typespec-client-generator-core: http operation examples", () => {
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
+  it("body fallback", async () => {
+    await runner.host.addRealTypeSpecFile(
+      "./examples/parameters.json",
+      `${__dirname}/http-operation-examples/bodyFallback.json`
+    );
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op bodyTest(prop: string): void;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples[0].kind, "http");
+
+    const parameters = operation.examples[0].parameters;
+    ok(parameters);
+    strictEqual(parameters.length, 1);
+
+    strictEqual(parameters[0].value.kind, "model");
+    strictEqual(parameters[0].value.value["prop"].kind, "string");
+    strictEqual(parameters[0].value.value["prop"].value, "body");
+    strictEqual(parameters[0].value.type.kind, "model");
+
+    expectDiagnostics(runner.context.diagnostics, []);
+  });
+
   it("parameters diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/parametersDiagnostic.json",
