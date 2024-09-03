@@ -1290,6 +1290,11 @@ export async function getOpenAPIForService(
         "Using encodedName for the body property is meaningless. That property is not serialized as Json. If wanting to rename it use @Azure.ClientGenerator.Core.clientName",
         param.decorators.find((x) => x.definition?.name === "@encodedName")?.node ?? param
       );
+      result.name = jsonName;
+
+      if (!result["x-ms-client-name"]) {
+        result["x-ms-client-name"] = param.name;
+      }
     } else {
       // For body parameter the only value of the name is in the client so no need to keep the original one
       if (result["x-ms-client-name"]) {
