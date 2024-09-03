@@ -13,7 +13,7 @@ Return whether a parameter is the Api Version parameter of a client
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `object` |
 | `type.name` | `string` |
 

@@ -45,6 +45,7 @@ import {
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
   NeedsRouteDecorator,
+  SpreadCustomParametersDecorator,
   SpreadCustomResponsePropertiesDecorator,
 } from "../generated-defs/Azure.Core.Foundations.Private.js";
 import {
@@ -1239,7 +1240,7 @@ export function getResponseProperty(program: Program, entity: ModelProperty): st
   return parameterName;
 }
 
-export const $spreadCustomParameters = (
+export const $spreadCustomParameters: SpreadCustomParametersDecorator = (
   context: DecoratorContext,
   entity: Model,
   customizations: Model
@@ -1269,11 +1270,10 @@ export const $spreadCustomParameters = (
 export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Type
+  customizations: Model
 ) => {
-  const customResponseProperties: Type | undefined = (customizations as any).properties.get(
-    "response"
-  )?.type;
+  const customResponseProperties: Type | undefined =
+    customizations.properties.get("response")?.type;
   if (customResponseProperties) {
     if (customResponseProperties.kind !== "Model") {
       // The constraint checker will have complained about this already.

@@ -20,7 +20,7 @@ function $operationLink(
 | `entity` | `Operation` |
 | `linkedOperation` | `Operation` |
 | `linkType` | `string` |
-| `parameters`? | `Model` |
+| `parameters`? | `Type` |
 
 ## Returns
 

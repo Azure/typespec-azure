@@ -14,7 +14,7 @@ function getSdkConstant(
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `BooleanLiteral` \| `NumericLiteral` \| `StringLiteral` |
 | `operation`? | `Operation` |
 

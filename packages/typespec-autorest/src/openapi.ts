@@ -16,7 +16,10 @@ import {
   isAzureResource,
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
-import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
+import {
+  getClientNameOverride,
+  shouldFlattenProperty,
+} from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
@@ -85,6 +88,7 @@ import {
   isTemplateDeclarationOrInstance,
   isVoidType,
   navigateTypesInNamespace,
+  reportDeprecated,
   resolveEncodedName,
   resolvePath,
 } from "@typespec/compiler";
@@ -95,7 +99,10 @@ import {
   HttpOperation,
   HttpOperationBody,
   HttpOperationMultipartBody,
+  HttpOperationParameter,
   HttpOperationParameters,
+  HttpOperationPathParameter,
+  HttpOperationQueryParameter,
   HttpOperationResponse,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
@@ -103,10 +110,9 @@ import {
   OAuth2FlowType,
   Visibility,
   createMetadataInfo,
-  getAllHttpServices,
   getAuthentication,
   getHeaderFieldOptions,
-  getQueryParamOptions,
+  getHttpService,
   getServers,
   getStatusCodeDescription,
   getVisibilitySuffix,
@@ -141,7 +147,6 @@ import {
   OpenAPI2Operation,
   OpenAPI2Parameter,
   OpenAPI2ParameterBase,
-  OpenAPI2ParameterType,
   OpenAPI2PathItem,
   OpenAPI2PathParameter,
   OpenAPI2QueryParameter,
@@ -340,8 +345,8 @@ export async function getOpenAPIForService(
   const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
   program.reportDiagnostics(diagnostics);
 
-  const services = ignoreDiagnostics(getAllHttpServices(program));
-  const routes = services[0].operations;
+  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
+  const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
   routes.forEach(emitOperation);
@@ -426,10 +431,20 @@ export async function getOpenAPIForService(
     }
     const parameters: OpenAPI2PathParameter[] = [];
     for (const prop of server.parameters.values()) {
-      const param = getOpenAPI2Parameter(prop, "path", {
-        visibility: Visibility.Read,
-        ignoreMetadataAnnotations: false,
-      });
+      const param = getOpenAPI2Parameter(
+        {
+          param: prop,
+          type: "path",
+          name: prop.name,
+          explode: false,
+          style: "simple",
+          allowReserved: false,
+        },
+        {
+          visibility: Visibility.Read,
+          ignoreMetadataAnnotations: false,
+        }
+      );
       if (
         prop.type.kind === "Scalar" &&
         ignoreDiagnostics(
@@ -853,13 +868,20 @@ export async function getOpenAPIForService(
   }
 
   function getResponseHeader(prop: ModelProperty): OpenAPI2HeaderDefinition {
-    const header: any = {};
-    populateParameter(header, prop, "header", {
+    const header: any = getOpenAPI2HeaderParameter(prop, {
       visibility: Visibility.Read,
       ignoreMetadataAnnotations: false,
     });
+    Object.assign(
+      header,
+      applyIntrinsicDecorators(prop, {
+        type: (header as any).type,
+        format: (header as any).format,
+      })
+    );
     delete header.in;
     delete header.name;
+    delete header["x-ms-client-name"];
     delete header.required;
     return header;
   }
@@ -1050,11 +1072,8 @@ export async function getOpenAPIForService(
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
-      emitParameter(
-        httpOpParam.param,
-        httpOpParam.type,
-        { visibility, ignoreMetadataAnnotations: false },
-        httpOpParam.name
+      emitParameter(httpOpParam.param, () =>
+        getOpenAPI2Parameter(httpOpParam, { visibility, ignoreMetadataAnnotations: false })
       );
     }
 
@@ -1104,17 +1123,14 @@ export async function getOpenAPIForService(
       compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
       if (bodyModelType) {
         for (const param of bodyModelType.properties.values()) {
-          emitParameter(param, "formData", schemaContext, getJsonName(param));
+          emitParameter(param, () =>
+            getOpenAPI2FormDataParameter(param, schemaContext, getJsonName(param))
+          );
         }
       }
     } else if (body.property) {
-      emitParameter(
-        body.property,
-        "body",
-        { visibility, ignoreMetadataAnnotations: false },
-        getJsonName(body.property),
-        schema
-      );
+      const prop = body.property;
+      emitParameter(prop, () => getOpenAPI2BodyParameter(prop, getJsonName(prop), schema));
     } else {
       currentEndpoint.parameters.push({
         name: "body",
@@ -1166,23 +1182,17 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  function emitParameter(
-    param: ModelProperty,
-    kind: OpenAPI2ParameterType,
-    schemaContext: SchemaContext,
-    name?: string,
-    typeOverride?: any
-  ) {
-    if (isNeverType(param.type)) {
+  function emitParameter(prop: ModelProperty, resolve: () => OpenAPI2Parameter) {
+    if (isNeverType(prop.type)) {
       return;
     }
 
-    const ph = getParamPlaceholder(param);
+    const ph = getParamPlaceholder(prop);
     currentEndpoint.parameters.push(ph);
 
     // If the parameter already has a $ref, don't bother populating it
     if (!("$ref" in ph)) {
-      populateParameter(ph, param, kind, schemaContext, name, typeOverride);
+      Object.assign(ph, resolve());
     }
   }
 
@@ -1244,17 +1254,16 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getOpenAPI2ParameterBase(
-    param: ModelProperty,
-    name: string | undefined
-  ): OpenAPI2ParameterBase {
+  function getOpenAPI2ParameterBase(param: ModelProperty, name?: string): OpenAPI2ParameterBase {
     const base: OpenAPI2ParameterBase = {
       name: name ?? param.name,
       required: !param.optional,
       description: getDoc(program, param),
     };
-    if (param.name !== base.name) {
-      base["x-ms-client-name"] = param.name;
+
+    const clientName = getClientName(context, param);
+    if (name !== clientName) {
+      base["x-ms-client-name"] = clientName;
     }
 
     attachExtensions(param, base);
@@ -1267,11 +1276,34 @@ export async function getOpenAPIForService(
     name?: string,
     bodySchema?: any
   ): OpenAPI2BodyParameter {
-    return {
+    const result: OpenAPI2BodyParameter = {
       in: "body",
       ...getOpenAPI2ParameterBase(param, name),
       schema: bodySchema,
     };
+
+    const jsonName = getJsonName(param);
+    if (jsonName !== param.name) {
+      // Special case to be able to keep pre-existing cases where you have both the body parameter name and x-ms-client-name
+      reportDeprecated(
+        program,
+        "Using encodedName for the body property is meaningless. That property is not serialized as Json. If wanting to rename it use @Azure.ClientGenerator.Core.clientName",
+        param.decorators.find((x) => x.definition?.name === "@encodedName")?.node ?? param
+      );
+      result.name = jsonName;
+
+      if (!result["x-ms-client-name"]) {
+        result["x-ms-client-name"] = param.name;
+      }
+    } else {
+      // For body parameter the only value of the name is in the client so no need to keep the original one
+      if (result["x-ms-client-name"]) {
+        result.name = result["x-ms-client-name"];
+        delete result["x-ms-client-name"];
+      }
+    }
+
+    return result;
   }
 
   function getOpenAPI2FormDataParameter(
@@ -1280,12 +1312,22 @@ export async function getOpenAPIForService(
     name?: string
   ): OpenAPI2FormDataParameter {
     const base = getOpenAPI2ParameterBase(param, name);
-    return {
+    const result = {
       in: "formData",
       ...base,
       ...(getFormDataSchema(param.type, schemaContext, base.name) as any),
       default: param.defaultValue && getDefaultValue(param.defaultValue),
     };
+
+    Object.assign(
+      result,
+      applyIntrinsicDecorators(param, {
+        type: (result as any).type,
+        format: (result as any).format,
+      })
+    );
+
+    return result;
   }
 
   function getSimpleParameterSchema(
@@ -1308,41 +1350,57 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getOpenAPI2QueryParameter(
-    param: ModelProperty,
-    schemaContext: SchemaContext,
-    name?: string
-  ): OpenAPI2QueryParameter {
-    const base = getOpenAPI2ParameterBase(param, name);
-    let collectionFormat = getQueryParamOptions(program, param).format;
+  function getQueryCollectionFormat(param: HttpOperationQueryParameter): string | undefined {
+    if (param.explode) {
+      return "multi";
+    }
+    let collectionFormat = param.format;
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
       collectionFormat = undefined;
-      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
+      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param.param });
     }
 
+    return collectionFormat;
+  }
+  function getOpenAPI2QueryParameter(
+    param: HttpOperationQueryParameter,
+    schemaContext: SchemaContext
+  ): OpenAPI2QueryParameter {
+    const base = getOpenAPI2ParameterBase(param.param, param.name);
+    const collectionFormat = getQueryCollectionFormat(param);
+    const schema = getSimpleParameterSchema(param.param, schemaContext, base.name);
     return {
       in: "query",
-      collectionFormat: collectionFormat as any,
-      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      collectionFormat:
+        collectionFormat === "csv" && schema.items === undefined // If csv
+          ? undefined
+          : (collectionFormat as any),
+      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue),
       ...base,
-      ...getSimpleParameterSchema(param, schemaContext, base.name),
+      ...schema,
     };
   }
 
   function getOpenAPI2PathParameter(
-    param: ModelProperty,
-    schemaContext: SchemaContext,
-    name?: string
+    param: HttpOperationPathParameter,
+    schemaContext: SchemaContext
   ): OpenAPI2PathParameter {
-    const base = getOpenAPI2ParameterBase(param, name);
+    const base = getOpenAPI2ParameterBase(param.param, param.name);
 
-    return {
+    const result: OpenAPI2PathParameter = {
       in: "path",
-      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue),
       ...base,
-      ...getSimpleParameterSchema(param, schemaContext, base.name),
+      ...getSimpleParameterSchema(param.param, schemaContext, base.name),
     };
+
+    if (param.allowReserved) {
+      result["x-ms-skip-url-encoding"] = true;
+    }
+
+    return result;
   }
+
   function getOpenAPI2HeaderParameter(
     param: ModelProperty,
     schemaContext: SchemaContext,
@@ -1363,58 +1421,40 @@ export async function getOpenAPIForService(
     };
   }
 
-  function getOpenAPI2ParameterInternal<T extends OpenAPI2Parameter["in"]>(
-    param: ModelProperty,
-    kind: T,
-    schemaContext: SchemaContext,
-    name?: string,
-    bodySchema?: any
-  ): OpenAPI2Parameter & { in: T } {
-    switch (kind) {
-      case "body":
-        return getOpenAPI2BodyParameter(param, name, bodySchema) as any;
-      case "formData":
-        return getOpenAPI2FormDataParameter(param, schemaContext, name) as any;
+  function getOpenAPI2ParameterInternal(
+    param: HttpOperationParameter,
+    schemaContext: SchemaContext
+  ): OpenAPI2Parameter & { in: "query" | "path" | "header" } {
+    switch (param.type) {
       case "query":
-        return getOpenAPI2QueryParameter(param, schemaContext, name) as any;
+        return getOpenAPI2QueryParameter(param, schemaContext);
       case "path":
-        return getOpenAPI2PathParameter(param, schemaContext, name) as any;
+        return getOpenAPI2PathParameter(param, schemaContext);
       case "header":
-        return getOpenAPI2HeaderParameter(param, schemaContext, name) as any;
+        return getOpenAPI2HeaderParameter(param.param, schemaContext, param.name);
       default:
-        const _assertNever: never = kind;
+        const _assertNever: never = param;
         compilerAssert(false, "Unreachable");
     }
   }
 
   function getOpenAPI2Parameter<T extends OpenAPI2Parameter["in"]>(
-    param: ModelProperty,
-    kind: T,
-    schemaContext: SchemaContext,
-    name?: string,
-    bodySchema?: any
+    param: HttpOperationParameter & { type: T },
+    schemaContext: SchemaContext
   ): OpenAPI2Parameter & { in: T } {
-    const value = getOpenAPI2ParameterInternal(param, kind, schemaContext, name, bodySchema);
+    const value = getOpenAPI2ParameterInternal(param, schemaContext);
     // Apply decorators to a copy of the parameter definition.  We use
     // Object.assign here because applyIntrinsicDecorators returns a new object
     // based on the target object and we need to apply its changes back to the
     // original parameter.
     Object.assign(
       value,
-      applyIntrinsicDecorators(param, { type: (value as any).type, format: (value as any).format })
+      applyIntrinsicDecorators(param.param, {
+        type: (value as any).type,
+        format: (value as any).format,
+      })
     );
-    return value;
-  }
-
-  function populateParameter(
-    ph: OpenAPI2Parameter,
-    param: ModelProperty,
-    kind: OpenAPI2ParameterType,
-    schemaContext: SchemaContext,
-    name?: string,
-    bodySchema?: any
-  ) {
-    Object.assign(ph, getOpenAPI2Parameter(param, kind, schemaContext, name, bodySchema));
+    return value as any;
   }
 
   function emitParameters() {
@@ -1449,7 +1489,11 @@ export async function getOpenAPIForService(
     // TYPESPEC type.
     for (const group of processedSchemas.values()) {
       for (const [visibility, processed] of group) {
-        let name = getOpenAPITypeName(program, processed.type, typeNameOptions);
+        let name = getClientNameOverride(context.tcgcSdkContext, processed.type);
+        if (name === undefined) {
+          name = getOpenAPITypeName(program, processed.type, typeNameOptions);
+        }
+
         if (processed.getSchemaNameOverride !== undefined) {
           name = processed.getSchemaNameOverride(name, visibility);
         } else if (group.size > 1) {
@@ -1666,8 +1710,10 @@ export async function getOpenAPIForService(
     let foundCustom = false;
     for (const [name, member] of e.flattenedMembers.entries()) {
       const description = getDoc(program, member.type);
+      const memberClientName = getClientNameOverride(context.tcgcSdkContext, member.type);
+
       values.push({
-        name: typeof name === "string" ? name : `${member.value}`,
+        name: memberClientName ?? (typeof name === "string" ? name : `${member.value}`),
         value: member.value,
         description,
       });
@@ -2242,9 +2288,10 @@ export async function getOpenAPIForService(
       let foundCustom = false;
       for (const member of type.members.values()) {
         const description = getDoc(program, member);
+        const memberClientName = getClientName(context, member);
         values.push({
           name: member.name,
-          value: member.value ?? member.name,
+          value: member.value ?? memberClientName,
           description,
         });
 

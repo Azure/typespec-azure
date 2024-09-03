@@ -1,5 +1,21 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.45.0
+
+### Bug Fixes
+
+- [#1248](https://github.com/Azure/typespec-azure/pull/1248) Fix issue what allowed `multi` format on a header
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1275](https://github.com/Azure/typespec-azure/pull/1275) Add support for encoding numeric types as string
+- [#1247](https://github.com/Azure/typespec-azure/pull/1247) Add support for URI templates in routes
+
+
 ## 0.44.1
 
 ### Features

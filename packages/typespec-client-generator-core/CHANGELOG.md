@@ -1,5 +1,61 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.45.4
+
+### Bug Fixes
+
+- [#1392](https://github.com/Azure/typespec-azure/pull/1392) Fix multipart for client customization
+
+
+## 0.45.3
+
+### Bug Fixes
+
+- [#1328](https://github.com/Azure/typespec-azure/pull/1328) change example file path to relative file path
+- [#1338](https://github.com/Azure/typespec-azure/pull/1338) consider scope when find service of a client
+- [#1376](https://github.com/Azure/typespec-azure/pull/1376) no need to add access override along with usage override for orphan model
+
+### Features
+
+- [#1363](https://github.com/Azure/typespec-azure/pull/1363) URI template support
+
+
+## 0.45.2
+
+### Bug Fixes
+
+- [#1336](https://github.com/Azure/typespec-azure/pull/1336) Add `@hasJsonConverter` for csharp only to indicate if JSON converter is needed
+- [#1350](https://github.com/Azure/typespec-azure/pull/1350) Bug fix for encode as string on ModelProperty.
+- [#1343](https://github.com/Azure/typespec-azure/pull/1343) Add generic parameter inputs to `SdkUnionType` to clearly define the union types of `endpoint` and `credential` params
+
+
+## 0.45.1
+
+### Bug Fixes
+
+- [#1330](https://github.com/Azure/typespec-azure/pull/1330) Fix collectionFormat for "csv"
+
+
+## 0.45.0
+
+### Bug Fixes
+
+- [#1238](https://github.com/Azure/typespec-azure/pull/1238) TCGC, add `crossLanguageDefinitionId` to `SdkClientType`
+- [#1266](https://github.com/Azure/typespec-azure/pull/1266) expose default values for endpoint template arguments through `.clientDefaultValue`
+- [#1281](https://github.com/Azure/typespec-azure/pull/1281) Support @multipartBody for `bodyParam` of `SdkHttpOperation`
+- [#1233](https://github.com/Azure/typespec-azure/pull/1233) don't move server description onto endpoints parameter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1258](https://github.com/Azure/typespec-azure/pull/1258) add support for encoding an int as a string
+- [#1155](https://github.com/Azure/typespec-azure/pull/1155) Make literal endpoints overridable
+- [#1148](https://github.com/Azure/typespec-azure/pull/1148) add `@override` decorator that allows authors to explicitly describe their desired client method
+
+
 ## 0.44.3
 
 ### Bug Fixes

@@ -13,7 +13,7 @@ Get the serialized name of a type.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `context` | `TCGCContext` |  |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |  |
 | `type` | `Type` & `object` |  |
 
 ## Returns
