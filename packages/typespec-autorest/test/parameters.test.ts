@@ -310,6 +310,19 @@ describe("body parameters", () => {
     expect(res.paths["/"].post.parameters[0]).toMatchObject({ in: "body", name: "bar" });
   });
 
+  it("set x-ms-client-name with @clientName when also using encodedName", async () => {
+    const res = await openApiFor(
+      `
+      #suppress "deprecated" "For tests"
+      op test(@body @encodedName("application/json", "jsonName") @clientName("bar") foo: string): void;`
+    );
+    expect(res.paths["/"].post.parameters[0]).toMatchObject({
+      in: "body",
+      name: "jsonName",
+      "x-ms-client-name": "bar",
+    });
+  });
+
   it("using @body ignore any metadata property underneath", async () => {
     const res = await openApiFor(`@get op read(
       @body body: {
