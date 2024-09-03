@@ -27,6 +27,7 @@ import {
   isQueryParam,
 } from "@typespec/http";
 import { camelCase } from "change-case";
+import { getParamAlias } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -56,9 +57,14 @@ import {
   isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
+  twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { getCrossLanguageDefinitionId, getEffectivePayloadType } from "./public-utils.js";
+import {
+  getCrossLanguageDefinitionId,
+  getEffectivePayloadType,
+  isApiVersion,
+} from "./public-utils.js";
 import {
   addEncodeInfo,
   addFormatInfo,
@@ -495,9 +501,22 @@ export function getCorrespondingMethodParams(
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  const operationLocation = getLocationOfOperation(operation);
+  const operationLocation = getLocationOfOperation(operation)!;
+  let clientParams = context.__clientToParameters.get(operationLocation);
+  if (!clientParams) {
+    clientParams = [];
+    context.__clientToParameters.set(operationLocation, clientParams);
+  }
+
+  const correspondingClientParams = clientParams.filter(
+    (x) =>
+      twoParamsEquivalent(context, x.__raw, serviceParam.__raw) ||
+      (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name)
+  );
+  if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
+
   if (serviceParam.isApiVersionParam) {
-    const existingApiVersion = context.__namespaceToApiVersionParameter.get(operationLocation);
+    const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
       diagnostics.add(
         createDiagnostic({
@@ -511,10 +530,11 @@ export function getCorrespondingMethodParams(
       );
       return diagnostics.wrap([]);
     }
-    return diagnostics.wrap([context.__namespaceToApiVersionParameter.get(operationLocation)!]);
+    return diagnostics.wrap(clientParams.filter((x) => isApiVersion(context, x)));
   }
   if (isSubscriptionId(context, serviceParam)) {
-    if (!context.__subscriptionIdParameter) {
+    const subId = clientParams.find((x) => isSubscriptionId(context, x));
+    if (!subId) {
       diagnostics.add(
         createDiagnostic({
           code: "no-corresponding-method-param",
@@ -527,7 +547,7 @@ export function getCorrespondingMethodParams(
       );
       return diagnostics.wrap([]);
     }
-    return diagnostics.wrap([context.__subscriptionIdParameter]);
+    return diagnostics.wrap(subId ? [subId] : []);
   }
 
   // to see if the service parameter is a method parameter or a property of a method parameter

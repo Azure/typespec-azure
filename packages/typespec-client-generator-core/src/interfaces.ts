@@ -38,12 +38,11 @@ export interface TCGCContext {
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
+  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
-  __subscriptionIdParameter?: SdkParameter;
   __rawClients?: SdkClient[];
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
@@ -84,12 +83,9 @@ export interface SdkClient {
   crossLanguageDefinitionId: string;
 }
 
-export interface SdkInitializationType extends SdkModelType {
-  properties: SdkParameter[];
-}
-
 export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
+  __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
   /**
@@ -380,6 +376,10 @@ export interface SdkModelType extends SdkTypeBase {
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+}
+
+export interface SdkInitializationType extends SdkModelType {
+  properties: SdkParameter[];
 }
 
 export interface SdkCredentialType extends SdkTypeBase {
