@@ -4133,6 +4133,90 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(op.parameters[1].correspondingMethodParams[0], containerName);
     });
 
+    it("redefine client structure", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op uploadContainer(@path containerName: string): void;
+        op uploadBlob(@path containerName: string, @path blobName: string): void;
+        `,
+        `
+        namespace MyCustomizations {
+          model ContainerClientInitialization {
+            containerName: string;
+          }
+          @client({service: MyService})
+          @clientInitialization(ContainerClientInitialization)
+          namespace ContainerClient {
+            op upload is MyService.uploadContainer;
+
+
+            model BlobClientInitialization {
+              containerName: string;
+              blobName: string;
+            }
+
+            @client({service: MyService})
+            @clientInitialization(BlobClientInitialization)
+            namespace BlobClient {
+              op upload is MyService.uploadBlob;
+            }
+          }
+        }
+        
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 2);
+
+      const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
+      ok(containerClient);
+      strictEqual(containerClient.initialization.access, "public");
+      strictEqual(containerClient.initialization.properties.length, 2);
+      ok(containerClient.initialization.properties.find((x) => x.kind === "endpoint"));
+
+      const containerName = containerClient.initialization.properties.find(
+        (x) => x.name === "containerName"
+      );
+      ok(containerName);
+
+      const methods = containerClient.methods;
+      strictEqual(methods.length, 1);
+      strictEqual(methods[0].name, "upload");
+      strictEqual(methods[0].kind, "basic");
+      strictEqual(methods[0].parameters.length, 0);
+      strictEqual(methods[0].operation.parameters.length, 1);
+      strictEqual(methods[0].operation.parameters[0].correspondingMethodParams[0], containerName);
+
+      const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
+      ok(blobClient);
+      strictEqual(blobClient.initialization.access, "public");
+      strictEqual(blobClient.initialization.properties.length, 3);
+      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
+
+      const containerNameOnBlobClient = blobClient.initialization.properties.find(
+        (x) => x.name === "containerName"
+      );
+      ok(containerNameOnBlobClient);
+
+      const blobName = blobClient.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+
+      const blobMethods = blobClient.methods;
+      strictEqual(blobMethods.length, 1);
+      strictEqual(blobMethods[0].name, "upload");
+      strictEqual(blobMethods[0].kind, "basic");
+      strictEqual(blobMethods[0].parameters.length, 0);
+      strictEqual(blobMethods[0].operation.parameters.length, 2);
+      strictEqual(
+        blobMethods[0].operation.parameters[0].correspondingMethodParams[0],
+        containerNameOnBlobClient
+      );
+      strictEqual(blobMethods[0].operation.parameters[1].correspondingMethodParams[0], blobName);
+    });
+
     it("@paramAlias", async () => {
       await runner.compileWithCustomization(
         `
