@@ -287,6 +287,7 @@ function createContentTypeOrAcceptHeader(
       decorators: [],
     };
   }
+  const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
   // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
@@ -295,7 +296,7 @@ function createContentTypeOrAcceptHeader(
     apiVersions: bodyObject.apiVersions,
     isApiVersionParam: false,
     onClient: false,
-    optional: false,
+    optional: optional,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
   };
