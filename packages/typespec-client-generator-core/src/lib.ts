@@ -210,12 +210,6 @@ export const $lib = createTypeSpecLibrary({
         default: `@usage override conflicts with the usage calculated from operation or other @usage override.`,
       },
     },
-    "assigning-public-params-to-internal-client": {
-      severity: "error",
-      messages: {
-        default: `Cannot assign client parameters to an internal client if they're not on the parent client`,
-      },
-    },
   },
 });
 

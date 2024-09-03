@@ -468,8 +468,8 @@ model MyServiceClientOptions {
 @@clientInitialization(MyService, MyServiceClientOptions)
 @@paramAlias(MyServiceClientOptions.blob, "blobName")
 
-// The generated client will have `blobName` on it. We will also
-// elevate the existing `blob` parameter to the client level.
+// The generated client will have `blob` on it. We will also
+// elevate the existing `blobName` parameter to the client level.
 ```
 
 #### `@protocolAPI`

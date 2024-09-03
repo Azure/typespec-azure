@@ -92,18 +92,13 @@ function getScopedDecoratorData(
   return retval[AllScopes]; // in this case it applies to all languages
 }
 
-function listScopedDecoratorData(
-  context: { program: Program },
-  key: symbol,
-  emitterName?: string
-): any[] {
-  const scope = emitterName || AllScopes;
+function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
   const retval = [...context.program.stateMap(key).values()];
   return retval
     .filter((targetEntry) => {
-      return targetEntry[scope] || targetEntry[AllScopes];
+      return targetEntry[context.emitterName] || targetEntry[AllScopes];
     })
-    .flatMap((targetEntry) => targetEntry[scope] ?? targetEntry[AllScopes]);
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
 }
 
 function setScopedDecoratorData(
@@ -238,13 +233,10 @@ export function getClient(
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup(context: {
-  program: Program;
-  emitterName?: string;
-}): boolean {
+function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
-    listScopedDecoratorData(context, clientKey, context.emitterName).length > 0 ||
-    listScopedDecoratorData(context, operationGroupKey, context.emitterName).length > 0
+    listScopedDecoratorData(context, clientKey).length > 0 ||
+    listScopedDecoratorData(context, operationGroupKey).length > 0
   );
 }
 
@@ -318,7 +310,7 @@ function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): S
 export function listClients(context: TCGCContext): SdkClient[] {
   if (context.__rawClients) return context.__rawClients;
 
-  const explicitClients = [...listScopedDecoratorData(context, clientKey, context.emitterName)];
+  const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
     context.__rawClients = getClientsWithVersioning(context, explicitClients);
     if (context.__rawClients.some((client) => isArm(client.service))) {
@@ -390,17 +382,6 @@ export const $operationGroup: OperationGroupDecorator = (
   );
 };
 
-function isOperationGroupWithNoExplicitDecorator(type: Namespace | Interface): boolean {
-  // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
-  if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
-    return true;
-  }
-  if (type.kind === "Namespace" && !type.decorators.some((t) => t.decorator.name === "$service")) {
-    return true;
-  }
-  return false;
-}
-
 /**
  * Check a namespace or interface is an operation group.
  * @param context TCGCContext
@@ -411,7 +392,14 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
   }
-  return isOperationGroupWithNoExplicitDecorator(type);
+  // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
+  if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
+    return true;
+  }
+  if (type.kind === "Namespace" && !type.decorators.some((t) => t.decorator.name === "$service")) {
+    return true;
+  }
+  return false;
 }
 /**
  * Check an operation is in an operation group.
@@ -1015,26 +1003,14 @@ export const $clientInitialization: ClientInitializationDecorator = (
   options: Model,
   scope?: LanguageScopes
 ) => {
-  let isOg = isOperationGroupWithNoExplicitDecorator(target);
-  if (hasExplicitClientOrOperationGroup(context)) {
-    isOg = context.program.stateMap(operationGroupKey).get(target) !== undefined;
-  }
-  if (isOg) {
-    if (
-      target.namespace &&
-      context.program.stateMap(clientInitializationKey).get(target.namespace) &&
-      context.program.stateMap(clientInitializationKey).get(target.namespace)[AllScopes] === options
-    ) {
-      setScopedDecoratorData(context, $override, clientInitializationKey, target, options, scope);
-    } else {
-      reportDiagnostic(context.program, {
-        code: "assigning-public-params-to-internal-client",
-        format: { name: target.name },
-        target: context.decoratorTarget,
-      });
-    }
-  }
-  setScopedDecoratorData(context, $override, clientInitializationKey, target, options, scope);
+  setScopedDecoratorData(
+    context,
+    $clientInitialization,
+    clientInitializationKey,
+    target,
+    options,
+    scope
+  );
 };
 
 export function getClientInitialization(

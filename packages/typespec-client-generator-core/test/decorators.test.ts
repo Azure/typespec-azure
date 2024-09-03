@@ -4070,8 +4070,8 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
     });
 
-    it("@operationGroup without same model on parent client", async () => {
-      const diagnostics = await runner.diagnose(
+    it("@operationGroup with same model on parent client", async () => {
+      await runner.compile(
         `
         @service
         namespace MyService;
@@ -4086,12 +4086,51 @@ describe("typespec-client-generator-core: decorators", () => {
           containerName: string;
         }
 
+        @@clientInitialization(MyService, MyClientInitialization);
         @@clientInitialization(MyService.MyInterface, MyClientInitialization);
         `
       );
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/assigning-public-params-to-internal-client",
-      });
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.access, "public");
+      strictEqual(client.initialization.properties.length, 3);
+      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+
+      const containerName = client.initialization.properties.find(
+        (x) => x.name === "containerName"
+      );
+      ok(containerName);
+      strictEqual(containerName.clientDefaultValue, undefined);
+      strictEqual(containerName.onClient, true);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 1);
+      const clientAccessor = methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      const og = clientAccessor.response;
+      strictEqual(og.kind, "client");
+
+      strictEqual(og.initialization.access, "internal");
+      strictEqual(og.initialization.properties.length, 3);
+      ok(og.initialization.properties.find((x) => x.kind === "endpoint"));
+      ok(og.initialization.properties.find((x) => x === blobName));
+      ok(og.initialization.properties.find((x) => x === containerName));
+
+      const download = og.methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 0);
+
+      const op = download.operation;
+      strictEqual(op.parameters.length, 2);
+      strictEqual(op.parameters[0].correspondingMethodParams[0], blobName);
+      strictEqual(op.parameters[1].correspondingMethodParams[0], containerName);
     });
 
     it("@paramAlias", async () => {
