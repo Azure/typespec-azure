@@ -88,6 +88,7 @@ import {
   isTemplateDeclarationOrInstance,
   isVoidType,
   navigateTypesInNamespace,
+  reportDeprecated,
   resolveEncodedName,
   resolvePath,
 } from "@typespec/compiler";
@@ -1281,11 +1282,22 @@ export async function getOpenAPIForService(
       schema: bodySchema,
     };
 
-    // For body parameter the only value of the name is in the client so no need to keep the original one
-    if (result["x-ms-client-name"]) {
-      result.name = result["x-ms-client-name"];
-      delete result["x-ms-client-name"];
+    const jsonName = getJsonName(param);
+    if (jsonName !== param.name) {
+      // Special case to be able to keep pre-existing cases where you have both the body parameter name and x-ms-client-name
+      reportDeprecated(
+        program,
+        "Using encodedName for the body property is meaningless. That property is not serialized as Json. If wanting to rename it use @Azure.ClientGenerator.Core.clientName",
+        param
+      );
+    } else {
+      // For body parameter the only value of the name is in the client so no need to keep the original one
+      if (result["x-ms-client-name"]) {
+        result.name = result["x-ms-client-name"];
+        delete result["x-ms-client-name"];
+      }
     }
+
     return result;
   }
 
