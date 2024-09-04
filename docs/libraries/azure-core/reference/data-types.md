@@ -230,10 +230,10 @@ model Azure.Core.MultiPartFile
 
 #### Properties
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| filename    | `string` |             |
-| contentType | `string` |             |
+| Name        | Type     | Description                                             |
+| ----------- | -------- | ------------------------------------------------------- |
+| filename    | `string` | The file name in file part of multipart request body    |
+| contentType | `string` | The content type in file part of multipart request body |
 
 ### `OrderByQueryParameter` {#Azure.Core.OrderByQueryParameter}
 
