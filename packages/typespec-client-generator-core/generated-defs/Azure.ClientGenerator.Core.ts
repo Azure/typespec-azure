@@ -433,6 +433,67 @@ export type UseSystemTextJsonConverterDecorator = (
   scope?: string
 ) => void;
 
+/**
+ * Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ *
+ * op upload(blobName: string): void;
+ * op download(blobName: string): void;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ * model MyServiceClientOptions {
+ *   blobName: string;
+ * }
+ *
+ * @@clientInitialization(MyService, MyServiceClientOptions)
+ * // The generated client will have `blobName` on it. We will also
+ * // elevate the existing `blobName` parameter to the client level.
+ * ```
+ */
+export type ClientInitializationDecorator = (
+  context: DecoratorContext,
+  target: Namespace | Interface,
+  options: Model,
+  scope?: string
+) => void;
+
+/**
+ * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ *
+ * op upload(blobName: string): void;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ * model MyServiceClientOptions {
+ *   blob: string;
+ * }
+ *
+ * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@paramAlias(MyServiceClientOptions.blob, "blobName")
+ *
+ * // The generated client will have `blobName` on it. We will also
+ * // elevate the existing `blob` parameter to the client level.
+ * ```
+ */
+export type ParamAliasDecorator = (
+  context: DecoratorContext,
+  original: ModelProperty,
+  paramAlias: string,
+  scope?: string
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -444,4 +505,6 @@ export type AzureClientGeneratorCoreDecorators = {
   flattenProperty: FlattenPropertyDecorator;
   override: OverrideDecorator;
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
+  clientInitialization: ClientInitializationDecorator;
+  paramAlias: ParamAliasDecorator;
 };

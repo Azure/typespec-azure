@@ -34,10 +34,12 @@ import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   ClientDecorator,
+  ClientInitializationDecorator,
   ClientNameDecorator,
   ConvenientAPIDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
+  ParamAliasDecorator,
   ProtocolAPIDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
@@ -50,6 +52,9 @@ import {
   SdkContext,
   SdkEmitterOptions,
   SdkHttpOperation,
+  SdkInitializationType,
+  SdkMethodParameter,
+  SdkModelPropertyType,
   SdkOperationGroup,
   SdkServiceOperation,
   TCGCContext,
@@ -608,9 +613,9 @@ export function createTCGCContext(program: Program, emitterName: string): TCGCCo
     emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
     diagnostics: diagnostics.diagnostics,
     originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
+    __clientToParameters: new Map(),
     __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
+    __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
   };
 }
@@ -989,3 +994,56 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   entity: Model,
   scope?: LanguageScopes
 ) => {};
+
+const clientInitializationKey = createStateSymbol("clientInitialization");
+
+export const $clientInitialization: ClientInitializationDecorator = (
+  context: DecoratorContext,
+  target: Namespace | Interface,
+  options: Model,
+  scope?: LanguageScopes
+) => {
+  setScopedDecoratorData(
+    context,
+    $clientInitialization,
+    clientInitializationKey,
+    target,
+    options,
+    scope
+  );
+};
+
+export function getClientInitialization(
+  context: TCGCContext,
+  entity: Namespace | Interface
+): SdkInitializationType | undefined {
+  const model = getScopedDecoratorData(context, clientInitializationKey, entity);
+  if (!model) return model;
+  const sdkModel = getSdkModel(context, model);
+  const initializationProps = sdkModel.properties.map(
+    (property: SdkModelPropertyType): SdkMethodParameter => {
+      property.onClient = true;
+      property.kind = "method";
+      return property as SdkMethodParameter;
+    }
+  );
+  return {
+    ...sdkModel,
+    properties: initializationProps,
+  };
+}
+
+const paramAliasKey = createStateSymbol("paramAlias");
+
+export const paramAliasDecorator: ParamAliasDecorator = (
+  context: DecoratorContext,
+  original: ModelProperty,
+  paramAlias: string,
+  scope?: LanguageScopes
+) => {
+  setScopedDecoratorData(context, paramAliasDecorator, paramAliasKey, original, paramAlias, scope);
+};
+
+export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
+  return getScopedDecoratorData(context, paramAliasKey, original);
+}
