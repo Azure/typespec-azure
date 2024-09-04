@@ -231,7 +231,7 @@ async function emitOutput(
   });
 
   // Copy examples to the output directory
-  if (options.examplesDirectory && result.operationExamples.length > 0) {
+  if (result.operationExamples.length > 0) {
     const examplesPath = resolvePath(getDirectoryPath(result.outputFile), "examples");
     await program.host.mkdirp(examplesPath);
     for (const { examples } of result.operationExamples) {

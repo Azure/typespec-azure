@@ -678,14 +678,12 @@ export async function getOpenAPIForService(
       );
     }
 
-    if (options.examplesDirectory) {
-      const examples = exampleMap.get(currentEndpoint.operationId);
-      if (examples && currentEndpoint.operationId) {
-        operationIdsWithExample.add(currentEndpoint.operationId);
-        currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
-        for (const [title, example] of Object.entries(examples)) {
-          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
-        }
+    const autoExamples = exampleMap.get(currentEndpoint.operationId);
+    if (autoExamples && currentEndpoint.operationId) {
+      operationIdsWithExample.add(currentEndpoint.operationId);
+      currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
+      for (const [title, example] of Object.entries(autoExamples)) {
+        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
       }
     }
 
@@ -2580,6 +2578,7 @@ async function loadExamples(
   const diagnostics = createDiagnosticCollector();
   const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
   const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+
   if (!(await checkExamplesDirExists(host, exampleDir))) {
     if (options.examplesDirectory) {
       diagnostics.add(
@@ -2606,7 +2605,7 @@ async function loadExamples(
             code: "example-loading",
             messageId: "noOperationId",
             format: { filename: fileName },
-            target: NoTarget,
+            target: { file: exampleFile, pos: 0, end: 0 },
           })
         );
         continue;
@@ -2621,7 +2620,7 @@ async function loadExamples(
         diagnostics.add(
           createDiagnostic({
             code: "duplicate-example-file",
-            target: NoTarget,
+            target: { file: exampleFile, pos: 0, end: 0 },
             format: {
               filename: fileName,
               operationId: example.operationId,
