@@ -67,6 +67,7 @@ import {
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
+  SdkInitializationType,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
@@ -98,7 +99,9 @@ import {
   isJsonContentType,
   isMultipartOperation,
   isNeverOrVoidType,
+  isOnClient,
   isXmlContentType,
+  twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -719,6 +722,18 @@ export function getSdkModel(
   return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
 }
 
+export function getInitializationType(
+  context: TCGCContext,
+  type: Model,
+  operation?: Operation
+): SdkInitializationType {
+  const model = ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
+  for (const property of model.properties) {
+    property.kind = "method";
+  }
+  return model as SdkInitializationType;
+}
+
 export function getSdkModelWithDiagnostics(
   context: TCGCContext,
   type: Model,
@@ -1209,6 +1224,7 @@ export function getSdkModelPropertyTypeBase(
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
+  const onClient = isOnClient(context, type);
   return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,
@@ -1225,6 +1241,7 @@ export function getSdkModelPropertyTypeBase(
       type,
       operation ? getLocationOfOperation(operation) : undefined
     ),
+    onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
@@ -1363,6 +1380,14 @@ export function getSdkModelPropertyType(
   operation?: Operation
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+
+  const clientParams = operation
+    ? context.__clientToParameters.get(getLocationOfOperation(operation))
+    : undefined;
+  const correspondingClientParams = clientParams?.find((x) =>
+    twoParamsEquivalent(context, x.__raw, type)
+  );
+  if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
@@ -1771,14 +1796,24 @@ function handleServiceOrphanType(
   return diagnostics.wrap(undefined);
 }
 
-function filterOutModels(context: TCGCContext) {
+function filterOutModels(context: TCGCContext, filter: number): (SdkModelType | SdkEnumType)[] {
+  const result = new Set<SdkModelType | SdkEnumType>();
   for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
-    if (type.kind === "Enum" || type.kind === "Model" || type.kind === "Union") {
-      if (context.filterOutCoreModels && isAzureCoreModel(type)) {
-        sdkType.usage = UsageFlags.None;
-      }
+    // filter models/enums/union of Core
+    if (
+      context.filterOutCoreModels &&
+      ["Enum", "Model", "Union"].includes(type.kind) &&
+      isAzureCoreModel(type)
+    ) {
+      continue;
     }
+    // filter models with unexpected usage
+    if ((sdkType.usage & filter) === 0) {
+      continue;
+    }
+    result.add(sdkType);
   }
+  return [...result];
 }
 
 export function getAllModelsWithDiagnostics(
@@ -1855,8 +1890,6 @@ export function getAllModelsWithDiagnostics(
   diagnostics.pipe(updateUsageOverrideOfModel(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-  // filter out models
-  filterOutModels(context);
   let filter = 0;
   if (options.input && options.output) {
     filter = Number.MAX_SAFE_INTEGER;
@@ -1865,9 +1898,7 @@ export function getAllModelsWithDiagnostics(
   } else if (options.output) {
     filter += UsageFlags.Output;
   }
-  return diagnostics.wrap(
-    [...new Set(context.modelsMap.values())].filter((t) => (t.usage & filter) > 0)
-  );
+  return diagnostics.wrap(filterOutModels(context, filter));
 }
 
 export function getAllModels(

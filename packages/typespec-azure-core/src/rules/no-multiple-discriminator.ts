@@ -6,7 +6,7 @@ import {
   paramMessage,
 } from "@typespec/compiler";
 
-export const preventMultipleDiscriminator = createRule({
+export const noMultipleDiscriminatorRule = createRule({
   name: "no-multiple-discriminator",
   description: "Classes should have at most one discriminator.",
   severity: "warning",

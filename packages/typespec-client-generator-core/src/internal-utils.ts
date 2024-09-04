@@ -31,6 +31,7 @@ import {
   HttpStatusCodeRange,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -118,16 +119,14 @@ export function updateWithApiVersionInformation(
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
-  onClient: boolean;
 } {
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
     clientDefaultValue:
       isApiVersionParam && namespace
-        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        ? context.__clientToApiVersionClientDefaultValue.get(namespace)
         : undefined,
-    onClient: onClient(context, type),
   };
 }
 
@@ -443,10 +442,6 @@ export function isSubscriptionId(context: TCGCContext, parameter: { name: string
   return Boolean(context.arm) && parameter.name === "subscriptionId";
 }
 
-export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
-  return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
-}
-
 export function getLocationOfOperation(operation: Operation): Namespace | Interface {
   // have to check interface first, because interfaces are more granular than namespaces
   return (operation.interface || operation.namespace)!;
@@ -533,6 +528,20 @@ export function isXmlContentType(contentType: string): boolean {
   return regex.test(contentType);
 }
 
+export function twoParamsEquivalent(
+  context: TCGCContext,
+  param1?: ModelProperty,
+  param2?: ModelProperty
+): boolean {
+  if (!param1 || !param2) {
+    return false;
+  }
+  return (
+    param1.name === param2.name ||
+    getParamAlias(context, param1) === param2.name ||
+    param1.name === getParamAlias(context, param2)
+  );
+}
 /**
  * If body is from spread, then it does not directly from a model property.
  * @param httpBody
@@ -571,4 +580,18 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
     }
   }
   return type;
+}
+
+export function isOnClient(context: TCGCContext, type: ModelProperty): boolean {
+  const namespace = type.model?.namespace;
+  return (
+    isSubscriptionId(context, type) ||
+    isApiVersion(context, type) ||
+    Boolean(
+      namespace &&
+        context.__clientToParameters
+          .get(namespace)
+          ?.find((x) => twoParamsEquivalent(context, x.__raw, type))
+    )
+  );
 }
