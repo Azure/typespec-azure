@@ -660,7 +660,7 @@ function addDefaultClientParameters<
   if (apiVersionParam) {
     client.initialization.properties.push(apiVersionParam);
   }
-  const subId = client.initialization.properties.find((x) => isSubscriptionId(context, x));
+  const subId = context.__clientToParameters.get(client.__raw.type)?.find((x) => isSubscriptionId(context, x));
   if (subId) {
     client.initialization.properties.push(subId);
   }
