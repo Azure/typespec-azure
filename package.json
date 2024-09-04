@@ -26,7 +26,7 @@
     "regen-docs": "pnpm run-all  --parallel --aggregate-output --reporter=append-only run regen-docs",
     "regen-samples": "pnpm run-all run regen-samples",
     "test": "vitest run --workspace ./vitest.workspace.fast.ts",
-    "test:ci": "pnpm test --coverage --reporter=junit --reporter=default",
+    "test:ci": "vitest run  --coverage --reporter=junit --reporter=default",
     "test:e2e": "pnpm run-all run test:e2e",
     "update-latest-docs": "pnpm run-all run update-latest-docs",
     "watch": "tsc --build ./tsconfig.ws.json --watch",
