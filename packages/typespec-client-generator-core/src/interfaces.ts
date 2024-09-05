@@ -222,10 +222,10 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   boolean = "boolean",
   plainDate = "plainDate",
   plainTime = "plainTime",
-  any = "any",
+  unknown = "unknown",
 }
 
-export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
+export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "unknown";
 
 type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
 
@@ -307,7 +307,7 @@ export interface SdkArrayType extends SdkTypeBase {
 
 export interface SdkTupleType extends SdkTypeBase {
   kind: "tuple";
-  values: SdkType[];
+  valueTypes: SdkType[];
 }
 
 export interface SdkDictionaryType extends SdkTypeBase {
@@ -356,7 +356,7 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   name: string;
   isGeneratedName: boolean;
   kind: "union";
-  values: TValueType[];
+  variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
 }
 
@@ -700,44 +700,44 @@ interface SdkExampleBase {
 
 export interface SdkHttpOperationExample extends SdkExampleBase {
   kind: "http";
-  parameters: SdkHttpParameterExample[];
-  responses: Map<number, SdkHttpResponseExample>;
+  parameters: SdkHttpParameterExampleValue[];
+  responses: Map<number, SdkHttpResponseExampleValue>;
 }
 
-export interface SdkHttpParameterExample {
+export interface SdkHttpParameterExampleValue {
   parameter: SdkHttpParameter;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 
-export interface SdkHttpResponseExample {
+export interface SdkHttpResponseExampleValue {
   response: SdkHttpResponse;
-  headers: SdkHttpResponseHeaderExample[];
-  bodyValue?: SdkTypeExample;
+  headers: SdkHttpResponseHeaderExampleValue[];
+  bodyValue?: SdkExampleValue;
 }
 
-export interface SdkHttpResponseHeaderExample {
+export interface SdkHttpResponseHeaderExampleValue {
   header: SdkServiceResponseHeader;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 
-export type SdkTypeExample =
-  | SdkStringExample
-  | SdkNumberExample
-  | SdkBooleanExample
-  | SdkNullExample
-  | SdkAnyExample
-  | SdkArrayExample
-  | SdkDictionaryExample
-  | SdkUnionExample
-  | SdkModelExample;
+export type SdkExampleValue =
+  | SdkStringExampleValue
+  | SdkNumberExampleValue
+  | SdkBooleanExampleValue
+  | SdkNullExampleValue
+  | SdkUnknownExampleValue
+  | SdkArrayExampleValue
+  | SdkDictionaryExampleValue
+  | SdkUnionExampleValue
+  | SdkModelExampleValue;
 
-export interface SdkExampleTypeBase {
+export interface SdkExampleValueBase {
   kind: string;
   type: SdkType;
   value: unknown;
 }
 
-export interface SdkStringExample extends SdkExampleTypeBase {
+export interface SdkStringExampleValue extends SdkExampleValueBase {
   kind: "string";
   type:
     | SdkBuiltInType
@@ -749,7 +749,7 @@ export interface SdkStringExample extends SdkExampleTypeBase {
   value: string;
 }
 
-export interface SdkNumberExample extends SdkExampleTypeBase {
+export interface SdkNumberExampleValue extends SdkExampleValueBase {
   kind: "number";
   type:
     | SdkBuiltInType
@@ -761,45 +761,45 @@ export interface SdkNumberExample extends SdkExampleTypeBase {
   value: number;
 }
 
-export interface SdkBooleanExample extends SdkExampleTypeBase {
+export interface SdkBooleanExampleValue extends SdkExampleValueBase {
   kind: "boolean";
   type: SdkBuiltInType | SdkConstantType;
   value: boolean;
 }
 
-export interface SdkNullExample extends SdkExampleTypeBase {
+export interface SdkNullExampleValue extends SdkExampleValueBase {
   kind: "null";
   type: SdkNullableType;
   value: null;
 }
 
-export interface SdkAnyExample extends SdkExampleTypeBase {
-  kind: "any";
+export interface SdkUnknownExampleValue extends SdkExampleValueBase {
+  kind: "unknown";
   type: SdkBuiltInType;
   value: unknown;
 }
 
-export interface SdkArrayExample extends SdkExampleTypeBase {
+export interface SdkArrayExampleValue extends SdkExampleValueBase {
   kind: "array";
   type: SdkArrayType;
-  value: SdkTypeExample[];
+  value: SdkExampleValue[];
 }
 
-export interface SdkDictionaryExample extends SdkExampleTypeBase {
+export interface SdkDictionaryExampleValue extends SdkExampleValueBase {
   kind: "dict";
   type: SdkDictionaryType;
-  value: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
 }
 
-export interface SdkUnionExample extends SdkExampleTypeBase {
+export interface SdkUnionExampleValue extends SdkExampleValueBase {
   kind: "union";
   type: SdkUnionType;
   value: unknown;
 }
 
-export interface SdkModelExample extends SdkExampleTypeBase {
+export interface SdkModelExampleValue extends SdkExampleValueBase {
   kind: "model";
   type: SdkModelType;
-  value: Record<string, SdkTypeExample>;
-  additionalPropertiesValue?: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
+  additionalPropertiesValue?: Record<string, SdkExampleValue>;
 }

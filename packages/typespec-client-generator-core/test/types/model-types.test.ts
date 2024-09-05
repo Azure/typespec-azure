@@ -1176,7 +1176,7 @@ describe("typespec-client-generator-core: model types", () => {
     );
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
-    strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "any");
+    strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "unknown");
     strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
     strictEqual(AdditionalPropertiesModel3.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel3.baseModel, undefined);
@@ -1262,8 +1262,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "float32");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
     strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "union");
-    strictEqual(AdditionalPropertiesModel2.additionalProperties?.values[0].kind, "boolean");
-    strictEqual(AdditionalPropertiesModel2.additionalProperties?.values[1].kind, "float32");
+    strictEqual(AdditionalPropertiesModel2.additionalProperties?.variantTypes[0].kind, "boolean");
+    strictEqual(AdditionalPropertiesModel2.additionalProperties?.variantTypes[1].kind, "float32");
     strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
   });
 

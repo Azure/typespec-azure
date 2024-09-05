@@ -25,13 +25,13 @@ describe("typespec-client-generator-core: tuple types", () => {
     const scopes = models[0].properties.find((x) => x.name === "scopes");
     ok(scopes);
     strictEqual(scopes.type.kind, "tuple");
-    strictEqual(scopes.type.values[0].kind, "constant");
-    strictEqual(scopes.type.values[0].valueType.kind, "string");
-    strictEqual(scopes.type.values[0].value, "https://security.microsoft.com/.default");
+    strictEqual(scopes.type.valueTypes[0].kind, "constant");
+    strictEqual(scopes.type.valueTypes[0].valueType.kind, "string");
+    strictEqual(scopes.type.valueTypes[0].value, "https://security.microsoft.com/.default");
     const test = models[0].properties.find((x) => x.name === "test");
     ok(test);
     strictEqual(test.type.kind, "tuple");
-    strictEqual(test.type.values[0].kind, "int32");
-    strictEqual(test.type.values[1].kind, "string");
+    strictEqual(test.type.valueTypes[0].kind, "int32");
+    strictEqual(test.type.valueTypes[1].kind, "string");
   });
 });

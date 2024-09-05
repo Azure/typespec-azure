@@ -67,7 +67,6 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
-  addFormatInfo,
   getClientTypeWithDiagnostics,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
@@ -434,7 +433,6 @@ function getSdkHttpResponseAndExceptions(
           ? "application/json"
           : innerResponse.body?.contentTypes[0];
         addEncodeInfo(context, header, clientType, defaultContentType);
-        addFormatInfo(context, header, clientType);
         headers.push({
           __raw: header,
           description: getDocHelper(context, header).description,

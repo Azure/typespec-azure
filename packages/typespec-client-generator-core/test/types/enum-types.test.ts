@@ -499,9 +499,9 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(unionType.name, "Test");
     strictEqual(unionType.crossLanguageDefinitionId, "N.Test");
 
-    const values = unionType.values;
-    strictEqual(values.length, 3);
-    const a = values[0] as SdkEnumType;
+    const variants = unionType.variantTypes;
+    strictEqual(variants.length, 3);
+    const a = variants[0] as SdkEnumType;
     strictEqual(a.kind, "enum");
     strictEqual(a.name, "A");
     strictEqual(a.crossLanguageDefinitionId, "N.A");
@@ -511,7 +511,7 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(a.values[1].name, "A2");
     strictEqual(a.values[1].value, "A2");
 
-    const b = values[1] as SdkEnumType;
+    const b = variants[1] as SdkEnumType;
     strictEqual(b.kind, "enum");
     strictEqual(b.name, "B");
     strictEqual(b.crossLanguageDefinitionId, "N.B");
@@ -519,7 +519,7 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(b.values[0].name, "B");
     strictEqual(b.values[0].value, "B");
 
-    const c = values[2] as SdkEnumType;
+    const c = variants[2] as SdkEnumType;
     strictEqual(c.kind, "enum");
     strictEqual(c.name, "C");
     strictEqual(c.crossLanguageDefinitionId, "N.C");
@@ -606,15 +606,15 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(unionType.name, "TestColor");
     strictEqual(unionType.crossLanguageDefinitionId, "Test.color.anonymous");
     strictEqual(unionType.isGeneratedName, true);
-    const values = unionType.values;
-    const lr = values[0] as SdkEnumType;
+    const variants = unionType.variantTypes;
+    const lr = variants[0] as SdkEnumType;
     strictEqual(lr.name, "LR");
     strictEqual(lr.crossLanguageDefinitionId, "N.LR");
     strictEqual(lr.isUnionAsEnum, false);
     strictEqual(lr.values[0].name, "left");
     strictEqual(lr.values[1].name, "right");
     strictEqual(lr.isFixed, true);
-    const ud = values[1] as SdkEnumType;
+    const ud = variants[1] as SdkEnumType;
     strictEqual(ud.name, "UD");
     strictEqual(ud.crossLanguageDefinitionId, "N.UD");
     strictEqual(ud.isUnionAsEnum, false);

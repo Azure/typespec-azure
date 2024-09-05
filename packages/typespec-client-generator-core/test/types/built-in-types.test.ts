@@ -130,7 +130,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     `
     );
     const sdkType = getSdkTypeHelper(runner);
-    strictEqual(sdkType.kind, "any");
+    strictEqual(sdkType.kind, "unknown");
   });
 
   it("bytes", async function () {
@@ -229,7 +229,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(type.baseType?.kind, "string");
   });
 
-  it("format", async function () {
+  it("format should not alter typespec types", async function () {
     const runnerWithCore = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
@@ -242,18 +242,17 @@ describe("typespec-client-generator-core: built-in types", () => {
         urlScalar: url;
 
         @format("url")
-        urlProperty: string;
+        urlFormatProperty: string;
       }
     `
     );
-    const models = runnerWithCore.context.sdkPackage.models;
-    for (const property of models[0].properties) {
-      strictEqual(property.kind, "property");
-      strictEqual(
-        property.type.kind,
-        property.serializedName.replace("Scalar", "").replace("Property", "")
-      );
-    }
+    const model = runnerWithCore.context.sdkPackage.models[0];
+    const urlScalarProperty = model.properties.find((x) => x.name === "urlScalar");
+    const urlFormatProperty = model.properties.find((x) => x.name === "urlFormatProperty");
+    ok(urlScalarProperty);
+    ok(urlFormatProperty);
+    strictEqual(urlScalarProperty.type.kind, "url");
+    strictEqual(urlFormatProperty.type.kind, "string");
   });
 
   it("etag from core", async () => {
@@ -317,21 +316,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(type.baseType.baseType.name, "string");
     strictEqual(type.baseType.baseType.crossLanguageDefinitionId, "TypeSpec.string");
     strictEqual(type.baseType.baseType.baseType, undefined);
-  });
-
-  it("unknown format", async function () {
-    await runner.compileWithBuiltInService(
-      `
-      @usage(Usage.input | Usage.output)
-      model Test {
-        @format("unknown")
-        unknownProp: string;
-      }
-    `
-    );
-    const models = getAllModels(runner.context);
-    strictEqual(models[0].kind, "model");
-    strictEqual(models[0].properties[0].type.kind, "string");
   });
 
   it("known values", async function () {

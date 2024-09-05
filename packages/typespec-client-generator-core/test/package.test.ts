@@ -273,8 +273,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(credentialParam.type.kind, "union");
       strictEqual(credentialParam.type.name, "ServiceCredentialUnion");
       strictEqual(credentialParam.type.isGeneratedName, true);
-      strictEqual(credentialParam.type.values.length, 2);
-      const schemes = credentialParam.type.values
+      strictEqual(credentialParam.type.variantTypes.length, 2);
+      const schemes = credentialParam.type.variantTypes
         .filter((v): v is SdkCredentialType => v.kind === "credential")
         .map((s) => s.scheme);
       strictEqual(schemes.length, 2);
@@ -396,9 +396,9 @@ describe("typespec-client-generator-core: package", () => {
 
       const endpointParamType = endpointParam.type;
       strictEqual(endpointParamType.kind, "union");
-      strictEqual(endpointParamType.values.length, 2);
+      strictEqual(endpointParamType.variantTypes.length, 2);
 
-      const overridableEndpoint = endpointParamType.values.find(
+      const overridableEndpoint = endpointParamType.variantTypes.find(
         (x) => x.kind === "endpoint" && x.serverUrl === "{endpoint}"
       ) as SdkEndpointType;
       ok(overridableEndpoint);
@@ -406,7 +406,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(overridableEndpoint.templateArguments[0].name, "endpoint");
       strictEqual(overridableEndpoint.templateArguments[0].clientDefaultValue, undefined);
 
-      const templatedEndpoint = endpointParamType.values.find(
+      const templatedEndpoint = endpointParamType.variantTypes.find(
         (x) =>
           x.kind === "endpoint" && x.serverUrl === "{endpoint}/server/path/multiple/{apiVersion}"
       ) as SdkEndpointType;
