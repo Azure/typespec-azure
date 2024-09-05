@@ -2209,7 +2209,9 @@ describe("typespec-client-generator-core: package", () => {
       const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
       for (const name of ["apiVersion", "subscriptionId", "endpoint", "credential"]) {
-        ok(client.initialization.properties.find((x) => x.name === name) !== undefined);
+        const item = client.initialization.properties.find((x) => x.name === name)
+        ok(item !== undefined);
+        ok(item.onClient);
       }
     });
 
