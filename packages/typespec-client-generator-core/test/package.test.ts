@@ -2178,7 +2178,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionOpParam.correspondingMethodParams[0], apiVersionClientParam);
     });
 
-    it("global parameters", async () => {
+    it("client level signatures by default", async () => {
       const runnerWithArm = await createSdkTestRunner({
         librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
         autoUsings: ["Azure.ResourceManager", "Azure.Core"],
