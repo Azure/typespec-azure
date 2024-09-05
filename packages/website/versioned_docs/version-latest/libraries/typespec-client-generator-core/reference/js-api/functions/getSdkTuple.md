@@ -14,7 +14,7 @@ function getSdkTuple(
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Tuple` |
 | `operation`? | `Operation` |
 

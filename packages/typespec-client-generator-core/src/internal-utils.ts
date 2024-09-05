@@ -10,19 +10,28 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
+  Model,
   ModelProperty,
   Namespace,
   Numeric,
   NumericLiteral,
   Operation,
   Program,
+  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
   Value,
 } from "@typespec/compiler";
-import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
+import {
+  HttpOperation,
+  HttpOperationBody,
+  HttpOperationMultipartBody,
+  HttpOperationResponseContent,
+  HttpStatusCodeRange,
+} from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -37,7 +46,6 @@ import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
-  getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
@@ -111,16 +119,14 @@ export function updateWithApiVersionInformation(
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
-  onClient: boolean;
 } {
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
     clientDefaultValue:
       isApiVersionParam && namespace
-        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        ? context.__clientToApiVersionClientDefaultValue.get(namespace)
         : undefined,
-    onClient: onClient(context, type),
   };
 }
 
@@ -432,33 +438,8 @@ export function createGeneratedName(
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
-function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
-  if (type.kind !== "Model") return false;
-  if (!isHttpOperation(context, operation)) return false;
-  const httpBody = operation
-    ? getHttpOperationWithCache(context, operation).parameters.body
-    : undefined;
-  return Boolean(
-    httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
-  );
-}
-
-export function isMultipartFormData(
-  context: TCGCContext,
-  type: Type,
-  operation?: Operation
-): boolean {
-  return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
-}
-
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
   return Boolean(context.arm) && parameter.name === "subscriptionId";
-}
-
-export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
-  return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
 }
 
 export function getLocationOfOperation(operation: Operation): Namespace | Interface {
@@ -545,4 +526,72 @@ export function isJsonContentType(contentType: string): boolean {
 export function isXmlContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
   return regex.test(contentType);
+}
+
+export function twoParamsEquivalent(
+  context: TCGCContext,
+  param1?: ModelProperty,
+  param2?: ModelProperty
+): boolean {
+  if (!param1 || !param2) {
+    return false;
+  }
+  return (
+    param1.name === param2.name ||
+    getParamAlias(context, param1) === param2.name ||
+    param1.name === getParamAlias(context, param2)
+  );
+}
+/**
+ * If body is from spread, then it does not directly from a model property.
+ * @param httpBody
+ * @param parameters
+ * @returns
+ */
+export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
+  return httpBody.property === undefined;
+}
+
+/**
+ * If body is from simple spread, then we use the original model as body model.
+ * @param type
+ * @returns
+ */
+export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model {
+  if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
+    const innerModel = type.sourceModels[0].model;
+    const projectedProgram = context.program as ProjectedProgram;
+    // for case: `op test(...Model):void;`
+    if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
+      return projectedProgram.projector
+        ? (projectedProgram.projector.projectedTypes.get(innerModel) as Model)
+        : innerModel;
+    }
+    // for case: `op test(@header h: string, @query q: string, ...Model): void;`
+    if (
+      innerModel.sourceModels.length === 1 &&
+      innerModel.sourceModels[0].usage === "spread" &&
+      innerModel.sourceModels[0].model.name !== "" &&
+      innerModel.sourceModels[0].model.properties.size === type.properties.size
+    ) {
+      return projectedProgram.projector
+        ? (projectedProgram.projector.projectedTypes.get(innerModel.sourceModels[0].model) as Model)
+        : innerModel.sourceModels[0].model;
+    }
+  }
+  return type;
+}
+
+export function isOnClient(context: TCGCContext, type: ModelProperty): boolean {
+  const namespace = type.model?.namespace;
+  return (
+    isSubscriptionId(context, type) ||
+    isApiVersion(context, type) ||
+    Boolean(
+      namespace &&
+        context.__clientToParameters
+          .get(namespace)
+          ?.find((x) => twoParamsEquivalent(context, x.__raw, type))
+    )
+  );
 }

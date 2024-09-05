@@ -11,7 +11,7 @@ function shouldGenerateConvenient(context, entity): boolean
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Operation` |
 
 ## Returns

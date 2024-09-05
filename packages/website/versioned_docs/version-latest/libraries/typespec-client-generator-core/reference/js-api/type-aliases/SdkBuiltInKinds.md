@@ -4,10 +4,5 @@ title: "[T] SdkBuiltInKinds"
 
 ---
 ```ts
-type SdkBuiltInKinds: 
-  | keyof typeof SdkBuiltInKindsMiscellaneousEnum
-  | keyof typeof SdkIntKindsEnum
-  | keyof typeof SdkFloatKindsEnum
-  | keyof typeof SdkGenericBuiltInStringKindsEnum
-  | keyof typeof SdkAzureBuiltInStringKindsMapping;
+type SdkBuiltInKinds: Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
 ```

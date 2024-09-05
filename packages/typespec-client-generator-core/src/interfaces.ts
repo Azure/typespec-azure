@@ -35,23 +35,20 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
   modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  spreadModels?: Map<Model, SdkModelType>;
   httpOperationCache?: Map<Operation, HttpOperation>;
   unionsMap?: Map<Union, SdkUnionType>;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
+  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
+  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   knownScalars?: Record<string, SdkBuiltInKinds>;
   diagnostics: readonly Diagnostic[];
-  __subscriptionIdParameter?: SdkParameter;
   __rawClients?: SdkClient[];
   apiVersion?: string;
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
-  examplesDirectory?: string;
+  examplesDir?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
 }
@@ -71,7 +68,11 @@ export interface SdkEmitterOptions {
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
+  /**
+   * @deprecated Use `examples-dir` instead.
+   */
   "examples-directory"?: string;
+  "examples-dir"?: string;
 }
 
 export interface SdkClient {
@@ -79,32 +80,30 @@ export interface SdkClient {
   name: string;
   service: Namespace;
   type: Namespace | Interface;
-  /**
-   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
-   */
-  arm: boolean;
   crossLanguageDefinitionId: string;
-}
-
-export interface SdkInitializationType extends SdkModelType {
-  properties: SdkParameter[];
 }
 
 export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
+  __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
   initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
-  /**
-   * @deprecated This property is deprecated. Look at `.arm` on `SdkContext` instead.
-   */
-  arm: boolean;
+  parent?: SdkClientType<TServiceOperation>;
 }
 
 export interface SdkOperationGroup {
@@ -133,8 +132,17 @@ interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
+  __accessSet?: boolean;
 }
 
 export type SdkType =
@@ -281,21 +289,6 @@ interface SdkOffsetDateTimeType extends SdkDateTimeTypeBase {
 
 export type SdkDateTimeType = SdkUtcDateTimeType | SdkOffsetDateTimeType;
 
-/**
- * @deprecated: Use SdkDateTimeType instead.
- */
-export type SdkDatetimeType = SdkDateTimeType;
-
-/**
- * @deprecated: Use SdkUtcDateTimeType instead.
- */
-export type SdkUtcDatetimeType = SdkUtcDateTimeType;
-
-/**
- * @deprecated Use SdkOffsetDateTimeType instead.
- */
-export type SdkOffsetDatetimeType = SdkOffsetDateTimeType;
-
 export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
@@ -359,11 +352,11 @@ export interface SdkConstantType extends SdkTypeBase {
   isGeneratedName: boolean;
 }
 
-export interface SdkUnionType extends SdkTypeBase {
+export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
   kind: "union";
-  values: SdkType[];
+  values: TValueType[];
   crossLanguageDefinitionId: string;
 }
 
@@ -373,10 +366,6 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
   name: string;
-  /**
-   * @deprecated This property is deprecated. Check the bitwise and value of UsageFlags.MultipartFormData and the `.usage` property on this model.
-   */
-  isFormDataType: boolean;
   isGeneratedName: boolean;
   access: AccessFlags;
   usage: UsageFlags;
@@ -387,6 +376,10 @@ export interface SdkModelType extends SdkTypeBase {
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+}
+
+export interface SdkInitializationType extends SdkModelType {
+  properties: SdkParameter[];
 }
 
 export interface SdkCredentialType extends SdkTypeBase {
@@ -405,8 +398,16 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   type: SdkType;
   name: string;
   isGeneratedName: boolean;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
   apiVersions: string[];
   onClient: boolean;
   clientDefaultValue?: any;
@@ -420,12 +421,12 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   serializedName?: string;
-  type: SdkEndpointType | SdkUnionType;
+  type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
   kind: "credential";
-  type: SdkCredentialType | SdkUnionType; // union of credentials
+  type: SdkCredentialType | SdkUnionType<SdkCredentialType>;
   onClient: true;
 }
 
@@ -465,7 +466,7 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   flatten: boolean;
 }
 
-export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes";
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
 export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
@@ -479,11 +480,19 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
+  explode: boolean;
 }
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
+  /**
+   * @deprecated This property is deprecated. Use `allowReserved` instead.
+   * @param serviceParam
+   */
   urlEncode: boolean;
+  explode: boolean;
+  style: "simple" | "label" | "matrix" | "fragment" | "path";
+  allowReserved: boolean;
   serializedName: string;
   optional: false;
   correspondingMethodParams: SdkModelPropertyType[];
@@ -511,8 +520,16 @@ export interface SdkServiceResponseHeader {
   __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
 }
 
 export interface SdkMethodResponse {
@@ -543,6 +560,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;
   kind: "http";
   path: string;
+  uriTemplate: string;
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;
@@ -564,24 +582,23 @@ interface SdkMethodBase extends DecoratedType {
   access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   description?: string;
+  /**
+   * @deprecated Use `doc` and `summary` instead.
+   */
   details?: string;
+  doc?: string;
+  summary?: string;
   crossLanguageDefintionId: string;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
-  /**
-   * @deprecated This property is deprecated. Access .correspondingMethodParams on the service parameters instead.
-   * @param serviceParam
-   */
-  getParameterMapping(serviceParam: SdkServiceParameter): SdkModelPropertyType[];
   operation: TServiceOperation;
   parameters: SdkMethodParameter[];
-  /**
-   * @deprecated This property is deprecated. Access .resultPath on the method response instead.
-   */
-  getResponseMapping(): string | undefined;
   response: SdkMethodResponse;
   exception?: SdkMethodResponse;
   generateConvenient: boolean;

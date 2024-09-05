@@ -63,7 +63,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -85,7 +85,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -197,7 +197,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -216,7 +216,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/OperationState'
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -269,7 +269,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/OperationState'
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -390,7 +390,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/OperationState'
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -440,7 +440,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -468,7 +468,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -586,7 +586,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -605,7 +605,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/OperationState'
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -697,7 +697,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -719,7 +719,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -788,7 +788,7 @@ paths:
                         description: The unique ID of the operation.
                       status:
                         allOf:
-                          - $ref: '#/components/schemas/OperationState'
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                         description: The status of the operation
                       error:
                         allOf:
@@ -809,7 +809,7 @@ paths:
                         description: The unique ID of the operation.
                       status:
                         allOf:
-                          - $ref: '#/components/schemas/OperationState'
+                          - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                         description: The status of the operation
                       error:
                         allOf:
@@ -860,7 +860,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             ETag:
               required: false
               description: The entity tag for the response.
@@ -1012,7 +1012,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -1070,7 +1070,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/OperationState'
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1118,7 +1118,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -1137,7 +1137,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/OperationState'
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1196,7 +1196,7 @@ paths:
               required: false
               description: Indicates whether the repeatable request was accepted or rejected.
               schema:
-                $ref: '#/components/schemas/RepeatabilityResult'
+                $ref: '#/components/schemas/Azure.Core.RepeatabilityResult'
             x-ms-client-request-id:
               required: false
               description: An opaque, globally-unique, client-generated string identifier for the request.
@@ -1215,7 +1215,7 @@ paths:
                     description: The unique ID of the operation.
                   status:
                     allOf:
-                      - $ref: '#/components/schemas/OperationState'
+                      - $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
                     description: The status of the operation
                   error:
                     allOf:
@@ -1317,6 +1317,7 @@ components:
       schema:
         type: string
         minLength: 1
+      explode: false
     Azure.Core.MaxPageSizeQueryParameter:
       name: maxpagesize
       in: query
@@ -1325,6 +1326,7 @@ components:
       schema:
         type: integer
         format: int32
+      explode: false
     Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent:
       name: Repeatability-First-Sent
       in: header
@@ -1349,7 +1351,6 @@ components:
         type: array
         items:
           type: string
-      explode: true
     Azure.Core.SkipQueryParameter:
       name: skip
       in: query
@@ -1359,6 +1360,7 @@ components:
         type: integer
         format: int32
         default: 0
+      explode: false
     Azure.Core.TopQueryParameter:
       name: top
       in: query
@@ -1367,6 +1369,7 @@ components:
       schema:
         type: integer
         format: int32
+      explode: false
     WidgetRepairStatusParams:
       name: widgetId
       in: path
@@ -1421,6 +1424,23 @@ components:
             - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
           description: Inner error.
       description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.
+    Azure.Core.Foundations.OperationState:
+      anyOf:
+        - type: string
+          enum:
+            - NotStarted
+            - Running
+            - Succeeded
+            - Failed
+            - Canceled
+        - type: string
+      description: Enum describing allowed operation states.
+    Azure.Core.RepeatabilityResult:
+      type: string
+      enum:
+        - accepted
+        - rejected
+      description: Repeatability Result header options
     Azure.Core.eTag:
       type: string
       format: eTag
@@ -1457,17 +1477,6 @@ components:
           description: The entity tag for this resource.
           readOnly: true
       description: A manufacturer of widgets.
-    OperationState:
-      anyOf:
-        - type: string
-          enum:
-            - NotStarted
-            - Running
-            - Succeeded
-            - Failed
-            - Canceled
-        - type: string
-      description: Enum describing allowed operation states.
     PagedManufacturer:
       type: object
       required:
@@ -1513,12 +1522,6 @@ components:
           format: uri
           description: The link to the next page of items
       description: Paged collection of WidgetPart items
-    RepeatabilityResult:
-      type: string
-      enum:
-        - accepted
-        - rejected
-      description: Repeatability Result header options
     Versions:
       type: string
       enum:

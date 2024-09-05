@@ -16,7 +16,10 @@ import {
   isAzureResource,
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
-import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
+import {
+  getClientNameOverride,
+  shouldFlattenProperty,
+} from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
@@ -85,6 +88,7 @@ import {
   isTemplateDeclarationOrInstance,
   isVoidType,
   navigateTypesInNamespace,
+  reportDeprecated,
   resolveEncodedName,
   resolvePath,
 } from "@typespec/compiler";
@@ -106,9 +110,9 @@ import {
   OAuth2FlowType,
   Visibility,
   createMetadataInfo,
-  getAllHttpServices,
   getAuthentication,
   getHeaderFieldOptions,
+  getHttpService,
   getServers,
   getStatusCodeDescription,
   getVisibilitySuffix,
@@ -341,8 +345,8 @@ export async function getOpenAPIForService(
   const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
   program.reportDiagnostics(diagnostics);
 
-  const services = ignoreDiagnostics(getAllHttpServices(program));
-  const routes = services[0].operations;
+  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
+  const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
   routes.forEach(emitOperation);
@@ -877,6 +881,7 @@ export async function getOpenAPIForService(
     );
     delete header.in;
     delete header.name;
+    delete header["x-ms-client-name"];
     delete header.required;
     return header;
   }
@@ -1255,8 +1260,10 @@ export async function getOpenAPIForService(
       required: !param.optional,
       description: getDoc(program, param),
     };
-    if (param.name !== base.name) {
-      base["x-ms-client-name"] = param.name;
+
+    const clientName = getClientName(context, param);
+    if (name !== clientName) {
+      base["x-ms-client-name"] = clientName;
     }
 
     attachExtensions(param, base);
@@ -1269,11 +1276,34 @@ export async function getOpenAPIForService(
     name?: string,
     bodySchema?: any
   ): OpenAPI2BodyParameter {
-    return {
+    const result: OpenAPI2BodyParameter = {
       in: "body",
       ...getOpenAPI2ParameterBase(param, name),
       schema: bodySchema,
     };
+
+    const jsonName = getJsonName(param);
+    if (jsonName !== param.name) {
+      // Special case to be able to keep pre-existing cases where you have both the body parameter name and x-ms-client-name
+      reportDeprecated(
+        program,
+        "Using encodedName for the body property is meaningless. That property is not serialized as Json. If wanting to rename it use @Azure.ClientGenerator.Core.clientName",
+        param.decorators.find((x) => x.definition?.name === "@encodedName")?.node ?? param
+      );
+      result.name = jsonName;
+
+      if (!result["x-ms-client-name"]) {
+        result["x-ms-client-name"] = param.name;
+      }
+    } else {
+      // For body parameter the only value of the name is in the client so no need to keep the original one
+      if (result["x-ms-client-name"]) {
+        result.name = result["x-ms-client-name"];
+        delete result["x-ms-client-name"];
+      }
+    }
+
+    return result;
   }
 
   function getOpenAPI2FormDataParameter(
@@ -1459,7 +1489,11 @@ export async function getOpenAPIForService(
     // TYPESPEC type.
     for (const group of processedSchemas.values()) {
       for (const [visibility, processed] of group) {
-        let name = getOpenAPITypeName(program, processed.type, typeNameOptions);
+        let name = getClientNameOverride(context.tcgcSdkContext, processed.type);
+        if (name === undefined) {
+          name = getOpenAPITypeName(program, processed.type, typeNameOptions);
+        }
+
         if (processed.getSchemaNameOverride !== undefined) {
           name = processed.getSchemaNameOverride(name, visibility);
         } else if (group.size > 1) {
@@ -1676,8 +1710,10 @@ export async function getOpenAPIForService(
     let foundCustom = false;
     for (const [name, member] of e.flattenedMembers.entries()) {
       const description = getDoc(program, member.type);
+      const memberClientName = getClientNameOverride(context.tcgcSdkContext, member.type);
+
       values.push({
-        name: typeof name === "string" ? name : `${member.value}`,
+        name: memberClientName ?? (typeof name === "string" ? name : `${member.value}`),
         value: member.value,
         description,
       });
@@ -2252,9 +2288,10 @@ export async function getOpenAPIForService(
       let foundCustom = false;
       for (const member of type.members.values()) {
         const description = getDoc(program, member);
+        const memberClientName = getClientName(context, member);
         values.push({
           name: member.name,
-          value: member.value ?? member.name,
+          value: member.value ?? memberClientName,
           description,
         });
 

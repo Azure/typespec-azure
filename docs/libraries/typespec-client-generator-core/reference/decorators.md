@@ -10,17 +10,19 @@ toc_max_heading_level: 3
 
 ### `@access` {#@Azure.ClientGenerator.Core.access}
 
-Set explicit access for operations, models and enums.
-When setting access for models,
-the access info wll not be propagated to models' properties, base models or sub models.
+Override access for operations, models and enums.
+When setting access for namespaces,
+the access info will be propagated to the models and operations defined in the namespace.
+If the model has an access override, the model override takes precedence.
 When setting access for an operation,
 it will influence the access info for models/enums that are used by this operation.
-Models/enums that are used in any operations with `@access(Access.public)` will be implicitly set to access "public"
-Models/enums that are only used in operations with `@access(Access.internal)` will be implicitly set to access "internal".
-This influence will be propagated to models' properties, parent models, discriminated sub models.
-But this influence will be override by `@usage` decorator on models/enums directly.
-If an operation/model/enum has no `@access` decorator and is not influenced by any operation with `@access` decorator,
-the access result is undefined.
+Models/enums that are used in any operations with `@access(Access.public)` will be set to access "public"
+Models/enums that are only used in operations with `@access(Access.internal)` will be set to access "internal".
+The access info for models will be propagated to models' properties,
+parent models, discriminated sub models.
+The override access should not be narrow than the access calculated by operation,
+and different override access should not conflict with each other,
+otherwise a warning will be added to diagnostics list.
 
 ```typespec
 @Azure.ClientGenerator.Core.access(value: EnumMember, scope?: valueof string)
@@ -28,7 +30,7 @@ the access result is undefined.
 
 #### Target
 
-`Model | Operation | Enum | Union`
+`Model | Operation | Enum | Union | Namespace`
 
 #### Parameters
 
@@ -102,10 +104,10 @@ model Test1 {}
 @route("/func1")
 op func1(@body body: Test1): void;
 
-// undefined
+// Access.public
 model Test2 {}
 
-// undefined
+// Access.public
 @route("/func2")
 op func2(@body body: Test2): void;
 
@@ -117,7 +119,7 @@ model Test3 {}
 @route("/func3")
 op func3(@body body: Test3): void;
 
-// undefined
+// Access.public
 model Test4 {}
 
 // Access.internal
@@ -125,7 +127,7 @@ model Test4 {}
 @route("/func4")
 op func4(@body body: Test4): void;
 
-// undefined
+// Access.public
 @route("/func5")
 op func5(@body body: Test4): void;
 
@@ -137,7 +139,7 @@ model Test5 {}
 @route("/func6")
 op func6(@body body: Test5): void;
 
-// undefined
+// Access.public
 @route("/func7")
 op func7(@body body: Test5): void;
 
@@ -199,38 +201,43 @@ interface MyInterface {}
 interface MyInterface {}
 ```
 
-### `@clientFormat` {#@Azure.ClientGenerator.Core.clientFormat}
+### `@clientInitialization` {#@Azure.ClientGenerator.Core.clientInitialization}
 
-:::warning
-**Deprecated**: @clientFormat decorator is deprecated. Use `@encode` decorator in `@typespec/compiler` instead.
-:::
-
-DEPRECATED: Use `@encode` decorator in `@typespec/compiler` instead.
-
-Can be used to explain the client type that the current TYPESPEC
-type should map to.
+Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
 
 ```typespec
-@Azure.ClientGenerator.Core.clientFormat(value: valueof "unixtime" | "iso8601" | "rfc1123" | "seconds")
+@Azure.ClientGenerator.Core.clientInitialization(options: Model, scope?: valueof string)
 ```
 
 #### Target
 
-`ModelProperty`
+`Namespace | Interface`
 
 #### Parameters
 
-| Name  | Type                                                        | Description                 |
-| ----- | ----------------------------------------------------------- | --------------------------- |
-| value | `valueof "unixtime" \| "iso8601" \| "rfc1123" \| "seconds"` | The client format to apply. |
+| Name    | Type             | Description                                                                                                   |
+| ------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| options | `Model`          |                                                                                                               |
+| scope   | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
 
 #### Examples
 
 ```typespec
-model MyModel {
-  @clientFormat("unixtime")
-  created_at?: int64;
+// main.tsp
+namespace MyService;
+
+op upload(blobName: string): void;
+op download(blobName: string): void;
+
+// client.tsp
+namespace MyCustomizations;
+model MyServiceClientOptions {
+  blobName: string;
 }
+
+@@clientInitialization(MyService, MyServiceClientOptions)
+// The generated client will have `blobName` on it. We will also
+// elevate the existing `blobName` parameter to the client level.
 ```
 
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
@@ -293,40 +300,6 @@ Whether you want to generate an operation as a convenient operation.
 op test: void;
 ```
 
-### `@exclude` {#@Azure.ClientGenerator.Core.exclude}
-
-:::warning
-**Deprecated**: @exclude decorator is deprecated. Use `@usage` and `@access` decorator instead.
-:::
-
-DEPRECATED: Use `@usage` and `@access` decorator instead.
-
-Whether to exclude a model from generation for specific languages. By default we generate
-all models that are included in operations.
-
-```typespec
-@Azure.ClientGenerator.Core.exclude(scope?: valueof string)
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-#### Examples
-
-```typespec
-@exclude("python")
-model ModelToExclude {
-  prop: string;
-}
-```
-
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
 
 :::warning
@@ -357,72 +330,6 @@ model Foo {
   prop: Bar;
 }
 model Bar {}
-```
-
-### `@include` {#@Azure.ClientGenerator.Core.include}
-
-:::warning
-**Deprecated**: @include decorator is deprecated. Use `@usage` and `@access` decorator instead.
-:::
-
-DEPRECATED: Use `@usage` and `@access` decorator instead.
-
-Whether to include a model in generation for specific languages. By default we generate
-all models that are included in operations.
-
-```typespec
-@Azure.ClientGenerator.Core.include(scope?: valueof string)
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-#### Examples
-
-```typespec
-@include("python")
-model ModelToInclude {
-  prop: string;
-}
-```
-
-### `@internal` {#@Azure.ClientGenerator.Core.internal}
-
-:::warning
-**Deprecated**: @internal decorator is deprecated. Use `@access` decorator instead.
-:::
-
-DEPRECATED: Use `@access` decorator instead.
-
-Whether to mark an operation as internal for specific languages,
-meaning it should not be exposed to end SDK users
-
-```typespec
-@Azure.ClientGenerator.Core.internal(scope?: valueof string)
-```
-
-#### Target
-
-`Operation`
-
-#### Parameters
-
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
-
-#### Examples
-
-```typespec
-@internal("python")
-op test: void;
 ```
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
@@ -510,6 +417,46 @@ op myOperationCustomization(params: Params): void;
 // method signature is now `op myOperation(params: Params)` just for csharp
 ```
 
+### `@paramAlias` {#@Azure.ClientGenerator.Core.paramAlias}
+
+Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+
+```typespec
+@Azure.ClientGenerator.Core.paramAlias(paramAlias: valueof string, scope?: valueof string)
+```
+
+#### Target
+
+`ModelProperty`
+
+#### Parameters
+
+| Name       | Type             | Description                                                                                                   |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| paramAlias | `valueof string` |                                                                                                               |
+| scope      | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+#### Examples
+
+```typespec
+// main.tsp
+namespace MyService;
+
+op upload(blobName: string): void;
+
+// client.tsp
+namespace MyCustomizations;
+model MyServiceClientOptions {
+  blob: string;
+}
+
+@@clientInitialization(MyService, MyServiceClientOptions)
+@@paramAlias(MyServiceClientOptions.blob, "blobName")
+
+// The generated client will have `blobName` on it. We will also
+// elevate the existing `blob` parameter to the client level.
+```
+
 ### `@protocolAPI` {#@Azure.ClientGenerator.Core.protocolAPI}
 
 Whether you want to generate an operation as a protocol operation.
@@ -538,18 +485,21 @@ op test: void;
 
 ### `@usage` {#@Azure.ClientGenerator.Core.usage}
 
-Expand usage for models/enums.
+Override usage for models/enums.
 A model/enum's default usage info is always calculated by the operations that use it.
-You could use this decorator to expand the default usage info.
+You could use this decorator to override the default usage info.
+When setting usage for namespaces,
+the usage info will be propagated to the models defined in the namespace.
+If the model has an usage override, the model override takes precedence.
 For example, with operation definition `op test(): OutputModel`,
 the model `OutputModel` has default usage `Usage.output`.
-After adding decorator `@@usage(OutputModel, Usage.input)`,
+After adding decorator `@@usage(OutputModel, Usage.input | Usage.output)`,
 the final usage result for `OutputModel` is `Usage.input | Usage.output`.
-The calculation of default usage info for models will be propagated to models' properties,
+The usage info for models will be propagated to models' properties,
 parent models, discriminated sub models.
-But the expanded usage from `@usage` decorator will not be propagated.
-If you want to do any customization for the usage of a model,
-you need to take care of all related models/enums.
+The override usage should not be narrow than the usage calculated by operation,
+and different override usage should not conflict with each other,
+otherwise a warning will be added to diagnostics list.
 
 ```typespec
 @Azure.ClientGenerator.Core.usage(value: EnumMember | Union, scope?: valueof string)
@@ -557,7 +507,7 @@ you need to take care of all related models/enums.
 
 #### Target
 
-`Model | Enum | Union`
+`Model | Enum | Union | Namespace`
 
 #### Parameters
 
@@ -616,4 +566,31 @@ model Origin {
 
 @get
 op getModel(): Fish;
+```
+
+### `@useSystemTextJsonConverter` {#@Azure.ClientGenerator.Core.useSystemTextJsonConverter}
+
+Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
+
+```typespec
+@Azure.ClientGenerator.Core.useSystemTextJsonConverter(scope?: valueof string)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                   |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+#### Examples
+
+```typespec
+@useSystemTextJsonConverter
+model MyModel {
+  prop: string;
+}
 ```

@@ -18,7 +18,7 @@ function $ensureTraitsPresent(
 | `context` | `DecoratorContext` |
 | `target` | `Interface` \| `Operation` |
 | `traitModel` | `Model` |
-| `expectedTraits` | `Tuple` |
+| `expectedTraits` | `Type` |
 
 ## Returns
 

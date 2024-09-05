@@ -14,7 +14,7 @@ function getSdkUnionWithDiagnostics(
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Union` |
 | `operation`? | `Operation` |
 

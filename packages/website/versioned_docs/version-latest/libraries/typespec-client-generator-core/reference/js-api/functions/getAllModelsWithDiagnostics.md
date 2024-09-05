@@ -11,7 +11,7 @@ function getAllModelsWithDiagnostics(context, options): [(SdkModelType | SdkEnum
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `options` | `GetAllModelsOptions` |
 
 ## Returns
