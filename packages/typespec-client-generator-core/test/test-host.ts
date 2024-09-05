@@ -168,9 +168,9 @@ export async function createSdkTestRunner(
 
   // compile with dummy arm service definition
   sdkTestRunner.compileWithBuiltInAzureResourceManagerService =
-  async function compileWithBuiltInAzureResourceManagerService(code) {
-    const result = await baseCompile(
-      `
+    async function compileWithBuiltInAzureResourceManagerService(code) {
+      const result = await baseCompile(
+        `
     @armProviderNamespace("My.Service")
     @server("http://localhost:3000", "endpoint")
     @service({title: "My.Service"})
@@ -185,17 +185,17 @@ export async function createSdkTestRunner(
       V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
     ${code}`,
-      {
-        noEmit: true,
-      }
-    );
-    sdkTestRunner.context = await createSdkContextTestHelper(
-      sdkTestRunner.program,
-      options,
-      sdkContextOption
-    );
-    return result;
-  };
+        {
+          noEmit: true,
+        }
+      );
+      sdkTestRunner.context = await createSdkContextTestHelper(
+        sdkTestRunner.program,
+        options,
+        sdkContextOption
+      );
+      return result;
+    };
 
   const mainAutoCode = [
     ...host.libraries

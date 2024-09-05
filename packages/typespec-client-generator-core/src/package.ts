@@ -660,7 +660,9 @@ function addDefaultClientParameters<
   if (apiVersionParam) {
     client.initialization.properties.push(apiVersionParam);
   }
-  let subId = context.__clientToParameters.get(client.__raw.type)?.find((x) => isSubscriptionId(context, x));
+  let subId = context.__clientToParameters
+    .get(client.__raw.type)
+    ?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
     for (const operationGroup of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an subId param, the top level needs it as well
