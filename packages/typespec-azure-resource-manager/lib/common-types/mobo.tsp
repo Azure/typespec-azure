@@ -7,6 +7,7 @@ namespace Azure.ResourceManager.CommonTypes;
 @added(Versions.v5)
 model ManagedOnBehalfOfConfiguration {
   /** Managed-On-Behalf-Of broker resources */
+  @visibility("read")
   moboBrokerResources?: MoboBrokerResource[];
 }
 
@@ -14,6 +15,5 @@ model ManagedOnBehalfOfConfiguration {
 @added(Versions.v5)
 model MoboBrokerResource {
   /** Resource identifier of a Managed-On-Behalf-Of broker resource */
-  @format("arm-id")
-  id?: string;
+  id?: Azure.Core.armResourceIdentifier;
 }

@@ -16,6 +16,7 @@
           "items": {
             "$ref": "#/definitions/MoboBrokerResource"
           },
+          "readOnly": true,
           "x-ms-identifiers": [
             "id"
           ]
