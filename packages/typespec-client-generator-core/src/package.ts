@@ -666,7 +666,7 @@ function addDefaultClientParameters<
       // if any sub operation groups have an subId param, the top level needs it as well
       subId = context.__clientToParameters
         .get(operationGroup.type)
-        ?.find((x) => x.isApiVersionParam);
+        ?.find((x) => isSubscriptionId(context, x));
       if (apiVersionParam) break;
     }
   }

@@ -34,6 +34,7 @@ export interface SdkTestRunner extends BasicTestRunner {
   context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
+  compileWithBuiltInAzureResourceManagerService(code: string): Promise<Record<string, Type>>;
   compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
   compileWithVersionedService(code: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
@@ -164,6 +165,37 @@ export async function createSdkTestRunner(
       );
       return result;
     };
+
+  // compile with dummy arm service definition
+  sdkTestRunner.compileWithBuiltInAzureResourceManagerService =
+  async function compileWithBuiltInAzureResourceManagerService(code) {
+    const result = await baseCompile(
+      `
+    @armProviderNamespace("My.Service")
+    @server("http://localhost:3000", "endpoint")
+    @service({title: "My.Service"})
+    @versioned(Versions)
+    @armCommonTypesVersion(CommonTypes.Versions.v5)
+    namespace My.Service;
+
+    /** Api versions */
+    enum Versions {
+      /** 2024-04-01-preview api version */
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      V2024_04_01_PREVIEW: "2024-04-01-preview",
+    }
+    ${code}`,
+      {
+        noEmit: true,
+      }
+    );
+    sdkTestRunner.context = await createSdkContextTestHelper(
+      sdkTestRunner.program,
+      options,
+      sdkContextOption
+    );
+    return result;
+  };
 
   const mainAutoCode = [
     ...host.libraries
