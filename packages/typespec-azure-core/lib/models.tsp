@@ -403,9 +403,9 @@ model ArmResourceIdentifierAllowedResource {
 
 @doc("Used in file part of multipart request body")
 model MultiPartFile extends File {
-  @doc("The file name in file part of multipart request body")
+  /** The file name in file part of multipart request body */
   filename: string;
 
-  @doc("The content type in file part of multipart request body")
+  /** The content type in file part of multipart request body */
   contentType: string;
 }

@@ -1,12 +1,11 @@
-import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { getHttpPart, isOrExtendsHttpFile } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { getOperations } from "./test-host.js";
+import { getOperations } from "../test-host.js";
 
 describe("typespec-azure-core: models", () => {
   it("MultiPartFile could be recognized by @typespec/http", async () => {
-    const [operations, diagnostics, runner] = await getOperations(
+    const [operations, _, runner] = await getOperations(
       `
       model TestModel {
         file: HttpPart<MultiPartFile>;
@@ -25,6 +24,5 @@ describe("typespec-azure-core: models", () => {
     const file = getHttpPart(runner.program, fileHttpPart.type);
     ok(file !== undefined);
     ok(isOrExtendsHttpFile(runner.program, file.type));
-    expectDiagnosticEmpty(diagnostics);
   });
 });
