@@ -1237,9 +1237,9 @@ model Azure.ResourceManager.CommonTypes.ManagedOnBehalfOfConfiguration
 
 #### Properties
 
-| Name                 | Type                                                                                           | Description                            |
-| -------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------- |
-| moboBrokerResources? | [`MoboBrokerResource[]`](./data-types.md#Azure.ResourceManager.CommonTypes.MoboBrokerResource) | Managed-On-Behalf-Of broker resources. |
+| Name                 | Type                                               | Description                           |
+| -------------------- | -------------------------------------------------- | ------------------------------------- |
+| moboBrokerResources? | `ResourceManager.CommonTypes.MoboBrokerResource[]` | Managed-On-Behalf-Of broker resources |
 
 ### `ManagedServiceIdentity` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity}
 
@@ -1282,9 +1282,9 @@ model Azure.ResourceManager.CommonTypes.MoboBrokerResource
 
 #### Properties
 
-| Name | Type                         | Description                                                    |
-| ---- | ---------------------------- | -------------------------------------------------------------- |
-| id?  | `Core.armResourceIdentifier` | Resource identifier of a Managed-On-Behalf-Of broker resource. |
+| Name | Type                         | Description                                                   |
+| ---- | ---------------------------- | ------------------------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | Resource identifier of a Managed-On-Behalf-Of broker resource |
 
 ### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
 
