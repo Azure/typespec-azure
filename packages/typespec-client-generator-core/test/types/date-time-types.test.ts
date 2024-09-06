@@ -1,5 +1,5 @@
-import { strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { strictEqual, ok } from "assert";
+import { beforeEach, describe, afterEach, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
@@ -24,7 +24,16 @@ describe("typespec-client-generator-core: date-time types", () => {
     strictEqual(sdkType.wireType.kind, "string");
     strictEqual(sdkType.encode, "rfc3339");
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("rfc3339", async function () {
     await runner.compileWithBuiltInService(
       `

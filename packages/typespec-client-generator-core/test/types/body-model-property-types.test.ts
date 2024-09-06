@@ -1,5 +1,5 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { isReadOnly } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkBodyModelPropertyTypeHelper } from "./utils.js";
@@ -10,7 +10,16 @@ describe("typespec-client-generator-core: body model property types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("required", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -134,12 +143,12 @@ describe("typespec-client-generator-core: body model property types", () => {
     strictEqual(values[1].kind, "int32");
   });
   it("versioning", async function () {
-    const runnerWithVersion = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       "api-version": "all",
       emitterName: "@azure-tools/typespec-python",
     });
 
-    await runnerWithVersion.compile(`
+    await runner.compile(`
         @versioned(Versions)
         @service({title: "Widget Service"})
         namespace DemoService;
@@ -164,7 +173,7 @@ describe("typespec-client-generator-core: body model property types", () => {
           removedProp: string;
         }
       `);
-    const sdkModel = runnerWithVersion.context.sdkPackage.models.find((x) => x.kind === "model");
+    const sdkModel = runner.context.sdkPackage.models.find((x) => x.kind === "model");
     ok(sdkModel);
     strictEqual(sdkModel.kind, "model");
 
