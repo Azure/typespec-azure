@@ -1,7 +1,7 @@
 ---
-changeKind: breaking
+changeKind: fix
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Filter Core models directly instead of clear their usage
+Don't filter out redefinitions of `Azure.Core` models when filtering out `Azure.Core` models
