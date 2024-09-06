@@ -822,6 +822,23 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 0);
   });
+  it("filtering models doesn't remove redefs", async () => {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core", "Azure.Core.Foundations"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      model HealthInsightsErrorResponse is ErrorResponse {
+        ...RequestIdResponseHeader;
+      }
+      op foo(): OkResponse | HealthInsightsErrorResponse;
+  `);
+    const sdkPackage = runnerWithCore.context.sdkPackage;
+    const models = sdkPackage.models;
+    strictEqual(models.length, 1);
+    strictEqual(models[0].name, "HealthInsightsErrorResponse");
+  });
   it("input usage", async () => {
     await runner.compileWithBuiltInService(`
         model InputModel {
