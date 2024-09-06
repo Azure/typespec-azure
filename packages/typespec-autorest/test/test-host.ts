@@ -75,39 +75,69 @@ export async function emitOpenApiWithDiagnostics(
   return [doc, ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"])];
 }
 
-export async function openApiFor(
+interface CompileOpenAPIOptions {
+  host?: TestHost;
+  options?: AutorestEmitterOptions;
+}
+
+export async function compileOpenAPI(
   code: string,
-  versions?: string[],
-  options: AutorestEmitterOptions = {}
-) {
-  const runner = await createAutorestTestRunner();
+  options: CompileOpenAPIOptions = {}
+): Promise<OpenAPI2Document> {
+  const runner = await createAutorestTestRunner(options.host);
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
     emitters: {
       [AutorestTestLibrary.name]: {
-        ...options,
+        ...options.options,
         "emitter-output-dir": resolveVirtualPath("tsp-output"),
       },
     },
   });
 
-  if (versions) {
-    const output: any = {};
-    for (const version of versions) {
-      output[version] = JSON.parse(
-        runner.fs.get(resolveVirtualPath("tsp-output", version, "openapi.json"))!
-      );
-    }
-    return output;
-  }
-  expectDiagnosticEmpty(
-    ignoreDiagnostics(diagnostics, [
-      "@azure-tools/typespec-azure-core/use-standard-operations",
-      "@typespec/http/no-service-found",
-    ])
-  );
+  expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
   const outPath = resolveVirtualPath("tsp-output", "openapi.json");
   return JSON.parse(runner.fs.get(outPath)!);
+}
+
+export async function compileVersionedOpenAPI<K extends string>(
+  code: string,
+  versions: K[],
+  options: CompileOpenAPIOptions = {}
+): Promise<Record<K, OpenAPI2Document>> {
+  const runner = await createAutorestTestRunner(options.host);
+  const diagnostics = await runner.diagnose(code, {
+    noEmit: false,
+    emitters: {
+      [AutorestTestLibrary.name]: {
+        ...options.options,
+        "emitter-output-dir": resolveVirtualPath("tsp-output"),
+      },
+    },
+  });
+  expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
+
+  const output: any = {};
+  for (const version of versions) {
+    output[version] = JSON.parse(
+      runner.fs.get(resolveVirtualPath("tsp-output", version, "openapi.json"))!
+    );
+  }
+  return output;
+}
+
+/**
+ * Deprecated use `compileOpenAPI` or `compileVersionedOpenAPI` instead
+ */
+export async function openApiFor(
+  code: string,
+  versions?: string[],
+  options: AutorestEmitterOptions = {}
+): Promise<any> {
+  if (versions) {
+    return compileVersionedOpenAPI(code, versions, { options });
+  }
+  return compileOpenAPI(code, { options });
 }
 
 export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterOptions = {}) {
@@ -120,7 +150,7 @@ export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterO
 }
 
 export async function oapiForModel(name: string, modelDef: string) {
-  const oapi = await openApiFor(`
+  const oapi = await compileOpenAPI(`
     ${modelDef};
     @service({title: "Testing model"})
     @route("/")
@@ -130,13 +160,13 @@ export async function oapiForModel(name: string, modelDef: string) {
     }
   `);
 
-  const response = oapi.paths["/"].get.responses[200];
-  const useSchema = response?.schema;
+  const response = oapi.paths["/"]?.get?.responses?.[200];
+  const useSchema = (response as any)?.schema;
 
   return {
     isRef: !!useSchema?.$ref,
     useSchema,
-    defs: oapi.definitions,
+    defs: oapi.definitions as any,
     response: response,
   };
 }

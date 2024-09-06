@@ -210,7 +210,7 @@ export type OpenAPI2Schema = Extensions & {
    * Declares the value of the property that the server will use if none is provided,
    * for example a "count" to control the number of results per page might default to 100 if not supplied by the client in the request.
    *
-   * @note "default" has no meaning for required parameters.) See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.2. Unlike JSON Schema this value MUST conform to the defined type for this parameter. */
+   * "default" has no meaning for required parameters.) See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.2. Unlike JSON Schema this value MUST conform to the defined type for this parameter. */
   default?: string | boolean | number | Record<string, unknown>;
 
   /**
