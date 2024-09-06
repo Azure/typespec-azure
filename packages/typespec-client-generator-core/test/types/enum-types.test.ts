@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Enum, Model, Union } from "@typespec/compiler";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
 import { getClientType, getSdkEnum } from "../../src/types.js";
 import {
@@ -16,7 +16,16 @@ describe("typespec-client-generator-core: enum types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("string extensible", async function () {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
@@ -200,12 +209,12 @@ describe("typespec-client-generator-core: enum types", () => {
   });
 
   it("string fixed", async function () {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
       #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
       @doc(".")
       @fixed
@@ -227,9 +236,9 @@ describe("typespec-client-generator-core: enum types", () => {
         prop: DaysOfWeekFixedEnum
       }
       `);
-    strictEqual(runnerWithCore.context.sdkPackage.models.length, 1);
-    strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
-    const sdkType = runnerWithCore.context.sdkPackage.enums[0];
+    strictEqual(runner.context.sdkPackage.models.length, 1);
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    const sdkType = runner.context.sdkPackage.enums[0];
     strictEqual(sdkType.isFixed, true);
     strictEqual(sdkType.name, "DaysOfWeekFixedEnum");
     strictEqual(sdkType.crossLanguageDefinitionId, "My.Service.DaysOfWeekFixedEnum");
@@ -648,12 +657,12 @@ describe("typespec-client-generator-core: enum types", () => {
   });
 
   it("versioned enums with all", async () => {
-    const runnerWithVersion = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       "api-version": "all",
       emitterName: "@azure-tools/typespec-python",
     });
 
-    await runnerWithVersion.compile(
+    await runner.compile(
       `
         @versioned(Versions)
         @service()
@@ -665,7 +674,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runnerWithVersion.context.sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
     strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -677,12 +686,12 @@ describe("typespec-client-generator-core: enum types", () => {
   });
 
   it("versioned enums with latest", async () => {
-    const runnerWithVersion = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       "api-version": "latest",
       emitterName: "@azure-tools/typespec-python",
     });
 
-    await runnerWithVersion.compile(
+    await runner.compile(
       `
         @versioned(Versions)
         @service()
@@ -694,7 +703,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runnerWithVersion.context.sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
     strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -706,12 +715,12 @@ describe("typespec-client-generator-core: enum types", () => {
   });
 
   it("versioned enums with specific version", async () => {
-    const runnerWithVersion = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       "api-version": "v1",
       emitterName: "@azure-tools/typespec-python",
     });
 
-    await runnerWithVersion.compile(
+    await runner.compile(
       `
         @versioned(Versions)
         @service()
@@ -723,7 +732,7 @@ describe("typespec-client-generator-core: enum types", () => {
         }
       `
     );
-    const enums = runnerWithVersion.context.sdkPackage.enums;
+    const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     strictEqual(enums[0].name, "Versions");
     strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
