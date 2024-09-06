@@ -402,7 +402,7 @@ model ArmResourceIdentifierAllowedResource {
 }
 
 @doc("Used in file part of multipart request body")
-model MultiPartFile extends File {
+model FileWithRequiredMetadata extends File {
   /** The file name in file part of multipart request body */
   filename: string;
 

@@ -455,7 +455,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(fileRequiredFileName.multipartOptions.contentType.optional, false);
   });
 
-  it("with MultiPartFile of Azure.Core", async function () {
+  it("with FileWithRequiredMetadata of Azure.Core", async function () {
     const runnerCore = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       emitterName: "@azure-tools/typespec-java",
@@ -464,7 +464,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     await runnerCore.compileWithBuiltInService(`
         model MultiPartRequest{
             fileOptionalFileName: HttpPart<File>;
-            fileRequiredFileName: HttpPart<MultiPartFile>;
+            fileRequiredFileName: HttpPart<FileWithRequiredMetadata>;
         }
         @post
         op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
