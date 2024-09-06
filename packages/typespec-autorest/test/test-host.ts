@@ -110,7 +110,7 @@ export async function compileVersionedOpenAPI<K extends string>(
     noEmit: false,
     emitters: {
       [AutorestTestLibrary.name]: {
-        ...options,
+        ...options.options,
         "emitter-output-dir": resolveVirtualPath("tsp-output"),
       },
     },
@@ -127,7 +127,7 @@ export async function compileVersionedOpenAPI<K extends string>(
 }
 
 /**
- * @deprecated use `compileOpenAPI` or `compileVersionedOpenAPI` instead
+ * Deprecated use `compileOpenAPI` or `compileVersionedOpenAPI` instead
  */
 export async function openApiFor(
   code: string,
