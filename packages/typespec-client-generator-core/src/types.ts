@@ -27,7 +27,7 @@ import {
   getVisibility,
   ignoreDiagnostics,
   isErrorModel,
-  isNeverType,
+  isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -44,7 +44,6 @@ import {
   getAccessOverride,
   getOverriddenClientMethod,
   getUsageOverride,
-  isExclude,
   isInclude,
   isInternal,
   listClients,
@@ -108,6 +107,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
+  isArrayOrDictTspType,
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
@@ -453,34 +453,32 @@ export function getSdkArrayOrDictWithDiagnostics(
 ): [(SdkDictionaryType | SdkArrayType) | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // if model with both indexer and properties or name should be a model with additional properties
-  if (type.indexer !== undefined && type.properties.size === 0) {
-    if (!isNeverType(type.indexer.key)) {
-      const valueType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, type.indexer.value!, operation)
-      );
-      const name = type.indexer.key.name;
-      if (name === "string" && type.name === "Record") {
-        // model MyModel is Record<> {} should be model with additional properties
-        if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
-          return diagnostics.wrap(undefined);
-        }
-        // other cases are dict
-        return diagnostics.wrap({
-          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "dict")),
-          keyType: diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, type.indexer.key, operation)
-          ),
-          valueType: valueType,
-        });
-      } else if (name === "integer") {
-        // only array's index key name is integer
-        return diagnostics.wrap({
-          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
-          name: getLibraryName(context, type),
-          valueType: valueType,
-          crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
-        });
+  if (type.indexer && isArrayOrDictTspType(type)) {
+    const valueType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, type.indexer.value!, operation)
+    );
+    const name = type.indexer.key.name;
+    if (name === "string" && type.name === "Record") {
+      // model MyModel is Record<> {} should be model with additional properties
+      if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
+        return diagnostics.wrap(undefined);
       }
+      // other cases are dict
+      return diagnostics.wrap({
+        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "dict")),
+        keyType: diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, type.indexer.key, operation)
+        ),
+        valueType: valueType,
+      });
+    } else if (name === "integer") {
+      // only array's index key name is integer
+      return diagnostics.wrap({
+        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
+        name: getLibraryName(context, type),
+        valueType: valueType,
+        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
+      });
     }
   }
   return diagnostics.wrap(undefined);
@@ -1333,6 +1331,17 @@ export function getSdkModelPropertyType(
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
   if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
+
+  if (
+    type.model &&
+    !isTemplateDeclarationOrInstance(type.model) &&
+    !isAzureCoreModel(type.model) &&
+    type.type.kind === "Model" &&
+    type.type.name
+  ) {
+    // we only count a model as having property usage if it's named, and is on a named model
+    updateUsageOfModel(context, UsageFlags.Property, base.type, { propagation: false });
+  }
   const result: SdkBodyModelPropertyType = {
     ...base,
     kind: "property",
@@ -1751,7 +1760,8 @@ function filterOutModels(context: TCGCContext, filter: number): (SdkModelType | 
     if (
       context.filterOutCoreModels &&
       ["Enum", "Model", "Union"].includes(type.kind) &&
-      isAzureCoreModel(type)
+      isAzureCoreModel(type) &&
+      !(sdkType.usage & UsageFlags.Property)
     ) {
       continue;
     }

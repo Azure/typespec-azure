@@ -40,6 +40,7 @@ import {
   getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
+  isArrayOrDictTspType,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
 
@@ -352,11 +353,23 @@ export function intOrFloat(value: number): "int32" | "float32" {
  * @returns
  */
 export function isAzureCoreModel(t: Type): boolean {
-  return (
-    (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
-    t.namespace !== undefined &&
-    ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
-  );
+  switch (t.kind) {
+    case "Model":
+      if (t.indexer && isArrayOrDictTspType(t)) {
+        return isAzureCoreModel(t.indexer.value!);
+      }
+      return (
+        t.namespace !== undefined &&
+        ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
+      );
+    case "Enum":
+    case "Union":
+      return (
+        t.namespace !== undefined &&
+        ["Azure.Core", "Azure.Core.Foundations"].includes(getNamespaceFullName(t.namespace))
+      );
+  }
+  return false;
 }
 
 export function isAcceptHeader(param: SdkModelPropertyType): boolean {

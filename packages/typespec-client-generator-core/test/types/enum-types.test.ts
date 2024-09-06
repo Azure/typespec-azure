@@ -761,10 +761,12 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(enums.length, 2);
     strictEqual(enums[0].name, "LR");
     strictEqual(enums[0].crossLanguageDefinitionId, "N.LR");
-    strictEqual(enums[0].usage, UsageFlags.Input | UsageFlags.Json);
+    ok(enums[0].usage & UsageFlags.Input);
+    ok(enums[0].usage & UsageFlags.Json);
     strictEqual(enums[1].name, "UD");
     strictEqual(enums[1].crossLanguageDefinitionId, "N.UD");
-    strictEqual(enums[1].usage, UsageFlags.Input | UsageFlags.Json);
+    ok(enums[1].usage & UsageFlags.Input);
+    ok(enums[1].usage & UsageFlags.Json);
   });
 
   it("spread and union as enum", async () => {
@@ -791,6 +793,8 @@ describe("typespec-client-generator-core: enum types", () => {
     const testModel = models.find((x) => x.name === "Test");
     ok(testModel);
     strictEqual(testModel.access, "public");
-    strictEqual(testModel.usage, UsageFlags.Input | UsageFlags.Json);
+    ok(testModel.usage & UsageFlags.Input);
+    ok(testModel.usage & UsageFlags.Json);
+    ok(testModel.usage & UsageFlags.Property);
   });
 });

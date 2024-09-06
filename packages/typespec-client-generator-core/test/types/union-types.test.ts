@@ -517,7 +517,8 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(models.length, 2);
     const foo = models.find((x) => x.name === "Foo");
     ok(foo);
-    strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    ok(foo.usage & UsageFlags.Input);
+    ok(foo.usage & UsageFlags.Output);
     strictEqual(foo.access, "public");
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);

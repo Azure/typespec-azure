@@ -15,6 +15,7 @@ import {
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
+  isNeverType,
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
@@ -623,4 +624,13 @@ export function getHttpOperationExamples(
   operation: HttpOperation
 ): SdkHttpOperationExample[] {
   return context.__httpOperationExamples?.get(operation) ?? [];
+}
+
+export function isArrayOrDictTspType(type: Type): boolean {
+  return Boolean(
+    type.kind === "Model" &&
+      type.indexer &&
+      type.properties.size === 0 &&
+      !isNeverType(type.indexer.key)
+  );
 }

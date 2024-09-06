@@ -836,7 +836,9 @@ describe("typespec-client-generator-core: model types", () => {
   `);
     const sdkPackage = runnerWithCore.context.sdkPackage;
     const models = sdkPackage.models;
-    strictEqual(models.length, 1);
+    strictEqual(models.length, 2);
+    ok(models.find((x) => x.name === "HealthInsightsErrorResponse"));
+    ok(models.find((x) => x.name === "Error"));
     strictEqual(models[0].name, "HealthInsightsErrorResponse");
   });
   it("input usage", async () => {
@@ -907,10 +909,11 @@ describe("typespec-client-generator-core: model types", () => {
       models.find((x) => x.name === "RoundTripModel")?.usage,
       UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
     );
-    strictEqual(
-      models.find((x) => x.name === "ResultModel")?.usage,
-      UsageFlags.Output | UsageFlags.Json
-    );
+    const resultModel = models.find((x) => x.name === "ResultModel");
+    ok(resultModel);
+    ok(resultModel.usage & UsageFlags.Output);
+    ok(resultModel.usage & UsageFlags.Json);
+    ok(resultModel.usage & UsageFlags.Property);
   });
 
   it("usage propagation", async () => {

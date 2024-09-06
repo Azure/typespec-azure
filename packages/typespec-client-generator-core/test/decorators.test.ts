@@ -2446,7 +2446,11 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
       strictEqual(getUsage(runner.context, SawShark), UsageFlags.Output | UsageFlags.Json);
-      strictEqual(getUsage(runner.context, Origin), UsageFlags.Output | UsageFlags.Json);
+
+      const originUsage = getUsage(runner.context, Origin);
+      ok(originUsage & UsageFlags.Output);
+      ok(originUsage & UsageFlags.Json);
+      ok(originUsage & UsageFlags.Property);
     });
 
     it("usage and convenience", async () => {

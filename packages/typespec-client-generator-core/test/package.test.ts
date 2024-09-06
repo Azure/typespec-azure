@@ -2524,7 +2524,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(models.length, 1);
       const model = models.find((x) => x.name === "TestRequest");
       ok(model);
-      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Json);
+      ok(model.usage & UsageFlags.Input);
+      ok(model.usage & UsageFlags.Json);
 
       strictEqual(method.parameters.length, 2);
       const param = method.parameters[0];

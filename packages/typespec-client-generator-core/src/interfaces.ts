@@ -684,6 +684,8 @@ export enum UsageFlags {
   Json = 1 << 8,
   // Set when model is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
+  // Set when a model is used as a property of another model.
+  Property = 1 << 10,
 }
 
 interface SdkExampleBase {
