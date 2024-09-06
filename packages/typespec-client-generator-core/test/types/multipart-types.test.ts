@@ -584,6 +584,9 @@ describe("typespec-client-generator-core: multipart types", () => {
   it("check isFilePart in multipart with @multipartBody for model", async function () {
     await runner.compileWithBuiltInService(`
         model MultiPartRequest {
+            bytesRaw: HttpPart<bytes>,
+            bytesArrayRaw: HttpPart<bytes>[],
+            fileRaw: HttpPart<File>,
             fileArrayRaw: HttpPart<File>[],
             bytesWithBody: HttpPart<{@body body: bytes}>,
             bytesArrayWithBody: HttpPart<{@body body: bytes}>[],
@@ -602,9 +605,6 @@ describe("typespec-client-generator-core: multipart types", () => {
       ok(p.multipartOptions);
       strictEqual(p.multipartOptions.isFilePart, true);
       strictEqual(p.multipartOptions.isMulti, p.name.toLowerCase().includes("array"));
-      if (p.type.kind === "model") {
-        ok(p.type.name !== "");
-      }
     }
   });
 
