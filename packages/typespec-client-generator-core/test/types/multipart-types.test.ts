@@ -543,6 +543,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(stringWithContentType);
     strictEqual(stringWithContentType.type.kind, "model");
+    strictEqual(stringWithContentType.type.name, "MultiPartRequestStringWithContentType");
     ok(stringWithContentType.multipartOptions);
     ok(stringWithContentType.multipartOptions.contentType);
     deepEqual(stringWithContentType.multipartOptions.defaultContentTypes, ["text/html"]);
@@ -563,6 +564,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(bytesWithContentType);
     strictEqual(bytesWithContentType.type.kind, "model");
+    strictEqual(bytesWithContentType.type.name, "MultiPartRequestBytesWithContentType");
     ok(bytesWithContentType.multipartOptions);
     ok(bytesWithContentType.multipartOptions.contentType);
     deepEqual(bytesWithContentType.multipartOptions.defaultContentTypes, ["image/png"]);
