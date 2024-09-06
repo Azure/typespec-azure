@@ -474,7 +474,7 @@ function getContextPath(
       // Peel off HttpPart<MyRealType> to get "MyRealType"
       const typeWrappedByHttpPart = getHttpPart(context.program, currentType);
       if (typeWrappedByHttpPart) {
-        return dfsModelProperties(expectedType, typeWrappedByHttpPart.type, displayName)
+        return dfsModelProperties(expectedType, typeWrappedByHttpPart.type, displayName);
       }
 
       if (
@@ -485,7 +485,11 @@ function getContextPath(
       ) {
         // handle array or dict
         const dictOrArrayItemType: Type = currentType.indexer.value;
-        return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
+        return dfsModelProperties(
+          expectedType,
+          dictOrArrayItemType,
+          pluralize.singular(displayName)
+        );
       }
 
       // handle model

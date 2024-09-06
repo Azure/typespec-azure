@@ -1,6 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import {
   SdkBodyModelPropertyType,
   SdkClientType,
@@ -14,6 +14,17 @@ describe("typespec-client-generator-core: multipart types", () => {
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+  });
+
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
   });
 
   it("multipart form basic", async function () {
@@ -592,7 +603,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       strictEqual(p.multipartOptions.isFilePart, true);
       strictEqual(p.multipartOptions.isMulti, p.name.toLowerCase().includes("array"));
       if (p.type.kind === "model") {
-        ok(p.type.name !== "")
+        ok(p.type.name !== "");
       }
     }
   });
