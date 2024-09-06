@@ -803,22 +803,33 @@ export function getSdkModelWithDiagnostics(
 function getSdkEnumValueType(
   context: TCGCContext,
   values: (string | number | undefined)[]
-): [SdkBuiltInType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  let kind: "string" | "int32" | "float32" = "string";
+): SdkBuiltInType | SdkUnionType {
+  let stringType: SdkBuiltInType | undefined = undefined;
+  let numberType: SdkBuiltInType | undefined = undefined;
+
   for (const value of values) {
     if (typeof value === "number") {
-      kind = intOrFloat(value);
-      if (kind === "float32") {
-        break;
+      const calType = intOrFloat(value);
+      if (numberType === undefined || (numberType.kind === "int32" && calType === "float32")) {
+        numberType = getTypeSpecBuiltInType(context, calType);
       }
-    } else if (typeof value === "string") {
-      kind = "string";
-      break;
+    } else {
+      stringType = getTypeSpecBuiltInType(context, "string");
     }
   }
 
-  return diagnostics.wrap(getTypeSpecBuiltInType(context, kind!));
+  if (stringType === undefined || numberType === undefined) {
+    return stringType ?? numberType!;
+  } else {
+    return {
+      kind: "union",
+      values: [stringType, numberType],
+      name: "",
+      isGeneratedName: false,
+      crossLanguageDefinitionId: "",
+      decorators: [],
+    };
+  }
 }
 
 function getUnionAsEnumValueType(
@@ -889,11 +900,9 @@ function getSdkEnumWithDiagnostics(
       details: docWrapper.details,
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
-      valueType: diagnostics.pipe(
-        getSdkEnumValueType(
-          context,
-          [...type.members.values()].map((v) => v.value)
-        )
+      valueType: getSdkEnumValueType(
+        context,
+        [...type.members.values()].map((v) => v.value)
       ),
       values: [],
       isFixed: true, // enums are always fixed after we switch to use union to represent extensible enum
@@ -964,11 +973,9 @@ export function getSdkUnionEnumWithDiagnostics(
       summary: getSummary(context.program, union),
       valueType:
         diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
-        diagnostics.pipe(
-          getSdkEnumValueType(
-            context,
-            [...type.flattenedMembers.values()].map((v) => v.value)
-          )
+        getSdkEnumValueType(
+          context,
+          [...type.flattenedMembers.values()].map((v) => v.value)
         ),
       values: [],
       isFixed: !type.open,
@@ -1010,11 +1017,9 @@ function getKnownValuesEnum(
         details: docWrapper.details,
         doc: getDoc(context.program, type),
         summary: getSummary(context.program, type),
-        valueType: diagnostics.pipe(
-          getSdkEnumValueType(
-            context,
-            [...knownValues.members.values()].map((v) => v.value)
-          )
+        valueType: getSdkEnumValueType(
+          context,
+          [...knownValues.members.values()].map((v) => v.value)
         ),
         values: [],
         isFixed: false,
