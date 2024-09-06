@@ -68,6 +68,7 @@
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@types/node": "~18.11.19",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:~",

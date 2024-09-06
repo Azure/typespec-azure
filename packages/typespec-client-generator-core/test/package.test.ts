@@ -1,5 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -2174,6 +2176,43 @@ describe("typespec-client-generator-core: package", () => {
       ok(apiVersionOpParam);
       strictEqual(apiVersionOpParam.clientDefaultValue, "v2");
       strictEqual(apiVersionOpParam.correspondingMethodParams[0], apiVersionClientParam);
+    });
+
+    it("client level signatures by default", async () => {
+      const runnerWithArm = await createSdkTestRunner({
+        librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+        autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
+        model MyProperties {
+          @visibility("read")
+          @doc("Display name of the Azure Extended Zone.")
+          displayName: string;
+        }
+
+        @subscriptionResource
+        model MyModel is ProxyResource<MyProperties> {
+          @key("extendedZoneName")
+          @segment("extendedZones")
+          @path
+          name: string;
+        }
+
+        @armResourceOperations
+        interface MyInterface {
+          get is ArmResourceRead<MyModel>;
+        }
+      `);
+
+      const sdkPackage = runnerWithArm.context.sdkPackage;
+      const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
+        ?.response as SdkClientType<SdkHttpOperation>;
+      for (const name of ["apiVersion", "subscriptionId", "endpoint", "credential"]) {
+        const item = client.initialization.properties.find((x) => x.name === name);
+        ok(item !== undefined);
+        ok(item.onClient);
+      }
     });
 
     it("default api version for operation is", async () => {
