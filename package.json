@@ -40,7 +40,7 @@
     "@types/node": "~18.11.19",
     "@typescript-eslint/parser": "^7.17.0",
     "@typescript-eslint/utils": "^7.17.0",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^2.0.4",
     "c8": "^10.1.2",
     "cspell": "^8.12.1",
     "eslint": "^8.57.0",
