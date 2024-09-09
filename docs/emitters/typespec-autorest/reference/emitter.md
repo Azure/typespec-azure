@@ -79,11 +79,17 @@ Example: azureResourceProviderFolder is provided
 - `arm-folder/AzureService/preview/2020-01-01.yaml`
 - `arm-folder/AzureService/preview/2020-01-01.yaml`
 
+### `examples-dir`
+
+**Type:** `string`
+
+Directory where the examples are located. Default: `{project-root}/examples`.
+
 ### `examples-directory`
 
 **Type:** `string`
 
-Directory where the examples are located. Default: `{cwd}/examples`.
+DEPRECATED. Use examples-dir instead
 
 ### `version`
 

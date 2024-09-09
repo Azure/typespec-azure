@@ -169,6 +169,7 @@ describe("typespec-autorest: versioning", () => {
       `
       @versioned(Versions)
       @service({title: "My Service"})
+      #suppress "deprecated" "For testing"
       namespace MyService {
         enum Versions {
           @useDependency(MyLibrary.Versions.A)
@@ -192,6 +193,7 @@ describe("typespec-autorest: versioning", () => {
         op read1(): Test;
         op read2(): MyLibrary.Foo;
       }
+      #suppress "deprecated" "For testing"
       @versioned(Versions)
       namespace MyLibrary {
         enum Versions {A, B, C}
