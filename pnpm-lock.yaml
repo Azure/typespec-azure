@@ -36,6 +36,9 @@ importers:
       '@typescript-eslint/utils':
         specifier: ^7.15.0
         version: 7.15.0(eslint@8.57.0)(typescript@5.5.3)
+      '@vitest/coverage-v8':
+        specifier: ^1.6.0
+        version: 1.6.0(vitest@1.6.0(@types/node@18.11.19)(@vitest/ui@1.6.0)(happy-dom@14.12.3)(jsdom@19.0.0)(terser@5.31.1))
       c8:
         specifier: ^10.1.2
         version: 10.1.2
