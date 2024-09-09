@@ -11,38 +11,38 @@ configuration:
           - payloadType: Pull_Request
         then:
           - if:
-              - filesMatchPattern:
-                  pattern: eng/.*
+              - includesModifiedFiles:
+                  files:
+                    - eng/**/*
+                    - .github/**/*
             then:
               - addLabel:
                   label: eng
           - if:
-              - filesMatchPattern:
-                  pattern: .github/.*
-            then:
-              - addLabel:
-                  label: eng
-          - if:
-              - filesMatchPattern:
-                  pattern: packages/typespec-azure-core/.*
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-azure-core/**/*
             then:
               - addLabel:
                   label: lib:azure-core
           - if:
-              - filesMatchPattern:
-                  pattern: packages/typespec-azure-resource-manager/.*
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-azure-resource-manager/**/*
             then:
               - addLabel:
                   label: lib:azure-resource-manager
           - if:
-              - filesMatchPattern:
-                  pattern: packages/typespec-azurerest/.*
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-azurerest/**/*
             then:
               - addLabel:
                   label: emitter:autorest
           - if:
-              - filesMatchPattern:
-                  pattern: packages/typespec-client-generator-core/.*
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-client-generator-core/**/*
             then:
               - addLabel:
                   label: lib:tcgc
