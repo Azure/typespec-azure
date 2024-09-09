@@ -2225,6 +2225,9 @@ importers:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:~
         version: link:../typespec-azure-core
+      '@azure-tools/typespec-azure-resource-manager':
+        specifier: workspace:~
+        version: link:../typespec-azure-resource-manager
       '@types/node':
         specifier: ~18.11.19
         version: 18.11.19
