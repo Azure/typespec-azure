@@ -1,5 +1,23 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.6.0
+
+### Bug Fixes
+
+- [#1279](https://github.com/Azure/typespec-azure/pull/1279) fix the included versions value in typespec-autorest-canonical emitter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+
+## 0.5.1
+
+### Features
+
+- [#1237](https://github.com/Azure/typespec-azure/pull/1237) Use new `createTcgcContext` from tcgc lib, which is the minimal context object that handles scope
+
+
 ## 0.5.0
 
 ### Bug Fixes

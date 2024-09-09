@@ -22,7 +22,7 @@ export const knownEncodingRule = createRule({
   create(context) {
     function checkEncoding(type: ModelProperty | Scalar) {
       const encode = getEncode(context.program, type);
-      if (encode) {
+      if (encode && encode.encoding) {
         if (!knownEncodings.has(encode.encoding)) {
           context.reportDiagnostic({
             format: {

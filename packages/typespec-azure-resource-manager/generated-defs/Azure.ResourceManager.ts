@@ -1,6 +1,7 @@
 import type {
   DecoratorContext,
   EnumMember,
+  EnumValue,
   Interface,
   Model,
   Namespace,
@@ -237,7 +238,7 @@ export type ArmResourceOperationsDecorator = (
 export type ArmCommonTypesVersionDecorator = (
   context: DecoratorContext,
   target: Namespace | EnumMember,
-  version: string | unknown
+  version: string | EnumValue
 ) => void;
 
 /**
@@ -258,3 +259,27 @@ export type ResourceBaseTypeDecorator = (
   target: Model,
   baseType: Type
 ) => void;
+
+export type AzureResourceManagerDecorators = {
+  armResourceCollectionAction: ArmResourceCollectionActionDecorator;
+  armProviderNameValue: ArmProviderNameValueDecorator;
+  armProviderNamespace: ArmProviderNamespaceDecorator;
+  useLibraryNamespace: UseLibraryNamespaceDecorator;
+  armLibraryNamespace: ArmLibraryNamespaceDecorator;
+  singleton: SingletonDecorator;
+  tenantResource: TenantResourceDecorator;
+  subscriptionResource: SubscriptionResourceDecorator;
+  locationResource: LocationResourceDecorator;
+  resourceGroupResource: ResourceGroupResourceDecorator;
+  extensionResource: ExtensionResourceDecorator;
+  armResourceAction: ArmResourceActionDecorator;
+  armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator;
+  armResourceRead: ArmResourceReadDecorator;
+  armResourceUpdate: ArmResourceUpdateDecorator;
+  armResourceDelete: ArmResourceDeleteDecorator;
+  armResourceList: ArmResourceListDecorator;
+  armResourceOperations: ArmResourceOperationsDecorator;
+  armCommonTypesVersion: ArmCommonTypesVersionDecorator;
+  armVirtualResource: ArmVirtualResourceDecorator;
+  resourceBaseType: ResourceBaseTypeDecorator;
+};

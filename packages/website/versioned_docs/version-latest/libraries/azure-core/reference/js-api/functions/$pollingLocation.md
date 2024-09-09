@@ -16,7 +16,7 @@ function $pollingLocation(
 | ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `ModelProperty` |
-| `options`? | `Model` |
+| `options`? | `Type` |
 
 ## Returns
 

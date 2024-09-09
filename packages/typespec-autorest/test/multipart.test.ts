@@ -118,6 +118,24 @@ describe("legacy implicit form", () => {
     ]);
   });
 
+  it("set part doc", async () => {
+    const res = await openApiFor(
+      `
+      op upload(@header contentType: "multipart/form-data", @doc("Part doc") profileImage: bytes): void;
+      `
+    );
+    const op = res.paths["/"].post;
+    deepStrictEqual(op.parameters, [
+      {
+        in: "formData",
+        name: "profileImage",
+        description: "Part doc",
+        required: true,
+        type: "file",
+      },
+    ]);
+  });
+
   it("part of type `bytes[]` produce `type: array, items: { type: string, format: binary }`", async () => {
     const res = await openApiFor(
       `

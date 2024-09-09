@@ -23,29 +23,32 @@ import {
   Union,
   Value,
 } from "@typespec/compiler";
-import { HttpOperation, HttpOperationResponseContent, HttpStatusCodeRange } from "@typespec/http";
+import {
+  HttpOperation,
+  HttpOperationBody,
+  HttpOperationMultipartBody,
+  HttpOperationResponseContent,
+  HttpStatusCodeRange,
+} from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import {
   DecoratorInfo,
-  SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkModelType,
-  SdkParameter,
   SdkType,
-  SdkUnionType,
+  TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
-  getEffectivePayloadType,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -301,7 +304,7 @@ export function getTypeDecorators(
         };
         for (let i = 0; i < decorator.args.length; i++) {
           decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
-            getDecoratorArgValue(decorator.args[i].jsValue, type, decoratorName)
+            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName)
           );
         }
         retval.push(decoratorInfo);
@@ -312,6 +315,7 @@ export function getTypeDecorators(
 }
 
 function getDecoratorArgValue(
+  context: TCGCContext,
   arg:
     | Type
     | Record<string, unknown>
@@ -328,7 +332,7 @@ function getDecoratorArgValue(
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
     if (arg.kind === "EnumMember") {
-      return diagnostics.wrap(arg.value ?? arg.name);
+      return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
     }
     if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
       return diagnostics.wrap(arg.value);
@@ -386,48 +390,6 @@ export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOper
 
 export type TspLiteralType = StringLiteral | NumericLiteral | BooleanLiteral;
 
-export interface TCGCContext {
-  program: Program;
-  emitterName: string;
-  generateProtocolMethods?: boolean;
-  generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
-  packageName?: string;
-  flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
-  operationModelsMap?: Map<Operation, Map<Type, SdkModelType | SdkEnumType>>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  spreadModels?: Map<Model, SdkModelType>;
-  httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
-  __namespaceToApiVersionParameter: Map<Interface | Namespace, SdkParameter>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __namespaceToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
-  __subscriptionIdParameter?: SdkParameter;
-  __rawClients?: SdkClient[];
-  apiVersion?: string;
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
-  originalProgram: Program;
-  decoratorsAllowList?: string[];
-  previewStringRegex: RegExp;
-}
-
-export function createTCGCContext(program: Program): TCGCContext {
-  return {
-    program,
-    emitterName: "__TCGC_INTERNAL__",
-    diagnostics: [],
-    originalProgram: program,
-    __namespaceToApiVersionParameter: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __namespaceToApiVersionClientDefaultValue: new Map(),
-    previewStringRegex: /-preview$/,
-  };
-}
-
 export function getNonNullOptions(type: Union): Type[] {
   return [...type.variants.values()].map((x) => x.type).filter((t) => !isNullType(t));
 }
@@ -477,27 +439,6 @@ export function createGeneratedName(
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
-function isOperationBodyType(context: TCGCContext, type: Type, operation?: Operation): boolean {
-  if (type.kind !== "Model") return false;
-  if (!isHttpOperation(context, operation)) return false;
-  const httpBody = operation
-    ? getHttpOperationWithCache(context, operation).parameters.body
-    : undefined;
-  return Boolean(
-    httpBody &&
-      httpBody.type.kind === "Model" &&
-      getEffectivePayloadType(context, httpBody.type) === getEffectivePayloadType(context, type)
-  );
-}
-
-export function isMultipartFormData(
-  context: TCGCContext,
-  type: Type,
-  operation?: Operation
-): boolean {
-  return isMultipartOperation(context, operation) && isOperationBodyType(context, type, operation);
-}
-
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
   return Boolean(context.arm) && parameter.name === "subscriptionId";
 }
@@ -522,9 +463,22 @@ export function getAnyType(
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
     kind: "any",
+    name: "any",
     encode: "string",
+    crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
+}
+
+export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
+  let apiVersion = context.apiVersion;
+  if (apiVersion === "all") {
+    return apiVersion;
+  }
+  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
+    apiVersion = versions[versions.length - 1];
+  }
+  return apiVersion;
 }
 
 export function getHttpOperationResponseHeaders(
@@ -572,4 +526,49 @@ export function filterApiVersionsInEnum(
 export function isJsonContentType(contentType: string): boolean {
   const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
   return regex.test(contentType);
+}
+
+export function isXmlContentType(contentType: string): boolean {
+  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
+  return regex.test(contentType);
+}
+
+/**
+ * If body is from spread, then it does not directly from a model property.
+ * @param httpBody
+ * @param parameters
+ * @returns
+ */
+export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
+  return httpBody.property === undefined;
+}
+
+/**
+ * If body is from simple spread, then we use the original model as body model.
+ * @param type
+ * @returns
+ */
+export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model {
+  if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
+    const innerModel = type.sourceModels[0].model;
+    const projectedProgram = context.program as ProjectedProgram;
+    // for case: `op test(...Model):void;`
+    if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
+      return projectedProgram.projector
+        ? (projectedProgram.projector.projectedTypes.get(innerModel) as Model)
+        : innerModel;
+    }
+    // for case: `op test(@header h: string, @query q: string, ...Model): void;`
+    if (
+      innerModel.sourceModels.length === 1 &&
+      innerModel.sourceModels[0].usage === "spread" &&
+      innerModel.sourceModels[0].model.name !== "" &&
+      innerModel.sourceModels[0].model.properties.size === type.properties.size
+    ) {
+      return projectedProgram.projector
+        ? (projectedProgram.projector.projectedTypes.get(innerModel.sourceModels[0].model) as Model)
+        : innerModel.sourceModels[0].model;
+    }
+  }
+  return type;
 }

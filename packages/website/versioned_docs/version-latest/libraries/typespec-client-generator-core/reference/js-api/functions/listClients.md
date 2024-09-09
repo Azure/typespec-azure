@@ -13,7 +13,7 @@ List all the clients.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `context` | `TCGCContext` | TCGCContext |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | TCGCContext |
 
 ## Returns
 

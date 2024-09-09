@@ -1,9 +1,9 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
+import { isAzureCoreModel } from "../../src/internal-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -132,7 +132,6 @@ describe("typespec-client-generator-core: model types", () => {
   it("recursive model", async () => {
     await runner.compileWithBuiltInService(`
       @usage(Usage.input | Usage.output)
-      @access(Access.public)
       model RecursiveModel {
         prop: RecursiveModel
       }
@@ -188,7 +187,8 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
+    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
@@ -200,7 +200,8 @@ describe("typespec-client-generator-core: model types", () => {
     const sharktypeProperty = shark.properties[0];
     ok(sharktypeProperty);
     strictEqual(sharktypeProperty.name, "sharktype");
-    strictEqual(sharktypeProperty.description, "Discriminator property for Shark.");
+    strictEqual(sharktypeProperty.description, "Discriminator property for Shark."); // eslint-disable-line deprecation/deprecation
+    strictEqual(sharktypeProperty.doc, "Discriminator property for Shark.");
     strictEqual(sharktypeProperty.kind, "property");
     strictEqual(sharktypeProperty.discriminator, true);
     strictEqual(sharktypeProperty.type.kind, "string");
@@ -231,7 +232,8 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
+    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
@@ -263,12 +265,14 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
+    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
     strictEqual(kindProperty.__raw, undefined);
-    strictEqual(kindProperty.type.__raw, undefined);
+    strictEqual(kindProperty.type.__raw?.kind, "Scalar");
+    strictEqual(kindProperty.type.__raw?.name, "string");
     strictEqual(fish.discriminatorProperty, kindProperty);
   });
 
@@ -319,6 +323,24 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(dog.discriminatorProperty, dogKindProperty);
   });
 
+  it("anonymous model contains template", async () => {
+    await runner.compileWithBuiltInService(`
+
+      model Name {
+        name: string;
+      }
+      model ModelTemplate<T> {
+        prop: T
+      }
+
+      op test(): {prop: ModelTemplate<Name>};
+      `);
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    const modelNames = models.map((model) => model.name).sort();
+    deepStrictEqual(modelNames, ["TestResponse", "Name", "ModelTemplateName"].sort());
+  });
+
   it("union to extensible enum values", async () => {
     await runner.compileWithBuiltInService(`
       union PetKind {
@@ -347,7 +369,8 @@ describe("typespec-client-generator-core: model types", () => {
     const catValue = values.find((x) => x.name === "Cat");
     ok(catValue);
     strictEqual(catValue.value, "cat");
-    strictEqual(catValue.description, "Cat");
+    strictEqual(catValue.description, "Cat"); // eslint-disable-line deprecation/deprecation
+    strictEqual(catValue.doc, "Cat");
     strictEqual(catValue.enumType, petKind);
     strictEqual(catValue.valueType, petKind.valueType);
     strictEqual(catValue.kind, "enumvalue");
@@ -355,7 +378,8 @@ describe("typespec-client-generator-core: model types", () => {
     const dogValue = values.find((x) => x.name === "Dog");
     ok(dogValue);
     strictEqual(dogValue.value, "dog");
-    strictEqual(dogValue.description, "Dog");
+    strictEqual(dogValue.description, "Dog"); // eslint-disable-line deprecation/deprecation
+    strictEqual(dogValue.doc, "Dog");
     strictEqual(dogValue.enumType, petKind);
     strictEqual(dogValue.valueType, petKind.valueType);
     strictEqual(dogValue.kind, "enumvalue");
@@ -476,7 +500,8 @@ describe("typespec-client-generator-core: model types", () => {
     const dogKindProperty = dog.properties[0];
     ok(dogKindProperty);
     strictEqual(dogKindProperty.type, dogKind);
-    strictEqual(dogKindProperty.description, "Discriminator property for Dog.");
+    strictEqual(dogKindProperty.description, "Discriminator property for Dog."); // eslint-disable-line deprecation/deprecation
+    strictEqual(dogKindProperty.doc, "Discriminator property for Dog.");
   });
 
   it("discriminator", async () => {
@@ -690,6 +715,12 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
+
+    for (const [type, sdkType] of runnerWithCore.context.modelsMap?.entries() ?? []) {
+      if (isAzureCoreModel(type)) {
+        ok(sdkType.usage !== UsageFlags.None);
+      }
+    }
   });
 
   it("filterOutCoreModels false", async () => {
@@ -1112,23 +1143,19 @@ describe("typespec-client-generator-core: model types", () => {
   it("additionalProperties of same type", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel extends Record<string> {
           prop: string;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel2 is Record<unknown> {
           prop: string;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel3 {
           prop: string;
           ...Record<string>;
         }
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model NoAdditionalPropertiesModel {
           prop: string;
         }
@@ -1216,14 +1243,12 @@ describe("typespec-client-generator-core: model types", () => {
   it("additionalProperties of different types", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel {
           prop: string;
           ...Record<float32>;
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model AdditionalPropertiesModel2 {
           prop: string;
           ...Record<boolean | float32>;
@@ -1247,11 +1272,9 @@ describe("typespec-client-generator-core: model types", () => {
         @service({})
         namespace MyService {
           @usage(Usage.input)
-          @access(Access.public)
           model InputModel {}
 
           @usage(Usage.output)
-          @access(Access.public)
           model OutputModel {}
         }
       `);
@@ -1268,7 +1291,6 @@ describe("typespec-client-generator-core: model types", () => {
   it("template model", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Catalog is TrackedResource<CatalogProperties> {
           @pattern("^[A-Za-z0-9_-]{1,50}$")
           @key("catalogName")
@@ -1277,7 +1299,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model CatalogProperties {
           test?: string;
         }
@@ -1287,7 +1308,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Deployment is TrackedResource<DeploymentProperties> {
           @key("deploymentName")
           @segment("deployments")
@@ -1295,7 +1315,6 @@ describe("typespec-client-generator-core: model types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model DeploymentProperties {
           deploymentId?: string;
           deploymentDateUtc?: utcDateTime;
@@ -1332,7 +1351,6 @@ describe("typespec-client-generator-core: model types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Model1{}
 
           model Model2{}
@@ -1454,7 +1472,6 @@ describe("typespec-client-generator-core: model types", () => {
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model Test{
             prop1: never;
             prop2: void;
@@ -1466,5 +1483,106 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "Test");
     strictEqual(models[0].properties.length, 0);
+  });
+
+  it("xml usage", async () => {
+    await runner.compileAndDiagnose(`
+        @service({})
+        namespace MyService {
+          model RoundTrip {
+            prop: string;
+          }
+
+          model Input {
+            prop: string;
+          }
+
+          @route("/test1")
+          op test1(@header("content-type") contentType: "application/xml", @body body: RoundTrip): RoundTrip;
+          
+          @route("/test2")
+          op test2(@header("content-type") contentType: "application/xml", @body body: Input): void;
+        }
+      `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    const roundTripModel = models.find((x) => x.name === "RoundTrip");
+    const inputModel = models.find((x) => x.name === "Input");
+    ok(roundTripModel);
+    strictEqual(
+      roundTripModel.usage,
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json | UsageFlags.Xml
+    );
+
+    ok(inputModel);
+    strictEqual(inputModel.usage, UsageFlags.Input | UsageFlags.Xml);
+  });
+
+  it("check bodyParam for @multipartBody", async function () {
+    await runner.compileWithBuiltInService(`
+        model Address {
+          city: string;
+        }
+        model MultiPartRequest{
+          id?: HttpPart<string>;
+          profileImage: HttpPart<bytes>;
+          address: HttpPart<Address>;
+          picture: HttpPart<File>;
+        }
+        @post
+        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+        `);
+    const formDataMethod = runner.context.sdkPackage.clients[0].methods[0];
+    strictEqual(formDataMethod.kind, "basic");
+    strictEqual(formDataMethod.name, "upload");
+    strictEqual(formDataMethod.parameters.length, 2);
+
+    strictEqual(formDataMethod.parameters[0].name, "contentType");
+    strictEqual(formDataMethod.parameters[0].type.kind, "constant");
+    strictEqual(formDataMethod.parameters[0].type.value, "multipart/form-data");
+
+    strictEqual(formDataMethod.parameters[1].name, "body");
+    strictEqual(formDataMethod.parameters[1].type.kind, "model");
+    strictEqual(formDataMethod.parameters[1].type.name, "MultiPartRequest");
+
+    const formDataOp = formDataMethod.operation;
+    strictEqual(formDataOp.parameters.length, 1);
+    ok(formDataOp.parameters.find((x) => x.name === "contentType" && x.kind === "header"));
+
+    const formDataBodyParam = formDataOp.bodyParam;
+    ok(formDataBodyParam);
+    strictEqual(formDataBodyParam.type.kind, "model");
+    strictEqual(formDataBodyParam.type.name, "MultiPartRequest");
+    strictEqual(formDataBodyParam.correspondingMethodParams.length, 1);
+    strictEqual(formDataBodyParam.type.properties.length, 4);
+    strictEqual(formDataBodyParam.type.properties[0].name, "id");
+    strictEqual(formDataBodyParam.type.properties[0].type.kind, "string");
+    strictEqual(formDataBodyParam.type.properties[1].name, "profileImage");
+    strictEqual(formDataBodyParam.type.properties[1].type.kind, "bytes");
+    strictEqual(formDataBodyParam.type.properties[2].name, "address");
+    strictEqual(formDataBodyParam.type.properties[2].type.kind, "model");
+    strictEqual(formDataBodyParam.type.properties[2].type.name, "Address");
+    strictEqual(formDataBodyParam.type.properties[3].name, "picture");
+    strictEqual(formDataBodyParam.type.properties[3].type.kind, "model");
+    strictEqual(formDataBodyParam.type.properties[3].type.name, "File");
+  });
+
+  it("check multipartOptions for property of base model", async function () {
+    await runner.compileWithBuiltInService(`
+      model MultiPartRequest{
+          fileProperty: HttpPart<File>;
+      }
+      @post
+      op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+      `);
+    const models = runner.context.sdkPackage.models;
+    const fileModel = models.find((x) => x.name === "File");
+    ok(fileModel);
+    for (const p of fileModel.properties) {
+      strictEqual(p.kind, "property");
+      strictEqual(p.isMultipartFileInput, false);
+      strictEqual(p.multipartOptions, undefined);
+    }
   });
 });

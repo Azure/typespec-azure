@@ -26,3 +26,9 @@ export type ResponsePropertyDecorator = (
   entity: Model,
   name: string
 ) => void;
+
+export type AzureCoreFoundationsDecorators = {
+  omitKeyProperties: OmitKeyPropertiesDecorator;
+  requestParameter: RequestParameterDecorator;
+  responseProperty: ResponsePropertyDecorator;
+};

@@ -3,6 +3,7 @@ import {
   Diagnostic,
   Enum,
   EnumMember,
+  EnumValue,
   Model,
   ModelProperty,
   Namespace,
@@ -86,7 +87,7 @@ export function isArmCommonType(entity: Type): boolean {
 export const $armCommonTypesVersion: ArmCommonTypesVersionDecorator = (
   context: DecoratorContext,
   entity: Namespace | EnumMember,
-  version: unknown // TODO: switch to precise type when tspd supports it: string | EnumValue
+  version: string | EnumValue
 ) => {
   // try convert string to EnumMember
   let versionEnum: EnumMember;
@@ -102,7 +103,7 @@ export const $armCommonTypesVersion: ArmCommonTypesVersionDecorator = (
     }
     versionEnum = foundEnumMember as EnumMember;
   } else {
-    versionEnum = (version as any).value;
+    versionEnum = version.value;
   }
 
   context.program.stateMap(ArmStateKeys.armCommonTypesVersion).set(entity, versionEnum.name);

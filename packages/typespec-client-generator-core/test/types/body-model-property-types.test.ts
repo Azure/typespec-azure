@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { isReadOnly } from "../../src/types.js";
@@ -15,7 +14,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("required", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: string | int32;
         }
@@ -27,7 +25,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("optional", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name?: string;
         }
@@ -39,7 +36,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("readonly", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @visibility("read")
           name?: string;
@@ -52,7 +48,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("not readonly", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @visibility("read", "create", "update")
           name?: string;
@@ -67,7 +62,6 @@ describe("typespec-client-generator-core: body model property types", () => {
         #suppress "deprecated" "for testing"
         @test
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         @projectedName("java", "JavaTest")
         model Test {
           @projectedName("java", "javaProjectedName")
@@ -125,7 +119,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("union type", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: string | int32;
         }
@@ -159,7 +152,6 @@ describe("typespec-client-generator-core: body model property types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @added(Versions.v1)
           @removed(Versions.v2)

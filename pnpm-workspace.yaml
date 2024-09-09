@@ -3,3 +3,4 @@ packages:
   - core/ # Install core workspace dependencies too. Needed for prettier plugins
   - core/packages/*
   - "!core/packages/http-client-csharp/**"
+  - "!core/packages/http-client-java/**"

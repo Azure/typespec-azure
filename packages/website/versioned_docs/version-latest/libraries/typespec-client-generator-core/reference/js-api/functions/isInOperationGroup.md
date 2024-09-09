@@ -13,7 +13,7 @@ Check an operation is in an operation group.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `context` | `TCGCContext` | TCGCContext |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | TCGCContext |
 | `type` | `Namespace` \| `Interface` \| `Operation` | Type to check |
 
 ## Returns

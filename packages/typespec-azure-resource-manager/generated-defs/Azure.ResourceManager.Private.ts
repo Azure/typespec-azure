@@ -152,3 +152,18 @@ export type ArmResourcePropertiesOptionalityDecorator = (
   target: ModelProperty,
   isOptional: boolean
 ) => void;
+
+export type AzureResourceManagerPrivateDecorators = {
+  resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
+  resourceParameterBaseFor: ResourceParameterBaseForDecorator;
+  azureResourceBase: AzureResourceBaseDecorator;
+  omitIfEmpty: OmitIfEmptyDecorator;
+  conditionalClientFlatten: ConditionalClientFlattenDecorator;
+  assignProviderNameValue: AssignProviderNameValueDecorator;
+  armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator;
+  armResourceInternal: ArmResourceInternalDecorator;
+  defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator;
+  enforceConstraint: EnforceConstraintDecorator;
+  armRenameListByOperation: ArmRenameListByOperationDecorator;
+  armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
+};

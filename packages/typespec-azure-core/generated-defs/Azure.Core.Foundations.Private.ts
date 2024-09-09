@@ -8,7 +8,7 @@ import type { DecoratorContext, Model, Operation, Scalar, Type } from "@typespec
 export type SpreadCustomParametersDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Type
+  customizations: Model
 ) => void;
 
 /**
@@ -19,7 +19,7 @@ export type SpreadCustomParametersDecorator = (
 export type SpreadCustomResponsePropertiesDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Type
+  customizations: Model
 ) => void;
 
 /**
@@ -79,5 +79,16 @@ export type EnsureVerbDecorator = (
 export type DefaultFinalStateViaDecorator = (
   context: DecoratorContext,
   target: Operation,
-  states: unknown
+  states: readonly ("operation-location" | "location" | "azure-async-operation")[]
 ) => void;
+
+export type AzureCoreFoundationsPrivateDecorators = {
+  spreadCustomParameters: SpreadCustomParametersDecorator;
+  spreadCustomResponseProperties: SpreadCustomResponsePropertiesDecorator;
+  ensureResourceType: EnsureResourceTypeDecorator;
+  embeddingVector: EmbeddingVectorDecorator;
+  armResourceIdentifierConfig: ArmResourceIdentifierConfigDecorator;
+  needsRoute: NeedsRouteDecorator;
+  ensureVerb: EnsureVerbDecorator;
+  defaultFinalStateVia: DefaultFinalStateViaDecorator;
+};

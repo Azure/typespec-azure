@@ -25,6 +25,16 @@ emit:
   - "@azure-tools/typespec-service-csharp"
 ```
 
+The config can be extended with options as follows:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-service-csharp"
+options:
+  "@azure-tools/typespec-service-csharp":
+    option: value
+```
+
 ### Emitter options
 
 #### `skip-format`

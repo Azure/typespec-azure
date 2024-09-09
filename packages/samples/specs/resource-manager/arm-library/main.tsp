@@ -14,14 +14,18 @@ using Azure.ResourceManager;
 @service({
   title: "Microsoft.EnvelopeTest",
 })
-@OpenAPI.info({
-  version: "2021-09-21-preview",
-})
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @useLibraryNamespace(Microsoft.InterfacesTest, Microsoft.OperationsTest)
-@armCommonTypesVersion(CommonTypes.Versions.v5)
 @armProviderNamespace
+@versioned(Versions)
 namespace Microsoft.LibraryTest;
+
+/** ARM Library API versions */
+enum Versions {
+  /** 2021-09-21-preview version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  `2021-09-21-preview`,
+}
 
 interface Operations extends Azure.ResourceManager.Operations {}
 

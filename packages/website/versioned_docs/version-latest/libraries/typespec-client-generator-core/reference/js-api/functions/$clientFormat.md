@@ -7,8 +7,7 @@ title: "[F] $clientFormat"
 function $clientFormat(
    context, 
    target, 
-   format, 
-   scope?): void
+   value): void
 ```
 
 ## Parameters
@@ -17,8 +16,7 @@ function $clientFormat(
 | ------ | ------ |
 | `context` | `DecoratorContext` |
 | `target` | `ModelProperty` |
-| `format` | [`ClientFormat`](../type-aliases/ClientFormat.md) |
-| `scope`? | `string` |
+| `value` | `"seconds"` \| `"unixtime"` \| `"iso8601"` \| `"rfc1123"` |
 
 ## Returns
 

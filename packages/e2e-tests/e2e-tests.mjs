@@ -51,6 +51,7 @@ function getPackagesPath() {
     "@typespec/openapi": resolveLocalPackage("core/packages/openapi"),
     "@typespec/http": resolveLocalPackage("core/packages/http"),
     "@typespec/rest": resolveLocalPackage("core/packages/rest"),
+    "@typespec/xml": resolveLocalPackage("core/packages/xml"),
     "@typespec/versioning": resolveLocalPackage("core/packages/versioning"),
     "@azure-tools/typespec-azure-core": resolveLocalPackage("packages/typespec-azure-core"),
     "@azure-tools/typespec-azure-resource-manager": resolveLocalPackage(
@@ -140,6 +141,7 @@ function testCadlRanch(packages, args) {
       "@typespec/rest": packages["@typespec/rest"],
       "@typespec/openapi": packages["@typespec/openapi"],
       "@typespec/openapi3": packages["@typespec/openapi3"],
+      "@typespec/xml": packages["@typespec/xml"],
       "@typespec/versioning": packages["@typespec/versioning"],
       "@azure-tools/typespec-azure-core": packages["@azure-tools/typespec-azure-core"],
       "@azure-tools/typespec-azure-resource-manager":

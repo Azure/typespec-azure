@@ -1,0 +1,8 @@
+{
+  "operationId": "parametersDiagnostic",
+  "title": "parametersDiagnostic",
+  "parameters": {
+    "test": "a"
+  },
+  "responses": {}
+}

@@ -1,4 +1,3 @@
-/* eslint-disable deprecation/deprecation */
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import {
   Model,
@@ -293,7 +292,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
           })
@@ -309,7 +308,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
           })
@@ -323,7 +322,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "azure-pick-me",
@@ -338,7 +337,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "Azure.Pick.Me",
@@ -356,7 +355,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "azure.pick.me",
@@ -371,7 +370,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       strictEqual(
         getClientNamespaceString(
-          createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
           })
@@ -1430,7 +1429,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         const models = runner.context.sdkPackage.models;
         const diagnostics = runner.context.diagnostics;
         ok(diagnostics);
-        deepStrictEqual(diagnostics, runner.context.sdkPackage.diagnostics);
         strictEqual(models.length, 4);
         const union = models[0].properties[0].type;
         strictEqual(union.kind, "union");
@@ -1518,7 +1516,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(
           `
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model A {
             pForA: {
               name: string;
@@ -1527,7 +1524,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         `
         );
         const models = runner.context.sdkPackage.models;
-        strictEqual(models.length, 1);
+        strictEqual(models.length, 2);
         strictEqual(models[0].properties[0].crossLanguageDefinitionId, "TestService.A.pForA");
         const propType = models[0].properties[0].type;
         strictEqual(propType.kind, "model");
@@ -1546,7 +1543,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(
           `
           @usage(Usage.input | Usage.output)
-          @access(Access.public)
           model A {
             status: "start" | "stop";
           }

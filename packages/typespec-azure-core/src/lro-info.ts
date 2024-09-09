@@ -10,13 +10,14 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   getEffectiveModelType,
+  ignoreDiagnostics,
   isErrorType,
   isType,
 } from "@typespec/compiler";
 import {
   HttpOperationResponse,
   getHeaderFieldName,
-  getOperationParameters,
+  getHttpOperation,
   getResponsesForOperation,
   isHeader,
   isMetadata,
@@ -128,7 +129,7 @@ export function getLroOperationInfo(
 ): [LroOperationInfo | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const targetResponses = diagnostics.pipe(getResponsesForOperation(program, targetOperation));
-  const targetParameters = diagnostics.pipe(getOperationParameters(program, targetOperation));
+  const targetParameters = ignoreDiagnostics(getHttpOperation(program, targetOperation)).parameters;
   const targetProperties = new Map<string, ModelProperty>();
   const parameterMap = new Map<string, PropertyMap>();
   const unmatchedParameters = new Set<string>(targetParameters.parameters.flatMap((p) => p.name));
@@ -146,7 +147,7 @@ export function getLroOperationInfo(
     }
   }
   const sourceResponses = diagnostics.pipe(getResponsesForOperation(program, sourceOperation));
-  const sourceParameters = diagnostics.pipe(getOperationParameters(program, sourceOperation));
+  const sourceParameters = ignoreDiagnostics(getHttpOperation(program, sourceOperation)).parameters;
   const sourceBodyProperties = new Map<string, ModelProperty>();
   if (sourceParameters.body && sourceParameters.body.type.kind === "Model") {
     for (const [sourceName, sourceProp] of getAllProperties(sourceParameters.body.type)) {
