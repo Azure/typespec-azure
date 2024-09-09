@@ -35,7 +35,7 @@ configuration:
           - if:
               - includesModifiedFiles:
                   files:
-                    - packages/typespec-azurerest/**/*
+                    - packages/typespec-autorest/**/*
             then:
               - addLabel:
                   label: emitter:autorest
