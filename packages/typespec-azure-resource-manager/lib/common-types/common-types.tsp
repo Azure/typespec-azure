@@ -9,5 +9,6 @@ import "./extended-location-ref.tsp";
 import "./internal.tsp";
 import "./commontypes.private.decorators.tsp";
 import "./versions.tsp";
+import "./mobo.tsp";
 
 namespace Azure.ResourceManager.CommonTypes;

@@ -9,9 +9,11 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    labels: [] # conflict with our labels in labels.ts
 
   # Auto update the cadl-ranch-specs version used for e2e tests. It is pinned instead of always using the latest so we don't have a failure showing in random PRs blocking the flow.
   - package-ecosystem: "npm"
     directory: "/packages/e2e-tests/cadl-ranch-specs"
     schedule:
       interval: "daily"
+    labels: [] # conflict with our labels in labels.ts
