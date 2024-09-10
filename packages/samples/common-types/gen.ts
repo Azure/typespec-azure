@@ -19,6 +19,7 @@ await emitCommonTypesSwagger("managed-identity-with-delegation");
 await emitCommonTypesSwagger("network-security-perimeter");
 await emitCommonTypesSwagger("private-links");
 await emitCommonTypesSwagger("types");
+await emitCommonTypesSwagger("mobo");
 
 function log(...args: any[]) {
   // eslint-disable-next-line no-console
