@@ -1348,6 +1348,7 @@ describe("typespec-client-generator-core: model types", () => {
     const catalog = models.find((x) => x.name === "Catalog");
     ok(catalog);
     strictEqual(catalog.properties.length, 1);
+    strictEqual(catalog.properties[0].name, "properties");
   });
   it("model with deprecated annotation", async () => {
     await runner.compileAndDiagnose(`
