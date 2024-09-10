@@ -959,25 +959,11 @@ model Azure.ResourceManager.CommonTypes.AccessRuleProperties
 | -------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
 | direction?                 | [`AccessRuleDirection`](./data-types.md#Azure.ResourceManager.CommonTypes.AccessRuleDirection) |                                                        |
 | addressPrefixes?           | `string[]`                                                                                     | Address prefixes in the CIDR format for inbound rules  |
-| subscriptions?             | `ResourceManager.CommonTypes.AccessRulePropertiesSubscriptionsItem[]`                          | Subscriptions for inbound rules                        |
+| subscriptions?             | `ResourceManager.CommonTypes.{ id: Core.armResourceIdentifier }[]`                             | Subscriptions for inbound rules                        |
 | networkSecurityPerimeters? | `ResourceManager.CommonTypes.NetworkSecurityPerimeter[]`                                       | Network security perimeters for inbound rules          |
 | fullyQualifiedDomainNames? | `string[]`                                                                                     | Fully qualified domain names (FQDN) for outbound rules |
 | emailAddresses?            | `string[]`                                                                                     | Email addresses for outbound rules                     |
 | phoneNumbers?              | `string[]`                                                                                     | Phone numbers for outbound rules                       |
-
-### `AccessRulePropertiesSubscriptionsItem` {#Azure.ResourceManager.CommonTypes.AccessRulePropertiesSubscriptionsItem}
-
-Subscription identifiers
-
-```typespec
-model Azure.ResourceManager.CommonTypes.AccessRulePropertiesSubscriptionsItem
-```
-
-#### Properties
-
-| Name | Type                         | Description                                                                                                            |
-| ---- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| id?  | `Core.armResourceIdentifier` | The fully qualified Azure resource ID of the subscription e.g. ('/subscriptions/00000000-0000-0000-0000-000000000000') |
 
 ### `ApiVersionParameter` {#Azure.ResourceManager.CommonTypes.ApiVersionParameter}
 

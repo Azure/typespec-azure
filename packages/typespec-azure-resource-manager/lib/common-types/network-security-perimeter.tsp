@@ -3,10 +3,8 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using OpenAPI;
 
-@service({
-  title: "Network security perimeter common type definitions",
-})
 @info({
+  title: "Network security perimeter common type definitions",
   description: "Common types for network security perimeters based on a shared API specification. These common, versioned type definitions are intended for resource providers (RPs, except Network RP) to use, and reuse, for defining their own API versions that share a set of type definitions that is consistent across providers.",
   contact: {},
 })
@@ -125,7 +123,10 @@ model AccessRuleProperties {
   addressPrefixes?: string[];
 
   /** Subscriptions for inbound rules */
-  subscriptions?: AccessRulePropertiesSubscriptionsItem[];
+  subscriptions?: {
+    /** The fully qualified Azure resource ID of the subscription e.g. ('/subscriptions/00000000-0000-0000-0000-000000000000') */
+    id?: Azure.Core.armResourceIdentifier;
+  }[];
 
   /** Network security perimeters for inbound rules */
   networkSecurityPerimeters?: NetworkSecurityPerimeter[];
@@ -138,13 +139,6 @@ model AccessRuleProperties {
 
   /** Phone numbers for outbound rules */
   phoneNumbers?: string[];
-}
-
-/** Subscription identifiers */
-@added(Versions.v5)
-model AccessRulePropertiesSubscriptionsItem {
-  /** The fully qualified Azure resource ID of the subscription e.g. ('/subscriptions/00000000-0000-0000-0000-000000000000') */
-  id?: Azure.Core.armResourceIdentifier;
 }
 
 /** Information about a network security perimeter (NSP) */

@@ -64,7 +64,14 @@
           "type": "array",
           "description": "Subscriptions for inbound rules",
           "items": {
-            "$ref": "#/definitions/AccessRulePropertiesSubscriptionsItem"
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "arm-id",
+                "description": "The fully qualified Azure resource ID of the subscription e.g. ('/subscriptions/00000000-0000-0000-0000-000000000000')"
+              }
+            }
           }
         },
         "networkSecurityPerimeters": {
@@ -94,17 +101,6 @@
           "items": {
             "type": "string"
           }
-        }
-      }
-    },
-    "AccessRulePropertiesSubscriptionsItem": {
-      "type": "object",
-      "description": "Subscription identifiers",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "arm-id",
-          "description": "The fully qualified Azure resource ID of the subscription e.g. ('/subscriptions/00000000-0000-0000-0000-000000000000')"
         }
       }
     },
