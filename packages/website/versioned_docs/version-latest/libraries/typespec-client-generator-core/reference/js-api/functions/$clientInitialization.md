@@ -1,12 +1,13 @@
 ---
 jsApi: true
-title: "[F] $include"
+title: "[F] $clientInitialization"
 
 ---
 ```ts
-function $include(
+function $clientInitialization(
    context, 
    target, 
+   options, 
    scope?): void
 ```
 
@@ -15,13 +16,10 @@ function $include(
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `Model` |
+| `target` | `Namespace` \| `Interface` |
+| `options` | `Model` |
 | `scope`? | `string` |
 
 ## Returns
 
 `void`
-
-## Deprecated
-
-Use `usage` and `access` decorator instead.

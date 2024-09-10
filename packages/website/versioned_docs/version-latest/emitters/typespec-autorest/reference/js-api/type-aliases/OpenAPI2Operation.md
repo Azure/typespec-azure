@@ -26,3 +26,4 @@ type OpenAPI2Operation: Extensions & object;
 | `x-ms-examples` | `Record`<`string`, [`Ref`](../interfaces/Ref.md)<`unknown`\>\> | - |
 | `x-ms-long-running-operation` | `boolean` | - |
 | `x-ms-long-running-operation-options` | [`XMSLongRunningOperationOptions`](XMSLongRunningOperationOptions.md) | - |
+| `x-ms-pageable` | [`XmsPageable`](XmsPageable.md) | - |
