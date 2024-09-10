@@ -1328,6 +1328,27 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(catalog.properties.length, 2);
     strictEqual(deployment.properties.length, 2);
   });
+  it("arm proxy resource template model", async () => {
+    await runner.compileWithBuiltInAzureResourceManagerService(`
+        @usage(Usage.input | Usage.output)
+        model Catalog is ProxyResource<CatalogProperties> {
+          @pattern("^[A-Za-z0-9_-]{1,50}$")
+          @key("catalogName")
+          @segment("catalogs")
+          name: string;
+        }
+
+        @usage(Usage.input | Usage.output)
+        model CatalogProperties {
+          test?: string;
+        }
+      `);
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 4);
+    const catalog = models.find((x) => x.name === "Catalog");
+    ok(catalog);
+    strictEqual(catalog.properties.length, 1);
+  });
   it("model with deprecated annotation", async () => {
     await runner.compileAndDiagnose(`
         @service({})

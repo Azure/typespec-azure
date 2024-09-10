@@ -39,6 +39,7 @@ import {
   getHttpPart,
   getServers,
   isHeader,
+  isMetadata,
   isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
@@ -1428,6 +1429,7 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
+      isMetadata(context.program, property) ||
       sdkType.kind !== "model"
     ) {
       continue;
