@@ -342,7 +342,7 @@ export async function getOpenAPIForService(
 
   const operationIdsWithExample = new Set<string>();
 
-  const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
+  const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
   const httpService = ignoreDiagnostics(getHttpService(program, service.type));
@@ -469,10 +469,9 @@ export async function getOpenAPIForService(
     };
   }
 
-  function parseNextLinkName(paged: PagedResultMetadata): string | undefined {
-    const pathComponents = paged.nextLinkSegments;
-    if (pathComponents) {
-      return pathComponents[pathComponents.length - 1];
+  function getLastSegment(segments: string[] | undefined): string | undefined {
+    if (segments) {
+      return segments[segments.length - 1];
     }
     return undefined;
   }
@@ -511,10 +510,12 @@ export async function getOpenAPIForService(
     for (const response of operation.responses) {
       const paged = extractPagedMetadataNested(program, response.type as Model);
       if (paged) {
-        const nextLinkName = parseNextLinkName(paged);
+        const nextLinkName = getLastSegment(paged.nextLinkSegments);
+        const itemName = getLastSegment(paged.itemsSegments);
         if (nextLinkName) {
           currentEndpoint["x-ms-pageable"] = {
             nextLinkName,
+            itemName: itemName !== "value" ? itemName : undefined,
           };
         }
         // Once we find paged metadata, we don't need to processes any further.
@@ -678,14 +679,12 @@ export async function getOpenAPIForService(
       );
     }
 
-    if (options.examplesDirectory) {
-      const examples = exampleMap.get(currentEndpoint.operationId);
-      if (examples && currentEndpoint.operationId) {
-        operationIdsWithExample.add(currentEndpoint.operationId);
-        currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
-        for (const [title, example] of Object.entries(examples)) {
-          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
-        }
+    const autoExamples = exampleMap.get(currentEndpoint.operationId);
+    if (autoExamples && currentEndpoint.operationId) {
+      operationIdsWithExample.add(currentEndpoint.operationId);
+      currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
+      for (const [title, example] of Object.entries(autoExamples)) {
+        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
       }
     }
 
@@ -2563,31 +2562,38 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
+async function checkExamplesDirExists(host: CompilerHost, dir: string) {
+  try {
+    return (await host.stat(dir)).isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
 async function loadExamples(
-  host: CompilerHost,
+  program: Program,
   options: AutorestDocumentEmitterOptions,
   version?: string
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
+  const host = program.host;
   const diagnostics = createDiagnosticCollector();
-  if (!options.examplesDirectory) {
+  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
+  const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+
+  if (!(await checkExamplesDirExists(host, exampleDir))) {
+    if (options.examplesDirectory) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "noDirectory",
+          format: { directory: exampleDir },
+          target: NoTarget,
+        })
+      );
+    }
     return diagnostics.wrap(new Map());
   }
-  const exampleDir = version
-    ? resolvePath(options.examplesDirectory, version)
-    : resolvePath(options.examplesDirectory);
-  try {
-    if (!(await host.stat(exampleDir)).isDirectory()) return diagnostics.wrap(new Map());
-  } catch (err) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "example-loading",
-        messageId: "noDirectory",
-        format: { directory: exampleDir },
-        target: NoTarget,
-      })
-    );
-    return diagnostics.wrap(new Map());
-  }
+
   const map = new Map<string, Record<string, LoadedExample>>();
   const exampleFiles = await host.readDir(exampleDir);
   for (const fileName of exampleFiles) {
@@ -2600,7 +2606,7 @@ async function loadExamples(
             code: "example-loading",
             messageId: "noOperationId",
             format: { filename: fileName },
-            target: NoTarget,
+            target: { file: exampleFile, pos: 0, end: 0 },
           })
         );
         continue;
@@ -2615,7 +2621,7 @@ async function loadExamples(
         diagnostics.add(
           createDiagnostic({
             code: "duplicate-example-file",
-            target: NoTarget,
+            target: { file: exampleFile, pos: 0, end: 0 },
             format: {
               filename: fileName,
               operationId: example.operationId,

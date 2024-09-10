@@ -12,8 +12,8 @@ export interface Example {
 /**
  * `@example` - attaches example files to an operation. Multiple examples can be specified.
  *
- * @param {string} param pathOrUri - path or Uri to the example file.
- * @param {string} param title - name or description of the example file.
+ * @param {string} pathOrUri - path or Uri to the example file.
+ * @param {string} title - name or description of the example file.
  *
  * `@example` can be specified on Operations.
  */
@@ -50,7 +50,7 @@ export function getExamples(program: Program, entity: Type): Example[] | undefin
 /**
  * `@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as ARM common types.
  *
- * @param {string} param jsonRef - path or Uri to an OpenAPI schema.
+ * @param {string} jsonRef - path or Uri to an OpenAPI schema.
  *
  * `@useRef` can be specified on Models and ModelProperty.
  */

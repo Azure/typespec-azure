@@ -17,6 +17,7 @@ await emitCommonTypesSwagger("customer-managed-keys");
 await emitCommonTypesSwagger("managed-identity");
 await emitCommonTypesSwagger("private-links");
 await emitCommonTypesSwagger("types");
+await emitCommonTypesSwagger("mobo");
 
 function log(...args: any[]) {
   // eslint-disable-next-line no-console
