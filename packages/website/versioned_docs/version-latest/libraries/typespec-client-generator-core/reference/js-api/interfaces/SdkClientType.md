@@ -17,14 +17,17 @@ title: "[I] SdkClientType"
 
 | Property | Type | Description | Inherited from |
 | ------ | ------ | ------ | ------ |
+| `__raw` | [`SdkClient`](SdkClient.md) \| [`SdkOperationGroup`](SdkOperationGroup.md) | - | - |
 | `apiVersions` | `string`[] | - | - |
-| ~~`arm`~~ | `boolean` | **Deprecated** This property is deprecated. Look at `.arm` on `SdkContext` instead. | - |
 | `crossLanguageDefinitionId` | `string` | - | - |
 | `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `DecoratedType.decorators` |
-| `description?` | `string` | - | - |
-| `details?` | `string` | - | - |
+| ~~`description?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - |
+| ~~`details?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - |
+| `doc?` | `string` | - | - |
 | `initialization` | [`SdkInitializationType`](SdkInitializationType.md) | - | - |
 | `kind` | `"client"` | - | - |
 | `methods` | [`SdkMethod`](../type-aliases/SdkMethod.md)<`TServiceOperation`\>[] | - | - |
 | `name` | `string` | - | - |
 | `nameSpace` | `string` | - | - |
+| `parent?` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\> | - | - |
+| `summary?` | `string` | - | - |
