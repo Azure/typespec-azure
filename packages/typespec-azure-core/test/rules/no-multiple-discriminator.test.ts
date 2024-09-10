@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { preventMultipleDiscriminator } from "../../src/rules/prevent-multiple-discriminator.js";
+import { noMultipleDiscriminatorRule } from "../../src/rules/no-multiple-discriminator.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: no-multiple-discriminator rule", () => {
@@ -15,7 +15,7 @@ describe("typespec-azure-core: no-multiple-discriminator rule", () => {
     runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
     tester = createLinterRuleTester(
       runner,
-      preventMultipleDiscriminator,
+      noMultipleDiscriminatorRule,
       "@azure-tools/typespec-azure-core"
     );
   });

@@ -16,7 +16,10 @@ import {
   isAzureResource,
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
-import { shouldFlattenProperty } from "@azure-tools/typespec-client-generator-core";
+import {
+  getClientNameOverride,
+  shouldFlattenProperty,
+} from "@azure-tools/typespec-client-generator-core";
 import {
   ArrayModelType,
   BooleanLiteral,
@@ -85,6 +88,7 @@ import {
   isTemplateDeclarationOrInstance,
   isVoidType,
   navigateTypesInNamespace,
+  reportDeprecated,
   resolveEncodedName,
   resolvePath,
 } from "@typespec/compiler";
@@ -106,9 +110,9 @@ import {
   OAuth2FlowType,
   Visibility,
   createMetadataInfo,
-  getAllHttpServices,
   getAuthentication,
   getHeaderFieldOptions,
+  getHttpService,
   getServers,
   getStatusCodeDescription,
   getVisibilitySuffix,
@@ -338,11 +342,11 @@ export async function getOpenAPIForService(
 
   const operationIdsWithExample = new Set<string>();
 
-  const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
+  const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
-  const services = ignoreDiagnostics(getAllHttpServices(program));
-  const routes = services[0].operations;
+  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
+  const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
   routes.forEach(emitOperation);
@@ -465,10 +469,9 @@ export async function getOpenAPIForService(
     };
   }
 
-  function parseNextLinkName(paged: PagedResultMetadata): string | undefined {
-    const pathComponents = paged.nextLinkSegments;
-    if (pathComponents) {
-      return pathComponents[pathComponents.length - 1];
+  function getLastSegment(segments: string[] | undefined): string | undefined {
+    if (segments) {
+      return segments[segments.length - 1];
     }
     return undefined;
   }
@@ -507,10 +510,12 @@ export async function getOpenAPIForService(
     for (const response of operation.responses) {
       const paged = extractPagedMetadataNested(program, response.type as Model);
       if (paged) {
-        const nextLinkName = parseNextLinkName(paged);
+        const nextLinkName = getLastSegment(paged.nextLinkSegments);
+        const itemName = getLastSegment(paged.itemsSegments);
         if (nextLinkName) {
           currentEndpoint["x-ms-pageable"] = {
             nextLinkName,
+            itemName: itemName !== "value" ? itemName : undefined,
           };
         }
         // Once we find paged metadata, we don't need to processes any further.
@@ -674,14 +679,12 @@ export async function getOpenAPIForService(
       );
     }
 
-    if (options.examplesDirectory) {
-      const examples = exampleMap.get(currentEndpoint.operationId);
-      if (examples && currentEndpoint.operationId) {
-        operationIdsWithExample.add(currentEndpoint.operationId);
-        currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
-        for (const [title, example] of Object.entries(examples)) {
-          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
-        }
+    const autoExamples = exampleMap.get(currentEndpoint.operationId);
+    if (autoExamples && currentEndpoint.operationId) {
+      operationIdsWithExample.add(currentEndpoint.operationId);
+      currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
+      for (const [title, example] of Object.entries(autoExamples)) {
+        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
       }
     }
 
@@ -877,6 +880,7 @@ export async function getOpenAPIForService(
     );
     delete header.in;
     delete header.name;
+    delete header["x-ms-client-name"];
     delete header.required;
     return header;
   }
@@ -1255,8 +1259,10 @@ export async function getOpenAPIForService(
       required: !param.optional,
       description: getDoc(program, param),
     };
-    if (param.name !== base.name) {
-      base["x-ms-client-name"] = param.name;
+
+    const clientName = getClientName(context, param);
+    if (name !== clientName) {
+      base["x-ms-client-name"] = clientName;
     }
 
     attachExtensions(param, base);
@@ -1269,11 +1275,34 @@ export async function getOpenAPIForService(
     name?: string,
     bodySchema?: any
   ): OpenAPI2BodyParameter {
-    return {
+    const result: OpenAPI2BodyParameter = {
       in: "body",
       ...getOpenAPI2ParameterBase(param, name),
       schema: bodySchema,
     };
+
+    const jsonName = getJsonName(param);
+    if (jsonName !== param.name) {
+      // Special case to be able to keep pre-existing cases where you have both the body parameter name and x-ms-client-name
+      reportDeprecated(
+        program,
+        "Using encodedName for the body property is meaningless. That property is not serialized as Json. If wanting to rename it use @Azure.ClientGenerator.Core.clientName",
+        param.decorators.find((x) => x.definition?.name === "@encodedName")?.node ?? param
+      );
+      result.name = jsonName;
+
+      if (!result["x-ms-client-name"]) {
+        result["x-ms-client-name"] = param.name;
+      }
+    } else {
+      // For body parameter the only value of the name is in the client so no need to keep the original one
+      if (result["x-ms-client-name"]) {
+        result.name = result["x-ms-client-name"];
+        delete result["x-ms-client-name"];
+      }
+    }
+
+    return result;
   }
 
   function getOpenAPI2FormDataParameter(
@@ -1459,7 +1488,11 @@ export async function getOpenAPIForService(
     // TYPESPEC type.
     for (const group of processedSchemas.values()) {
       for (const [visibility, processed] of group) {
-        let name = getOpenAPITypeName(program, processed.type, typeNameOptions);
+        let name = getClientNameOverride(context.tcgcSdkContext, processed.type);
+        if (name === undefined) {
+          name = getOpenAPITypeName(program, processed.type, typeNameOptions);
+        }
+
         if (processed.getSchemaNameOverride !== undefined) {
           name = processed.getSchemaNameOverride(name, visibility);
         } else if (group.size > 1) {
@@ -1676,8 +1709,10 @@ export async function getOpenAPIForService(
     let foundCustom = false;
     for (const [name, member] of e.flattenedMembers.entries()) {
       const description = getDoc(program, member.type);
+      const memberClientName = getClientNameOverride(context.tcgcSdkContext, member.type);
+
       values.push({
-        name: typeof name === "string" ? name : `${member.value}`,
+        name: memberClientName ?? (typeof name === "string" ? name : `${member.value}`),
         value: member.value,
         description,
       });
@@ -2252,9 +2287,10 @@ export async function getOpenAPIForService(
       let foundCustom = false;
       for (const member of type.members.values()) {
         const description = getDoc(program, member);
+        const memberClientName = getClientName(context, member);
         values.push({
           name: member.name,
-          value: member.value ?? member.name,
+          value: member.value ?? memberClientName,
           description,
         });
 
@@ -2526,31 +2562,38 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
+async function checkExamplesDirExists(host: CompilerHost, dir: string) {
+  try {
+    return (await host.stat(dir)).isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
 async function loadExamples(
-  host: CompilerHost,
+  program: Program,
   options: AutorestDocumentEmitterOptions,
   version?: string
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
+  const host = program.host;
   const diagnostics = createDiagnosticCollector();
-  if (!options.examplesDirectory) {
+  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
+  const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+
+  if (!(await checkExamplesDirExists(host, exampleDir))) {
+    if (options.examplesDirectory) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "noDirectory",
+          format: { directory: exampleDir },
+          target: NoTarget,
+        })
+      );
+    }
     return diagnostics.wrap(new Map());
   }
-  const exampleDir = version
-    ? resolvePath(options.examplesDirectory, version)
-    : resolvePath(options.examplesDirectory);
-  try {
-    if (!(await host.stat(exampleDir)).isDirectory()) return diagnostics.wrap(new Map());
-  } catch (err) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "example-loading",
-        messageId: "noDirectory",
-        format: { directory: exampleDir },
-        target: NoTarget,
-      })
-    );
-    return diagnostics.wrap(new Map());
-  }
+
   const map = new Map<string, Record<string, LoadedExample>>();
   const exampleFiles = await host.readDir(exampleDir);
   for (const fileName of exampleFiles) {
@@ -2563,7 +2606,7 @@ async function loadExamples(
             code: "example-loading",
             messageId: "noOperationId",
             format: { filename: fileName },
-            target: NoTarget,
+            target: { file: exampleFile, pos: 0, end: 0 },
           })
         );
         continue;
@@ -2578,7 +2621,7 @@ async function loadExamples(
         diagnostics.add(
           createDiagnostic({
             code: "duplicate-example-file",
-            target: NoTarget,
+            target: { file: exampleFile, pos: 0, end: 0 },
             format: {
               filename: fileName,
               operationId: example.operationId,

@@ -2,6 +2,7 @@ import { resolvePath } from "@typespec/compiler";
 import {
   BasicTestRunner,
   expectDiagnosticEmpty,
+  expectDiagnostics,
   resolveVirtualPath,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -467,6 +468,19 @@ op test(): void;
           $ref: `#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate`,
         },
       ]);
+    });
+  });
+
+  describe("'examples-dir'", () => {
+    it("emit diagnostic if examples-dir is not absolute", async () => {
+      const runner = await createAutorestTestRunner(undefined, {
+        "examples-dir": "./examples",
+      });
+
+      const diagnostics = await runner.diagnose("op test(): void;");
+      expectDiagnostics(diagnostics, {
+        code: "config-path-absolute",
+      });
     });
   });
 });

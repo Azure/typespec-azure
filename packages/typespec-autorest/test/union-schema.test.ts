@@ -1,6 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: union schema", () => {
@@ -40,6 +40,12 @@ describe("typespec-autorest: union schema", () => {
   });
 
   describe("unions as enum", () => {
+    it("change definition name with @clientName", async () => {
+      const res = await openApiFor(`@clientName("ClientFoo") union Foo {"a"};`);
+      expect(res.definitions).toHaveProperty("ClientFoo");
+      expect(res.definitions).not.toHaveProperty("Foo");
+    });
+
     it("emit enum for simple union of string literals", async () => {
       const res = await openApiFor(`union Test {"one" , "two"}`);
       deepStrictEqual(res.definitions.Test, {
@@ -102,6 +108,16 @@ describe("typespec-autorest: union schema", () => {
           ],
         },
       });
+    });
+
+    it("change x-ms-enum.values names with @clientName", async () => {
+      const res = await openApiFor(
+        `union Test {@clientName("OneClient") One: "one" , @clientName("TwoClient") Two: "two"};`
+      );
+      expect(res.definitions.Test["x-ms-enum"].values).toEqual([
+        { value: "one", name: "OneClient" },
+        { value: "two", name: "TwoClient" },
+      ]);
     });
 
     it("include the description the x-ms-enum values", async () => {

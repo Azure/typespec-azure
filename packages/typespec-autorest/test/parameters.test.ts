@@ -24,6 +24,16 @@ describe("path parameters", () => {
     expect(res.paths).toHaveProperty("/{my-custom-path}");
   });
 
+  it("set x-ms-client-name with @clientName", async () => {
+    const param = await getPathParam(
+      `op test(@clientName("myParamClient") @path myParam: string): void;`
+    );
+    expect(param).toMatchObject({
+      name: "myParam",
+      "x-ms-client-name": "myParamClient",
+    });
+  });
+
   describe("setting reserved expansion attribute applies the x-ms-skip-url-encoding property", () => {
     it("with option", async () => {
       const param = await getPathParam(
@@ -68,6 +78,16 @@ describe("query parameters", () => {
       "x-ms-client-name": "select",
       required: true,
       type: "string",
+    });
+  });
+
+  it("set x-ms-client-name with @clientName", async () => {
+    const param = await getQueryParam(
+      `op test(@clientName("myParamClient") @query myParam: string): void;`
+    );
+    expect(param).toMatchObject({
+      name: "myParam",
+      "x-ms-client-name": "myParamClient",
     });
   });
 
@@ -267,12 +287,40 @@ describe("header parameters", () => {
     strictEqual(res.paths["/"].get.parameters[0].in, "query");
     strictEqual(res.paths["/"].get.parameters[0].name, "top");
   });
+
+  it("set x-ms-client-name with @clientName", async () => {
+    const res = await openApiFor(
+      `op test(@clientName("myParamClient") @header myParam: string): void;`
+    );
+    expect(res.paths["/"].get.parameters[0]).toMatchObject({
+      name: "my-param",
+      "x-ms-client-name": "myParamClient",
+    });
+  });
 });
 
 describe("body parameters", () => {
   it("omit request body if type is void", async () => {
     const res = await openApiFor(`op test(@body foo: void): void;`);
     deepStrictEqual(res.paths["/"].post.parameters, []);
+  });
+
+  it("set name with @clientName", async () => {
+    const res = await openApiFor(`op test(@body @clientName("bar") foo: string): void;`);
+    expect(res.paths["/"].post.parameters[0]).toMatchObject({ in: "body", name: "bar" });
+  });
+
+  it("set x-ms-client-name with @clientName when also using encodedName", async () => {
+    const res = await openApiFor(
+      `
+      #suppress "deprecated" "For tests"
+      op test(@body @encodedName("application/json", "jsonName") @clientName("bar") foo: string): void;`
+    );
+    expect(res.paths["/"].post.parameters[0]).toMatchObject({
+      in: "body",
+      name: "jsonName",
+      "x-ms-client-name": "bar",
+    });
   });
 
   it("using @body ignore any metadata property underneath", async () => {
@@ -444,28 +492,6 @@ describe("misc", () => {
           });
         });
       });
-    });
-
-    it("@query/@header/@path names & @projectedName on body parameter are honored (LEGACY)", async () => {
-      const res = await openApiFor(
-        `
-      @route("/{x-ms-arg-3}")
-      op test(
-        @query("x-ms-arg-1") @doc("my-doc") arg1: string,
-        @header("x-ms-arg-2") @doc("my-doc") arg2: string,
-        @path("x-ms-arg-3") @doc("my-doc") arg3: string): void;
-
-      @put
-      op test2(
-        #suppress "deprecated" "for testing"
-        @projectedName("json", "x-body") @body @doc("my-doc") arg: string): void;
-
-      `
-      );
-      strictEqual(res.paths["/{x-ms-arg-3}"].get.parameters[0].name, "x-ms-arg-1");
-      strictEqual(res.paths["/{x-ms-arg-3}"].get.parameters[1].name, "x-ms-arg-2");
-      strictEqual(res.paths["/{x-ms-arg-3}"].get.parameters[2].name, "x-ms-arg-3");
-      strictEqual(res.paths["/"].put.parameters[0].name, "x-body");
     });
   });
 });

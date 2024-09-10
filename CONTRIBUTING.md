@@ -198,6 +198,16 @@ pnpm e2e-tests --local-cadl-ranch=/Users/some/dev/cadl-ranch
 
 ## Publishing
 
+### Prerequisites
+
+1. Install the GitHub CLI and configure your account. Some of the tools use your GitHub account.
+2. Check that validation of the `typespec-next` branch is green in [pipelines](https://dev.azure.com/azure-sdk/public/_build?definitionId=6143&_a=summary).
+   1. **Note**: Anytime a new PR is merged during the release process, make sure this validation is green.
+3. Verify that the CodeGen nightly [builds](https://dev.azure.com/azure-sdk/public/_dashboards/dashboard/ef641981-29b5-4a67-9e8f-1e4ae2fe4894) are green.
+   1. **Note**: Check with codegen owners if a build is red due to a change unrelated to the TypeSpec release.
+
+### Steps
+
 Do the following to publish a new release:
 
 1. Announce to coworkers on Teams in TypeSpec Engineering channel that you will
@@ -205,19 +215,48 @@ Do the following to publish a new release:
    is complete.
 
 2. Make sure your working copy is clean and you are up-to-date and on the
-   main branch.
+   main branch (both typespec-azure and core should point to main).
 
-3. Run `pnpm prepare-publish` to stage the publishing changes.
+3. Generate release notes for TypeSpec once the full list of changes are in.
 
-If it works you'll get a message like this:
+   1. In your fork of the core (typespec) repo, run `npx chronus changelog --policy typespec > out.md`.
+   1. Create a new entry in `docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
+      Example PR: https://github.com/microsoft/typespec/pull/4102
 
-```
-Success! Push publish/kvd01q9v branches and send PRs.
-```
+4. Generate release notes for TypeSpec Azure once the full list of changes are in.
 
-4. Follow steps 4-9 in [making a cross-cutting change across both
-   repos](#making-a-cross-cutting-change-across-both-repos) to send PRs from
-   the generated `publish/<unique_id>` branches and merge them.
+   1. In your fork of the typespec-azure repo, run `npx chronus changelog --policy typespec-azure > out.md`.
+   1. Create a new entry in `docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
+      Example PR: https://github.com/Azure/typespec-azure/pull/1306
+
+5. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
+
+   1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
+
+6. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
+
+7. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
+
+8. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
+
+   - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
+   - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
+
+   - Double-check that updated version numbers are correct. Running the tool multiple times will increment the version number multiple times as well.
+
+9. Push and merge TypeSpec (core) PR.
+
+10. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
+
+11. Make sure release pipeline completed and packages are on NPM.
+
+### Followups
+
+1. Upgrade https://github.com/Azure/azure-rest-api-specs to use new versions of TypeSpec.
+   1. Example PR: https://github.com/Azure/azure-rest-api-specs/pull/30122
+1. Upgrade https://github.com/Azure/cadl-ranch to use new versions of TypeSpec.
+   1. Example PR: https://github.com/Azure/cadl-ranch/pull/668
+1. Send an email to the `TypeSpec Partners` group announcing the release.
 
 **NOTE**: The reason for step 1 to ask for folks to avoid merging while
 publishing is in progress is that any changes merged to the repo while the
