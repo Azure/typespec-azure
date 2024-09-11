@@ -3871,6 +3871,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(downloadOp.parameters.length, 1);
       const blobNameOpParam = downloadOp.parameters[0];
       strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.onClient, true);
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
     });
