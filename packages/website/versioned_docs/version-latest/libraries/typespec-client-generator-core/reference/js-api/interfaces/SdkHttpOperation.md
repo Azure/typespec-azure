@@ -19,4 +19,5 @@ title: "[I] SdkHttpOperation"
 | `parameters` | ([`SdkPathParameter`](SdkPathParameter.md) \| [`SdkQueryParameter`](SdkQueryParameter.md) \| [`SdkHeaderParameter`](SdkHeaderParameter.md))[] |
 | `path` | `string` |
 | `responses` | `Map`<`number` \| `HttpStatusCodeRange`, [`SdkHttpResponse`](SdkHttpResponse.md)\> |
+| `uriTemplate` | `string` |
 | `verb` | `HttpVerb` |

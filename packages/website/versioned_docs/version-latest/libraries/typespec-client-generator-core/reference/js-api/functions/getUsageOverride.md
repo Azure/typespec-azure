@@ -4,7 +4,7 @@ title: "[F] getUsageOverride"
 
 ---
 ```ts
-function getUsageOverride(context, entity): UsageFlags | undefined
+function getUsageOverride(context, entity): number | undefined
 ```
 
 ## Parameters
@@ -16,4 +16,4 @@ function getUsageOverride(context, entity): UsageFlags | undefined
 
 ## Returns
 
-[`UsageFlags`](../enumerations/UsageFlags.md) \| `undefined`
+`number` \| `undefined`

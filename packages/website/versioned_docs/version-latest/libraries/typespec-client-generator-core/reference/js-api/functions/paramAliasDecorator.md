@@ -1,12 +1,13 @@
 ---
 jsApi: true
-title: "[F] $exclude"
+title: "[F] paramAliasDecorator"
 
 ---
 ```ts
-function $exclude(
+function paramAliasDecorator(
    context, 
-   target, 
+   original, 
+   paramAlias, 
    scope?): void
 ```
 
@@ -15,13 +16,10 @@ function $exclude(
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `Model` |
+| `original` | `ModelProperty` |
+| `paramAlias` | `string` |
 | `scope`? | `string` |
 
 ## Returns
 
 `void`
-
-## Deprecated
-
-Use `usage` and `access` decorator instead.
