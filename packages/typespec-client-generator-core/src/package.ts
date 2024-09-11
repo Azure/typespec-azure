@@ -7,6 +7,7 @@ import {
   getService,
   getSummary,
   ignoreDiagnostics,
+  Model,
   Operation,
   Type,
 } from "@typespec/compiler";
@@ -34,6 +35,7 @@ import {
   SdkHttpOperation,
   SdkInitializationType,
   SdkLroPagingServiceMethod,
+  SdkLroServiceMetadata,
   SdkLroServiceMethod,
   SdkMethod,
   SdkMethodParameter,
@@ -154,33 +156,61 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const metadata = getLroMetadata(context.program, operation)!;
+  const metadata = getServiceMethodLroMetadata(context, operation)!;
   const basicServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation)
   );
 
-  if (metadata.finalResult === undefined || metadata.finalResult === "void") {
-    basicServiceMethod.response.type = undefined;
-  } else {
-    basicServiceMethod.response.type = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, metadata.finalResult)
-    );
-  }
+  basicServiceMethod.response.type = metadata.finalResponse?.result;
 
-  basicServiceMethod.response.resultPath = metadata.finalResultPath;
+  basicServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
 
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
-    __raw_lro_metadata: metadata,
+    lroMetadata: metadata,
     operation: diagnostics.pipe(
       getSdkServiceOperation<TServiceOperation>(
         context,
-        metadata.operation,
+        metadata.__raw.operation,
         basicServiceMethod.parameters
       )
     ),
   });
+}
+
+function getServiceMethodLroMetadata(
+  context: TCGCContext,
+  operation: Operation
+): SdkLroServiceMetadata | undefined {
+  const rawMetadata = getLroMetadata(context.program, operation);
+  if (rawMetadata === undefined) {
+    return undefined;
+  }
+
+  const diagnostics = createDiagnosticCollector();
+
+  return {
+    __raw: rawMetadata,
+    finalStateVia: rawMetadata.finalStateVia,
+    finalResponse:
+      rawMetadata.finalEnvelopeResult !== undefined && rawMetadata.finalEnvelopeResult !== "void"
+        ? {
+            envelopeResult: diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult)
+            ) as SdkModelType,
+            result: diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model)
+            ) as SdkModelType,
+            resultPath: rawMetadata.finalResultPath,
+          }
+        : undefined,
+    pollingStep: {
+      responseBody: diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel)
+      ) as SdkModelType,
+    },
+  };
 }
 
 function getSdkMethodResponse(
