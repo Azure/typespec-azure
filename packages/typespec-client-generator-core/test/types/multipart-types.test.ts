@@ -61,6 +61,22 @@ describe("typespec-client-generator-core: multipart types", () => {
       code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
     });
   });
+  it("multipart conflicting model usage for HttpPart", async function () {
+    await runner.compile(
+      `
+        @service({title: "Test Service"}) namespace TestService;
+
+        model MultiPartRequest {
+          id: string;
+          profileImage: bytes;
+        }
+        
+        @post op basic1(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+        @put op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+      `
+    );
+    deepEqual(runner.context.diagnostics.length, 0);
+  });
   it("multipart resolving conflicting model usage with spread", async function () {
     await runner.compileWithBuiltInService(
       `
