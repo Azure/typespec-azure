@@ -9,5 +9,7 @@ type CollectionFormat:
   | "csv"
   | "ssv"
   | "tsv"
-  | "pipes";
+  | "pipes"
+  | "simple"
+  | "form";
 ```

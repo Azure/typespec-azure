@@ -1,5 +1,43 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.46.0
+
+### Bug Fixes
+
+- [#1476](https://github.com/Azure/typespec-azure/pull/1476) Fix to add client signature `subscriptionId` for ARM SDK
+- [#1424](https://github.com/Azure/typespec-azure/pull/1424) do not handle example value with null for model type
+- [#1424](https://github.com/Azure/typespec-azure/pull/1424) consider renaming for parameter or property
+- [#1431](https://github.com/Azure/typespec-azure/pull/1431) consider renaming when mapping examples
+- [#1452](https://github.com/Azure/typespec-azure/pull/1452) TCGC, make content type optional when request body is optional
+- [#1399](https://github.com/Azure/typespec-azure/pull/1399) remove import of `UnionEnumVariant`
+- [#1432](https://github.com/Azure/typespec-azure/pull/1432) need to handle projection when finding spread original model
+- [#1377](https://github.com/Azure/typespec-azure/pull/1377) Fix getLibraryName for anonymous model which is derived from template
+- [#1435](https://github.com/Azure/typespec-azure/pull/1435) Don't require params introduced by `Azure.Core` with `@override`
+- [#1410](https://github.com/Azure/typespec-azure/pull/1410) set sdk method body parameter encode with http content type
+
+### Features
+
+- [#1305](https://github.com/Azure/typespec-azure/pull/1305) Add Namespace as target for @access decorator
+- [#1398](https://github.com/Azure/typespec-azure/pull/1398) add `@clientInitialization` decorator
+- [#1253](https://github.com/Azure/typespec-azure/pull/1253) add parent client info to `SdkClientType`
+- [#1253](https://github.com/Azure/typespec-azure/pull/1253) add `listSubClients` helper func
+- [#1379](https://github.com/Azure/typespec-azure/pull/1379) add `doc` and `summary` to tcgc types
+- [#1387](https://github.com/Azure/typespec-azure/pull/1387) add default path for example detection
+- [#1395](https://github.com/Azure/typespec-azure/pull/1395) do propagation when override access or usage
+- [#1388](https://github.com/Azure/typespec-azure/pull/1388) use original model for spread if it is from a simple spread
+- [#1303](https://github.com/Azure/typespec-azure/pull/1303) allow `@usage` to apply to namespaces
+
+### Deprecations
+
+- [#1395](https://github.com/Azure/typespec-azure/pull/1395) deprecate `@internal` decorator and `isInternal` helper function
+
+### Breaking Changes
+
+- [#1440](https://github.com/Azure/typespec-azure/pull/1440) Filter Core models directly instead of clear their usage
+- [#1451](https://github.com/Azure/typespec-azure/pull/1451) Have no client parameters appear on method signatures
+- [#1420](https://github.com/Azure/typespec-azure/pull/1420) clean up deprecation exports of previous version
+
+
 ## 0.45.4
 
 ### Bug Fixes
