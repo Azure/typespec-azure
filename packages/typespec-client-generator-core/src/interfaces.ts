@@ -627,6 +627,10 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 }
 
 interface SdkLroServiceMethodOptions {
+  /**
+   * @deprecated This property will be removed in future releases. Use `lroMetadata` for synthesized LRO metadata. If you still want to access primitive LRO info, use `lroMetadata.__raw`.
+   */
+  __raw_lro_metadata: LroMetadata;
   lroMetadata: SdkLroServiceMetadata;
 }
 

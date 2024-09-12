@@ -168,6 +168,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   return diagnostics.wrap({
     ...basicServiceMethod,
     kind: "lro",
+    __raw_lro_metadata: metadata.__raw,
     lroMetadata: metadata,
     operation: diagnostics.pipe(
       getSdkServiceOperation<TServiceOperation>(
