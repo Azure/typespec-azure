@@ -449,7 +449,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       // );
       // ok(pollingModel);
       // strictEqual(metadata.pollingStep.responseBody, pollingModel);
-      // TODO: TCGC bug to not include polling model
+      // TODO: TCGC bug to not include polling model https://github.com/Azure/typespec-azure/issues/1530
       strictEqual(
         metadata.pollingStep.responseBody?.name,
         "ArmOperationStatusResourceProvisioningState"
