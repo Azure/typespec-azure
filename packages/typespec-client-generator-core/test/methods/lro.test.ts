@@ -272,10 +272,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           format: string;
         }
 
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
         op getJobStatus is ResourceOperations.ResourceRead<JobState>;
 
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
         @route("/analyze")
         @pollingOperation(getJobStatus)
         op analyze is Azure.Core.Foundations.LongRunningOperation<
@@ -335,10 +333,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           format: string;
         }
 
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
         op getJobStatus is ResourceOperations.ResourceRead<JobState>;
 
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations"
         @route("/analyze")
         @pollingOperation(getJobStatus)
         op analyze is Azure.Core.Foundations.LongRunningOperation<
@@ -416,7 +412,6 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           age?: int32;
         }
 
-        #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"
         op createOrReplace is ArmResourceCreateOrReplaceAsync<Employee>;
     `);
       const methods = runner.context.sdkPackage.clients[0].methods;
@@ -470,7 +465,6 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           age?: int32;
         }
 
-        #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"
         op delete is ArmResourceDeleteWithoutOkAsync<Employee>;
     `);
       const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "Employee");
@@ -519,7 +513,6 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           age?: int32;
         }
 
-        #suppress "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes"
         op actionAsync is ArmResourceActionAsync<Employee, void, void>;
     `);
       const methods = runner.context.sdkPackage.clients[0].methods;
