@@ -115,7 +115,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         const metadata = lroMethod.lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        assert.isUndefined(metadata.finalStep);
+        strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
         const pollingModel = runner.context.sdkPackage.models.find(
           (m) => m.name === "OperationStatusError"
@@ -162,7 +162,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        assert.isUndefined(metadata.finalStep);
+        strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
 
         const pollingModel = runner.context.sdkPackage.models.find(
           (m) => m.name === "OperationStatusExportedUserError"
@@ -228,7 +228,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        assert.isUndefined(metadata.finalStep);
+        strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
 
         const pollingModel = runner.context.sdkPackage.models.find(
           (m) => m.name === "OperationStatusGenerationResultError"
@@ -300,7 +300,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        assert.isUndefined(metadata.finalStep);
+        strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
         const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
         ok(pollingModel);
@@ -367,7 +367,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.location);
-        assert.isUndefined(metadata.finalStep);
+        strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
         const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
         ok(pollingModel);
@@ -441,7 +441,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
       ok(metadata);
       strictEqual(metadata.finalStateVia, FinalStateValue.azureAsyncOperation);
-      assert.isUndefined(metadata.finalStep);
+      strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
       // ARM LRO core types are different
       // const pollingModel = runner.context.sdkPackage.models.find(
@@ -491,7 +491,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
       ok(metadata);
       strictEqual(metadata.finalStateVia, FinalStateValue.location);
-      assert.isUndefined(metadata.finalStep);
+      strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
       // ARM LRO core types are different
       // const pollingModel = runner.context.sdkPackage.models.find(
@@ -534,7 +534,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
       ok(metadata);
       strictEqual(metadata.finalStateVia, FinalStateValue.location);
-      assert.isUndefined(metadata.finalStep);
+      strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
       // ARM LRO core types are different
       // const pollingModel = runner.context.sdkPackage.models.find(
