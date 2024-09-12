@@ -52,7 +52,7 @@
     "@typespec/versioning": "workspace:~"
   },
   "devDependencies": {
-    "@types/node": "~18.11.19",
+    "@types/node": "~22.5.4",
     "@typespec/internal-build-utils": "workspace:~",
     "@typespec/samples": "workspace:~",
     "@vitest/coverage-v8": "^2.1.0",

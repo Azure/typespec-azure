@@ -59,7 +59,7 @@
   "devDependencies": {
     "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
-    "@types/node": "~18.11.19",
+    "@types/node": "~22.5.4",
     "@typespec/compiler": "workspace:~",
     "@typespec/http": "workspace:~",
     "@typespec/library-linter": "workspace:~",

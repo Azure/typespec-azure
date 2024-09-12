@@ -52,7 +52,7 @@
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
-    "@types/node": "~18.11.19",
+    "@types/node": "~22.5.4",
     "@typespec/compiler": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "@vitest/coverage-v8": "^2.1.0",
