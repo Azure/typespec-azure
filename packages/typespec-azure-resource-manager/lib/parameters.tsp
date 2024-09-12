@@ -83,9 +83,8 @@ model ArmLocationResource<BaseType extends
  */
 @doc("The default resourceUri parameter type.")
 model ResourceUriParameter {
-  @path
+  @path(#{ allowReserved: true })
   @doc("The fully qualified Azure Resource manager identifier of the resource.")
-  @extension("x-ms-skip-url-encoding", true)
   @resourceParameterBaseFor([ResourceHome.Extension])
   resourceUri: string;
 }

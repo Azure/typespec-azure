@@ -15,12 +15,12 @@ function $example(
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `context` | `DecoratorContext` |
-| `target` | `Operation` |
-| `pathOrUri` | `string` |
-| `title` | `string` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `context` | `DecoratorContext` | - |
+| `target` | `Operation` | - |
+| `pathOrUri` | `string` | path or Uri to the example file. |
+| `title` | `string` | name or description of the example file. `@example` can be specified on Operations. |
 
 ## Returns
 

@@ -16,7 +16,7 @@ function $access(
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `Enum` \| `Model` \| `Operation` \| `Union` |
+| `target` | \| `Namespace` \| `Enum` \| `Model` \| `Operation` \| `Union` |
 | `value` | `EnumMember` |
 | `scope`? | `string` |
 
