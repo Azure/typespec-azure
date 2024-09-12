@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.46.0
+
+### Bug Fixes
+
+- [#1359](https://github.com/Azure/typespec-azure/pull/1359) `arm-no-record` rule should warn about any use of `Record<X>` not just when inside resource properties
+
+### Features
+
+- [#1482](https://github.com/Azure/typespec-azure/pull/1482) Add mobo type to TypeSpec-Azure common types
+
+
 ## 0.45.0
 
 ### Bug Fixes

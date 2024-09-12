@@ -12,5 +12,5 @@ title: "[I] SdkUnionExample"
 | Property | Type | Overrides |
 | ------ | ------ | ------ |
 | `kind` | `"union"` | [`SdkExampleTypeBase`](SdkExampleTypeBase.md).`kind` |
-| `type` | [`SdkUnionType`](SdkUnionType.md) | [`SdkExampleTypeBase`](SdkExampleTypeBase.md).`type` |
+| `type` | [`SdkUnionType`](SdkUnionType.md)<[`SdkType`](../type-aliases/SdkType.md)\> | [`SdkExampleTypeBase`](SdkExampleTypeBase.md).`type` |
 | `value` | `unknown` | [`SdkExampleTypeBase`](SdkExampleTypeBase.md).`value` |
