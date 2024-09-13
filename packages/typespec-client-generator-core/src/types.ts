@@ -1630,26 +1630,6 @@ function updateTypesFromOperation(
     }
 
     const multipartOperation = isMultipartOperation(context, operation);
-    // this part should be put before setting current body's usage because it is based on the previous usage
-    if (
-      sdkType.kind === "model" &&
-      ((!multipartOperation && (sdkType.usage & UsageFlags.MultipartFormData) > 0) ||
-        (multipartOperation &&
-          (sdkType.usage & UsageFlags.Input) > 0 &&
-          (sdkType.usage & UsageFlags.Input & UsageFlags.MultipartFormData) === 0))
-    ) {
-      // This means we have a model that is used both for formdata input and for regular body input
-      diagnostics.add(
-        createDiagnostic({
-          code: "conflicting-multipart-model-usage",
-          target: httpBody.type,
-          format: {
-            modelName: sdkType.name,
-          },
-        })
-      );
-    }
-
     if (generateConvenient) {
       if (spread) {
         updateUsageOrAccessOfModel(context, UsageFlags.Spread, sdkType, { propagation: false });
@@ -1677,6 +1657,27 @@ function updateTypesFromOperation(
     }
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
+
+    // after complete of usage calculation for httpBody, check whether it has 
+    // conflicting usage between multipart and regular body
+    if (
+      sdkType.kind === "model" &&
+      ((!multipartOperation && (sdkType.usage & UsageFlags.MultipartFormData) > 0) ||
+        (multipartOperation &&
+          (sdkType.usage & UsageFlags.MultipartFormData) > 0 &&
+          ((sdkType.usage & UsageFlags.Json | sdkType.usage & UsageFlags.Xml) > 0)))
+    ) {
+      // This means we have a model that is used both for formdata input and for regular body input
+      diagnostics.add(
+        createDiagnostic({
+          code: "conflicting-multipart-model-usage",
+          target: httpBody.type,
+          format: {
+            modelName: sdkType.name,
+          },
+        })
+      );
+    }
   }
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
