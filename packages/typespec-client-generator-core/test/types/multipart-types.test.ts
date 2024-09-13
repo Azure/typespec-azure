@@ -1,6 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import {
   SdkBodyModelPropertyType,
   SdkClientType,
@@ -14,6 +14,17 @@ describe("typespec-client-generator-core: multipart types", () => {
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+  });
+
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
   });
 
   it("multipart form basic", async function () {
@@ -543,6 +554,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(stringWithContentType);
     strictEqual(stringWithContentType.type.kind, "model");
+    strictEqual(stringWithContentType.type.name, "MultiPartRequestStringWithContentType");
     ok(stringWithContentType.multipartOptions);
     ok(stringWithContentType.multipartOptions.contentType);
     deepEqual(stringWithContentType.multipartOptions.defaultContentTypes, ["text/html"]);
@@ -563,6 +575,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(bytesWithContentType);
     strictEqual(bytesWithContentType.type.kind, "model");
+    strictEqual(bytesWithContentType.type.name, "MultiPartRequestBytesWithContentType");
     ok(bytesWithContentType.multipartOptions);
     ok(bytesWithContentType.multipartOptions.contentType);
     deepEqual(bytesWithContentType.multipartOptions.defaultContentTypes, ["image/png"]);
