@@ -54,7 +54,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(pathParam.onClient, false);
     strictEqual(pathParam.isApiVersionParam, false);
     strictEqual(pathParam.type.kind, "string");
-    strictEqual(pathParam.urlEncode, true); // eslint-disable-line @typescript-eslint/no-deprecated
+    strictEqual(pathParam.urlEncode, true);
     strictEqual(method.response.kind, "method");
     strictEqual(method.response.type, undefined);
 
@@ -118,7 +118,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(pathParam.onClient, false);
     strictEqual(pathParam.isApiVersionParam, false);
     strictEqual(pathParam.type.kind, "string");
-    strictEqual(pathParam.urlEncode, true); // eslint-disable-line @typescript-eslint/no-deprecated
+    strictEqual(pathParam.urlEncode, true);
     strictEqual(pathParam.correspondingMethodParams.length, 1);
     deepStrictEqual(pathParam.correspondingMethodParams[0], pathMethod);
   });
