@@ -840,7 +840,7 @@ export const $flattenProperty: FlattenPropertyDecorator = (
       target: target,
     });
   }
-  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line deprecation/deprecation
+  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line @typescript-eslint/no-deprecated
 };
 
 /**
@@ -971,7 +971,7 @@ export const $override = (
       },
     });
   }
-  setScopedDecoratorData(context, $override, overrideKey, original, override, scope); // eslint-disable-line deprecation/deprecation
+  setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
 
 /**

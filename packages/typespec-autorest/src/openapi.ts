@@ -1068,6 +1068,7 @@ export async function getOpenAPIForService(
         continue;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
@@ -1353,6 +1354,7 @@ export async function getOpenAPIForService(
     if (param.explode) {
       return "multi";
     }
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     let collectionFormat = param.format;
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
       collectionFormat = undefined;

@@ -32,6 +32,7 @@ import {
   StringBuilder,
   TypeSpecDeclaration,
   code,
+  createAssetEmitter,
 } from "@typespec/compiler/emitter-framework";
 import {
   HttpOperation,
@@ -69,7 +70,6 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
   const NoResourceContext: string = "RPCOperations";
 
   class CSharpCodeEmitter extends CodeTypeEmitter {
-    #names: string[] = [];
     #licenseHeader = `// Copyright (c) Microsoft Corporation. All rights reserved.
     // Licensed under the MIT License.`;
     #sourceTypeKey: string = "sourceType";
@@ -301,8 +301,10 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       const [typeName, typeDefault] = this.#findPropertyType(property);
       const doc = getDoc(this.emitter.getProgram(), property);
       //const attributes = getAttributes(this.emitter.getProgram(), property);
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       const defaultValue = property.default
-        ? code`${this.emitter.emitType(property.default)}`
+        ? // eslint-disable-next-line @typescript-eslint/no-deprecated
+          code`${this.emitter.emitType(property.default)}`
         : typeDefault;
       return this.emitter.result.rawCode(code`
       ${doc ? `${formatComment(doc)}` : ""}
@@ -528,8 +530,10 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         NameCasingType.Parameter
       );
       const [emittedType, emittedDefault] = this.#findPropertyType(parameter);
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       const defaultValue = parameter.default
-        ? code`${this.emitter.emitType(parameter.default)}`
+        ? // eslint-disable-next-line @typescript-eslint/no-deprecated
+          code`${this.emitter.emitType(parameter.default)}`
         : emittedDefault;
       return this.emitter.result.rawCode(
         code`${emittedType} ${emittedName}${defaultValue === undefined ? "" : ` = ${defaultValue}`}`
@@ -572,6 +576,8 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       return this.emitter.result.rawCode(code`${emittedName}`);
     }
 
+    // TODO: remove?
+    // eslint-disable-next-line no-unused-private-class-members
     #emitParameterAttribute(parameter: HttpOperationParameter): EmitterOutput<string> {
       switch (parameter.type) {
         case "header":
@@ -819,7 +825,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
     }
   }
 
-  const emitter = context.getAssetEmitter(CSharpCodeEmitter);
+  const emitter = createAssetEmitter(context.program, CSharpCodeEmitter, context as any);
   const ns = context.program.checker.getGlobalNamespaceType();
   processNameSpace(context.program, ns);
   const options = emitter.getOptions();
