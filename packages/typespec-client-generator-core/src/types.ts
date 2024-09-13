@@ -1658,7 +1658,7 @@ function updateTypesFromOperation(
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
 
-    // after complete of usage calculation for httpBody, check whether it has
+    // after completion of usage calculation for httpBody, check whether it has
     // conflicting usage between multipart and regular body
     if (
       sdkType.kind === "model" &&
