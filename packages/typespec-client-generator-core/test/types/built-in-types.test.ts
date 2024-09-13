@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkBuiltInType } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -13,7 +13,16 @@ describe("typespec-client-generator-core: built-in types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("string", async function () {
     await runner.compileWithBuiltInService(
       `
@@ -204,12 +213,12 @@ describe("typespec-client-generator-core: built-in types", () => {
   });
 
   it("armId from Core", async function () {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(
+    await runner.compileWithBuiltInAzureCoreService(
       `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -221,7 +230,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       }
     `
     );
-    const models = runnerWithCore.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "armResourceIdentifier");
@@ -235,7 +244,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(
+    await runner.compileWithBuiltInAzureCoreService(
       `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -256,13 +265,13 @@ describe("typespec-client-generator-core: built-in types", () => {
   });
 
   it("etag from core", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -277,7 +286,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     @doc("Gets status.")
     op getStatus is GetResourceOperationStatus<User>;
     `);
-    const userModel = runnerWithCore.context.sdkPackage.models.find(
+    const userModel = runner.context.sdkPackage.models.find(
       (x) => x.kind === "model" && x.name === "User"
     );
     ok(userModel);
