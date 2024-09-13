@@ -61,7 +61,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
     });
   });
-  it("multipart conflicting model usage for HttpPart", async function () {
+  it("multipart conflicting model usage for only multipart operations", async function () {
     await runner.compile(
       `
         @service({title: "Test Service"}) namespace TestService;
