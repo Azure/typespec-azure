@@ -95,6 +95,26 @@ describe("typespec-azure-core: no-enum rule", () => {
       )
       .toBeValid();
   });
+
+  it(`doesn't emit diagnostic if x-ms-identifiers property is defined in a base class`, async () => {
+    await tester
+      .expect(
+        `
+        model Foo {
+          @OpenAPI.extension("x-ms-identifiers", ["name"])
+          bar: Child[];
+        }
+
+        model Child extends Base {
+          other: string;
+        }
+
+        model Base { name: string;}
+        `
+      )
+      .toBeValid();
+  });
+
   it(`doesn't emit diagnostic if element is a primitive type`, async () => {
     await tester
       .expect(
