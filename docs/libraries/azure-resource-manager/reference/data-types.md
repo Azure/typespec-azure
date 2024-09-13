@@ -2038,14 +2038,6 @@ The kind of entity that created the resource.
 union Azure.ResourceManager.CommonTypes.createdByType
 ```
 
-### `CreatedByType` {#Azure.ResourceManager.CommonTypes.CreatedByType}
-
-The type of identity that created the resource.
-
-```typespec
-union Azure.ResourceManager.CommonTypes.CreatedByType
-```
-
 ### `EncryptionStatus` {#Azure.ResourceManager.CommonTypes.EncryptionStatus}
 
 Indicates whether or not the encryption is enabled for container registry.

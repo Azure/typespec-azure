@@ -80,16 +80,6 @@ union ResourceAssociationAccessMode {
   Audit: "Audit",
 }
 
-/** The type of identity that created the resource. */
-@added(Versions.v5)
-union CreatedByType {
-  string,
-  User: "User",
-  Application: "Application",
-  ManagedIdentity: "ManagedIdentity",
-  Key: "Key",
-}
-
 /** Allow, disallow, or let network security perimeter configuration control public network access to the protected resource. Value is optional but if passed in, it must be 'Enabled', 'Disabled' or 'SecuredByPerimeter'. */
 @added(Versions.v5)
 union PublicNetworkAccess {
