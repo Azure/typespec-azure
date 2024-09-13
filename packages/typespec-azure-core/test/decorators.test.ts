@@ -52,11 +52,9 @@ describe("typespec-azure-core: decorators", () => {
       `);
       const actual = getPagedResult(runner.program, Foo as Model);
       assert(actual?.itemsProperty?.name === "foos");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.itemsPath === "foos");
       deepStrictEqual(actual?.itemsSegments, ["foos"]);
       assert(actual?.nextLinkProperty?.name === "nextThing");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.nextLinkPath === "nextThing");
       deepStrictEqual(actual?.nextLinkSegments, ["nextThing"]);
     });
@@ -78,11 +76,9 @@ describe("typespec-azure-core: decorators", () => {
       `);
       const actual = getPagedResult(runner.program, Foo as Model);
       assert(actual?.itemsProperty?.name === "things");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.itemsPath === "boo.things");
       deepStrictEqual(actual?.itemsSegments, ["boo", "things"]);
       assert(actual?.nextLinkProperty?.name === "next");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.nextLinkPath === "boo.doo.next");
       deepStrictEqual(actual?.nextLinkSegments, ["boo", "doo", "next"]);
     });

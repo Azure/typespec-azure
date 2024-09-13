@@ -210,7 +210,6 @@ describe("header parameters", () => {
       `,
       { "omit-unreachable-types": true }
     );
-    ``;
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), [
       {
