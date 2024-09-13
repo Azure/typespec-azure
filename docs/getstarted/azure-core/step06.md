@@ -17,15 +17,15 @@ alias ServiceTraits = SupportsRepeatableRequests &
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 interface Widgets {
-  @doc("Gets status of a Widget operation.")
-  getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+  @doc("Get status of a Widget operation. This operation return status in status code. No response body is returned.")
+  getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
   @doc("Fetch a Widget by name.")
   getWidget is Operations.ResourceRead<Widget>;
 
-  @doc("Creates or updates a Widget asynchronously.")
+  @doc("Create or replace a Widget asynchronously.")
   @pollingOperation(Widgets.getWidgetOperationStatus)
-  createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+  createOrUpdateWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 
   @doc("Delete a Widget asynchronously.")
   @pollingOperation(Widgets.getWidgetOperationStatus)
@@ -36,7 +36,7 @@ interface Widgets {
 }
 ```
 
-1. We change `createOrUpdateWidget` to use `LongRunningResourceCreateOrUpdate<Widget>` and `deleteWidget` to use `LongRunningResourceDelete`.
+1. We change `createOrUpdateWidget` to use `LongRunningResourceCreateOrReplace<Widget>` and `deleteWidget` to use `LongRunningResourceDelete`.
 2. We define the `getWidgetOperationStatus` operation based on the `GetResourceOperationStatus` signature. This defines the operation status monitor as a child resource of the `Widget` type so that it shows up under that resource in the route hierarchy.
 3. We **must** add the `pollingOperation` decorator to both of the long-running operations and reference the `Widgets.getWidgetOperationStatus` operation. This connects the long-running operations to their associated status monitor operation to make it easier for service clients to be generated.
 
