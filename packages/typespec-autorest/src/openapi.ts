@@ -1659,7 +1659,7 @@ export async function getOpenAPIForService(
       reportUnsupportedUnion("empty");
       return {};
     }
-    const type = getEnumMemberType(e.members.values().next().value);
+    const type = getEnumMemberType(e.members.values().next().value!);
     for (const option of e.members.values()) {
       if (type !== getEnumMemberType(option)) {
         reportUnsupportedUnion();
