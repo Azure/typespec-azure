@@ -239,7 +239,7 @@ describe("typespec-client-generator-core: built-in types", () => {
   });
 
   it("format should not alter typespec types", async function () {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
@@ -255,7 +255,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       }
     `
     );
-    const model = runnerWithCore.context.sdkPackage.models[0];
+    const model = runner.context.sdkPackage.models[0];
     const urlScalarProperty = model.properties.find((x) => x.name === "urlScalar");
     const urlFormatProperty = model.properties.find((x) => x.name === "urlFormatProperty");
     ok(urlScalarProperty);
