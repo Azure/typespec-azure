@@ -486,7 +486,7 @@ describe("typespec-client-generator-core: example types", () => {
     ).operation;
     ok(operation);
     strictEqual(operation.examples?.length, 1);
-    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "any");
+    strictEqual(operation.examples[0].responses.get(200)?.bodyValue?.kind, "unknown");
     deepStrictEqual(operation.examples[0].responses.get(200)?.bodyValue?.value, { test: 123 });
 
     expectDiagnostics(runner.context.diagnostics, []);
@@ -887,11 +887,11 @@ describe("typespec-client-generator-core: example types", () => {
     ok(example.additionalPropertiesValue);
     strictEqual(Object.keys(example.additionalPropertiesValue).length, 2);
     strictEqual(example.additionalPropertiesValue["c"].value, true);
-    strictEqual(example.additionalPropertiesValue["c"].kind, "any");
-    strictEqual(example.additionalPropertiesValue["c"].type.kind, "any");
+    strictEqual(example.additionalPropertiesValue["c"].kind, "unknown");
+    strictEqual(example.additionalPropertiesValue["c"].type.kind, "unknown");
     deepStrictEqual(example.additionalPropertiesValue["d"].value, [1, 2, 3]);
-    strictEqual(example.additionalPropertiesValue["d"].kind, "any");
-    strictEqual(example.additionalPropertiesValue["d"].type.kind, "any");
+    strictEqual(example.additionalPropertiesValue["d"].kind, "unknown");
+    strictEqual(example.additionalPropertiesValue["d"].type.kind, "unknown");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });

@@ -137,10 +137,10 @@ describe("typespec-client-generator-core: body model property types", () => {
     strictEqual(prop.kind, "property");
     const sdkType = prop.type;
     strictEqual(sdkType.kind, "union");
-    const values = sdkType.values;
-    strictEqual(values.length, 2);
-    strictEqual(values[0].kind, "string");
-    strictEqual(values[1].kind, "int32");
+    const variants = sdkType.variantTypes;
+    strictEqual(variants.length, 2);
+    strictEqual(variants[0].kind, "string");
+    strictEqual(variants[1].kind, "int32");
   });
   it("versioning", async function () {
     runner = await createSdkTestRunner({

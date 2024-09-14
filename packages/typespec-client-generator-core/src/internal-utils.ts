@@ -244,7 +244,7 @@ export function getHashForType(type: SdkType): string {
   }
   if (type.kind === "enum" || type.kind === "model" || type.kind === "enumvalue") return type.name;
   if (type.kind === "union") {
-    return type.values.map((x) => getHashForType(x)).join("|");
+    return type.variantTypes.map((x) => getHashForType(x)).join("|");
   }
   return type.kind;
 }
@@ -457,8 +457,8 @@ export function getAnyType(
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    kind: "any",
-    name: "any",
+    kind: "unknown",
+    name: "unknown",
     encode: "string",
     crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
