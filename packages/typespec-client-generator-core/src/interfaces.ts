@@ -163,7 +163,7 @@ export type SdkType =
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
-  encode: string;
+  encode?: string;
   name: string;
   baseType?: SdkBuiltInType;
   crossLanguageDefinitionId: string;
