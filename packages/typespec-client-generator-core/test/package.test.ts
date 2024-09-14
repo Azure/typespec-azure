@@ -2199,20 +2199,28 @@ describe("typespec-client-generator-core: package", () => {
           name: string;
         }
 
-        @armResourceOperations
-        interface MyInterface {
-          get is ArmResourceRead<MyModel>;
+        namespace MyClient {
+          interface Operations extends Azure.ResourceManager.Operations {}
+
+          @armResourceOperations
+          interface MyInterface {
+            get is ArmResourceRead<MyModel>;
+          }
         }
       `);
 
       const sdkPackage = runnerWithArm.context.sdkPackage;
       const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
-      for (const name of ["apiVersion", "subscriptionId", "endpoint", "credential"]) {
-        const item = client.initialization.properties.find((x) => x.name === name);
-        ok(item !== undefined);
-        ok(item.onClient);
+      for (const p of client.initialization.properties) {
+        ok(p.onClient);
       }
+      deepStrictEqual(client.initialization.properties.map((x) => x.name).sort(), [
+        "apiVersion",
+        "credential",
+        "endpoint",
+        "subscriptionId",
+      ]);
     });
 
     it("default api version for operation is", async () => {

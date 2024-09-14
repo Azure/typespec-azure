@@ -669,7 +669,7 @@ function addDefaultClientParameters<
       subId = context.__clientToParameters
         .get(operationGroup.type)
         ?.find((x) => isSubscriptionId(context, x));
-      if (apiVersionParam) break;
+      if (subId) break;
     }
   }
   if (subId) {
