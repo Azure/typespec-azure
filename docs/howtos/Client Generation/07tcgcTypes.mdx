@@ -911,8 +911,8 @@ export interface SdkHttpOperation {
   bodyParam: SdkBodyParameter;
   // mapping of status codes to SdkHttpResponse for valid responses
   // HttpStatusCodeRange can represent either a single status code or a range.
-  responses: Map<HttpStatusCodeRange, SdkHttpResponse>;
-  exceptions: Map<HttpStatusCodeRange, SdkHttpResponse>;
+  responses: SdkHttpResponse[];
+  exceptions: SdkHttpResponse[];
   examples?: SdkHttpOperationExample[];
 }
 ```
@@ -1277,6 +1277,7 @@ interface HttpStatusCodeRange {
 
 export interface SdkHttpResponse {
   kind: "http";
+  statusCodes: number | HttpStatusCodeRange | "*";
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
   type?: SdkType;
@@ -1518,7 +1519,7 @@ interface SdkExampleBase {
 export interface SdkHttpOperationExample extends SdkExampleBase {
   kind: "http";
   parameters: SdkHttpParameterExample[];
-  responses: Map<number, SdkHttpResponseExample>;
+  responses: SdkHttpResponseExample[];
 }
 
 export interface SdkHttpParameterExample {
@@ -1528,6 +1529,7 @@ export interface SdkHttpParameterExample {
 
 export interface SdkHttpResponseExample {
   response: SdkHttpResponse;
+  statusCode: number;
   headers: SdkHttpResponseHeaderExample[];
   bodyValue?: SdkTypeExample;
 }
