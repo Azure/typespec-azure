@@ -731,7 +731,7 @@ export type SdkExampleValue =
   | SdkUnionExampleValue
   | SdkModelExampleValue;
 
-export interface SdkExampleValueBase {
+interface SdkExampleValueBase {
   kind: string;
   type: SdkType;
   value: unknown;
