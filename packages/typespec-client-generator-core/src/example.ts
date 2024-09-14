@@ -9,7 +9,6 @@ import {
   isService,
   resolvePath,
 } from "@typespec/compiler";
-import { HttpStatusCodeRange } from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import {
   SdkArrayExampleValue,
@@ -291,12 +290,12 @@ function handleHttpParameters(
 }
 
 function handleHttpResponses(
-  responses: Map<number | HttpStatusCodeRange, SdkHttpResponse>,
+  responses: SdkHttpResponse[],
   example: any,
   relativePath: string
-): [Map<number, SdkHttpResponseExampleValue>, readonly Diagnostic[]] {
+): [SdkHttpResponseExampleValue[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const responseExamples = new Map<number, SdkHttpResponseExampleValue>();
+  const responseExamples: SdkHttpResponseExampleValue[] = [];
   if (
     "responses" in example &&
     typeof example.responses === "object" &&
@@ -305,11 +304,13 @@ function handleHttpResponses(
     for (const code of Object.keys(example.responses)) {
       const statusCode = parseInt(code, 10);
       let found = false;
-      for (const [responseCode, response] of responses.entries()) {
+      for (const response of responses) {
+        const responseCode = response.statusCodes;
         if (responseCode === statusCode) {
-          responseExamples.set(
-            statusCode,
-            diagnostics.pipe(handleHttpResponse(response, example.responses[code], relativePath))
+          responseExamples.push(
+            diagnostics.pipe(
+              handleHttpResponse(response, statusCode, example.responses[code], relativePath)
+            )
           );
           found = true;
           break;
@@ -319,9 +320,10 @@ function handleHttpResponses(
           responseCode.start <= statusCode &&
           responseCode.end >= statusCode
         ) {
-          responseExamples.set(
-            statusCode,
-            diagnostics.pipe(handleHttpResponse(response, example.responses[code], relativePath))
+          responseExamples.push(
+            diagnostics.pipe(
+              handleHttpResponse(response, statusCode, example.responses[code], relativePath)
+            )
           );
           found = true;
           break;
@@ -341,12 +343,14 @@ function handleHttpResponses(
 
 function handleHttpResponse(
   response: SdkHttpResponse,
+  statusCode: number,
   example: any,
   relativePath: string
 ): [SdkHttpResponseExampleValue, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const responseExample: SdkHttpResponseExampleValue = {
     response,
+    statusCode,
     headers: [],
   };
   if (typeof example === "object" && example !== null) {

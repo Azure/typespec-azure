@@ -550,6 +550,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
+  statusCodes: number | HttpStatusCodeRange | "*";
 }
 
 interface SdkServiceOperationBase {}
@@ -564,8 +565,8 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;
-  responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-  exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  responses: SdkHttpResponse[];
+  exceptions: SdkHttpResponse[];
   examples?: SdkHttpOperationExample[];
 }
 
@@ -701,7 +702,7 @@ interface SdkExampleBase {
 export interface SdkHttpOperationExample extends SdkExampleBase {
   kind: "http";
   parameters: SdkHttpParameterExampleValue[];
-  responses: Map<number, SdkHttpResponseExampleValue>;
+  responses: SdkHttpResponseExampleValue[];
 }
 
 export interface SdkHttpParameterExampleValue {
@@ -711,6 +712,7 @@ export interface SdkHttpParameterExampleValue {
 
 export interface SdkHttpResponseExampleValue {
   response: SdkHttpResponse;
+  statusCode: number;
   headers: SdkHttpResponseHeaderExampleValue[];
   bodyValue?: SdkExampleValue;
 }

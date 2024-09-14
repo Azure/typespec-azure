@@ -204,23 +204,32 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].kind, "http");
 
-    const okResponse = operation.examples[0].responses.get(200);
+    const okResponse = operation.examples[0].responses.find((x) => x.statusCode === 200);
     ok(okResponse);
-    deepStrictEqual(okResponse.response, operation.responses.get(200));
+    deepStrictEqual(
+      okResponse.response,
+      operation.responses.find((x) => x.statusCodes === 200)
+    );
     ok(okResponse.bodyValue);
 
     strictEqual(okResponse.bodyValue.kind, "string");
     strictEqual(okResponse.bodyValue.value, "test");
     strictEqual(okResponse.bodyValue.type.kind, "string");
 
-    const createdResponse = operation.examples[0].responses.get(201);
+    const createdResponse = operation.examples[0].responses.find((x) => x.statusCode === 201);
     ok(createdResponse);
-    deepStrictEqual(createdResponse.response, operation.responses.get(201));
+    deepStrictEqual(
+      createdResponse.response,
+      operation.responses.find((x) => x.statusCodes === 201)
+    );
 
     strictEqual(createdResponse.bodyValue, undefined);
     strictEqual(createdResponse.headers.length, 1);
 
-    deepStrictEqual(createdResponse.headers[0].header, operation.responses.get(201)?.headers[0]);
+    deepStrictEqual(
+      createdResponse.headers[0].header,
+      operation.responses.find((x) => x.statusCodes === 201)?.headers[0]
+    );
     strictEqual(createdResponse.headers[0].value.value, "test");
     strictEqual(createdResponse.headers[0].value.kind, "string");
     strictEqual(createdResponse.headers[0].value.type.kind, "string");
@@ -257,10 +266,13 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].kind, "http");
 
-    strictEqual(operation.examples[0].responses.size, 1);
-    const createdResponse = operation.examples[0].responses.get(201);
+    strictEqual(operation.examples[0].responses.length, 1);
+    const createdResponse = operation.examples[0].responses.find((x) => x.statusCode === 201);
     ok(createdResponse);
-    deepStrictEqual(createdResponse.response, operation.responses.get(201));
+    deepStrictEqual(
+      createdResponse.response,
+      operation.responses.find((x) => x.statusCodes === 201)
+    );
 
     strictEqual(createdResponse.bodyValue, undefined);
     strictEqual(createdResponse.headers.length, 0);
