@@ -633,6 +633,7 @@ function getCollectionFormat(
   type: ModelProperty
 ): CollectionFormat | undefined {
   const program = context.program;
+  /* eslint-disable @typescript-eslint/no-deprecated */
   const tspCollectionFormat = (
     isQueryParam(program, type)
       ? getQueryParamOptions(program, type)

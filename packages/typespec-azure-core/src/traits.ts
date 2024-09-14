@@ -239,7 +239,7 @@ export const $traitAdded: TraitAddedDecorator = (
     }
 
     // Invoke the decorator on the sole envelope property
-    const envelopeProperty = target.properties.values().next().value;
+    const envelopeProperty = target.properties.values().next().value!;
     context.call($traitAdded, envelopeProperty, addedVersion);
 
     // Manually push the decorator onto the property so that it's copyable when

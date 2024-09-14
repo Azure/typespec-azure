@@ -124,7 +124,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
 export function getEmitterTargetName(context: TCGCContext): string {
   return ignoreDiagnostics(
     parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name)
-  ); // eslint-disable-line deprecation/deprecation
+  );
 }
 
 /**
