@@ -2358,6 +2358,9 @@ importers:
       es-module-shims:
         specifier: ~1.10.0
         version: 1.10.0
+      monaco-editor:
+        specifier: ~0.46.0
+        version: 0.46.0
       prism-react-renderer:
         specifier: ^2.4.0
         version: 2.4.0(react@18.3.1)
@@ -2424,7 +2427,7 @@ importers:
         version: 6.2.0(webpack@5.94.0)
       monaco-editor-webpack-plugin:
         specifier: ~7.1.0
-        version: 7.1.0(monaco-editor@0.51.0)(webpack@5.94.0)
+        version: 7.1.0(monaco-editor@0.46.0)(webpack@5.94.0)
       rimraf:
         specifier: ~6.0.1
         version: 6.0.1
@@ -23531,17 +23534,17 @@ snapshots:
 
   monaco-editor-core@0.51.0: {}
 
+  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.46.0)(webpack@5.94.0):
+    dependencies:
+      loader-utils: 2.0.4
+      monaco-editor: 0.46.0
+      webpack: 5.94.0
+
   monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.51.0)(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))):
     dependencies:
       loader-utils: 2.0.4
       monaco-editor: 0.51.0
       webpack: 5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))
-
-  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.51.0)(webpack@5.94.0):
-    dependencies:
-      loader-utils: 2.0.4
-      monaco-editor: 0.51.0
-      webpack: 5.94.0
 
   monaco-editor@0.46.0: {}
 
