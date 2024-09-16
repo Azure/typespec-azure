@@ -190,14 +190,14 @@ export function getPagedResult(
         const items = _getItems(program, entity);
         if (items !== undefined) {
           metadata.itemsProperty = items.property;
-          // eslint-disable-next-line deprecation/deprecation
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
           metadata.itemsPath = items.path;
           metadata.itemsSegments = items.segments;
         }
         const nextLink = _getNextLink(program, entity);
         if (nextLink !== undefined) {
           metadata.nextLinkProperty = nextLink.property;
-          // eslint-disable-next-line deprecation/deprecation
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
           metadata.nextLinkPath = nextLink.path;
           metadata.nextLinkSegments = nextLink.segments;
         }
