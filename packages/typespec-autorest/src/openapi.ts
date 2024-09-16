@@ -1818,12 +1818,7 @@ export async function getOpenAPIForService(
         return defaultType.value.value ?? defaultType.value.name;
       case "ScalarValue":
         if (modelProperty) {
-          return serializeValueAsJson(
-            program,
-            defaultType,
-            defaultType.type,
-            getEncode(program, modelProperty)
-          );
+          return serializeValueAsJson(program, defaultType, modelProperty);
         }
         return serializeValueAsJson(program, defaultType, defaultType.type);
       case "ObjectValue":
