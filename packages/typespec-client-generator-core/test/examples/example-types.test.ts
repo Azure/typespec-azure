@@ -846,7 +846,7 @@ describe("typespec-client-generator-core: example types", () => {
       message: `Value in example file 'getModelDiscriminatorDiagnostic.json' does not follow its definition:\n{"kind":"shark","sharktype":"test","age":2}`,
     });
   });
-  1;
+
   it("SdkModelExample with additional properties", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getModelAdditionalProperties.json",

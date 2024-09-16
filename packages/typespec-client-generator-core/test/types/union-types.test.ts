@@ -316,7 +316,6 @@ describe("typespec-client-generator-core: union types", () => {
       values[1],
       models.find((x) => x.kind === "model" && x.name === "Model2")
     );
-    1;
   });
 
   it("model with nullable enum property", async function () {
