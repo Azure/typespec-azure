@@ -49,7 +49,7 @@ export function getRunnerPosOffset(pos: number): number {
 export async function createAzureCoreTestRunner(
   options: {
     omitServiceNamespace?: boolean;
-  } = {}
+  } = {},
 ): Promise<BasicTestRunner> {
   const host = await createAzureCoreTestHost();
   const serviceNamespace = options.omitServiceNamespace
@@ -66,7 +66,7 @@ export async function createAzureCoreTestRunner(
 
 export async function getOperations(
   code: string,
-  routeOptions?: RouteResolutionOptions
+  routeOptions?: RouteResolutionOptions,
 ): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
   const runner = await createAzureCoreTestRunner();
   await runner.compileAndDiagnose(code, { noEmit: true });
@@ -90,7 +90,7 @@ export interface SimpleHttpOperation {
 
 export async function getSimplifiedOperations(
   code: string,
-  routeOptions?: RouteResolutionOptions
+  routeOptions?: RouteResolutionOptions,
 ): Promise<[SimpleHttpOperation[], readonly Diagnostic[]]> {
   const [routes, diagnostics] = await getOperations(code, routeOptions);
 
@@ -108,7 +108,7 @@ export async function getSimplifiedOperations(
             : undefined),
       },
       responseProperties: Array.from((r.responses[0].type as Model).properties ?? []).map(
-        ([k, v]) => k
+        ([k, v]) => k,
       ),
     };
   });

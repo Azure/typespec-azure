@@ -63,14 +63,14 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
  */
 export const $armVirtualResource: ArmVirtualResourceDecorator = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
 ) => {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
   program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "Virtual");
   const pathProperty = getProperty(
     entity,
-    (p) => isPathParam(program, p) && getSegment(program, p) !== undefined
+    (p) => isPathParam(program, p) && getSegment(program, p) !== undefined,
   );
   if (pathProperty === undefined) {
     reportDiagnostic(program, {
@@ -94,7 +94,7 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
 
 function getProperty(
   target: Model,
-  predicate: (property: ModelProperty) => boolean
+  predicate: (property: ModelProperty) => boolean,
 ): ModelProperty | undefined {
   for (const prop of getAllProperties(target).values()) {
     if (predicate(prop)) return prop;
@@ -116,7 +116,7 @@ export function isArmVirtualResource(program: Program, target: Model): boolean {
 
 function resolveArmResourceDetails(
   program: Program,
-  resource: ArmResourceDetailsBase
+  resource: ArmResourceDetailsBase,
 ): ArmResourceDetails {
   // Combine fully-resolved operation details with the base details we already have
   const operations = resolveResourceOperations(program, resource.typespecType);
@@ -137,7 +137,7 @@ function resolveArmResourceDetails(
 function getResourceTypePath(
   resource: ArmResourceDetailsBase,
   itemPath: string | undefined,
-  baseType: ResourceBaseType
+  baseType: ResourceBaseType,
 ): string | undefined {
   if (!itemPath) {
     return undefined;
@@ -183,7 +183,7 @@ export function getArmResources(program: Program): ArmResourceDetails[] {
   if (cachedResources.size > 0) {
     // Return the cached resource details
     return Array.from(
-      program.stateMap(ArmStateKeys.armResourcesCached).values()
+      program.stateMap(ArmStateKeys.armResourcesCached).values(),
     ) as ArmResourceDetails[];
   }
 
@@ -202,7 +202,7 @@ export { getArmResource } from "./private.decorators.js";
 
 export function getArmResourceInfo(
   program: Program,
-  resourceType: Model
+  resourceType: Model,
 ): ArmResourceDetails | undefined {
   const resourceInfo = getArmResource(program, resourceType);
 
@@ -248,7 +248,7 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
  */
 export const $armResourceOperations: ArmResourceOperationsDecorator = (
   context: DecoratorContext,
-  interfaceType: Interface
+  interfaceType: Interface,
 ) => {
   const { program } = context;
 
@@ -270,7 +270,7 @@ export const $armResourceOperations: ArmResourceOperationsDecorator = (
 export const $singleton: SingletonDecorator = (
   context: DecoratorContext,
   resourceType: Model,
-  keyValue: string = "default"
+  keyValue: string = "default",
 ) => {
   context.program.stateMap(ArmStateKeys.armSingletonResources).set(resourceType, keyValue);
 };
@@ -294,7 +294,7 @@ export enum ResourceBaseType {
 export const $resourceBaseType: ResourceBaseTypeDecorator = (
   context: DecoratorContext,
   entity: Model,
-  baseType: Type
+  baseType: Type,
 ) => {
   let baseTypeString: string = "";
   if (isNeverType(baseType)) return;
@@ -304,42 +304,42 @@ export const $resourceBaseType: ResourceBaseTypeDecorator = (
 
 export const $tenantResource: TenantResourceDecorator = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
 ) => {
   setResourceBaseType(context.program, entity, "Tenant");
 };
 
 export const $subscriptionResource: SubscriptionResourceDecorator = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
 ) => {
   setResourceBaseType(context.program, entity, "Subscription");
 };
 
 export const $locationResource: LocationResourceDecorator = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
 ) => {
   setResourceBaseType(context.program, entity, "Location");
 };
 
 export const $resourceGroupResource: ResourceGroupResourceDecorator = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
 ) => {
   setResourceBaseType(context.program, entity, "ResourceGroup");
 };
 
 export const $extensionResource: ExtensionResourceDecorator = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
 ) => {
   setResourceBaseType(context.program, entity, "Extension");
 };
 
 export const $armProviderNameValue: ArmProviderNameValueDecorator = (
   context: DecoratorContext,
-  entity: Operation
+  entity: Operation,
 ) => {
   const armProvider = getServiceNamespace(context.program, entity);
   if (armProvider === undefined) return;

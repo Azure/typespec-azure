@@ -7,7 +7,7 @@ it("defines array inline", async () => {
     "Pet",
     `
     model Pet { names: string[] };
-    `
+    `,
   );
 
   ok(res.isRef);
@@ -24,7 +24,7 @@ it("define a named array using model is", async () => {
     `
     model PetNames is string[] {}
     model Pet { names: PetNames };
-    `
+    `,
   );
 
   ok(res.isRef);
@@ -43,7 +43,7 @@ it("named array applies doc", async () => {
     @doc("This is a doc for PetNames")
     model PetNames is string[] {}
     model Pet { names: PetNames };
-    `
+    `,
   );
   deepStrictEqual(res.defs.PetNames.description, "This is a doc for PetNames");
 });
@@ -56,7 +56,7 @@ it("can specify minItems using @minItems decorator", async () => {
       @minItems(1)
       names: string[]
     };
-    `
+    `,
   );
 
   ok(res.defs.Pet, "expected definition named Pet");
@@ -75,7 +75,7 @@ it("can specify maxItems using @maxItems decorator", async () => {
       @maxItems(3)
       names: string[]
     };
-    `
+    `,
   );
 
   ok(res.defs.Pet, "expected definition named Pet");
@@ -92,7 +92,7 @@ it("can specify minItems using @minItems decorator (on array model)", async () =
     `
     @minItems(1)
     model Names is string[];
-    `
+    `,
   );
 
   deepStrictEqual(res.defs.Names, {
@@ -108,7 +108,7 @@ it("can specify maxItems using @maxItems decorator  (on array model)", async () 
     `
     @maxItems(3)
     model Names is string[];
-    `
+    `,
   );
 
   deepStrictEqual(res.defs.Names, {

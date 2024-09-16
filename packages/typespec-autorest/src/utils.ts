@@ -79,7 +79,7 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
   const operationName = getClientName(context, operation);
   if (operation.interface) {
     return pascalCaseForOperationId(
-      `${getClientName(context, operation.interface)}_${operationName}`
+      `${getClientName(context, operation.interface)}_${operationName}`,
     );
   }
   const namespace = operation.namespace;

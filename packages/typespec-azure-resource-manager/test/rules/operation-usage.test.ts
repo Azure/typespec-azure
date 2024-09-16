@@ -20,7 +20,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     tester = createLinterRuleTester(
       runner,
       invalidActionVerbRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
   it("Detects non-post actions", async () => {
@@ -80,7 +80,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
          @doc("The provisioning State")
          provisioningState: ResourceState;
        }
-    `
+    `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb",
@@ -137,17 +137,17 @@ describe("typespec-azure-resource-manager: generates armResourceAction paths cor
         @armResourceAction(Widget)
         DefaultToCamelCase(...TenantInstanceParameters<Widget>): ArmResponse<Widget> | ErrorResponse;
       }
-      `
+      `,
     );
 
     strictEqual(
       getHttpOperation(runner.program, results.thisIsTheCorrectPattern as Operation)[0].path,
-      "/providers/Microsoft.Contoso/widgets/{widgetName}/correctPattern"
+      "/providers/Microsoft.Contoso/widgets/{widgetName}/correctPattern",
     );
 
     strictEqual(
       getHttpOperation(runner.program, results.DefaultToCamelCase as Operation)[0].path,
-      "/providers/Microsoft.Contoso/widgets/{widgetName}/defaultToCamelCase"
+      "/providers/Microsoft.Contoso/widgets/{widgetName}/defaultToCamelCase",
     );
   });
 });
@@ -161,7 +161,7 @@ describe("typespec-azure-resource-manager: improper list by subscription operati
     tester = createLinterRuleTester(
       runner,
       listBySubscriptionRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -208,7 +208,7 @@ describe("typespec-azure-resource-manager: improper list by subscription operati
          @doc("The provisioning State")
          provisioningState: ResourceState;
        }
-    `
+    `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation",

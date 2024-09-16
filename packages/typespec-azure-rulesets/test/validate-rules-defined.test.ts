@@ -45,7 +45,7 @@ describe("expect all rules to be defined", () => {
       } else {
         const missingRuleList = missing.map((x) => `  ${x}`).join("\n");
         fail(
-          `Ruleset '${name}' is missing the follow rules. They need to be explicitly defined in enabled or disabled:\n${missingRuleList}`
+          `Ruleset '${name}' is missing the follow rules. They need to be explicitly defined in enabled or disabled:\n${missingRuleList}`,
         );
       }
     });

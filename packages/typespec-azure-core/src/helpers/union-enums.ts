@@ -86,7 +86,7 @@ export function getUnionAsEnum(union: Union): [UnionEnum | undefined, readonly D
 
 function getUnionAsEnumInternal(
   union: Union,
-  visited: Set<Union>
+  visited: Set<Union>,
 ): [UnionEnum | undefined, readonly Diagnostic[]] {
   if (visited.has(union)) {
     return [undefined, [createDiagnostic({ code: "union-enums-circular", target: union })]];
@@ -99,7 +99,7 @@ function getUnionAsEnumInternal(
         code: "union-enums-invalid-kind",
         format: { kind: type.kind },
         target: union,
-      })
+      }),
     );
   }
 
@@ -185,7 +185,7 @@ function getUnionAsEnumInternal(
         code: "union-enums-multiple-kind",
         format: { kinds: [...kinds].join(", ") },
         target: union,
-      })
+      }),
     );
   }
   if (diagnostics.diagnostics.length > 0) {

@@ -17,7 +17,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     tester = createLinterRuleTester(
       runner,
       coreOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -42,7 +42,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           @delete delete(...ResourceInstanceParameters<FooResource>): | ArmDeletedResponse | ArmDeleteAcceptedResponse | ArmDeletedNoContentResponse | ErrorResponse;
           @post action(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
         }
-      `
+      `,
       )
       .toEmitDiagnostics([
         {
@@ -128,7 +128,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
              @doc("The provisioning State")
              provisioningState: ResourceState;
            }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
@@ -205,7 +205,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
              @doc("The provisioning State")
              provisioningState: ResourceState;
            }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",

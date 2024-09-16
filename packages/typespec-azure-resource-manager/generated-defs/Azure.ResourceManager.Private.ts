@@ -9,7 +9,7 @@ import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@t
 export type ResourceBaseParametersOfDecorator = (
   context: DecoratorContext,
   target: Model,
-  propertyName: Model
+  propertyName: Model,
 ) => void;
 
 /**
@@ -21,7 +21,7 @@ export type ResourceBaseParametersOfDecorator = (
 export type ResourceParameterBaseForDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  values: Type
+  values: Type,
 ) => void;
 
 /**
@@ -43,7 +43,7 @@ export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Mod
 export type OmitIfEmptyDecorator = (
   context: DecoratorContext,
   target: Model,
-  propertyName: string
+  propertyName: string,
 ) => void;
 
 /**
@@ -56,7 +56,7 @@ export type OmitIfEmptyDecorator = (
  */
 export type ConditionalClientFlattenDecorator = (
   context: DecoratorContext,
-  target: ModelProperty
+  target: ModelProperty,
 ) => void;
 
 /**
@@ -68,7 +68,7 @@ export type ConditionalClientFlattenDecorator = (
 export type AssignProviderNameValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  resource: Model
+  resource: Model,
 ) => void;
 
 /**
@@ -76,7 +76,7 @@ export type AssignProviderNameValueDecorator = (
  */
 export type ArmUpdateProviderNamespaceDecorator = (
   context: DecoratorContext,
-  target: Operation
+  target: Operation,
 ) => void;
 
 /**
@@ -95,7 +95,7 @@ export type ArmUpdateProviderNamespaceDecorator = (
 export type ArmResourceInternalDecorator = (
   context: DecoratorContext,
   target: Model,
-  properties: Model
+  properties: Model,
 ) => void;
 
 /**
@@ -107,7 +107,7 @@ export type DefaultResourceKeySegmentNameDecorator = (
   target: ModelProperty,
   armResource: Model,
   keyName: string,
-  segment: string
+  segment: string,
 ) => void;
 
 /**
@@ -123,7 +123,7 @@ export type EnforceConstraintDecorator = (
   context: DecoratorContext,
   target: Operation | Model,
   sourceType: Model,
-  constraintType: Model
+  constraintType: Model,
 ) => void;
 
 /**
@@ -140,7 +140,7 @@ export type ArmRenameListByOperationDecorator = (
   resourceType: Model,
   parentTypeName?: string,
   parentFriendlyTypeName?: string,
-  applyOperationRename?: boolean
+  applyOperationRename?: boolean,
 ) => void;
 
 /**
@@ -150,7 +150,7 @@ export type ArmRenameListByOperationDecorator = (
 export type ArmResourcePropertiesOptionalityDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  isOptional: boolean
+  isOptional: boolean,
 ) => void;
 
 export type AzureResourceManagerPrivateDecorators = {

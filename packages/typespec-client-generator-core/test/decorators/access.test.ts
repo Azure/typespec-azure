@@ -625,7 +625,7 @@ describe("typespec-client-generator-core: @access", () => {
           @path runId: string,
         ): RunStep[];
         @@access(listRunSteps, Access.internal);
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
@@ -640,7 +640,7 @@ describe("typespec-client-generator-core: @access", () => {
         model A {}
 
         op test(@body body: A): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
@@ -661,7 +661,7 @@ describe("typespec-client-generator-core: @access", () => {
         model B {}
 
         op test(@body body: A): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
@@ -688,7 +688,7 @@ describe("typespec-client-generator-core: @access", () => {
         }
 
         op test(@body body: A): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
@@ -720,7 +720,7 @@ describe("typespec-client-generator-core: @access", () => {
 
         @access(Access.internal)
         op two(): B;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
