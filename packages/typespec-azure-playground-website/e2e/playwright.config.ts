@@ -16,6 +16,17 @@ const config: PlaywrightTestConfig = {
   use: {
     baseURL: resolve(root, "dist"),
   },
+  projects: [
+    // TODO: investigate
+    // {
+    //   name: "chromium",
+    //   use: { browserName: "chromium" },
+    // },
+    {
+      name: "firefox",
+      use: { browserName: "firefox" },
+    },
+  ],
   testMatch: "*.e2e.ts",
 };
 export default config;
