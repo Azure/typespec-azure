@@ -8,6 +8,7 @@ export const apiVersionRule = createRule({
   name: "operation-missing-api-version",
   description: "Operations need an api version parameter.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/operation-missing-api-version",
   messages: {
     default: `Operation is missing an api version parameter.`,
   },
