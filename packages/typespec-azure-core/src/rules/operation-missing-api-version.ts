@@ -1,4 +1,5 @@
 import { ModelProperty, Operation, createRule } from "@typespec/compiler";
+import { getVersions } from "@typespec/versioning";
 
 function isApiVersionParam(prop: ModelProperty): boolean {
   return prop.name === "apiVersion" && prop.type.kind === "Scalar" && prop.type.name === "string";
@@ -15,6 +16,7 @@ export const apiVersionRule = createRule({
   create(context) {
     return {
       operation: (op: Operation) => {
+        if (!getVersions(context.program, op)[0]) return;
         if (!op.namespace) return;
         for (const param of op.parameters.properties.values()) {
           if (isApiVersionParam(param)) return;
