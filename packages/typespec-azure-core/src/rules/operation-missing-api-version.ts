@@ -16,8 +16,7 @@ export const apiVersionRule = createRule({
   create(context) {
     return {
       operation: (op: Operation) => {
-        if (!getVersions(context.program, op)[0]) return;
-        if (!op.namespace) return;
+        if (getVersions(context.program, op)[1] === undefined) return;
         for (const param of op.parameters.properties.values()) {
           if (isApiVersionParam(param)) return;
         }
