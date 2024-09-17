@@ -912,4 +912,27 @@ describe("typespec-autorest: model definitions", () => {
       });
     });
   });
+
+  it("encode know scalar as a default value", async () => {
+    const res = await oapiForModel(
+      "Test",
+      `
+        model Test { @encode("rfc7231") minDate: utcDateTime = utcDateTime.fromISO("2024-01-01T11:32:00Z"); }
+      `,
+    );
+
+    expect(res.defs.Test.properties.minDate.default).toEqual("Mon, 01 Jan 2024 11:32:00 GMT");
+  });
+
+  it("object value used as a default value", async () => {
+    const res = await oapiForModel(
+      "Test",
+      `
+        model Test { Pet: {name: string;  @encode("rfc7231")birthday: utcDateTime} = #{ name: "Dog", birthday:utcDateTime.fromISO("2024-01-01T11:32:00Z")}}
+      `,
+    );
+
+    expect(res.defs.Test.properties.Pet.default.name).toEqual("Dog");
+    expect(res.defs.Test.properties.Pet.default.birthday).toEqual("Mon, 01 Jan 2024 11:32:00 GMT");
+  });
 });
