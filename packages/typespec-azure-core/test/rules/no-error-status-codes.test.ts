@@ -16,7 +16,7 @@ describe("typespec-azure-core: no custom 4xx or 5xx responses", () => {
     tester = createLinterRuleTester(
       runner,
       noErrorStatusCodesRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -31,7 +31,7 @@ describe("typespec-azure-core: no custom 4xx or 5xx responses", () => {
            @statusCode statusCode: 404;
            @body message: "Not Found";
         };
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -53,7 +53,7 @@ describe("typespec-azure-core: no custom 4xx or 5xx responses", () => {
            @statusCode statusCode: 503;
            @body message: "Service Unavailable";
         };
-        `
+        `,
       )
       .toEmitDiagnostics([
         {

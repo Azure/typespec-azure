@@ -158,7 +158,7 @@ export function getBrowseArgQuery(program: Program, target: Type) {
 export function checkIsArmTrackedResource(
   program: Program,
   target: Model,
-  decoratorName: "browse"
+  decoratorName: "browse",
 ) {
   if (getArmResourceKind(target) !== "Tracked") {
     reportDiagnostic(program, {
@@ -174,7 +174,7 @@ export function checkIsArmTrackedResource(
 export function checkIsArmResource(
   program: Program,
   target: Model,
-  decoratorName: "about" | "marketplaceOffer" | "promotion"
+  decoratorName: "about" | "marketplaceOffer" | "promotion",
 ) {
   if (getArmResourceKind(target) !== "Tracked" && getArmResourceKind(target) !== "Proxy") {
     reportDiagnostic(program, {

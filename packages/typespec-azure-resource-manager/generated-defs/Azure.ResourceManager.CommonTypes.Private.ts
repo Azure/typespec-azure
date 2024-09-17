@@ -28,7 +28,7 @@ export type ArmCommonParameterDecorator = (
     | EnumValue
     | { readonly version: string | EnumValue; readonly isDefault: boolean }
     | string,
-  referenceFile?: string
+  referenceFile?: string,
 ) => void;
 
 /**
@@ -47,7 +47,7 @@ export type ArmCommonDefinitionDecorator = (
     | EnumValue
     | { readonly version: string | EnumValue; readonly isDefault: boolean }
     | string,
-  referenceFile?: string
+  referenceFile?: string,
 ) => void;
 
 export type AzureResourceManagerCommonTypesPrivateDecorators = {

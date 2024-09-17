@@ -12,7 +12,7 @@ describe("typespec-autorest: return types", () => {
       }
       @route("c1") op c1(): Foo;
       @route("c2") op c2(): {@body _: Foo};
-      `
+      `,
     );
     deepStrictEqual(res.paths["/c1"].get.responses["200"].schema, {
       $ref: "#/definitions/Foo",
@@ -32,7 +32,7 @@ describe("typespec-autorest: return types", () => {
         key: string;
       }
       @get op read(): Key & ETagHeader;
-      `
+      `,
     );
     ok(res.paths["/"].get.responses["200"].headers);
     ok(res.paths["/"].get.responses["200"].headers["e-tag"]);
@@ -53,7 +53,7 @@ describe("typespec-autorest: return types", () => {
       }
       @put
       op create(): TestCreatedResponse & Key;
-      `
+      `,
     );
     ok(res.paths["/"].put.responses["201"]);
     deepStrictEqual(res.paths["/"].put.responses["201"].schema, {
@@ -72,7 +72,7 @@ describe("typespec-autorest: return types", () => {
       }
       @put
       op create(): TestCreatedResponse & Key;
-      `
+      `,
     );
     ok(res.paths["/"].put.responses["201"]);
     ok(res.paths["/"].put.responses["201"].schema);
@@ -92,7 +92,7 @@ describe("typespec-autorest: return types", () => {
       }
       @put
       op create(): { ...TestCreatedResponse, ...ETagHeader, @body body: Key};
-      `
+      `,
     );
     ok(res.paths["/"].put.responses["201"]);
     ok(res.paths["/"].put.responses["201"].headers["e-tag"]);
@@ -117,7 +117,7 @@ describe("typespec-autorest: return types", () => {
       }
       @put
       op create(): TestCreatePageResponse;
-      `
+      `,
     );
     ok(res.paths["/"].put.responses["201"]);
     ok(res.paths["/"].put.responses["201"].headers["location"]);
@@ -140,18 +140,18 @@ describe("typespec-autorest: return types", () => {
       }
       @put
       op create(): CreatedOrUpdatedResponse & DateHeader & Key;
-      `
+      `,
     );
     ok(res.paths["/"].put.responses["200"]);
     ok(res.paths["/"].put.responses["201"]);
     // Note: 200 and 201 response should be equal except for description
     deepStrictEqual(
       res.paths["/"].put.responses["200"].headers,
-      res.paths["/"].put.responses["201"].headers
+      res.paths["/"].put.responses["201"].headers,
     );
     deepStrictEqual(
       res.paths["/"].put.responses["200"].schema,
-      res.paths["/"].put.responses["201"].schema
+      res.paths["/"].put.responses["201"].schema,
     );
   });
 
@@ -169,7 +169,7 @@ describe("typespec-autorest: return types", () => {
       }
       @get
       op read(): Key | Error;
-      `
+      `,
     );
     ok(res.paths["/"].get.responses["200"]);
     ok(res.definitions.Key);
@@ -200,7 +200,7 @@ describe("typespec-autorest: return types", () => {
       @get
       // Note: & takes precedence over |
       op read(): Key & TextPlain | Error;
-      `
+      `,
     );
     ok(res.paths["/"].get.responses["200"]);
     ok(res.paths["/"].get.responses["200"].schema);
@@ -219,7 +219,7 @@ describe("typespec-autorest: return types", () => {
       }
       @get
       op read(): { ...TextMulti, @body body: string };
-    `
+    `,
     );
     ok(res.paths["/"].get.responses["200"]);
     deepStrictEqual(res.paths["/"].get.produces, ["text/plain", "text/html", "text/csv"]);
@@ -239,7 +239,7 @@ describe("typespec-autorest: return types", () => {
       }
 
       op read(): Foo | Bar;
-      `
+      `,
     );
     expectDiagnostics(ignoreUseStandardOps(diagnostics), {
       code: "@azure-tools/typespec-autorest/duplicate-body-types",
@@ -264,7 +264,7 @@ describe("typespec-autorest: return types", () => {
       }
 
       @get() op read(): Foo[];
-      `
+      `,
     );
     ok(res.paths["/"].get.responses["200"]);
     ok(res.paths["/"].get.responses["200"].schema);
@@ -276,7 +276,7 @@ describe("typespec-autorest: return types", () => {
     const res = await openApiFor(
       `
       @get op test(): Record<string>;
-      `
+      `,
     );
 
     const responses = res.paths["/"].get.responses;
@@ -293,7 +293,7 @@ describe("typespec-autorest: return types", () => {
     const res = await openApiFor(
       `
       @get op delete(): {@header date: string};
-      `
+      `,
     );
 
     const responses = res.paths["/"].get.responses;
@@ -316,7 +316,7 @@ describe("typespec-autorest: return types", () => {
 
       @get
       op get(): Foo | Error;
-      `
+      `,
     );
     const responses = res.paths["/"].get.responses;
     ok(responses["200"]);
@@ -343,7 +343,7 @@ describe("typespec-autorest: return types", () => {
 
         @get
         op get(): Foo | Error;
-      `
+      `,
     );
     const responses = res.paths["/"].get.responses;
     ok(responses["200"]);
@@ -371,7 +371,7 @@ describe("typespec-autorest: return types", () => {
 
       @get
       op get(): Foo | Error;
-      `
+      `,
     );
     const responses = res.paths["/"].get.responses;
     deepStrictEqual(responses["400"]["x-ms-error-response"], true);
@@ -399,7 +399,7 @@ describe("typespec-autorest: return types", () => {
 
       @get
       op get(): Foo | CustomizedErrorResponse | Error;
-      `
+      `,
     );
     const responses = res.paths["/"].get.responses;
     deepStrictEqual(responses["400"]["x-ms-error-response"], true);
@@ -420,7 +420,7 @@ describe("typespec-autorest: return types", () => {
       }
       @get
       op get(): Foo | Error;
-      `
+      `,
     );
     const responses = res.paths["/"].get.responses;
     ok(responses["200"]);
@@ -439,7 +439,7 @@ describe("typespec-autorest: return types", () => {
       `
       @delete
       op delete(): { @header date: string, @body body: {} };
-      `
+      `,
     );
     const responses = res.paths["/"].delete.responses;
     ok(responses["204"] === undefined);
@@ -498,7 +498,7 @@ describe("typespec-autorest: return types", () => {
       async (body) => {
         const res = await openApiFor(`op test(): ${body};`);
         strictEqual(res.paths["/"].get.responses["200"].schema, undefined);
-      }
+      },
     );
   });
 

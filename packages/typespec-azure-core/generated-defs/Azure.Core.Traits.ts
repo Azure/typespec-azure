@@ -20,7 +20,7 @@ export type TraitDecorator = (context: DecoratorContext, target: Model, traitNam
 export type TraitLocationDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  contexts: EnumMember
+  contexts: EnumMember,
 ) => void;
 
 /**
@@ -33,7 +33,7 @@ export type TraitLocationDecorator = (
 export type TraitContextDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  contexts: Type
+  contexts: Type,
 ) => void;
 
 /**
@@ -45,7 +45,7 @@ export type TraitContextDecorator = (
 export type TraitAddedDecorator = (
   context: DecoratorContext,
   target: Model | ModelProperty,
-  addedVersion: Type
+  addedVersion: Type,
 ) => void;
 
 export type AzureCoreTraitsDecorators = {

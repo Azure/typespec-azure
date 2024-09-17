@@ -7,7 +7,7 @@ it("set the service title with @service", async () => {
     `
     @service({title: "My Service"})
     namespace Foo {}
-    `
+    `,
   );
   strictEqual(res.info.title, "My Service");
 });
@@ -20,7 +20,7 @@ it("set the service version with @service", async () => {
       version: "1.2.3-test"
     })
     namespace Foo {}
-    `
+    `,
   );
   strictEqual(res.info.version, "canonical");
 });
@@ -31,7 +31,7 @@ it("set the service description with @doc", async () => {
     @doc("My service description")
     @service({title: "My Service"})
     namespace Foo {}
-    `
+    `,
   );
   strictEqual(res.info.description, "My service description");
 });
@@ -42,7 +42,7 @@ it("set the service externalDocs with @externalDocs", async () => {
     @externalDocs("https://example.com", "more info")
     @service({title: "My Service"})
     namespace Foo {}
-    `
+    `,
   );
   deepStrictEqual(res.externalDocs, {
     url: "https://example.com",
@@ -55,7 +55,7 @@ it("lists the emitters used in the info section", async () => {
     @doc("My service description")
     @service({title: "My Service"})
     namespace Foo {}
-    `
+    `,
   );
   deepStrictEqual(res.info["x-typespec-generated"], [
     { emitter: "@azure-tools/typespec-autorest-canonical" },
@@ -81,7 +81,7 @@ it("set the additional information with @info decorator", async () => {
     namespace Foo {
       op test(): string;
     }
-    `
+    `,
   );
   deepStrictEqual(res.info, {
     title: "(title)",
