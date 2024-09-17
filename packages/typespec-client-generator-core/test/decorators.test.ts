@@ -234,11 +234,11 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const operations = listOperationsInOperationGroup(
         runner.context,
-        getClient(runner.context, MyClient)!
+        getClient(runner.context, MyClient)!,
       );
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["atRoot1", "atRoot2"]
+        ["atRoot1", "atRoot2"],
       );
     });
 
@@ -263,7 +263,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const operations = listOperationsInOperationGroup(runner.context, group);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["inOpGroup1", "inOpGroup2"]
+        ["inOpGroup1", "inOpGroup2"],
       );
     });
 
@@ -322,7 +322,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(
         getCrossLanguageDefinitionId(runner.context, one),
-        "MyClient.SubNamespace.Widgets.one"
+        "MyClient.SubNamespace.Widgets.one",
       );
     });
 
@@ -340,7 +340,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
       strictEqual(
         ignoreDiagnostics(getCrossLanguagePackageId(runner.context)),
-        "My.Package.Namespace"
+        "My.Package.Namespace",
       );
     });
 
@@ -433,7 +433,7 @@ describe("typespec-client-generator-core: decorators", () => {
         interface Model {
           op foo(): void;
         }
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
@@ -473,7 +473,7 @@ describe("typespec-client-generator-core: decorators", () => {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
         const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
           testCode[0],
-          testCode[1]
+          testCode[1],
         );
         expectDiagnostics(diagnostics, {
           code: "@azure-tools/typespec-client-generator-core/client-service",
@@ -485,7 +485,7 @@ describe("typespec-client-generator-core: decorators", () => {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
         const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
           testCode[0],
-          testCode[1]
+          testCode[1],
         );
         expectDiagnostics(diagnostics, {});
         const client = listClients(runner.context)[0];
@@ -497,7 +497,7 @@ describe("typespec-client-generator-core: decorators", () => {
         const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
         const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
           testCode[0],
-          testCode[1]
+          testCode[1],
         );
         expectDiagnostics(diagnostics, {});
         const client = listClients(runner.context)[0];
@@ -526,7 +526,7 @@ describe("typespec-client-generator-core: decorators", () => {
       let operations = listOperationsInOperationGroup(runner.context, clients[0]);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["atRoot1", "atRoot2"]
+        ["atRoot1", "atRoot2"],
       );
 
       const ogs = listOperationGroups(runner.context, clients[0]);
@@ -537,7 +537,7 @@ describe("typespec-client-generator-core: decorators", () => {
       operations = listOperationsInOperationGroup(runner.context, ogs[0]);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["inOpGroup1", "inOpGroup2"]
+        ["inOpGroup1", "inOpGroup2"],
       );
     });
 
@@ -653,7 +653,7 @@ describe("typespec-client-generator-core: decorators", () => {
       let operations = listOperationsInOperationGroup(runner.context, client);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["a_o1", "a_o2"]
+        ["a_o1", "a_o2"],
       );
 
       let group = getOperationGroup(runner.context, AA);
@@ -661,7 +661,7 @@ describe("typespec-client-generator-core: decorators", () => {
       operations = listOperationsInOperationGroup(runner.context, group);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["aa_o1", "aa_o2"]
+        ["aa_o1", "aa_o2"],
       );
 
       group = getOperationGroup(runner.context, AAA);
@@ -673,7 +673,7 @@ describe("typespec-client-generator-core: decorators", () => {
       operations = listOperationsInOperationGroup(runner.context, group);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["aab_o1", "aab_o2"]
+        ["aab_o1", "aab_o2"],
       );
 
       group = getOperationGroup(runner.context, AG);
@@ -681,7 +681,7 @@ describe("typespec-client-generator-core: decorators", () => {
       operations = listOperationsInOperationGroup(runner.context, group);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["a_g_o1", "a_g_o2"]
+        ["a_g_o1", "a_g_o2"],
       );
 
       group = getOperationGroup(runner.context, AAG);
@@ -689,7 +689,7 @@ describe("typespec-client-generator-core: decorators", () => {
       operations = listOperationsInOperationGroup(runner.context, group);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["aa_g_o1", "aa_g_o2"]
+        ["aa_g_o1", "aa_g_o2"],
       );
 
       group = getOperationGroup(runner.context, AABGroup1);
@@ -697,7 +697,7 @@ describe("typespec-client-generator-core: decorators", () => {
       operations = listOperationsInOperationGroup(runner.context, group);
       deepStrictEqual(
         operations.map((x) => x.name),
-        ["aab_g1_o1", "aab_g1_o2"]
+        ["aab_g1_o1", "aab_g1_o2"],
       );
 
       group = getOperationGroup(runner.context, AABGroup2);
@@ -752,36 +752,36 @@ describe("typespec-client-generator-core: decorators", () => {
           "aa_g_o2",
           "a_g_o1",
           "a_g_o2",
-        ]
+        ],
       );
       allOperations = listOperationsInOperationGroup(runner.context, aa, true);
       deepStrictEqual(
         allOperations.map((x) => x.name),
-        ["aa_o1", "aa_o2", "aab_o1", "aab_o2", "aab_g1_o1", "aab_g1_o2", "aa_g_o1", "aa_g_o2"]
+        ["aa_o1", "aa_o2", "aab_o1", "aab_o2", "aab_g1_o1", "aab_g1_o2", "aa_g_o1", "aa_g_o2"],
       );
       allOperations = listOperationsInOperationGroup(runner.context, aaa, true);
       deepStrictEqual(allOperations, []);
       allOperations = listOperationsInOperationGroup(runner.context, aab, true);
       deepStrictEqual(
         allOperations.map((x) => x.name),
-        ["aab_o1", "aab_o2", "aab_g1_o1", "aab_g1_o2"]
+        ["aab_o1", "aab_o2", "aab_g1_o1", "aab_g1_o2"],
       );
       allOperations = listOperationsInOperationGroup(runner.context, aag, true);
       deepStrictEqual(
         allOperations.map((x) => x.name),
-        ["aa_g_o1", "aa_g_o2"]
+        ["aa_g_o1", "aa_g_o2"],
       );
       allOperations = listOperationsInOperationGroup(runner.context, aabGroup1, true);
       deepStrictEqual(
         allOperations.map((x) => x.name),
-        ["aab_g1_o1", "aab_g1_o2"]
+        ["aab_g1_o1", "aab_g1_o2"],
       );
       allOperations = listOperationsInOperationGroup(runner.context, aabGroup2, true);
       deepStrictEqual(allOperations, []);
       allOperations = listOperationsInOperationGroup(runner.context, ag, true);
       deepStrictEqual(
         allOperations.map((x) => x.name),
-        ["a_g_o1", "a_g_o2"]
+        ["a_g_o1", "a_g_o2"],
       );
     });
 
@@ -873,7 +873,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(client1);
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
       deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
 
@@ -881,7 +881,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(client2);
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, client2).map((x) => x.name),
-        ["y"]
+        ["y"],
       );
       deepStrictEqual(listOperationGroups(runner.context, client2).length, 0);
     });
@@ -915,7 +915,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(client1);
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
       deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
     });
@@ -946,7 +946,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(b.groupPath, "Test1Client.B");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
     });
 
@@ -983,7 +983,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(b.groupPath, "Test1Client.BRename");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
 
       const c = b.subOperationGroups?.find((x) => x.type.name === "C");
@@ -993,7 +993,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(c.groupPath, "Test1Client.BRename.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, c).map((x) => x.name),
-        ["y"]
+        ["y"],
       );
     });
 
@@ -1044,7 +1044,7 @@ describe("typespec-client-generator-core: decorators", () => {
         namespace Customizations;
 
         @@clientName(A, "Test1Client");
-      `
+      `,
       );
 
       const clients = listClients(runner.context);
@@ -1054,7 +1054,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(client1);
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
       deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
     });
@@ -1072,7 +1072,7 @@ describe("typespec-client-generator-core: decorators", () => {
           name: "Test1Client",
           service: A
         });
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, {
@@ -1086,7 +1086,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(client1);
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
       deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
     });
@@ -1116,7 +1116,7 @@ describe("typespec-client-generator-core: decorators", () => {
         interface Test2Client {
           y is A.C.y;
         }
-      `
+      `,
       );
 
       const clients = listClients(runner.context);
@@ -1126,7 +1126,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(client1);
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
       deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
 
@@ -1134,7 +1134,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(client2);
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, client2).map((x) => x.name),
-        ["y"]
+        ["y"],
       );
       deepStrictEqual(listOperationGroups(runner.context, client2).length, 0);
     });
@@ -1162,7 +1162,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @@client(A.C, {
           name: "Test2Client",
         });
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -1191,7 +1191,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(og1.groupPath, "AClient.B");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
 
       const og2 = clientOgs.find((x) => x.type.name === "C");
@@ -1201,7 +1201,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(og2.groupPath, "AClient.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
-        ["y"]
+        ["y"],
       );
     });
 
@@ -1232,7 +1232,7 @@ describe("typespec-client-generator-core: decorators", () => {
         interface OpGrp2 {
           pet is PetStore.pet
         }
-      `
+      `,
       );
 
       const clients = listClients(runner.context);
@@ -1252,7 +1252,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(og1.groupPath, "PetStoreClient.OpGrp1");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
-        ["feed"]
+        ["feed"],
       );
 
       const og2 = clientOgs.find((x) => x.type.name === "OpGrp2");
@@ -1262,7 +1262,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(og2.groupPath, "PetStoreClient.OpGrp2");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
-        ["pet"]
+        ["pet"],
       );
     });
 
@@ -1283,7 +1283,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }`,
         `
         @@operationGroup(A.B);
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, {
@@ -1307,7 +1307,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(og1.groupPath, "AClient.B");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
-        ["x"]
+        ["x"],
       );
 
       const og2 = clientOgs.find((x) => x.type.name === "C");
@@ -1317,7 +1317,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(og2.groupPath, "AClient.C");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
-        ["y"]
+        ["y"],
       );
     });
 
@@ -1365,7 +1365,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(b.groupPath, "Test1Client.B");
       deepStrictEqual(
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
-        ["x", "y"]
+        ["x", "y"],
       );
     });
   });
@@ -1373,7 +1373,7 @@ describe("typespec-client-generator-core: decorators", () => {
   async function protocolAPITestHelper(
     runner: SdkTestRunner,
     protocolValue: boolean,
-    globalValue: boolean
+    globalValue: boolean,
   ): Promise<void> {
     const testCode = `
           @protocolAPI(${protocolValue})
@@ -1387,7 +1387,7 @@ describe("typespec-client-generator-core: decorators", () => {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
-      test as Operation
+      test as Operation,
     );
 
     const method = runner.context.sdkPackage.clients[0].methods[0];
@@ -1414,7 +1414,7 @@ describe("typespec-client-generator-core: decorators", () => {
   async function convenientAPITestHelper(
     runner: SdkTestRunner,
     convenientValue: boolean,
-    globalValue: boolean
+    globalValue: boolean,
   ): Promise<void> {
     const testCode = `
           @convenientAPI(${convenientValue})
@@ -1428,7 +1428,7 @@ describe("typespec-client-generator-core: decorators", () => {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
-      test as Operation
+      test as Operation,
     );
     strictEqual(actual, convenientValue);
 
@@ -1464,7 +1464,7 @@ describe("typespec-client-generator-core: decorators", () => {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
-        test as Operation
+        test as Operation,
       );
       strictEqual(actual, true);
       const method = runner.context.sdkPackage.clients[0].methods[0];
@@ -1499,7 +1499,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(
           shouldGenerateConvenient(runner.context, test),
           false,
-          "convenientAPI should be false for java"
+          "convenientAPI should be false for java",
         );
         strictEqual(method.generateConvenient, false, "convenientAPI should be false for java");
       }
@@ -1515,7 +1515,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(
           shouldGenerateProtocol(runner.context, test),
           false,
-          "protocolAPI should be false for csharp"
+          "protocolAPI should be false for csharp",
         );
         strictEqual(method.generateProtocol, false, "protocolAPI should be false for csharp");
 
@@ -1917,7 +1917,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @@clientName(MyService.Test1, "Test1Rename");
         @@clientName(MyService.func1, "func1Rename");
-      `
+      `,
       )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
 
       strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
@@ -2073,7 +2073,7 @@ describe("typespec-client-generator-core: decorators", () => {
       model Test {
         prop1: string;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2104,7 +2104,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       @clientName("B")
       union C {}
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2136,7 +2136,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       @route("/b")
       op b(): void;
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2166,7 +2166,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @route("/b")
         op b(): void;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2192,7 +2192,7 @@ describe("typespec-client-generator-core: decorators", () => {
       scalar a extends string;
 
       scalar b extends string;
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2222,7 +2222,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @route("/b")
       interface B {
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2249,7 +2249,7 @@ describe("typespec-client-generator-core: decorators", () => {
         prop1: string;
         prop2: string;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2276,7 +2276,7 @@ describe("typespec-client-generator-core: decorators", () => {
         one,
         two
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2303,7 +2303,7 @@ describe("typespec-client-generator-core: decorators", () => {
           a: {}, 
           b: {} 
         }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2328,7 +2328,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @clientName("B")
           namespace C {}
         }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2361,7 +2361,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @clientName("B")
           model A {}
         }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2384,7 +2384,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @clientName("Foo")
         model Bar {}
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2416,7 +2416,7 @@ describe("typespec-client-generator-core: decorators", () => {
       model Test {
         prop1: string;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2499,7 +2499,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -2537,7 +2537,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -2598,7 +2598,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -2635,7 +2635,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -2696,7 +2696,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -2733,7 +2733,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -2794,7 +2794,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v2");
@@ -2834,7 +2834,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2"]
+        ["v1", "v2"],
       );
     });
 
@@ -2895,7 +2895,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v1");
@@ -2923,7 +2923,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1"]
+        ["v1"],
       );
     });
 
@@ -2984,7 +2984,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -3024,7 +3024,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -3069,11 +3069,11 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 2);
       strictEqual(
         runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
-        "previewFunctionality"
+        "previewFunctionality",
       );
       strictEqual(
         runnerWithVersion.context.sdkPackage.clients[0].methods[1].name,
-        "stableFunctionality"
+        "stableFunctionality",
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
       strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "PreviewModel");
@@ -3091,14 +3091,14 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 1);
       strictEqual(
         runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
-        "stableFunctionality"
+        "stableFunctionality",
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
       strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
       strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
       strictEqual(
         runnerWithVersion.context.sdkPackage.models[0].usage,
-        UsageFlags.Spread | UsageFlags.Json
+        UsageFlags.Spread | UsageFlags.Json,
       );
     });
     it("add client", async () => {
@@ -3127,7 +3127,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
@@ -3137,7 +3137,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(versioningClient.initialization.properties.length, 1);
       const versioningClientEndpoint = versioningClient.initialization.properties.find(
-        (x) => x.kind === "endpoint"
+        (x) => x.kind === "endpoint",
       );
       ok(versioningClientEndpoint);
       deepStrictEqual(versioningClientEndpoint.apiVersions, ["v1", "v2"]);
@@ -3159,7 +3159,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(interfaceV2.initialization.properties.length, 1);
       const interfaceV2Endpoint = interfaceV2.initialization.properties.find(
-        (x) => x.kind === "endpoint"
+        (x) => x.kind === "endpoint",
       );
       ok(interfaceV2Endpoint);
       deepStrictEqual(interfaceV2Endpoint.apiVersions, ["v2"]);
@@ -3195,7 +3195,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
@@ -3228,7 +3228,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
@@ -3270,7 +3270,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkVersionsEnum = runnerWithVersion.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
@@ -3545,7 +3545,7 @@ describe("typespec-client-generator-core: decorators", () => {
         op func(params: MyService.Params): void;
 
         @@override(MyService.func, MyCustomizations.func);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
 
@@ -3634,7 +3634,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(methodWithCsharp.name, "func");
       strictEqual(methodWithCsharp.parameters.length, 2);
       const contentTypeParamWithCsharp = methodWithCsharp.parameters.find(
-        (x) => x.name === "contentType"
+        (x) => x.name === "contentType",
       );
       ok(contentTypeParamWithCsharp);
 
@@ -3642,14 +3642,14 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(paramsParamWithCsharp);
       strictEqual(
         sdkPackageWithCsharp.models.find((x) => x.name === "Params"),
-        paramsParamWithCsharp.type
+        paramsParamWithCsharp.type,
       );
 
       const httpOpWithCsharp = methodWithCsharp.operation;
       strictEqual(httpOpWithCsharp.parameters.length, 1);
       strictEqual(
         httpOpWithCsharp.parameters[0].correspondingMethodParams[0],
-        contentTypeParamWithCsharp
+        contentTypeParamWithCsharp,
       );
       ok(httpOpWithCsharp.bodyParam);
       strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
@@ -3761,7 +3761,7 @@ describe("typespec-client-generator-core: decorators", () => {
         op func(input: MyService.Params): void;
 
         @@override(MyService.func, MyCustomizations.func);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
 
@@ -3816,7 +3816,7 @@ describe("typespec-client-generator-core: decorators", () => {
         op templateOp(params: My.Service.Params): My.Service.Params;
 
         @@override(My.Service.templateOp, My.Customizations.templateOp);
-        `
+        `,
       );
       const sdkPackage = runnerWithCore.context.sdkPackage;
       const method = sdkPackage.clients[0].methods[0];
@@ -3847,7 +3847,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
 
         @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
@@ -3896,7 +3896,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @@clientInitialization(StorageClient, ClientInitialization);
         @@clientInitialization(StorageClient.BlobClient, ClientInitialization);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       const clients = sdkPackage.clients;
@@ -3938,7 +3938,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
       const blobClientBlobInitializationProp = blobClient.initialization.properties.find(
-        (x) => x.name === "blobName"
+        (x) => x.name === "blobName",
       );
       ok(blobClientBlobInitializationProp);
       strictEqual(blobClientBlobInitializationProp.kind, "method");
@@ -3974,7 +3974,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
 
         @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
@@ -4030,7 +4030,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
 
         @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
@@ -4044,7 +4044,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobName.optional, false);
 
       const containerName = client.initialization.properties.find(
-        (x) => x.name === "containerName"
+        (x) => x.name === "containerName",
       );
       ok(containerName);
       strictEqual(containerName.clientDefaultValue, undefined);
@@ -4088,7 +4088,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @@clientInitialization(MyService, MyClientInitialization);
         @@clientInitialization(MyService.MyInterface, MyClientInitialization);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
@@ -4103,7 +4103,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobName.onClient, true);
 
       const containerName = client.initialization.properties.find(
-        (x) => x.name === "containerName"
+        (x) => x.name === "containerName",
       );
       ok(containerName);
       strictEqual(containerName.clientDefaultValue, undefined);
@@ -4166,7 +4166,7 @@ describe("typespec-client-generator-core: decorators", () => {
           }
         }
         
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 2);
@@ -4178,7 +4178,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(containerClient.initialization.properties.find((x) => x.kind === "endpoint"));
 
       const containerName = containerClient.initialization.properties.find(
-        (x) => x.name === "containerName"
+        (x) => x.name === "containerName",
       );
       ok(containerName);
 
@@ -4197,7 +4197,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
 
       const containerNameOnBlobClient = blobClient.initialization.properties.find(
-        (x) => x.name === "containerName"
+        (x) => x.name === "containerName",
       );
       ok(containerNameOnBlobClient);
 
@@ -4212,7 +4212,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobMethods[0].operation.parameters.length, 2);
       strictEqual(
         blobMethods[0].operation.parameters[0].correspondingMethodParams[0],
-        containerNameOnBlobClient
+        containerNameOnBlobClient,
       );
       strictEqual(blobMethods[0].operation.parameters[1].correspondingMethodParams[0], blobName);
     });
@@ -4235,7 +4235,7 @@ describe("typespec-client-generator-core: decorators", () => {
         }
 
         @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];

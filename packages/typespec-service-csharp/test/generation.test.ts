@@ -8,19 +8,19 @@ function getGeneratedFile(runner: BasicTestRunner, fileName: string): [string, s
   assert.strictEqual(
     result === null || result === undefined,
     false,
-    `No file matching ${fileName} found in output`
+    `No file matching ${fileName} found in output`,
   );
   assert.strictEqual(result.length, 1, `found ${result.length} entries of ${fileName}`);
   const fileData = result[0];
   assert.strictEqual(
     fileData[0] === null || fileData[0] === undefined,
     false,
-    `${fileName} not found`
+    `${fileName} not found`,
   );
   assert.strictEqual(
     fileData[1] === null || fileData[1] === undefined,
     false,
-    `${fileName} has no contents`
+    `${fileName} has no contents`,
   );
   return fileData;
 }
@@ -29,7 +29,7 @@ function assertFileContains(fileName: string, fileContents: string, searchString
   assert.strictEqual(
     fileContents.includes(searchString),
     true,
-    `"${searchString}" not found in ${fileName}, contents of file: ${fileContents}`
+    `"${searchString}" not found in ${fileName}, contents of file: ${fileContents}`,
   );
 }
 
@@ -37,7 +37,7 @@ async function compileAndValidateSingleModel(
   runner: BasicTestRunner,
   code: string,
   fileToCheck: string,
-  expectedContent: string[]
+  expectedContent: string[],
 ): Promise<void> {
   await compileAndValidateMultiple(runner, code, [[fileToCheck, expectedContent]]);
 }
@@ -45,7 +45,7 @@ async function compileAndValidateSingleModel(
 async function compileAndValidateMultiple(
   runner: BasicTestRunner,
   code: string,
-  fileChecks: [string, string[]][]
+  fileChecks: [string, string[]][],
 ): Promise<void> {
   const spec = getStandardService(code);
   await runner.compile(spec);
@@ -127,7 +127,7 @@ describe("typespec-service-csharp: core service generation", () => {
         "public DateTimeOffset? UtcDateTimeProp { get; set; }",
         "public DateTimeOffset? OffsetDateTimeProp { get; set; }",
         "public string StringProp { get; set; }",
-      ]
+      ],
     );
   });
 
@@ -146,7 +146,7 @@ describe("typespec-service-csharp: core service generation", () => {
       }
       `,
       "Foo.cs",
-      ["public partial class Foo", `public string AdminPassword { get; set; }`]
+      ["public partial class Foo", `public string AdminPassword { get; set; }`],
     );
   });
 
@@ -170,7 +170,7 @@ describe("typespec-service-csharp: core service generation", () => {
         `public string StringLiteralProp { get; } = "This is a string literal";`,
         "public bool? BoolLiteralProp { get; } = true;",
         "public object? NumericLiteralProp { get; set; }",
-      ]
+      ],
     );
   });
 
@@ -194,7 +194,7 @@ describe("typespec-service-csharp: core service generation", () => {
         `public string? StringLiteralProp { get; set; } = "This is a string literal";`,
         "public bool? BoolLiteralProp { get; set; } = true;",
         "public int? NumericLiteralProp { get; set; } = 17;",
-      ]
+      ],
     );
   });
 
@@ -260,7 +260,7 @@ describe("typespec-service-csharp: core service generation", () => {
         "public DateTimeOffset[] ArrutcDateTimeProp { get; set; }",
         "public DateTimeOffset[] ArroffsetDateTimeProp { get; set; }",
         "public string[] ArrStringProp { get; set; }",
-      ]
+      ],
     );
   });
 
@@ -303,7 +303,7 @@ describe("typespec-service-csharp: core service generation", () => {
             `public Baz NextBazProp { get; set; }`,
           ],
         ],
-      ]
+      ],
     );
   });
 
@@ -323,7 +323,7 @@ describe("typespec-service-csharp: core service generation", () => {
       [
         "public partial class Foo",
         `public string? GeneratedInvalidName { get; set; } = "This is a string literal";`,
-      ]
+      ],
     );
   });
 
@@ -344,7 +344,7 @@ describe("typespec-service-csharp: core service generation", () => {
         "public partial class Foo",
         `public object ObjectUnionProp { get; set; }`,
         `public string StringUnionProp { get; set; }`,
-      ]
+      ],
     );
   });
 
@@ -436,7 +436,7 @@ interface Widgets {
             `protected virtual Task<IActionResult> OnDeleteWidgetAsync(string widgetName)`,
           ],
         ],
-      ]
+      ],
     );
   });
 });

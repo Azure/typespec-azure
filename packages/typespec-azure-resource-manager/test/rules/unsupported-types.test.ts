@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: unsupported types rule", () => {
     tester = createLinterRuleTester(
       runner,
       unsupportedTypeRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 

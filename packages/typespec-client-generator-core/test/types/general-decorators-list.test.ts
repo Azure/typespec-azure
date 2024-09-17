@@ -34,7 +34,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   it("basic arg type", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
     );
 
     await runner.compileWithBuiltInService(`
@@ -102,7 +102,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   it("multiple same decorators", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
     );
 
     await runner.compileWithBuiltInService(`
@@ -332,7 +332,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
     it("@useSystemTextJsonConverter", async function () {
       runner = await createSdkTestRunner(
         {},
-        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] }
+        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] },
       );
 
       await runner.compileWithBuiltInService(`

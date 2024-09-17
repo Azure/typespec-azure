@@ -49,7 +49,7 @@ describe("typespec-autorest: Additional properties", () => {
         "Pet",
         `
         model Pet { details: Record<unknown> };
-        `
+        `,
       );
 
       ok(res.isRef);
@@ -68,7 +68,7 @@ describe("typespec-autorest: Additional properties", () => {
       @doc("value")
       scalar Value;
       model Pet is Record<Value> {};
-      `
+      `,
     );
 
     ok(res.isRef);

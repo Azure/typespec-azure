@@ -17,7 +17,7 @@ function createLibraryReferenceStructure(
   libName: string,
   labelName: string,
   hasLinterRules: boolean,
-  extra?: SidebarItemConfig[]
+  extra?: SidebarItemConfig[],
 ): SidebarItemConfig {
   const rules: SidebarItemConfig = {
     type: "category",
@@ -96,13 +96,13 @@ const sidebars: SidebarsConfig = {
           "libraries",
           "azure-resource-manager",
           "Azure.ResourceManager",
-          true
+          true,
         ),
         createLibraryReferenceStructure(
           "libraries",
           "typespec-client-generator-core",
           "Azure.ClientGenerator.Core",
-          false
+          false,
         ),
         createLibraryReferenceStructure("libraries", "azure-portal-core", "Azure.Portal", false),
       ],
@@ -113,7 +113,7 @@ const sidebars: SidebarsConfig = {
           "emitters",
           "typespec-autorest",
           "Autorest / Swagger",
-          false
+          false,
         ),
       ],
     },

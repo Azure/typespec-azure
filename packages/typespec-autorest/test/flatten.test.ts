@@ -13,7 +13,7 @@ it("applies x-ms-client-flatten for property marked with @flattenProperty", asyn
 
     model WidgetProperties {
     }
-    `
+    `,
   );
   const model = res.definitions["Widget"]!;
   deepStrictEqual(model, {

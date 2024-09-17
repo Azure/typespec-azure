@@ -12,7 +12,7 @@ export type ExampleDecorator = (
   context: DecoratorContext,
   target: Operation,
   pathOrUri: string,
-  title: string
+  title: string,
 ) => void;
 
 /**
@@ -25,7 +25,7 @@ export type ExampleDecorator = (
 export type UseRefDecorator = (
   context: DecoratorContext,
   entity: Model | ModelProperty,
-  jsonRef: string
+  jsonRef: string,
 ) => void;
 
 export type AutorestDecorators = {

@@ -17,7 +17,7 @@ import type {
  */
 export type LroStatusDecorator = (
   context: DecoratorContext,
-  entity: Enum | Union | ModelProperty
+  entity: Enum | Union | ModelProperty,
 ) => void;
 
 /**
@@ -29,7 +29,7 @@ export type LroStatusDecorator = (
 export type FinalLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  finalResult?: Type
+  finalResult?: Type,
 ) => void;
 
 /**
@@ -42,7 +42,7 @@ export type FinalLocationDecorator = (
 export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  options?: Type
+  options?: Type,
 ) => void;
 
 /**
@@ -72,7 +72,7 @@ export type FixedDecorator = (context: DecoratorContext, target: Enum) => void;
  */
 export type LroSucceededDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => void;
 
 /**
@@ -81,7 +81,7 @@ export type LroSucceededDecorator = (
  */
 export type LroCanceledDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => void;
 
 /**
@@ -90,7 +90,7 @@ export type LroCanceledDecorator = (
  */
 export type LroFailedDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => void;
 
 /**
@@ -120,7 +120,7 @@ export type OperationLinkDecorator = (
   entity: Operation,
   linkedOperation: Operation,
   linkType: string,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
 
 /**
@@ -133,7 +133,7 @@ export type OperationLinkDecorator = (
 export type PollingOperationParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  targetParameter?: Type
+  targetParameter?: Type,
 ) => void;
 
 /**
@@ -147,7 +147,7 @@ export type PollingOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
 
 /**
@@ -161,7 +161,7 @@ export type FinalOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
 
 /**
@@ -172,7 +172,7 @@ export type FinalOperationDecorator = (
 export type UseFinalStateViaDecorator = (
   context: DecoratorContext,
   entity: Operation,
-  finalState: "original-uri" | "operation-location" | "location" | "azure-async-operation"
+  finalState: "original-uri" | "operation-location" | "location" | "azure-async-operation",
 ) => void;
 
 /**
@@ -186,7 +186,7 @@ export type NextPageOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
 
 export type AzureCoreDecorators = {

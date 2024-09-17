@@ -304,7 +304,7 @@ it("issues diagnostics for errors in a discriminated union", async () => {
 
     #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
     op read(): { @body body: Pet };
-    `
+    `,
   );
   expectDiagnostics(diagnostics, [
     {
@@ -349,7 +349,7 @@ it("issues diagnostics for duplicate discriminator values", async () => {
 
     #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
     op read(): { @body body: Pet };
-    `
+    `,
   );
   expectDiagnostics(diagnostics, [
     {
