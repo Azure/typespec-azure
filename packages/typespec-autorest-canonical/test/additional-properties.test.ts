@@ -48,7 +48,7 @@ describe("referencing Record<T>", () => {
       "Pet",
       `
       model Pet { details: Record<unknown> };
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -67,7 +67,7 @@ it("set additionalProperties if model extends Record with leaf type", async () =
     @doc("value")
     scalar Value;
     model Pet is Record<Value> {};
-    `
+    `,
   );
 
   ok(res.isRef);

@@ -7,5 +7,5 @@ export default mergeConfig(
     test: {
       testTimeout: 30000,
     },
-  })
+  }),
 );

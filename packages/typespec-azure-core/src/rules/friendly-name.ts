@@ -69,7 +69,7 @@ function checkFriendlyName(
     readonly scope: CallableMessage<[string]>;
     readonly template: CallableMessage<[]>;
   }>,
-  type: Type
+  type: Type,
 ) {
   const decorator = getFriendlyNameDecoratorOnType(type);
   if (decorator) {
@@ -97,7 +97,7 @@ function getFriendlyNameDecoratorOnType(type: Type): DecoratorApplication | unde
     (x) =>
       x.decorator.name === "$friendlyName" &&
       x.node?.kind === SyntaxKind.DecoratorExpression &&
-      x.node?.parent === type.node
+      x.node?.parent === type.node,
   );
 
   return decorators[0];

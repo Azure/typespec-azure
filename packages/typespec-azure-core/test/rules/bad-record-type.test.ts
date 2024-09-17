@@ -35,7 +35,7 @@ describe("typespec-azure-core: Record type rules", () => {
           model Foo is Record<string> {
               name: string;
           }
-        `
+        `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/bad-record-type",
@@ -56,7 +56,7 @@ describe("typespec-azure-core: Record type rules", () => {
         model Foo extends Record<unknown> {};
         model Bar extends Foo {};
         model Baz extends Bar {};
-        `
+        `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/bad-record-type",
@@ -69,7 +69,7 @@ describe("typespec-azure-core: Record type rules", () => {
         .expect(
           `model Foo extends Record<string> {
         name: string;
-      }`
+      }`,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/bad-record-type",
@@ -84,7 +84,7 @@ describe("typespec-azure-core: Record type rules", () => {
         .expect(
           `model Foo {
         props: Record<string>;
-      }`
+      }`,
         )
         .toBeValid();
     });
@@ -94,7 +94,7 @@ describe("typespec-azure-core: Record type rules", () => {
         .expect(
           `model Foo {
         props: Record<unknown>;
-      }`
+      }`,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/bad-record-type",

@@ -87,7 +87,7 @@ describe("typespec-autorest: OpenAPI output should be determinstic", () => {
       model Headers { ...A_Header, ...B_Header, ...C_Header };
 
       op read(): {@statusCode _: 200, content: string, headers: Headers};
-      `
+      `,
     );
     deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
   });
@@ -99,7 +99,7 @@ describe("typespec-autorest: OpenAPI output should be determinstic", () => {
       model Headers { ...C_Header, ...A_Header, ...B_Header };
 
       op read(): {@statusCode _: 200, content: string, headers: Headers};
-      `
+      `,
     );
     deepStrictEqual(Object.keys(res.paths["/"].get.responses["200"].headers), ["a", "b", "c"]);
   });

@@ -20,7 +20,7 @@ export const noResponseBodyRule = createRule({
           return;
         }
         const responses = getResponsesForOperation(context.program, op)[0].find(
-          (v) => v.statusCodes === 202
+          (v) => v.statusCodes === 202,
         );
         if (responses && responses.responses.some((v) => v.body)) {
           context.reportDiagnostic({

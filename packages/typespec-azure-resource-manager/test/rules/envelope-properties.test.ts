@@ -17,7 +17,7 @@ describe("typespec-azure-resource-manager: envelope properties rule", () => {
     tester = createLinterRuleTester(
       runner,
       envelopePropertiesRules,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -43,7 +43,7 @@ describe("typespec-azure-resource-manager: envelope properties rule", () => {
         ResourceRead<FooResource>,
         ResourceCreate<FooResource>,
         ResourceDelete<FooResource> {}
-      `
+      `,
       )
       .toEmitDiagnostics([
         {

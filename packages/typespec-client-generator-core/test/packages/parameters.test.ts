@@ -738,7 +738,7 @@ describe("typespec-client-generator-core: parameters", () => {
         
         @route("/generations:submit")
         op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
-      `)
+      `),
     );
     const sdkPackage = runnerWithCore.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);

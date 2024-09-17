@@ -32,7 +32,7 @@ import { AzureCoreStateKeys, reportDiagnostic } from "./lib.js";
 export const $traitSource: TraitSourceDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  traitName: string
+  traitName: string,
 ) => {
   // Store the source trait name on the envelope property
   context.program.stateMap(AzureCoreStateKeys.traitSource).set(target, traitName);
@@ -52,7 +52,7 @@ setTypeSpecNamespace("Traits.Private", $traitSource);
 export const $trait: TraitDecorator = (
   context: DecoratorContext,
   target: Model,
-  traitName?: string
+  traitName?: string,
 ) => {
   if (target.properties.size !== 1) {
     reportDiagnostic(context.program, {
@@ -138,7 +138,7 @@ export function getTraitName(program: Program, model: Model): string | undefined
 export const $traitContext: TraitContextDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  traitContext: Type
+  traitContext: Type,
 ) => {
   context.program
     .stateMap(AzureCoreStateKeys.traitContext)
@@ -181,7 +181,7 @@ function normalizeTraitContexts(program: Program, contexts: Type): EnumMember[] 
 
 function getTraitContextsOrUndefined(
   program: Program,
-  property: ModelProperty
+  property: ModelProperty,
 ): EnumMember[] | undefined {
   // Sometimes we need to know whether a trait context was explicitly set on a
   // property without defaulting to an empty array
@@ -201,7 +201,7 @@ export function getTraitContexts(program: Program, property: ModelProperty): Enu
 export const $traitLocation: TraitLocationDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  traitLocation: EnumMember
+  traitLocation: EnumMember,
 ) => {
   context.program.stateMap(AzureCoreStateKeys.traitLocation).set(target, traitLocation);
 };
@@ -215,7 +215,7 @@ setTypeSpecNamespace("Traits", $traitLocation);
  */
 export function getTraitLocation(
   program: Program,
-  property: ModelProperty
+  property: ModelProperty,
 ): EnumMember | undefined {
   return program.stateMap(AzureCoreStateKeys.traitLocation).get(property);
 }
@@ -225,7 +225,7 @@ const traitAddedKey = Symbol("traitLocation");
 export const $traitAdded: TraitAddedDecorator = (
   context: DecoratorContext,
   target: Model | ModelProperty,
-  addedVersion: Type
+  addedVersion: Type,
 ) => {
   if (addedVersion.kind !== "EnumMember") {
     // The type is probably "null" so don't do anything
@@ -257,7 +257,7 @@ export const $traitAdded: TraitAddedDecorator = (
 
 function getTraitAddedVersion(
   program: Program,
-  envelopeProperty: ModelProperty
+  envelopeProperty: ModelProperty,
 ): EnumMember | undefined {
   return program.stateMap(traitAddedKey).get(envelopeProperty);
 }
@@ -269,7 +269,7 @@ export const $addTraitProperties: AddTraitPropertiesDecorator = (
   target: Model,
   traitModel: Model,
   traitLocation: EnumMember,
-  traitContexts: Type
+  traitContexts: Type,
 ) => {
   // Keep track of all traits applied
   const appliedTraits = new Set<string>();
@@ -306,7 +306,7 @@ export const $addTraitProperties: AddTraitPropertiesDecorator = (
             traitProperty,
             contextsOverride ?? contexts,
             traitLocation,
-            normalizeTraitContexts(program, traitContexts)
+            normalizeTraitContexts(program, traitContexts),
           )
         ) {
           if (traitProperty.type.kind !== "Model") {
@@ -337,7 +337,7 @@ export const $addTraitProperties: AddTraitPropertiesDecorator = (
                       ]
                     : []),
                 ],
-              })
+              }),
             );
 
             appliedTraits.add(traitName);
@@ -353,7 +353,7 @@ function checkTraitPropertyCriteria(
   property: ModelProperty,
   traitContexts: EnumMember[],
   expectedLocation: EnumMember,
-  expectedContexts: EnumMember[]
+  expectedContexts: EnumMember[],
 ): boolean {
   const location = getTraitLocation(program, property);
   if (!location) {
@@ -380,7 +380,7 @@ let traitOverrideCounter = 1;
 export const $applyTraitOverride: ApplyTraitOverrideDecorator = (
   context: DecoratorContext,
   target: Model,
-  traitModel: Model
+  traitModel: Model,
 ) => {
   if (traitModel.properties.size !== 1) {
     // The @trait decorator has already raised a diagnostic so skip it.
@@ -404,7 +404,7 @@ export const $applyTraitOverride: ApplyTraitOverrideDecorator = (
       name: overrideName,
       model: target,
       sourceProperty: envelopeProperty,
-    })
+    }),
   );
 };
 
@@ -414,7 +414,7 @@ export const $ensureTraitsPresent: EnsureTraitsPresentDecorator = (
   context: DecoratorContext,
   target: Interface | Operation,
   traitModel: Model,
-  expectedTraits: Type
+  expectedTraits: Type,
 ) => {
   if (expectedTraits.kind !== "Tuple") {
     return;
@@ -462,7 +462,7 @@ setTypeSpecNamespace("Traits.Private", $ensureTraitsPresent);
 export const $ensureAllQueryParams: EnsureAllQueryParamsDecorator = (
   context: DecoratorContext,
   target: Model,
-  paramModel: Model
+  paramModel: Model,
 ) => {
   for (const [_, param] of paramModel.properties) {
     if (!isQueryParam(context.program, param)) {
@@ -483,7 +483,7 @@ setTypeSpecNamespace("Traits.Private", $ensureAllQueryParams);
 export const $ensureAllHeaderParams: EnsureAllHeaderParamsDecorator = (
   context: DecoratorContext,
   target: Model,
-  paramModel: Model
+  paramModel: Model,
 ) => {
   for (const [_, param] of paramModel.properties) {
     if (!isHeader(context.program, param)) {
