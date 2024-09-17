@@ -22,7 +22,7 @@ describe("typespec-azure-core: require `@useAuth` on Azure services", () => {
         `
         @route("/")
         op readWidget(): string;
-        `
+        `,
       )
       .toEmitDiagnostics([
         {

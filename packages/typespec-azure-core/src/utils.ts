@@ -12,7 +12,7 @@ import { getHttpOperation, HttpOperation, isStatusCode } from "@typespec/http";
  */
 export function filterModelProperties(
   model: Model,
-  predicate: (prop: ModelProperty) => boolean
+  predicate: (prop: ModelProperty) => boolean,
 ): ModelProperty[] {
   return [...getAllProperties(model).values()].filter(predicate);
 }
@@ -25,7 +25,7 @@ export function filterModelProperties(
  */
 export function filterResponseModels(
   operation: HttpOperation,
-  predicate: (model: Model) => boolean
+  predicate: (model: Model) => boolean,
 ): Model[] | undefined {
   const models: Model[] = [];
   for (const response of operation.responses) {
@@ -87,13 +87,13 @@ export function getOperationResponse(program: Program, operation: Operation): Mo
 export function getResultModelWithProperty(
   program: Program,
   operation: Operation,
-  predicate: (prop: ModelProperty) => boolean
+  predicate: (prop: ModelProperty) => boolean,
 ): [Model, ModelProperty] | undefined {
   const httpOperation = getHttpMetadata(program, operation);
 
   const models = filterResponseModels(
     httpOperation,
-    (model) => filterModelProperties(model, predicate).length > 0
+    (model) => filterModelProperties(model, predicate).length > 0,
   );
   if (models === undefined || models.length < 1) return undefined;
   const properties = [...models[0].properties.values()].filter(predicate);
@@ -110,7 +110,7 @@ export function getResultModelWithProperty(
 export function getSuccessResponse(program: Program, operation: HttpOperation): Model | undefined {
   const candidates = filterResponseModels(
     operation,
-    (response) => !isErrorModel(program, response)
+    (response) => !isErrorModel(program, response),
   )?.filter((m) => {
     const prop = getStatusCodeProperty(program, m);
     return (
@@ -143,7 +143,7 @@ function getStatusCodeProperty(program: Program, model: Model): ModelProperty | 
  */
 export function getAllProperties(
   model: Model,
-  collection?: Map<string, ModelProperty>
+  collection?: Map<string, ModelProperty>,
 ): Map<string, ModelProperty> {
   const outCollection: Map<string, ModelProperty> = collection ?? new Map<string, ModelProperty>();
   for (const [name, value] of model.properties.entries()) {

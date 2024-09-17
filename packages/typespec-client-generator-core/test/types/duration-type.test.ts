@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: duration types", () => {
         model Test {
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -32,7 +32,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.ISO8601)
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -48,7 +48,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.seconds, int32)
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -64,7 +64,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.seconds, float)
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -80,7 +80,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.seconds, float)
           prop: duration | null;
         }
-      `
+      `,
     );
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
@@ -103,7 +103,7 @@ describe("typespec-client-generator-core: duration types", () => {
         model Test {
           value: Float32Duration[];
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");

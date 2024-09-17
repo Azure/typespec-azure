@@ -82,7 +82,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
     arrayDeclaration(array: Model, name: string, elementType: Type): EmitterOutput<string> {
       return this.emitter.result.declaration(
         ensureCSharpIdentifier(this.emitter.getProgram(), array, name),
-        code`${this.emitter.emitTypeReference(elementType)}[]`
+        code`${this.emitter.emitTypeReference(elementType)}[]`,
       );
     }
 
@@ -150,7 +150,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
                 public static implicit operator ${enumName}(string str) =>
                     new ${enumName}(str);
             }
-        } `
+        } `,
       );
     }
 
@@ -163,7 +163,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           ? ensureCSharpIdentifier(
               this.emitter.getProgram(),
               en.namespace,
-              getNamespaceFullName(en.namespace)
+              getNamespaceFullName(en.namespace),
             )
           : "TypeSpec"
       }.Service.Models`;
@@ -182,7 +182,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         result.push(
           code`${ensureCSharpIdentifier(this.emitter.getProgram(), member, name)} = "${
             member.value ? (member.value as string) : name
-          }"`
+          }"`,
         );
         if (i < en.members.size) result.pushLiteralSegment(", ");
       }
@@ -218,7 +218,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       } {
       ${this.emitter.emitModelProperties(model)}
     }
-   } `
+   } `,
       );
 
       return decl;
@@ -233,7 +233,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           ? ensureCSharpIdentifier(
               this.emitter.getProgram(),
               model.namespace,
-              getNamespaceFullName(model.namespace)
+              getNamespaceFullName(model.namespace),
             )
           : "TypeSpec"
       }.Service.Models`;
@@ -252,7 +252,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           ? ensureCSharpIdentifier(
               this.emitter.getProgram(),
               model.namespace,
-              getNamespaceFullName(model.namespace)
+              getNamespaceFullName(model.namespace),
             )
           : "TypeSpec"
       }.Service.Models`;
@@ -296,7 +296,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       const propertyName = ensureCSharpIdentifier(
         this.emitter.getProgram(),
         property,
-        property.name
+        property.name,
       );
       const [typeName, typeDefault] = this.#findPropertyType(property);
       const doc = getDoc(this.emitter.getProgram(), property);
@@ -318,7 +318,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
     }
 
     #findPropertyType(
-      property: ModelProperty
+      property: ModelProperty,
     ): [EmitterOutput<string>, string | boolean | undefined] {
       switch (property.type.kind) {
         case "String":
@@ -356,7 +356,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         this.emitter.getProgram(),
         operation,
         name,
-        NameCasingType.Method
+        NameCasingType.Method,
       );
       const doc = getDoc(this.emitter.getProgram(), operation);
       const [httpOperation, _] = getHttpOperation(this.emitter.getProgram(), operation);
@@ -371,14 +371,14 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         public async Task<IActionResult> ${operationName}(${declParams})
         {
           var result = await On${operationName}Async(${this.#emitOperationCallParameters(
-            httpOperation
+            httpOperation,
           )});
           return result;
         }
         
         protected virtual Task<IActionResult> On${operationName}Async(${declParams}) {
           return Task.FromResult<IActionResult>(Ok());
-        }`
+        }`,
       );
     }
 
@@ -395,7 +395,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           !isErrorModel(this.emitter.getProgram(), r.type) &&
           r.type.instantiationParameters === undefined &&
           (r.type.kind !== "Model" || r.type.templateMapper !== undefined) &&
-          getCSharpStatusCode(r.statusCodes) !== undefined
+          getCSharpStatusCode(r.statusCodes) !== undefined,
       );
       for (const response of validResponses) {
         i++;
@@ -412,8 +412,8 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       const responseType = this.#metaInfo.getEffectivePayloadType(response.type, Visibility.Read);
       return this.emitter.result.rawCode(
         code`[ProducesResponseType((int)${getCSharpStatusCode(
-          response.statusCodes
-        )!}, Type = typeof(${this.#emitResponseType(responseType)}))]`
+          response.statusCodes,
+        )!}, Type = typeof(${this.#emitResponseType(responseType)}))]`,
       );
     }
 
@@ -500,7 +500,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           signature.push(
             code`${this.#emitOperationSignatureParameter(operation, parameter)}${
               i < pathParameters.length || bodyParam !== undefined ? ", " : ""
-            }`
+            }`,
           );
         }
       }
@@ -509,9 +509,9 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           code`${this.emitter.emitTypeReference(
             this.#metaInfo.getEffectivePayloadType(
               bodyParam.type,
-              Visibility.Create & Visibility.Update
-            )
-          )} body`
+              Visibility.Create & Visibility.Update,
+            ),
+          )} body`,
         );
       }
 
@@ -519,7 +519,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
     }
     #emitOperationSignatureParameter(
       operation: HttpOperation,
-      httpParam: HttpOperationParameter
+      httpParam: HttpOperationParameter,
     ): EmitterOutput<string> {
       const name = httpParam.name;
       const parameter = httpParam.param;
@@ -527,7 +527,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         this.emitter.getProgram(),
         parameter,
         name,
-        NameCasingType.Parameter
+        NameCasingType.Parameter,
       );
       const [emittedType, emittedDefault] = this.#findPropertyType(parameter);
       // eslint-disable-next-line @typescript-eslint/no-deprecated
@@ -536,7 +536,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           code`${this.emitter.emitType(parameter.default)}`
         : emittedDefault;
       return this.emitter.result.rawCode(
-        code`${emittedType} ${emittedName}${defaultValue === undefined ? "" : ` = ${defaultValue}`}`
+        code`${emittedType} ${emittedName}${defaultValue === undefined ? "" : ` = ${defaultValue}`}`,
       );
     }
 
@@ -551,7 +551,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           signature.push(
             code`${this.#emitOperationCallParameter(operation, parameter)}${
               i < pathParameters.length || bodyParam !== undefined ? ", " : ""
-            }`
+            }`,
           );
         }
       }
@@ -563,7 +563,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
     }
     #emitOperationCallParameter(
       operation: HttpOperation,
-      httpParam: HttpOperationParameter
+      httpParam: HttpOperationParameter,
     ): EmitterOutput<string> {
       const name = httpParam.name;
       const parameter = httpParam.param;
@@ -571,7 +571,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         this.emitter.getProgram(),
         parameter,
         name,
-        NameCasingType.Parameter
+        NameCasingType.Parameter,
       );
       return this.emitter.result.rawCode(code`${emittedName}`);
     }
@@ -591,12 +591,12 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
     #createOrGetResourceContext(
       name: string,
       operation: Operation,
-      resource?: Model
+      resource?: Model,
     ): ControllerContext {
       let context: ControllerContext | undefined = controllers.get(name);
       if (context !== undefined) return context;
       const sourceFile: SourceFile<string> = this.emitter.createSourceFile(
-        `controllers/${name}ControllerBase.cs`
+        `controllers/${name}ControllerBase.cs`,
       );
       sourceFile.meta[this.#sourceTypeKey] = CSharpSourceType.Controller;
       sourceFile.meta["resource"] = `${name}Controller`;
@@ -605,7 +605,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           ? ensureCSharpIdentifier(
               this.emitter.getProgram(),
               operation.namespace,
-              getNamespaceFullName(operation.namespace)
+              getNamespaceFullName(operation.namespace),
             )
           : "TypeSpec"
       }`;
@@ -624,7 +624,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         ? ensureCSharpIdentifier(
             this.emitter.getProgram(),
             namespace,
-            getNamespaceFullName(namespace)
+            getNamespaceFullName(namespace),
           )
         : "TypeSpec";
     }
@@ -632,7 +632,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       targetDeclaration: Declaration<string>,
       pathUp: Scope<string>[],
       pathDown: Scope<string>[],
-      commonScope: Scope<string> | null
+      commonScope: Scope<string> | null,
     ): string | EmitEntity<string> {
       return super.reference(targetDeclaration, pathUp, pathDown, commonScope);
     }
@@ -744,7 +744,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
           parameter.kind !== "Intrinsic" &&
           parameter.kind !== "Number" &&
           parameter.kind !== "String" &&
-          parameter.kind !== "Tuple"
+          parameter.kind !== "Tuple",
       );
       for (const parameter of args) {
         i++;
@@ -835,7 +835,7 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
     await exec(
       `dotnet format whitespace ${
         emitter.getOptions().emitterOutputDir
-      } --include-generated --folder`
+      } --include-generated --folder`,
     );
   }
 }

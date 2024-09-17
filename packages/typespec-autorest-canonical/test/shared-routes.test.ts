@@ -17,21 +17,21 @@ function expectOperation(doc: OpenAPI2Document, expect: ExpectOperation) {
   const pathSummary = [
     "paths:",
     ...Object.entries(doc.paths).map(
-      ([path, values]) => `  ${path}: [${Object.keys(values).join(", ")}]`
+      ([path, values]) => `  ${path}: [${Object.keys(values).join(", ")}]`,
     ),
     "x-ms-paths:",
     ...Object.entries(doc["x-ms-paths"] ?? {}).map(
-      ([path, values]) => `  ${[path]}: [${Object.keys(values).join(", ")}]`
+      ([path, values]) => `  ${[path]}: [${Object.keys(values).join(", ")}]`,
     ),
   ].join("\n");
   ok(
     pathItem,
-    `Expected path ${expect.path} to exist in ${expect.in}. But path founds are:\n${pathSummary}`
+    `Expected path ${expect.path} to exist in ${expect.in}. But path founds are:\n${pathSummary}`,
   );
   const operation = pathItem[expect.verb];
   ok(
     operation,
-    `Expected path ${expect.path} to have verb ${expect.verb} to exist in ${expect.in}. But path founds are:\n${pathSummary}`
+    `Expected path ${expect.path} to have verb ${expect.verb} to exist in ${expect.in}. But path founds are:\n${pathSummary}`,
   );
 
   strictEqual(operation.operationId, expect.operationId);
@@ -55,7 +55,7 @@ it("model shared routes that differ by variable query parameters", async () => {
     @sharedRoute
     @route("/sharedroutes/resources")
     op listBySubscription(...Thing, @query subscription: string, @query foo?: string): Thing[];
-    `
+    `,
   );
   expectOperation(results, {
     in: "paths",
@@ -87,7 +87,7 @@ it("model shared routes that differ by values of a specific query parameter", as
     @sharedRoute
     @route("/sharedroutes/resources")
     op listBySubscription(...Thing, @query filter: "subscription"): Thing[];
-    `
+    `,
   );
 
   expectOperation(results, {
@@ -125,7 +125,7 @@ it("model shared routes with implicit disambiguation ignore the implicit query p
     @sharedRoute
     @route("/sharedroutes/resources")
     op listByNothing(...Thing, @query apiVersion: string): Thing[];
-    `
+    `,
   );
 
   // The first shared route ends up in paths
@@ -170,7 +170,7 @@ it("model shared routes with implicit disambiguation and no queries", async () =
     @sharedRoute
     @route("/sharedroutes/resources")
     op listByNothing(...Thing): Thing[];
-    `
+    `,
   );
   // The first shared route ends up in paths
   expectOperation(results, {
@@ -214,7 +214,7 @@ it("can share route with @autoRoute", async () => {
       @key @path
       id: string;
     }
-    `
+    `,
   );
   expectOperation(results, {
     in: "paths",

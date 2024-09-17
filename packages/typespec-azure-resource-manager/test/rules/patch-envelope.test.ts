@@ -17,20 +17,20 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
     tester = createLinterRuleTester(
       runner,
       patchEnvelopePropertiesRules,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
   async function expectUpdateEnvelopePropertiesResult(
     resourceName: string,
     propertyName: string,
-    code: string
+    code: string,
   ) {
     await tester.expect(code).toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/patch-envelope",
       message:
         paramMessage`The Resource PATCH request for resource '${"resourceName"}' is missing envelope properties:  [${"propertyName"}]. Since these properties are supported in the resource, they must also be updatable via PATCH.`(
-          { resourceName: resourceName, propertyName: propertyName }
+          { resourceName: resourceName, propertyName: propertyName },
         ),
     });
   }
@@ -100,7 +100,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
         extra?: string ;
       }
 
-    `
+    `,
     );
   });
 
@@ -168,7 +168,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
         extra?: string ;
       }
 
-    `
+    `,
     );
   });
 });

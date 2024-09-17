@@ -33,6 +33,6 @@ export const retryAfterRule = createRule({
 
 function hasRetryAfterHeader(program: Program, op: Operation) {
   return !!getResponsesForOperation(program, op)[0].find((re) =>
-    re.responses.find((res) => res.headers?.["Retry-After"])
+    re.responses.find((res) => res.headers?.["Retry-After"]),
   );
 }

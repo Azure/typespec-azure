@@ -320,7 +320,7 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
 
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
       op read(): { @body body: Pet };
-      `
+      `,
     );
     expectDiagnostics(diagnostics, [
       {
@@ -365,7 +365,7 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
 
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
       op read(): { @body body: Pet };
-      `
+      `,
     );
     expectDiagnostics(diagnostics, [
       {

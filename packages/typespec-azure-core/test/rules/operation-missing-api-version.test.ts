@@ -36,7 +36,7 @@ describe("typespec-azure-core: api-version-parameter rule", () => {
           @route("/interfaceTest")
           op interfaceTest(): string;
         }
-      `
+      `,
       )
       .toEmitDiagnostics([
         {
@@ -67,7 +67,7 @@ describe("typespec-azure-core: api-version-parameter rule", () => {
 
         op test(...Azure.Core.Foundations.ApiVersionParameter): string;
         op test2(apiVersion: string): string;
-      `
+      `,
       )
       .toBeValid();
   });
@@ -85,7 +85,7 @@ describe("typespec-azure-core: api-version-parameter rule", () => {
         }
 
         op test(): string;
-      `
+      `,
       )
       .toBeValid();
   });

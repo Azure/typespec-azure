@@ -35,7 +35,7 @@ export async function createAutorestCanonicalTestHost() {
 
 export async function createAutorestCanonicalTestRunner(
   host?: TestHost,
-  emitterOptions?: AutorestCanonicalEmitterOptions
+  emitterOptions?: AutorestCanonicalEmitterOptions,
 ) {
   host ??= await createAutorestCanonicalTestHost();
   return createTestWrapper(host, {
@@ -56,7 +56,7 @@ export async function createAutorestCanonicalTestRunner(
 
 export async function emitOpenApiWithDiagnostics(
   code: string,
-  options: AutorestCanonicalEmitterOptions = {}
+  options: AutorestCanonicalEmitterOptions = {},
 ): Promise<[OpenAPI2Document, readonly Diagnostic[]]> {
   const runner = await createAutorestCanonicalTestRunner();
   const outputFile = resolveVirtualPath("openapi.json");
@@ -89,7 +89,7 @@ export async function openApiFor(code: string, options: AutorestCanonicalEmitter
     ignoreDiagnostics(diagnostics, [
       "@azure-tools/typespec-azure-core/use-standard-operations",
       "@typespec/http/no-service-found",
-    ])
+    ]),
   );
   const outPath = resolveVirtualPath("tsp-output", "canonical", "openapi.json");
   return JSON.parse(runner.fs.get(outPath)!);
@@ -97,7 +97,7 @@ export async function openApiFor(code: string, options: AutorestCanonicalEmitter
 
 export async function diagnoseOpenApiFor(
   code: string,
-  options: AutorestCanonicalEmitterOptions = {}
+  options: AutorestCanonicalEmitterOptions = {},
 ) {
   const runner = await createAutorestCanonicalTestRunner();
   return await runner.diagnose(code, {
@@ -131,7 +131,7 @@ export async function oapiForModel(name: string, modelDef: string) {
 
 export function ignoreDiagnostics(
   diagnostics: readonly Diagnostic[],
-  codes: string[]
+  codes: string[],
 ): readonly Diagnostic[] {
   return diagnostics.filter((x) => codes.indexOf(x.code) === -1);
 }

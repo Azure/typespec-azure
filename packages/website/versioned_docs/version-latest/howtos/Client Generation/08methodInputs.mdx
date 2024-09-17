@@ -55,7 +55,7 @@ export type DemoServiceContext = Client & {
     /** Resource for '/analyze' has methods for the following verbs: post */
     (path: "/users"): {
       get(
-        options: RequestParameters
+        options: RequestParameters,
       ): StreamableMethod<GetUser200Response | GetUserDefaultResponse>;
     };
   };
@@ -152,7 +152,7 @@ export type DemoServiceContext = Client & {
       post(
         options: {
           body: User;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -252,7 +252,7 @@ export type DemoServiceContext = Client & {
             firstName: string;
             lastName: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -262,7 +262,7 @@ export type DemoServiceContext = Client & {
 export async function upload(
   firstName: string,
   lastName: string,
-  options: UploadOptionalParams
+  options: UploadOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -344,7 +344,7 @@ export type DemoServiceContext = Client & {
     /** Resource for '/completions' has methods for the following verbs: post */
     (
       path: "/users/{id}",
-      id
+      id,
     ): {
       post(
         options: {
@@ -352,7 +352,7 @@ export type DemoServiceContext = Client & {
             firstName: string;
             lastName: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -363,7 +363,7 @@ export async function upload(
   id: string,
   firstName: string,
   lastName: string,
-  options: UploadOptionalParams
+  options: UploadOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -372,7 +372,7 @@ export class DemoServiceClient {
     id: string,
     firstName: string,
     lastName: string,
-    options: UploadOptionalParams
+    options: UploadOptionalParams,
   ): Promise<void>;
 }
 ```
@@ -458,7 +458,7 @@ export type DemoServiceContext = Client & {
             firstName: string;
             lastName: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -468,7 +468,7 @@ export type DemoServiceContext = Client & {
 export async function upload(
   firstName: string,
   lastName: string,
-  options: UploadOptionalParams
+  options: UploadOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -561,7 +561,7 @@ export type DemoServiceContext = Client & {
       post(
         options: {
           body: User;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -775,7 +775,7 @@ export type DemoServiceContext = Client & {
           body: {
             schema: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -789,7 +789,7 @@ export interface Schema {
 // Modular api layer
 export async function register(
   body: Schema,
-  options: GetBlobPropertiesOptionalParams
+  options: GetBlobPropertiesOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -901,12 +901,12 @@ export type WidgetServiceContext = Client & {
   path: {
     (
       path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string
+      widgetName: string,
     ): {
       post(
         options: {
           body: RepairInfo;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -918,7 +918,7 @@ export async function scheduleRepairs(
   widgetName: string,
   problem: string,
   contact: string,
-  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
 // Modular classical client layer
@@ -927,7 +927,7 @@ export class WidgetServiceClient {
     widgetName: string,
     problem: string,
     contact: string,
-    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} },
   ): Promise<RepairResult>;
 }
 ```
@@ -1070,12 +1070,12 @@ export type WidgetServiceContext = Client & {
   path: {
     (
       path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string
+      widgetName: string,
     ): {
       post(
         options: {
           body: RepairInfo;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -1086,7 +1086,7 @@ export async function scheduleRepairs(
   context: Client,
   widgetName: string,
   body: RepairInfo,
-  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
 // Modular classical client layer
@@ -1094,7 +1094,7 @@ export class WidgetServiceClient {
   scheduleRepairs(
     widgetName: string,
     body: RepairInfo,
-    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} },
   ): Promise<RepairResult>;
 }
 ```

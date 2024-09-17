@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: date-time types", () => {
         model Test {
           prop: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -33,7 +33,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.rfc3339)
           prop: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -49,7 +49,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.rfc7231)
           prop: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -65,7 +65,7 @@ describe("typespec-client-generator-core: date-time types", () => {
       model Test {
         prop: unixTimestamp32;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -83,7 +83,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.unixTimestamp, int64)
           value: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -105,7 +105,7 @@ describe("typespec-client-generator-core: date-time types", () => {
         model Test {
           value: extraLayerDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -133,7 +133,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.unixTimestamp, int64)
           value: utcDateTime | null;
         }
-      `
+      `,
     );
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
@@ -156,7 +156,7 @@ describe("typespec-client-generator-core: date-time types", () => {
         model Test {
           value: unixTimestampDateTime[];
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");

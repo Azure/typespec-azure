@@ -23,7 +23,7 @@ describe("typespec-autorest: versioning", () => {
         }
       }
     `,
-      ["v1", "v2"]
+      ["v1", "v2"],
     )) as { v1: OpenAPI2Document; v2: OpenAPI2Document };
     expect(v1["x-ms-parameterized-host"]?.parameters?.[0]).toEqual({
       enum: ["v1"],
@@ -100,7 +100,7 @@ describe("typespec-autorest: versioning", () => {
         }
       }
     `,
-      ["v1", "v2", "v3"]
+      ["v1", "v2", "v3"],
     );
     strictEqual(v1.info.version, "v1");
     deepStrictEqual(v1.definitions.Test, {
@@ -206,7 +206,7 @@ describe("typespec-autorest: versioning", () => {
         }
       }
     `,
-      ["v1", "v2", "v3"]
+      ["v1", "v2", "v3"],
     );
     strictEqual(v1.info.version, "v1");
     deepStrictEqual(v1.definitions.Test, {

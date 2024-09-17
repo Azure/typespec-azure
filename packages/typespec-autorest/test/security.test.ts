@@ -10,7 +10,7 @@ describe("typespec-autorest: security", () => {
       @service({title: "My service"})
       @useAuth(BasicAuth)
       namespace MyService {}
-      `
+      `,
     );
     deepStrictEqual(res.securityDefinitions, {
       BasicAuth: {
@@ -26,7 +26,7 @@ describe("typespec-autorest: security", () => {
       @service({title: "My service"})
       @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-my-header">)
       namespace MyService {}
-      `
+      `,
     );
     deepStrictEqual(res.securityDefinitions, {
       ApiKeyAuth: {
@@ -52,7 +52,7 @@ describe("typespec-autorest: security", () => {
           scopes: ["read", "write"];
         }
       }
-      `
+      `,
     );
     deepStrictEqual(res.securityDefinitions, {
       OAuth2Auth: {
@@ -77,7 +77,7 @@ describe("typespec-autorest: security", () => {
         @doc("My custom basic auth")
         model MyAuth is BasicAuth;
       }
-      `
+      `,
     );
     deepStrictEqual(res.securityDefinitions, {
       MyAuth: {
@@ -94,7 +94,7 @@ describe("typespec-autorest: security", () => {
       @service({title: "My service"})
       @useAuth(BasicAuth | [ApiKeyAuth<ApiKeyLocation.header, "x-my-header">, BasicAuth])
       namespace MyService {}
-      `
+      `,
     );
     deepStrictEqual(res.securityDefinitions, {
       ApiKeyAuth: {
@@ -123,7 +123,7 @@ describe("typespec-autorest: security", () => {
       @service({title: "My service"})
       @useAuth(BearerAuth)
       namespace MyService {}
-      `
+      `,
     );
 
     expectDiagnostics(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]), [

@@ -34,7 +34,7 @@ export type ClientNameDecorator = (
   context: DecoratorContext,
   target: Type,
   rename: string,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -52,7 +52,7 @@ export type ConvenientAPIDecorator = (
   context: DecoratorContext,
   target: Operation,
   value?: boolean,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -70,7 +70,7 @@ export type ProtocolAPIDecorator = (
   context: DecoratorContext,
   target: Operation,
   value?: boolean,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -103,7 +103,7 @@ export type ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   value?: Model,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -119,7 +119,7 @@ export type ClientDecorator = (
 export type OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -192,7 +192,7 @@ export type UsageDecorator = (
   context: DecoratorContext,
   target: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -340,7 +340,7 @@ export type AccessDecorator = (
   context: DecoratorContext,
   target: Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -360,7 +360,7 @@ export type AccessDecorator = (
 export type FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -412,7 +412,7 @@ export type OverrideDecorator = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -430,7 +430,7 @@ export type OverrideDecorator = (
 export type UseSystemTextJsonConverterDecorator = (
   context: DecoratorContext,
   target: Model,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -460,7 +460,7 @@ export type ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Model,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -491,7 +491,7 @@ export type ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
   paramAlias: string,
-  scope?: string
+  scope?: string,
 ) => void;
 
 export type AzureClientGeneratorCoreDecorators = {

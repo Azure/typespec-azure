@@ -9,7 +9,7 @@ import { checkFor } from "./test-host.js";
 function assertLifecycleOperation(
   resource: ArmResourceDetails,
   kind: ArmLifecycleOperationKind,
-  operationGroup: string
+  operationGroup: string,
 ) {
   ok(resource.operations.lifecycle[kind], `No ${kind} operation`);
   strictEqual(resource.operations.lifecycle[kind]!.kind, kind);

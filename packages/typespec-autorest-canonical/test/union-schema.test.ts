@@ -11,7 +11,7 @@ it("union with self reference model and null", async () => {
       properties: Thing | null;
     }
     op doStuff(): Thing;
-    `
+    `,
   );
   deepStrictEqual(res.definitions.Thing.properties.properties, {
     type: "object",
@@ -29,7 +29,7 @@ it("union of mixed types emit diagnostic", async () => {
     }
     
     op foo(param: "all" | "none" | Params): void;
-    `
+    `,
   );
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-autorest/union-unsupported",
@@ -105,7 +105,7 @@ describe("unions as enum", () => {
 
   it("include the description the x-ms-enum values", async () => {
     const res = await openApiFor(
-      `union Test {@doc("Doc for one") "one" , @doc("Doc for two") Two: "two"}`
+      `union Test {@doc("Doc for one") "one" , @doc("Doc for two") Two: "two"}`,
     );
     deepStrictEqual(res.definitions.Test, {
       type: "string",
@@ -126,7 +126,7 @@ describe("unions as enum", () => {
       `
       union Test { UpDown, "left", "right"} 
       union UpDown { "up", "down" }
-      `
+      `,
     );
     deepStrictEqual(res.definitions.Test, {
       type: "string",

@@ -23,5 +23,5 @@ export default tsEslint.config(
     ],
   },
   ...TypeSpecCommonEslintConfigs,
-  ...getTypeScriptProjectRules(dirname(fileURLToPath(import.meta.url)))
+  ...getTypeScriptProjectRules(dirname(fileURLToPath(import.meta.url))),
 );

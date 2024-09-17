@@ -558,7 +558,7 @@ describe("typespec-azure-core: decorators", () => {
 
       const result = getOperationLinks(
         runner.program,
-        Foo.operations.get("createOrUpdate")!
+        Foo.operations.get("createOrUpdate")!,
       ) as Map<string, OperationLinkMetadata>;
       assert(result !== undefined);
       assert(result.get("final") !== undefined);
@@ -876,7 +876,7 @@ describe("typespec-azure-core: decorators", () => {
             B,
             C,
           }
-          `
+          `,
       );
 
       ok(isFixed(runner.program, result.FixedEnum as Enum), "Expected fixed enum");
