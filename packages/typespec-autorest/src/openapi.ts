@@ -1802,28 +1802,8 @@ export async function getOpenAPIForService(
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(defaultType: Value, modelProperty?: ModelProperty): any {
-    switch (defaultType.valueKind) {
-      case "StringValue":
-        return defaultType.value;
-      case "NumericValue":
-        return defaultType.value.asNumber() ?? undefined;
-      case "BooleanValue":
-        return defaultType.value;
-      case "ArrayValue":
-        return defaultType.values.map((x) => getDefaultValue(x));
-      case "NullValue":
-        return null;
-      case "EnumValue":
-        return defaultType.value.value ?? defaultType.value.name;
-      case "ScalarValue":
-        if (modelProperty) {
-          return serializeValueAsJson(program, defaultType, modelProperty);
-        }
-        return serializeValueAsJson(program, defaultType, defaultType.type);
-      case "ObjectValue":
-        return serializeValueAsJson(program, defaultType, defaultType.type);
-    }
+  function getDefaultValue(defaultType: Value, modelProperty: ModelProperty): any {
+    return serializeValueAsJson(program, defaultType, modelProperty);
   }
 
   function includeDerivedModel(model: Model): boolean {

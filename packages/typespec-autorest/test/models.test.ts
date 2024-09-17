@@ -918,7 +918,7 @@ describe("typespec-autorest: model definitions", () => {
       "Test",
       `
         model Test { @encode("rfc7231") minDate: utcDateTime = utcDateTime.fromISO("2024-01-01T11:32:00Z"); }
-      `
+      `,
     );
 
     expect(res.defs.Test.properties.minDate.default).toEqual("Mon, 01 Jan 2024 11:32:00 GMT");
@@ -928,10 +928,11 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Test",
       `
-        model Test { Pet: {name: string;} = #{ name: "Dog"}; }
-      `
+        model Test { Pet: {name: string;  @encode("rfc7231")birthday: utcDateTime} = #{ name: "Dog", birthday:utcDateTime.fromISO("2024-01-01T11:32:00Z")}}
+      `,
     );
 
     expect(res.defs.Test.properties.Pet.default.name).toEqual("Dog");
+    expect(res.defs.Test.properties.Pet.default.birthday).toEqual("Mon, 01 Jan 2024 11:32:00 GMT");
   });
 });
