@@ -85,7 +85,6 @@ import {
   createGeneratedName,
   filterApiVersionsInEnum,
   getAvailableApiVersions,
-  getDocHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
@@ -261,13 +260,10 @@ function getSdkBuiltInTypeWithDiagnostics(
   kind: SdkBuiltInKinds,
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const docWrapper = getDocHelper(context, type);
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
     encode: getEncodeHelper(context, type, kind),
-    description: docWrapper.description,
-    details: docWrapper.details,
     doc: getDoc(context.program, type),
     summary: getSummary(context.program, type),
     baseType:
@@ -322,7 +318,6 @@ function getSdkDateTimeType(
   kind: "utcDateTime" | "offsetDateTime",
 ): [SdkDateTimeType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const docWrapper = getDocHelper(context, type);
   const baseType =
     type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
       ? diagnostics.pipe(getSdkDateTimeType(context, type.baseScalar, kind))
@@ -338,8 +333,6 @@ function getSdkDateTimeType(
     encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    description: docWrapper.description,
-    details: docWrapper.details,
     doc: getDoc(context.program, type),
     summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
@@ -423,7 +416,6 @@ function getSdkDurationTypeWithDiagnostics(
   kind: "duration",
 ): [SdkDurationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const docWrapper = getDocHelper(context, type);
   const baseType =
     type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
       ? diagnostics.pipe(getSdkDurationTypeWithDiagnostics(context, type.baseScalar, kind))
@@ -439,8 +431,6 @@ function getSdkDurationTypeWithDiagnostics(
     encode: (encode ?? "ISO8601") as DurationKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    description: docWrapper.description,
-    details: docWrapper.details,
     doc: getDoc(context.program, type),
     summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
@@ -689,7 +679,6 @@ function addDiscriminatorToModelType(
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
     model.properties.splice(0, 0, {
       kind: "property",
-      description: `Discriminator property for ${model.name}.`,
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
       discriminator: true,
@@ -745,15 +734,12 @@ export function getSdkModelWithDiagnostics(
   if (sdkType) {
     updateModelsMap(context, type, sdkType);
   } else {
-    const docWrapper = getDocHelper(context, type);
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
     const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
-      description: docWrapper.description,
-      details: docWrapper.details,
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       properties: [],
@@ -854,13 +840,10 @@ function getSdkEnumValueWithDiagnostics(
   type: EnumMember,
 ): [SdkEnumValueType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const docWrapper = getDocHelper(context, type);
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
     value: type.value ?? type.name,
-    description: docWrapper.description,
-    details: docWrapper.details,
     doc: getDoc(context.program, type),
     summary: getSummary(context.program, type),
     enumType,
@@ -880,13 +863,10 @@ function getSdkEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   let sdkType = context.modelsMap?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
-    const docWrapper = getDocHelper(context, type);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
-      description: docWrapper.description,
-      details: docWrapper.details,
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
@@ -922,13 +902,10 @@ function getSdkUnionEnumValues(
   const diagnostics = createDiagnosticCollector();
   const values: SdkEnumValueType[] = [];
   for (const member of type.flattenedMembers.values()) {
-    const docWrapper = getDocHelper(context, member.type);
     const name = getLibraryName(context, member.type);
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
-      description: docWrapper.description,
-      details: docWrapper.details,
       doc: getDoc(context.program, member.type),
       summary: getSummary(context.program, member.type),
       value: member.value,
@@ -952,14 +929,11 @@ export function getSdkUnionEnumWithDiagnostics(
   const union = type.union;
   let sdkType = context.modelsMap?.get(union) as SdkEnumType | undefined;
   if (!sdkType) {
-    const docWrapper = getDocHelper(context, union);
     const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
       name,
       isGeneratedName: !type.union.name,
-      description: docWrapper.description,
-      details: docWrapper.details,
       doc: getDoc(context.program, union),
       summary: getSummary(context.program, union),
       valueType:
@@ -1001,13 +975,10 @@ function getKnownValuesEnum(
   } else {
     let sdkType = context.modelsMap?.get(type) as SdkEnumType | undefined;
     if (!sdkType) {
-      const docWrapper = getDocHelper(context, type);
       sdkType = {
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
         name: getLibraryName(context, type),
         isGeneratedName: false,
-        description: docWrapper.description,
-        details: docWrapper.details,
         doc: getDoc(context.program, type),
         summary: getSummary(context.program, type),
         valueType: diagnostics.pipe(
@@ -1196,7 +1167,6 @@ export function getSdkCredentialParameter(
     kind: "credential",
     name,
     isGeneratedName: true,
-    description: "Credential used to authenticate requests to the service.",
     doc: "Credential used to authenticate requests to the service.",
     apiVersions: getAvailableApiVersions(context, client.service, client.type),
     onClient: true,
@@ -1222,13 +1192,10 @@ export function getSdkModelPropertyTypeBase(
   if (knownValues) {
     propertyType = diagnostics.pipe(getSdkEnumWithDiagnostics(context, knownValues, operation));
   }
-  const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type);
   return diagnostics.wrap({
     __raw: type,
-    description: docWrapper.description,
-    details: docWrapper.details,
     doc: getDoc(context.program, type),
     summary: getSummary(context.program, type),
     apiVersions,

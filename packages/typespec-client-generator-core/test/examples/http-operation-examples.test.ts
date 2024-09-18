@@ -33,7 +33,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].kind, "http");
     strictEqual(operation.examples[0].name, "simple description");
-    strictEqual(operation.examples[0].description, "simple description");
+    strictEqual(operation.examples[0].doc, "simple description");
     strictEqual(operation.examples[0].filePath, "simple.json");
     deepStrictEqual(operation.examples[0].rawExample, {
       operationId: "simple",

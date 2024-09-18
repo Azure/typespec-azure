@@ -164,8 +164,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     strictEqual(sdkType.valueType.name, "unixTimestampDateTime");
     strictEqual(sdkType.valueType.encode, "unixTimestamp");
     strictEqual(sdkType.valueType.wireType?.kind, "int64");
-    strictEqual(sdkType.valueType.description, "title");
-    strictEqual(sdkType.valueType.details, "doc");
     strictEqual(sdkType.valueType.doc, "doc");
     strictEqual(sdkType.valueType.summary, "title");
     strictEqual(sdkType.valueType.crossLanguageDefinitionId, "TestService.unixTimestampDateTime");

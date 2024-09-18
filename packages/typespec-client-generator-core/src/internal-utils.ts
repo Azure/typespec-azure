@@ -209,30 +209,6 @@ export function getAvailableApiVersions(
   return retval;
 }
 
-interface DocWrapper {
-  description?: string;
-  details?: string;
-}
-
-/**
- *
- * @param context
- * @param type
- * @returns Returns the description and details of a type
- */
-export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
-  const program = context.program;
-  if (getSummary(program, type)) {
-    return {
-      description: getSummary(program, type),
-      details: getDoc(program, type),
-    };
-  }
-  return {
-    description: getDoc(program, type),
-  };
-}
-
 /**
  *
  * @param type

@@ -109,8 +109,6 @@ describe("typespec-client-generator-core: duration types", () => {
     strictEqual(sdkType.kind, "array");
     strictEqual(sdkType.valueType.kind, "duration");
     strictEqual(sdkType.valueType.name, "Float32Duration");
-    strictEqual(sdkType.valueType.description, "title");
-    strictEqual(sdkType.valueType.details, "doc");
     strictEqual(sdkType.valueType.doc, "doc");
     strictEqual(sdkType.valueType.summary, "title");
     // the encode and wireType will only be added to the outer type

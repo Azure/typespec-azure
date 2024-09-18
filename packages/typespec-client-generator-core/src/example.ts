@@ -228,7 +228,7 @@ function handleHttpOperationExamples(
     const operationExample = {
       kind: "http",
       name: title,
-      description: title,
+      doc: title,
       filePath: example.relativePath,
       parameters: diagnostics.pipe(
         handleHttpParameters(
@@ -354,7 +354,7 @@ function handleHttpResponse(
   } as SdkHttpResponseExample;
   if (typeof example === "object" && example !== null) {
     for (const name of Object.keys(example)) {
-      if (name === "description") {
+      if (name === "doc") {
         continue;
       } else if (name === "body") {
         if (response.type) {

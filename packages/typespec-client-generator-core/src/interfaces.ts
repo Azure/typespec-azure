@@ -92,14 +92,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   initialization: SdkInitializationType;
@@ -136,14 +128,6 @@ interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   __accessSet?: boolean;
@@ -402,14 +386,6 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   type: SdkType;
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   apiVersions: string[];
@@ -524,14 +500,6 @@ export interface SdkServiceResponseHeader {
   __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
 }
@@ -553,7 +521,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
-  description?: string;
+  doc?: string;
 }
 
 interface SdkServiceOperationBase {}
@@ -586,14 +554,6 @@ interface SdkMethodBase extends DecoratedType {
   access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   crossLanguageDefintionId: string;
@@ -750,7 +710,7 @@ export enum UsageFlags {
 interface SdkExampleBase {
   kind: string;
   name: string;
-  description: string;
+  doc: string
   filePath: string;
   rawExample: any;
 }
