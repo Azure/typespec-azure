@@ -131,17 +131,17 @@ function getUnknownType(context: TCGCContext, type: Type): [SdkBuiltInType, read
   const unknownType: SdkBuiltInType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "unknown")),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type, "unknown"),
+    encode: getEncodeHelper(context, type),
     crossLanguageDefinitionId: "",
   };
   return diagnostics.wrap(unknownType);
 }
 
-function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
+function getEncodeHelper(context: TCGCContext, type: Type): string | undefined {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    return getEncode(context.program, type)?.encoding || kind;
+    return getEncode(context.program, type)?.encoding;
   }
-  return kind;
+  return undefined;
 }
 
 /**
@@ -190,14 +190,13 @@ export function addEncodeInfo(
   if (isSdkIntKind(innerType.kind)) {
     // only integer type is allowed to be encoded as string
     if (encodeData && "encode" in innerType) {
-      const encode = getEncode(context.program, type);
-      if (encode?.encoding) {
-        innerType.encode = encode.encoding;
+      if (encodeData?.encoding) {
+        innerType.encode = encodeData.encoding;
       }
-      if (encode?.type) {
+      if (encodeData?.type) {
         // if we specify the encoding type in the decorator, we set the `.encode` string
         // to the kind of the encoding type
-        innerType.encode = getSdkBuiltInType(context, encode.type).kind;
+        innerType.encode = getSdkBuiltInType(context, encodeData.type).kind;
       }
     }
   }
@@ -241,7 +240,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type, kind),
+    encode: getEncodeHelper(context, type),
     description: docWrapper.description,
     details: docWrapper.details,
     doc: getDoc(context.program, type),
@@ -1197,7 +1196,7 @@ export function getSdkModelPropertyTypeBase(
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
-  const onClient = isOnClient(context, type);
+  const onClient = isOnClient(context, type, operation);
   return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,

@@ -295,7 +295,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     ok(etagProperty);
     strictEqual(etagProperty.type.kind, "string");
     strictEqual(etagProperty.type.name, "eTag");
-    strictEqual(etagProperty.type.encode, "string");
+    strictEqual(etagProperty.type.encode, undefined);
     strictEqual(etagProperty.type.crossLanguageDefinitionId, "Azure.Core.eTag");
     strictEqual(etagProperty.type.baseType?.kind, "string");
   });

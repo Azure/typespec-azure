@@ -577,8 +577,12 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
   return type;
 }
 
-export function isOnClient(context: TCGCContext, type: ModelProperty): boolean {
-  const namespace = type.model?.namespace;
+export function isOnClient(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation?: Operation
+): boolean {
+  const namespace = operation ? getLocationOfOperation(operation) : type.model?.namespace;
   return (
     isSubscriptionId(context, type) ||
     isApiVersion(context, type) ||
