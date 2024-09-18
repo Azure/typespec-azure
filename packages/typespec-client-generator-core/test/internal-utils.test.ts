@@ -1,4 +1,3 @@
-import { Operation } from "@typespec/compiler";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { listSubClients } from "../src/public-utils.js";
@@ -10,7 +9,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
-  
+
   describe("parseEmitterName", () => {
     it("@azure-tools/typespec-{language}", async () => {
       const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });

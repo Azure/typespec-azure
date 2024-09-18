@@ -710,7 +710,7 @@ export enum UsageFlags {
 interface SdkExampleBase {
   kind: string;
   name: string;
-  doc: string
+  doc: string;
   filePath: string;
   rawExample: any;
 }
