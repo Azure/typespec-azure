@@ -1196,7 +1196,7 @@ export function getSdkModelPropertyTypeBase(
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
-  const onClient = isOnClient(context, type);
+  const onClient = isOnClient(context, type, operation);
   return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,

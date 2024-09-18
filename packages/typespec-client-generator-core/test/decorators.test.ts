@@ -3873,6 +3873,53 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameOpParam.name, "blobName");
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+      strictEqual(blobNameOpParam.onClient, true);
+    });
+
+    it("On Interface", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        model clientInitModel
+        {
+            p1: string;
+        }
+
+        @route("/bump")
+        @clientInitialization(clientInitModel)
+        interface bumpParameter {
+            @route("/op1")
+            @doc("bump parameter")
+            @post
+            @convenientAPI(true)
+            op op1(@path p1: string, @query q1: string): void;
+
+            @route("/op2")
+            @doc("bump parameter")
+            @post
+            @convenientAPI(true)
+            op op2(@path p1: string): void;
+        }
+        `
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const clientAccessor = sdkPackage.clients[0].methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      const bumpParameterClient = clientAccessor.response;
+
+      const methods = bumpParameterClient.methods;
+      strictEqual(methods.length, 2);
+
+      const op1Method = methods.find((x) => x.name === "op1");
+      ok(op1Method);
+      strictEqual(op1Method.kind, "basic");
+      strictEqual(op1Method.parameters.length, 1);
+      strictEqual(op1Method.parameters[0].name, "q1");
+      const op1Op = op1Method.operation;
+      strictEqual(op1Op.parameters.length, 2);
+      strictEqual(op1Op.parameters[0].name, "p1");
+      strictEqual(op1Op.parameters[0].onClient, true);
+      strictEqual(op1Op.parameters[1].name, "q1");
+      strictEqual(op1Op.parameters[1].onClient, false);
     });
     it("subclient", async () => {
       await runner.compileWithCustomization(
@@ -3956,6 +4003,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameOpParam.name, "blobName");
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobClientBlobInitializationProp);
+      strictEqual(blobNameOpParam.onClient, true);
     });
     it("some methods don't have client initialization params", async () => {
       await runner.compileWithCustomization(
@@ -4004,6 +4052,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameOpParam.name, "blobName");
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+      strictEqual(blobNameOpParam.onClient, true);
 
       const noClientParamsMethod = methods[1];
       strictEqual(noClientParamsMethod.name, "noClientParams");
@@ -4131,6 +4180,8 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(op.parameters.length, 2);
       strictEqual(op.parameters[0].correspondingMethodParams[0], blobName);
       strictEqual(op.parameters[1].correspondingMethodParams[0], containerName);
+      strictEqual(op.parameters[0].onClient, true);
+      strictEqual(op.parameters[1].onClient, true);
     });
 
     it("redefine client structure", async () => {
