@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { armPropertiesTypeObjectNoDefinitionRule } from "../../src/rules/arm-properties-type-object-no-definition.js";
+import { armNoEmptyModel } from "../../src/rules/arm-no-empty-model.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
 const armDef = `
@@ -21,7 +21,7 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
-      armPropertiesTypeObjectNoDefinitionRule,
+      armNoEmptyModel,
       "@azure-tools/typespec-azure-resource-manager",
     );
   });
@@ -32,12 +32,26 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
         ` 
       ${armDef}
       model Foo { 
-        props: {}; 
+        props: {};
       } 
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-properties-type-object-no-definition",
+        code: "@azure-tools/typespec-azure-resource-manager/arm-no-empty-model",
+        message: "Properties with type:object must have definition of a reference model.",
+      });
+  });
+
+  it("emits diagnostic when model type:object is not defined", async () => {
+    await tester
+      .expect(
+        ` 
+      ${armDef}
+      model Foo { } 
+        `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-no-empty-model",
         message: "Properties with type:object must have definition of a reference model.",
       });
   });
@@ -66,6 +80,19 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
       ${armDef}
       model WidgetProperties {
         Date: utcDateTime;
+      }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("valid when a property use a primitve data type ", async () => {
+    await tester
+      .expect(
+        ` 
+      ${armDef}
+      model WidgetProperties {
+        Name: string;
       }
         `,
       )

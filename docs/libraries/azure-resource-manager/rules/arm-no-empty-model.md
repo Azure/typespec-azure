@@ -1,9 +1,9 @@
 ---
-title: arm-properties-type-object-no-definition
+title: arm-no-empty-model
 ---
 
 ```text title=- Full name-
-@azure-tools/typespec-azure-resource-manager/arm-properties-type-object-no-definition
+@azure-tools/typespec-azure-resource-manager/arm-no-empty-model
 ```
 
 ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.
