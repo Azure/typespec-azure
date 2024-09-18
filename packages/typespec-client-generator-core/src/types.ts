@@ -1843,17 +1843,22 @@ export function getAllModelsWithDiagnostics(
   }
   // update for orphan models/enums/unions
   for (const client of listClients(context)) {
-    // orphan models
-    for (const model of client.service.models.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, model));
-    }
-    // orphan enums
-    for (const enumType of client.service.enums.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, enumType));
-    }
-    // orphan unions
-    for (const unionType of client.service.unions.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, unionType));
+    const namespaces = [client.service];
+    while (namespaces.length) {
+      const namespace = namespaces.pop()!;
+      // orphan models
+      for (const model of namespace.models.values()) {
+        diagnostics.pipe(handleServiceOrphanType(context, model));
+      }
+      // orphan enums
+      for (const enumType of namespace.enums.values()) {
+        diagnostics.pipe(handleServiceOrphanType(context, enumType));
+      }
+      // orphan unions
+      for (const unionType of namespace.unions.values()) {
+        diagnostics.pipe(handleServiceOrphanType(context, unionType));
+      }
+      namespaces.push(...namespace.namespaces.values());
     }
   }
   // update access
