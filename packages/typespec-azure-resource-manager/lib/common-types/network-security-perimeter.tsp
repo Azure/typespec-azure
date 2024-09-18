@@ -247,13 +247,16 @@ model NetworkSecurityPerimeterConfigurationListResult {
 }
 
 /**
- * The default NetworkSecurityPerimeterConfigurationName.
+ * The name for a network security perimeter configuration
+ * @template Segment The resource type name for network security perimeter configuration (default is networkSecurityPerimeterConfigurations)
  */
 @added(Versions.v5)
-model NetworkSecurityPerimeterConfigurationNameParameter {
+model NetworkSecurityPerimeterConfigurationNameParameter<Segment extends valueof string = "networkSecurityPerimeterConfigurations"> {
   /** The name for a network security perimeter configuration */
   @path
   @minLength(1)
   @maxLength(512)
-  networkSecurityPerimeterConfigurationName: string;
+  @TypeSpec.Rest.segment(Segment)
+  @key("networkSecurityPerimeterConfigurationName")
+  name: string;
 }

@@ -1413,17 +1413,23 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationLis
 
 ### `NetworkSecurityPerimeterConfigurationNameParameter` {#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter}
 
-The default NetworkSecurityPerimeterConfigurationName.
+The name for a network security perimeter configuration
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter
+model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter<Segment>
 ```
+
+#### Template Parameters
+
+| Name    | Description                                                                                                             |
+| ------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Segment | The resource type name for network security perimeter configuration (default is networkSecurityPerimeterConfigurations) |
 
 #### Properties
 
-| Name                                      | Type     | Description                                             |
-| ----------------------------------------- | -------- | ------------------------------------------------------- |
-| networkSecurityPerimeterConfigurationName | `string` | The name for a network security perimeter configuration |
+| Name | Type     | Description                                             |
+| ---- | -------- | ------------------------------------------------------- |
+| name | `string` | The name for a network security perimeter configuration |
 
 ### `NetworkSecurityPerimeterConfigurationProperties` {#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties}
 
