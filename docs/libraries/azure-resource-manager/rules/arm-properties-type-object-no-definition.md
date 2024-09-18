@@ -16,6 +16,10 @@ model Information {
 }
 ```
 
+```tsp
+model Empty {}
+```
+
 #### ✅ Correct
 
 ```tsp
