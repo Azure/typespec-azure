@@ -285,12 +285,6 @@ export const $lib = createTypeSpecLibrary({
           "Empty unions are not supported for OpenAPI v2 - enums must have at least one value.",
       },
     },
-    "invalid-default": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Invalid type '${"type"}' for a default value`,
-      },
-    },
     "invalid-multi-collection-format": {
       severity: "error",
       messages: {

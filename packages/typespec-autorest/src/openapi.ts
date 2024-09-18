@@ -91,6 +91,7 @@ import {
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
+  serializeValueAsJson,
 } from "@typespec/compiler";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
@@ -1316,7 +1317,7 @@ export async function getOpenAPIForService(
       in: "formData",
       ...base,
       ...(getFormDataSchema(param.type, schemaContext, base.name) as any),
-      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      default: param.defaultValue && getDefaultValue(param.defaultValue, param),
     };
 
     Object.assign(
@@ -1376,7 +1377,7 @@ export async function getOpenAPIForService(
         collectionFormat === "csv" && schema.items === undefined // If csv
           ? undefined
           : (collectionFormat as any),
-      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue),
+      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue, param.param),
       ...base,
       ...schema,
     };
@@ -1390,7 +1391,7 @@ export async function getOpenAPIForService(
 
     const result: OpenAPI2PathParameter = {
       in: "path",
-      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue),
+      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue, param.param),
       ...base,
       ...getSimpleParameterSchema(param.param, schemaContext, base.name),
     };
@@ -1415,7 +1416,7 @@ export async function getOpenAPIForService(
     }
     return {
       in: "header",
-      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      default: param.defaultValue && getDefaultValue(param.defaultValue, param),
       ...base,
       collectionFormat: collectionFormat as any,
       ...getSimpleParameterSchema(param, schemaContext, base.name),
@@ -1801,27 +1802,8 @@ export async function getOpenAPIForService(
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(defaultType: Value): any {
-    switch (defaultType.valueKind) {
-      case "StringValue":
-        return defaultType.value;
-      case "NumericValue":
-        return defaultType.value.asNumber() ?? undefined;
-      case "BooleanValue":
-        return defaultType.value;
-      case "ArrayValue":
-        return defaultType.values.map((x) => getDefaultValue(x));
-      case "NullValue":
-        return null;
-      case "EnumValue":
-        return defaultType.value.value ?? defaultType.value.name;
-      default:
-        reportDiagnostic(program, {
-          code: "invalid-default",
-          format: { type: defaultType.valueKind },
-          target: defaultType,
-        });
-    }
+  function getDefaultValue(defaultType: Value, modelProperty: ModelProperty): any {
+    return serializeValueAsJson(program, defaultType, modelProperty);
   }
 
   function includeDerivedModel(model: Model): boolean {
@@ -1960,7 +1942,7 @@ export async function getOpenAPIForService(
       applySummary(prop, property);
 
       if (prop.defaultValue && !("$ref" in property)) {
-        property.default = getDefaultValue(prop.defaultValue);
+        property.default = getDefaultValue(prop.defaultValue, prop);
       }
 
       if (isReadonlyProperty(program, prop)) {
