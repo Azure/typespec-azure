@@ -459,5 +459,4 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(models[0].usage, UsageFlags.Output);
     strictEqual(models[0].access, "public");
   });
-
 });
