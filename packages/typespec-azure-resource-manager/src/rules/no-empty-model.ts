@@ -1,11 +1,11 @@
 import { createRule, Model } from "@typespec/compiler";
 
-export const armNoEmptyModel = createRule({
-  name: "arm-no-empty-model",
+export const noEmptyModel = createRule({
+  name: "no-empty-model",
   severity: "warning",
   description:
     "ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-empty-model",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-empty-model",
   messages: {
     default: "Properties with type:object must have definition of a reference model.",
     extends:
@@ -16,7 +16,7 @@ export const armNoEmptyModel = createRule({
       model: (model: Model) => {
         if (model.properties.size === 0) {
           context.reportDiagnostic({
-            code: "arm-no-empty-model",
+            code: "no-empty-model",
             target: model,
           });
         }

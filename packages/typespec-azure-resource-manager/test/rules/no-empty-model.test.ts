@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { armNoEmptyModel } from "../../src/rules/arm-no-empty-model.js";
+import { noEmptyModel } from "../../src/rules/no-empty-model.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
 const armDef = `
@@ -21,7 +21,7 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
-      armNoEmptyModel,
+      noEmptyModel,
       "@azure-tools/typespec-azure-resource-manager",
     );
   });
@@ -37,7 +37,7 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-no-empty-model",
+        code: "@azure-tools/typespec-azure-resource-manager/no-empty-model",
         message: "Properties with type:object must have definition of a reference model.",
       });
   });
@@ -51,7 +51,7 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
         `,
       )
       .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-no-empty-model",
+        code: "@azure-tools/typespec-azure-resource-manager/no-empty-model",
         message: "Properties with type:object must have definition of a reference model.",
       });
   });
