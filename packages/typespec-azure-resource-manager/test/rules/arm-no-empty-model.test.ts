@@ -86,7 +86,7 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
       .toBeValid();
   });
 
-  it("valid when a property use a primitve data type ", async () => {
+  it("valid when a property use a simple data type ", async () => {
     await tester
       .expect(
         ` 
