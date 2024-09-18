@@ -5,6 +5,7 @@ export const armNoEmptyModel = createRule({
   severity: "warning",
   description:
     "ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-empty-model",
   messages: {
     default: "Properties with type:object must have definition of a reference model.",
     extends:

@@ -16,6 +16,8 @@ model Information {
 }
 ```
 
+#### ❌ Incorrect
+
 ```tsp
 model Empty {}
 ```
