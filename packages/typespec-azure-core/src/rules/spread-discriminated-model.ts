@@ -34,7 +34,7 @@ export const spreadDiscriminatedModelRule = createRule({
               model.node.properties.find(
                 (x) =>
                   x.kind === SyntaxKind.ModelSpreadProperty &&
-                  context.program.checker.getTypeForNode(x.target) === targetModel
+                  context.program.checker.getTypeForNode(x.target) === targetModel,
               ) ?? model;
             context.reportDiagnostic({
               format: {

@@ -9,15 +9,18 @@ title: "[I] SdkBuiltInType"
 
 ## Properties
 
-| Property | Type | Overrides | Inherited from |
-| ------ | ------ | ------ | ------ |
-| `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
-| `baseType?` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - |
-| `crossLanguageDefinitionId` | `string` | - | - |
-| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
-| `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
-| `description?` | `string` | - | `SdkTypeBase.description` |
-| `details?` | `string` | - | `SdkTypeBase.details` |
-| `encode` | `string` | - | - |
-| `kind` | [`SdkBuiltInKinds`](../type-aliases/SdkBuiltInKinds.md) | `SdkTypeBase.kind` | - |
-| `name` | `string` | - | - |
+| Property | Type | Description | Overrides | Inherited from |
+| ------ | ------ | ------ | ------ | ------ |
+| `__accessSet?` | `boolean` | - | - | `SdkTypeBase.__accessSet` |
+| `__raw?` | `Type` | - | - | `SdkTypeBase.__raw` |
+| `baseType?` | [`SdkBuiltInType`](SdkBuiltInType.md) | - | - | - |
+| `crossLanguageDefinitionId` | `string` | - | - | - |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | - | `SdkTypeBase.decorators` |
+| `deprecation?` | `string` | - | - | `SdkTypeBase.deprecation` |
+| ~~`description?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - | `SdkTypeBase.description` |
+| ~~`details?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - | `SdkTypeBase.details` |
+| `doc?` | `string` | - | - | `SdkTypeBase.doc` |
+| `encode` | `string` | - | - | - |
+| `kind` | [`SdkBuiltInKinds`](../type-aliases/SdkBuiltInKinds.md) | - | `SdkTypeBase.kind` | - |
+| `name` | `string` | - | - | - |
+| `summary?` | `string` | - | - | `SdkTypeBase.summary` |

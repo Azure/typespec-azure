@@ -31,7 +31,7 @@ export const armResourceOperationsRule = createRule({
             kinds
               .map((k) => resourceOperations.lifecycle[k])
               .forEach(
-                (op) => op && checkArmResourceOperationReturnType(context, model, op.operation)
+                (op) => op && checkArmResourceOperationReturnType(context, model, op.operation),
               );
             const lists = resourceOperations.lists;
             for (const key in lists) {
@@ -47,7 +47,7 @@ export const armResourceOperationsRule = createRule({
 function checkArmResourceOperationReturnType(
   context: LinterRuleContext<DiagnosticMessages>,
   model: Model,
-  operation: Operation
+  operation: Operation,
 ) {
   if (!isInternalTypeSpec(context.program, operation)) {
     const returnType = operation.returnType;
@@ -84,7 +84,7 @@ function checkIfArmModel(
   context: LinterRuleContext<DiagnosticMessages>,
   operation: Operation,
   model: Model,
-  modelCandidate: Model
+  modelCandidate: Model,
 ) {
   if (getArmResource(context.program, modelCandidate) && modelCandidate !== model) {
     context.reportDiagnostic({

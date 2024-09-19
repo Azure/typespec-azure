@@ -37,7 +37,7 @@ export const missingXmsIdentifiersRule = createRule({
     function isArrayMissingIdentifier(
       program: Program,
       array: ArrayModelType,
-      property: ModelProperty
+      property: ModelProperty,
     ) {
       const elementType = array.indexer.value;
       if (elementType.kind !== "Model") {

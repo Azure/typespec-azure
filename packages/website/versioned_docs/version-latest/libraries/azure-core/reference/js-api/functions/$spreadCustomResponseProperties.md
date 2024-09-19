@@ -16,7 +16,7 @@ function $spreadCustomResponseProperties(
 | ------ | ------ |
 | `context` | `DecoratorContext` |
 | `entity` | `Model` |
-| `customizations` | `Type` |
+| `customizations` | `Model` |
 
 ## Returns
 

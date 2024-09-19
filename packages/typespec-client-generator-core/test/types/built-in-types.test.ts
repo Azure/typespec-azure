@@ -21,7 +21,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: string;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "string");
@@ -36,7 +36,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: boolean;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "boolean");
@@ -63,7 +63,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         model Test {
           prop: ${type};
         }
-      `
+      `,
       );
       const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
       strictEqual(sdkType.kind, type);
@@ -81,7 +81,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         model Test {
           prop: ${type};
         }
-      `
+      `,
       );
       const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
       strictEqual(sdkType.kind, type);
@@ -97,7 +97,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: decimal;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "decimal");
@@ -112,7 +112,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: decimal128;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "decimal128");
@@ -127,7 +127,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: unknown;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "any");
@@ -140,7 +140,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: bytes;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
@@ -156,7 +156,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         @encode(BytesKnownEncoding.base64)
         prop: bytes;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
@@ -172,7 +172,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         @encode(BytesKnownEncoding.base64url)
         prop: bytes;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
@@ -190,7 +190,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         value: Base64UrlBytes[];
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
@@ -219,7 +219,7 @@ describe("typespec-client-generator-core: built-in types", () => {
           }
         ]>;
       }
-    `
+    `,
     );
     const models = runnerWithCore.context.sdkPackage.models;
     const type = models[0].properties[0].type;
@@ -244,14 +244,14 @@ describe("typespec-client-generator-core: built-in types", () => {
         @format("url")
         urlProperty: string;
       }
-    `
+    `,
     );
     const models = runnerWithCore.context.sdkPackage.models;
     for (const property of models[0].properties) {
       strictEqual(property.kind, "property");
       strictEqual(
         property.type.kind,
-        property.serializedName.replace("Scalar", "").replace("Property", "")
+        property.serializedName.replace("Scalar", "").replace("Property", ""),
       );
     }
   });
@@ -279,7 +279,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     op getStatus is GetResourceOperationStatus<User>;
     `);
     const userModel = runnerWithCore.context.sdkPackage.models.find(
-      (x) => x.kind === "model" && x.name === "User"
+      (x) => x.kind === "model" && x.name === "User",
     );
     ok(userModel);
     strictEqual(userModel.properties.length, 2);
@@ -302,7 +302,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: Derived;
       }
-      `
+      `,
     );
     const models = getAllModels(runner.context);
     strictEqual(models[0].kind, "model");
@@ -327,7 +327,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         @format("unknown")
         unknownProp: string;
       }
-    `
+    `,
     );
     const models = getAllModels(runner.context);
     strictEqual(models[0].kind, "model");
@@ -357,7 +357,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       op func(
         @body body: TestModel
       ): void;
-    `
+    `,
     );
     expectDiagnostics(runner.context.diagnostics, []);
     const m = runner.context.sdkPackage.models.find((x) => x.name === "TestModel");
@@ -389,15 +389,15 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: TestScalar;
       }
-    `
+    `,
     );
     const models = getAllModels(runner.context);
     strictEqual(models[0].kind, "model");
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "TestScalar");
-    strictEqual(type.description, "title"); // eslint-disable-line deprecation/deprecation
-    strictEqual(type.details, "doc"); // eslint-disable-line deprecation/deprecation
+    strictEqual(type.description, "title");
+    strictEqual(type.details, "doc");
     strictEqual(type.doc, "doc");
     strictEqual(type.summary, "title");
     strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
@@ -411,7 +411,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         @encode(string)
         value: safeint;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "safeint");
@@ -429,7 +429,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         value: int32EncodedAsString;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "int32");

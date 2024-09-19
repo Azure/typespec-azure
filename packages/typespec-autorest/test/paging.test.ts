@@ -10,7 +10,7 @@ it("use Azure.Core.Page as the response", async () => {
     namespace Test {
       op list(): Azure.Core.Page<{}>;
     }
-    `
+    `,
   );
 
   const listThings = res.paths["/"].get;
@@ -29,7 +29,7 @@ it("define a custom paged operation with custom next link", async () => {
         \`@odata.nextLink\`?: string;
       }
       op list(): CustomPageModel<{}>;
-      `
+      `,
   );
 
   const listThings = res.paths["/"].get;
@@ -50,7 +50,7 @@ it("define a custom paged operation with custom item name", async () => {
     }
       
     op list(): List;
-    `
+    `,
   );
 
   const listThings = res.paths["/"].get;

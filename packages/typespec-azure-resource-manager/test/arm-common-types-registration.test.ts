@@ -25,7 +25,7 @@ function boilerplate(version: string | undefined) {
 describe("common definition", () => {
   async function compute(
     decorators: string,
-    commonTypesVersion: string
+    commonTypesVersion: string,
   ): Promise<[ArmCommonTypeRecord | undefined, readonly Diagnostic[]]> {
     const runner = await createAzureResourceManagerTestRunner();
     const { Foo, Service } = (await runner.compile(`
@@ -48,7 +48,7 @@ describe("common definition", () => {
           @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
           @Azure.ResourceManager.CommonTypes.Private.armCommonDefinition("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
         `,
-        version
+        version,
       );
       expectDiagnosticEmpty(diagnostics);
       expect(ref).toEqual({
@@ -116,7 +116,7 @@ describe("common definition", () => {
 describe("common parameters", () => {
   async function compute(
     decorators: string,
-    commonTypesVersion: string
+    commonTypesVersion: string,
   ): Promise<[ArmCommonTypeRecord | undefined, readonly Diagnostic[]]> {
     const runner = await createAzureResourceManagerTestRunner();
     const { foo, Service } = (await runner.compile(`
@@ -141,7 +141,7 @@ describe("common parameters", () => {
           @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v4, "foo.json")
           @Azure.ResourceManager.CommonTypes.Private.armCommonParameter("Foo", Azure.ResourceManager.CommonTypes.Versions.v5, "foo.json")
         `,
-        version
+        version,
       );
       expectDiagnosticEmpty(diagnostics);
       expect(ref).toEqual({

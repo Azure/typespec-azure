@@ -1,5 +1,16 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.46.0
+
+### Bug Fixes
+
+- [#1357](https://github.com/Azure/typespec-azure/pull/1357) Disable `use-standard-operations` azure core linter rule from `resource-manager` ruleset
+
+### Features
+
+- [#1342](https://github.com/Azure/typespec-azure/pull/1342) Replace `no-operation-id` linter rule with a more generic `no-openapi` rule guarding against any use of openapi decorators
+
+
 ## 0.45.0
 
 ### Bug Fixes

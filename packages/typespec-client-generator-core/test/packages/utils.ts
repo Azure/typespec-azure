@@ -40,7 +40,7 @@ export function getServiceWithDefaultApiVersion(op: string) {
 export function getServiceMethodOfClient(
   sdkPackage: SdkPackage<SdkHttpOperation>,
   numMethods: number = 1,
-  methodIndex: number = 0
+  methodIndex: number = 0,
 ): SdkServiceMethod<SdkHttpOperation> {
   let client = sdkPackage.clients[0];
   if (client.methods.some((x) => x.kind === "clientaccessor")) {

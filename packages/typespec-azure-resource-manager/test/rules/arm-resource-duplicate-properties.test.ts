@@ -14,7 +14,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
     tester = createLinterRuleTester(
       runner,
       armResourceDuplicatePropertiesRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -28,7 +28,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
           @key @segment("foo") name: string;
           ...ManagedServiceIdentityProperty;
         }
-      `
+      `,
       )
       .toBeValid();
   });
@@ -48,7 +48,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
           name: string;
           identity: string;
         }
-      `
+      `,
       )
       .toEmitDiagnostics([
         {

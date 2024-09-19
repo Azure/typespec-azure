@@ -16,7 +16,7 @@ describe("typespec-azure-core: no explicit routes on resource operations", () =>
     tester = createLinterRuleTester(
       runner,
       noExplicitRoutesResourceOps,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -31,7 +31,7 @@ describe("typespec-azure-core: no explicit routes on resource operations", () =>
 
         @route("/api/widgets")
         op listWidgets is Azure.Core.StandardResourceOperations.ResourceList<Widget>;
-        `
+        `,
       )
       .toEmitDiagnostics([
         {

@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.46.0
+
+### Features
+
+- [#1342](https://github.com/Azure/typespec-azure/pull/1342) Replace `no-operation-id` linter rule with a more generic `no-openapi` rule guarding against any use of openapi decorators
+
+
 ## 0.45.0
 
 ### Bug Fixes

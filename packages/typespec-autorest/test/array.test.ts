@@ -8,7 +8,7 @@ describe("typespec-autorest: Array", () => {
       "Pet",
       `
       model Pet { names: string[] };
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -25,7 +25,7 @@ describe("typespec-autorest: Array", () => {
       `
       model PetNames is string[] {}
       model Pet { names: PetNames };
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -44,7 +44,7 @@ describe("typespec-autorest: Array", () => {
       @doc("This is a doc for PetNames")
       model PetNames is string[] {}
       model Pet { names: PetNames };
-      `
+      `,
     );
     deepStrictEqual(res.defs.PetNames.description, "This is a doc for PetNames");
   });
@@ -57,7 +57,7 @@ describe("typespec-autorest: Array", () => {
         @minItems(1)
         names: string[]
       };
-      `
+      `,
     );
 
     ok(res.defs.Pet, "expected definition named Pet");
@@ -76,7 +76,7 @@ describe("typespec-autorest: Array", () => {
         @maxItems(3)
         names: string[]
       };
-      `
+      `,
     );
 
     ok(res.defs.Pet, "expected definition named Pet");
@@ -93,7 +93,7 @@ describe("typespec-autorest: Array", () => {
       `
       @minItems(1)
       model Names is string[];
-      `
+      `,
     );
 
     deepStrictEqual(res.defs.Names, {
@@ -109,7 +109,7 @@ describe("typespec-autorest: Array", () => {
       `
       @maxItems(3)
       model Names is string[];
-      `
+      `,
     );
 
     deepStrictEqual(res.defs.Names, {
