@@ -1331,8 +1331,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
-        )
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
+          )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1662,8 +1662,9 @@ function updateTypesFromOperation(
     // conflicting usage between multipart and regular body
     if (sdkType.kind === "model") {
       const isUsedInMultipart = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
-      const isUsedInOthers = ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
-      if (!multipartOperation && isUsedInMultipart || multipartOperation && isUsedInOthers) {
+      const isUsedInOthers =
+        ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
+      if ((!multipartOperation && isUsedInMultipart) || (multipartOperation && isUsedInOthers)) {
         // This means we have a model that is used both for formdata input and for regular body input
         diagnostics.add(
           createDiagnostic({
@@ -1672,7 +1673,7 @@ function updateTypesFromOperation(
             format: {
               modelName: sdkType.name,
             },
-          })
+          }),
         );
       }
     }

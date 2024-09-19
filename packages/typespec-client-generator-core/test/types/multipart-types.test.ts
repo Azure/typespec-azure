@@ -44,7 +44,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(profileImage.multipartOptions);
     strictEqual(profileImage.multipartOptions.isFilePart, true);
   });
-  
+
   it("multipart conflicting model usage", async function () {
     await runner.compile(
       `
@@ -80,14 +80,14 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         @route("/basic2") 
         op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-      `
+      `,
     );
     deepEqual(runner.context.diagnostics.length, 0);
     const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
     ok(address);
     deepEqual(address.usage, UsageFlags.Input);
     const multiPartRequest = runner.context.sdkPackage.models.find(
-      (x) => x.name === "MultiPartRequest"
+      (x) => x.name === "MultiPartRequest",
     );
     ok(multiPartRequest);
     deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
@@ -113,14 +113,14 @@ describe("typespec-client-generator-core: multipart types", () => {
         @post
         @route("/basic2") 
         op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-      `
+      `,
     );
     deepEqual(runner.context.diagnostics.length, 0);
     const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
     ok(address);
     deepEqual(address.usage, UsageFlags.Input | UsageFlags.Json);
     const multiPartRequest = runner.context.sdkPackage.models.find(
-      (x) => x.name === "MultiPartRequest"
+      (x) => x.name === "MultiPartRequest",
     );
     ok(multiPartRequest);
     deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
