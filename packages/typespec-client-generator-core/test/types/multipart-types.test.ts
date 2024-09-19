@@ -44,6 +44,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(profileImage.multipartOptions);
     strictEqual(profileImage.multipartOptions.isFilePart, true);
   });
+  
   it("multipart conflicting model usage", async function () {
     await runner.compile(
       `
@@ -61,6 +62,7 @@ describe("typespec-client-generator-core: multipart types", () => {
       code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
     });
   });
+
   it("multipart conflicting model usage for only multipart operations", async function () {
     await runner.compile(
       `
@@ -90,6 +92,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(multiPartRequest);
     deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
   });
+
   it("multipart conflicting model usage for mixed operations", async function () {
     await runner.compile(
       `
