@@ -28,7 +28,6 @@ import {
   HttpOperationBody,
   HttpOperationMultipartBody,
   HttpOperationResponseContent,
-  HttpStatusCodeRange,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import { getParamAlias } from "./decorators.js";
@@ -397,15 +396,13 @@ export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
 }
 
-export function getAllResponseBodiesAndNonBodyExists(
-  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
-): {
+export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[]): {
   allResponseBodies: SdkType[];
   nonBodyExists: boolean;
 } {
   const allResponseBodies: SdkType[] = [];
   let nonBodyExists = false;
-  for (const response of responses.values()) {
+  for (const response of responses) {
     if (response.type) {
       if (response.type.kind === "nullable") {
         nonBodyExists = true;
@@ -418,9 +415,7 @@ export function getAllResponseBodiesAndNonBodyExists(
   return { allResponseBodies, nonBodyExists };
 }
 
-export function getAllResponseBodies(
-  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
-): SdkType[] {
+export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 

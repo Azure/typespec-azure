@@ -1023,15 +1023,15 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "delete");
       const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.size, 1);
+      strictEqual(serviceResponses.length, 1);
 
-      const voidResponse = serviceResponses.get(204);
+      const voidResponse = serviceResponses.find((x) => x.statusCodes === 204);
       ok(voidResponse);
       strictEqual(voidResponse.kind, "http");
       strictEqual(voidResponse.type, undefined);
       strictEqual(voidResponse.headers.length, 0);
 
-      const errorResponse = method.operation.exceptions.get("*");
+      const errorResponse = method.operation.exceptions.find((x) => x.statusCodes === "*");
       ok(errorResponse);
       strictEqual(errorResponse.kind, "http");
       ok(errorResponse.type);
@@ -1058,15 +1058,15 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "delete");
       const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.size, 1);
+      strictEqual(serviceResponses.length, 1);
 
-      const voidResponse = serviceResponses.get(204);
+      const voidResponse = serviceResponses.find((x) => x.statusCodes === 204);
       ok(voidResponse);
       strictEqual(voidResponse.kind, "http");
       strictEqual(voidResponse.type, undefined);
       strictEqual(voidResponse.headers.length, 0);
 
-      const errorResponse = method.operation.exceptions.get(403);
+      const errorResponse = method.operation.exceptions.find((x) => x.statusCodes === 403);
       ok(errorResponse);
       strictEqual(errorResponse.kind, "http");
       ok(errorResponse.type);
@@ -1101,9 +1101,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.models.length, 3);
       strictEqual(method.name, "create");
       const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.size, 1);
+      strictEqual(serviceResponses.length, 1);
 
-      const createResponse = serviceResponses.get(200);
+      const createResponse = serviceResponses.find((x) => x.statusCodes === 200);
       ok(createResponse);
       strictEqual(createResponse.kind, "http");
       strictEqual(
@@ -1112,7 +1112,7 @@ describe("typespec-client-generator-core: package", () => {
       );
       strictEqual(createResponse.headers.length, 0);
 
-      const errorResponse = method.operation.exceptions.get("*");
+      const errorResponse = method.operation.exceptions.find((x) => x.statusCodes === "*");
       ok(errorResponse);
       strictEqual(errorResponse.kind, "http");
       ok(errorResponse.type);
@@ -1144,11 +1144,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.models.length, 1);
       strictEqual(method.name, "operation");
       const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.size, 1);
+      strictEqual(serviceResponses.length, 1);
 
       strictEqual(method.parameters.length, 1);
 
-      const createResponse = serviceResponses.get(200);
+      const createResponse = serviceResponses.find((x) => x.statusCodes === 200);
       ok(createResponse);
       strictEqual(createResponse.kind, "http");
       strictEqual(
@@ -1184,7 +1184,7 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       const serviceResponses = method.operation.responses;
 
-      const createResponse = serviceResponses.get(200);
+      const createResponse = serviceResponses.find((x) => x.statusCodes === 200);
       ok(createResponse);
       strictEqual(createResponse.headers[0].type.kind, "nullable");
       strictEqual(createResponse.type?.kind, "nullable");
@@ -1205,10 +1205,10 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       const serviceResponses = method.operation.responses;
 
-      const okResponse = serviceResponses.get(200);
+      const okResponse = serviceResponses.find((x) => x.statusCodes === 200);
       ok(okResponse);
 
-      const noContentResponse = serviceResponses.get(204);
+      const noContentResponse = serviceResponses.find((x) => x.statusCodes === 204);
       ok(noContentResponse);
       strictEqual(noContentResponse.type, undefined);
       strictEqual(method.response.type?.kind, "nullable");
@@ -1230,9 +1230,9 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.response.type, undefined);
       const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.size, 1);
+      strictEqual(serviceResponses.length, 1);
 
-      const voidResponse = serviceResponses.get(204);
+      const voidResponse = serviceResponses.find((x) => x.statusCodes === 204);
       ok(voidResponse);
       strictEqual(voidResponse.kind, "http");
       strictEqual(voidResponse.type, undefined);
@@ -1946,14 +1946,14 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(serviceOperation.bodyParam.name, "resource");
       strictEqual(serviceOperation.bodyParam.type, widgetModel);
 
-      strictEqual(serviceOperation.responses.size, 2);
+      strictEqual(serviceOperation.responses.length, 2);
       const responseHeaders = [
         "Repeatability-Result",
         "ETag",
         "x-ms-client-request-id",
         "Operation-Location",
       ];
-      const response200 = serviceOperation.responses.get(200);
+      const response200 = serviceOperation.responses.find((x) => x.statusCodes === 200);
       ok(response200);
       deepStrictEqual(
         response200.headers.map((x) => x.serializedName),
@@ -1961,7 +1961,7 @@ describe("typespec-client-generator-core: package", () => {
       );
       strictEqual(response200.type, widgetModel);
 
-      const response201 = serviceOperation.responses.get(201);
+      const response201 = serviceOperation.responses.find((x) => x.statusCodes === 201);
       ok(response201);
       deepStrictEqual(
         response201.headers.map((x) => x.serializedName),
@@ -1969,7 +1969,7 @@ describe("typespec-client-generator-core: package", () => {
       );
       strictEqual(response201.type, widgetModel);
 
-      const exception = serviceOperation.exceptions.get("*");
+      const exception = serviceOperation.exceptions.find((x) => x.statusCodes === "*");
       ok(exception);
       strictEqual(exception.kind, "http");
       ok(exception.type);
@@ -2077,8 +2077,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(accept.kind, "header");
       strictEqual(accept.correspondingMethodParams[0], listManufacturers.parameters[1]);
 
-      strictEqual(operation.responses.size, 1);
-      const response200 = operation.responses.get(200);
+      strictEqual(operation.responses.length, 1);
+      const response200 = operation.responses.find((x) => x.statusCodes === 200);
       ok(response200);
       strictEqual(response200.kind, "http");
       const pagingModel = response200.type;
