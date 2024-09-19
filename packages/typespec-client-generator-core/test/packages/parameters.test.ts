@@ -42,7 +42,10 @@ describe("typespec-client-generator-core: parameters", () => {
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.bodyParam, undefined);
-    strictEqual(serviceOperation.exceptions.get("*"), undefined);
+    strictEqual(
+      serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
+      undefined,
+    );
 
     strictEqual(serviceOperation.parameters.length, 1);
     const pathParam = serviceOperation.parameters[0];
@@ -147,7 +150,10 @@ describe("typespec-client-generator-core: parameters", () => {
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.bodyParam, undefined);
-    strictEqual(serviceOperation.exceptions.get("*"), undefined);
+    strictEqual(
+      serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
+      undefined,
+    );
 
     strictEqual(serviceOperation.parameters.length, 1);
     const headerParam = serviceOperation.parameters[0];
@@ -223,7 +229,10 @@ describe("typespec-client-generator-core: parameters", () => {
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.bodyParam, undefined);
-    strictEqual(serviceOperation.exceptions.get("*"), undefined);
+    strictEqual(
+      serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
+      undefined,
+    );
 
     strictEqual(serviceOperation.parameters.length, 1);
     const queryParam = serviceOperation.parameters[0];
@@ -665,8 +674,8 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(serviceContentTypeParam.type.value, "application/json");
     strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
 
-    strictEqual(serviceOperation.responses.size, 1);
-    const response = serviceOperation.responses.get(200);
+    strictEqual(serviceOperation.responses.length, 1);
+    const response = serviceOperation.responses.find((x) => x.statusCodes === 200);
     ok(response);
     strictEqual(response.kind, "http");
     strictEqual(response.type, sdkPackage.models[0]);
@@ -705,8 +714,8 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(serviceContentTypeParam.type.value, "image/png");
     strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
 
-    strictEqual(serviceOperation.responses.size, 1);
-    const response = serviceOperation.responses.get(200);
+    strictEqual(serviceOperation.responses.length, 1);
+    const response = serviceOperation.responses.find((x) => x.statusCodes === 200);
     ok(response);
     strictEqual(response.kind, "http");
     strictEqual(sdkPackage.models.length, 0);
@@ -779,8 +788,10 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(method.parameters.length, 0);
     strictEqual(method.response.type, undefined);
     strictEqual(method.operation.parameters.length, 0);
-    strictEqual(method.operation.responses.get(200)?.headers.length, 0);
-    strictEqual(method.operation.responses.get(200)?.type, undefined);
+    const response = method.operation.responses.find((x) => x.statusCodes === 200);
+    ok(response);
+    strictEqual(response.headers.length, 0);
+    strictEqual(response.type, undefined);
   });
 
   describe("uri template related", () => {
