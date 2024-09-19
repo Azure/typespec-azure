@@ -35,7 +35,7 @@ async function emitCommonTypesSwagger(name: string) {
 
   const output = await getAllServicesAtAllVersions(
     program,
-    resolveAutorestOptions(program, dir, {})
+    resolveAutorestOptions(program, dir, {}),
   );
   if (program.diagnostics.length > 0) {
     logDiagnostics(program.diagnostics, NodeHost.logSink);

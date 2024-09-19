@@ -74,12 +74,12 @@ function createEnumToExtensibleUnionCodeFix(en: Enum): CodeFix {
             `${type},\n`,
             ...en.node.members.map((member) => {
               return `${getNodeTrivia(script, member)}${getNodeAnnotations(
-                member
+                member,
               )}${convertEnumMemberToUnionVariant(member)},`;
             }),
             getNodeTrivia(script, en.node.end - 1),
             "}",
-          ].join("")
+          ].join(""),
         ),
       ];
     },

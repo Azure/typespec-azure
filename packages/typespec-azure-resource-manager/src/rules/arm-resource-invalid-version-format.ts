@@ -34,7 +34,7 @@ export const armResourceInvalidVersionFormatRule = createRule({
                 break;
               case "string":
                 const versionMatch = versionValue.match(
-                  /^[\d]{4}-[\d]{2}-[\d]{2}(-[\w]+(\.\d+)?)?$/
+                  /^[\d]{4}-[\d]{2}-[\d]{2}(-[\w]+(\.\d+)?)?$/,
                 );
                 if (
                   versionMatch === undefined ||

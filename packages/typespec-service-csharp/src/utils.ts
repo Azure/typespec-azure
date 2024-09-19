@@ -28,7 +28,7 @@ export function getCSharpTypeForScalar(program: Program, scalar: Scalar): CSharp
 
 export function getCSharpTypeForStdScalars(
   program: Program,
-  scalar: Scalar & { name: IntrinsicScalarName }
+  scalar: Scalar & { name: IntrinsicScalarName },
 ): CSharpType {
   const standardScalars: Map<IntrinsicScalarName, CSharpType> = new Map<
     IntrinsicScalarName,
@@ -188,7 +188,7 @@ export function isValueType(program: Program, type: Type): boolean {
 export function formatComment(
   text: string,
   lineLength: number = 76,
-  lineEnd: string = "\n"
+  lineEnd: string = "\n",
 ): string {
   function getNextLine(target: string): string {
     for (let i = lineLength - 1; i > 0; i--) {
@@ -214,7 +214,7 @@ export function formatComment(
 
 export function getCSharpIdentifier(
   name: string,
-  context: NameCasingType = NameCasingType.Class
+  context: NameCasingType = NameCasingType.Class,
 ): string {
   if (name === undefined) return "Placeholder";
   switch (context) {
@@ -236,7 +236,7 @@ export function ensureCSharpIdentifier(
   program: Program,
   target: Type,
   name: string,
-  context: NameCasingType = NameCasingType.Class
+  context: NameCasingType = NameCasingType.Class,
 ): string {
   let location = "";
   switch (target.kind) {

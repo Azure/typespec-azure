@@ -55,7 +55,7 @@ describe("typespec-client-generator-core: multipart types", () => {
   
         @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
         @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-      `
+      `,
     );
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
@@ -136,7 +136,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         
         @put op multipartOperation(@header contentType: "multipart/form-data", ...A): void;
         @post op normalOperation(...B): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
@@ -176,7 +176,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         }
         
         @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
@@ -190,7 +190,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         }
         
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
@@ -214,7 +214,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         }
         
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
-        `
+        `,
     );
     ok(runner.context.diagnostics?.length);
     expectDiagnostics(runner.context.diagnostics, {
@@ -235,7 +235,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         
         @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void | ErrorResponse;
         @post op normalOp(): void | ErrorResponse;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
@@ -274,7 +274,7 @@ describe("typespec-client-generator-core: multipart types", () => {
         }
         `);
     const client = runner.context.sdkPackage.clients[0].methods.find(
-      (x) => x.kind === "clientaccessor"
+      (x) => x.kind === "clientaccessor",
     )?.response as SdkClientType<SdkHttpOperation>;
     const formDataMethod = client.methods[0];
     strictEqual(formDataMethod.kind, "basic");
@@ -388,7 +388,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(id.multipartOptions.isFilePart, false);
     deepEqual(id.multipartOptions.defaultContentTypes, ["text/plain"]);
     const profileImage = MultiPartRequest.properties.find(
-      (x) => x.name === "profileImage"
+      (x) => x.name === "profileImage",
     ) as SdkBodyModelPropertyType;
     strictEqual(profileImage.optional, false);
     ok(profileImage.multipartOptions);
@@ -397,7 +397,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(profileImage.multipartOptions.contentType, undefined);
     deepEqual(profileImage.multipartOptions.defaultContentTypes, ["application/octet-stream"]);
     const address = MultiPartRequest.properties.find(
-      (x) => x.name === "address"
+      (x) => x.name === "address",
     ) as SdkBodyModelPropertyType;
     strictEqual(address.optional, false);
     ok(address.multipartOptions);
@@ -420,7 +420,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
     const fileArrayOnePart = MultiPartRequest.properties.find(
-      (x) => x.name === "fileArrayOnePart"
+      (x) => x.name === "fileArrayOnePart",
     ) as SdkBodyModelPropertyType;
     ok(fileArrayOnePart);
     ok(fileArrayOnePart.multipartOptions);
@@ -433,7 +433,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     deepEqual(fileArrayOnePart.multipartOptions.defaultContentTypes, ["application/json"]);
 
     const fileArrayMultiParts = MultiPartRequest.properties.find(
-      (x) => x.name === "fileArrayMultiParts"
+      (x) => x.name === "fileArrayMultiParts",
     ) as SdkBodyModelPropertyType;
     ok(fileArrayMultiParts);
     ok(fileArrayMultiParts.multipartOptions);
@@ -464,7 +464,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
     const fileOptionalFileName = MultiPartRequest.properties.find(
-      (x) => x.name === "file"
+      (x) => x.name === "file",
     ) as SdkBodyModelPropertyType;
     ok(fileOptionalFileName);
     ok(fileOptionalFileName.multipartOptions);
@@ -490,7 +490,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(MultiPartRequest);
     ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
     const fileOptionalFileName = MultiPartRequest.properties.find(
-      (x) => x.name === "fileOptionalFileName"
+      (x) => x.name === "fileOptionalFileName",
     ) as SdkBodyModelPropertyType;
     ok(fileOptionalFileName);
     strictEqual(fileOptionalFileName.optional, false);
@@ -503,7 +503,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(fileOptionalFileName.multipartOptions.contentType.optional, true);
 
     const fileRequiredFileName = MultiPartRequest.properties.find(
-      (x) => x.name === "fileRequiredFileName"
+      (x) => x.name === "fileRequiredFileName",
     ) as SdkBodyModelPropertyType;
     ok(fileRequiredFileName);
     strictEqual(fileRequiredFileName.optional, false);
@@ -559,7 +559,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
     const stringsOnePart = MultiPartRequest.properties.find(
-      (x) => x.name === "stringsOnePart"
+      (x) => x.name === "stringsOnePart",
     ) as SdkBodyModelPropertyType;
     ok(stringsOnePart);
     strictEqual(stringsOnePart.type.kind, "array");
@@ -567,7 +567,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(stringsOnePart.multipartOptions);
     strictEqual(stringsOnePart.multipartOptions.isMulti, false);
     const stringsMultiParts = MultiPartRequest.properties.find(
-      (x) => x.name === "stringsMultiParts"
+      (x) => x.name === "stringsMultiParts",
     ) as SdkBodyModelPropertyType;
     ok(stringsMultiParts);
     strictEqual(stringsMultiParts.type.kind, "array");
@@ -592,7 +592,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
     ok(MultiPartRequest);
     const stringWithoutContentType = MultiPartRequest.properties.find(
-      (x) => x.name === "stringWithoutContentType"
+      (x) => x.name === "stringWithoutContentType",
     ) as SdkBodyModelPropertyType;
     ok(stringWithoutContentType);
     strictEqual(stringWithoutContentType.type.kind, "string");
@@ -601,7 +601,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     deepEqual(stringWithoutContentType.multipartOptions.defaultContentTypes, ["text/plain"]);
 
     const stringWithContentType = MultiPartRequest.properties.find(
-      (x) => x.name === "stringWithContentType"
+      (x) => x.name === "stringWithContentType",
     ) as SdkBodyModelPropertyType;
     ok(stringWithContentType);
     strictEqual(stringWithContentType.type.kind, "model");
@@ -610,7 +610,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     deepEqual(stringWithContentType.multipartOptions.defaultContentTypes, ["text/html"]);
 
     const bytesWithoutContentType = MultiPartRequest.properties.find(
-      (x) => x.name === "bytesWithoutContentType"
+      (x) => x.name === "bytesWithoutContentType",
     ) as SdkBodyModelPropertyType;
     ok(bytesWithoutContentType);
     strictEqual(bytesWithoutContentType.type.kind, "bytes");
@@ -621,7 +621,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ]);
 
     const bytesWithContentType = MultiPartRequest.properties.find(
-      (x) => x.name === "bytesWithContentType"
+      (x) => x.name === "bytesWithContentType",
     ) as SdkBodyModelPropertyType;
     ok(bytesWithContentType);
     strictEqual(bytesWithContentType.type.kind, "model");

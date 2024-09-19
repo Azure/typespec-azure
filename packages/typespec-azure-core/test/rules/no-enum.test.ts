@@ -23,7 +23,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         enum PetKind {
           cat, dog
         }
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -42,7 +42,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         enum Versions {
           v1, v2
         }
-        `
+        `,
       )
       .toBeValid();
   });
@@ -59,7 +59,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         }
 
         enum Bar { a,  b}
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -76,7 +76,7 @@ describe("typespec-azure-core: no-enum rule", () => {
           enum PetKind {
             cat, dog
           }
-          `
+          `,
         )
         .applyCodeFix("enum-to-extensible-union").toEqual(`
           union PetKind {
@@ -97,7 +97,7 @@ describe("typespec-azure-core: no-enum rule", () => {
             /** dog doc */
             dog
           }
-          `
+          `,
         )
         .applyCodeFix("enum-to-extensible-union").toEqual(`
           union PetKind {
@@ -118,7 +118,7 @@ describe("typespec-azure-core: no-enum rule", () => {
           enum PetKind {
             Cat: "cat", Dog: "dog",
           }
-          `
+          `,
         )
         .applyCodeFix("enum-to-extensible-union").toEqual(`
           union PetKind {
@@ -150,7 +150,7 @@ describe("typespec-azure-core: no-enum rule", () => {
 
             // end
           }
-          `
+          `,
         )
         .applyCodeFix("enum-to-extensible-union").toEqual(`
           union PetKind {

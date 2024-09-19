@@ -35,7 +35,7 @@ export async function createAutorestTestHost() {
 
 export async function createAutorestTestRunner(
   host?: TestHost,
-  emitterOptions?: AutorestEmitterOptions
+  emitterOptions?: AutorestEmitterOptions,
 ) {
   host ??= await createAutorestTestHost();
   return createTestWrapper(host, {
@@ -58,7 +58,7 @@ export async function createAutorestTestRunner(
 
 export async function emitOpenApiWithDiagnostics(
   code: string,
-  options: AutorestEmitterOptions = {}
+  options: AutorestEmitterOptions = {},
 ): Promise<[OpenAPI2Document, readonly Diagnostic[]]> {
   const runner = await createAutorestTestRunner();
   const outputFile = resolveVirtualPath("openapi.json");
@@ -82,7 +82,7 @@ interface CompileOpenAPIOptions {
 
 export async function compileOpenAPI(
   code: string,
-  options: CompileOpenAPIOptions = {}
+  options: CompileOpenAPIOptions = {},
 ): Promise<OpenAPI2Document> {
   const runner = await createAutorestTestRunner(options.host);
   const diagnostics = await runner.diagnose(code, {
@@ -103,7 +103,7 @@ export async function compileOpenAPI(
 export async function compileVersionedOpenAPI<K extends string>(
   code: string,
   versions: K[],
-  options: CompileOpenAPIOptions = {}
+  options: CompileOpenAPIOptions = {},
 ): Promise<Record<K, OpenAPI2Document>> {
   const runner = await createAutorestTestRunner(options.host);
   const diagnostics = await runner.diagnose(code, {
@@ -120,7 +120,7 @@ export async function compileVersionedOpenAPI<K extends string>(
   const output: any = {};
   for (const version of versions) {
     output[version] = JSON.parse(
-      runner.fs.get(resolveVirtualPath("tsp-output", version, "openapi.json"))!
+      runner.fs.get(resolveVirtualPath("tsp-output", version, "openapi.json"))!,
     );
   }
   return output;
@@ -132,7 +132,7 @@ export async function compileVersionedOpenAPI<K extends string>(
 export async function openApiFor(
   code: string,
   versions?: string[],
-  options: AutorestEmitterOptions = {}
+  options: AutorestEmitterOptions = {},
 ): Promise<any> {
   if (versions) {
     return compileVersionedOpenAPI(code, versions, { options });
@@ -173,7 +173,7 @@ export async function oapiForModel(name: string, modelDef: string) {
 
 export function ignoreDiagnostics(
   diagnostics: readonly Diagnostic[],
-  codes: string[]
+  codes: string[],
 ): readonly Diagnostic[] {
   return diagnostics.filter((x) => codes.indexOf(x.code) === -1);
 }
