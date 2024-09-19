@@ -44,7 +44,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(serviceOperation.bodyParam, undefined);
     strictEqual(
       serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
-      undefined
+      undefined,
     );
 
     strictEqual(serviceOperation.parameters.length, 1);
@@ -152,7 +152,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(serviceOperation.bodyParam, undefined);
     strictEqual(
       serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
-      undefined
+      undefined,
     );
 
     strictEqual(serviceOperation.parameters.length, 1);
@@ -231,7 +231,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(serviceOperation.bodyParam, undefined);
     strictEqual(
       serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
-      undefined
+      undefined,
     );
 
     strictEqual(serviceOperation.parameters.length, 1);

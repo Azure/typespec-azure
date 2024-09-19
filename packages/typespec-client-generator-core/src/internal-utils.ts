@@ -580,7 +580,7 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
 export function isOnClient(
   context: TCGCContext,
   type: ModelProperty,
-  operation?: Operation
+  operation?: Operation,
 ): boolean {
   const namespace = operation ? getLocationOfOperation(operation) : type.model?.namespace;
   return (

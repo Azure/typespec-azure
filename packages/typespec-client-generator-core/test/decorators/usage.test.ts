@@ -450,7 +450,7 @@ describe("typespec-client-generator-core: @usage", () => {
             name: string;
           }
         }
-      `
+      `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);

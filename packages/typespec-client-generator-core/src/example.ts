@@ -310,7 +310,7 @@ function handleHttpResponses(
           responseExamples.push(
             diagnostics.pipe(
               handleHttpResponse(response, statusCode, example.responses[code], relativePath),
-            )
+            ),
           );
           found = true;
           break;
@@ -323,7 +323,7 @@ function handleHttpResponses(
           responseExamples.push(
             diagnostics.pipe(
               handleHttpResponse(response, statusCode, example.responses[code], relativePath),
-            )
+            ),
           );
           found = true;
           break;

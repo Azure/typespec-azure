@@ -208,7 +208,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     ok(okResponse);
     deepStrictEqual(
       okResponse.response,
-      operation.responses.find((x) => x.statusCodes === 200)
+      operation.responses.find((x) => x.statusCodes === 200),
     );
     ok(okResponse.bodyValue);
 
@@ -220,7 +220,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     ok(createdResponse);
     deepStrictEqual(
       createdResponse.response,
-      operation.responses.find((x) => x.statusCodes === 201)
+      operation.responses.find((x) => x.statusCodes === 201),
     );
 
     strictEqual(createdResponse.bodyValue, undefined);
@@ -228,7 +228,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
 
     deepStrictEqual(
       createdResponse.headers[0].header,
-      operation.responses.find((x) => x.statusCodes === 201)?.headers[0]
+      operation.responses.find((x) => x.statusCodes === 201)?.headers[0],
     );
     strictEqual(createdResponse.headers[0].value.value, "test");
     strictEqual(createdResponse.headers[0].value.kind, "string");
@@ -271,7 +271,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     ok(createdResponse);
     deepStrictEqual(
       createdResponse.response,
-      operation.responses.find((x) => x.statusCodes === 201)
+      operation.responses.find((x) => x.statusCodes === 201),
     );
 
     strictEqual(createdResponse.bodyValue, undefined);

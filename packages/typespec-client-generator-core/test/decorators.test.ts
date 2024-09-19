@@ -3899,7 +3899,7 @@ describe("typespec-client-generator-core: decorators", () => {
             @convenientAPI(true)
             op op2(@path p1: string): void;
         }
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       const clientAccessor = sdkPackage.clients[0].methods[0];

@@ -488,7 +488,7 @@ function getContextPath(
         return dfsModelProperties(
           expectedType,
           dictOrArrayItemType,
-          pluralize.singular(displayName)
+          pluralize.singular(displayName),
         );
       }
 
