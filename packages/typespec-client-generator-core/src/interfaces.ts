@@ -521,7 +521,7 @@ export interface SdkHttpResponse extends SdkServiceResponse {
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
-  doc?: string;
+  description?: string;
   statusCodes: number | HttpStatusCodeRange | "*";
 }
 

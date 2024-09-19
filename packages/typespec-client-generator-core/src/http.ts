@@ -474,7 +474,7 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation,
         httpOperation.operation,
       ),
-      doc: response.description,
+      description: response.description,
     };
     if (sdkResponse.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
       exceptions.push(sdkResponse);

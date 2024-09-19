@@ -55,6 +55,6 @@ describe("typespec-client-generator-core: responses", () => {
     strictEqual(method.kind, "basic");
     const responses = Array.from(method.operation.responses.values());
     strictEqual(responses.length, 1);
-    strictEqual(responses[0].doc, "description on response");
+    strictEqual(responses[0].description, "description on response");
   });
 });
