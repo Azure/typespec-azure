@@ -16,7 +16,7 @@ describe("typespec-azure-core: no-multiple-discriminator rule", () => {
     tester = createLinterRuleTester(
       runner,
       noMultipleDiscriminatorRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -36,7 +36,7 @@ describe("typespec-azure-core: no-multiple-discriminator rule", () => {
           fishtype: "shark";
           sharktype: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -61,7 +61,7 @@ describe("typespec-azure-core: no-multiple-discriminator rule", () => {
         model Shark extends Fish {
           fishtype: "shark";
         }
-        `
+        `,
       )
       .toBeValid();
   });

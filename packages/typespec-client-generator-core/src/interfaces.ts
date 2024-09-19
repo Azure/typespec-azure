@@ -1,4 +1,8 @@
-import { LroMetadata, PagedResultMetadata } from "@azure-tools/typespec-azure-core";
+import {
+  FinalStateValue,
+  LroMetadata,
+  PagedResultMetadata,
+} from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
   Diagnostic,
@@ -623,7 +627,60 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 }
 
 interface SdkLroServiceMethodOptions {
+  /**
+   * @deprecated This property will be removed in future releases. Use `lroMetadata` for synthesized LRO metadata. If you still want to access primitive LRO info, use `lroMetadata.__raw`.
+   */
   __raw_lro_metadata: LroMetadata;
+  lroMetadata: SdkLroServiceMetadata;
+}
+
+/**
+ * Long running operation metadata.
+ */
+export interface SdkLroServiceMetadata {
+  /** LRO metadata from TypeSpec core library */
+  __raw: LroMetadata;
+
+  /** Legacy `finalStateVia` value */
+  finalStateVia: FinalStateValue;
+  /** Polling step metadata */
+  pollingStep: SdkLroServicePollingStep;
+  /** Final step metadata */
+  finalStep?: SdkLroServiceFinalStep;
+  /** Synthesized final response metadata */
+  finalResponse?: SdkLroServiceFinalResponse;
+}
+
+/**
+ * Long running operation polling step metadata.
+ */
+export interface SdkLroServicePollingStep {
+  /** Response body type */
+  responseBody?: SdkModelType;
+}
+
+/**
+ * Long running operation final step metadata.
+ */
+export interface SdkLroServiceFinalStep {
+  /** Final step kind */
+  kind:
+    | "finalOperationLink"
+    | "finalOperationReference"
+    | "pollingSuccessProperty"
+    | "noPollingResult";
+}
+
+/**
+ * Synthesized long running operation response metadata.
+ */
+export interface SdkLroServiceFinalResponse {
+  /** Intact response type */
+  envelopeResult: SdkModelType;
+  /** Meaningful result type */
+  result: SdkModelType;
+  /** Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns. */
+  resultPath?: string;
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>

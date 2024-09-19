@@ -187,7 +187,7 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.description, "Discriminator property for Fish.");
     strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
@@ -200,7 +200,7 @@ describe("typespec-client-generator-core: model types", () => {
     const sharktypeProperty = shark.properties[0];
     ok(sharktypeProperty);
     strictEqual(sharktypeProperty.name, "sharktype");
-    strictEqual(sharktypeProperty.description, "Discriminator property for Shark."); // eslint-disable-line deprecation/deprecation
+    strictEqual(sharktypeProperty.description, "Discriminator property for Shark.");
     strictEqual(sharktypeProperty.doc, "Discriminator property for Shark.");
     strictEqual(sharktypeProperty.kind, "property");
     strictEqual(sharktypeProperty.discriminator, true);
@@ -232,7 +232,7 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.description, "Discriminator property for Fish.");
     strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
@@ -265,7 +265,7 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish."); // eslint-disable-line deprecation/deprecation
+    strictEqual(kindProperty.description, "Discriminator property for Fish.");
     strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
@@ -303,7 +303,7 @@ describe("typespec-client-generator-core: model types", () => {
     ok(golden);
 
     const kind = golden.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "kind"
+      (x) => x.kind === "property" && x.serializedName === "kind",
     );
     ok(kind);
     strictEqual(kind.type.kind, "enumvalue");
@@ -315,7 +315,7 @@ describe("typespec-client-generator-core: model types", () => {
     const dogKind = runner.context.sdkPackage.enums[0];
 
     const dogKindProperty = dog.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "kind"
+      (x) => x.kind === "property" && x.serializedName === "kind",
     );
     ok(dogKindProperty);
     strictEqual(dogKindProperty.kind, "property");
@@ -363,13 +363,13 @@ describe("typespec-client-generator-core: model types", () => {
     const values = petKind.values;
     deepStrictEqual(
       values.map((x) => x.name),
-      ["Cat", "Dog"]
+      ["Cat", "Dog"],
     );
 
     const catValue = values.find((x) => x.name === "Cat");
     ok(catValue);
     strictEqual(catValue.value, "cat");
-    strictEqual(catValue.description, "Cat"); // eslint-disable-line deprecation/deprecation
+    strictEqual(catValue.description, "Cat");
     strictEqual(catValue.doc, "Cat");
     strictEqual(catValue.enumType, petKind);
     strictEqual(catValue.valueType, petKind.valueType);
@@ -378,7 +378,7 @@ describe("typespec-client-generator-core: model types", () => {
     const dogValue = values.find((x) => x.name === "Dog");
     ok(dogValue);
     strictEqual(dogValue.value, "dog");
-    strictEqual(dogValue.description, "Dog"); // eslint-disable-line deprecation/deprecation
+    strictEqual(dogValue.description, "Dog");
     strictEqual(dogValue.doc, "Dog");
     strictEqual(dogValue.enumType, petKind);
     strictEqual(dogValue.valueType, petKind.valueType);
@@ -452,11 +452,11 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(sdkPackage.enums[1].name, "FooResponseRepeatabilityResult");
     deepStrictEqual(
       sdkPackage.enums[0].values.map((x) => x.name),
-      ["accepted", "rejected"]
+      ["accepted", "rejected"],
     );
     deepStrictEqual(
       sdkPackage.enums[1].values.map((x) => x.name),
-      ["accepted", "rejected"]
+      ["accepted", "rejected"],
     );
   });
 
@@ -486,7 +486,7 @@ describe("typespec-client-generator-core: model types", () => {
     ok(golden);
 
     const kind = golden.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "kind"
+      (x) => x.kind === "property" && x.serializedName === "kind",
     );
     ok(kind);
     strictEqual(kind.type.kind, "enumvalue");
@@ -500,7 +500,7 @@ describe("typespec-client-generator-core: model types", () => {
     const dogKindProperty = dog.properties[0];
     ok(dogKindProperty);
     strictEqual(dogKindProperty.type, dogKind);
-    strictEqual(dogKindProperty.description, "Discriminator property for Dog."); // eslint-disable-line deprecation/deprecation
+    strictEqual(dogKindProperty.description, "Discriminator property for Dog.");
     strictEqual(dogKindProperty.doc, "Discriminator property for Dog.");
   });
 
@@ -747,7 +747,7 @@ describe("typespec-client-generator-core: model types", () => {
         op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.sdkPackage.models.sort((a, b) =>
-      a.name.localeCompare(b.name)
+      a.name.localeCompare(b.name),
     );
     strictEqual(models.length, 4);
     strictEqual(models[0].name, "Error");
@@ -814,7 +814,7 @@ describe("typespec-client-generator-core: model types", () => {
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
     const models = runnerWithCore.context.sdkPackage.models.sort((a, b) =>
-      a.name.localeCompare(b.name)
+      a.name.localeCompare(b.name),
     );
     strictEqual(models.length, 5);
     strictEqual(models[0].name, "Error");
@@ -912,11 +912,11 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 2);
     strictEqual(
       models.find((x) => x.name === "RoundTripModel")?.usage,
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(
       models.find((x) => x.name === "ResultModel")?.usage,
-      UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Output | UsageFlags.Json,
     );
   });
 
@@ -1166,13 +1166,13 @@ describe("typespec-client-generator-core: model types", () => {
     const AdditionalPropertiesModel2 = models.find((x) => x.name === "AdditionalPropertiesModel2");
     const AdditionalPropertiesModel3 = models.find((x) => x.name === "AdditionalPropertiesModel3");
     const NonAdditionalPropertiesModel = models.find(
-      (x) => x.name === "NoAdditionalPropertiesModel"
+      (x) => x.name === "NoAdditionalPropertiesModel",
     );
     ok(
       AdditionalPropertiesModel &&
         AdditionalPropertiesModel2 &&
         AdditionalPropertiesModel3 &&
-        NonAdditionalPropertiesModel
+        NonAdditionalPropertiesModel,
     );
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -1221,7 +1221,7 @@ describe("typespec-client-generator-core: model types", () => {
         AdditionalPropertiesModel2 &&
         AdditionalPropertiesModel3 &&
         Test &&
-        Test2
+        Test2,
     );
 
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
@@ -1234,7 +1234,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(AdditionalPropertiesModel3.baseModel, undefined);
     strictEqual(
       AdditionalPropertiesModel3.usage,
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(Test.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
     strictEqual(Test2.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
@@ -1449,7 +1449,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = getAllModels(runner.context);
     strictEqual(models.length, 5);
     const errorModels = models.filter(
-      (x) => x.kind === "model" && (x.usage & UsageFlags.Error) > 0
+      (x) => x.kind === "model" && (x.usage & UsageFlags.Error) > 0,
     );
     deepStrictEqual(errorModels.map((x) => x.name).sort(), [
       "ApiError",
@@ -1458,11 +1458,11 @@ describe("typespec-client-generator-core: model types", () => {
       "FourZeroFourError",
     ]);
     const validModel = models.filter(
-      (x) => x.kind === "model" && (x.usage & UsageFlags.Error) === 0
+      (x) => x.kind === "model" && (x.usage & UsageFlags.Error) === 0,
     );
     deepStrictEqual(
       validModel.map((x) => x.name),
-      ["ValidResponse"]
+      ["ValidResponse"],
     );
   });
 
@@ -1512,7 +1512,7 @@ describe("typespec-client-generator-core: model types", () => {
     ok(roundTripModel);
     strictEqual(
       roundTripModel.usage,
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json | UsageFlags.Xml
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json | UsageFlags.Xml,
     );
 
     ok(inputModel);

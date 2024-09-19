@@ -40,7 +40,7 @@ describe("typespec-azure-core: friendly-name rule", () => {
           op list is listTemplate<User>;
 
           op update is updateTemplate<User>;
-          `
+          `,
         )
         .toBeValid();
     });
@@ -58,7 +58,7 @@ describe("typespec-azure-core: friendly-name rule", () => {
           @friendlyName("FriendlyModel")
           model TestModel {
           }
-          `
+          `,
         )
         .toEmitDiagnostics([
           {
@@ -84,7 +84,7 @@ describe("typespec-azure-core: friendly-name rule", () => {
           }
 
           op update is updateTemplate<User>;
-          `
+          `,
         )
         .toEmitDiagnostics([
           {

@@ -2,6 +2,7 @@ import { createTCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
   EmitContext,
   Namespace,
+  NoTarget,
   Program,
   Service,
   emitFile,
@@ -11,6 +12,7 @@ import {
   interpolatePath,
   listServices,
   projectProgram,
+  reportDeprecated,
   resolvePath,
 } from "@typespec/compiler";
 import { resolveInfo } from "@typespec/openapi";
@@ -58,7 +60,7 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
   const options = resolveAutorestOptions(
     context.program,
     context.emitterOutputDir,
-    context.options
+    context.options,
   );
   tracer.trace("options", JSON.stringify(options, null, 2));
 
@@ -68,21 +70,33 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
 export function resolveAutorestOptions(
   program: Program,
   emitterOutputDir: string,
-  options: AutorestEmitterOptions
+  options: AutorestEmitterOptions,
 ): ResolvedAutorestEmitterOptions {
-  const resolvedOptions = { ...defaultOptions, ...options };
+  const resolvedOptions = {
+    ...defaultOptions,
+    ...options,
+  };
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {
       "project-root": program.projectRoot,
       "emitter-output-dir": emitterOutputDir,
-    }
+    },
   );
+
+  if (resolvedOptions["examples-directory"]) {
+    reportDeprecated(
+      program,
+      `examples-directory option is deprecated use examples-dir instead or remove it if examples are located in {project-root}/examples`,
+      NoTarget,
+    );
+  }
+
   return {
     outputFile: resolvedOptions["output-file"],
     outputDir: emitterOutputDir,
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
-    examplesDirectory: resolvedOptions["examples-directory"],
+    examplesDirectory: resolvedOptions["examples-dir"] ?? resolvedOptions["examples-directory"],
     version: resolvedOptions["version"],
     newLine: resolvedOptions["new-line"],
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
@@ -98,7 +112,7 @@ export function resolveAutorestOptions(
 
 export async function getAllServicesAtAllVersions(
   program: Program,
-  options: ResolvedAutorestEmitterOptions
+  options: ResolvedAutorestEmitterOptions,
 ): Promise<AutorestServiceRecord[]> {
   const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
 
@@ -111,7 +125,7 @@ export async function getAllServicesAtAllVersions(
   for (const service of services) {
     const originalProgram = program;
     const versions = buildVersionProjections(program, service.type).filter(
-      (v) => !options.version || options.version === v.version
+      (v) => !options.version || options.version === v.version,
     );
 
     if (versions.length === 1 && versions[0].version === undefined) {
@@ -164,7 +178,7 @@ export async function getAllServicesAtAllVersions(
             projectedService,
             services.length > 1,
             options,
-            record.version
+            record.version,
           ),
           service: projectedService,
           version: record.version,
@@ -185,7 +199,7 @@ export async function getAllServicesAtAllVersions(
 
 async function emitAllServiceAtAllVersions(
   program: Program,
-  options: ResolvedAutorestEmitterOptions
+  options: ResolvedAutorestEmitterOptions,
 ) {
   const services = await getAllServicesAtAllVersions(program, options);
   if (program.compilerOptions.noEmit || program.hasError()) {
@@ -205,7 +219,7 @@ async function emitAllServiceAtAllVersions(
 async function emitOutput(
   program: Program,
   result: AutorestEmitterResult,
-  options: ResolvedAutorestEmitterOptions
+  options: ResolvedAutorestEmitterOptions,
 ) {
   const sortedDocument = sortOpenAPIDocument(result.document);
 
@@ -217,7 +231,7 @@ async function emitOutput(
   });
 
   // Copy examples to the output directory
-  if (options.examplesDirectory && result.operationExamples.length > 0) {
+  if (result.operationExamples.length > 0) {
     const examplesPath = resolvePath(getDirectoryPath(result.outputFile), "examples");
     await program.host.mkdirp(examplesPath);
     for (const { examples } of result.operationExamples) {
@@ -242,7 +256,7 @@ function resolveOutputFile(
   service: Service,
   multipleServices: boolean,
   options: ResolvedAutorestEmitterOptions,
-  version?: string
+  version?: string,
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
   if (azureResourceProviderFolder) {

@@ -71,7 +71,7 @@ interface ArmResourceOperationsData {
 
 function getArmResourceOperations(
   program: Program,
-  resourceType: Model
+  resourceType: Model,
 ): ArmResourceOperationsData {
   let operations = program.stateMap(ArmStateKeys.armResourceOperations).get(resourceType);
   if (!operations) {
@@ -84,12 +84,12 @@ function getArmResourceOperations(
 
 function resolveHttpOperations<T extends Record<string, ArmResourceOperationData>>(
   program: Program,
-  data: T
+  data: T,
 ): Record<keyof T, ArmResourceOperation> {
   const result: Record<string, ArmResourceOperation> = {};
   for (const [key, item] of Object.entries(data)) {
     const httpOperation: HttpOperation = ignoreDiagnostics(
-      getHttpOperation(program, item.operation)
+      getHttpOperation(program, item.operation),
     );
     result[key] = {
       ...item,
@@ -102,7 +102,7 @@ function resolveHttpOperations<T extends Record<string, ArmResourceOperationData
 
 export function resolveResourceOperations(
   program: Program,
-  resourceType: Model
+  resourceType: Model,
 ): ArmResourceOperations {
   const operations = getArmResourceOperations(program, resourceType);
 
@@ -110,7 +110,7 @@ export function resolveResourceOperations(
   return {
     lifecycle: resolveHttpOperations(
       program,
-      operations.lifecycle as Record<string, ArmResourceOperationData>
+      operations.lifecycle as Record<string, ArmResourceOperationData>,
     ),
     actions: resolveHttpOperations(program, operations.actions),
     lists: resolveHttpOperations(program, operations.lists),
@@ -122,7 +122,7 @@ function setResourceLifecycleOperation(
   target: Operation,
   resourceType: Model,
   kind: ArmLifecycleOperationKind,
-  decoratorName: string
+  decoratorName: string,
 ) {
   // Only register methods from non-templated interface types
   if (target.interface === undefined || target.interface.node.templateParameters.length > 0) {
@@ -145,7 +145,7 @@ function setResourceLifecycleOperation(
 export const $armResourceRead: ArmResourceReadDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   setResourceLifecycleOperation(context, target, resourceType, "read", "@armResourceRead");
 };
@@ -153,21 +153,21 @@ export const $armResourceRead: ArmResourceReadDecorator = (
 export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   setResourceLifecycleOperation(
     context,
     target,
     resourceType,
     "createOrUpdate",
-    "@armResourceCreateOrUpdate"
+    "@armResourceCreateOrUpdate",
   );
 };
 
 export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   setResourceLifecycleOperation(context, target, resourceType, "update", "@armResourceUpdate");
 };
@@ -175,7 +175,7 @@ export const $armResourceUpdate: ArmResourceUpdateDecorator = (
 export const $armResourceDelete: ArmResourceDeleteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   setResourceLifecycleOperation(context, target, resourceType, "delete", "@armResourceDelete");
 };
@@ -183,7 +183,7 @@ export const $armResourceDelete: ArmResourceDeleteDecorator = (
 export const $armResourceList: ArmResourceListDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   // Only register methods from non-templated interface types
   if (target.interface === undefined || target.interface.node.templateParameters.length > 0) {
@@ -209,7 +209,7 @@ export function armRenameListByOperationInternal(
   resourceType: Model,
   parentTypeName?: string,
   parentFriendlyTypeName?: string,
-  applyOperationRename?: boolean
+  applyOperationRename?: boolean,
 ) {
   const { program } = context;
   if (
@@ -251,7 +251,7 @@ export function armRenameListByOperationInternal(
     `List ${resourceType.name} resources by ${
       parentType ? parentTypeName : parentFriendlyTypeName
     }`,
-    undefined as any
+    undefined as any,
   );
 
   if (applyOperationRename === undefined || applyOperationRename === true) {
@@ -293,7 +293,7 @@ function getArmParentName(program: Program, resource: Model): string[] {
 export const $armResourceAction: ArmResourceActionDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   const { program } = context;
 
@@ -330,7 +330,7 @@ function uncapitalize(name: string): string {
 
 export const $armResourceCollectionAction: ArmResourceCollectionActionDecorator = (
   context: DecoratorContext,
-  target: Operation
+  target: Operation,
 ) => {
   context.program.stateMap(ArmStateKeys.armResourceCollectionAction).set(target, true);
 };

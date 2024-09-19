@@ -1,5 +1,41 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.46.0
+
+### Bug Fixes
+
+- [#1436](https://github.com/Azure/typespec-azure/pull/1436) Fixes bug where defining multiple services in a project resulted in each openapi output containing the same single service definition.
+
+### Features
+
+- [#1455](https://github.com/Azure/typespec-azure/pull/1455) Respect `@clientName` for definition names(model, enums, union, etc.), enum and union member and for parameters
+- [#1449](https://github.com/Azure/typespec-azure/pull/1449) Add support for custom item name in `x-ms-pageable`
+
+### Deprecations
+
+- [#1368](https://github.com/Azure/typespec-azure/pull/1368) Replace `examples-directory` with `examples-dir` which will validate an absolute path is provided
+
+  Case 1: Examples are in `examples` directory next to `tspconfig.yaml`. In this case the option can just be removed
+  ```diff
+  - examples-directory: examples
+  ```
+  
+  ```diff
+  - examples-directory: {project-root}/examples
+  ```
+  
+  Case 2: Examples are in a different directory
+  ```diff
+  - examples-directory: autorest-examples
+  + examples-dir: {project-root}/autorest-examples
+  ```
+  
+  ```diff
+  - examples-directory: {project-root}/autorest-examples
+  + examples-dir: {project-root}/autorest-examples
+  ```
+
+
 ## 0.45.0
 
 ### Bug Fixes

@@ -12,7 +12,8 @@ title: "[I] AutorestEmitterOptions"
 | `azure-resource-provider-folder?` | `string` | - |
 | `emit-common-types-schema?` | `"never"` \| `"for-visibility-changes"` | Determines whether and how to emit schemas for common-types **Default** `"for-visibility-changes"` |
 | `emit-lro-options?` | `"all"` \| `"none"` \| `"final-state-only"` | Determines whether and how to emit the x-ms-long-running-operation-options **Default** `"final-state-only"` |
-| `examples-directory?` | `string` | Directory where the examples are located. **Default** `{cwd}/examples` |
+| `examples-dir?` | `string` | Directory where the examples are located. **Default** `{project-root}/examples` |
+| ~~`examples-directory?`~~ | `string` | **Deprecated** use [examples-dir](AutorestEmitterOptions.md) |
 | `include-x-typespec-name?` | `"never"` \| `"inline-only"` | If the generated openapi types should have the `x-typespec-name` extension set with the name of the TypeSpec type that created it. This extension is meant for debugging and should not be depended on. **Default** `"never"` |
 | `new-line?` | `"lf"` \| `"crlf"` | Set the newline character for emitting files. **Default** `lf` |
 | `omit-unreachable-types?` | `boolean` | Omit unreachable types. By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted. |

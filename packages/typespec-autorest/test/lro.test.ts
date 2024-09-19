@@ -58,25 +58,25 @@ describe("typespec-autorest: Long-running Operations", () => {
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
       `,
       undefined,
-      { "emit-lro-options": "all" }
+      { "emit-lro-options": "all" },
     );
 
     deepStrictEqual(
       openapi.paths["/widgets/{widgetName}"].patch["x-ms-long-running-operation"],
-      true
+      true,
     );
     deepStrictEqual(
       openapi.paths["/widgets/{widgetName}"].patch["x-ms-long-running-operation-options"],
       {
         "final-state-via": "operation-location",
         "final-state-schema": "#/definitions/Widget",
-      }
+      },
     );
     deepStrictEqual(
       openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get[
         "x-ms-long-running-operation"
       ],
-      undefined
+      undefined,
     );
   });
 
@@ -131,7 +131,7 @@ describe("typespec-autorest: Long-running Operations", () => {
         { putOp: "createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;" },
       ]),
       undefined,
-      { "emit-lro-options": "all" }
+      { "emit-lro-options": "all" },
     );
 
     const itemPath =
@@ -178,7 +178,7 @@ describe("typespec-autorest: Long-running Operations", () => {
         },
       ]),
       undefined,
-      { "emit-lro-options": "all" }
+      { "emit-lro-options": "all" },
     );
 
     const itemPath =
@@ -198,7 +198,7 @@ describe("typespec-autorest: Long-running Operations", () => {
         },
       ]),
       undefined,
-      { "emit-lro-options": "all" }
+      { "emit-lro-options": "all" },
     );
 
     const itemPath =
@@ -221,7 +221,7 @@ describe("typespec-autorest: Long-running Operations", () => {
         },
       ]),
       undefined,
-      { "emit-lro-options": "all" }
+      { "emit-lro-options": "all" },
     );
 
     const itemPath =

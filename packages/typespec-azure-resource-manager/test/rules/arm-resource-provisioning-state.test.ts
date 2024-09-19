@@ -19,7 +19,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
     tester = createLinterRuleTester(
       runner,
       armResourceProvisioningStateRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -42,7 +42,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
           ${RequiredValues.join(",")}
         }
         
-      `
+      `,
       )
       .toBeValid();
   });
@@ -66,7 +66,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
           ${RequiredValues.map((x) => `${x}: "${x}"`).join(",")}
         }
         
-      `
+      `,
       )
       .toBeValid();
   });
@@ -80,7 +80,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         model FooResource is TrackedResource<{}> {
           @key @segment("foo") name: string;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
@@ -108,7 +108,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
             #suppress "deprecated" "for testing"
             @knownValues(StateKV)
             scalar State extends string;
-          `
+          `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
@@ -131,7 +131,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
           @visibility("read")
           provisioningState?: string;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
@@ -154,7 +154,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
           @visibility("read")
           provisioningState: ResourceProvisioningState;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
@@ -175,7 +175,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         model FooProperties {
           provisioningState?: ResourceProvisioningState;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
@@ -197,7 +197,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
           @visibility("read", "update")          
           provisioningState?: ResourceProvisioningState;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
@@ -225,7 +225,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
               enum FooProvisioningState {
                 ${RequiredValues.filter((x) => x !== omit).join(",")}
               }
-            `
+            `,
           )
           .toEmitDiagnostics({
             code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",

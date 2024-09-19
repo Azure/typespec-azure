@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     noStringDiscriminatorRule,
-    "@azure-tools/typespec-azure-core"
+    "@azure-tools/typespec-azure-core",
   );
 });
 
@@ -26,7 +26,7 @@ it("emits a warning @discriminator is used without the explicit property", async
         @discriminator("kind")
         model Pet {
         }
-        `
+        `,
     )
     .toEmitDiagnostics([
       {
@@ -45,7 +45,7 @@ it("emits a warning @discriminator points to a property that is not a union", as
         model Pet {
           kind: string;
         }
-        `
+        `,
     )
     .toEmitDiagnostics([
       {
@@ -69,7 +69,7 @@ it("doesn't warn when using an extensible union as the type", async () => {
           dog: "dog",
           cat: "cat",
         }
-        `
+        `,
     )
     .toBeValid();
 });

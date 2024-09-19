@@ -50,7 +50,7 @@ export const namespace = "Azure.ResourceManager.Private";
 const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
-  propertyName: string
+  propertyName: string,
 ) => {
   const modelProp = getProperty(entity, propertyName);
 
@@ -67,7 +67,7 @@ const $enforceConstraint: EnforceConstraintDecorator = (
   context: DecoratorContext,
   entity: Operation | Model,
   sourceType: Model,
-  constraintType: Model
+  constraintType: Model,
 ) => {
   if (sourceType !== undefined && constraintType !== undefined) {
     // walk the baseModel chain until find a match or fail
@@ -92,11 +92,11 @@ const $enforceConstraint: EnforceConstraintDecorator = (
 const $resourceBaseParametersOf: ResourceBaseParametersOfDecorator = (
   context: DecoratorContext,
   entity: Model,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   const targetResourceBaseType: ResourceBaseType = getResourceBaseType(
     context.program,
-    resourceType
+    resourceType,
   );
   const removedProperties: string[] = [];
   for (const [propertyName, property] of entity.properties) {
@@ -112,7 +112,7 @@ const $resourceBaseParametersOf: ResourceBaseParametersOfDecorator = (
 const $resourceParameterBaseFor: ResourceParameterBaseForDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  values: Type
+  values: Type,
 ) => {
   const resolvedValues: string[] = [];
   // TODO this will crash if passed anything other than a tuple
@@ -130,7 +130,7 @@ const $defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator = (
   entity: ModelProperty,
   resource: Model,
   keyName: string,
-  segment: string
+  segment: string,
 ) => {
   const modelName = camelCase(resource.name);
   const pluralName = pluralize(modelName);
@@ -148,7 +148,7 @@ const $defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator = (
 
 export function getResourceParameterBases(
   program: Program,
-  property: ModelProperty
+  property: ModelProperty,
 ): string[] | undefined {
   return program.stateMap(ArmStateKeys.armResourceCollection).get(property);
 }
@@ -156,19 +156,19 @@ export function getResourceParameterBases(
 export function isResourceParameterBaseFor(
   program: Program,
   property: ModelProperty,
-  resourceBaseType: string
+  resourceBaseType: string,
 ): boolean {
   return isResourceParameterBaseForInternal(
     program,
     property,
-    resolveResourceBaseType(resourceBaseType)
+    resolveResourceBaseType(resourceBaseType),
   );
 }
 
 function isResourceParameterBaseForInternal(
   program: Program,
   property: ModelProperty,
-  resolvedBaseType: ResourceBaseType
+  resolvedBaseType: ResourceBaseType,
 ): boolean {
   const resourceBases = getResourceParameterBases(program, property);
   if (resourceBases !== undefined) {
@@ -191,7 +191,7 @@ function isResourceParameterBaseForInternal(
 const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   const { program } = context;
 
@@ -209,7 +209,7 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
  */
 const $armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator = (
   context: DecoratorContext,
-  entity: Operation
+  entity: Operation,
 ) => {
   const { program } = context;
 
@@ -266,7 +266,7 @@ export function isArmOperationsListInterface(program: Program, type: Interface):
 const $armResourceInternal: ArmResourceInternalDecorator = (
   context: DecoratorContext,
   resourceType: Model,
-  propertiesType: Model
+  propertiesType: Model,
 ) => {
   const { program } = context;
 
@@ -357,7 +357,7 @@ export function listArmResources(program: Program): ArmResourceDetails[] {
 
 export function getArmResource(
   program: Program,
-  resourceType: Model
+  resourceType: Model,
 ): ArmResourceDetails | undefined {
   return program.stateMap(ArmStateKeys.armResources).get(resourceType);
 }
@@ -379,7 +379,7 @@ function hasProperty(program: Program, model: Model): boolean {
 
 const $azureResourceBase: AzureResourceBaseDecorator = (
   context: DecoratorContext,
-  resourceType: Model
+  resourceType: Model,
 ) => {
   context.program.stateMap(ArmStateKeys.azureResourceBase).set(resourceType, true);
 };
@@ -397,7 +397,7 @@ export function isAzureResource(program: Program, resourceType: Model): boolean 
  */
 const $conditionalClientFlatten: ConditionalClientFlattenDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty
+  entity: ModelProperty,
 ) => {
   context.program.stateMap(ArmStateKeys.armConditionalClientFlatten).set(entity, true);
 };
@@ -413,7 +413,7 @@ const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
   resourceType: Model,
   parentTypeName?: string,
   parentFriendlyTypeName?: string,
-  applyOperationRename?: boolean
+  applyOperationRename?: boolean,
 ) => {
   armRenameListByOperationInternal(
     context,
@@ -421,14 +421,14 @@ const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
     resourceType,
     parentTypeName,
     parentFriendlyTypeName,
-    applyOperationRename
+    applyOperationRename,
   );
 };
 
 const $armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  isOptional: boolean
+  isOptional: boolean,
 ) => {
   if (target.name === "properties") {
     target.optional = isOptional;

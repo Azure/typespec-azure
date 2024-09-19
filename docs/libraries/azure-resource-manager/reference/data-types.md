@@ -1227,6 +1227,20 @@ model Azure.ResourceManager.CommonTypes.LocationResourceParameter
 | -------- | -------------------- | ----------------------------- |
 | location | `Core.azureLocation` | The name of the Azure region. |
 
+### `ManagedOnBehalfOfConfiguration` {#Azure.ResourceManager.CommonTypes.ManagedOnBehalfOfConfiguration}
+
+Managed-On-Behalf-Of configuration properties. This configuration exists for the resources where a resource provider manages those resources on behalf of the resource owner.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.ManagedOnBehalfOfConfiguration
+```
+
+#### Properties
+
+| Name                 | Type                                               | Description                           |
+| -------------------- | -------------------------------------------------- | ------------------------------------- |
+| moboBrokerResources? | `ResourceManager.CommonTypes.MoboBrokerResource[]` | Managed-On-Behalf-Of broker resources |
+
 ### `ManagedServiceIdentity` {#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity}
 
 Managed service identity (system assigned and/or user assigned identities)
@@ -1257,6 +1271,20 @@ model Azure.ResourceManager.CommonTypes.ManagementGroupNameParameter
 | Name                | Type     | Description                                                     |
 | ------------------- | -------- | --------------------------------------------------------------- |
 | managementGroupName | `string` | The name of the management group. The name is case insensitive. |
+
+### `MoboBrokerResource` {#Azure.ResourceManager.CommonTypes.MoboBrokerResource}
+
+Managed-On-Behalf-Of broker resource. This resource is created by the Resource Provider to manage some resources on behalf of the user.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.MoboBrokerResource
+```
+
+#### Properties
+
+| Name | Type                         | Description                                                   |
+| ---- | ---------------------------- | ------------------------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | Resource identifier of a Managed-On-Behalf-Of broker resource |
 
 ### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
 

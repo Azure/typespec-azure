@@ -16,7 +16,7 @@ function $usage(
 | Parameter | Type |
 | ------ | ------ |
 | `context` | `DecoratorContext` |
-| `target` | `Enum` \| `Model` \| `Union` |
+| `target` | `Namespace` \| `Enum` \| `Model` \| `Union` |
 | `value` | `EnumMember` \| `Union` |
 | `scope`? | `string` |
 

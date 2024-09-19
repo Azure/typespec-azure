@@ -91,6 +91,7 @@ import {
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
+  serializeValueAsJson,
 } from "@typespec/compiler";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
@@ -271,7 +272,7 @@ interface ProcessedSchema extends PendingSchema {
 
 export async function getOpenAPIForService(
   context: AutorestEmitterContext,
-  options: AutorestDocumentEmitterOptions
+  options: AutorestDocumentEmitterOptions,
 ): Promise<AutorestEmitterResult> {
   const { program, service } = context;
   const typeNameOptions: TypeNameOptions = {
@@ -342,7 +343,7 @@ export async function getOpenAPIForService(
 
   const operationIdsWithExample = new Set<string>();
 
-  const [exampleMap, diagnostics] = await loadExamples(program.host, options, context.version);
+  const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
   const httpService = ignoreDiagnostics(getHttpService(program, service.type));
@@ -395,7 +396,7 @@ export async function getOpenAPIForService(
 
   function resolveHost(
     program: Program,
-    namespace: Namespace
+    namespace: Namespace,
   ): Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes"> {
     const servers = getServers(program, namespace);
     if (servers === undefined) {
@@ -443,7 +444,7 @@ export async function getOpenAPIForService(
         {
           visibility: Visibility.Read,
           ignoreMetadataAnnotations: false,
-        }
+        },
       );
       if (
         prop.type.kind === "Scalar" &&
@@ -451,8 +452,8 @@ export async function getOpenAPIForService(
           program.checker.isTypeAssignableTo(
             prop.type.projectionBase ?? prop.type,
             program.checker.getStdType("url"),
-            prop.type
-          )
+            prop.type,
+          ),
         )
       ) {
         param["x-ms-skip-url-encoding"] = true;
@@ -469,17 +470,16 @@ export async function getOpenAPIForService(
     };
   }
 
-  function parseNextLinkName(paged: PagedResultMetadata): string | undefined {
-    const pathComponents = paged.nextLinkSegments;
-    if (pathComponents) {
-      return pathComponents[pathComponents.length - 1];
+  function getLastSegment(segments: string[] | undefined): string | undefined {
+    if (segments) {
+      return segments[segments.length - 1];
     }
     return undefined;
   }
 
   function extractPagedMetadataNested(
     program: Program,
-    type: Model
+    type: Model,
   ): PagedResultMetadata | undefined {
     // This only works for `is Page<T>` not `extends Page<T>`.
     let paged = getPagedResult(program, type);
@@ -511,10 +511,12 @@ export async function getOpenAPIForService(
     for (const response of operation.responses) {
       const paged = extractPagedMetadataNested(program, response.type as Model);
       if (paged) {
-        const nextLinkName = parseNextLinkName(paged);
+        const nextLinkName = getLastSegment(paged.nextLinkSegments);
+        const itemName = getLastSegment(paged.itemsSegments);
         if (nextLinkName) {
           currentEndpoint["x-ms-pageable"] = {
             nextLinkName,
+            itemName: itemName !== "value" ? itemName : undefined,
           };
         }
         // Once we find paged metadata, we don't need to processes any further.
@@ -674,18 +676,16 @@ export async function getOpenAPIForService(
     if (examples) {
       currentEndpoint["x-ms-examples"] = examples.reduce(
         (acc, example) => ({ ...acc, [example.title]: { $ref: example.pathOrUri } }),
-        {}
+        {},
       );
     }
 
-    if (options.examplesDirectory) {
-      const examples = exampleMap.get(currentEndpoint.operationId);
-      if (examples && currentEndpoint.operationId) {
-        operationIdsWithExample.add(currentEndpoint.operationId);
-        currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
-        for (const [title, example] of Object.entries(examples)) {
-          currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
-        }
+    const autoExamples = exampleMap.get(currentEndpoint.operationId);
+    if (autoExamples && currentEndpoint.operationId) {
+      operationIdsWithExample.add(currentEndpoint.operationId);
+      currentEndpoint["x-ms-examples"] = currentEndpoint["x-ms-examples"] || {};
+      for (const [title, example] of Object.entries(autoExamples)) {
+        currentEndpoint["x-ms-examples"][title] = { $ref: `./examples/${example.relativePath}` };
       }
     }
 
@@ -720,7 +720,7 @@ export async function getOpenAPIForService(
   function isBytes(type: Type) {
     const baseType = type.projectionBase ?? type;
     return ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type)
+      program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type),
     );
   }
 
@@ -744,7 +744,7 @@ export async function getOpenAPIForService(
 
   function getOpenAPI2StatusCodes(
     statusCodes: HttpStatusCodesEntry,
-    diagnosticTarget: DiagnosticTarget
+    diagnosticTarget: DiagnosticTarget,
   ): OpenAPI2StatusCode[] {
     if (statusCodes === "*") {
       return ["default"];
@@ -757,7 +757,7 @@ export async function getOpenAPIForService(
 
   function rangeToOpenAPI(
     range: HttpStatusCodeRange,
-    diagnosticTarget: DiagnosticTarget
+    diagnosticTarget: DiagnosticTarget,
   ): OpenAPI2StatusCode[] {
     const reportInvalid = () =>
       reportDiagnostic(program, {
@@ -851,7 +851,7 @@ export async function getOpenAPIForService(
 
   function getSchemaForResponseBody(
     body: HttpOperationBody | HttpOperationMultipartBody,
-    contentTypes: string[]
+    contentTypes: string[],
   ): OpenAPI2Schema | OpenAPI2FileSchema {
     const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
     if (isBinary) {
@@ -877,7 +877,7 @@ export async function getOpenAPIForService(
       applyIntrinsicDecorators(prop, {
         type: (header as any).type,
         format: (header as any).format,
-      })
+      }),
     );
     delete header.in;
     delete header.name;
@@ -1069,11 +1069,12 @@ export async function getOpenAPIForService(
         continue;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
       emitParameter(httpOpParam.param, () =>
-        getOpenAPI2Parameter(httpOpParam, { visibility, ignoreMetadataAnnotations: false })
+        getOpenAPI2Parameter(httpOpParam, { visibility, ignoreMetadataAnnotations: false }),
       );
     }
 
@@ -1095,7 +1096,7 @@ export async function getOpenAPIForService(
 
   function emitBodyParameters(
     body: HttpOperationBody | HttpOperationMultipartBody,
-    visibility: Visibility
+    visibility: Visibility,
   ) {
     switch (body.bodyKind) {
       case "single":
@@ -1124,7 +1125,7 @@ export async function getOpenAPIForService(
       if (bodyModelType) {
         for (const param of bodyModelType.properties.values()) {
           emitParameter(param, () =>
-            getOpenAPI2FormDataParameter(param, schemaContext, getJsonName(param))
+            getOpenAPI2FormDataParameter(param, schemaContext, getJsonName(param)),
           );
         }
       }
@@ -1147,7 +1148,7 @@ export async function getOpenAPIForService(
       let schema = getFormDataSchema(
         part.body.type,
         { visibility, ignoreMetadataAnnotations: false },
-        partName
+        partName,
       );
       if (schema) {
         if (part.multi) {
@@ -1200,7 +1201,7 @@ export async function getOpenAPIForService(
     type: Type,
     schemaContext: SchemaContext,
     paramName: string,
-    multipart?: boolean
+    multipart?: boolean,
   ): PrimitiveItems | undefined {
     const fullSchema = getSchemaForType(type, schemaContext);
     if (fullSchema === undefined) {
@@ -1221,7 +1222,7 @@ export async function getOpenAPIForService(
   function getFormDataSchema(
     type: Type,
     schemaContext: SchemaContext,
-    paramName: string
+    paramName: string,
   ): PrimitiveItems | undefined {
     if (isBytes(type)) {
       return { type: "file" };
@@ -1274,7 +1275,7 @@ export async function getOpenAPIForService(
   function getOpenAPI2BodyParameter(
     param: ModelProperty,
     name?: string,
-    bodySchema?: any
+    bodySchema?: any,
   ): OpenAPI2BodyParameter {
     const result: OpenAPI2BodyParameter = {
       in: "body",
@@ -1288,7 +1289,7 @@ export async function getOpenAPIForService(
       reportDeprecated(
         program,
         "Using encodedName for the body property is meaningless. That property is not serialized as Json. If wanting to rename it use @Azure.ClientGenerator.Core.clientName",
-        param.decorators.find((x) => x.definition?.name === "@encodedName")?.node ?? param
+        param.decorators.find((x) => x.definition?.name === "@encodedName")?.node ?? param,
       );
       result.name = jsonName;
 
@@ -1309,14 +1310,14 @@ export async function getOpenAPIForService(
   function getOpenAPI2FormDataParameter(
     param: ModelProperty,
     schemaContext: SchemaContext,
-    name?: string
+    name?: string,
   ): OpenAPI2FormDataParameter {
     const base = getOpenAPI2ParameterBase(param, name);
     const result = {
       in: "formData",
       ...base,
       ...(getFormDataSchema(param.type, schemaContext, base.name) as any),
-      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      default: param.defaultValue && getDefaultValue(param.defaultValue, param),
     };
 
     Object.assign(
@@ -1324,7 +1325,7 @@ export async function getOpenAPIForService(
       applyIntrinsicDecorators(param, {
         type: (result as any).type,
         format: (result as any).format,
-      })
+      }),
     );
 
     return result;
@@ -1333,7 +1334,7 @@ export async function getOpenAPIForService(
   function getSimpleParameterSchema(
     param: ModelProperty,
     schemaContext: SchemaContext,
-    name: string
+    name: string,
   ): Pick<
     OpenAPI2QueryParameter | OpenAPI2HeaderParameter | OpenAPI2PathParameter,
     "type" | "items"
@@ -1354,6 +1355,7 @@ export async function getOpenAPIForService(
     if (param.explode) {
       return "multi";
     }
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     let collectionFormat = param.format;
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
       collectionFormat = undefined;
@@ -1364,7 +1366,7 @@ export async function getOpenAPIForService(
   }
   function getOpenAPI2QueryParameter(
     param: HttpOperationQueryParameter,
-    schemaContext: SchemaContext
+    schemaContext: SchemaContext,
   ): OpenAPI2QueryParameter {
     const base = getOpenAPI2ParameterBase(param.param, param.name);
     const collectionFormat = getQueryCollectionFormat(param);
@@ -1375,7 +1377,7 @@ export async function getOpenAPIForService(
         collectionFormat === "csv" && schema.items === undefined // If csv
           ? undefined
           : (collectionFormat as any),
-      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue),
+      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue, param.param),
       ...base,
       ...schema,
     };
@@ -1383,13 +1385,13 @@ export async function getOpenAPIForService(
 
   function getOpenAPI2PathParameter(
     param: HttpOperationPathParameter,
-    schemaContext: SchemaContext
+    schemaContext: SchemaContext,
   ): OpenAPI2PathParameter {
     const base = getOpenAPI2ParameterBase(param.param, param.name);
 
     const result: OpenAPI2PathParameter = {
       in: "path",
-      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue),
+      default: param.param.defaultValue && getDefaultValue(param.param.defaultValue, param.param),
       ...base,
       ...getSimpleParameterSchema(param.param, schemaContext, base.name),
     };
@@ -1404,7 +1406,7 @@ export async function getOpenAPIForService(
   function getOpenAPI2HeaderParameter(
     param: ModelProperty,
     schemaContext: SchemaContext,
-    name?: string
+    name?: string,
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(param, name);
     let collectionFormat = getHeaderFieldOptions(program, param).format;
@@ -1414,7 +1416,7 @@ export async function getOpenAPIForService(
     }
     return {
       in: "header",
-      default: param.defaultValue && getDefaultValue(param.defaultValue),
+      default: param.defaultValue && getDefaultValue(param.defaultValue, param),
       ...base,
       collectionFormat: collectionFormat as any,
       ...getSimpleParameterSchema(param, schemaContext, base.name),
@@ -1423,7 +1425,7 @@ export async function getOpenAPIForService(
 
   function getOpenAPI2ParameterInternal(
     param: HttpOperationParameter,
-    schemaContext: SchemaContext
+    schemaContext: SchemaContext,
   ): OpenAPI2Parameter & { in: "query" | "path" | "header" } {
     switch (param.type) {
       case "query":
@@ -1440,7 +1442,7 @@ export async function getOpenAPIForService(
 
   function getOpenAPI2Parameter<T extends OpenAPI2Parameter["in"]>(
     param: HttpOperationParameter & { type: T },
-    schemaContext: SchemaContext
+    schemaContext: SchemaContext,
   ): OpenAPI2Parameter & { in: T } {
     const value = getOpenAPI2ParameterInternal(param, schemaContext);
     // Apply decorators to a copy of the parameter definition.  We use
@@ -1452,7 +1454,7 @@ export async function getOpenAPIForService(
       applyIntrinsicDecorators(param.param, {
         type: (value as any).type,
         format: (value as any).format,
-      })
+      }),
     );
     return value as any;
   }
@@ -1548,7 +1550,7 @@ export async function getOpenAPIForService(
           enum: addSchema,
           union: addSchema,
         },
-        { skipSubNamespaces }
+        { skipSubNamespaces },
       );
       processSchemas();
     }
@@ -1634,7 +1636,7 @@ export async function getOpenAPIForService(
     compilerAssert(
       member,
       `Version enum ${e.name} does not have a member for ${currentVersion}.`,
-      e
+      e,
     );
     return {
       type: "string",
@@ -1660,7 +1662,7 @@ export async function getOpenAPIForService(
       reportUnsupportedUnion("empty");
       return {};
     }
-    const type = getEnumMemberType(e.members.values().next().value);
+    const type = getEnumMemberType(e.members.values().next().value!);
     for (const option of e.members.values()) {
       if (type !== getEnumMemberType(option)) {
         reportUnsupportedUnion();
@@ -1795,32 +1797,13 @@ export async function getOpenAPIForService(
 
   function getSchemaForUnionVariant(
     variant: UnionVariant,
-    schemaContext: SchemaContext
+    schemaContext: SchemaContext,
   ): OpenAPI2Schema {
     return getSchemaForType(variant.type, schemaContext)!;
   }
 
-  function getDefaultValue(defaultType: Value): any {
-    switch (defaultType.valueKind) {
-      case "StringValue":
-        return defaultType.value;
-      case "NumericValue":
-        return defaultType.value.asNumber() ?? undefined;
-      case "BooleanValue":
-        return defaultType.value;
-      case "ArrayValue":
-        return defaultType.values.map((x) => getDefaultValue(x));
-      case "NullValue":
-        return null;
-      case "EnumValue":
-        return defaultType.value.value ?? defaultType.value.name;
-      default:
-        reportDiagnostic(program, {
-          code: "invalid-default",
-          format: { type: defaultType.valueKind },
-          target: defaultType,
-        });
-    }
+  function getDefaultValue(defaultType: Value, modelProperty: ModelProperty): any {
+    return serializeValueAsJson(program, defaultType, modelProperty);
   }
 
   function includeDerivedModel(model: Model): boolean {
@@ -1914,7 +1897,7 @@ export async function getOpenAPIForService(
         !metadataInfo.isPayloadProperty(
           prop,
           schemaContext.visibility,
-          schemaContext.ignoreMetadataAnnotations
+          schemaContext.ignoreMetadataAnnotations,
         )
       ) {
         continue;
@@ -1959,7 +1942,7 @@ export async function getOpenAPIForService(
       applySummary(prop, property);
 
       if (prop.defaultValue && !("$ref" in property)) {
-        property.default = getDefaultValue(prop.defaultValue);
+        property.default = getDefaultValue(prop.defaultValue, prop);
       }
 
       if (isReadonlyProperty(program, prop)) {
@@ -2090,7 +2073,7 @@ export async function getOpenAPIForService(
 
   function applyIntrinsicDecorators(
     typespecType: Model | Scalar | ModelProperty | Union,
-    target: OpenAPI2Schema
+    target: OpenAPI2Schema,
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
@@ -2207,7 +2190,7 @@ export async function getOpenAPIForService(
 
   function applyEncoding(
     typespecType: Scalar | ModelProperty,
-    target: OpenAPI2Schema
+    target: OpenAPI2Schema,
   ): OpenAPI2Schema {
     const encodeData = getEncode(program, typespecType);
     if (encodeData) {
@@ -2218,7 +2201,7 @@ export async function getOpenAPIForService(
       newTarget.format = mergeFormatAndEncoding(
         newTarget.format,
         encodeData.encoding,
-        newType.format
+        newType.format,
       );
       return newTarget;
     }
@@ -2227,7 +2210,7 @@ export async function getOpenAPIForService(
   function mergeFormatAndEncoding(
     format: string | undefined,
     encoding: string | undefined,
-    encodeAsFormat: string | undefined
+    encodeAsFormat: string | undefined,
   ): string | undefined {
     switch (format) {
       case undefined:
@@ -2313,7 +2296,7 @@ export async function getOpenAPIForService(
         explainStringTemplateNotSerializable(stringTemplate).map((x) => ({
           ...x,
           severity: "warning",
-        }))
+        })),
       );
       return { type: "string" };
     }
@@ -2322,7 +2305,7 @@ export async function getOpenAPIForService(
   // Map an TypeSpec type to an OA schema. Returns undefined when the resulting
   // OA schema is just a regular object schema.
   function getSchemaForLiterals(
-    typespecType: NumericLiteral | StringLiteral | BooleanLiteral
+    typespecType: NumericLiteral | StringLiteral | BooleanLiteral,
   ): OpenAPI2Schema;
   function getSchemaForLiterals(typespecType: Type): OpenAPI2Schema | undefined;
   function getSchemaForLiterals(typespecType: Type): OpenAPI2Schema | undefined {
@@ -2457,7 +2440,7 @@ export async function getOpenAPIForService(
 
   function processServiceAuthentication(
     authentication: Authentication,
-    serviceNamespace: Namespace
+    serviceNamespace: Namespace,
   ): {
     securitySchemes: Record<string, OpenAPI2SecurityScheme>;
     security: Record<string, string[]>[];
@@ -2484,7 +2467,7 @@ export async function getOpenAPIForService(
 
   function getOpenAPI2Scheme(
     auth: HttpAuth,
-    serviceNamespace: Namespace
+    serviceNamespace: Namespace,
   ): [OpenAPI2SecurityScheme, string[]] | undefined {
     switch (auth.type) {
       case "http":
@@ -2563,31 +2546,38 @@ export function sortOpenAPIDocument(doc: OpenAPI2Document): OpenAPI2Document {
   return sorted;
 }
 
-async function loadExamples(
-  host: CompilerHost,
-  options: AutorestDocumentEmitterOptions,
-  version?: string
-): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
-  const diagnostics = createDiagnosticCollector();
-  if (!options.examplesDirectory) {
-    return diagnostics.wrap(new Map());
-  }
-  const exampleDir = version
-    ? resolvePath(options.examplesDirectory, version)
-    : resolvePath(options.examplesDirectory);
+async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   try {
-    if (!(await host.stat(exampleDir)).isDirectory()) return diagnostics.wrap(new Map());
+    return (await host.stat(dir)).isDirectory();
   } catch (err) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "example-loading",
-        messageId: "noDirectory",
-        format: { directory: exampleDir },
-        target: NoTarget,
-      })
-    );
+    return false;
+  }
+}
+
+async function loadExamples(
+  program: Program,
+  options: AutorestDocumentEmitterOptions,
+  version?: string,
+): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
+  const host = program.host;
+  const diagnostics = createDiagnosticCollector();
+  const examplesBaseDir = options.examplesDirectory ?? resolvePath(program.projectRoot, "examples");
+  const exampleDir = version ? resolvePath(examplesBaseDir, version) : resolvePath(examplesBaseDir);
+
+  if (!(await checkExamplesDirExists(host, exampleDir))) {
+    if (options.examplesDirectory) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "example-loading",
+          messageId: "noDirectory",
+          format: { directory: exampleDir },
+          target: NoTarget,
+        }),
+      );
+    }
     return diagnostics.wrap(new Map());
   }
+
   const map = new Map<string, Record<string, LoadedExample>>();
   const exampleFiles = await host.readDir(exampleDir);
   for (const fileName of exampleFiles) {
@@ -2600,8 +2590,8 @@ async function loadExamples(
             code: "example-loading",
             messageId: "noOperationId",
             format: { filename: fileName },
-            target: NoTarget,
-          })
+            target: { file: exampleFile, pos: 0, end: 0 },
+          }),
         );
         continue;
       }
@@ -2615,13 +2605,13 @@ async function loadExamples(
         diagnostics.add(
           createDiagnostic({
             code: "duplicate-example-file",
-            target: NoTarget,
+            target: { file: exampleFile, pos: 0, end: 0 },
             format: {
               filename: fileName,
               operationId: example.operationId,
               title: example.title,
             },
-          })
+          }),
         );
       }
 
@@ -2637,7 +2627,7 @@ async function loadExamples(
           messageId: "default",
           format: { filename: fileName, error: err?.toString() ?? "" },
           target: NoTarget,
-        })
+        }),
       );
     }
   }

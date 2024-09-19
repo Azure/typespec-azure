@@ -17,6 +17,7 @@ await emitCommonTypesSwagger("customer-managed-keys");
 await emitCommonTypesSwagger("managed-identity");
 await emitCommonTypesSwagger("private-links");
 await emitCommonTypesSwagger("types");
+await emitCommonTypesSwagger("mobo");
 
 function log(...args: any[]) {
   // eslint-disable-next-line no-console
@@ -34,7 +35,7 @@ async function emitCommonTypesSwagger(name: string) {
 
   const output = await getAllServicesAtAllVersions(
     program,
-    resolveAutorestOptions(program, dir, {})
+    resolveAutorestOptions(program, dir, {}),
   );
   if (program.diagnostics.length > 0) {
     logDiagnostics(program.diagnostics, NodeHost.logSink);

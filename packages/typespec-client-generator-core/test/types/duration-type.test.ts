@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: duration types", () => {
         model Test {
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -32,7 +32,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.ISO8601)
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -48,7 +48,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.seconds, int32)
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -64,7 +64,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.seconds, float)
           prop: duration;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "duration");
@@ -80,7 +80,7 @@ describe("typespec-client-generator-core: duration types", () => {
           @encode(DurationKnownEncoding.seconds, float)
           prop: duration | null;
         }
-      `
+      `,
     );
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
@@ -103,14 +103,14 @@ describe("typespec-client-generator-core: duration types", () => {
         model Test {
           value: Float32Duration[];
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
     strictEqual(sdkType.valueType.kind, "duration");
     strictEqual(sdkType.valueType.name, "Float32Duration");
-    strictEqual(sdkType.valueType.description, "title"); // eslint-disable-line deprecation/deprecation
-    strictEqual(sdkType.valueType.details, "doc"); // eslint-disable-line deprecation/deprecation
+    strictEqual(sdkType.valueType.description, "title");
+    strictEqual(sdkType.valueType.details, "doc");
     strictEqual(sdkType.valueType.doc, "doc");
     strictEqual(sdkType.valueType.summary, "title");
     // the encode and wireType will only be added to the outer type

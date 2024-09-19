@@ -9,7 +9,7 @@ describe("typespec-autorest: definitions", () => {
       "Foo",
       `model Foo {
         x: int32;
-      };`
+      };`,
     );
 
     ok(res.isRef);
@@ -38,7 +38,7 @@ describe("typespec-autorest: definitions", () => {
       @route("/test1")
       @get
       op test1(p: P): Q;
-      `
+      `,
     );
 
     expectDiagnostics(diagnostics, [
@@ -54,7 +54,7 @@ describe("typespec-autorest: definitions", () => {
       "{ ... Foo }",
       `model Foo {
         x: int32;
-      };`
+      };`,
     );
 
     ok(res.isRef);
@@ -69,7 +69,7 @@ describe("typespec-autorest: definitions", () => {
       "Foo<int32>",
       `model Foo<T> {
         x: T;
-      };`
+      };`,
     );
 
     ok(!res.isRef);
@@ -91,7 +91,7 @@ describe("typespec-autorest: definitions", () => {
       }
       model Foo<T> {
         x: T;
-      };`
+      };`,
     );
 
     ok(!res.isRef);
@@ -111,7 +111,7 @@ describe("typespec-autorest: definitions", () => {
       model Foo {
         y: int32;
       };
-      model Bar extends Foo {}`
+      model Bar extends Foo {}`,
     );
 
     ok(res.isRef);
@@ -139,7 +139,7 @@ describe("typespec-autorest: definitions", () => {
         y?: int32;
       }
       @route("/") op test(): Parent;
-      `
+      `,
     );
     deepStrictEqual(res.definitions.Parent, {
       type: "object",
@@ -166,7 +166,7 @@ describe("typespec-autorest: definitions", () => {
         y?: int32;
       }
       @route("/") op test(): Parent;
-      `
+      `,
     );
     ok(!("TParent" in res.definitions), "Parent templated type shouldn't be included in OpenAPI");
     deepStrictEqual(res.definitions.Parent, {
@@ -199,11 +199,11 @@ describe("typespec-autorest: definitions", () => {
         y?: int32;
       }
       @route("/") op test(): Parent;
-      `
+      `,
     );
     ok(
       !("TParent_string" in res.definitions),
-      "Parent instantiated templated type shouldn't be included in OpenAPI"
+      "Parent instantiated templated type shouldn't be included in OpenAPI",
     );
   });
 
@@ -216,7 +216,7 @@ describe("typespec-autorest: definitions", () => {
       };
       model Bar extends Foo {
         x: int32;
-      }`
+      }`,
     );
 
     ok(res.isRef);
@@ -243,7 +243,7 @@ describe("typespec-autorest: definitions", () => {
       model Foo<T> {
         y: T;
       };
-      model Bar extends Foo<int32> {}`
+      model Bar extends Foo<int32> {}`,
     );
 
     ok(res.isRef);
@@ -265,7 +265,7 @@ describe("typespec-autorest: definitions", () => {
       };
       model Bar extends Foo<int32> {
         x: int32
-      }`
+      }`,
     );
 
     ok(res.isRef);
@@ -295,7 +295,7 @@ describe("typespec-autorest: definitions", () => {
       @friendlyName("Bar_{name}", T)
       model Bar<T> extends Foo<T> {
         x: T
-      }`
+      }`,
     );
 
     ok(res.isRef);
@@ -319,7 +319,7 @@ describe("typespec-autorest: definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `
-      model Foo { @statusCode code: 200, @header x: string};`
+      model Foo { @statusCode code: 200, @header x: string};`,
     );
 
     ok(!res.isRef);
@@ -335,7 +335,7 @@ describe("typespec-autorest: definitions", () => {
       "Bar",
       `
       model Foo { x?: string};
-      model Bar extends Foo {};`
+      model Bar extends Foo {};`,
     );
 
     ok(res.isRef);
@@ -358,7 +358,7 @@ describe("typespec-autorest: definitions", () => {
       `
       model Foo { x: int32 };
       model Bar extends Foo {};
-      model Baz extends Bar {};`
+      model Baz extends Bar {};`,
     );
 
     ok(res.isRef);
@@ -394,7 +394,7 @@ describe("typespec-autorest: definitions", () => {
       model Pet {
         someString?: string = "withDefault"
       }
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -425,7 +425,7 @@ describe("typespec-autorest: definitions", () => {
         #suppress "@azure-tools/typespec-autorest/union-unsupported" test
         name: string | int32;
       };
-      `
+      `,
       );
       ok(res.isRef);
       deepStrictEqual(res.defs.Pet, {
@@ -448,7 +448,7 @@ describe("typespec-autorest: definitions", () => {
       @route("/things/{id}")
       @get
       op get(@path id: string, @query test: string, ...Thing): Thing & { @header test: string; };
-      `
+      `,
     );
 
     deepStrictEqual(oapi.definitions.Thing, {
@@ -464,7 +464,7 @@ describe("typespec-autorest: definitions", () => {
       oapi.paths["/things/{id}"].get.parameters.find((p: any) => p.in === "body").schema,
       {
         $ref: "#/definitions/Thing",
-      }
+      },
     );
 
     deepStrictEqual(oapi.paths["/things/{id}"].get.responses["200"].schema, {
@@ -487,7 +487,7 @@ describe("typespec-autorest: literals", () => {
         "Pet",
         `
         model Pet { name: ${test[0]} };
-        `
+        `,
       );
 
       const schema = res.defs.Pet.properties.name;
@@ -537,7 +537,7 @@ describe("typespec-autorest: operations", () => {
       `
       #deprecated "use something else"
       op read(@query query: string): string;
-      `
+      `,
     );
 
     strictEqual(res.paths["/"].get.deprecated, true);
@@ -647,7 +647,7 @@ describe("typespec-autorest: enums", () => {
           foo,
           bar
         }
-      `
+      `,
     );
 
     const schema = res.defs.Foo;
@@ -679,7 +679,7 @@ describe("typespec-autorest: enums", () => {
           FooCustom: "foo",
           bar,
         }
-      `
+      `,
     );
 
     const schema = res.defs.Foo;
@@ -710,7 +710,7 @@ describe("typespec-autorest: enums", () => {
           Zero: 0,
           One: 1,
         }
-      `
+      `,
     );
 
     const schema = res.defs.Test;
@@ -745,7 +745,7 @@ describe("typespec-autorest: enums", () => {
       #suppress "deprecated" "for testing"
       @knownValues(KnownPetType)
       scalar PetType extends string;
-      `
+      `,
     );
     ok(res.isRef);
     deepStrictEqual(res.defs.PetType, {
@@ -778,7 +778,7 @@ describe("typespec-autorest: extension decorator", () => {
       @get()
       @extension("x-operation-extension", "barbaz")
       op list(): Pet[];
-      `
+      `,
     );
     ok(oapi.paths["/"].get);
     strictEqual(oapi.paths["/"].get["x-operation-extension"], "barbaz");
@@ -797,7 +797,7 @@ describe("typespec-autorest: extension decorator", () => {
       }
       @route("/Pets")
       @get op get(... PetId): Pet;
-    `
+    `,
     );
     ok(oapi.paths["/Pets/{petId}"].get);
     strictEqual(oapi.paths["/Pets/{petId}"].get.parameters[0]["$ref"], "#/parameters/PetId");
@@ -816,7 +816,7 @@ describe("typespec-autorest: extension decorator", () => {
       }
       @route("/Pets")
       @get op list(): PetList;
-      `
+      `,
     );
     ok(oapi.paths["/Pets"].get);
     notStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);

@@ -24,7 +24,7 @@ describe("typespec-azure-core: no-format rule", () => {
           @format("abc123")
           name: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -40,7 +40,7 @@ describe("typespec-azure-core: no-format rule", () => {
         `
         @format("abc123")
         scalar CoolString extends string;
-        `
+        `,
       )
       .toEmitDiagnostics([
         {

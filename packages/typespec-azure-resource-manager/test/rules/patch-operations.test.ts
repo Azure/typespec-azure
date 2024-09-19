@@ -17,7 +17,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     tester = createLinterRuleTester(
       runner,
       patchOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -86,7 +86,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
          @doc("The provisioning State")
          provisioningState: ResourceState;
        }
-    `
+    `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
@@ -164,7 +164,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
          @doc("The provisioning State")
          provisioningState: ResourceState;
        }
-    `
+    `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
@@ -235,7 +235,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         extra?: string ;
       }
 
-    `
+    `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",

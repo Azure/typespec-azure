@@ -565,7 +565,7 @@ import { PythonSdkContext } from "./lib.js";
 import { PythonSdkClientType } from "./interfaces.js";
 
 function linkSubClients<TServiceOperation extends PythonSdkServiceOperation>(
-  sdkContext: PythonSdkContext<TServiceOperation>
+  sdkContext: PythonSdkContext<TServiceOperation>,
 ): void {
   for (const client of sdkContext.clients) {
     client.subclients = client.methods
@@ -601,7 +601,7 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
 ```ts
 function serializeServiceMethod<TServiceOperation extends PythonSdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
-  method: SdkServiceMethod<TServiceOperation>
+  method: SdkServiceMethod<TServiceOperation>,
 ): PythonSdkServiceMethod {
   switch (method.kind) {
     case "basic":
@@ -968,7 +968,7 @@ const sdkHttpOperation = {
 function serializeServiceOperation<TServiceOperation extends PythonSdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
   method: SdkServiceMethod<TServiceOperation>,
-  operation: TServiceOperation
+  operation: TServiceOperation,
 ): TServiceOperation {
   switch (operation.kind) {
     case "http":
@@ -1252,7 +1252,7 @@ import { getPythonSdkType } from "./types.js";
 
 function serializeMethodResponse<TServiceOperation extends SdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
-  response: SdkMethodResponse
+  response: SdkMethodResponse,
 ): PythonSdkMethodResponse {
   return {
     ...response,
@@ -1699,7 +1699,7 @@ const sdkHttpOperationExample = {
 ```ts
 function serializeServiceOperationExample(
   context: PythonSdkContext<SdkHttpOperation>,
-  operation: SdkHttpOperation
+  operation: SdkHttpOperation,
 ): PythonSdkHttpOperationExample {
   for (const example of operation.examples) {
     return {
@@ -1720,7 +1720,7 @@ function serializeServiceOperationExample(
             })),
             bodyValue: serializeTypeExample(context, value.bodyValue),
           },
-        ])
+        ]),
       ),
     };
   }
@@ -1728,7 +1728,7 @@ function serializeServiceOperationExample(
 
 function serializeTypeExample(
   context: PythonSdkContext<SdkHttpOperation>,
-  example: SdkTypeExample
+  example: SdkTypeExample,
 ): PythonSdkTypeExample {
   switch (example.kind) {
     case "string":
@@ -1770,7 +1770,7 @@ function serializeTypeExample(
           Object.entries(example.value).map(([key, value]) => [
             key,
             serializeTypeExample(context, value),
-          ])
+          ]),
         ),
       };
     case "union":
@@ -1786,14 +1786,14 @@ function serializeTypeExample(
           Object.entries(example.value).map(([key, value]) => [
             key,
             serializeTypeExample(context, value),
-          ])
+          ]),
         ),
         additionalPropertiesValue: example.additionalPropertiesValue
           ? Object.fromEntries(
               Object.entries(example.additionalPropertiesValue).map(([key, value]) => [
                 key,
                 serializeTypeExample(context, value),
-              ])
+              ]),
             )
           : undefined,
       };
@@ -1862,12 +1862,12 @@ export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
 
 function serializeClient<TServiceOperation extends PythonSdkServiceOperation>(
   sdkContext: PythonSdkContext<TServiceOperation>,
-  client: SdkClientType<TServiceOperation>
+  client: SdkClientType<TServiceOperation>,
 ): PythonSdkClientType {
   const pythonClient = {
     ...client,
     parameters: client.initialization?.properties.map((x) =>
-      getSdkModelPropertyType(sdkContext, x)
+      getSdkModelPropertyType(sdkContext, x),
     ),
     subClients: client.methods
       .filter((x) => x.kind === "clientaccessor")
@@ -1882,7 +1882,7 @@ function serializeClient<TServiceOperation extends PythonSdkServiceOperation>(
 }
 
 function linkSubClients<TServiceOperation extends PythonSdkServiceOperation>(
-  sdkContext: PythonSdkContext<TServiceOperation>
+  sdkContext: PythonSdkContext<TServiceOperation>,
 ): void {
   for (const client of sdkContext.clients) {
     client.subclients = client.methods
@@ -2037,7 +2037,7 @@ import { getPythonSdkType, getSdkModelPropertyType } from "./types.js";
 function serializeHttpServiceOperation(
   context: PythonSdkContext<SdkHttpOperation>,
   method: SdkServiceMethod<SdkHttpOperation>,
-  operation: SdkHttpOperation
+  operation: SdkHttpOperation,
 ): PythonSdkHttpOperation {
   return {
     ...operation,
@@ -2046,16 +2046,16 @@ function serializeHttpServiceOperation(
       ? getSdkModelPropertyType(context, operation.bodyParam)
       : undefined,
     responses: Object.entries(operation.responses).map(([statusCode, responses]) =>
-      serializeHttpResponse(context, method, statusCode, responses)
+      serializeHttpResponse(context, method, statusCode, responses),
     ),
     exceptions: Object.entries(operation.exceptions).map(([statusCode, exceptions]) =>
-      serializeHttpResponse(context, method, statusCode, exceptions)
+      serializeHttpResponse(context, method, statusCode, exceptions),
     ),
   };
 
   function serializeHttpResponse(
     context: PythonSdkContext<SdkHttpOperation>,
-    response: SdkHttpResponse
+    response: SdkHttpResponse,
   ): PythonSdkHttpResponse {
     return {
       ...response,

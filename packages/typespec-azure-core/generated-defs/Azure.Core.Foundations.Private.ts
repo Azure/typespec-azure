@@ -8,7 +8,7 @@ import type { DecoratorContext, Model, Operation, Scalar, Type } from "@typespec
 export type SpreadCustomParametersDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Model
+  customizations: Model,
 ) => void;
 
 /**
@@ -19,7 +19,7 @@ export type SpreadCustomParametersDecorator = (
 export type SpreadCustomResponsePropertiesDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Model
+  customizations: Model,
 ) => void;
 
 /**
@@ -31,7 +31,7 @@ export type SpreadCustomResponsePropertiesDecorator = (
 export type EnsureResourceTypeDecorator = (
   context: DecoratorContext,
   entity: Operation,
-  resourceType: Type
+  resourceType: Type,
 ) => void;
 
 /**
@@ -40,7 +40,7 @@ export type EnsureResourceTypeDecorator = (
 export type EmbeddingVectorDecorator = (
   context: DecoratorContext,
   entity: Model,
-  type: Scalar
+  type: Scalar,
 ) => void;
 
 /**
@@ -49,7 +49,7 @@ export type EmbeddingVectorDecorator = (
 export type ArmResourceIdentifierConfigDecorator = (
   context: DecoratorContext,
   target: Scalar,
-  options: Type
+  options: Type,
 ) => void;
 
 /**
@@ -68,7 +68,7 @@ export type EnsureVerbDecorator = (
   context: DecoratorContext,
   entity: Operation,
   templateName: string,
-  verb: string
+  verb: string,
 ) => void;
 
 /**
@@ -79,7 +79,7 @@ export type EnsureVerbDecorator = (
 export type DefaultFinalStateViaDecorator = (
   context: DecoratorContext,
   target: Operation,
-  states: readonly ("operation-location" | "location" | "azure-async-operation")[]
+  states: readonly ("operation-location" | "location" | "azure-async-operation")[],
 ) => void;
 
 export type AzureCoreFoundationsPrivateDecorators = {

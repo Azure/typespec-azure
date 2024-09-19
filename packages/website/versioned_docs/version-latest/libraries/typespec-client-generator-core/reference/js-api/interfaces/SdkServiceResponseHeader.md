@@ -5,10 +5,12 @@ title: "[I] SdkServiceResponseHeader"
 ---
 ## Properties
 
-| Property | Type |
-| ------ | ------ |
-| `__raw` | `ModelProperty` |
-| `description?` | `string` |
-| `details?` | `string` |
-| `serializedName` | `string` |
-| `type` | [`SdkType`](../type-aliases/SdkType.md) |
+| Property | Type | Description |
+| ------ | ------ | ------ |
+| `__raw` | `ModelProperty` | - |
+| ~~`description?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. |
+| ~~`details?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. |
+| `doc?` | `string` | - |
+| `serializedName` | `string` | - |
+| `summary?` | `string` | - |
+| `type` | [`SdkType`](../type-aliases/SdkType.md) | - |

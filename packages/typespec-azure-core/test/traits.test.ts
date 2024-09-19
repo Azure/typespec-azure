@@ -159,7 +159,7 @@ describe("typespec-azure-core: service traits", () => {
       expectDiagnosticEmpty(diagnostics);
       strictEqual(
         getSourceTraitName(runner.program, unnamedTrait as ModelProperty),
-        "UnnamedTrait"
+        "UnnamedTrait",
       );
       strictEqual(getSourceTraitName(runner.program, namedTrait as ModelProperty), "Named");
     });

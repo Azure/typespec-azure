@@ -55,10 +55,10 @@ function getPackagesPath() {
     "@typespec/versioning": resolveLocalPackage("core/packages/versioning"),
     "@azure-tools/typespec-azure-core": resolveLocalPackage("packages/typespec-azure-core"),
     "@azure-tools/typespec-azure-resource-manager": resolveLocalPackage(
-      "packages/typespec-azure-resource-manager"
+      "packages/typespec-azure-resource-manager",
     ),
     "@azure-tools/typespec-client-generator-core": resolveLocalPackage(
-      "packages/typespec-client-generator-core"
+      "packages/typespec-client-generator-core",
     ),
   };
 }
@@ -95,10 +95,10 @@ function getCadlRanchDependencies(originalPackageJson, localCadlRanch) {
     console.log(`Using local cadl ranch "${localCadlRanch}`);
     return {
       "@azure-tools/cadl-ranch-specs": pathToFileURL(
-        resolve(localCadlRanch, "packages/cadl-ranch-specs")
+        resolve(localCadlRanch, "packages/cadl-ranch-specs"),
       ).href,
       "@azure-tools/cadl-ranch-expect": pathToFileURL(
-        resolve(repoRoot, localCadlRanch, "packages/cadl-ranch-expect")
+        resolve(repoRoot, localCadlRanch, "packages/cadl-ranch-expect"),
       ).href,
     };
   } else {
