@@ -106,21 +106,21 @@ describe("typespec-client-generator-core: body model property types", () => {
 
     // wire name test with encoded and projected
     const jsonEncodedProp = sdkModel.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "encodedWireName"
+      (x) => x.kind === "property" && x.serializedName === "encodedWireName",
     );
     ok(jsonEncodedProp);
     strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
 
     // wire name test with deprecated projected
     const jsonProjectedProp = sdkModel.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "realWireName"
+      (x) => x.kind === "property" && x.serializedName === "realWireName",
     );
     ok(jsonProjectedProp);
     strictEqual(jsonProjectedProp.name, "jsonProjectedName");
 
     // regular
     const regularProp = sdkModel.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "regular"
+      (x) => x.kind === "property" && x.serializedName === "regular",
     );
     ok(regularProp);
     strictEqual(regularProp.name, "regular");

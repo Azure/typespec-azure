@@ -16,7 +16,7 @@ describe("typespec-azure-core: use-standard-operations rule", () => {
     tester = createLinterRuleTester(
       runner,
       useStandardOperations,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -43,7 +43,7 @@ describe("typespec-azure-core: use-standard-operations rule", () => {
 
       @route("good")
       op goodOp is GoodBaseOp<Widget>;
-`
+`,
       )
       .toEmitDiagnostics([
         {
@@ -68,7 +68,7 @@ describe("typespec-azure-core: use-standard-operations rule", () => {
 
       op CustomResourceOp<TResource extends TypeSpec.Reflection.Model> is Azure.Core.Foundations.ResourceOperation<TResource, {}, TResource>;
       op usingCustomOp is CustomResourceOp<Widget>;
-`
+`,
       )
       .toEmitDiagnostics([
         // NOTE: This is *desired behavior* because any new operation defined from a

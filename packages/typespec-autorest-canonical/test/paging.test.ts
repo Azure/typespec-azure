@@ -11,7 +11,7 @@ it("define a standard paged operation", async () => {
       @get
       op list(): Azure.Core.Page<{}>;
     }
-    `
+    `,
   );
 
   const listThings = res.paths["/"].get;
@@ -38,7 +38,7 @@ it("define a custom paged operation with custom next link", async () => {
       }
       op list(): CustomPageModel<{}>;
     }
-    `
+    `,
   );
 
   const listThings = res.paths["/"].get;

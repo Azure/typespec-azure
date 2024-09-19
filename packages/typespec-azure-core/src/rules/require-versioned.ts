@@ -45,7 +45,7 @@ function createAddVersionedCodeFix(namespace: Namespace): CodeFix {
       const updatedLocation = { ...location, pos: lineStart };
       return context.prependText(
         updatedLocation,
-        `${indent}@versioned(Versions /* create an enum called Versions with your service version */)\n`
+        `${indent}@versioned(Versions /* create an enum called Versions with your service version */)\n`,
       );
     },
   };

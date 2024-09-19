@@ -57,7 +57,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(pathParam.onClient, false);
     strictEqual(pathParam.isApiVersionParam, false);
     strictEqual(pathParam.type.kind, "string");
-    strictEqual(pathParam.urlEncode, true); // eslint-disable-line deprecation/deprecation
+    strictEqual(pathParam.urlEncode, true);
     strictEqual(method.response.kind, "method");
     strictEqual(method.response.type, undefined);
 
@@ -121,7 +121,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(pathParam.onClient, false);
     strictEqual(pathParam.isApiVersionParam, false);
     strictEqual(pathParam.type.kind, "string");
-    strictEqual(pathParam.urlEncode, true); // eslint-disable-line deprecation/deprecation
+    strictEqual(pathParam.urlEncode, true);
     strictEqual(pathParam.correspondingMethodParams.length, 1);
     deepStrictEqual(pathParam.correspondingMethodParams[0], pathMethod);
   });
@@ -747,7 +747,7 @@ describe("typespec-client-generator-core: parameters", () => {
         
         @route("/generations:submit")
         op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
-      `)
+      `),
     );
     const sdkPackage = runnerWithCore.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);

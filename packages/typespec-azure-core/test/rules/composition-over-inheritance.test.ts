@@ -16,7 +16,7 @@ describe("typespec-azure-core: composition-over-inheritance rule", () => {
     tester = createLinterRuleTester(
       runner,
       compositionOverInheritanceRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -25,7 +25,7 @@ describe("typespec-azure-core: composition-over-inheritance rule", () => {
       .expect(
         `
         model Pet {}
-        model Cat extends Pet {}`
+        model Cat extends Pet {}`,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/composition-over-inheritance",
@@ -42,7 +42,7 @@ describe("typespec-azure-core: composition-over-inheritance rule", () => {
       .expect(
         `
         model Pet<T> { t: T}
-        model Cat extends Pet<string> {}`
+        model Cat extends Pet<string> {}`,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/composition-over-inheritance",
@@ -57,7 +57,7 @@ describe("typespec-azure-core: composition-over-inheritance rule", () => {
         `
         @discriminator("kind") model Pet { kind: string }
         model Cat extends Pet { kind: "cat" }
-        model Dog extends Pet { kind: "dog" }`
+        model Dog extends Pet { kind: "dog" }`,
       )
       .toBeValid();
   });
@@ -68,7 +68,7 @@ describe("typespec-azure-core: composition-over-inheritance rule", () => {
         `
         model Pet {}
         model Cat is Pet {}
-        model Dog is Pet {}`
+        model Dog is Pet {}`,
       )
       .toBeValid();
   });
@@ -79,7 +79,7 @@ describe("typespec-azure-core: composition-over-inheritance rule", () => {
         `
         model Pet {}
         model Cat { ...Pet }
-        model Dog { ...Pet }`
+        model Dog { ...Pet }`,
       )
       .toBeValid();
   });
@@ -90,7 +90,7 @@ describe("typespec-azure-core: composition-over-inheritance rule", () => {
         `
         model PetBase {}
         model Pet extends PetBase {}
-        model Cat is Pet;`
+        model Cat is Pet;`,
       )
       .toEmitDiagnostics([
         // Should only be a single diagnostic

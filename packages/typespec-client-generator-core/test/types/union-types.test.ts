@@ -27,7 +27,7 @@ describe("typespec-client-generator-core: union types", () => {
         model Test {
           name: string | int32;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "union");
@@ -304,7 +304,7 @@ describe("typespec-client-generator-core: union types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 4);
     const modelWithNamedUnionProperty = models.find(
-      (x) => x.kind === "model" && x.name === "ModelWithNamedUnionProperty"
+      (x) => x.kind === "model" && x.name === "ModelWithNamedUnionProperty",
     );
     ok(modelWithNamedUnionProperty);
     const property = modelWithNamedUnionProperty.properties[0];
@@ -317,15 +317,14 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(variants[0].name, "Model1");
     strictEqual(
       variants[0],
-      models.find((x) => x.kind === "model" && x.name === "Model1")
+      models.find((x) => x.kind === "model" && x.name === "Model1"),
     );
     strictEqual(variants[1].kind, "model");
     strictEqual(variants[1].name, "Model2");
     strictEqual(
       variants[1],
-      models.find((x) => x.kind === "model" && x.name === "Model2")
+      models.find((x) => x.kind === "model" && x.name === "Model2"),
     );
-    1;
   });
 
   it("model with nullable enum property", async function () {
@@ -577,7 +576,7 @@ describe("typespec-client-generator-core: union types", () => {
         union TestUnion {
           "A"
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "enum");

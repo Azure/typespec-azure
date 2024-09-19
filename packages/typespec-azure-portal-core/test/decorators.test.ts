@@ -226,7 +226,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   it("@marketplaceOffer.id with space", async () => {
     const marketplaceOffer = `@test @marketplaceOffer({id: "id space"})`;
     const diagnostics = await runner.diagnose(
-      createTestSpec(undefined, undefined, marketplaceOffer)
+      createTestSpec(undefined, undefined, marketplaceOffer),
     );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-offer-id",
@@ -237,7 +237,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   it("@promotion", async () => {
     const promotion = `@test @promotion({apiVersion: "2024-02-20-preview"})`;
     const { Foo } = await runner.compile(
-      createTestSpec(undefined, undefined, undefined, promotion)
+      createTestSpec(undefined, undefined, undefined, promotion),
     );
     const promotionOptions = getPromotion(runner.program, Foo);
     strictEqual(promotionOptions.apiVersion, "2024-02-20-preview");
@@ -247,7 +247,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   it("@promotion with wrong apiVersion", async () => {
     const promotion = `@test @promotion({apiVersion: "2024-02-20"})`;
     const diagnostics = await runner.diagnose(
-      createTestSpec(undefined, undefined, undefined, promotion)
+      createTestSpec(undefined, undefined, undefined, promotion),
     );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-apiversion",
@@ -258,7 +258,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
   it("@promotion with incorrect apiVersion", async () => {
     const promotion = `@test @promotion({apiVersion: "2023-01"})`;
     const diagnostics = await runner.diagnose(
-      createTestSpec(undefined, undefined, undefined, promotion)
+      createTestSpec(undefined, undefined, undefined, promotion),
     );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-portal-core/invalid-apiversion",
@@ -273,7 +273,7 @@ describe("TypeSpec-Azure-Portal-Core decorators test", () => {
       autoUpdate: true
     })`;
     const { Foo } = await runner.compile(
-      createTestSpec(undefined, undefined, undefined, promotion)
+      createTestSpec(undefined, undefined, undefined, promotion),
     );
     const promotionOptions = getPromotion(runner.program, Foo);
     strictEqual(promotionOptions.apiVersion, "2024-02-20-preview");
@@ -285,7 +285,7 @@ export function createTestSpec(
   browseDec?: string,
   aboutDec?: string,
   marketplaceOffer?: string,
-  promotion?: string
+  promotion?: string,
 ) {
   return `
     @service({title: "Microsoft.Foo"})

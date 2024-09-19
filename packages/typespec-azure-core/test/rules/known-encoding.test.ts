@@ -31,7 +31,7 @@ describe("typespec-azure-core: known-encoding rule", () => {
         model Foo {
           @encode("custom-rfc") myDateTime:  utcDateTime;
         }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/known-encoding",
@@ -49,7 +49,7 @@ describe("typespec-azure-core: known-encoding rule", () => {
         model Foo {
           @encode("rfc3339") myDateTime:  utcDateTime;
         }
-        `
+        `,
       )
       .toBeValid();
   });

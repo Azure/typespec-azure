@@ -29,7 +29,7 @@ export async function createAzureResourceManagerTestRunner() {
 }
 
 export async function checkFor(
-  code: string
+  code: string,
 ): Promise<{ program: Program; diagnostics: readonly Diagnostic[] }> {
   const runner = await createAzureResourceManagerTestRunner();
   const diagnostics = await runner.diagnose(code);

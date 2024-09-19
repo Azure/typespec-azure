@@ -41,7 +41,7 @@ it("works with models", async () => {
         @added(Versions.C) prop3: string;
       }
     }
-  `
+  `,
   );
   strictEqual(v.info.version, canonicalVersion);
   deepStrictEqual(v.info["x-canonical-included-versions"], [
@@ -115,7 +115,7 @@ it("works with models and projectedNames (LEGACY)", async () => {
         @added(Versions.C) prop3: string;
       }
     }
-  `
+  `,
   );
   strictEqual(v.info.version, canonicalVersion);
   deepStrictEqual(v.info["x-canonical-included-versions"], ["v1", "v2", "v3"]);
@@ -185,7 +185,7 @@ it("Diagnostics for unsupported versioning decorators.", async () => {
         @added(Versions.C) prop3: string;
       }
     }
-  `
+  `,
   );
   expectDiagnostics(ignoreUseStandardOps(diagnostics), [
     {
@@ -240,7 +240,7 @@ it("Get correct included versions when there is no value", async () => {
         @added(Versions.C) prop3: string;
       }
     }
-  `
+  `,
   );
   strictEqual(v.info.version, canonicalVersion);
   deepStrictEqual(v.info["x-canonical-included-versions"], ["v1", "v2", "v3"]);

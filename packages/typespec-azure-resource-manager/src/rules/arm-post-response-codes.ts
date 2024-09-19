@@ -23,7 +23,7 @@ export const armPostResponseCodesRule = createRule({
   },
   create(context) {
     function getResponseBody(
-      response: HttpOperationResponse | undefined
+      response: HttpOperationResponse | undefined,
     ): HttpOperationBody | HttpOperationMultipartBody | undefined {
       if (response === undefined) return undefined;
       if (response.responses.length > 1) {
@@ -76,7 +76,7 @@ export const armPostResponseCodesRule = createRule({
       if (
         !allowed.some(
           (expected) =>
-            statusCodes.size === expected.size && [...statusCodes].every((v) => expected.has(v))
+            statusCodes.size === expected.size && [...statusCodes].every((v) => expected.has(v)),
         )
       ) {
         context.reportDiagnostic({

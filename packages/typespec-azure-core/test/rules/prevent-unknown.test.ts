@@ -22,7 +22,7 @@ describe("typespec-azure-core: no-unknown rule", () => {
         `
         namespace Azure.Widget;
         model Widget { name: unknown; }
-        `
+        `,
       )
       .toEmitDiagnostics([
         {

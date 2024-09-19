@@ -16,7 +16,7 @@ describe("typespec-autorest: format", () => {
       }
 
       op get(): void;
-      `
+      `,
     );
     const model = res.definitions["Widget"]!;
     deepStrictEqual(model, {
@@ -43,7 +43,7 @@ describe("typespec-autorest: format", () => {
       }
 
       op get(): void;
-      `
+      `,
     );
     expectDiagnostics(diagnostics, [
       {
@@ -67,7 +67,7 @@ describe("typespec-autorest: format", () => {
       }
 
       op get(): void;
-      `
+      `,
     );
     expectDiagnosticEmpty(diagnostics);
   });

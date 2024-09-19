@@ -61,7 +61,7 @@ export const clientNameKey = createStateSymbol("clientName");
  */
 export function parseEmitterName(
   program: Program,
-  emitterName?: string
+  emitterName?: string,
 ): [string, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (!emitterName) {
@@ -70,7 +70,7 @@ export function parseEmitterName(
         code: "no-emitter-name",
         format: {},
         target: program.getGlobalNamespaceType(),
-      })
+      }),
     );
     return diagnostics.wrap("none");
   }
@@ -90,7 +90,7 @@ export function parseEmitterName(
  */
 export function getClientNamespaceStringHelper(
   context: TCGCContext,
-  namespace?: Namespace
+  namespace?: Namespace,
 ): string | undefined {
   let packageName = context.packageName;
   if (packageName) {
@@ -114,7 +114,7 @@ export function getClientNamespaceStringHelper(
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: { name: string },
-  namespace?: Namespace | Interface
+  namespace?: Namespace | Interface,
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: unknown;
@@ -132,7 +132,7 @@ export function updateWithApiVersionInformation(
 export function filterApiVersionsWithDecorators(
   context: TCGCContext,
   type: Type,
-  apiVersions: string[]
+  apiVersions: string[],
 ): string[] {
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
@@ -180,7 +180,7 @@ function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]
 export function getAvailableApiVersions(
   context: TCGCContext,
   type: Type,
-  wrapper?: Type
+  wrapper?: Type,
 ): string[] {
   let wrapperApiVersions: string[] = [];
   if (wrapper) {
@@ -262,7 +262,7 @@ interface DefaultSdkTypeBase<TKind> {
 export function getSdkTypeBaseHelper<TKind>(
   context: TCGCContext,
   type: Type,
-  kind: TKind
+  kind: TKind,
 ): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
@@ -279,7 +279,7 @@ export function getNamespacePrefix(namespace: Namespace): string {
 
 export function getTypeDecorators(
   context: TCGCContext,
-  type: Type
+  type: Type,
 ): [DecoratorInfo[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: DecoratorInfo[] = [];
@@ -302,7 +302,7 @@ export function getTypeDecorators(
         };
         for (let i = 0; i < decorator.args.length; i++) {
           decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
-            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName)
+            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }
         retval.push(decoratorInfo);
@@ -325,7 +325,7 @@ function getDecoratorArgValue(
     | Numeric
     | null,
   type: Type,
-  decoratorName: string
+  decoratorName: string,
 ): [any, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
@@ -340,7 +340,7 @@ function getDecoratorArgValue(
         code: "unsupported-generic-decorator-arg-type",
         target: type,
         format: { decoratorName },
-      })
+      }),
     );
     return diagnostics.wrap(undefined);
   }
@@ -428,7 +428,7 @@ export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
 export function createGeneratedName(
   context: TCGCContext,
   type: Namespace | Operation,
-  suffix: string
+  suffix: string,
 ): string {
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
@@ -448,7 +448,7 @@ export function isNeverOrVoidType(type: Type): boolean {
 
 export function getAnyType(
   context: TCGCContext,
-  type: Type
+  type: Type,
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
@@ -472,7 +472,7 @@ export function getValidApiVersion(context: TCGCContext, versions: string[]): st
 }
 
 export function getHttpOperationResponseHeaders(
-  response: HttpOperationResponseContent
+  response: HttpOperationResponseContent,
 ): ModelProperty[] {
   const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];
   if (response.body?.contentTypeProperty) {
@@ -483,7 +483,7 @@ export function getHttpOperationResponseHeaders(
 
 export function removeVersionsLargerThanExplicitlySpecified(
   context: TCGCContext,
-  versions: { value: string | number }[]
+  versions: { value: string | number }[],
 ): void {
   // filter with specific api version
   if (
@@ -501,14 +501,14 @@ export function removeVersionsLargerThanExplicitlySpecified(
 export function filterApiVersionsInEnum(
   context: TCGCContext,
   client: SdkClient,
-  sdkVersionsEnum: SdkEnumType
+  sdkVersionsEnum: SdkEnumType,
 ): void {
   // if they explicitly set an api version, remove larger versions
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value)
+      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value),
     );
   }
 }
@@ -526,7 +526,7 @@ export function isXmlContentType(contentType: string): boolean {
 export function twoParamsEquivalent(
   context: TCGCContext,
   param1?: ModelProperty,
-  param2?: ModelProperty
+  param2?: ModelProperty,
 ): boolean {
   if (!param1 || !param2) {
     return false;
@@ -590,7 +590,7 @@ export function isOnClient(
       namespace &&
         context.__clientToParameters
           .get(namespace)
-          ?.find((x) => twoParamsEquivalent(context, x.__raw, type))
+          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
     )
   );
 }

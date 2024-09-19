@@ -54,7 +54,7 @@ export const coreOperationsRule = createRule({
             const requiredDecorators = resourceOperationDecorators[verb];
             if (requiredDecorators?.length > 0) {
               const decorator = operation.decorators.find(
-                (d) => requiredDecorators.indexOf(d.decorator.name) >= 0
+                (d) => requiredDecorators.indexOf(d.decorator.name) >= 0,
               );
               if (!decorator) {
                 context.reportDiagnostic({
@@ -97,7 +97,7 @@ function isApiParameter(program: Program, property: ModelProperty): boolean {
 function hasApiParameter(program: Program, model: Model): boolean {
   if (model.properties === undefined || model.properties.size === 0) return false;
   const apiVersionParams: ModelProperty[] = [...model.properties.values()].filter((i) =>
-    isApiParameter(program, i)
+    isApiParameter(program, i),
   );
   return apiVersionParams !== null && apiVersionParams.length === 1;
 }

@@ -39,7 +39,7 @@ it("can share types with a library namespace", async () => {
       @armResourceOperations
       interface TestTrackedOperations extends Microsoft.Library.TrackedOperations {}
       
-    }`
+    }`,
   );
 
   const listSubscriptionPath =
@@ -102,7 +102,7 @@ it("can use private links with common-types references", async () => {
       
         endpoints?: PrivateEndpoint[];
       }
-      `
+      `,
   );
 
   const createPath =
@@ -139,7 +139,7 @@ it("can use private endpoints with common-types references", async () => {
         listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
         getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
       }
-      `
+      `,
   );
 
   const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
@@ -149,7 +149,7 @@ it("can use private endpoints with common-types references", async () => {
   ok(openapi.paths[privateEndpointList].get);
   deepStrictEqual(
     openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
-    "#/definitions/PrivateEndpointConnectionResourceListResult"
+    "#/definitions/PrivateEndpointConnectionResourceListResult",
   );
   ok(openapi.definitions.PrivateEndpointConnectionResourceListResult.properties["value"]);
   ok(openapi.paths[privateEndpointGet]);
@@ -178,7 +178,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
         listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource>;
         getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
       }
-      `
+      `,
   );
 
   const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
@@ -188,7 +188,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
   ok(openapi.paths[privateEndpointList].get);
   deepStrictEqual(
     openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
-    "#/definitions/PrivateEndpointConnectionResourceListResult"
+    "#/definitions/PrivateEndpointConnectionResourceListResult",
   );
   ok(openapi.definitions.PrivateEndpointConnectionResourceListResult.properties["value"]);
   ok(openapi.paths[privateEndpointGet]);
@@ -217,7 +217,7 @@ it("can use ResourceNameParameter for default name parameter definition", async 
         listConnections is ArmResourceListByParent<PrivateEndpointConnection>;
         getConnection is ArmResourceRead<PrivateEndpointConnection>;
       }
-      `
+      `,
   );
 
   const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
@@ -227,7 +227,7 @@ it("can use ResourceNameParameter for default name parameter definition", async 
   ok(openapi.paths[privateEndpointList].get);
   deepStrictEqual(
     openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
-    "#/definitions/PrivateEndpointConnectionListResult"
+    "#/definitions/PrivateEndpointConnectionListResult",
   );
   ok(openapi.definitions.PrivateEndpointConnectionListResult.properties["value"]);
   ok(openapi.paths[privateEndpointGet]);
@@ -264,7 +264,7 @@ it("can emit x-ms-client-flatten with optional configuration", async () => {
     undefined,
     {
       "arm-resource-flattening": true,
-    }
+    },
   );
 
   ok(openapi.definitions.Employee.properties.properties["x-ms-client-flatten"]);
@@ -294,13 +294,13 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
       model DependentProperties {
         age?: int32;
       }
-      `
+      `,
   );
 
   strictEqual(openapi.definitions.Employee.properties.properties["x-ms-client-flatten"], undefined);
   strictEqual(
     openapi.definitions.Dependent.properties.properties["x-ms-client-flatten"],
-    undefined
+    undefined,
   );
 });
 it("generates PATCH bodies for custom patch of common resource envelope mixins", async () => {
@@ -361,7 +361,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
         update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
-      `
+      `,
   );
 
   const all = openapi.definitions["AllPropertiesResourceUpdate"];
@@ -370,19 +370,19 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
   ok(system);
   deepStrictEqual(
     all["properties"]["plan"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate",
   );
   deepStrictEqual(
     all["properties"]["sku"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate",
   );
   deepStrictEqual(
     all["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
   );
   deepStrictEqual(
     system["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate",
   );
   ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
   ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
@@ -391,7 +391,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
   ok(openapi.definitions["Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"]);
   deepStrictEqual(
     openapi.definitions["Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet"],
-    undefined
+    undefined,
   );
 });
 it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
@@ -452,7 +452,7 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
         update is ArmResourcePatchAsync<SystemAssignedResource, SystemAssignedProperties>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
-      `
+      `,
   );
 
   const all = openapi.definitions["AllPropertiesResourceUpdate"];
@@ -461,19 +461,19 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
   ok(system);
   deepStrictEqual(
     all["properties"]["plan"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate",
   );
   deepStrictEqual(
     all["properties"]["sku"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate",
   );
   deepStrictEqual(
     all["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
   );
   deepStrictEqual(
     system["properties"]["identity"]["$ref"],
-    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"
+    "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate",
   );
   ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
   ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);

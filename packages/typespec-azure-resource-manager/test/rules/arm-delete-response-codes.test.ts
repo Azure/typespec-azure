@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     armDeleteResponseCodesRule,
-    "@azure-tools/typespec-azure-resource-manager"
+    "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
@@ -46,7 +46,7 @@ it("Emits a warning for synchronous delete operation that does not contain the a
           result: boolean;
         }
       }
-    `
+    `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
@@ -84,7 +84,7 @@ it("Does not emit a warning for synchronous delete operation that contains the a
         @statusCode _: 204;
         result: boolean;
       } | ErrorResponse
-    }`
+    }`,
     )
     .toBeValid();
 });
@@ -111,7 +111,7 @@ it("Does not emit a warning for synchronous delete operation that uses the `ArmR
     @armResourceOperations
     interface Employees {
       delete is ArmResourceDeleteSync<Employee>;
-    }`
+    }`,
     )
     .toBeValid();
 });
@@ -140,7 +140,7 @@ it("Emits a warning for long-running delete operation that does not contain the 
         #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Employee>;
       }
-    `
+    `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes",
@@ -171,7 +171,7 @@ it("Does not emit a warning for long-running delete operation that uses the `Arm
       @armResourceOperations
       interface Employees {
         delete is ArmResourceDeleteWithoutOkAsync<Employee>;
-      }`
+      }`,
     )
     .toBeValid();
 });

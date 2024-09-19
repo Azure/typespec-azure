@@ -12,7 +12,7 @@ import { createAutorestCanonicalTestRunner, ignoreDiagnostics } from "./test-hos
 
 async function openapiWithOptions(
   code: string,
-  options: AutorestCanonicalEmitterOptions
+  options: AutorestCanonicalEmitterOptions,
 ): Promise<OpenAPI2Document> {
   const runner = await createAutorestCanonicalTestRunner();
 
@@ -39,7 +39,7 @@ beforeEach(async () => {
 describe("'new-line' option", () => {
   async function rawOpenApiFor(
     code: string,
-    options: AutorestCanonicalEmitterOptions
+    options: AutorestCanonicalEmitterOptions,
   ): Promise<string> {
     const outPath = resolvePath("/openapi.json");
 
@@ -54,7 +54,7 @@ describe("'new-line' option", () => {
       ignoreDiagnostics(diagnostics, [
         "@typespec/http/no-service-found",
         "@azure-tools/typespec-azure-core/use-standard-operations",
-      ])
+      ]),
     );
 
     return runner.fs.get(outPath)!;
@@ -113,7 +113,7 @@ describe("'output-file' option", () => {
         emitters: {
           "@azure-tools/typespec-autorest-canonical": { "emitter-output-dir": emitterOutputDir },
         },
-      }
+      },
     );
     ok(runner.fs.has(resolvePath(emitterOutputDir, "canonical/openapi.json")));
   });
@@ -131,7 +131,7 @@ describe("'output-file' option", () => {
             "emitter-output-dir": emitterOutputDir,
           },
         },
-      }
+      },
     );
     ok(runner.fs.has(resolveVirtualPath("./my-output/canonical/openapi.json")));
   });
@@ -156,11 +156,11 @@ op test(): void;
             "emitter-output-dir": emitterOutputDir,
           },
         },
-      }
+      },
     );
     ok(
       !versionedRunner.fs.has(resolveVirtualPath("./my-output/openapi.json")),
-      "Shouldn't have created the non versioned file name"
+      "Shouldn't have created the non versioned file name",
     );
     ok(versionedRunner.fs.has(resolveVirtualPath("./my-output/canonical/openapi.json")));
   });
@@ -186,23 +186,23 @@ op test(): void;
             "azure-resource-provider-folder": "./arm-folder",
           },
         },
-      }
+      },
     );
 
     ok(
       !versionedRunner.fs.has(
-        resolveVirtualPath("./my-output/arm-folder/TestService/stable/v1/openapi.json")
-      )
+        resolveVirtualPath("./my-output/arm-folder/TestService/stable/v1/openapi.json"),
+      ),
     );
     ok(
       !versionedRunner.fs.has(
-        resolveVirtualPath("./my-output/arm-folder/TestService/preview/v2-preview/openapi.json")
-      )
+        resolveVirtualPath("./my-output/arm-folder/TestService/preview/v2-preview/openapi.json"),
+      ),
     );
     ok(
       versionedRunner.fs.has(
-        resolveVirtualPath("./my-output/arm-folder/TestService/canonical/openapi.json")
-      )
+        resolveVirtualPath("./my-output/arm-folder/TestService/canonical/openapi.json"),
+      ),
     );
   });
 });
@@ -215,7 +215,7 @@ describe("omit-unreachable-types", () => {
         model Referenced {name: string}
         op test(): Referenced;
       `,
-      {}
+      {},
     );
     deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced", "Referenced"]);
   });
@@ -229,7 +229,7 @@ describe("omit-unreachable-types", () => {
       `,
       {
         "omit-unreachable-types": true,
-      }
+      },
     );
     deepStrictEqual(Object.keys(output.definitions!), ["Referenced"]);
   });
@@ -241,7 +241,7 @@ describe("include-x-typespec-name", () => {
       `
         model Foo {names: string[]}
       `,
-      {}
+      {},
     );
     ok(!("x-typespec-name" in output.definitions!.Foo.properties!.names));
   });
@@ -251,7 +251,7 @@ describe("include-x-typespec-name", () => {
       `
         model Foo {names: string[]}
       `,
-      { "include-x-typespec-name": "never" }
+      { "include-x-typespec-name": "never" },
     );
     ok(!("x-typespec-name" in output.definitions!.Foo.properties!.names));
   });
@@ -261,7 +261,7 @@ describe("include-x-typespec-name", () => {
       `
         model Foo {names: string[]}
       `,
-      { "include-x-typespec-name": "inline-only" }
+      { "include-x-typespec-name": "inline-only" },
     );
     const prop: any = output.definitions!.Foo.properties!.names;
     strictEqual(prop["x-typespec-name"], `string[]`);

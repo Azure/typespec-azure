@@ -7,7 +7,7 @@ import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
 async function computeCommonTypeRefs<T extends string>(
   code: string,
-  versions: T[]
+  versions: T[],
 ): Promise<Record<T, string | undefined>> {
   const runner = await createAzureResourceManagerTestRunner();
   const { Service, test } = (await runner.compile(`
@@ -41,7 +41,7 @@ it("defaults to v3", async () => {
         serviceVersion2,
       }
       `,
-    ["serviceVersion1", "serviceVersion2"]
+    ["serviceVersion1", "serviceVersion2"],
   );
 
   expect(refs).toEqual({
@@ -65,7 +65,7 @@ it("can specify a global version", async () => {
         serviceVersion2,
       }
       `,
-    ["serviceVersion1", "serviceVersion2"]
+    ["serviceVersion1", "serviceVersion2"],
   );
 
   expect(refs).toEqual({
@@ -91,7 +91,7 @@ it("can specify a different common types version per api version", async () => {
         serviceVersion2,
       }
       `,
-    ["serviceVersion1", "serviceVersion2"]
+    ["serviceVersion1", "serviceVersion2"],
   );
 
   expect(refs).toEqual({

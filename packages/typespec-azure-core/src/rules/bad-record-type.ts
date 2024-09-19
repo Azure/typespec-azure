@@ -11,7 +11,7 @@ import {
 function validateIsRecordType(
   context: LinterRuleContext<DiagnosticMessages>,
   type: Type,
-  target: Model
+  target: Model,
 ) {
   if (type.kind === "Intrinsic" && type.name === "unknown") {
     context.reportDiagnostic({
@@ -31,7 +31,7 @@ function validateIsRecordType(
 function validateExtendsRecordType(
   context: LinterRuleContext<DiagnosticMessages>,
   baseModel: Model,
-  target: Model
+  target: Model,
 ) {
   if (!baseModel.indexer) {
     return;
@@ -55,7 +55,7 @@ function validateExtendsRecordType(
 function validatePropertyRecordType(
   context: LinterRuleContext<DiagnosticMessages>,
   type: Type,
-  target: ModelProperty
+  target: ModelProperty,
 ) {
   if (type.kind === "Model" && type.indexer) {
     const indexerVal = type.indexer.value;
