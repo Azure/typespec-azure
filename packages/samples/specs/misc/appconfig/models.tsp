@@ -6,9 +6,11 @@ namespace AppConfig;
 @friendlyName("Paged{name}", Resource)
 @doc("Paged collection of {name} items", Resource)
 model Page<Resource extends {}> {
+  @pageItems
   @doc("The {name} items on this page", Resource)
   items: Resource[];
 
+  @nextLink
   @doc("The link to the next page of items")
   nextLink?: string;
 }
