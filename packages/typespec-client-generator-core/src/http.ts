@@ -15,7 +15,6 @@ import {
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
-  HttpStatusCodeRange,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getPathParamName,
@@ -67,7 +66,6 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
-  addFormatInfo,
   getClientTypeWithDiagnostics,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
@@ -413,14 +411,14 @@ function getSdkHttpResponseAndExceptions(
   httpOperation: HttpOperation,
 ): [
   {
-    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+    responses: SdkHttpResponse[];
+    exceptions: SdkHttpResponse[];
   },
   readonly Diagnostic[],
 ] {
   const diagnostics = createDiagnosticCollector();
-  const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
-  const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
+  const responses: SdkHttpResponse[] = [];
+  const exceptions: SdkHttpResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -434,7 +432,6 @@ function getSdkHttpResponseAndExceptions(
           ? "application/json"
           : innerResponse.body?.contentTypes[0];
         addEncodeInfo(context, header, clientType, defaultContentType);
-        addFormatInfo(context, header, clientType);
         headers.push({
           __raw: header,
           description: getDocHelper(context, header).description,
@@ -473,6 +470,7 @@ function getSdkHttpResponseAndExceptions(
       kind: "http",
       type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
       headers,
+      statusCodes: response.statusCodes,
       contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
@@ -484,10 +482,10 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
     };
-    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
-      exceptions.set(response.statusCodes, sdkResponse);
+    if (sdkResponse.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
+      exceptions.push(sdkResponse);
     } else {
-      responses.set(response.statusCodes, sdkResponse);
+      responses.push(sdkResponse);
     }
   }
   return diagnostics.wrap({ responses, exceptions });

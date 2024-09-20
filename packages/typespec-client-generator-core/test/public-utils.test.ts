@@ -1434,11 +1434,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(union.kind, "union");
         strictEqual(union.name, "AItems");
         ok(union.isGeneratedName);
-        const model1 = union.values[0];
+        const model1 = union.variantTypes[0];
         strictEqual(model1.kind, "model");
         strictEqual(model1.name, "AItems1");
         ok(model1.isGeneratedName);
-        const model2 = union.values[1];
+        const model2 = union.variantTypes[1];
         strictEqual(model2.kind, "model");
         strictEqual(model2.name, "AItems2");
         ok(model2.isGeneratedName);

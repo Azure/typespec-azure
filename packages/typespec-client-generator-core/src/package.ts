@@ -231,7 +231,7 @@ function getSdkMethodResponse(
     type = {
       __raw: operation,
       kind: "union",
-      values: allResponseBodies,
+      variantTypes: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
@@ -602,7 +602,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   if (types.length > 1) {
     type = {
       kind: "union",
-      values: types,
+      variantTypes: types,
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, rawClient.service),
@@ -702,7 +702,7 @@ function addDefaultClientParameters<
       subId = context.__clientToParameters
         .get(operationGroup.type)
         ?.find((x) => isSubscriptionId(context, x));
-      if (apiVersionParam) break;
+      if (subId) break;
     }
   }
   if (subId) {
