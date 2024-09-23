@@ -1,5 +1,44 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.46.1
+
+### Bug Fixes
+
+- [#1491](https://github.com/Azure/typespec-azure/pull/1491) Fix naming logic for anonymous model wrapped by `HttpPart`
+- [#1542](https://github.com/Azure/typespec-azure/pull/1542) Fix `subscriptionId` for ARM SDK
+- [#1558](https://github.com/Azure/typespec-azure/pull/1558) Handle orphan types in nested namespaces
+- [#1554](https://github.com/Azure/typespec-azure/pull/1554) Fix `onClient` setting for client initialization parameters applied to an interface
+
+### Breaking Changes
+
+- [#1540](https://github.com/Azure/typespec-azure/pull/1540)
+  1. The type of `responses` and `exceptions` in `SdkHttpOperation` changed from `Map<number | HttpStatusCodeRange | "*", SdkHttpResponse>` to `SdkHttpResponse[]`.
+  2. The type of `responses` in `SdkHttpOperationExample` changed from `Map<number, SdkHttpResponseExampleValue>` to `SdkHttpResponseExampleValue[]`.
+  3. `SdkHttpResponse` adds a new property `statusCodes` to store its corresponding status code or status code range.
+  Migration hints:
+  The type changed from map to array, and the key of the map is moved as a new property of the value type. For example, for code like this:
+  ```
+  for (const [statusCodes, response] of operation.responses)
+  ```
+  you could do the same in this way:
+  ```
+  for (const response of operation.responses)
+  {
+    const statusCodes = response.statusCodes;
+  }
+  ```
+- [#1463](https://github.com/Azure/typespec-azure/pull/1463)
+  1. The kind for `unknown` renamed from `any` to `unknown`.
+  2. The `values` property in `SdkUnionType` renamed to `variantTypes`.
+  3. The `values` property in `SdkTupleType` renamed to `valueTypes`.
+  4. The example types for parameter, response and `SdkType` has been renamed to `XXXExampleValue` to emphasize that they are values instead of the example itself.
+  5. The `@format` decorator is no longer able to change the type of the property.
+- [#1539](https://github.com/Azure/typespec-azure/pull/1539)
+  1. change `encode` in `SdkBuiltInType` to optional.
+  2. no longer use the value of `kind` as `encode` when there is no encode on this type.
+- [#1541](https://github.com/Azure/typespec-azure/pull/1541) no longer export the `SdkExampleValueBase` interface. This type should have no usage in downstream consumer's code. If there is any usage, please replace it with `SdkExampleValue`.
+
+
 ## 0.46.0
 
 ### Bug Fixes
