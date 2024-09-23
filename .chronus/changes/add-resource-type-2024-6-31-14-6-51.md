@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Add `resourceType` scalar, and changed some properties to be resourceType instead of string
+Add `armResourceType` scalar, and changed some properties to be `armResourceType` instead of string

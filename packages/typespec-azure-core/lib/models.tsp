@@ -358,7 +358,7 @@ scalar azureLocation extends string;
  * Microsoft.Network/virtualNetworks/subnets
  * ```
  */
-scalar resourceType extends string;
+scalar armResourceType extends string;
 
 /**
  * A type definition that refers the id to an Azure Resource Manager resource.
@@ -403,7 +403,7 @@ alias AllArmResourceDeploymentScopes = [
 
 model ArmResourceIdentifierAllowedResource {
   /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
-  type: resourceType;
+  type: armResourceType;
 
   /**
    * An array of scopes. If not specified, the default scope is ["ResourceGroup"].
