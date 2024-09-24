@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.46.1
+
+### Bug Fixes
+
+- [#1491](https://github.com/Azure/typespec-azure/pull/1491) `x-ms-skip-url-encoding` should be replaced with `allowReserved`
+
+
 ## 0.46.0
 
 ### Bug Fixes
