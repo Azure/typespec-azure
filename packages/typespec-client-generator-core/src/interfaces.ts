@@ -554,7 +554,6 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
-  statusCodes: number | HttpStatusCodeRange | "*";
 }
 
 export interface SdkHttpResponse extends SdkHttpResponseBase {
