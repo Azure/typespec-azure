@@ -211,4 +211,46 @@ describe("typespec-client-generator-core: load examples", () => {
     ok(operation);
     strictEqual(operation.examples?.length, 1);
   });
+
+  it("load multiple example of original operation id with @clientName", async () => {
+    await runner.host.addRealTypeSpecFile(
+      "./examples/clientNameOriginal.json",
+      `${__dirname}/load/clientNameOriginal.json`
+    );
+    await runner.host.addRealTypeSpecFile(
+      "./examples/clientNameAnotherOriginal.json",
+      `${__dirname}/load/clientNameAnotherOriginal.json`
+    );
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        @clientName("renamedNS")
+        namespace NS {
+          @route("/ns")
+          @clientName("renamedOP")
+          op get(): string;
+        }
+
+        @clientName("renamedIF")
+        namespace IF {
+          @route("/if")
+          @clientName("renamedOP")
+          op get(): string;
+        }
+      }
+    `);
+
+    let operation = (
+      (runner.context.sdkPackage.clients[0].methods[0] as SdkClientAccessor<SdkHttpOperation>)
+        .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    operation = (
+      (runner.context.sdkPackage.clients[0].methods[1] as SdkClientAccessor<SdkHttpOperation>)
+        .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+  });
 });
