@@ -23,7 +23,6 @@ import {
   getDiscriminator,
   getDoc,
   getEncode,
-  getFormat,
   getKnownValues,
   getSummary,
   getVisibility,
@@ -78,7 +77,6 @@ import {
   TCGCContext,
   UsageFlags,
   getKnownScalars,
-  isSdkBuiltInKind,
   isSdkIntKind,
 } from "./interfaces.js";
 import {
@@ -128,44 +126,22 @@ export function getTypeSpecBuiltInType(
   return getSdkBuiltInType(context, type) as SdkBuiltInType;
 }
 
-function getAnyType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly Diagnostic[]] {
+function getUnknownType(context: TCGCContext, type: Type): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const anyType: SdkBuiltInType = {
-    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "any")),
+  const unknownType: SdkBuiltInType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "unknown")),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type, "any"),
+    encode: getEncodeHelper(context, type),
     crossLanguageDefinitionId: "",
   };
-  return diagnostics.wrap(anyType);
+  return diagnostics.wrap(unknownType);
 }
 
-function getEncodeHelper(context: TCGCContext, type: Type, kind: string): string {
+function getEncodeHelper(context: TCGCContext, type: Type): string | undefined {
   if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    return getEncode(context.program, type)?.encoding || kind;
+    return getEncode(context.program, type)?.encoding;
   }
-  return kind;
-}
-
-/**
- * Add format info onto an sdk type. Since the format decorator
- * decorates the ModelProperty, we add the format info onto the property's internal
- * type.
- * @param context sdk context
- * @param type the original typespec type. Used to grab the format decorator off of
- * @param propertyType the type of the property, i.e. the internal type that we add the format info onto
- */
-export function addFormatInfo(
-  context: TCGCContext,
-  type: ModelProperty | Scalar,
-  propertyType: SdkType,
-): void {
-  const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
-  let format = getFormat(context.program, type) ?? "";
-
-  // special case: we treat format: uri the same as format: url
-  if (format === "uri") format = "url";
-
-  if (isSdkBuiltInKind(format)) innerType.kind = format;
+  return undefined;
 }
 
 /**
@@ -214,14 +190,13 @@ export function addEncodeInfo(
   if (isSdkIntKind(innerType.kind)) {
     // only integer type is allowed to be encoded as string
     if (encodeData && "encode" in innerType) {
-      const encode = getEncode(context.program, type);
-      if (encode?.encoding) {
-        innerType.encode = encode.encoding;
+      if (encodeData?.encoding) {
+        innerType.encode = encodeData.encoding;
       }
-      if (encode?.type) {
+      if (encodeData?.type) {
         // if we specify the encoding type in the decorator, we set the `.encode` string
         // to the kind of the encoding type
-        innerType.encode = getSdkBuiltInType(context, encode.type).kind;
+        innerType.encode = getSdkBuiltInType(context, encodeData.type).kind;
       }
     }
   }
@@ -234,7 +209,7 @@ export function addEncodeInfo(
  * @param scalar the original typespec scalar
  * @returns the corresponding sdk built in kind
  */
-function getScalarKind(context: TCGCContext, scalar: Scalar): IntrinsicScalarName | "any" {
+function getScalarKind(context: TCGCContext, scalar: Scalar): IntrinsicScalarName | "unknown" {
   if (context.program.checker.isStdType(scalar)) {
     return scalar.name;
   }
@@ -242,7 +217,7 @@ function getScalarKind(context: TCGCContext, scalar: Scalar): IntrinsicScalarNam
   // for those scalar defined as `scalar newThing;`,
   // the best we could do here is return as a `any` type with a name and namespace and let the generator figure what this is
   if (scalar.baseScalar === undefined) {
-    return "any";
+    return "unknown";
   }
 
   return getScalarKind(context, scalar.baseScalar);
@@ -265,7 +240,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type, kind),
+    encode: getEncodeHelper(context, type),
     description: docWrapper.description,
     details: docWrapper.details,
     doc: getDoc(context.program, type),
@@ -277,7 +252,6 @@ function getSdkBuiltInTypeWithDiagnostics(
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   };
   addEncodeInfo(context, type, stdType);
-  addFormatInfo(context, type, stdType);
   return diagnostics.wrap(stdType);
 }
 
@@ -380,7 +354,7 @@ function getSdkTypeForLiteral(
 }
 
 function getSdkTypeForIntrinsic(context: TCGCContext, type: IntrinsicType): SdkBuiltInType {
-  const kind = "any";
+  const kind = "unknown";
   const diagnostics = createDiagnosticCollector();
   return {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
@@ -511,7 +485,7 @@ export function getSdkTupleWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "tuple")),
-    values: type.values.map((x) =>
+    valueTypes: type.values.map((x) =>
       diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
     ),
   });
@@ -533,7 +507,7 @@ export function getSdkUnionWithDiagnostics(
 
   if (nonNullOptions.length === 0) {
     diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
-    return diagnostics.wrap(diagnostics.pipe(getAnyType(context, type)));
+    return diagnostics.wrap(diagnostics.pipe(getUnknownType(context, type)));
   }
 
   // if a union is `type | null`, then we will return a nullable wrapper type of the type
@@ -560,7 +534,7 @@ export function getSdkUnionWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
       name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
       isGeneratedName: !type.name,
-      values: nonNullOptions.map((x) =>
+      variantTypes: nonNullOptions.map((x) =>
         diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
       ),
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -1089,7 +1063,6 @@ export function getClientTypeWithDiagnostics(
         getClientTypeWithDiagnostics(context, type.type, operation),
       );
       diagnostics.pipe(addEncodeInfo(context, type, innerType));
-      addFormatInfo(context, type, innerType);
       retval = diagnostics.pipe(getKnownValuesEnum(context, type, operation)) ?? innerType;
       break;
     case "UnionVariant":
@@ -1107,7 +1080,7 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkEnumValueWithDiagnostics(context, enumType, type));
       break;
     default:
-      retval = diagnostics.pipe(getAnyType(context, type));
+      retval = diagnostics.pipe(getUnknownType(context, type));
       diagnostics.add(
         createDiagnostic({ code: "unsupported-kind", target: type, format: { kind: type.kind } }),
       );
@@ -1174,7 +1147,7 @@ function getSdkCredentialType(
     return {
       __raw: client.service,
       kind: "union",
-      values: credentialTypes,
+      variantTypes: credentialTypes,
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
@@ -1217,14 +1190,13 @@ export function getSdkModelPropertyTypeBase(
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
   let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
-  addFormatInfo(context, type, propertyType);
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
     propertyType = diagnostics.pipe(getSdkEnumWithDiagnostics(context, knownValues, operation));
   }
   const docWrapper = getDocHelper(context, type);
   const name = getPropertyNames(context, type)[0];
-  const onClient = isOnClient(context, type);
+  const onClient = isOnClient(context, type, operation);
   return diagnostics.wrap({
     __raw: type,
     description: docWrapper.description,
@@ -1487,7 +1459,7 @@ function updateUsageOrAccessOfModel(
     return diagnostics.wrap(undefined);
   }
   if (type.kind === "union") {
-    for (const unionType of type.values) {
+    for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccessOfModel(context, value, unionType, options));
     }
     return diagnostics.wrap(undefined);
@@ -1630,26 +1602,6 @@ function updateTypesFromOperation(
     }
 
     const multipartOperation = isMultipartOperation(context, operation);
-    // this part should be put before setting current body's usage because it is based on the previous usage
-    if (
-      sdkType.kind === "model" &&
-      ((!multipartOperation && (sdkType.usage & UsageFlags.MultipartFormData) > 0) ||
-        (multipartOperation &&
-          (sdkType.usage & UsageFlags.Input) > 0 &&
-          (sdkType.usage & UsageFlags.Input & UsageFlags.MultipartFormData) === 0))
-    ) {
-      // This means we have a model that is used both for formdata input and for regular body input
-      diagnostics.add(
-        createDiagnostic({
-          code: "conflicting-multipart-model-usage",
-          target: httpBody.type,
-          format: {
-            modelName: sdkType.name,
-          },
-        }),
-      );
-    }
-
     if (generateConvenient) {
       if (spread) {
         updateUsageOrAccessOfModel(context, UsageFlags.Spread, sdkType, { propagation: false });
@@ -1677,7 +1629,28 @@ function updateTypesFromOperation(
     }
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccessOfModel(context, access, sdkType));
+
+    // after completion of usage calculation for httpBody, check whether it has
+    // conflicting usage between multipart and regular body
+    if (sdkType.kind === "model") {
+      const isUsedInMultipart = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
+      const isUsedInOthers =
+        ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
+      if ((!multipartOperation && isUsedInMultipart) || (multipartOperation && isUsedInOthers)) {
+        // This means we have a model that is used both for formdata input and for regular body input
+        diagnostics.add(
+          createDiagnostic({
+            code: "conflicting-multipart-model-usage",
+            target: httpBody.type,
+            format: {
+              modelName: sdkType.name,
+            },
+          }),
+        );
+      }
+    }
   }
+
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -1871,17 +1844,22 @@ export function getAllModelsWithDiagnostics(
   }
   // update for orphan models/enums/unions
   for (const client of listClients(context)) {
-    // orphan models
-    for (const model of client.service.models.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, model));
-    }
-    // orphan enums
-    for (const enumType of client.service.enums.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, enumType));
-    }
-    // orphan unions
-    for (const unionType of client.service.unions.values()) {
-      diagnostics.pipe(handleServiceOrphanType(context, unionType));
+    const namespaces = [client.service];
+    while (namespaces.length) {
+      const namespace = namespaces.pop()!;
+      // orphan models
+      for (const model of namespace.models.values()) {
+        diagnostics.pipe(handleServiceOrphanType(context, model));
+      }
+      // orphan enums
+      for (const enumType of namespace.enums.values()) {
+        diagnostics.pipe(handleServiceOrphanType(context, enumType));
+      }
+      // orphan unions
+      for (const unionType of namespace.unions.values()) {
+        diagnostics.pipe(handleServiceOrphanType(context, unionType));
+      }
+      namespaces.push(...namespace.namespaces.values());
     }
   }
   // update access

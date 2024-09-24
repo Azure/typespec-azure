@@ -28,7 +28,6 @@ import {
   HttpOperationBody,
   HttpOperationMultipartBody,
   HttpOperationResponseContent,
-  HttpStatusCodeRange,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
 import { getParamAlias } from "./decorators.js";
@@ -244,7 +243,7 @@ export function getHashForType(type: SdkType): string {
   }
   if (type.kind === "enum" || type.kind === "model" || type.kind === "enumvalue") return type.name;
   if (type.kind === "union") {
-    return type.values.map((x) => getHashForType(x)).join("|");
+    return type.variantTypes.map((x) => getHashForType(x)).join("|");
   }
   return type.kind;
 }
@@ -397,15 +396,13 @@ export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
 }
 
-export function getAllResponseBodiesAndNonBodyExists(
-  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>,
-): {
+export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[]): {
   allResponseBodies: SdkType[];
   nonBodyExists: boolean;
 } {
   const allResponseBodies: SdkType[] = [];
   let nonBodyExists = false;
-  for (const response of responses.values()) {
+  for (const response of responses) {
     if (response.type) {
       if (response.type.kind === "nullable") {
         nonBodyExists = true;
@@ -418,9 +415,7 @@ export function getAllResponseBodiesAndNonBodyExists(
   return { allResponseBodies, nonBodyExists };
 }
 
-export function getAllResponseBodies(
-  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>,
-): SdkType[] {
+export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
@@ -457,8 +452,8 @@ export function getAnyType(
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    kind: "any",
-    name: "any",
+    kind: "unknown",
+    name: "unknown",
     encode: "string",
     crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
@@ -582,8 +577,12 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
   return type;
 }
 
-export function isOnClient(context: TCGCContext, type: ModelProperty): boolean {
-  const namespace = type.model?.namespace;
+export function isOnClient(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation?: Operation,
+): boolean {
+  const namespace = operation ? getLocationOfOperation(operation) : type.model?.namespace;
   return (
     isSubscriptionId(context, type) ||
     isApiVersion(context, type) ||

@@ -435,4 +435,28 @@ describe("typespec-client-generator-core: @usage", () => {
       code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
     });
   });
+
+  it("orphan model in group", async () => {
+    await runner.compileWithBuiltInService(
+      `
+        @access(Access.public)
+        @usage(Usage.output)
+        namespace Models {
+          model Model1 {
+            ref: Model2;
+          }
+
+          model Model2 {
+            name: string;
+          }
+        }
+      `,
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    strictEqual(models[0].usage, UsageFlags.Output);
+    strictEqual(models[0].access, "public");
+    strictEqual(models[1].usage, UsageFlags.Output);
+    strictEqual(models[1].access, "public");
+  });
 });
