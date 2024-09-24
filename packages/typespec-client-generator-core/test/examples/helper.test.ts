@@ -17,11 +17,11 @@ describe("typespec-client-generator-core: helper", () => {
   it("getHttpOperationExamples", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getOne.json",
-      `${__dirname}/helper/getOne.json`
+      `${__dirname}/helper/getOne.json`,
     );
     await runner.host.addRealTypeSpecFile(
       "./examples/getTwo.json",
-      `${__dirname}/helper/getTwo.json`
+      `${__dirname}/helper/getTwo.json`,
     );
     const { get } = await runner.compile(`
       @service({})
@@ -33,7 +33,7 @@ describe("typespec-client-generator-core: helper", () => {
 
     const examples = getHttpOperationExamples(
       runner.context,
-      getHttpOperationWithCache(runner.context, get as Operation)
+      getHttpOperationWithCache(runner.context, get as Operation),
     );
     strictEqual(examples.length, 2);
   });

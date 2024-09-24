@@ -59,11 +59,11 @@ describe("typespec-client-generator-core: enum types", () => {
     const nameList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     deepEqual(
       values.map((x) => x.name),
-      nameList
+      nameList,
     );
     deepEqual(
       values.map((x) => x.value),
-      nameList
+      nameList,
     );
     for (const value of sdkType.values) {
       deepStrictEqual(value.enumType, sdkType);
@@ -99,11 +99,11 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(values.length, 5);
     deepEqual(
       values.map((x) => x.name),
-      ["one", "two", "three", "four", "five"]
+      ["one", "two", "three", "four", "five"],
     );
     deepEqual(
       values.map((x) => x.value),
-      [1, 2, 3, 4, 5]
+      [1, 2, 3, 4, 5],
     );
   });
 
@@ -132,11 +132,11 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(values.length, 3);
     deepEqual(
       values.map((x) => x.name),
-      ["a", "b", "c"]
+      ["a", "b", "c"],
     );
     deepEqual(
       values.map((x) => x.value),
-      [1, 2.1, 3]
+      [1, 2.1, 3],
     );
   });
 
@@ -165,11 +165,11 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(values.length, 3);
     deepEqual(
       values.map((x) => x.name),
-      ["a", "b", "c"]
+      ["a", "b", "c"],
     );
     deepEqual(
       values.map((x) => x.value),
-      [1, 2, 3]
+      [1, 2, 3],
     );
   });
 
@@ -248,11 +248,11 @@ describe("typespec-client-generator-core: enum types", () => {
     const nameList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     deepEqual(
       values.map((x) => x.name),
-      nameList
+      nameList,
     );
     deepEqual(
       values.map((x) => x.value),
-      nameList
+      nameList,
     );
     for (const value of sdkType.values) {
       deepStrictEqual(value.enumType, sdkType);
@@ -404,7 +404,7 @@ describe("typespec-client-generator-core: enum types", () => {
 
         @@clientName(N.TestUnion, "TestUnionRename");
         @@clientName(N.TestUnion.B, "BRename");
-      `
+      `,
     )) as { TestUnion: Union };
 
     const enumType = getClientType(runner.context, TestUnion);
@@ -444,7 +444,7 @@ describe("typespec-client-generator-core: enum types", () => {
           }
           op x(body: Test): void;
         }
-      `
+      `,
     )) as { Test: Union };
 
     const nullableType = getClientType(runner.context, Test);
@@ -497,7 +497,7 @@ describe("typespec-client-generator-core: enum types", () => {
           }
           op x(body: Test): void;
         }
-      `
+      `,
     )) as { Test: Union };
 
     const nullableType = getClientType(runner.context, Test);
@@ -557,7 +557,7 @@ describe("typespec-client-generator-core: enum types", () => {
           }
           op read(@body body: Test): void;
         }
-      `
+      `,
     )) as { Test: Model };
 
     const modelType = getClientType(runner.context, Test) as SdkModelType;
@@ -607,7 +607,7 @@ describe("typespec-client-generator-core: enum types", () => {
           }
           op read(@body body: Test): void;
         }
-      `
+      `,
     )) as { Test: Model };
 
     const modelType = getClientType(runner.context, Test) as SdkModelType;
@@ -643,7 +643,7 @@ describe("typespec-client-generator-core: enum types", () => {
           v1,
           v2,
         }
-      `
+      `,
     );
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
@@ -652,7 +652,7 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
-      ["v1", "v2"]
+      ["v1", "v2"],
     );
   });
 
@@ -672,7 +672,7 @@ describe("typespec-client-generator-core: enum types", () => {
           v1,
           v2,
         }
-      `
+      `,
     );
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
@@ -681,7 +681,7 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
-      ["v1", "v2"]
+      ["v1", "v2"],
     );
   });
 
@@ -701,7 +701,7 @@ describe("typespec-client-generator-core: enum types", () => {
           v1,
           v2,
         }
-      `
+      `,
     );
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
@@ -710,7 +710,7 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
-      ["v1", "v2"]
+      ["v1", "v2"],
     );
   });
 
@@ -730,7 +730,7 @@ describe("typespec-client-generator-core: enum types", () => {
           v1,
           v2,
         }
-      `
+      `,
     );
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
@@ -739,7 +739,7 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
     deepStrictEqual(
       enums[0].values.map((x) => x.value),
-      ["v1"]
+      ["v1"],
     );
   });
 
@@ -764,7 +764,7 @@ describe("typespec-client-generator-core: enum types", () => {
           }
           op read(@body body: Test): void;
         }
-      `
+      `,
     );
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 2);
@@ -790,7 +790,7 @@ describe("typespec-client-generator-core: enum types", () => {
           model Test { name: string; }
           op read(prop1: StringExtensibleNamedUnion; prop2: Test): void;
         }
-      `
+      `,
     );
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);

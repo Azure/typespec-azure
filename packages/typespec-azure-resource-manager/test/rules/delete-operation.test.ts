@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: delete operation missing rule", () =>
     tester = createLinterRuleTester(
       runner,
       deleteOperationMissingRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -40,7 +40,7 @@ describe("typespec-azure-resource-manager: delete operation missing rule", () =>
           ResourceRead<FooResource>,
           ResourceCreate<FooResource>,
           ResourceDelete<FooResource> {}
-      `
+      `,
       )
       .toBeValid();
   });
@@ -63,7 +63,7 @@ describe("typespec-azure-resource-manager: delete operation missing rule", () =>
         ResourceUpdate<FooResource,{}>,
         ResourceRead<FooResource>,
         ResourceCreate<FooResource> {}
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation",

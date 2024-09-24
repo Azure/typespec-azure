@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
     tester = createLinterRuleTester(
       runner,
       armCommonTypesVersionRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -35,7 +35,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
           v2;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
@@ -49,7 +49,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
         @service({ title: "Test" })
         @armProviderNamespace("Contoso.Service")
         namespace Service;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-common-types-version",
@@ -70,7 +70,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
           v1;
           v2;
         }
-      `
+      `,
       )
       .toBeValid();
   });
@@ -91,7 +91,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           v2;
         }
-      `
+      `,
       )
       .toBeValid();
   });

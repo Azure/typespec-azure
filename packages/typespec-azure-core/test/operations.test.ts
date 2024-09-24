@@ -30,7 +30,7 @@ describe("typespec-azure-core: operation templates", () => {
       };
 
       @test op resourceUpsert is StandardResourceOperations.ResourceCreateOrUpdate<TestModel>;
-      `
+      `,
     );
 
     ok(operations.length === 1);
@@ -38,14 +38,14 @@ describe("typespec-azure-core: operation templates", () => {
     strictEqual(operations[0].verb, "patch");
 
     const contentTypeParam = operations[0].parameters.parameters.find(
-      (p) => p.name === "Content-Type"
+      (p) => p.name === "Content-Type",
     );
     ok(contentTypeParam, "No Content-Type header was found.");
     strictEqual(contentTypeParam!.type, "header");
     strictEqual(contentTypeParam!.param.type.kind, "String");
     strictEqual(
       (contentTypeParam!.param.type as StringLiteral).value,
-      "application/merge-patch+json"
+      "application/merge-patch+json",
     );
 
     expectDiagnosticEmpty(diagnostics);
@@ -78,7 +78,7 @@ describe("typespec-azure-core: operation templates", () => {
 
       @test
       model UpsertableFlower is Azure.Core.Foundations.ResourceCreateOrUpdateModel<Flower> {};
-      `
+      `,
     )) as {
       FlowerProperties: Model;
       Flower: Model;
@@ -116,7 +116,7 @@ describe("typespec-azure-core: operation templates", () => {
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
       @TypeSpec.Http.route("basic")
 @test op basicOp is Azure.Core.Foundations.LongRunningOperation<{}>;
-      `
+      `,
     );
 
     function hasLocationHeader(operation: HttpOperation, statusCode: number = 201): void {
@@ -126,7 +126,7 @@ describe("typespec-azure-core: operation templates", () => {
       ok(locationHeader, `No location header: ${operation.operation.name}`);
       ok(
         isFinalLocation(runner.program, locationHeader),
-        `@finalLocation not found: ${operation.operation.name}`
+        `@finalLocation not found: ${operation.operation.name}`,
       );
     }
 
@@ -137,7 +137,7 @@ describe("typespec-azure-core: operation templates", () => {
       ok(operationLocationHeader, `No Operation-Location header: ${operation.operation.name}`);
       ok(
         isPollingLocation(runner.program, operationLocationHeader),
-        `@pollingLocation not found: ${operation.operation.name}`
+        `@pollingLocation not found: ${operation.operation.name}`,
       );
     }
 
@@ -256,7 +256,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   async function compileLroOperation(
     code: string,
-    operationName?: string
+    operationName?: string,
   ): Promise<[HttpOperation, LroMetadata | undefined, BasicTestRunner]> {
     let [operations, diagnostics, runner] = await getOperations(
       `
@@ -287,7 +287,7 @@ describe("typespec-azure-core: operation templates", () => {
       alias Customizations = Azure.Core.Traits.RequestHeadersTrait<CustomRequestHeaders> & Azure.Core.Traits.QueryParametersTrait<CustomQueryParameters> & Azure.Core.Traits.ResponseHeadersTrait<CustomResponseProperties>;
 
       ${code}
-      `
+      `,
     );
 
     expectDiagnosticEmpty(diagnostics);
@@ -326,7 +326,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceRead", async () => {
     const operation = await compileResourceOperation(
-      `@test op read is Azure.Core.ResourceRead<TestModel, Customizations>;`
+      `@test op read is Azure.Core.ResourceRead<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -363,7 +363,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceList", async () => {
     const operation = await compileResourceOperation(
-      `@test op list is Azure.Core.ResourceList<TestModel, Customizations>;`
+      `@test op list is Azure.Core.ResourceList<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -380,7 +380,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceList works with getPagedResult", async () => {
     const [operations, _, runner] = await getOperations(
-      `@test op list is Azure.Core.ResourceList<TestModel, Customizations>;`
+      `@test op list is Azure.Core.ResourceList<TestModel, Customizations>;`,
     );
 
     const pagedResult = getPagedResult(runner.program, operations[0].operation);
@@ -392,7 +392,7 @@ describe("typespec-azure-core: operation templates", () => {
       `
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
       @test op list is Azure.Core.Foundations.NonPagedResourceList<TestModel, Customizations>;
-      `
+      `,
     );
 
     deepStrictEqual(operation, {
@@ -409,7 +409,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceCreateWithServiceProvidedName", async () => {
     const operation = await compileResourceOperation(
-      `@test op create is StandardResourceOperations.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`
+      `@test op create is StandardResourceOperations.ResourceCreateWithServiceProvidedName<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -426,7 +426,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceCreateOrUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<TestModel, Customizations>;`
+      `@test op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<TestModel, Customizations>;`,
     );
 
     const params = [...expectedParamsWithName];
@@ -449,7 +449,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op update is StandardResourceOperations.ResourceUpdate<TestModel, Customizations>;`
+      `@test op update is StandardResourceOperations.ResourceUpdate<TestModel, Customizations>;`,
     );
 
     const params = [...expectedParamsWithName];
@@ -472,7 +472,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceCreateOrReplace", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrReplace is StandardResourceOperations.ResourceCreateOrReplace<TestModel, Customizations>;`
+      `@test op createOrReplace is StandardResourceOperations.ResourceCreateOrReplace<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -489,7 +489,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("ResourceDelete", async () => {
     const operation = await compileResourceOperation(
-      `@test op delete is Azure.Core.ResourceDelete<TestModel, Customizations>;`
+      `@test op delete is Azure.Core.ResourceDelete<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -506,7 +506,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceCreateWithServiceProvidedName", async () => {
     const operation = await compileResourceOperation(
-      `@test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel, Customizations>;`
+      `@test op create is StandardResourceOperations.LongRunningResourceCreateWithServiceProvidedName<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -523,7 +523,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceCreateOrUpdate", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`
+      `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
     );
 
     const params = [...expectedParamsWithName];
@@ -546,7 +546,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceCreateOrReplace", async () => {
     const operation = await compileResourceOperation(
-      `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`
+      `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -564,7 +564,7 @@ describe("typespec-azure-core: operation templates", () => {
   it("LongRunningResourceUpdate", async () => {
     const operation = await compileResourceOperation(
       `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-       @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`
+       @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
     );
 
     const params = [...expectedParamsWithName];
@@ -587,7 +587,7 @@ describe("typespec-azure-core: operation templates", () => {
 
   it("LongRunningResourceDelete", async () => {
     const operation = await compileResourceOperation(
-      `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`
+      `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
     );
 
     deepStrictEqual(operation, {
@@ -624,7 +624,7 @@ describe("typespec-azure-core: operation templates", () => {
       }
 
       @test op customAction is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;
-      `
+      `,
     );
 
     deepStrictEqual(operation, {
@@ -650,7 +650,7 @@ describe("typespec-azure-core: operation templates", () => {
 
       @TypeSpec.Rest.actionSeparator("/")
       @test op action2 is Azure.Core.ResourceAction<Thing, {}, {}>;
-      `
+      `,
     );
     strictEqual(operations[0].path, "/things/{id}/action2");
   });
@@ -668,7 +668,7 @@ describe("typespec-azure-core: operation templates", () => {
           message: string;
         }
   
-        @test op customAction is Azure.Core.ResourceCollectionAction<TestModel, OpParams, OpResponse>;`
+        @test op customAction is Azure.Core.ResourceCollectionAction<TestModel, OpParams, OpResponse>;`,
     );
 
     deepStrictEqual(operation, {
@@ -694,7 +694,7 @@ describe("typespec-azure-core: operation templates", () => {
       
       @TypeSpec.Rest.actionSeparator("/")
       @test op customAction is Azure.Core.ResourceCollectionAction<Thing, {}, {}>;
-      `
+      `,
     );
     strictEqual(operations[0].path, "/things/customAction");
   });
@@ -702,7 +702,7 @@ describe("typespec-azure-core: operation templates", () => {
   describe("RpcOperation", () => {
     it("allows override of TraitContext", async () => {
       const operation = await compileResourceOperation(
-        `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;`
+        `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;`,
       );
 
       deepStrictEqual(operation, {
@@ -719,7 +719,7 @@ describe("typespec-azure-core: operation templates", () => {
 
     it("works with default TraitContext.Undefined", async () => {
       const operation = await compileResourceOperation(
-        `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel>;`
+        `@test @route("/test") op rpcOp is Azure.Core.RpcOperation<{}, TestModel>;`,
       );
 
       deepStrictEqual(operation, {
@@ -759,7 +759,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         model StatusError { message: string; }
         @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;
-      `
+      `,
       );
 
       const statusOp = operations[0];
@@ -823,7 +823,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         model StatusError { message: string; }
         @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError>;
-      `
+      `,
       );
 
       const statusOp = operations[0];
@@ -861,7 +861,7 @@ describe("typespec-azure-core: operation templates", () => {
   describe("LongRunningOperation", () => {
     it("Gets Lro for standard Async CreateOrUpdate", async () => {
       const [_, metadata] = await compileLroOperation(
-        `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`
+        `@test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -888,7 +888,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         @Azure.Core.pollingOperation(poll)
         @test op createOrUpdate is StandardResourceOperations.LongRunningResourceCreateOrUpdate<TestModel, Customizations>;`,
-        "createOrUpdate"
+        "createOrUpdate",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -910,7 +910,7 @@ describe("typespec-azure-core: operation templates", () => {
 
     it("Gets Lro for standard Async CreateOrReplace", async () => {
       const [_, metadata] = await compileLroOperation(
-        `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`
+        `@test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
       );
 
       ok(metadata);
@@ -939,7 +939,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         @Azure.Core.pollingOperation(poll)
         @test op createOrReplace is StandardResourceOperations.LongRunningResourceCreateOrReplace<TestModel, Customizations>;`,
-        "createOrReplace"
+        "createOrReplace",
       );
 
       ok(metadata);
@@ -962,7 +962,7 @@ describe("typespec-azure-core: operation templates", () => {
 
     it("Gets Lro for standard Async Delete", async () => {
       const [_, metadata, runner] = await compileLroOperation(
-        `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`
+        `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -976,7 +976,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.logicalResult.name, "OperationStatus");
       deepStrictEqual(
         getNamespaceName(runner.program, metadata.logicalResult.namespace),
-        "Azure.Core.Foundations"
+        "Azure.Core.Foundations",
       );
       deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
       deepStrictEqual(metadata.logicalPath, undefined);
@@ -995,7 +995,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         @Azure.Core.pollingOperation(poll)
         @test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
-        "delete"
+        "delete",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -1009,7 +1009,7 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.logicalResult.name, "ResourceOperationStatus");
       deepStrictEqual(
         getNamespaceName(runner.program, metadata.logicalResult.namespace),
-        "Azure.Core"
+        "Azure.Core",
       );
       deepStrictEqual(metadata.envelopeResult.name, "ResourceOperationStatus");
       deepStrictEqual(metadata.logicalPath, undefined);
@@ -1025,7 +1025,7 @@ describe("typespec-azure-core: operation templates", () => {
     it("Gets Lro for standard Async Update", async () => {
       const [_, metadata] = await compileLroOperation(
         `#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-         @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`
+         @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -1054,7 +1054,7 @@ describe("typespec-azure-core: operation templates", () => {
          #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
          @Azure.Core.pollingOperation(poll)
          @test op update is Azure.Core.Foundations.LongRunningResourceUpdate<TestModel, Customizations>;`,
-        "update"
+        "update",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -1086,7 +1086,7 @@ describe("typespec-azure-core: operation templates", () => {
           message: string;
         }
   
-        @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`
+        @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`,
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -1122,7 +1122,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         @Azure.Core.pollingOperation(poll)
         @test op doAction is Azure.Core.LongRunningResourceAction<TestModel, OpParams, OpResponse>;`,
-        "doAction"
+        "doAction",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -1164,7 +1164,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         model StatusError { message: string; }
         @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{}, TestModel, PollingStatus, StatusError, Customizations, Azure.Core.Foundations.ErrorResponse, Azure.Core.Traits.TraitContext.Read>;`,
-        "lrRpcOp"
+        "lrRpcOp",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
@@ -1224,7 +1224,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationReference");
@@ -1301,7 +1301,7 @@ describe("typespec-azure-core: operation templates", () => {
           createJob is TLongRunningRpcOperation<{...Request}, JobResult>;
         }
         `,
-        "createJob"
+        "createJob",
       );
       ok(metadata);
 
@@ -1359,7 +1359,7 @@ describe("typespec-azure-core: operation templates", () => {
             @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1415,7 +1415,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1469,7 +1469,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1516,7 +1516,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1568,7 +1568,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1624,7 +1624,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1674,7 +1674,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1731,7 +1731,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1785,7 +1785,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1833,7 +1833,7 @@ describe("typespec-azure-core: operation templates", () => {
             @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1876,7 +1876,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
           };      
         `,
-        "deleteWidget"
+        "deleteWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1917,7 +1917,7 @@ describe("typespec-azure-core: operation templates", () => {
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("location") opLink: string,
           };      
         `,
-        "deleteWidget"
+        "deleteWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.statusMonitorStep?.target.kind, "link");
@@ -1976,7 +1976,7 @@ describe("typespec-azure-core: operation templates", () => {
             @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2035,7 +2035,7 @@ describe("typespec-azure-core: operation templates", () => {
             @lroResult @bodyRoot body?: SimpleWidget
           };      
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2096,7 +2096,7 @@ describe("typespec-azure-core: operation templates", () => {
           @lroResult @bodyRoot body?: SimpleWidget;
         };
         `,
-        "mungeWidget"
+        "mungeWidget",
       );
 
       ok(metadata);
@@ -2200,7 +2200,7 @@ describe("typespec-azure-core: operation templates", () => {
             operationLocation?: ResourceLocation<DeviceOperation>;
           }
         >;`,
-        "importDevices"
+        "importDevices",
       );
 
       ok(metadata);
@@ -2259,7 +2259,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2321,7 +2321,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2382,7 +2382,7 @@ describe("typespec-azure-core: operation templates", () => {
         @doc("get lro status")
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
-        `
+        `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2434,7 +2434,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2494,7 +2494,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2554,7 +2554,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2623,7 +2623,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
 
       ok(metadata);
@@ -2690,7 +2690,7 @@ describe("typespec-azure-core: operation templates", () => {
         @doc("get lro status")
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@doc("The id") @path id: string, @doc("The operation") @path operationId: string): PollingStatus;
-        `
+        `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2739,7 +2739,7 @@ describe("typespec-azure-core: operation templates", () => {
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
         `,
-        "createWidget"
+        "createWidget",
       );
       ok(metadata);
       deepStrictEqual(metadata.finalStateVia, "original-uri");
@@ -2813,7 +2813,7 @@ describe("typespec-azure-core: operation templates", () => {
   
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@path id: string, @path operationId: string): PollingStatus;
-        `
+        `,
       );
       ok(diagnostics.length > 1);
       expectDiagnostics(diagnostics, [
@@ -2839,7 +2839,7 @@ describe("typespec-azure-core: operation templates", () => {
         model OpResponse is CustomResponseProperties {
           message: string;
         }
-         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`
+         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
       );
       deepStrictEqual(metadata, undefined);
     });
@@ -2901,7 +2901,7 @@ describe("typespec-azure-core: operation templates", () => {
         {
           code: "invalid-argument",
         },
-      ]
+      ],
     );
   });
 });

@@ -4,7 +4,7 @@ import { UsageFlags } from "../../src/interfaces.js";
 describe("typespec-client-generator-core: usage flags", () => {
   it("all possible values in UsageFlags should be orthogonal", async () => {
     const values = Object.values(UsageFlags).filter(
-      (value) => typeof value === "number"
+      (value) => typeof value === "number",
     ) as number[];
 
     for (let i = 0; i < values.length; i++) {

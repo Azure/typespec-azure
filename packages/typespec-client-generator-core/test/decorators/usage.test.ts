@@ -47,7 +47,7 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(getUsage(runner.context, Model2), UsageFlags.Output | UsageFlags.Json);
     strictEqual(
       getUsage(runner.context, Model3),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
   });
@@ -106,11 +106,11 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Output);
     strictEqual(
       getUsage(runner.context, Model2),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(
       getUsage(runner.context, Model3),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
     strictEqual(getUsage(runner.context, Enum1), UsageFlags.Input | UsageFlags.Output);
@@ -171,20 +171,20 @@ describe("typespec-client-generator-core: @usage", () => {
 
     strictEqual(
       getUsage(runner.context, Fish),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(
       getUsage(runner.context, Shark),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
     strictEqual(
       getUsage(runner.context, SawShark),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(
       getUsage(runner.context, Origin),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
   });
 
@@ -257,7 +257,7 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input | UsageFlags.Json);
     strictEqual(
       getUsage(runner.context, JsonMergePatchModel),
-      UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json
+      UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json,
     );
   });
 
@@ -298,15 +298,15 @@ describe("typespec-client-generator-core: @usage", () => {
     // this is set to input and output because of the namespace override
     strictEqual(
       getUsage(runner.context, InputModel),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(
       getUsage(runner.context, OutputModel),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(
       getUsage(runner.context, RoundtripModel),
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
   });
 
@@ -331,7 +331,7 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input);
     strictEqual(
       getUsage(runner.context, OrphanModelWithOverride),
-      UsageFlags.Input | UsageFlags.Output
+      UsageFlags.Input | UsageFlags.Output,
     );
   });
 
@@ -342,7 +342,7 @@ describe("typespec-client-generator-core: @usage", () => {
         model A {}
 
         op test(@body body: A): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
@@ -363,7 +363,7 @@ describe("typespec-client-generator-core: @usage", () => {
         model B {}
 
         op test(@body body: A): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
@@ -389,7 +389,7 @@ describe("typespec-client-generator-core: @usage", () => {
         }
 
         op test(@body body: A): void;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
@@ -419,17 +419,17 @@ describe("typespec-client-generator-core: @usage", () => {
         op one(...B): B;
 
         op two(): B;
-        `
+        `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     strictEqual(
       models.find((m) => m.name === "B")?.usage,
-      UsageFlags.Spread | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Spread | UsageFlags.Output | UsageFlags.Json,
     );
     strictEqual(
       models.find((m) => m.name === "X")?.usage,
-      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
+      UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
     );
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
@@ -450,7 +450,7 @@ describe("typespec-client-generator-core: @usage", () => {
             name: string;
           }
         }
-      `
+      `,
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);

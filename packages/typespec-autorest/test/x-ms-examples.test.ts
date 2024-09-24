@@ -27,7 +27,7 @@ describe("with @example decorator", () => {
         @Autorest.example("./someExample.json", "Some example")
         name: string;
       }
-      `
+      `,
     );
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), {
@@ -48,7 +48,7 @@ describe("with @example decorator", () => {
       @operationId("Pets_Get")
       @Autorest.example("./getPet.json", "Get a pet")
       op read(): Pet;
-      `
+      `,
     );
 
     deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
@@ -70,7 +70,7 @@ describe("with @example decorator", () => {
       @Autorest.example("./getPet.json", "Get a pet")
       @Autorest.example("./getAnotherPet.json", "Get another pet")
       op read(): Pet;
-      `
+      `,
     );
 
     deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
@@ -96,7 +96,7 @@ describe("with @example decorator", () => {
       @Autorest.example("./getPet.json", "Get a pet")
       @Autorest.example("./getPet.json", "Get another pet")
       op read(): Pet;
-      `
+      `,
     );
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), {
@@ -118,7 +118,7 @@ describe("with @example decorator", () => {
       @Autorest.example("./getPet.json", "Get a pet")
       @Autorest.example("./getAnotherPet.json", "Get a pet")
       op read(): Pet;
-      `
+      `,
     );
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), {

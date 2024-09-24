@@ -16,7 +16,7 @@ describe("typespec-azure-core: long-running-polling-operation-required rule", ()
     tester = createLinterRuleTester(
       runner,
       longRunningOperationsRequirePollingOperation,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -33,7 +33,7 @@ describe("typespec-azure-core: long-running-polling-operation-required rule", ()
           @TypeSpec.Http.header("operation-LOCATION")
           location: string;
         } | { error: string };
-      `
+      `,
       )
       .toEmitDiagnostics([
         {
@@ -74,7 +74,7 @@ describe("typespec-azure-core: long-running-polling-operation-required rule", ()
           @TypeSpec.Http.header("operation-LOCATION")
           location: string;
         } | { error: string };
-      `
+      `,
       )
       .toBeValid();
   });

@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
     tester = createLinterRuleTester(
       runner,
       resourceNameRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -36,7 +36,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
             @segment("foo")
             name: string;
           }
-      `
+      `,
         )
         .toBeValid();
     });
@@ -54,7 +54,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
           @segment("foo")
           name: string;
         }
-        `
+        `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-resource-manager/resource-name",
@@ -82,7 +82,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
         }
         @armResourceOperations
         interface FooResources extends ResourceRead<Foo_Resource> {}
-      `
+      `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-resource-manager/resource-name",

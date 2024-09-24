@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     lroLocationHeaderRule,
-    "@azure-tools/typespec-azure-resource-manager"
+    "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
@@ -41,7 +41,7 @@ it("Emits a warning for LRO 202 response that does not contain a Location header
         @armResourceDelete(Employee)
         delete is ArmResourceDeleteWithoutOkAsync<Employee, EmployeeProperties, LroHeaders = {}>;
       }
-    `
+    `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/lro-location-header",
@@ -69,7 +69,7 @@ it("Emits a warning for custom 202 response that does not contain a Location hea
         @armResourceDelete(Employee)
         delete(): { @statusCode _: 202 };
       }
-    `
+    `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/lro-location-header",
@@ -95,7 +95,7 @@ it("Does not emit a warning for LRO 202 response that contains the Location resp
       @armResourceOperations
       interface Employees {
         delete is ArmResourceDeleteWithoutOkAsync<Employee, EmployeeProperties>;
-      }`
+      }`,
     )
     .toBeValid();
 });

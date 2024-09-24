@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: Operations interface missing rule", (
     tester = createLinterRuleTester(
       runner,
       operationsInterfaceMissingRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -28,7 +28,7 @@ describe("typespec-azure-resource-manager: Operations interface missing rule", (
         namespace MyService;
 
         interface Operations extends Azure.ResourceManager.Operations {}
-      `
+      `,
       )
       .toBeValid();
   });
@@ -39,7 +39,7 @@ describe("typespec-azure-resource-manager: Operations interface missing rule", (
         `
         @Azure.ResourceManager.armProviderNamespace
         namespace MyService;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint",

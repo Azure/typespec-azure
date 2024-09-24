@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getString.json",
-      `${__dirname}/example-types/getString.json`
+      `${__dirname}/example-types/getString.json`,
     );
     await runner.compile(`
       @service({})
@@ -43,7 +43,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringDiagnostic.json",
-      `${__dirname}/example-types/getStringDiagnostic.json`
+      `${__dirname}/example-types/getStringDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -69,7 +69,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from constant", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromConstant.json",
-      `${__dirname}/example-types/getStringFromConstant.json`
+      `${__dirname}/example-types/getStringFromConstant.json`,
     );
     await runner.compile(`
       @service({})
@@ -95,7 +95,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from constant diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromConstantDiagnostic.json",
-      `${__dirname}/example-types/getStringFromConstantDiagnostic.json`
+      `${__dirname}/example-types/getStringFromConstantDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -121,7 +121,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from enum", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromEnum.json",
-      `${__dirname}/example-types/getStringFromEnum.json`
+      `${__dirname}/example-types/getStringFromEnum.json`,
     );
     await runner.compile(`
       @service({})
@@ -150,7 +150,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from enum diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromEnumDiagnostic.json",
-      `${__dirname}/example-types/getStringFromEnumDiagnostic.json`
+      `${__dirname}/example-types/getStringFromEnumDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -179,7 +179,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from enum value", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromEnumValue.json",
-      `${__dirname}/example-types/getStringFromEnumValue.json`
+      `${__dirname}/example-types/getStringFromEnumValue.json`,
     );
     await runner.compile(`
       @service({})
@@ -208,7 +208,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from enum value diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromEnumValueDiagnostic.json",
-      `${__dirname}/example-types/getStringFromEnumValueDiagnostic.json`
+      `${__dirname}/example-types/getStringFromEnumValueDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -237,7 +237,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from datetime", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromDataTime.json",
-      `${__dirname}/example-types/getStringFromDataTime.json`
+      `${__dirname}/example-types/getStringFromDataTime.json`,
     );
     await runner.compile(`
       @service({})
@@ -264,7 +264,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkStringExample from duration", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromDuration.json",
-      `${__dirname}/example-types/getStringFromDuration.json`
+      `${__dirname}/example-types/getStringFromDuration.json`,
     );
     await runner.compile(`
       @service({})
@@ -291,7 +291,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkNumberExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getNumber.json",
-      `${__dirname}/example-types/getNumber.json`
+      `${__dirname}/example-types/getNumber.json`,
     );
     await runner.compile(`
       @service({})
@@ -317,7 +317,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkNumberExample diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getNumberDiagnostic.json",
-      `${__dirname}/example-types/getNumberDiagnostic.json`
+      `${__dirname}/example-types/getNumberDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -343,7 +343,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkNumberExample from datetime", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getNumberFromDateTime.json",
-      `${__dirname}/example-types/getNumberFromDateTime.json`
+      `${__dirname}/example-types/getNumberFromDateTime.json`,
     );
     await runner.compile(`
       @service({})
@@ -373,7 +373,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkNumberExample from duration", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getNumberFromDuration.json",
-      `${__dirname}/example-types/getNumberFromDuration.json`
+      `${__dirname}/example-types/getNumberFromDuration.json`,
     );
     await runner.compile(`
       @service({})
@@ -403,7 +403,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkBooleanExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getBoolean.json",
-      `${__dirname}/example-types/getBoolean.json`
+      `${__dirname}/example-types/getBoolean.json`,
     );
     await runner.compile(`
       @service({})
@@ -429,7 +429,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkBooleanExample diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getBooleanDiagnostic.json",
-      `${__dirname}/example-types/getBooleanDiagnostic.json`
+      `${__dirname}/example-types/getBooleanDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -455,7 +455,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkNullExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getNull.json",
-      `${__dirname}/example-types/getNull.json`
+      `${__dirname}/example-types/getNull.json`,
     );
     await runner.compile(`
       @service({})
@@ -482,7 +482,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkAnyExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getAny.json",
-      `${__dirname}/example-types/getAny.json`
+      `${__dirname}/example-types/getAny.json`,
     );
     await runner.compile(`
       @service({})
@@ -507,7 +507,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkUnionExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getUnion.json",
-      `${__dirname}/example-types/getUnion.json`
+      `${__dirname}/example-types/getUnion.json`,
     );
     await runner.compile(`
       @service({})
@@ -531,7 +531,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkArrayExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getArray.json",
-      `${__dirname}/example-types/getArray.json`
+      `${__dirname}/example-types/getArray.json`,
     );
     await runner.compile(`
       @service({})
@@ -567,7 +567,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkArrayExample diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getArrayDiagnostic.json",
-      `${__dirname}/example-types/getArrayDiagnostic.json`
+      `${__dirname}/example-types/getArrayDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -593,7 +593,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkDictionaryExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getDictionary.json",
-      `${__dirname}/example-types/getDictionary.json`
+      `${__dirname}/example-types/getDictionary.json`,
     );
     await runner.compile(`
       @service({})
@@ -629,7 +629,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkDictionaryExample diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getDictionaryDiagnostic.json",
-      `${__dirname}/example-types/getDictionaryDiagnostic.json`
+      `${__dirname}/example-types/getDictionaryDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -655,7 +655,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkModelExample", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getModel.json",
-      `${__dirname}/example-types/getModel.json`
+      `${__dirname}/example-types/getModel.json`,
     );
     await runner.compile(`
       @service({})
@@ -701,7 +701,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkModelExample diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getModelDiagnostic.json",
-      `${__dirname}/example-types/getModelDiagnostic.json`
+      `${__dirname}/example-types/getModelDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -729,7 +729,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkModelExample from discriminated types", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getModelDiscriminator.json",
-      `${__dirname}/example-types/getModelDiscriminator.json`
+      `${__dirname}/example-types/getModelDiscriminator.json`,
     );
     await runner.compile(`
       @service({})
@@ -829,7 +829,7 @@ describe("typespec-client-generator-core: example types", () => {
   it("SdkModelExample from discriminated types diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getModelDiscriminatorDiagnostic.json",
-      `${__dirname}/example-types/getModelDiscriminatorDiagnostic.json`
+      `${__dirname}/example-types/getModelDiscriminatorDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -872,11 +872,11 @@ describe("typespec-client-generator-core: example types", () => {
       message: `Value in example file 'getModelDiscriminatorDiagnostic.json' does not follow its definition:\n{"kind":"shark","sharktype":"test","age":2}`,
     });
   });
-  1;
+
   it("SdkModelExample with additional properties", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getModelAdditionalProperties.json",
-      `${__dirname}/example-types/getModelAdditionalProperties.json`
+      `${__dirname}/example-types/getModelAdditionalProperties.json`,
     );
     await runner.compile(`
       @service({})

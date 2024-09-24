@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("simple case", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/simple.json",
-      `${__dirname}/http-operation-examples/simple.json`
+      `${__dirname}/http-operation-examples/simple.json`,
     );
     await runner.compile(`
       @service({})
@@ -48,7 +48,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("parameters", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/parameters.json",
-      `${__dirname}/http-operation-examples/parameters.json`
+      `${__dirname}/http-operation-examples/parameters.json`,
     );
     await runner.compile(`
       @service({})
@@ -112,7 +112,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("body fallback", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/parameters.json",
-      `${__dirname}/http-operation-examples/bodyFallback.json`
+      `${__dirname}/http-operation-examples/bodyFallback.json`,
     );
     await runner.compile(`
       @service({})
@@ -143,7 +143,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("parameters diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/parametersDiagnostic.json",
-      `${__dirname}/http-operation-examples/parametersDiagnostic.json`
+      `${__dirname}/http-operation-examples/parametersDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -178,7 +178,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("responses", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/responses.json",
-      `${__dirname}/http-operation-examples/responses.json`
+      `${__dirname}/http-operation-examples/responses.json`,
     );
     await runner.compile(`
       @service({})
@@ -208,7 +208,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     ok(okResponse);
     deepStrictEqual(
       okResponse.response,
-      operation.responses.find((x) => x.statusCodes === 200)
+      operation.responses.find((x) => x.statusCodes === 200),
     );
     ok(okResponse.bodyValue);
 
@@ -220,7 +220,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     ok(createdResponse);
     deepStrictEqual(
       createdResponse.response,
-      operation.responses.find((x) => x.statusCodes === 201)
+      operation.responses.find((x) => x.statusCodes === 201),
     );
 
     strictEqual(createdResponse.bodyValue, undefined);
@@ -228,7 +228,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
 
     deepStrictEqual(
       createdResponse.headers[0].header,
-      operation.responses.find((x) => x.statusCodes === 201)?.headers[0]
+      operation.responses.find((x) => x.statusCodes === 201)?.headers[0],
     );
     strictEqual(createdResponse.headers[0].value.value, "test");
     strictEqual(createdResponse.headers[0].value.kind, "string");
@@ -240,7 +240,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("responses diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/responsesDiagnostic.json",
-      `${__dirname}/http-operation-examples/responsesDiagnostic.json`
+      `${__dirname}/http-operation-examples/responsesDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -271,7 +271,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     ok(createdResponse);
     deepStrictEqual(
       createdResponse.response,
-      operation.responses.find((x) => x.statusCodes === 201)
+      operation.responses.find((x) => x.statusCodes === 201),
     );
 
     strictEqual(createdResponse.bodyValue, undefined);

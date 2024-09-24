@@ -21,7 +21,7 @@ export const $example: ExampleDecorator = (
   context: DecoratorContext,
   entity: Type,
   pathOrUri: string,
-  title: string
+  title: string,
 ) => {
   const { program } = context;
   if (!program.stateMap(AutorestStateKeys.example).has(entity)) {
@@ -57,7 +57,7 @@ export function getExamples(program: Program, entity: Type): Example[] | undefin
 export const $useRef: UseRefDecorator = (
   context: DecoratorContext,
   entity: Model | ModelProperty,
-  jsonRef: string
+  jsonRef: string,
 ) => {
   context.program.stateMap(AutorestStateKeys.useRef).set(entity, jsonRef);
 };

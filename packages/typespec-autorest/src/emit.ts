@@ -60,7 +60,7 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
   const options = resolveAutorestOptions(
     context.program,
     context.emitterOutputDir,
-    context.options
+    context.options,
   );
   tracer.trace("options", JSON.stringify(options, null, 2));
 
@@ -70,7 +70,7 @@ export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
 export function resolveAutorestOptions(
   program: Program,
   emitterOutputDir: string,
-  options: AutorestEmitterOptions
+  options: AutorestEmitterOptions,
 ): ResolvedAutorestEmitterOptions {
   const resolvedOptions = {
     ...defaultOptions,
@@ -81,14 +81,14 @@ export function resolveAutorestOptions(
     {
       "project-root": program.projectRoot,
       "emitter-output-dir": emitterOutputDir,
-    }
+    },
   );
 
   if (resolvedOptions["examples-directory"]) {
     reportDeprecated(
       program,
       `examples-directory option is deprecated use examples-dir instead or remove it if examples are located in {project-root}/examples`,
-      NoTarget
+      NoTarget,
     );
   }
 
@@ -112,7 +112,7 @@ export function resolveAutorestOptions(
 
 export async function getAllServicesAtAllVersions(
   program: Program,
-  options: ResolvedAutorestEmitterOptions
+  options: ResolvedAutorestEmitterOptions,
 ): Promise<AutorestServiceRecord[]> {
   const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
 
@@ -125,7 +125,7 @@ export async function getAllServicesAtAllVersions(
   for (const service of services) {
     const originalProgram = program;
     const versions = buildVersionProjections(program, service.type).filter(
-      (v) => !options.version || options.version === v.version
+      (v) => !options.version || options.version === v.version,
     );
 
     if (versions.length === 1 && versions[0].version === undefined) {
@@ -178,7 +178,7 @@ export async function getAllServicesAtAllVersions(
             projectedService,
             services.length > 1,
             options,
-            record.version
+            record.version,
           ),
           service: projectedService,
           version: record.version,
@@ -199,7 +199,7 @@ export async function getAllServicesAtAllVersions(
 
 async function emitAllServiceAtAllVersions(
   program: Program,
-  options: ResolvedAutorestEmitterOptions
+  options: ResolvedAutorestEmitterOptions,
 ) {
   const services = await getAllServicesAtAllVersions(program, options);
   if (program.compilerOptions.noEmit || program.hasError()) {
@@ -219,7 +219,7 @@ async function emitAllServiceAtAllVersions(
 async function emitOutput(
   program: Program,
   result: AutorestEmitterResult,
-  options: ResolvedAutorestEmitterOptions
+  options: ResolvedAutorestEmitterOptions,
 ) {
   const sortedDocument = sortOpenAPIDocument(result.document);
 
@@ -256,7 +256,7 @@ function resolveOutputFile(
   service: Service,
   multipleServices: boolean,
   options: ResolvedAutorestEmitterOptions,
-  version?: string
+  version?: string,
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
   if (azureResourceProviderFolder) {

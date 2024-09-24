@@ -17,7 +17,7 @@ describe("typespec-azure-core: key-visibility-required rule", () => {
     tester = createLinterRuleTester(
       runner,
       requireKeyVisibility,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -38,7 +38,7 @@ describe("typespec-azure-core: key-visibility-required rule", () => {
          ┆@key
          name: string;
         }`,
-      "The key property 'name' does not have an explicit visibility setting, please use the @visibility decorator to set it."
+      "The key property 'name' does not have an explicit visibility setting, please use the @visibility decorator to set it.",
     );
   });
 
@@ -49,7 +49,7 @@ describe("typespec-azure-core: key-visibility-required rule", () => {
          @key
          @visibility("read")
          name: string;
-        }`
+        }`,
       )
       .toBeValid();
   });
