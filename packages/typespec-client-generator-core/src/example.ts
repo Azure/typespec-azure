@@ -139,7 +139,7 @@ async function loadExamples(
   return diagnostics.wrap(map);
 }
 
-function resolveOperationId(context: TCGCContext, operation: Operation) {
+function resolveOperationId(context: TCGCContext, operation: Operation, honorRenaming: boolean) {
   const { program } = context;
   // if @operationId was specified use that value
   const explicitOperationId = getOperationId(program, operation);
@@ -147,9 +147,9 @@ function resolveOperationId(context: TCGCContext, operation: Operation) {
     return explicitOperationId;
   }
 
-  const operationName = getLibraryName(context, operation);
+  const operationName = honorRenaming ? getLibraryName(context, operation) : operation.name;
   if (operation.interface) {
-    return `${getLibraryName(context, operation.interface)}_${operationName}`;
+    return `${honorRenaming ? getLibraryName(context, operation.interface) : operation.interface.name}_${operationName}`;
   }
   const namespace = operation.namespace;
   if (
@@ -160,7 +160,7 @@ function resolveOperationId(context: TCGCContext, operation: Operation) {
     return operationName;
   }
 
-  return `${getLibraryName(context, namespace)}_${operationName}`;
+  return `${honorRenaming ? getLibraryName(context, namespace) : namespace.name}_${operationName}`;
 }
 
 export async function handleClientExamples(
@@ -181,7 +181,14 @@ export async function handleClientExamples(
       // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
       let operation = method.__raw;
       while (operation && operation.templateMapper === undefined) {
-        const operationId = resolveOperationId(context, operation).toLowerCase();
+        // try operation id with renaming
+        let operationId = resolveOperationId(context, operation, true).toLowerCase();
+        if (examples.has(operationId)) {
+          diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
+          break;
+        }
+        // try operation id without renaming
+        operationId = resolveOperationId(context, operation, false).toLowerCase();
         if (examples.has(operationId)) {
           diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
           break;

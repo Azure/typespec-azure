@@ -31,6 +31,7 @@ import {
   CollectionFormat,
   SdkBodyParameter,
   SdkHeaderParameter,
+  SdkHttpErrorResponse,
   SdkHttpOperation,
   SdkHttpParameter,
   SdkHttpResponse,
@@ -80,9 +81,7 @@ export function getSdkHttpOperation(
   const { responses, exceptions } = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation),
   );
-  const responsesWithBodies = [...responses.values()]
-    .concat([...exceptions.values()])
-    .filter((r) => r.type);
+  const responsesWithBodies = [...responses.values(), ...exceptions.values()].filter((r) => r.type);
   const parameters = diagnostics.pipe(
     getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0]),
   );
@@ -117,7 +116,7 @@ function getSdkHttpParameters(
   context: TCGCContext,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
-  responseBody?: SdkHttpResponse,
+  responseBody?: SdkHttpResponse | SdkHttpErrorResponse,
 ): [SdkHttpParameters, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkHttpParameters = {
@@ -259,7 +258,7 @@ function getSdkHttpParameters(
 function createContentTypeOrAcceptHeader(
   context: TCGCContext,
   httpOperation: HttpOperation,
-  bodyObject: SdkBodyParameter | SdkHttpResponse,
+  bodyObject: SdkBodyParameter | SdkHttpResponse | SdkHttpErrorResponse,
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
@@ -412,13 +411,13 @@ function getSdkHttpResponseAndExceptions(
 ): [
   {
     responses: SdkHttpResponse[];
-    exceptions: SdkHttpResponse[];
+    exceptions: SdkHttpErrorResponse[];
   },
   readonly Diagnostic[],
 ] {
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
-  const exceptions: SdkHttpResponse[] = [];
+  const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -465,12 +464,10 @@ function getSdkHttpResponseAndExceptions(
             : innerResponse.body.type;
       }
     }
-    const sdkResponse: SdkHttpResponse = {
+    const sdkResponse = {
       __raw: response,
-      kind: "http",
       type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
       headers,
-      statusCodes: response.statusCodes,
       contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
       defaultContentType: contentTypes.includes("application/json")
         ? "application/json"
@@ -482,10 +479,18 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
     };
-    if (sdkResponse.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
-      exceptions.push(sdkResponse);
+    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
+      exceptions.push({
+        ...sdkResponse,
+        kind: "http",
+        statusCodes: response.statusCodes,
+      });
     } else {
-      responses.push(sdkResponse);
+      responses.push({
+        ...sdkResponse,
+        kind: "http",
+        statusCodes: response.statusCodes,
+      });
     }
   }
   return diagnostics.wrap({ responses, exceptions });

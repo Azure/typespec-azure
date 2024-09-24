@@ -548,12 +548,19 @@ export interface SdkServiceResponse {
   apiVersions: string[];
 }
 
-export interface SdkHttpResponse extends SdkServiceResponse {
+interface SdkHttpResponseBase extends SdkServiceResponse {
   __raw: HttpOperationResponse;
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
+}
+
+export interface SdkHttpResponse extends SdkHttpResponseBase {
+  statusCodes: number | HttpStatusCodeRange;
+}
+
+export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
   statusCodes: number | HttpStatusCodeRange | "*";
 }
 
@@ -570,7 +577,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;
   responses: SdkHttpResponse[];
-  exceptions: SdkHttpResponse[];
+  exceptions: SdkHttpErrorResponse[];
   examples?: SdkHttpOperationExample[];
 }
 
