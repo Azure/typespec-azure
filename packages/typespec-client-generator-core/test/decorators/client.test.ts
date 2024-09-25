@@ -1,11 +1,17 @@
+import { ignoreDiagnostics, Interface, Namespace, Operation } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getClient, getOperationGroup, listClients, listOperationGroups, listOperationsInOperationGroup } from "../../src/decorators.js";
-import { ignoreDiagnostics, Interface, Namespace, Operation } from "@typespec/compiler";
-import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
+import {
+  getClient,
+  getOperationGroup,
+  listClients,
+  listOperationGroups,
+  listOperationsInOperationGroup,
+} from "../../src/decorators.js";
 import { SdkOperationGroup } from "../../src/interfaces.js";
+import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
+import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: client related", () => {
   let runner: SdkTestRunner;
