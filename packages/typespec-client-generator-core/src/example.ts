@@ -362,7 +362,7 @@ function handleHttpResponse(
   };
   if (typeof example === "object" && example !== null) {
     for (const name of Object.keys(example)) {
-      if (name === "doc") {
+      if (name === "description") {
         continue;
       } else if (name === "body") {
         if (response.type) {
