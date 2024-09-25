@@ -47,7 +47,6 @@ import {
 } from "./interfaces.js";
 import {
   getAvailableApiVersions,
-  getDocHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
@@ -181,8 +180,6 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
-        description: getDocHelper(context, tspBody.type).description,
-        details: getDocHelper(context, tspBody.type).details,
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
@@ -213,7 +210,6 @@ function getSdkHttpParameters(
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
       ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
-      description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
       doc: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
@@ -433,8 +429,6 @@ function getSdkHttpResponseAndExceptions(
         addEncodeInfo(context, header, clientType, defaultContentType);
         headers.push({
           __raw: header,
-          description: getDocHelper(context, header).description,
-          details: getDocHelper(context, header).details,
           doc: getDoc(context.program, header),
           summary: getSummary(context.program, header),
           serializedName: getHeaderFieldName(context.program, header),

@@ -337,7 +337,6 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(templateArg.optional, false);
       strictEqual(templateArg.onClient, true);
       strictEqual(templateArg.clientDefaultValue, undefined);
-      strictEqual(templateArg.description, undefined);
       strictEqual(templateArg.doc, undefined);
 
       const credentialParam = client.initialization.properties.filter(
