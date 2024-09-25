@@ -38,8 +38,6 @@
     "@eslint/js": "^9.11.1",
     "@pnpm/find-workspace-packages": "^6.0.9",
     "@types/node": "~22.7.1",
-    "@typescript-eslint/parser": "^8.7.0",
-    "@typescript-eslint/utils": "^8.7.0",
     "c8": "^10.1.2",
     "cspell": "^8.14.4",
     "eslint": "^9.11.1",
