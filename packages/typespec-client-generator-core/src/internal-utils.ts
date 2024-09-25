@@ -3,9 +3,7 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
-  getDoc,
   getNamespaceFullName,
-  getSummary,
   Interface,
   isNeverType,
   isNullType,
@@ -206,30 +204,6 @@ export function getAvailableApiVersions(
   const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
   context.__tspTypeToApiVersions.set(type, retval);
   return retval;
-}
-
-interface DocWrapper {
-  description?: string;
-  details?: string;
-}
-
-/**
- *
- * @param context
- * @param type
- * @returns Returns the description and details of a type
- */
-export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
-  const program = context.program;
-  if (getSummary(program, type)) {
-    return {
-      description: getSummary(program, type),
-      details: getDoc(program, type),
-    };
-  }
-  return {
-    description: getDoc(program, type),
-  };
 }
 
 /**
