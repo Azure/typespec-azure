@@ -389,8 +389,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "TestScalar");
-    strictEqual(type.description, "title");
-    strictEqual(type.details, "doc");
     strictEqual(type.doc, "doc");
     strictEqual(type.summary, "title");
     strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
