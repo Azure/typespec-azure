@@ -28,7 +28,6 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
-  validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {

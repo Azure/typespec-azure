@@ -1676,7 +1676,6 @@ describe("typespec-client-generator-core: decorators", () => {
       expectDiagnosticEmpty(diagnostics);
     });
 
-
     it("duplicate-decorator diagnostic for multiple same scope", async () => {
       const diagnostics = await runner.diagnose(`
       @test
