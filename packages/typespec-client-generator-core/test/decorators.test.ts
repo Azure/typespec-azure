@@ -1,6 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Interface, Model, Namespace, Operation, ignoreDiagnostics } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -1624,7 +1624,8 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+        code: "@azure-tools/typespec-client-generator-core/duplicate-decorator",
+        message: "Decorator @access cannot be used twice on the same declaration with same scope.",
       });
     });
 
@@ -1640,9 +1641,41 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+        code: "@azure-tools/typespec-client-generator-core/duplicate-decorator",
+        message: "Decorator @access cannot be used twice on the same declaration with same scope.",
       });
     });
+
+    it("duplicate-decorator diagnostic for augmented decorator", async () => {
+      const diagnostics = await runner.diagnose(`
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+
+      @@access(func, Access.internal, "csharp");
+      @@access(func, Access.internal);
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-decorator",
+        message: "Decorator @access cannot be used twice on the same declaration with same scope.",
+      });
+    });
+
+    it("no duplicate-decorator diagnostic for valid case", async () => {
+      const diagnostics = await runner.diagnose(`
+      @access(Access.internal, "csharp")
+      @access(Access.internal, "python")
+      op func(
+        @query("createdAt")
+        createdAt: utcDateTime;
+      ): void;
+      `);
+
+      expectDiagnosticEmpty(diagnostics);
+    });
+
 
     it("duplicate-decorator diagnostic for multiple same scope", async () => {
       const diagnostics = await runner.diagnose(`
@@ -1656,7 +1689,8 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+        code: "@azure-tools/typespec-client-generator-core/duplicate-decorator",
+        message: "Decorator @access cannot be used twice on the same declaration with same scope.",
       });
     });
 
@@ -1732,7 +1766,8 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+        code: "@azure-tools/typespec-client-generator-core/duplicate-decorator",
+        message: "Decorator @access cannot be used twice on the same declaration with same scope.",
       });
     });
   });

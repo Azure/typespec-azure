@@ -108,8 +108,7 @@ function setScopedDecoratorData(
   target: Type,
   value: unknown,
   scope?: LanguageScopes,
-  transitivity: boolean = false,
-): boolean {
+) {
   const targetEntry = context.program.stateMap(key).get(target);
   const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
 
@@ -117,7 +116,7 @@ function setScopedDecoratorData(
   if (!targetEntry) {
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, newObject);
-    return true;
+    return;
   }
 
   // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
@@ -125,19 +124,14 @@ function setScopedDecoratorData(
   if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-    return true;
+    return;
   }
-  // we only want to allow multiple decorators if they each specify a different scope
-  if (!transitivity) {
-    validateDecoratorUniqueOnNode(context, target, decorator);
-    return false;
-  }
-  // for transitivity situation, we could allow scope extension
-  if (!scopes.includes(AllScopes) && !scope) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-  }
-  return false;
+  // report diagnostic for duplicate decorators on same scope
+  reportDiagnostic(context.program, {
+    code: "duplicate-decorator",
+    format: { decoratorName: "@" + decorator.name.slice(1) },
+    target: context.decoratorTarget,
+  });
 }
 
 const clientKey = createStateSymbol("client");
