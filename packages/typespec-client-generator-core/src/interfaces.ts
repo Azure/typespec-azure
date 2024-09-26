@@ -718,6 +718,10 @@ export enum UsageFlags {
 interface SdkExampleBase {
   kind: string;
   name: string;
+  /**
+   * @deprecated Use `doc` instead.
+   */
+  description: string;
   doc: string;
   filePath: string;
   rawExample: any;
