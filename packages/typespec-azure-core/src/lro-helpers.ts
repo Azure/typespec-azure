@@ -117,6 +117,9 @@ export interface OperationReference {
   parameterMap?: Map<string, ParameterSource>;
 
   parameters?: Map<string, PropertyMap>;
+
+  /** headers linking to the operation */
+  link?: OperationLink;
 }
 
 /**
@@ -310,26 +313,23 @@ export function getLroMetadata(program: Program, operation: Operation): LroMetad
   if (context === undefined) return undefined;
   processFinalReference(program, operation, context);
   processFinalLink(program, operation, context);
-  const nextReference: NextOperationReference | undefined = processStatusMonitorReference(
-    program,
-    operation,
-    context,
-  );
+  const nextReference:
+    | NextOperationReference
+    | (NextOperationLink & { operation: Operation })
+    | undefined = processStatusMonitorReference(program, operation, context);
   if (nextReference !== undefined && nextReference.responseModel.kind === "Model") {
     context.statusMonitorStep = nextReference;
-    processFinalReference(program, nextReference.target.operation, context);
-    processFinalLink(program, nextReference.target.operation, context);
+    const linkedOperation =
+      nextReference.kind === "nextOperationLink"
+        ? nextReference.operation
+        : nextReference.target.operation;
+    processFinalReference(program, linkedOperation, context);
+    processFinalLink(program, linkedOperation, context);
     context.pollingStep = getPollingStep(program, nextReference.responseModel, context);
     return createLroMetadata(program, operation, context);
   }
 
   if (processStatusMonitorLink(program, operation, context)) {
-    return createLroMetadata(program, operation, context);
-  }
-
-  const originalStep = getPollingStep(program, operation, context);
-  if (originalStep !== undefined) {
-    context.pollingStep = originalStep;
     return createLroMetadata(program, operation, context);
   }
 
@@ -463,8 +463,10 @@ function createOperationLink(program: Program, modelProperty: ModelProperty): Op
   };
 }
 
-function createOperationReference(metadata: OperationLinkMetadata): OperationReference | undefined {
-  if (!metadata.parameterMap) return undefined;
+function createOperationReferenceOrLink(
+  metadata: OperationLinkMetadata
+): OperationReference | OperationLink | undefined {
+  if (!metadata.parameterMap && !metadata.link) return undefined;
   const map = new Map<string, ParameterSource>();
   if (metadata.parameterMap) {
     for (const [name, parameters] of metadata.parameterMap) {
@@ -485,6 +487,13 @@ function createOperationReference(metadata: OperationLinkMetadata): OperationRef
       operation: metadata.linkedOperation,
       parameterMap: map,
       parameters: metadata.parameterMap,
+    };
+  }
+  if (metadata.link) {
+    return {
+      kind: "link",
+      location: metadata.link.location,
+      property: metadata.link.property,
     };
   }
 
@@ -554,9 +563,6 @@ function getLogicalResourceOperation(
     case "delete":
       resultOp = "delete";
       break;
-    case "put":
-      resultOp = "createOrReplace";
-      break;
     default:
       return undefined;
   }
@@ -602,6 +608,12 @@ function getFinalStateVia(
           break;
         case "nextOperationReference":
           finalState = FinalStateValue.customOperationReference;
+          if (context.statusMonitorStep.target.link?.location === "ResponseHeader") {
+            finalState = getLroStatusFromHeaderProperty(
+              program,
+              context.statusMonitorStep.target.link.property
+            );
+          }
       }
     } else {
       finalState = getStatusFromLinkOrReference(program, operation, context.finalStep.target);
@@ -700,7 +712,6 @@ function getPollingStep(
       PollingOperationKey,
     );
   }
-  if (context.pollingOperationLink?.parameterMap === undefined) return undefined;
   const statusMonitorOverride = context.pollingOperationLink?.result?.statusMonitor;
   if (statusMonitorOverride !== undefined && statusMonitorOverride.monitorType !== undefined) {
     info = {
@@ -754,6 +765,8 @@ function getStatusFromLinkOrReference(
         finalState = FinalStateValue.customOperationReference;
         if (isMatchingGetOperation(program, sourceOperation, target.operation)) {
           finalState = FinalStateValue.originalUri;
+        } else if (target.link !== undefined && target.link.location === "ResponseHeader") {
+          finalState = getLroStatusFromHeaderProperty(program, target.link.property);
         }
       }
       break;
@@ -802,6 +815,7 @@ function GetStatusMonitorInfoFromOperation(
   program: Program,
   operation: HttpOperation,
 ): StatusMonitorInfo | undefined {
+  if (operation.verb === "get" || operation.verb === "head") return undefined;
   const models = filterResponseModels(
     operation,
     (model) =>
@@ -971,16 +985,31 @@ function processFinalReference(program: Program, operation: Operation, context: 
   if (context.finalStep !== undefined) return;
   // looks for operation marked with @finalOperation
   const link = getOperationLink(program, operation, "final");
-  if (link === undefined || link.parameterMap === undefined || link.result?.type === undefined)
+  if (
+    link === undefined ||
+    link.result?.type === undefined ||
+    (link.link === undefined && link.parameterMap === undefined)
+  )
     return;
   context.finalOperationLink = link;
-  const reference = createOperationReference(link);
+  const reference = createOperationReferenceOrLink(link);
   if (reference === undefined) return;
-  context.finalStep = {
-    kind: "finalOperationReference",
-    responseModel: link.result?.type,
-    target: reference,
-  };
+  switch (reference.kind) {
+    case "reference":
+      context.finalStep = {
+        kind: "finalOperationReference",
+        responseModel: link.result?.type,
+        target: reference,
+      };
+      break;
+    case "link":
+      context.finalStep = {
+        kind: "finalOperationLink",
+        responseModel: link.result?.type,
+        target: reference,
+      };
+      break;
+  }
 }
 
 function createStatusMonitorPollingData(data: StatusMonitorMetadata): StatusMonitorInfo {
@@ -1062,8 +1091,8 @@ function processStatusMonitorLink(
 function processStatusMonitorReference(
   program: Program,
   referencedOperation: Operation,
-  context: LroContext,
-): NextOperationReference | undefined {
+  context: LroContext
+): NextOperationReference | (NextOperationLink & { operation: Operation }) | undefined {
   const references: Map<string, OperationLinkMetadata> | undefined = getOperationLinks(
     program,
     referencedOperation,
@@ -1073,19 +1102,29 @@ function processStatusMonitorReference(
   const pollingData: OperationLinkMetadata | undefined = references.get(PollingOperationKey);
   if (pollingData === undefined) return undefined;
   context.pollingOperationLink = pollingData;
-  const pollingReference = createOperationReference(pollingData);
+  const pollingReference = createOperationReferenceOrLink(pollingData);
   if (pollingReference === undefined) return undefined;
   context.statusMonitorInfo = pollingData.result?.statusMonitor;
   const finalData: OperationLinkMetadata | undefined = references.get(FinalOperationKey);
   if (context.finalStep === undefined && finalData !== undefined) {
-    const finalReference = createOperationReference(finalData);
+    const finalReference = createOperationReferenceOrLink(finalData);
     const finalModel = finalData?.result?.type;
     if (finalReference !== undefined && finalModel !== undefined) {
-      context.finalStep = {
-        kind: "finalOperationReference",
-        responseModel: finalModel,
-        target: finalReference,
-      };
+      switch (finalReference.kind) {
+        case "reference":
+          context.finalStep = {
+            kind: "finalOperationReference",
+            responseModel: finalModel,
+            target: finalReference,
+          };
+          break;
+        case "link":
+          context.finalStep = {
+            kind: "finalOperationLink",
+            responseModel: finalModel,
+            target: finalReference,
+          };
+      }
     }
   }
   if (
@@ -1102,11 +1141,21 @@ function processStatusMonitorReference(
   }
   const responseModel = pollingData.result?.type;
   if (responseModel === undefined) return undefined;
-  return {
-    kind: "nextOperationReference",
-    responseModel: responseModel,
-    target: pollingReference,
-  };
+  switch (pollingReference.kind) {
+    case "reference":
+      return {
+        kind: "nextOperationReference",
+        responseModel: responseModel,
+        target: pollingReference,
+      };
+    case "link":
+      return {
+        kind: "nextOperationLink",
+        responseModel: responseModel,
+        target: pollingReference,
+        operation: pollingData.linkedOperation,
+      };
+  }
 }
 
 function resolveOperationLocation(
