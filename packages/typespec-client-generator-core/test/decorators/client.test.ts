@@ -1,5 +1,5 @@
 import { ignoreDiagnostics, Interface, Namespace, Operation } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -463,7 +463,7 @@ describe("typespec-client-generator-core: client related", () => {
           testCode[0],
           testCode[1],
         );
-        expectDiagnostics(diagnostics, {});
+        expectDiagnosticEmpty(diagnostics);
         const client = listClients(runner.context)[0];
         strictEqual(listOperationGroups(runner.context, client).length, 0);
       }
@@ -475,7 +475,7 @@ describe("typespec-client-generator-core: client related", () => {
           testCode[0],
           testCode[1],
         );
-        expectDiagnostics(diagnostics, {});
+        expectDiagnosticEmpty(diagnostics);
         const client = listClients(runner.context)[0];
         strictEqual(listOperationGroups(runner.context, client).length, 1);
       }
@@ -487,7 +487,7 @@ describe("typespec-client-generator-core: client related", () => {
           testCode[0],
           testCode[1],
         );
-        expectDiagnostics(diagnostics, {});
+        expectDiagnosticEmpty(diagnostics);
         const client = listClients(runner.context)[0];
         strictEqual(listOperationGroups(runner.context, client).length, 0);
       }
