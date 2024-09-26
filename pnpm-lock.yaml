@@ -2642,6 +2642,9 @@ importers:
       '@types/react':
         specifier: ~18.3.9
         version: 18.3.9
+      '@typespec/internal-build-utils':
+        specifier: workspace:~
+        version: link:../../core/packages/internal-build-utils
       '@typespec/tspd':
         specifier: workspace:~
         version: link:../../core/packages/tspd
