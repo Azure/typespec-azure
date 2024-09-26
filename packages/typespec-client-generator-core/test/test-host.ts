@@ -9,6 +9,7 @@ import {
 } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
+import { StreamsTestLibrary } from "@typespec/streams/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { CreateSdkContextOptions, createSdkContext } from "../src/decorators.js";
 import {
@@ -20,7 +21,13 @@ import {
 import { SdkTestLibrary } from "../src/testing/index.js";
 
 export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}) {
-  let libraries = [SdkTestLibrary, HttpTestLibrary, RestTestLibrary, VersioningTestLibrary];
+  let libraries = [
+    SdkTestLibrary,
+    StreamsTestLibrary,
+    HttpTestLibrary,
+    RestTestLibrary,
+    VersioningTestLibrary,
+  ];
   if (options.librariesToAdd) {
     libraries = libraries.concat(options.librariesToAdd);
   }

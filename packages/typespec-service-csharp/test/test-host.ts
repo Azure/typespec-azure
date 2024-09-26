@@ -2,6 +2,7 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { createTestHost, createTestWrapper } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
+import { StreamsTestLibrary } from "@typespec/streams/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { CSharpServiceEmitterOptions } from "../src/lib.js";
 import { CSharpServiceEmitterTestLibrary } from "../src/testing/index.js";
@@ -9,6 +10,7 @@ import { CSharpServiceEmitterTestLibrary } from "../src/testing/index.js";
 export async function createCSharpServiceEmitterTestHost() {
   const result = await createTestHost({
     libraries: [
+      StreamsTestLibrary,
       HttpTestLibrary,
       RestTestLibrary,
       AzureCoreTestLibrary,

@@ -6,12 +6,14 @@ import { createTestHost, createTestWrapper } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
+import { StreamsTestLibrary } from "@typespec/streams/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { PortalCoreTestLibrary } from "../src/testing/index.js";
 
 export async function createPortalCoreHost() {
   return createTestHost({
     libraries: [
+      StreamsTestLibrary,
       RestTestLibrary,
       AzureResourceManagerTestLibrary,
       HttpTestLibrary,
