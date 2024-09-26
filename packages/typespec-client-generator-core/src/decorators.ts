@@ -167,7 +167,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : (findClientService(context.program, target, scope) ?? (target as any));
+      : (findClientService(context.program, target) ?? (target as any));
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
@@ -197,7 +197,21 @@ export const $client: ClientDecorator = (
 function findClientService(
   program: Program,
   client: Namespace | Interface,
-  scope?: LanguageScopes,
+): Namespace | Interface | undefined {
+  let current: Namespace | undefined = client as any;
+  while (current) {
+    if (isService(program, current)) {
+      return current;
+    }
+    current = current.namespace;
+  }
+  return undefined;
+}
+
+function findOperationGroupService(
+  program: Program,
+  client: Namespace | Interface,
+  scope: LanguageScopes,
 ): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
@@ -206,8 +220,8 @@ function findClientService(
       return current;
     }
     const client = program.stateMap(clientKey).get(current);
-    if (client && client[scope ?? AllScopes]) {
-      return client[scope ?? AllScopes].service;
+    if (client && (client[scope] || client[AllScopes])) {
+      return (client[scope] ?? client[AllScopes]).service;
     }
     current = current.namespace;
   }
@@ -359,14 +373,6 @@ export const $operationGroup: OperationGroupDecorator = (
     });
     return;
   }
-  const service = findClientService(context.program, target, scope) ?? (target as any);
-  if (!isService(context.program, service)) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name: target.name },
-      target: context.decoratorTarget,
-    });
-  }
 
   setScopedDecoratorData(
     context,
@@ -376,7 +382,6 @@ export const $operationGroup: OperationGroupDecorator = (
     {
       kind: "SdkOperationGroup",
       type: target,
-      service,
     },
     scope,
   );
@@ -458,7 +463,8 @@ export function getOperationGroup(
   type: Namespace | Interface,
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-  const service = findClientService(context.program, type, context.emitterName) ?? (type as any);
+  const service =
+    findOperationGroupService(context.program, type, context.emitterName) ?? (type as any);
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
       code: "client-service",
@@ -470,6 +476,7 @@ export function getOperationGroup(
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
       operationGroup.groupPath = buildOperationGroupPath(context, type);
+      operationGroup.service = service;
     }
   } else {
     // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
