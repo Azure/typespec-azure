@@ -231,6 +231,7 @@ function handleHttpOperationExamples(
     const operationExample: SdkHttpOperationExample = {
       kind: "http",
       name: title,
+      description: title,
       doc: title,
       filePath: example.relativePath,
       parameters: diagnostics.pipe(
