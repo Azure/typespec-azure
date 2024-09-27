@@ -9,10 +9,13 @@ export default tsEslint.config(
     ignores: [
       "**/dist/**/*",
       "**/.temp/**/*",
+      "**/temp/**/*",
       "**/generated-defs/*",
       "**/website/build/**/*",
       "**/.docusaurus/**/*",
       "core/packages/compiler/templates/**/*", // Ignore the templates which might have invalid code and not follow exactly our rules.
+      "**/venv/**/*", // Ignore python virtual env
+      "**/.vscode-test-web/**/*", // Ignore VSCode test web project
       // TODO: enable
       "**/.scripts/**/*",
       "eng/scripts/**/*",
@@ -23,5 +26,5 @@ export default tsEslint.config(
     ],
   },
   ...TypeSpecCommonEslintConfigs,
-  ...getTypeScriptProjectRules(dirname(fileURLToPath(import.meta.url)))
+  ...getTypeScriptProjectRules(dirname(fileURLToPath(import.meta.url))),
 );

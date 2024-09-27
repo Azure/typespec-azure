@@ -44,7 +44,7 @@ function findDiscriminator(program: Program, model?: Model): Discriminator | und
 function isExcludedDiscriminator(
   program: Program,
   type: ModelProperty | Enum | Union,
-  discTypes: [Model | Union, Discriminator][]
+  discTypes: [Model | Union, Discriminator][],
 ): boolean {
   if (type.kind === "ModelProperty") {
     const disc = findDiscriminator(program, type.model);

@@ -8,7 +8,7 @@ import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
 async function getOperations(
   code: string,
-  routeOptions?: RouteResolutionOptions
+  routeOptions?: RouteResolutionOptions,
 ): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
   const runner = await createAzureResourceManagerTestRunner();
   await runner.compileAndDiagnose(code, { noEmit: true });
@@ -18,7 +18,7 @@ async function getOperations(
 
 async function getLroMetadataFor(
   code: string,
-  operationName: string
+  operationName: string,
 ): Promise<[LroMetadata | undefined, readonly Diagnostic[], BasicTestRunner]> {
   const [operations, diagnostics, runner] = await getOperations(code);
   const filteredOperations = operations.filter((o) => o.operation.name === operationName);
@@ -71,7 +71,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate"
+      "createOrUpdate",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
@@ -132,7 +132,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate"
+      "createOrUpdate",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
@@ -184,7 +184,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "update"
+      "update",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
@@ -236,7 +236,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "delete"
+      "delete",
     );
     ok(metadata);
     deepStrictEqual(metadata.finalResult, "void");
@@ -302,7 +302,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff"
+      "doStuff",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
@@ -367,7 +367,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff"
+      "doStuff",
     );
     ok(metadata);
     deepStrictEqual(metadata.finalResult, "void");
@@ -421,7 +421,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate"
+      "createOrUpdate",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
@@ -482,7 +482,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate"
+      "createOrUpdate",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
@@ -534,7 +534,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "update"
+      "update",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
@@ -586,7 +586,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "delete"
+      "delete",
     );
     ok(metadata);
     deepStrictEqual(metadata.finalResult, "void");
@@ -652,7 +652,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff"
+      "doStuff",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
@@ -716,7 +716,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate"
+      "createOrUpdate",
     );
     ok(metadata);
     expectDiagnosticEmpty(_diag);

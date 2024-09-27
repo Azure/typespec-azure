@@ -6,13 +6,13 @@ export const $lib = createTypeSpecLibrary({
     "client-name": {
       severity: "warning",
       messages: {
-        default: paramMessage`Client name "${"name"}" must end with Client. Use @client({name: "...Client"}`,
+        default: paramMessage`Client name "${"name"}" must end with Client. Use @client({name: "...Client"})`,
       },
     },
     "client-service": {
       severity: "warning",
       messages: {
-        default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS}`,
+        default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS})`,
       },
     },
     "unknown-client-format": {

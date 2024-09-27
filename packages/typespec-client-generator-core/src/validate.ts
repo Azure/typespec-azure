@@ -45,7 +45,7 @@ function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScop
 function validateClientNamesPerNamespace(
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes,
-  namespace: Namespace
+  namespace: Namespace,
 ) {
   // Check for duplicate client names for models, enums, and unions
   validateClientNamesCore(tcgcContext, scope, [
@@ -106,7 +106,7 @@ function validateClientNamesCore(
     | ModelProperty
     | EnumMember
     | UnionVariant
-  >
+  >,
 ) {
   const duplicateTracker = new DuplicateTracker<
     string,
@@ -136,7 +136,7 @@ function reportDuplicateClientNames(
     string,
     Type | DecoratorExpressionNode | AugmentDecoratorStatementNode
   >,
-  scope: string | typeof AllScopes
+  scope: string | typeof AllScopes,
 ) {
   for (const [name, duplicates] of duplicateTracker.entries()) {
     for (const item of duplicates) {

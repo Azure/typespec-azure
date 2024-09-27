@@ -17,7 +17,7 @@ beforeAll(async () => {
   const filename = files.find((x) => x.startsWith("azure-tools-typespec-client-generator-core-"));
   if (filename === undefined) {
     throw new Error(
-      `Cannot resolve package starting with "azure-tools-typespec-client-generator-core-"`
+      `Cannot resolve package starting with "azure-tools-typespec-client-generator-core-"`,
     );
   }
   tgzFile = join(tempDir, filename);
@@ -44,7 +44,7 @@ async function execSuccessAsync(command: string, args: string[] = [], options: S
   if (result.exitCode !== 0) {
     throw new Error(
       `Command '${command} ${args.join(" ")}' failed with exit code ${result.exitCode}\n` +
-        result.stdio
+        result.stdio,
     );
   }
   return result;
@@ -52,7 +52,7 @@ async function execSuccessAsync(command: string, args: string[] = [], options: S
 async function execAsync(
   command: string,
   args: string[] = [],
-  options: SpawnOptions = {}
+  options: SpawnOptions = {},
 ): Promise<{ exitCode: number; stdio: string; stdout: string; stderr: string; proc: any }> {
   const child = spawn(command, args, options);
 

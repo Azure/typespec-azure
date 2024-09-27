@@ -12,7 +12,7 @@ it("map single status code", async () => {
     `
     op read(): {@statusCode _: 200, content: string};
     `,
-    ["200"]
+    ["200"],
   );
 });
 
@@ -21,7 +21,7 @@ it("map multiple status code", async () => {
     `
     op read(): {@statusCode _: 200 | 201 | 204, content: string};
     `,
-    ["200", "201", "204"]
+    ["200", "201", "204"],
   );
 });
 
@@ -30,7 +30,7 @@ it("map simple status code range", async () => {
     `
     op read(): {@minValue(400) @maxValue(499) @statusCode _: int32, content: string};
     `,
-    ["4XX"]
+    ["4XX"],
   );
 });
 
@@ -39,7 +39,7 @@ it("map status code range going over multiple hundreds", async () => {
     `
     op read(): {@minValue(400) @maxValue(599) @statusCode _: int32, content: string};
     `,
-    ["4XX", "5XX"]
+    ["4XX", "5XX"],
   );
 });
 
@@ -47,7 +47,7 @@ it("emit diagnostic if status code range is not supported", async () => {
   const diagnostics = await diagnoseOpenApiFor(
     `
     op read(): {@minValue(455) @maxValue(495) @statusCode _: int32, content: string};
-    `
+    `,
   );
   expectDiagnostics(diagnostics, [
     {

@@ -47,7 +47,7 @@ export const patchEnvelopePropertiesRules = createRule({
 function checkForPatchProperty(
   propertyName: string,
   resourceModel: Model,
-  patchModel: Type | undefined
+  patchModel: Type | undefined,
 ): boolean {
   return (
     getProperty(resourceModel, propertyName) === undefined ||

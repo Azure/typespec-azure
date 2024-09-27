@@ -15,7 +15,6 @@ import {
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
-  HttpStatusCodeRange,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getPathParamName,
@@ -32,6 +31,7 @@ import {
   CollectionFormat,
   SdkBodyParameter,
   SdkHeaderParameter,
+  SdkHttpErrorResponse,
   SdkHttpOperation,
   SdkHttpParameter,
   SdkHttpResponse,
@@ -47,7 +47,6 @@ import {
 } from "./interfaces.js";
 import {
   getAvailableApiVersions,
-  getDocHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
@@ -67,7 +66,6 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
-  addFormatInfo,
   getClientTypeWithDiagnostics,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
@@ -76,17 +74,15 @@ import {
 export function getSdkHttpOperation(
   context: TCGCContext,
   httpOperation: HttpOperation,
-  methodParameters: SdkMethodParameter[]
+  methodParameters: SdkMethodParameter[],
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
-    getSdkHttpResponseAndExceptions(context, httpOperation)
+    getSdkHttpResponseAndExceptions(context, httpOperation),
   );
-  const responsesWithBodies = [...responses.values()]
-    .concat([...exceptions.values()])
-    .filter((r) => r.type);
+  const responsesWithBodies = [...responses.values(), ...exceptions.values()].filter((r) => r.type);
   const parameters = diagnostics.pipe(
-    getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0])
+    getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0]),
   );
   return diagnostics.wrap({
     __raw: httpOperation,
@@ -119,7 +115,7 @@ function getSdkHttpParameters(
   context: TCGCContext,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
-  responseBody?: SdkHttpResponse
+  responseBody?: SdkHttpResponse | SdkHttpErrorResponse,
 ): [SdkHttpParameters, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkHttpParameters = {
@@ -129,14 +125,14 @@ function getSdkHttpParameters(
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type))
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
-        x.kind === "header" || x.kind === "query" || x.kind === "path"
+        x.kind === "header" || x.kind === "query" || x.kind === "path",
     );
   const headerParams = retval.parameters.filter(
-    (x): x is SdkHeaderParameter => x.kind === "header"
+    (x): x is SdkHeaderParameter => x.kind === "header",
   );
   // add operation info onto body param
   const tspBody = httpOperation.parameters.body;
@@ -146,7 +142,7 @@ function getSdkHttpParameters(
     // explicit @body and @bodyRoot
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
-        getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body")
+        getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
       if (bodyParam.kind !== "body") {
         diagnostics.add(
@@ -158,7 +154,7 @@ function getSdkHttpParameters(
               expectedType: "body",
               actualType: bodyParam.kind,
             },
-          })
+          }),
         );
         return diagnostics.wrap(retval);
       }
@@ -171,12 +167,12 @@ function getSdkHttpParameters(
           getClientTypeWithDiagnostics(
             context,
             getHttpBodySpreadModel(context, tspBody.type as Model),
-            httpOperation.operation
-          )
+            httpOperation.operation,
+          ),
         );
       } else {
         type = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation)
+          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation),
         );
       }
       const name = camelCase((type as { name: string }).name ?? "body");
@@ -184,8 +180,6 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
-        description: getDocHelper(context, tspBody.type).description,
-        details: getDocHelper(context, tspBody.type).details,
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
@@ -207,8 +201,8 @@ function getSdkHttpParameters(
           context,
           httpOperation.operation,
           methodParameters,
-          retval.bodyParam
-        )
+          retval.bodyParam,
+        ),
       );
     }
   }
@@ -216,7 +210,6 @@ function getSdkHttpParameters(
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
       ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
-      description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
       doc: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
@@ -252,7 +245,7 @@ function getSdkHttpParameters(
   }
   for (const param of retval.parameters) {
     param.correspondingMethodParams = diagnostics.pipe(
-      getCorrespondingMethodParams(context, httpOperation.operation, methodParameters, param)
+      getCorrespondingMethodParams(context, httpOperation.operation, methodParameters, param),
     );
   }
   return diagnostics.wrap(retval);
@@ -261,7 +254,7 @@ function getSdkHttpParameters(
 function createContentTypeOrAcceptHeader(
   context: TCGCContext,
   httpOperation: HttpOperation,
-  bodyObject: SdkBodyParameter | SdkHttpResponse
+  bodyObject: SdkBodyParameter | SdkHttpResponse | SdkHttpErrorResponse,
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
@@ -305,7 +298,7 @@ function createContentTypeOrAcceptHeader(
 function addContentTypeInfoToBodyParam(
   context: TCGCContext,
   httpOperation: HttpOperation,
-  bodyParam: SdkBodyParameter
+  bodyParam: SdkBodyParameter,
 ): readonly Diagnostic[] {
   const diagnostics = createDiagnosticCollector();
   const tspBody = httpOperation.parameters.body;
@@ -337,7 +330,7 @@ export function getSdkHttpParameter(
   param: ModelProperty,
   operation?: Operation,
   httpParam?: HttpOperationParameter,
-  location?: "path" | "query" | "header" | "body"
+  location?: "path" | "query" | "header" | "body",
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
@@ -349,8 +342,8 @@ export function getSdkHttpParameter(
       program.checker.isTypeAssignableTo(
         param.type.projectionBase ?? param.type,
         program.checker.getStdType("url"),
-        param.type
-      )
+        param.type,
+      ),
     );
     return diagnostics.wrap({
       ...base,
@@ -398,7 +391,7 @@ export function getSdkHttpParameter(
           expectedType: "path, query, header, or body",
           actualType: param.kind,
         },
-      })
+      }),
     );
   }
   return diagnostics.wrap({
@@ -410,17 +403,17 @@ export function getSdkHttpParameter(
 
 function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
-  httpOperation: HttpOperation
+  httpOperation: HttpOperation,
 ): [
   {
-    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+    responses: SdkHttpResponse[];
+    exceptions: SdkHttpErrorResponse[];
   },
   readonly Diagnostic[],
 ] {
   const diagnostics = createDiagnosticCollector();
-  const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
-  const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
+  const responses: SdkHttpResponse[] = [];
+  const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -434,11 +427,8 @@ function getSdkHttpResponseAndExceptions(
           ? "application/json"
           : innerResponse.body?.contentTypes[0];
         addEncodeInfo(context, header, clientType, defaultContentType);
-        addFormatInfo(context, header, clientType);
         headers.push({
           __raw: header,
-          description: getDocHelper(context, header).description,
-          details: getDocHelper(context, header).details,
           doc: getDoc(context.program, header),
           summary: getSummary(context.program, header),
           serializedName: getHeaderFieldName(context.program, header),
@@ -458,7 +448,7 @@ function getSdkHttpResponseAndExceptions(
                     ? innerResponse.body.type.name
                     : innerResponse.body.type.kind,
               },
-            })
+            }),
           );
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
@@ -468,9 +458,8 @@ function getSdkHttpResponseAndExceptions(
             : innerResponse.body.type;
       }
     }
-    const sdkResponse: SdkHttpResponse = {
+    const sdkResponse = {
       __raw: response,
-      kind: "http",
       type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
       headers,
       contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
@@ -480,14 +469,22 @@ function getSdkHttpResponseAndExceptions(
       apiVersions: getAvailableApiVersions(
         context,
         httpOperation.operation,
-        httpOperation.operation
+        httpOperation.operation,
       ),
       description: response.description,
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
-      exceptions.set(response.statusCodes, sdkResponse);
+      exceptions.push({
+        ...sdkResponse,
+        kind: "http",
+        statusCodes: response.statusCodes,
+      });
     } else {
-      responses.set(response.statusCodes, sdkResponse);
+      responses.push({
+        ...sdkResponse,
+        kind: "http",
+        statusCodes: response.statusCodes,
+      });
     }
   }
   return diagnostics.wrap({ responses, exceptions });
@@ -497,7 +494,7 @@ export function getCorrespondingMethodParams(
   context: TCGCContext,
   operation: Operation,
   methodParameters: SdkParameter[],
-  serviceParam: SdkHttpParameter
+  serviceParam: SdkHttpParameter,
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
@@ -511,7 +508,7 @@ export function getCorrespondingMethodParams(
   const correspondingClientParams = clientParams.filter(
     (x) =>
       twoParamsEquivalent(context, x.__raw, serviceParam.__raw) ||
-      (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name)
+      (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name),
   );
   if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
 
@@ -526,7 +523,7 @@ export function getCorrespondingMethodParams(
             paramName: "apiVersion",
             methodName: operation.name,
           },
-        })
+        }),
       );
       return diagnostics.wrap([]);
     }
@@ -543,7 +540,7 @@ export function getCorrespondingMethodParams(
             paramName: "subscriptionId",
             methodName: operation.name,
           },
-        })
+        }),
       );
       return diagnostics.wrap([]);
     }
@@ -578,14 +575,14 @@ export function getCorrespondingMethodParams(
         paramName: serviceParam.name,
         methodName: operation.name,
       },
-    })
+    }),
   );
   return diagnostics.wrap([]);
 }
 
 function findMapping(
   methodParameters: SdkModelPropertyType[],
-  serviceParam: SdkHttpParameter | SdkModelPropertyType
+  serviceParam: SdkHttpParameter | SdkModelPropertyType,
 ): SdkModelPropertyType | undefined {
   const queue: SdkModelPropertyType[] = [...methodParameters];
   const visited: Set<SdkModelType> = new Set();
@@ -630,9 +627,10 @@ function findMapping(
 
 function getCollectionFormat(
   context: TCGCContext,
-  type: ModelProperty
+  type: ModelProperty,
 ): CollectionFormat | undefined {
   const program = context.program;
+  /* eslint-disable @typescript-eslint/no-deprecated */
   const tspCollectionFormat = (
     isQueryParam(program, type)
       ? getQueryParamOptions(program, type)

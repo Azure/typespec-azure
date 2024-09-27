@@ -17,7 +17,7 @@ describe("typespec-azure-resource-manager: arm resource action no segment rule",
     tester = createLinterRuleTester(
       runner,
       armResourceActionNoSegmentRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -55,7 +55,7 @@ describe("typespec-azure-resource-manager: arm resource action no segment rule",
       @armResourceAction(Widget)
       thisIsTheWrongPattern(...TenantInstanceParameters<Widget>): ArmResponse<Widget> | ErrorResponse;
     }
-    `
+    `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-action-no-segment",

@@ -17,7 +17,7 @@ export const noResponseBodyRule = createRule({
         if (!isAzureSubNamespace(context.program, op.namespace)) return;
 
         const responses = getResponsesForOperation(context.program, op)[0].find(
-          (v) => v.statusCodes !== 204
+          (v) => v.statusCodes !== 204,
         );
         if (responses && !responses.responses.every((v) => v.body)) {
           context.reportDiagnostic({
@@ -25,7 +25,7 @@ export const noResponseBodyRule = createRule({
           });
         }
         const responses204 = getResponsesForOperation(context.program, op)[0].find(
-          (v) => v.statusCodes === 204
+          (v) => v.statusCodes === 204,
         );
         if (responses204 && responses204.responses.some((v) => v.body)) {
           context.reportDiagnostic({

@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
     tester = createLinterRuleTester(
       runner,
       armResourceEnvelopeProperties,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -30,7 +30,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
           @key @segment("foo") name: string;
           ...ManagedServiceIdentityProperty;
         }
-      `
+      `,
       )
       .toBeValid();
   });
@@ -46,7 +46,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
 
           disallowed?: string;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-envelope-property",

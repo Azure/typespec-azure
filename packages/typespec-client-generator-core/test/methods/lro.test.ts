@@ -37,7 +37,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         ${code}`,
           {
             noEmit: true,
-          }
+          },
         );
       };
     });
@@ -68,7 +68,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(method.name, "createOrReplace");
         assert.include(
           method.parameters.map((m) => m.type),
-          roundtripModel
+          roundtripModel,
         );
 
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -77,7 +77,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         assert.isUndefined(metadata.finalStep);
 
         const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusError"
+          (m) => m.name === "OperationStatusError",
         );
         ok(pollingModel);
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
@@ -109,7 +109,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         const lroMethod = method as SdkLroServiceMethod<SdkHttpOperation>;
         assert.notInclude(
           lroMethod.operation.parameters.map((m) => m.kind),
-          "body"
+          "body",
         );
 
         const metadata = lroMethod.lroMetadata;
@@ -118,7 +118,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
         const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusError"
+          (m) => m.name === "OperationStatusError",
         );
         ok(pollingModel);
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
@@ -156,7 +156,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(method.name, "export");
         assert.include(
           method.parameters.map((m) => m.name),
-          "format"
+          "format",
         );
 
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -165,7 +165,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
 
         const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusExportedUserError"
+          (m) => m.name === "OperationStatusExportedUserError",
         );
         ok(pollingModel);
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
@@ -211,7 +211,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
     `);
 
         const inputModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "GenerationOptions"
+          (m) => m.name === "GenerationOptions",
         );
         ok(inputModel);
 
@@ -222,7 +222,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(method.name, "longRunningRpc");
         assert.include(
           method.parameters.map((m) => m.type),
-          inputModel
+          inputModel,
         );
 
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -231,13 +231,13 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
 
         const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusGenerationResultError"
+          (m) => m.name === "OperationStatusGenerationResultError",
         );
         ok(pollingModel);
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         const returnModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "GenerationResult"
+          (m) => m.name === "GenerationResult",
         );
         ok(returnModel);
         strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
@@ -292,7 +292,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         assert.include(
           method.parameters.map((m) => m.name),
-          "format"
+          "format",
         );
 
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -357,7 +357,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         assert.include(
           method.parameters.map((m) => m.name),
-          "format"
+          "format",
         );
 
         const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -397,7 +397,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         ${code}`,
           {
             noEmit: true,
-          }
+          },
         );
       };
     });
@@ -420,17 +420,17 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(method.name, "createOrReplace");
       assert.include(
         method.parameters.map((m) => m.name),
-        "employeeName"
+        "employeeName",
       );
       assert.include(
         method.parameters.map((m) => m.name),
-        "resource"
+        "resource",
       );
       const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "Employee");
       ok(roundtripModel);
       assert.include(
         method.parameters.map((m) => m.type),
-        roundtripModel
+        roundtripModel,
       );
 
       const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -447,7 +447,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       // TODO: TCGC bug to not include polling model https://github.com/Azure/typespec-azure/issues/1530
       strictEqual(
         metadata.pollingStep.responseBody?.name,
-        "ArmOperationStatusResourceProvisioningState"
+        "ArmOperationStatusResourceProvisioningState",
       );
 
       strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
@@ -475,11 +475,11 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(method.name, "delete");
       assert.include(
         method.parameters.map((m) => m.name),
-        "employeeName"
+        "employeeName",
       );
       assert.notInclude(
         method.parameters.map((m) => m.name),
-        "resource"
+        "resource",
       );
 
       const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -496,7 +496,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       // TODO: TCGC bug to not include polling model
       strictEqual(
         metadata.pollingStep.responseBody?.name,
-        "ArmOperationStatusResourceProvisioningState"
+        "ArmOperationStatusResourceProvisioningState",
       );
 
       assert.isUndefined(metadata.finalResponse);
@@ -521,7 +521,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(method.name, "actionAsync");
       assert.include(
         method.parameters.map((m) => m.name),
-        "employeeName"
+        "employeeName",
       );
 
       const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
@@ -538,7 +538,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       // TODO: TCGC bug to not include polling model
       strictEqual(
         metadata.pollingStep.responseBody?.name,
-        "ArmOperationStatusResourceProvisioningState"
+        "ArmOperationStatusResourceProvisioningState",
       );
 
       assert.isUndefined(metadata.finalResponse);

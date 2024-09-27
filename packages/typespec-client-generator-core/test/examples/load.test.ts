@@ -115,7 +115,7 @@ describe("typespec-client-generator-core: load examples", () => {
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
     await runner.host.addRealTypeSpecFile(
       "./examples/getAnother.json",
-      `${__dirname}/load/getAnother.json`
+      `${__dirname}/load/getAnother.json`,
     );
     await runner.compile(`
       @service({})
@@ -157,7 +157,7 @@ describe("typespec-client-generator-core: load examples", () => {
       namespace Customizations {
         op test is TestClient.get;
       }
-    `
+    `,
     );
 
     const client = runner.context.sdkPackage.clients[0];
@@ -173,11 +173,53 @@ describe("typespec-client-generator-core: load examples", () => {
   it("load multiple example with @clientName", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/clientName.json",
-      `${__dirname}/load/clientName.json`
+      `${__dirname}/load/clientName.json`,
     );
     await runner.host.addRealTypeSpecFile(
       "./examples/clientNameAnother.json",
-      `${__dirname}/load/clientNameAnother.json`
+      `${__dirname}/load/clientNameAnother.json`,
+    );
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        @clientName("renamedNS")
+        namespace NS {
+          @route("/ns")
+          @clientName("renamedOP")
+          op get(): string;
+        }
+
+        @clientName("renamedIF")
+        namespace IF {
+          @route("/if")
+          @clientName("renamedOP")
+          op get(): string;
+        }
+      }
+    `);
+
+    let operation = (
+      (runner.context.sdkPackage.clients[0].methods[0] as SdkClientAccessor<SdkHttpOperation>)
+        .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    operation = (
+      (runner.context.sdkPackage.clients[0].methods[1] as SdkClientAccessor<SdkHttpOperation>)
+        .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+  });
+
+  it("load multiple example of original operation id with @clientName", async () => {
+    await runner.host.addRealTypeSpecFile(
+      "./examples/clientNameOriginal.json",
+      `${__dirname}/load/clientNameOriginal.json`,
+    );
+    await runner.host.addRealTypeSpecFile(
+      "./examples/clientNameAnotherOriginal.json",
+      `${__dirname}/load/clientNameAnotherOriginal.json`,
     );
     await runner.compile(`
       @service({})

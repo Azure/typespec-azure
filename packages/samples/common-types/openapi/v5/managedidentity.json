@@ -73,7 +73,7 @@
             "description": "User assigned managed identity."
           },
           {
-            "name": "SystemAndUserAssigned",
+            "name": "SystemAssigned,UserAssigned",
             "value": "SystemAssigned,UserAssigned",
             "description": "System and user assigned managed identity."
           }
