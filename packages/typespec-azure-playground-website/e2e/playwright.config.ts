@@ -17,11 +17,10 @@ const config: PlaywrightTestConfig = {
     baseURL: resolve(root, "dist"),
   },
   projects: [
-    // TODO: investigate
-    // {
-    //   name: "chromium",
-    //   use: { browserName: "chromium" },
-    // },
+    {
+      name: "chromium",
+      use: { browserName: "chromium" },
+    },
     {
       name: "firefox",
       use: { browserName: "firefox" },
