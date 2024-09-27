@@ -1011,7 +1011,7 @@ op startJobAsync(
 ): (CreatedResponse & JobLroResponse) | (OkResponse &
   JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
 `,
-        "startJobAsync"
+        "startJobAsync",
       );
 
       ok(metadata);
@@ -1087,7 +1087,7 @@ op createJob(
 ): (CreatedResponse & JobLroResponse) | (OkResponse &
   JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
 `,
-        "createJob"
+        "createJob",
       );
 
       ok(metadata);
@@ -3007,7 +3007,7 @@ op createJob(
           message: string;
           status: "Succeeded" | "Failed" | "Canceled";
         }
-         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`
+         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
       );
       deepStrictEqual(metadata, undefined);
     });
@@ -3024,7 +3024,7 @@ op createJob(
           message: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled";
         }
-         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`
+         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
       );
       deepStrictEqual(metadata, undefined);
     });

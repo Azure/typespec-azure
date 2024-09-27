@@ -536,7 +536,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate"
+      "createOrUpdate",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
@@ -590,7 +590,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "update"
+      "update",
     );
     ok(metadata);
     deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");

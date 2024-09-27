@@ -126,7 +126,7 @@ export function extractStatusMonitorInfo(
 
 function getBodyModel(program: Program, model: Model): Model | undefined {
   const bodyProps = [...getAllProperties(model).values()].filter(
-    (p) => isBody(program, p) || isBodyRoot(program, p)
+    (p) => isBody(program, p) || isBodyRoot(program, p),
   );
   if (bodyProps.length !== 1) return undefined;
   const outType = bodyProps[0].type;

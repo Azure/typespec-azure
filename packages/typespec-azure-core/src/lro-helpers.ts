@@ -464,7 +464,7 @@ function createOperationLink(program: Program, modelProperty: ModelProperty): Op
 }
 
 function createOperationReferenceOrLink(
-  metadata: OperationLinkMetadata
+  metadata: OperationLinkMetadata,
 ): OperationReference | OperationLink | undefined {
   if (!metadata.parameterMap && !metadata.link) return undefined;
   const map = new Map<string, ParameterSource>();
@@ -611,7 +611,7 @@ function getFinalStateVia(
           if (context.statusMonitorStep.target.link?.location === "ResponseHeader") {
             finalState = getLroStatusFromHeaderProperty(
               program,
-              context.statusMonitorStep.target.link.property
+              context.statusMonitorStep.target.link.property,
             );
           }
       }
@@ -1091,7 +1091,7 @@ function processStatusMonitorLink(
 function processStatusMonitorReference(
   program: Program,
   referencedOperation: Operation,
-  context: LroContext
+  context: LroContext,
 ): NextOperationReference | (NextOperationLink & { operation: Operation }) | undefined {
   const references: Map<string, OperationLinkMetadata> | undefined = getOperationLinks(
     program,
