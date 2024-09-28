@@ -88,6 +88,7 @@ import {
   isTemplateDeclarationOrInstance,
   isVoidType,
   navigateTypesInNamespace,
+  normalizePath,
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
@@ -133,6 +134,7 @@ import {
   shouldInline,
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
+import * as path from "path";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -2554,6 +2556,30 @@ async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   }
 }
 
+async function searchExampleJsonFiles(program: Program, exampleDir: string): Promise<string[]> {
+  const host = program.host;
+  const exampleFiles: string[] = [];
+
+  // Recursive file search
+  async function recursiveSearch(dir: string): Promise<void> {
+    const fileItems = await host.readDir(dir);
+
+    for (const item of fileItems) {
+      const relativePath = path.relative(exampleDir, path.join(dir, item));
+      const fullPath = path.join(dir, item);
+
+      if ((await host.stat(fullPath)).isDirectory()) {
+        await recursiveSearch(fullPath);
+      } else if ((await host.stat(fullPath)).isFile() && path.extname(item) === ".json") {
+        exampleFiles.push(normalizePath(relativePath));
+      }
+    }
+  }
+
+  await recursiveSearch(exampleDir);
+  return exampleFiles;
+}
+
 async function loadExamples(
   program: Program,
   options: AutorestDocumentEmitterOptions,
@@ -2579,7 +2605,7 @@ async function loadExamples(
   }
 
   const map = new Map<string, Record<string, LoadedExample>>();
-  const exampleFiles = await host.readDir(exampleDir);
+  const exampleFiles = await searchExampleJsonFiles(program, exampleDir);
   for (const fileName of exampleFiles) {
     try {
       const exampleFile = await host.readFile(resolvePath(exampleDir, fileName));

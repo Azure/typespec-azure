@@ -1,0 +1,14 @@
+{
+  "title": "Write pet",
+  "operationId": "Pets_Write",
+  "description": "Read pet example",
+  "parameters": {
+    "body": {
+      "name": "Rex",
+      "age": 3
+    }
+  },
+  "responses": {
+    "200": {}
+  }
+}
