@@ -1165,7 +1165,7 @@ export function getSdkModelPropertyTypeBase(
     propertyType = diagnostics.pipe(getSdkEnumWithDiagnostics(context, knownValues, operation));
   }
   const name = getPropertyNames(context, type)[0];
-  const onClient = isOnClient(context, type, operation);
+  const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   return diagnostics.wrap({
     __raw: type,
     doc: getDoc(context.program, type),

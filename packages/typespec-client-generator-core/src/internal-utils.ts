@@ -555,11 +555,12 @@ export function isOnClient(
   context: TCGCContext,
   type: ModelProperty,
   operation?: Operation,
+  versioning?: boolean,
 ): boolean {
   const namespace = operation ? getLocationOfOperation(operation) : type.model?.namespace;
   return (
     isSubscriptionId(context, type) ||
-    isApiVersion(context, type) ||
+    (isApiVersion(context, type) && versioning) ||
     Boolean(
       namespace &&
         context.__clientToParameters
