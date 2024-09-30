@@ -115,7 +115,7 @@ export function updateWithApiVersionInformation(
   namespace?: Namespace | Interface,
 ): {
   isApiVersionParam: boolean;
-  clientDefaultValue?: unknown;
+  clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
   return {
@@ -563,9 +563,29 @@ export function isOnClient(
     (isApiVersion(context, type) && versioning) ||
     Boolean(
       namespace &&
-        context.__clientToParameters
-          .get(namespace)
-          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
+      context.__clientToParameters
+        .get(namespace)
+        ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
     )
   );
+}
+
+export function getValueTypeValue(value: Value): string | boolean | null | number | Array<unknown> | Object | undefined {
+  switch (value.valueKind) {
+    case "ArrayValue":
+      return value.values.map((x) => getValueTypeValue(x));
+    case "BooleanValue":
+    case "StringValue":
+    case "NullValue":
+      return value.value;
+    case "NumericValue":
+      return value.value.asNumber();
+    case "EnumValue":
+      return value.value.value ?? value.value.name;
+    case "ObjectValue":
+      return Object.fromEntries([...value.properties.keys()].map((x) => [x, getValueTypeValue(value.properties.get(x)!.value)]));
+    case "ScalarValue":
+      // TODO: handle scalar value
+      return undefined;
+  }
 }

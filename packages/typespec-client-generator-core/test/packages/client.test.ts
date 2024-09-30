@@ -9,6 +9,7 @@ import {
   SdkEndpointParameter,
   SdkEndpointType,
   SdkHttpOperation,
+  SdkUnionType,
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -941,5 +942,49 @@ describe("typespec-client-generator-core: package", () => {
       apiVersionParam.correspondingMethodParams[0],
       client.initialization.properties.find((x) => x.isApiVersionParam),
     );
+  });
+
+  it("endpoint template argument with default value of enum member", async () => {
+    await runner.compile(`
+      @server(
+        "{endpoint}/client/structure/{client}",
+        "",
+        {
+          @doc("Need to be set as 'http://localhost:3000' in client.")
+          endpoint: url,
+      
+          @doc("Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client.")
+          client: ClientType = ClientType.Default,
+        }
+      )
+      @service({})
+      namespace My.Service;
+
+      enum ClientType {
+        Default: "default",
+        MultiClient: "multi-client",
+        RenamedOperation: "renamed-operation",
+        TwoOperationGroup: "two-operation-group",
+        ClientOperationGroup: "client-operation-group",
+      }
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.clients.length, 1);
+    const client = sdkPackage.clients[0];
+
+    strictEqual(client.initialization.properties.length, 1);
+    const parameter = client.initialization.properties[0];
+    strictEqual(parameter.name, "endpoint");
+    strictEqual(parameter.type.kind, "union");
+
+    const templateArg = parameter.type.variantTypes[0];
+    strictEqual(templateArg.kind, "endpoint");
+    strictEqual(templateArg.templateArguments.length, 2);
+    const clientTemplateArg = templateArg.templateArguments[1];
+    strictEqual(clientTemplateArg.kind, "path");
+    strictEqual(clientTemplateArg.name, "client");
+    strictEqual(clientTemplateArg.optional, false);
+    strictEqual(clientTemplateArg.onClient, true);
+    strictEqual(clientTemplateArg.clientDefaultValue, "default");
   });
 });
