@@ -388,6 +388,73 @@ describe("typespec-client-generator-core: package", () => {
     strictEqual(scheme.name, "x-ms-api-key");
   });
 
+  it("non-versioning service with api version param in endpoint", async () => {
+    await runner.compile(`
+        @server(
+          "{endpoint}/server/path/multiple/{apiVersion}",
+          "Test server with path parameters.",
+          {
+            @doc("Pass in http://localhost:3000 for endpoint.")
+            endpoint: url = "http://localhost:3000",
+
+            @doc("Pass in v1.0 for API version.")
+            apiVersion: string = "v1",
+          }
+        )
+        @service({})
+        namespace My.Service;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.clients.length, 1);
+    const client = sdkPackage.clients[0];
+    strictEqual(client.name, "ServiceClient");
+    strictEqual(client.initialization.properties.length, 1);
+
+    const endpointParams = client.initialization.properties.filter(
+      (p): p is SdkEndpointParameter => p.kind === "endpoint",
+    );
+    strictEqual(endpointParams.length, 1);
+    const endpointParam = endpointParams[0];
+    strictEqual(endpointParam.clientDefaultValue, undefined);
+    strictEqual(endpointParam.urlEncode, false);
+    strictEqual(endpointParam.name, "endpoint");
+    strictEqual(endpointParam.onClient, true);
+    strictEqual(endpointParam.optional, false);
+    strictEqual(endpointParam.kind, "endpoint");
+
+    const endpointParamType = endpointParam.type;
+    strictEqual(endpointParamType.kind, "union");
+    strictEqual(endpointParamType.variantTypes.length, 2);
+
+    const overridableEndpoint = endpointParamType.variantTypes.find(
+      (x) => x.kind === "endpoint" && x.serverUrl === "{endpoint}",
+    ) as SdkEndpointType;
+    ok(overridableEndpoint);
+    strictEqual(overridableEndpoint.templateArguments.length, 1);
+    strictEqual(overridableEndpoint.templateArguments[0].name, "endpoint");
+    strictEqual(overridableEndpoint.templateArguments[0].clientDefaultValue, undefined);
+
+    const templatedEndpoint = endpointParamType.variantTypes.find(
+      (x) =>
+        x.kind === "endpoint" && x.serverUrl === "{endpoint}/server/path/multiple/{apiVersion}",
+    ) as SdkEndpointType;
+    ok(templatedEndpoint);
+    strictEqual(templatedEndpoint.templateArguments.length, 2);
+    const endpointTemplateArg = templatedEndpoint.templateArguments[0];
+    strictEqual(endpointTemplateArg.name, "endpoint");
+    strictEqual(endpointTemplateArg.onClient, true);
+    strictEqual(endpointTemplateArg.optional, false);
+    strictEqual(endpointTemplateArg.kind, "path");
+    strictEqual(endpointTemplateArg.clientDefaultValue, "http://localhost:3000");
+
+    const apiVersionParam = templatedEndpoint.templateArguments[1];
+    strictEqual(apiVersionParam.clientDefaultValue, "v1");
+    strictEqual(apiVersionParam.name, "apiVersion");
+    strictEqual(apiVersionParam.onClient, true);
+    strictEqual(apiVersionParam.optional, false);
+    strictEqual(apiVersionParam.kind, "path");
+  });
+
   it("endpoint with path param default value", async () => {
     await runner.compile(`
         @server(
