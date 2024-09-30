@@ -50,6 +50,7 @@ import {
   createDiagnosticCollector,
   explainStringTemplateNotSerializable,
   getAllTags,
+  getAnyExtensionFromPath,
   getDirectoryPath,
   getDiscriminator,
   getDoc,
@@ -87,6 +88,7 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
+  joinPaths,
   navigateTypesInNamespace,
   normalizePath,
   reportDeprecated,
@@ -134,7 +136,6 @@ import {
   shouldInline,
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
-import * as path from "path";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -2565,12 +2566,15 @@ async function searchExampleJsonFiles(program: Program, exampleDir: string): Pro
     const fileItems = await host.readDir(dir);
 
     for (const item of fileItems) {
-      const relativePath = path.relative(exampleDir, path.join(dir, item));
-      const fullPath = path.join(dir, item);
+      const fullPath = joinPaths(dir, item);
+      const relativePath = getRelativePathFromDirectory(exampleDir, fullPath, false);
 
       if ((await host.stat(fullPath)).isDirectory()) {
         await recursiveSearch(fullPath);
-      } else if ((await host.stat(fullPath)).isFile() && path.extname(item) === ".json") {
+      } else if (
+        (await host.stat(fullPath)).isFile() &&
+        getAnyExtensionFromPath(item) === ".json"
+      ) {
         exampleFiles.push(normalizePath(relativePath));
       }
     }
