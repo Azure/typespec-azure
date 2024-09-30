@@ -1,9 +1,9 @@
+import { Model } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { getValueTypeValue } from "../src/internal-utils.js";
 import { listSubClients } from "../src/public-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
-import { Model } from "@typespec/compiler";
-import { getValueTypeValue } from "../src/internal-utils.js";
 
 describe("typespec-client-generator-core: internal-utils", () => {
   let runner: SdkTestRunner;
@@ -161,7 +161,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
   describe("getValueTypeValue", () => {
     it("string default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -169,13 +169,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
         model Test {
           prop: string = "default";
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "default");
     });
 
     it("boolean default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -183,13 +183,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
         model Test {
           prop: boolean = false;
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), false);
     });
 
     it("null default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -197,13 +197,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
         model Test {
           prop: boolean | null = null;
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), null);
     });
 
     it("numeric int default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -211,13 +211,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
         model Test {
           prop: int32 = 1;
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), 1);
     });
 
     it("numeric float default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -225,13 +225,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
         model Test {
           prop: float32 = 1.234;
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), 1.234);
     });
 
     it("enum member default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -244,13 +244,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
           A: "A",
           B: "B",
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "A");
     });
 
     it("enum member without value default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -263,13 +263,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
           A,
           B,
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "A");
     });
 
     it("array default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -277,13 +277,13 @@ describe("typespec-client-generator-core: internal-utils", () => {
         model Test {
           prop: string[] = #["a", "b"];
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
       deepStrictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), ["a", "b"]);
     });
 
     it("object default value", async () => {
-      const { Test } = await runner.compile(`
+      const { Test } = (await runner.compile(`
         @service({})
         namespace My.Service;
 
@@ -296,9 +296,12 @@ describe("typespec-client-generator-core: internal-utils", () => {
           x: int32;
           y: int32;
         }
-      `) as { Test: Model };
+      `)) as { Test: Model };
 
-      deepStrictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), { x: 0, y: 0 });
+      deepStrictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), {
+        x: 0,
+        y: 0,
+      });
     });
   });
 });

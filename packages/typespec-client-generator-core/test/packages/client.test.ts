@@ -9,7 +9,6 @@ import {
   SdkEndpointParameter,
   SdkEndpointType,
   SdkHttpOperation,
-  SdkUnionType,
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 

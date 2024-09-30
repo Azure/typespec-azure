@@ -563,14 +563,16 @@ export function isOnClient(
     (isApiVersion(context, type) && versioning) ||
     Boolean(
       namespace &&
-      context.__clientToParameters
-        .get(namespace)
-        ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
+        context.__clientToParameters
+          .get(namespace)
+          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
     )
   );
 }
 
-export function getValueTypeValue(value: Value): string | boolean | null | number | Array<unknown> | Object | undefined {
+export function getValueTypeValue(
+  value: Value,
+): string | boolean | null | number | Array<unknown> | Object | undefined {
   switch (value.valueKind) {
     case "ArrayValue":
       return value.values.map((x) => getValueTypeValue(x));
@@ -583,7 +585,12 @@ export function getValueTypeValue(value: Value): string | boolean | null | numbe
     case "EnumValue":
       return value.value.value ?? value.value.name;
     case "ObjectValue":
-      return Object.fromEntries([...value.properties.keys()].map((x) => [x, getValueTypeValue(value.properties.get(x)!.value)]));
+      return Object.fromEntries(
+        [...value.properties.keys()].map((x) => [
+          x,
+          getValueTypeValue(value.properties.get(x)!.value),
+        ]),
+      );
     case "ScalarValue":
       // TODO: handle scalar value
       return undefined;
