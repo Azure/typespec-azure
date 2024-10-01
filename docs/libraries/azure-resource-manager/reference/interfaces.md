@@ -671,6 +671,39 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
 
+### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
+
+```typespec
+op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                   |
+| ---------- | ----------------------------------------------------------------------------- |
+| Request    | The request model for the action                                              |
+| Response   | The response type for the action                                              |
+| Parameters | Optional. Additional parameters after the path parameters                     |
+| Scope      | Optional. The scope of the action.                                            |
+| LroHeaders | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Error      | Optional. The error response, if non-standard.                                |
+
+### `ArmProviderActionSync` {#Azure.ResourceManager.ArmProviderActionSync}
+
+```typespec
+op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Request    | The request model for the action.                          |
+| Response   | The response type for the action.                          |
+| Parameters | Optional. Additional parameters after the path parameters. |
+| Scope      | Optional. The scope of the action.                         |
+| Error      | Optional. The error response, if non-standard.             |
+
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
 ```typespec
@@ -1061,6 +1094,39 @@ op Azure.ResourceManager.ArmTagsPatchSync(provider: "Microsoft.ThisWillBeReplace
 | Resource       | the resource being patched                                |
 | BaseParameters | Optional. Allows overriding the operation parameters      |
 | Parameters     | Optional. Additional parameters after the path parameters |
+
+### `ArmTenantActionAsync` {#Azure.ResourceManager.ArmTenantActionAsync}
+
+```typespec
+op Azure.ResourceManager.ArmTenantActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                   |
+| ---------- | ----------------------------------------------------------------------------- |
+| Request    | The request model for the action                                              |
+| Response   | The response type for the action                                              |
+| Parameters | Optional. Additional parameters after the path parameters                     |
+| Scope      | Optional. The scope of the action.                                            |
+| LroHeaders | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Error      | Optional. The error response, if non-standard.                                |
+
+### `ArmTenantActionSync` {#Azure.ResourceManager.ArmTenantActionSync}
+
+```typespec
+op Azure.ResourceManager.ArmTenantActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Request    | The request model for the action                          |
+| Response   | The response type for the action                          |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Scope      | Optional. The scope of the action.                        |
+| Error      | Optional. The error response, if non-standard.            |
 
 ### `checkGlobalNameAvailability` {#Azure.ResourceManager.checkGlobalNameAvailability}
 

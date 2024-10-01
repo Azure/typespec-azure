@@ -842,6 +842,20 @@ model Azure.ResourceManager.ResourceUriParameter
 | ----------- | -------- | ---------------------------------------------------------------------- |
 | resourceUri | `string` | The fully qualified Azure Resource manager identifier of the resource. |
 
+### `SubscriptionActionScope` {#Azure.ResourceManager.SubscriptionActionScope}
+
+Template for subscription actions.
+
+```typespec
+model Azure.ResourceManager.SubscriptionActionScope
+```
+
+#### Properties
+
+| Name | Type     | Description            |
+| ---- | -------- | ---------------------- |
+| name | `string` | Symbolic name of scope |
+
 ### `SubscriptionLocationResource` {#Azure.ResourceManager.SubscriptionLocationResource}
 
 The location resource for subscription-based locations. This can be used as a parent
@@ -856,6 +870,20 @@ model Azure.ResourceManager.SubscriptionLocationResource
 | Name     | Type                 | Description                   |
 | -------- | -------------------- | ----------------------------- |
 | location | `Core.azureLocation` | The name of the Azure region. |
+
+### `TenantActionScope` {#Azure.ResourceManager.TenantActionScope}
+
+Template for tenant actions.
+
+```typespec
+model Azure.ResourceManager.TenantActionScope
+```
+
+#### Properties
+
+| Name | Type     | Description            |
+| ---- | -------- | ---------------------- |
+| name | `string` | Symbolic name of scope |
 
 ### `TenantLocationResource` {#Azure.ResourceManager.TenantLocationResource}
 

@@ -93,6 +93,15 @@ export function isInternalTypeSpec(
   );
 }
 
+export function isSourceOperationResourceManagerInternal(operation: Operation | undefined): boolean {
+  if (!operation?.sourceOperation?.namespace) {
+    return false;
+  }
+
+  const namespace = getNamespaceFullName(operation.sourceOperation.namespace);
+  return namespace.startsWith("Azure.ResourceManager");
+}
+
 export function getNamespaceName(
   program: Program,
   type: Model | Operation | ModelProperty | Interface | Namespace | undefined,

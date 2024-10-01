@@ -694,3 +694,113 @@ op checkLocalNameAvailability<
   Response,
   AdditionalParams
 >;
+
+/**
+ * @dev An action performed at subscription level.
+ * @template Request The request model for the action.
+ * @template Response The response type for the action.
+ * @template Parameters Optional. Additional parameters after the path parameters.
+ * @template Scope Optional. The scope of the action.
+ * @template Error Optional. The error response, if non-standard.
+ */
+@post
+@action
+@armResourceCollectionAction
+op ArmProviderActionSync<
+  Request extends {} | void = void,
+  Response extends {} | void = void,
+  Parameters extends {} = {},
+  Scope extends {} = SubscriptionActionScope,
+  Error extends {} = ErrorResponse
+>(
+  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...ProviderNamespace<Scope>,
+  ...Parameters,
+  @bodyRoot body: Request,
+): Response | ErrorResponse;
+
+/**
+ * @dev A long-running action performed at subscriptions level.
+ * @template Request The request model for the action
+ * @template Response The response type for the action
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Scope Optional. The scope of the action.
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
+ * @template Error Optional. The error response, if non-standard.
+ */
+@post
+@action
+@armResourceCollectionAction
+op ArmProviderActionAsync<
+  Request extends {} | void = void,
+  Response extends {} | void = void,
+  Parameters extends {} = {},
+  Scope extends {} = SubscriptionActionScope,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Response,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Error extends {} = ErrorResponse
+>(
+  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...ProviderNamespace<Scope>,
+  ...Parameters,
+  @bodyRoot body: Request,
+): Response | ErrorResponse;
+
+/**
+ * @dev An action performed at tenant level.
+ * @template Request The request model for the action
+ * @template Response The response type for the action
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Scope Optional. The scope of the action.
+ * @template Error Optional. The error response, if non-standard.
+ */
+@post
+@action
+@armResourceCollectionAction
+op ArmTenantActionSync<
+  Request extends {} | void = void,
+  Response extends {} | void = void,
+  Parameters extends {} = {},
+  Scope extends {} = TenantActionScope,
+  Error extends {} = ErrorResponse
+>(
+  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...ProviderNamespace<Scope>,
+  ...Parameters,
+  @bodyRoot body: Request,
+): Response | ErrorResponse;
+
+/**
+ * @dev A long-running action performed at tenant level.
+ * @template Request The request model for the action
+ * @template Response The response type for the action
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Scope Optional. The scope of the action.
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
+ * @template Error Optional. The error response, if non-standard.
+ */
+@post
+@action
+@armResourceCollectionAction
+op ArmTenantActionAsync<
+  Request extends {} | void = void,
+  Response extends {} | void = void,
+  Parameters extends {} = {},
+  Scope extends {} = TenantActionScope,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Response,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Error extends {} = ErrorResponse
+>(
+  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...ProviderNamespace<Scope>,
+  ...Parameters,
+  @bodyRoot body: Request,
+): Response | ErrorResponse;
