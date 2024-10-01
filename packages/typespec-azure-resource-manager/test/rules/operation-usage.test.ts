@@ -298,7 +298,6 @@ describe("typespec-azure-resource-manager: generates tenant paths correctly", ()
       "/providers/Microsoft.Contoso/getCores",
     );
   });
-
 });
 
 describe("typespec-azure-resource-manager: improper list by subscription operation", () => {

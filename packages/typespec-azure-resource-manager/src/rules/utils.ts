@@ -93,7 +93,9 @@ export function isInternalTypeSpec(
   );
 }
 
-export function isSourceOperationResourceManagerInternal(operation: Operation | undefined): boolean {
+export function isSourceOperationResourceManagerInternal(
+  operation: Operation | undefined,
+): boolean {
   if (!operation?.sourceOperation?.namespace) {
     return false;
   }
