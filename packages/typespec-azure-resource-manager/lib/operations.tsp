@@ -699,7 +699,7 @@ op checkLocalNameAvailability<
  * @dev An action performed at subscription level.
  * @template Request The request model for the action.
  * @template Response The response type for the action.
- * @template Parameters Optional. Additional parameters after the path parameters.
+ * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template Scope Optional. The scope of the action.
  * @template Error Optional. The error response, if non-standard.
  */
@@ -723,7 +723,7 @@ op ArmProviderActionSync<
  * @dev A long-running action performed at subscriptions level.
  * @template Request The request model for the action
  * @template Response The response type for the action
- * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template Scope Optional. The scope of the action.
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Error Optional. The error response, if non-standard.
@@ -754,7 +754,7 @@ op ArmProviderActionAsync<
  * @dev An action performed at tenant level.
  * @template Request The request model for the action
  * @template Response The response type for the action
- * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template Scope Optional. The scope of the action.
  * @template Error Optional. The error response, if non-standard.
  */
@@ -778,7 +778,7 @@ op ArmTenantActionSync<
  * @dev A long-running action performed at tenant level.
  * @template Request The request model for the action
  * @template Response The response type for the action
- * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template Scope Optional. The scope of the action.
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Error Optional. The error response, if non-standard.

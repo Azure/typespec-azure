@@ -683,7 +683,7 @@ op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscription
 | ---------- | ----------------------------------------------------------------------------- |
 | Request    | The request model for the action                                              |
 | Response   | The response type for the action                                              |
-| Parameters | Optional. Additional parameters after the path parameters                     |
+| Parameters | Optional. Additional parameters after the path parameters (e.g. Location)     |
 | Scope      | Optional. The scope of the action.                                            |
 | LroHeaders | Optional. Allows overriding the lro headers returned in the Accepted response |
 | Error      | Optional. The error response, if non-standard.                                |
@@ -696,13 +696,13 @@ op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionI
 
 #### Template Parameters
 
-| Name       | Description                                                |
-| ---------- | ---------------------------------------------------------- |
-| Request    | The request model for the action.                          |
-| Response   | The response type for the action.                          |
-| Parameters | Optional. Additional parameters after the path parameters. |
-| Scope      | Optional. The scope of the action.                         |
-| Error      | Optional. The error response, if non-standard.             |
+| Name       | Description                                                               |
+| ---------- | ------------------------------------------------------------------------- |
+| Request    | The request model for the action.                                         |
+| Response   | The response type for the action.                                         |
+| Parameters | Optional. Additional parameters after the path parameters (e.g. Location) |
+| Scope      | Optional. The scope of the action.                                        |
+| Error      | Optional. The error response, if non-standard.                            |
 
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
@@ -1107,7 +1107,7 @@ op Azure.ResourceManager.ArmTenantActionAsync(apiVersion: string, subscriptionId
 | ---------- | ----------------------------------------------------------------------------- |
 | Request    | The request model for the action                                              |
 | Response   | The response type for the action                                              |
-| Parameters | Optional. Additional parameters after the path parameters                     |
+| Parameters | Optional. Additional parameters after the path parameters (e.g. Location)     |
 | Scope      | Optional. The scope of the action.                                            |
 | LroHeaders | Optional. Allows overriding the lro headers returned in the Accepted response |
 | Error      | Optional. The error response, if non-standard.                                |
@@ -1120,13 +1120,13 @@ op Azure.ResourceManager.ArmTenantActionSync(apiVersion: string, subscriptionId:
 
 #### Template Parameters
 
-| Name       | Description                                               |
-| ---------- | --------------------------------------------------------- |
-| Request    | The request model for the action                          |
-| Response   | The response type for the action                          |
-| Parameters | Optional. Additional parameters after the path parameters |
-| Scope      | Optional. The scope of the action.                        |
-| Error      | Optional. The error response, if non-standard.            |
+| Name       | Description                                                               |
+| ---------- | ------------------------------------------------------------------------- |
+| Request    | The request model for the action                                          |
+| Response   | The response type for the action                                          |
+| Parameters | Optional. Additional parameters after the path parameters (e.g. Location) |
+| Scope      | Optional. The scope of the action.                                        |
+| Error      | Optional. The error response, if non-standard.                            |
 
 ### `checkGlobalNameAvailability` {#Azure.ResourceManager.checkGlobalNameAvailability}
 
