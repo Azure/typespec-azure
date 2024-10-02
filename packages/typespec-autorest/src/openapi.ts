@@ -50,6 +50,7 @@ import {
   createDiagnosticCollector,
   explainStringTemplateNotSerializable,
   getAllTags,
+  getAnyExtensionFromPath,
   getDirectoryPath,
   getDiscriminator,
   getDoc,
@@ -87,7 +88,9 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
+  joinPaths,
   navigateTypesInNamespace,
+  normalizePath,
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
@@ -2554,6 +2557,33 @@ async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   }
 }
 
+async function searchExampleJsonFiles(program: Program, exampleDir: string): Promise<string[]> {
+  const host = program.host;
+  const exampleFiles: string[] = [];
+
+  // Recursive file search
+  async function recursiveSearch(dir: string): Promise<void> {
+    const fileItems = await host.readDir(dir);
+
+    for (const item of fileItems) {
+      const fullPath = joinPaths(dir, item);
+      const relativePath = getRelativePathFromDirectory(exampleDir, fullPath, false);
+
+      if ((await host.stat(fullPath)).isDirectory()) {
+        await recursiveSearch(fullPath);
+      } else if (
+        (await host.stat(fullPath)).isFile() &&
+        getAnyExtensionFromPath(item) === ".json"
+      ) {
+        exampleFiles.push(normalizePath(relativePath));
+      }
+    }
+  }
+
+  await recursiveSearch(exampleDir);
+  return exampleFiles;
+}
+
 async function loadExamples(
   program: Program,
   options: AutorestDocumentEmitterOptions,
@@ -2579,7 +2609,7 @@ async function loadExamples(
   }
 
   const map = new Map<string, Record<string, LoadedExample>>();
-  const exampleFiles = await host.readDir(exampleDir);
+  const exampleFiles = await searchExampleJsonFiles(program, exampleDir);
   for (const fileName of exampleFiles) {
     try {
       const exampleFile = await host.readFile(resolvePath(exampleDir, fileName));
