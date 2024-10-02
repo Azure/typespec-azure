@@ -110,7 +110,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         }
 
         model Base { name: string;}
-        `
+        `,
       )
       .toBeValid();
   });
