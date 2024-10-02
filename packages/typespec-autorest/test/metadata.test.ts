@@ -253,7 +253,7 @@ describe("typespec-autorest: metadata", () => {
 
     `,
       undefined,
-      { "omit-unreachable-types": true }
+      { "omit-unreachable-types": true },
     );
 
     deepStrictEqual(res.definitions, {
@@ -335,7 +335,7 @@ describe("typespec-autorest: metadata", () => {
       }
       @route("/single") @get op single(...Parameters): string;
       @route("/batch") @get op batch(@bodyRoot body: Parameters[]): string;
-      `
+      `,
     );
     deepStrictEqual(res.paths, {
       "/single/{p}": {
@@ -430,7 +430,7 @@ describe("typespec-autorest: metadata", () => {
         @visibility("delete") d: string;
       }
       @route("/") @post op createMultiple(...Thing): Thing[];
-      `
+      `,
     );
 
     const request = res.paths["/"].post.parameters[1].schema;
@@ -479,7 +479,7 @@ describe("typespec-autorest: metadata", () => {
        inner?: Thing;
       }
       @route("/") @get op get(): Thing;
-      `
+      `,
     );
 
     const response = res.paths["/"].get.responses["200"].schema;
@@ -507,7 +507,7 @@ describe("typespec-autorest: metadata", () => {
       }
 
       @route("/") @get op get(...Thing): Thing;
-      `
+      `,
     );
 
     const request = res.paths["/"].get.parameters[0].schema;
@@ -551,7 +551,7 @@ describe("typespec-autorest: metadata", () => {
       
       @route("/pets")
       @post op create(...Pet): Pet;
-      `
+      `,
     );
 
     deepStrictEqual(res.paths, {
@@ -635,7 +635,7 @@ describe("typespec-autorest: metadata", () => {
         age: int32;
       }
       op single(...Pet): void;
-      `
+      `,
       );
       strictEqual(res.paths["/"].post.parameters[0].required, true);
     });
@@ -648,7 +648,7 @@ describe("typespec-autorest: metadata", () => {
         age: int32;
       }
       op single(@body pet: Pet): void;
-      `
+      `,
       );
       strictEqual(res.paths["/"].post.parameters[0].required, true);
     });
@@ -661,7 +661,7 @@ describe("typespec-autorest: metadata", () => {
         age: int32;
       }
       op single(@body pet?: Pet): void;
-      `
+      `,
       );
       strictEqual(res.paths["/"].post.parameters[0].required, false);
     });

@@ -78,7 +78,7 @@ function getScopedDecoratorData(
   context: TCGCContext,
   key: symbol,
   target: Type,
-  languageScope?: string | typeof AllScopes
+  languageScope?: string | typeof AllScopes,
 ): any {
   const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
   if (retval === undefined) return retval;
@@ -108,7 +108,7 @@ function setScopedDecoratorData(
   target: Type,
   value: unknown,
   scope?: LanguageScopes,
-  transitivity: boolean = false
+  transitivity: boolean = false,
 ): boolean {
   const targetEntry = context.program.stateMap(key).get(target);
   const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
@@ -144,7 +144,7 @@ const clientKey = createStateSymbol("client");
 
 function isArm(service: Namespace): boolean {
   return service.decorators.some(
-    (decorator) => decorator.decorator.name === "$armProviderNamespace"
+    (decorator) => decorator.decorator.name === "$armProviderNamespace",
   );
 }
 
@@ -152,7 +152,7 @@ export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options?: Model,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -167,7 +167,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : (findClientService(context.program, target, scope) ?? (target as any));
+      : (findClientService(context.program, target) ?? (target as any));
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
@@ -197,7 +197,21 @@ export const $client: ClientDecorator = (
 function findClientService(
   program: Program,
   client: Namespace | Interface,
-  scope?: LanguageScopes
+): Namespace | Interface | undefined {
+  let current: Namespace | undefined = client as any;
+  while (current) {
+    if (isService(program, current)) {
+      return current;
+    }
+    current = current.namespace;
+  }
+  return undefined;
+}
+
+function findOperationGroupService(
+  program: Program,
+  client: Namespace | Interface,
+  scope: LanguageScopes,
 ): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
@@ -206,8 +220,8 @@ function findClientService(
       return current;
     }
     const client = program.stateMap(clientKey).get(current);
-    if (client && client[scope ?? AllScopes]) {
-      return client[scope ?? AllScopes].service;
+    if (client && (client[scope] || client[AllScopes])) {
+      return (client[scope] ?? client[AllScopes]).service;
     }
     current = current.namespace;
   }
@@ -223,7 +237,7 @@ function findClientService(
  */
 export function getClient(
   context: TCGCContext,
-  type: Namespace | Interface
+  type: Namespace | Interface,
 ): SdkClient | undefined {
   for (const client of listClients(context)) {
     if (client.type === type) {
@@ -258,7 +272,7 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
     const apiVersion = getValidApiVersion(context, allApiVersions);
     if (apiVersion === undefined) return;
     const versionProjections = buildVersionProjections(context.program, client.service).filter(
-      (v) => apiVersion === v.version
+      (v) => apiVersion === v.version,
     );
     if (versionProjections.length !== 1)
       throw new Error("Version projects should only contain one element");
@@ -266,7 +280,7 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
     if (projectedVersion.projections.length > 0) {
       projectedProgram = context.program = projectProgram(
         context.originalProgram,
-        projectedVersion.projections
+        projectedVersion.projections,
       );
     }
     projectedService = projectedProgram
@@ -350,7 +364,7 @@ const operationGroupKey = createStateSymbol("operationGroup");
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
     reportDiagnostic(context.program, {
@@ -358,14 +372,6 @@ export const $operationGroup: OperationGroupDecorator = (
       target: context.decoratorTarget,
     });
     return;
-  }
-  const service = findClientService(context.program, target, scope) ?? (target as any);
-  if (!isService(context.program, service)) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name: target.name },
-      target: context.decoratorTarget,
-    });
   }
 
   setScopedDecoratorData(
@@ -376,9 +382,8 @@ export const $operationGroup: OperationGroupDecorator = (
     {
       kind: "SdkOperationGroup",
       type: target,
-      service,
     },
-    scope
+    scope,
   );
 };
 
@@ -409,7 +414,7 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
  */
 export function isInOperationGroup(
   context: TCGCContext,
-  type: Namespace | Interface | Operation
+  type: Namespace | Interface | Operation,
 ): boolean {
   switch (type.kind) {
     case "Operation":
@@ -455,10 +460,11 @@ function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interfa
  */
 export function getOperationGroup(
   context: TCGCContext,
-  type: Namespace | Interface
+  type: Namespace | Interface,
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-  const service = findClientService(context.program, type, context.emitterName) ?? (type as any);
+  const service =
+    findOperationGroupService(context.program, type, context.emitterName) ?? (type as any);
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
       code: "client-service",
@@ -470,6 +476,7 @@ export function getOperationGroup(
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
       operationGroup.groupPath = buildOperationGroupPath(context, type);
+      operationGroup.service = service;
     }
   } else {
     // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
@@ -528,7 +535,7 @@ export function getOperationGroup(
 export function listOperationGroups(
   context: TCGCContext,
   group: SdkClient | SdkOperationGroup,
-  ignoreHierarchy = false
+  ignoreHierarchy = false,
 ): SdkOperationGroup[] {
   const groups: SdkOperationGroup[] = [];
 
@@ -568,7 +575,7 @@ export function listOperationGroups(
 export function listOperationsInOperationGroup(
   context: TCGCContext,
   group: SdkOperationGroup | SdkClient,
-  ignoreHierarchy = false
+  ignoreHierarchy = false,
 ): Operation[] {
   const operations: Operation[] = [];
 
@@ -636,7 +643,7 @@ export async function createSdkContext<
 >(
   context: EmitContext<TOptions>,
   emitterName?: string,
-  options?: CreateSdkContextOptions
+  options?: CreateSdkContextOptions,
 ): Promise<SdkContext<TOptions, TServiceOperation>> {
   const diagnostics = createDiagnosticCollector();
   const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
@@ -646,7 +653,7 @@ export async function createSdkContext<
     context.options["generate-convenience-methods"] ?? convenienceOptions;
   const tcgcContext = createTCGCContext(
     context.program,
-    (emitterName ?? context.program.emitters[0]?.metadata?.name)!
+    (emitterName ?? context.program.emitters[0]?.metadata?.name)!,
   );
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
@@ -676,7 +683,7 @@ export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
   entity: Operation,
   value?: boolean,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
 };
@@ -687,7 +694,7 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   context: DecoratorContext,
   entity: Operation,
   value?: boolean,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
 };
@@ -708,7 +715,7 @@ export const $usage: UsageDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   const isValidValue = (value: number): boolean => value === 2 || value === 4;
 
@@ -744,7 +751,7 @@ export const $usage: UsageDecorator = (
 
 export function getUsageOverride(
   context: TCGCContext,
-  entity: Model | Enum | Union
+  entity: Model | Enum | Union,
 ): number | undefined {
   const usageFlags = getScopedDecoratorData(context, usageKey, entity);
   if (usageFlags || entity.namespace === undefined) return usageFlags;
@@ -773,7 +780,7 @@ export const $access: AccessDecorator = (
   context: DecoratorContext,
   entity: Model | Enum | Operation | Union | Namespace,
   value: EnumMember,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
@@ -787,7 +794,7 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace
+  entity: Model | Enum | Operation | Union | Namespace,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
@@ -831,7 +838,7 @@ const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
 export const $flattenProperty: FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   if (getDiscriminator(context.program, target.type)) {
     reportDiagnostic(context.program, {
@@ -858,7 +865,7 @@ export const $clientName: ClientNameDecorator = (
   context: DecoratorContext,
   entity: Type,
   value: string,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
@@ -867,8 +874,8 @@ export const $clientName: ClientNameDecorator = (
       if (
         ignoreDiagnostics(
           context.program.checker.resolveTypeReference(
-            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType
-          )
+            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType,
+          ),
         )?.node !== entity.node
       ) {
         return;
@@ -893,7 +900,7 @@ export const $clientName: ClientNameDecorator = (
 export function getClientNameOverride(
   context: TCGCContext,
   entity: Type,
-  languageScope?: string | typeof AllScopes
+  languageScope?: string | typeof AllScopes,
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
@@ -903,7 +910,7 @@ const overrideKey = createStateSymbol("override");
 // Recursive function to collect parameter names
 function collectParams(
   properties: RekeyableMap<string, ModelProperty>,
-  params: ModelProperty[] = []
+  params: ModelProperty[] = [],
 ): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
@@ -922,7 +929,7 @@ function collectParams(
         } else {
           // eslint-disable-next-line no-console
           console.log(
-            `We are not counting "${sourceProp.name}" as part of a method parameter because it's been added by Azure.Core templates`
+            `We are not counting "${sourceProp.name}" as part of a method parameter because it's been added by Azure.Core templates`,
           );
         }
       }
@@ -945,14 +952,14 @@ export const $override = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
   const overrideParams = collectParams(override.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   // Check if the sorted parameter names arrays are equal
@@ -984,7 +991,7 @@ export const $override = (
  */
 export function getOverriddenClientMethod(
   context: TCGCContext,
-  entity: Operation
+  entity: Operation,
 ): Operation | undefined {
   return getScopedDecoratorData(context, overrideKey, entity);
 }
@@ -992,7 +999,7 @@ export function getOverriddenClientMethod(
 export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {};
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
@@ -1001,7 +1008,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   options: Model,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(
     context,
@@ -1009,13 +1016,13 @@ export const $clientInitialization: ClientInitializationDecorator = (
     clientInitializationKey,
     target,
     options,
-    scope
+    scope,
   );
 };
 
 export function getClientInitialization(
   context: TCGCContext,
-  entity: Namespace | Interface
+  entity: Namespace | Interface,
 ): SdkInitializationType | undefined {
   const model = getScopedDecoratorData(context, clientInitializationKey, entity);
   if (!model) return model;
@@ -1025,7 +1032,7 @@ export function getClientInitialization(
       property.onClient = true;
       property.kind = "method";
       return property as SdkMethodParameter;
-    }
+    },
   );
   return {
     ...sdkModel,
@@ -1039,7 +1046,7 @@ export const paramAliasDecorator: ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
   paramAlias: string,
-  scope?: LanguageScopes
+  scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, paramAliasDecorator, paramAliasKey, original, paramAlias, scope);
 };

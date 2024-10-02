@@ -15,7 +15,7 @@ it("model used with @body and without shouldn't conflict if it contains no metad
     }
     @route("c1") op c1(): Foo;
     @route("c2") op c2(): {@body _: Foo};
-    `
+    `,
   );
   deepStrictEqual(res.paths["/c1"].get.responses["200"].schema, {
     $ref: "#/definitions/Foo",
@@ -35,7 +35,7 @@ it("defines responses with response headers", async () => {
       key: string;
     }
     @get op read(): Key & ETagHeader;
-    `
+    `,
   );
   ok(res.paths["/"].get.responses["200"].headers);
   ok(res.paths["/"].get.responses["200"].headers["e-tag"]);
@@ -56,7 +56,7 @@ it("defines responses with status codes", async () => {
     }
     @put
     op create(): TestCreatedResponse & Key;
-    `
+    `,
   );
   ok(res.paths["/"].put.responses["201"]);
   deepStrictEqual(res.paths["/"].put.responses["201"].schema, {
@@ -75,7 +75,7 @@ it("defines responses with numeric status codes", async () => {
     }
     @put
     op create(): TestCreatedResponse & Key;
-    `
+    `,
   );
   ok(res.paths["/"].put.responses["201"]);
   ok(res.paths["/"].put.responses["201"].schema);
@@ -95,7 +95,7 @@ it("defines responses with headers and status codes", async () => {
     }
     @put
     op create(): { ...TestCreatedResponse, ...ETagHeader, @body body: Key};
-    `
+    `,
   );
   ok(res.paths["/"].put.responses["201"]);
   ok(res.paths["/"].put.responses["201"].headers["e-tag"]);
@@ -120,7 +120,7 @@ it("defines responses with headers and status codes in base model", async () => 
     }
     @put
     op create(): TestCreatePageResponse;
-    `
+    `,
   );
   ok(res.paths["/"].put.responses["201"]);
   ok(res.paths["/"].put.responses["201"].headers["location"]);
@@ -143,18 +143,18 @@ it("defines separate responses for each status code defined as a union of values
     }
     @put
     op create(): CreatedOrUpdatedResponse & DateHeader & Key;
-    `
+    `,
   );
   ok(res.paths["/"].put.responses["200"]);
   ok(res.paths["/"].put.responses["201"]);
   // Note: 200 and 201 response should be equal except for description
   deepStrictEqual(
     res.paths["/"].put.responses["200"].headers,
-    res.paths["/"].put.responses["201"].headers
+    res.paths["/"].put.responses["201"].headers,
   );
   deepStrictEqual(
     res.paths["/"].put.responses["200"].schema,
-    res.paths["/"].put.responses["201"].schema
+    res.paths["/"].put.responses["201"].schema,
   );
 });
 
@@ -172,7 +172,7 @@ it("defines separate responses for each variant of a union return type", async (
     }
     @get
     op read(): Key | Error;
-    `
+    `,
   );
   ok(res.paths["/"].get.responses["200"]);
   ok(res.definitions.Key);
@@ -203,7 +203,7 @@ it("defines the response media type from the content-type header if present", as
     @get
     // Note: & takes precedence over |
     op read(): Key & TextPlain | Error;
-    `
+    `,
   );
   ok(res.paths["/"].get.responses["200"]);
   ok(res.paths["/"].get.responses["200"].schema);
@@ -222,7 +222,7 @@ it("defines the multiple response media types for content-type header with union
     }
     @get
     op read(): { ...TextMulti, @body body: string };
-  `
+  `,
   );
   ok(res.paths["/"].get.responses["200"]);
   deepStrictEqual(res.paths["/"].get.produces, ["text/plain", "text/html", "text/csv"]);
@@ -242,7 +242,7 @@ it("issues diagnostics when there is differrent body types across content types"
     }
 
     op read(): Foo | Bar;
-    `
+    `,
   );
   expectDiagnostics(ignoreUseStandardOps(diagnostics), {
     code: "@azure-tools/typespec-autorest/duplicate-body-types",
@@ -267,7 +267,7 @@ it("defines responses with top-level array type", async () => {
     }
 
     @get() op read(): Foo[];
-    `
+    `,
   );
   ok(res.paths["/"].get.responses["200"]);
   ok(res.paths["/"].get.responses["200"].schema);
@@ -279,7 +279,7 @@ it("produce additionalProperties schema if response is Record<T>", async () => {
   const res = await openApiFor(
     `
     @get op test(): Record<string>;
-    `
+    `,
   );
 
   const responses = res.paths["/"].get.responses;
@@ -296,7 +296,7 @@ it("return type with only response metadata should be 200 response w/ no content
   const res = await openApiFor(
     `
     @get op delete(): {@header date: string};
-    `
+    `,
   );
 
   const responses = res.paths["/"].get.responses;
@@ -319,7 +319,7 @@ it("defaults status code to default when model has @error decorator", async () =
 
     @get
     op get(): Foo | Error;
-    `
+    `,
   );
   const responses = res.paths["/"].get.responses;
   ok(responses["200"]);
@@ -346,7 +346,7 @@ it("defaults status code to default when model has @error decorator and explicit
 
       @get
       op get(): Foo | Error;
-    `
+    `,
   );
   const responses = res.paths["/"].get.responses;
   ok(responses["200"]);
@@ -374,7 +374,7 @@ it("emit x-ms-error-response when uses explicit status code and model has @error
 
     @get
     op get(): Foo | Error;
-    `
+    `,
   );
   const responses = res.paths["/"].get.responses;
   deepStrictEqual(responses["400"]["x-ms-error-response"], true);
@@ -402,7 +402,7 @@ it("emit x-ms-error-response when return type includes two union options with @e
 
     @get
     op get(): Foo | CustomizedErrorResponse | Error;
-    `
+    `,
   );
   const responses = res.paths["/"].get.responses;
   deepStrictEqual(responses["400"]["x-ms-error-response"], true);
@@ -423,7 +423,7 @@ it("uses explicit status code when model has @error decorator", async () => {
     }
     @get
     op get(): Foo | Error;
-    `
+    `,
   );
   const responses = res.paths["/"].get.responses;
   ok(responses["200"]);
@@ -442,7 +442,7 @@ it("defines body schema when explicit body has no content", async () => {
     `
     @delete
     op delete(): { @header date: string, @body body: {} };
-    `
+    `,
   );
   const responses = res.paths["/"].delete.responses;
   ok(responses["204"] === undefined);
@@ -500,7 +500,7 @@ describe("response model resolving to no property in the body produce no body", 
     async (body) => {
       const res = await openApiFor(`op test(): ${body};`);
       strictEqual(res.paths["/"].get.responses["200"].schema, undefined);
-    }
+    },
   );
 });
 

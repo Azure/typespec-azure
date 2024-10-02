@@ -1,5 +1,5 @@
-import { strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { ok, strictEqual } from "assert";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
@@ -9,7 +9,16 @@ describe("typespec-client-generator-core: date-time types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("default", async function () {
     await runner.compileWithBuiltInService(
       `
@@ -17,7 +26,7 @@ describe("typespec-client-generator-core: date-time types", () => {
         model Test {
           prop: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -33,7 +42,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.rfc3339)
           prop: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -49,7 +58,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.rfc7231)
           prop: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -65,7 +74,7 @@ describe("typespec-client-generator-core: date-time types", () => {
       model Test {
         prop: unixTimestamp32;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -83,7 +92,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.unixTimestamp, int64)
           value: utcDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -105,7 +114,7 @@ describe("typespec-client-generator-core: date-time types", () => {
         model Test {
           value: extraLayerDateTime;
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "utcDateTime");
@@ -133,7 +142,7 @@ describe("typespec-client-generator-core: date-time types", () => {
           @encode(DateTimeKnownEncoding.unixTimestamp, int64)
           value: utcDateTime | null;
         }
-      `
+      `,
     );
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
@@ -156,7 +165,7 @@ describe("typespec-client-generator-core: date-time types", () => {
         model Test {
           value: unixTimestampDateTime[];
         }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
@@ -164,8 +173,6 @@ describe("typespec-client-generator-core: date-time types", () => {
     strictEqual(sdkType.valueType.name, "unixTimestampDateTime");
     strictEqual(sdkType.valueType.encode, "unixTimestamp");
     strictEqual(sdkType.valueType.wireType?.kind, "int64");
-    strictEqual(sdkType.valueType.description, "title");
-    strictEqual(sdkType.valueType.details, "doc");
     strictEqual(sdkType.valueType.doc, "doc");
     strictEqual(sdkType.valueType.summary, "title");
     strictEqual(sdkType.valueType.crossLanguageDefinitionId, "TestService.unixTimestampDateTime");

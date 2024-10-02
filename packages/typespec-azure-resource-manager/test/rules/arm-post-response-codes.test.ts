@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     armPostResponseCodesRule,
-    "@azure-tools/typespec-azure-resource-manager"
+    "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
@@ -44,7 +44,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
           result: boolean;
         } | ErrorResponse;
       }
-      `
+      `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
@@ -79,7 +79,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
           @multipartBody result: [HttpPart<string>]
         } | ErrorResponse;
       }
-      `
+      `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
@@ -113,7 +113,7 @@ it("Does not emit a warning for a synchronous post operation that contains the 2
           result: boolean;
         } | ErrorResponse;
       }
-    `
+    `,
     )
     .toBeValid();
 });
@@ -143,7 +143,7 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
           result: boolean;
         } | ErrorResponse;
       }
-    `
+    `,
     )
     .toBeValid();
 });
@@ -189,7 +189,7 @@ it("Does not emit a warning for a long-running post operation that satisfies the
           @header("x-ms-operation-id") operationId: string;
           @body result: Widget;
         } | ErrorResponse;
-      }`
+      }`,
     )
     .toBeValid();
 });
@@ -232,7 +232,7 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
           @header("x-ms-operation-id") operationId: string;
           @bodyRoot body: Widget;
         } | ErrorResponse;
-      }`
+      }`,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
@@ -281,7 +281,7 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
           @statusCode code: "200";
           @header("x-ms-operation-id") operationId: string;
         } | ErrorResponse;
-      }`
+      }`,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",
@@ -327,7 +327,7 @@ it("Emits a warning for a long-running post operation that has invalid response 
           @statusCode code: "203";
           @header("x-ms-operation-id") operationId: string
         } | ErrorResponse;
-      }`
+      }`,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-post-operation-response-codes",

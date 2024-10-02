@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: model nesting rule", () => {
     tester = createLinterRuleTester(
       runner,
       beyondNestingRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -44,7 +44,7 @@ describe("typespec-azure-resource-manager: model nesting rule", () => {
           @key("c") @segment("cs") @path
           name: string;
         }
-      `
+      `,
       )
       .toBeValid();
   });
@@ -80,7 +80,7 @@ describe("typespec-azure-resource-manager: model nesting rule", () => {
           @key("d") @segment("ds") @path
           name: string;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels",

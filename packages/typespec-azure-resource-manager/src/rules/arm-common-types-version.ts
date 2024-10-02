@@ -36,12 +36,12 @@ export const armCommonTypesVersionRule = createRule({
                 .every(
                   (version) =>
                     !!version.enumMember.decorators.find(
-                      (x) => x.definition?.name === "@armCommonTypesVersion"
-                    )
+                      (x) => x.definition?.name === "@armCommonTypesVersion",
+                    ),
                 )
             ) &&
             !service.namespace.decorators.find(
-              (x) => x.definition?.name === "@armCommonTypesVersion"
+              (x) => x.definition?.name === "@armCommonTypesVersion",
             )
           ) {
             context.reportDiagnostic({

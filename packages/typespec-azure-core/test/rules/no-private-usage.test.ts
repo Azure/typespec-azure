@@ -25,7 +25,7 @@ it("emits a warning diagnostic if using type from Azure.Core.Foundations.Private
           bar: Azure.Core.Foundations.Private.ArmResourceIdentifierConfigOptions
         }
       }
-      `
+      `,
     )
     .toEmitDiagnostics([
       {
@@ -45,7 +45,7 @@ it("emits a warning diagnostic if using decorators from Azure.Core.Foundations.P
         @Azure.Core.Foundations.Private.embeddingVector(string)
         model Foo {}
       }
-      `
+      `,
     )
     .toEmitDiagnostics([
       {
@@ -69,7 +69,7 @@ it("ok using item from Private namespace in the project", async () => {
       namespace MyLib.Private {
         model Bar {}
       }
-      `
+      `,
     )
     .toBeValid();
 });

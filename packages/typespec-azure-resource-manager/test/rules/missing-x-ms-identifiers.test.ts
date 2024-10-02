@@ -16,7 +16,7 @@ describe("typespec-azure-core: no-enum rule", () => {
     tester = createLinterRuleTester(
       runner,
       missingXmsIdentifiersRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -31,7 +31,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
@@ -51,7 +51,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
@@ -71,7 +71,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
@@ -91,7 +91,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toBeValid();
   });
@@ -126,7 +126,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           id: string;
         }
-        `
+        `,
       )
       .toBeValid();
   });

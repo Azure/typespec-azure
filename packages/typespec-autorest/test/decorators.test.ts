@@ -103,7 +103,7 @@ describe("typespec-autorest: decorators", () => {
         ignoreDiagnostics(diagnostics, [
           "@azure-tools/typespec-azure-core/use-standard-operations",
           "@typespec/http/no-service-found",
-        ])
+        ]),
       );
 
       strictEqual(getRef(runner.program, Foo), "../common.json#/definitions/Foo");
@@ -136,7 +136,7 @@ describe("typespec-autorest: decorators", () => {
           ignoreDiagnostics(diagnostics, [
             "@azure-tools/typespec-azure-core/use-standard-operations",
             "@typespec/http/no-service-found",
-          ])
+          ]),
         );
 
         const outPath = resolvePath(outputDir, "openapi.json");
