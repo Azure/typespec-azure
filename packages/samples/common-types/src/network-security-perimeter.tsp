@@ -11,7 +11,10 @@ namespace Azure.ResourceManager.CommonTypes;
 model Resource {}
 
 @useRef("./types.json#/definitions/ProxyResource")
-model ProxyResource {}
+model ProxyResource {
+  @visibility("read")
+  id?: Azure.Core.armResourceIdentifier;
+}
 
 interface RegisterParams {
   @Versioning.added(Versions.v5)

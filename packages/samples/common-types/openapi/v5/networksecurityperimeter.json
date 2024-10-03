@@ -192,8 +192,7 @@
           "description": "Array of network security perimeter results.",
           "items": {
             "$ref": "#/definitions/NetworkSecurityPerimeterConfiguration"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "nextLink": {
           "type": "string",
