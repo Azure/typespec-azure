@@ -138,7 +138,7 @@ alias TenantInstanceParameters<Resource extends Foundations.Resource> = Resource
 >;
 
 /**
- * Template for subscription actions.
+ * Template used by ArmProviderAction templates.
  */
 @armVirtualResource
 @subscriptionResource
@@ -152,7 +152,7 @@ model SubscriptionActionScope {
 }
 
 /**
- * Template for tenant actions.
+ * Template used by ArmTenantAction templates.
  */
 @armVirtualResource
 @tenantResource

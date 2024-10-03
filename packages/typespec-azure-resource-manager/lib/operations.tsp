@@ -696,46 +696,35 @@ op checkLocalNameAvailability<
 >;
 
 /**
- * @dev An action performed at subscription level.
+ * @dev A provider action performed over a subscription
  * @template Request The request model for the action.
  * @template Response The response type for the action.
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
- * @template Scope Optional. The scope of the action.
+ * @template Scope Optional. The scope of the action (defaults to SubscriptionActionScope).
  * @template Error Optional. The error response, if non-standard.
  */
-@post
-@action
-@armResourceCollectionAction
 op ArmProviderActionSync<
   Request extends {} | void = void,
   Response extends {} | void = void,
   Parameters extends {} = {},
-  Scope extends {} = SubscriptionActionScope,
+  Scope extends SubscriptionActionScope = SubscriptionActionScope,
   Error extends {} = ErrorResponse
->(
-  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
-  ...ProviderNamespace<Scope>,
-  ...Parameters,
-  @bodyRoot body: Request,
-): Response | ErrorResponse;
+> is ArmActionSync<Request, Response, Parameters, Scope, Error>;
 
 /**
- * @dev A long-running action performed at subscriptions level.
+ * @dev A long-running provider action performed over a subscription.
  * @template Request The request model for the action
  * @template Response The response type for the action
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
- * @template Scope Optional. The scope of the action.
+ * @template Scope Optional. The scope of the action (defaults to SubscriptionActionScope).
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Error Optional. The error response, if non-standard.
  */
-@post
-@action
-@armResourceCollectionAction
 op ArmProviderActionAsync<
   Request extends {} | void = void,
   Response extends {} | void = void,
   Parameters extends {} = {},
-  Scope extends {} = SubscriptionActionScope,
+  Scope extends SubscriptionActionScope = SubscriptionActionScope,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Response,
@@ -743,15 +732,49 @@ op ArmProviderActionAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Error extends {} = ErrorResponse
->(
-  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
-  ...ProviderNamespace<Scope>,
-  ...Parameters,
-  @bodyRoot body: Request,
-): Response | ErrorResponse;
+> is ArmActionAsync<Request, Response, Parameters, Scope, LroHeaders, Error>;
 
 /**
- * @dev An action performed at tenant level.
+ * @dev A provider action performed over a tenant
+ * @template Request The request model for the action
+ * @template Response The response type for the action
+ * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
+ * @template Scope Optional. The scope of the action (Defaults to TenantActionScope).
+ * @template Error Optional. The error response, if non-standard.
+ */
+op ArmTenantActionSync<
+  Request extends {} | void = void,
+  Response extends {} | void = void,
+  Parameters extends {} = {},
+  Scope extends TenantActionScope = TenantActionScope,
+  Error extends {} = ErrorResponse
+> is ArmActionSync<Request, Response, Parameters, Scope, Error>;
+
+/**
+ * @dev A long-running provider action performed over a tenant.
+ * @template Request The request model for the action
+ * @template Response The response type for the action
+ * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
+ * @template Scope Optional. The scope of the action (Defaults to TenantActionScope).
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
+ * @template Error Optional. The error response, if non-standard.
+ */
+op ArmTenantActionAsync<
+  Request extends {} | void = void,
+  Response extends {} | void = void,
+  Parameters extends {} = {},
+  Scope extends TenantActionScope = TenantActionScope,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Response,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Error extends {} = ErrorResponse
+> is ArmActionAsync<Request, Response, Parameters, Scope, LroHeaders, Error>;
+
+/**
+ * @dev A provider action performed over a tenant
  * @template Request The request model for the action
  * @template Response The response type for the action
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
@@ -761,21 +784,23 @@ op ArmProviderActionAsync<
 @post
 @action
 @armResourceCollectionAction
-op ArmTenantActionSync<
+op ArmActionSync<
   Request extends {} | void = void,
   Response extends {} | void = void,
   Parameters extends {} = {},
-  Scope extends {} = TenantActionScope,
+  Scope extends {} = {},
   Error extends {} = ErrorResponse
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
   ...ProviderNamespace<Scope>,
   ...Parameters,
+
+  /** The request body */
   @bodyRoot body: Request,
 ): Response | ErrorResponse;
 
 /**
- * @dev A long-running action performed at tenant level.
+ * @dev A long-running provider action.
  * @template Request The request model for the action
  * @template Response The response type for the action
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
@@ -786,11 +811,11 @@ op ArmTenantActionSync<
 @post
 @action
 @armResourceCollectionAction
-op ArmTenantActionAsync<
+op ArmActionAsync<
   Request extends {} | void = void,
   Response extends {} | void = void,
   Parameters extends {} = {},
-  Scope extends {} = TenantActionScope,
+  Scope extends {} = {},
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
     Response,
@@ -802,5 +827,7 @@ op ArmTenantActionAsync<
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
   ...ProviderNamespace<Scope>,
   ...Parameters,
+
+  /** The request body */
   @bodyRoot body: Request,
 ): Response | ErrorResponse;
