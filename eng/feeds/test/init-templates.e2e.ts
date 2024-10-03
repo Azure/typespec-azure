@@ -82,7 +82,7 @@ describe("Init templates e2e tests", () => {
       Object.entries(template.inputs ?? {}).map(([key, value]) => [key, value.initialValue]),
     );
     await scaffoldNewProject(
-      NodeHost,
+      NodeHost as any,
       makeScaffoldingConfig(template, {
         name,
         folderName: name,
