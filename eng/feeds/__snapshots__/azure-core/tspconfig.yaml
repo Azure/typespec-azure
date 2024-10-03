@@ -1,6 +1,6 @@
 parameters:  
   "service-dir":
-    default: "sdk/{{#toLowerCase}}{{folderName}}{{/toLowerCase}}"
+    default: "sdk/azure-core"
   "dependencies":
     "additionalDirectories": []
     default: ""
@@ -9,23 +9,27 @@ emit:
 options:
   "@azure-tools/typespec-autorest":
     azure-resource-provider-folder: "data-plane"
+    emitter-output-dir: "{project-root}/.."
     output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-python":    
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
+    package-dir: "azure-contoso"
     package-name: "{package-dir}"  
     package-mode: dataplane
   "@azure-tools/typespec-csharp":
-    package-dir: "{{parameters.ServiceNamespace}}"
+    package-dir: "Azure.Contoso"
     namespace: "{package-dir}"
     clear-output-folder: true
     model-namespace: false
   "@azure-tools/typespec-ts":
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
+    package-dir: "azure-contoso-rest"
     generateMetadata: true
     generateTest: true
     packageDetails:
-      name: "@azure-rest/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
-      description: "{{parameters.ServiceNamespace}} Service"
+      name: "@azure-rest/azure-contoso-rest"
+      description: "Azure.Contoso Service"
   "@azure-tools/typespec-java":
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
-    namespace: com.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}
+    package-dir: "azure-contoso"
+    namespace: com.azure.contoso
+linter:
+  extends:
+    - "@azure-tools/typespec-azure-rulesets/data-plane"
