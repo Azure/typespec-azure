@@ -71,7 +71,6 @@ interface ScaffoldedTemplateFixture {
 
 describe("Init templates e2e tests", () => {
   beforeAll(async () => {
-    console.log("Test", testTempRoot);
     await rm(testTempRoot, { recursive: true, force: true });
     await mkdir(testTempRoot, { recursive: true });
   });
