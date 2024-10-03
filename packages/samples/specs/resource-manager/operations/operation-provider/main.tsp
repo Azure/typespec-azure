@@ -56,7 +56,7 @@ interface ProviderOperations {
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsSubscription is ArmProviderActionAsync<Response = Page<LogAnalyticsOperationResult>>;
-  /** Operation to get throttled Requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequestsTenant) */
+  /** Operation to get throttled Requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsTenant is ArmTenantActionAsync<Response = Page<LogAnalyticsOperationResult>>;
