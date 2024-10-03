@@ -56,10 +56,11 @@ core/packages/website/versioned_docs/**/standard-library/built-in-data-types.md
 packages/website/playground-versions.json
 core/packages/website/playground-versions.json
 
-core/eng/feeds/
+/core/eng/feeds/
 
 # TypeSpec init template
-eng/feeds/
+/eng/feeds/*
+!/eng/feeds/test/
 
 # Auto generated templates
 core/packages/compiler/templates/scaffolding.json
