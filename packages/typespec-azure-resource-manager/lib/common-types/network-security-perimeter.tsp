@@ -1,11 +1,7 @@
 using TypeSpec.Http;
 using TypeSpec.Versioning;
 using Azure.Core;
-using OpenAPI;
 
-@info({
-  title: "Network security perimeter common type definitions",
-})
 @server(
   "https://management.azure.com",
   "The endpoint for network security perimeter common type definitions"
