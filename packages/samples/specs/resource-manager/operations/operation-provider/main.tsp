@@ -26,38 +26,38 @@ enum Versions {
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
-/** Represents a virtual machine */
-model VirtualMachine {
-  /** the name of the virtual machine */
+/** Represents a virtual machine size */
+model vmSize {
+  /** The name of the virtual machine size */
   name: string;
 }
 
-/** Represents a throttled request */
-model ThrottledRequest {
-  /** The reason for throttling */
-  reason: string;
+/** LogAnalytics operation status response */
+model LogAnalyticsOperationResult {
+  /** LogAnalyticsOutput */
+  output: string;
 }
 
 @armResourceOperations
 interface ProviderOperations {
-  /** Operation to get virtual machines for provider (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVirtualMachines) */
+  /** Operation to get virtual machines for provider (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
   @get
-  getVirtualMachines is ArmProviderActionAsync<Response = Page<VirtualMachine>>;
-  /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVirtualMachinesTenant) */
+  getVmSizes is ArmProviderActionAsync<Response = Page<vmSize>>;
+  /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
   @get
-  getVirtualMachinesTenant is ArmTenantActionAsync<Response = Page<VirtualMachine>>;
-  /** Operation to get virtual machines for provider for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVirtualMachinesAtLocation) */
+  getVmSizesTenant is ArmTenantActionAsync<Response = Page<vmSize>>;
+  /** Operation to get virtual machines for provider for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation) */
   @get
-  getVirtualMachinesAtLocation is ArmProviderActionAsync<
-    Response = Page<VirtualMachine>,
+  getVmSizesLocation is ArmProviderActionAsync<
+    Response = Page<vmSize>,
     Parameters = LocationParameter
   >;
   /** Operation to get throttled Requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
-  getThrottledRequestsForSubscription is ArmProviderActionAsync<Response = Page<ThrottledRequest>>;
-  /** Operation to get throttled Requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
+  getThrottledRequestsSubscription is ArmProviderActionAsync<Response = Page<LogAnalyticsOperationResult>>;
+  /** Operation to get throttled Requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequestsTenant) */
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
-  getThrottledRequestsForTenant is ArmTenantActionAsync<Response = Page<ThrottledRequest>>;
+  getThrottledRequestsTenant is ArmTenantActionAsync<Response = Page<LogAnalyticsOperationResult>>;
 }
