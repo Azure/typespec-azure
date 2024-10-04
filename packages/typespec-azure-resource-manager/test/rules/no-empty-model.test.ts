@@ -3,7 +3,7 @@ import {
   LinterRuleTester,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { noEmptyModel } from "../../src/rules/no-empty-model.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
@@ -13,53 +13,52 @@ const armDef = `
 namespace Microsoft.Contoso;
 `;
 
-describe("typespec-azure-resource-manager: arm properties type-object no definition rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: BasicTestRunner;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      noEmptyModel,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
+beforeEach(async () => {
+  runner = await createAzureResourceManagerTestRunner();
+  tester = createLinterRuleTester(
+    runner,
+    noEmptyModel,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("emits diagnostic when a property use type:object that is not defined", async () => {
-    await tester
-      .expect(
-        ` 
+it("emits diagnostic when a property use type:object that is not defined", async () => {
+  await tester
+    .expect(
+      ` 
       ${armDef}
       model Foo { 
         props: {};
       } 
         `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/no-empty-model",
-        message: "Properties with type:object must have definition of a reference model.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+      message: "Properties with type:object must have definition of a reference model.",
+    });
+});
 
-  it("emits diagnostic when model type:object is not defined", async () => {
-    await tester
-      .expect(
-        ` 
+it("emits diagnostic when model type:object is not defined", async () => {
+  await tester
+    .expect(
+      ` 
       ${armDef}
       model Foo { } 
         `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/no-empty-model",
-        message: "Properties with type:object must have definition of a reference model.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/no-empty-model",
+      message: "Properties with type:object must have definition of a reference model.",
+    });
+});
 
-  it("valid when a property use type:object that is defined", async () => {
-    await tester
-      .expect(
-        `
+it("valid when a property use type:object that is defined", async () => {
+  await tester
+    .expect(
+      `
       ${armDef}
       model WidgetProperties {
         props: Foo;
@@ -69,33 +68,32 @@ describe("typespec-azure-resource-manager: arm properties type-object no definit
         Name: string;
       }
     `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("valid when a property use type:object known scalar", async () => {
-    await tester
-      .expect(
-        ` 
+it("valid when a property use type:object known scalar", async () => {
+  await tester
+    .expect(
+      ` 
       ${armDef}
       model WidgetProperties {
         Date: utcDateTime;
       }
         `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("valid when a property use a simple data type ", async () => {
-    await tester
-      .expect(
-        ` 
+it("valid when a property use a simple data type ", async () => {
+  await tester
+    .expect(
+      ` 
       ${armDef}
       model WidgetProperties {
         Name: string;
       }
         `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
 });
