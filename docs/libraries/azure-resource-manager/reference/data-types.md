@@ -844,7 +844,7 @@ model Azure.ResourceManager.ResourceUriParameter
 
 ### `SubscriptionActionScope` {#Azure.ResourceManager.SubscriptionActionScope}
 
-Template for subscription actions.
+Template used by ArmProviderAction templates.
 
 ```typespec
 model Azure.ResourceManager.SubscriptionActionScope
@@ -873,7 +873,7 @@ model Azure.ResourceManager.SubscriptionLocationResource
 
 ### `TenantActionScope` {#Azure.ResourceManager.TenantActionScope}
 
-Template for tenant actions.
+Template used by ArmTenantAction templates.
 
 ```typespec
 model Azure.ResourceManager.TenantActionScope
