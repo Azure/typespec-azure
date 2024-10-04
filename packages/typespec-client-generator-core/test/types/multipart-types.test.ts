@@ -1,6 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import {
   SdkBodyModelPropertyType,
   SdkClientType,
@@ -14,6 +14,17 @@ describe("typespec-client-generator-core: multipart types", () => {
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+  });
+
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
   });
 
   it("multipart form basic", async function () {
@@ -44,6 +55,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(profileImage.multipartOptions);
     strictEqual(profileImage.multipartOptions.isFilePart, true);
   });
+
   it("multipart conflicting model usage", async function () {
     await runner.compile(
       `
@@ -61,6 +73,70 @@ describe("typespec-client-generator-core: multipart types", () => {
       code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
     });
   });
+
+  it("multipart conflicting model usage for only multipart operations", async function () {
+    await runner.compile(
+      `
+        @service({title: "Test Service"}) namespace TestService;
+        model Address {city: string;}
+        model MultiPartRequest {
+          address: Address;
+          id: string;
+          profileImage: bytes;
+        }
+        
+        @post
+        @route("/basic1") 
+        op basic1(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+        @post
+        @route("/basic2") 
+        op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+      `,
+    );
+    deepEqual(runner.context.diagnostics.length, 0);
+    const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
+    ok(address);
+    deepEqual(address.usage, UsageFlags.Input);
+    const multiPartRequest = runner.context.sdkPackage.models.find(
+      (x) => x.name === "MultiPartRequest",
+    );
+    ok(multiPartRequest);
+    deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
+  });
+
+  it("multipart conflicting model usage for mixed operations", async function () {
+    await runner.compile(
+      `
+        @service({title: "Test Service"}) namespace TestService;
+        model Address {city: string;}
+        model RegularRequest {
+          address: Address;
+        }
+        model MultiPartRequest {
+          address: Address;
+          id: string;
+          profileImage: bytes;
+        }
+        
+        @post
+        @route("/basic1") 
+        op basic1(@body body: RegularRequest): NoContentResponse;
+        @post
+        @route("/basic2") 
+        op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+      `,
+    );
+    deepEqual(runner.context.diagnostics.length, 0);
+    const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
+    ok(address);
+    deepEqual(address.usage, UsageFlags.Input | UsageFlags.Json);
+    const multiPartRequest = runner.context.sdkPackage.models.find(
+      (x) => x.name === "MultiPartRequest",
+    );
+    ok(multiPartRequest);
+    deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
+  });
+
   it("multipart resolving conflicting model usage with spread", async function () {
     await runner.compileWithBuiltInService(
       `
@@ -543,6 +619,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(stringWithContentType);
     strictEqual(stringWithContentType.type.kind, "model");
+    strictEqual(stringWithContentType.type.name, "MultiPartRequestStringWithContentType");
     ok(stringWithContentType.multipartOptions);
     ok(stringWithContentType.multipartOptions.contentType);
     deepEqual(stringWithContentType.multipartOptions.defaultContentTypes, ["text/html"]);
@@ -563,6 +640,7 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(bytesWithContentType);
     strictEqual(bytesWithContentType.type.kind, "model");
+    strictEqual(bytesWithContentType.type.name, "MultiPartRequestBytesWithContentType");
     ok(bytesWithContentType.multipartOptions);
     ok(bytesWithContentType.multipartOptions.contentType);
     deepEqual(bytesWithContentType.multipartOptions.defaultContentTypes, ["image/png"]);

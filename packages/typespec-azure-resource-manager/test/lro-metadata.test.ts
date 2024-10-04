@@ -491,6 +491,114 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     deepStrictEqual(metadata.finalStateVia, "location");
   });
 
+  it("Returns correct metadata for Async CreateOrUpdate with final operation, with union type ProvisioningState", async () => {
+    const [metadata, _diag, _runner] = await getLroMetadataFor(
+      `
+  @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The state of the resource")
+      union ResourceState {
+        Succeeded: "Succeeded",
+        Canceled: "Canceled",
+        Failed: "Failed"
+      }
+
+      @doc("The widget properties")
+      model WidgetProperties {
+        @doc("I am a simple Resource Identifier")
+        simpleArmId: ResourceIdentifier;
+
+        @doc("The provisioning State")
+        provisioningState: ResourceState;
+      }
+
+      @doc("Foo resource")
+      model Widget is TrackedResource<WidgetProperties> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+      @armResourceOperations(Widget)
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        @Azure.Core.finalOperation(Widgets.get)
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteSync<Widget>;
+        listByResourceGroup is ArmResourceListByParent<Widget>;
+        listBySubscription is ArmListBySubscription<Widget>;
+      }
+      
+      `,
+      "createOrUpdate",
+    );
+    ok(metadata);
+    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+  });
+
+  it("Returns correct metadata for Async Update with final operation, with union type ProvisioningState", async () => {
+    const [metadata, _diag, _runner] = await getLroMetadataFor(
+      `
+  @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The state of the resource")
+      union ResourceState {
+        Succeeded: "Succeeded",
+        Canceled: "Canceled",
+        Failed: "Failed"
+      }
+
+      @doc("The widget properties")
+      model WidgetProperties {
+        @doc("I am a simple Resource Identifier")
+        simpleArmId: ResourceIdentifier;
+
+        @doc("The provisioning State")
+        provisioningState: ResourceState;
+      }
+
+      @doc("Foo resource")
+      model Widget is TrackedResource<WidgetProperties> {
+        @doc("Widget name")
+        @key("widgetName")
+        @segment("widgets")
+        @path
+        name: string;
+      }
+      @armResourceOperations(Widget)
+      interface Widgets {
+        get is ArmResourceRead<Widget>;
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        @Azure.Core.finalOperation(Widgets.get)
+        update is ArmResourcePatchAsync<Widget, WidgetProperties>;
+        delete is ArmResourceDeleteSync<Widget>;
+        listByResourceGroup is ArmResourceListByParent<Widget>;
+        listBySubscription is ArmListBySubscription<Widget>;
+      }
+      
+      `,
+      "update",
+    );
+    ok(metadata);
+    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+    deepStrictEqual(metadata.finalResultPath, undefined);
+    deepStrictEqual(metadata.finalStateVia, "original-uri");
+  });
+
   it("Returns correct metadata for Async Update with union type ProvisioningState", async () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `

@@ -153,6 +153,21 @@ describe("explicit example", () => {
     expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/getPet.json"))).toBe(true);
   });
 
+  it("read nested examples from {project-root}/examples", async () => {
+    addExampleFile("./examples/pets/getPet.json", { operationId: "Pets_get", title: "Get a pet" });
+
+    const openapi = await compileOpenAPI(`@operationId("Pets_get") op read(): void;`, {
+      host,
+    });
+
+    deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
+      "Get a pet": {
+        $ref: "./examples/pets/getPet.json",
+      },
+    });
+    expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/pets/getPet.json"))).toBe(true);
+  });
+
   it("read examples from examples-dir", async () => {
     addExampleFile("./my-examples/getPet.json", { operationId: "Pets_get", title: "Get a pet" });
 
@@ -167,6 +182,25 @@ describe("explicit example", () => {
       },
     });
     expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/getPet.json"))).toBe(true);
+  });
+
+  it("read nested examples from examples-dir", async () => {
+    addExampleFile("./my-examples/pets/getPet.json", {
+      operationId: "Pets_get",
+      title: "Get a pet",
+    });
+
+    const openapi = await compileOpenAPI(`@operationId("Pets_get") op read(): void;`, {
+      host,
+      options: { "examples-dir": resolveVirtualPath("./my-examples") },
+    });
+
+    deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
+      "Get a pet": {
+        $ref: "./examples/pets/getPet.json",
+      },
+    });
+    expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/pets/getPet.json"))).toBe(true);
   });
 
   it("emit diagnostic when example files use same operation id", async () => {

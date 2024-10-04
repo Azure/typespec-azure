@@ -1,0 +1,11 @@
+{
+  "operationId": "IF_get",
+  "title": "renamedIF_renamedOP",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "description": "ARM operation completed successfully.",
+      "body": "test"
+    }
+  }
+}

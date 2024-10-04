@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/internal-utils.js";
 import { getAllModels } from "../../src/types.js";
@@ -13,7 +13,16 @@ describe("typespec-client-generator-core: model types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("basic", async () => {
     await runner.compile(`
         @service({})
@@ -187,7 +196,6 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
     strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
@@ -200,7 +208,6 @@ describe("typespec-client-generator-core: model types", () => {
     const sharktypeProperty = shark.properties[0];
     ok(sharktypeProperty);
     strictEqual(sharktypeProperty.name, "sharktype");
-    strictEqual(sharktypeProperty.description, "Discriminator property for Shark.");
     strictEqual(sharktypeProperty.doc, "Discriminator property for Shark.");
     strictEqual(sharktypeProperty.kind, "property");
     strictEqual(sharktypeProperty.discriminator, true);
@@ -232,7 +239,6 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
     strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
@@ -265,7 +271,6 @@ describe("typespec-client-generator-core: model types", () => {
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.description, "Discriminator property for Fish.");
     strictEqual(kindProperty.doc, "Discriminator property for Fish.");
     strictEqual(kindProperty.kind, "property");
     strictEqual(kindProperty.discriminator, true);
@@ -369,7 +374,6 @@ describe("typespec-client-generator-core: model types", () => {
     const catValue = values.find((x) => x.name === "Cat");
     ok(catValue);
     strictEqual(catValue.value, "cat");
-    strictEqual(catValue.description, "Cat");
     strictEqual(catValue.doc, "Cat");
     strictEqual(catValue.enumType, petKind);
     strictEqual(catValue.valueType, petKind.valueType);
@@ -378,7 +382,6 @@ describe("typespec-client-generator-core: model types", () => {
     const dogValue = values.find((x) => x.name === "Dog");
     ok(dogValue);
     strictEqual(dogValue.value, "dog");
-    strictEqual(dogValue.description, "Dog");
     strictEqual(dogValue.doc, "Dog");
     strictEqual(dogValue.enumType, petKind);
     strictEqual(dogValue.valueType, petKind.valueType);
@@ -500,7 +503,6 @@ describe("typespec-client-generator-core: model types", () => {
     const dogKindProperty = dog.properties[0];
     ok(dogKindProperty);
     strictEqual(dogKindProperty.type, dogKind);
-    strictEqual(dogKindProperty.description, "Discriminator property for Dog.");
     strictEqual(dogKindProperty.doc, "Discriminator property for Dog.");
   });
 
@@ -690,12 +692,12 @@ describe("typespec-client-generator-core: model types", () => {
   });
 
   it("filterOutCoreModels true", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
       @resource("users")
       @doc("Details about a user.")
       model User {
@@ -711,12 +713,12 @@ describe("typespec-client-generator-core: model types", () => {
       @doc("Creates or updates a User")
       op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-    for (const [type, sdkType] of runnerWithCore.context.modelsMap?.entries() ?? []) {
+    for (const [type, sdkType] of runner.context.modelsMap?.entries() ?? []) {
       if (isAzureCoreModel(type)) {
         ok(sdkType.usage !== UsageFlags.None);
       }
@@ -724,13 +726,13 @@ describe("typespec-client-generator-core: model types", () => {
   });
 
   it("filterOutCoreModels false", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
         @resource("users")
         @doc("Details about a user.")
         model User {
@@ -746,9 +748,7 @@ describe("typespec-client-generator-core: model types", () => {
         @doc("Creates or updates a User")
         op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.sdkPackage.models.sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
+    const models = runner.context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
     strictEqual(models.length, 4);
     strictEqual(models[0].name, "Error");
     strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
@@ -761,12 +761,12 @@ describe("typespec-client-generator-core: model types", () => {
   });
 
   it("lro core filterOutCoreModels true", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
       @resource("users")
       @doc("Details about a user.")
       model User {
@@ -783,20 +783,20 @@ describe("typespec-client-generator-core: model types", () => {
       @pollingOperation(My.Service.getStatus)
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
   });
 
   it("lro core filterOutCoreModels false", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
       @resource("users")
       @doc("Details about a user.")
       model User {
@@ -813,9 +813,7 @@ describe("typespec-client-generator-core: model types", () => {
       @pollingOperation(My.Service.getStatus)
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
-    const models = runnerWithCore.context.sdkPackage.models.sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
+    const models = runner.context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
     strictEqual(models.length, 5);
     strictEqual(models[0].name, "Error");
     strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
@@ -827,8 +825,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[3].crossLanguageDefinitionId, "Azure.Core.ResourceOperationStatus");
     strictEqual(models[4].name, "User");
     strictEqual(models[4].crossLanguageDefinitionId, "My.Service.User");
-    strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
-    strictEqual(runnerWithCore.context.sdkPackage.enums[0].name, "OperationState");
+    strictEqual(runner.context.sdkPackage.enums.length, 1);
+    strictEqual(runner.context.sdkPackage.enums[0].name, "OperationState");
   });
   it("no models filter core", async () => {
     await runner.compile(`
@@ -1176,7 +1174,7 @@ describe("typespec-client-generator-core: model types", () => {
     );
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
-    strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "any");
+    strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "unknown");
     strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
     strictEqual(AdditionalPropertiesModel3.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel3.baseModel, undefined);
@@ -1262,8 +1260,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "float32");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
     strictEqual(AdditionalPropertiesModel2.additionalProperties?.kind, "union");
-    strictEqual(AdditionalPropertiesModel2.additionalProperties?.values[0].kind, "boolean");
-    strictEqual(AdditionalPropertiesModel2.additionalProperties?.values[1].kind, "float32");
+    strictEqual(AdditionalPropertiesModel2.additionalProperties?.variantTypes[0].kind, "boolean");
+    strictEqual(AdditionalPropertiesModel2.additionalProperties?.variantTypes[1].kind, "float32");
     strictEqual(AdditionalPropertiesModel2.baseModel, undefined);
   });
 

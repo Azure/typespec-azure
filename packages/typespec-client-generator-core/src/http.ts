@@ -15,7 +15,6 @@ import {
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
-  HttpStatusCodeRange,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getPathParamName,
@@ -32,6 +31,7 @@ import {
   CollectionFormat,
   SdkBodyParameter,
   SdkHeaderParameter,
+  SdkHttpErrorResponse,
   SdkHttpOperation,
   SdkHttpParameter,
   SdkHttpResponse,
@@ -47,7 +47,6 @@ import {
 } from "./interfaces.js";
 import {
   getAvailableApiVersions,
-  getDocHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
@@ -67,7 +66,6 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
-  addFormatInfo,
   getClientTypeWithDiagnostics,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
@@ -82,9 +80,7 @@ export function getSdkHttpOperation(
   const { responses, exceptions } = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation),
   );
-  const responsesWithBodies = [...responses.values()]
-    .concat([...exceptions.values()])
-    .filter((r) => r.type);
+  const responsesWithBodies = [...responses.values(), ...exceptions.values()].filter((r) => r.type);
   const parameters = diagnostics.pipe(
     getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0]),
   );
@@ -119,7 +115,7 @@ function getSdkHttpParameters(
   context: TCGCContext,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
-  responseBody?: SdkHttpResponse,
+  responseBody?: SdkHttpResponse | SdkHttpErrorResponse,
 ): [SdkHttpParameters, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: SdkHttpParameters = {
@@ -184,8 +180,6 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
-        description: getDocHelper(context, tspBody.type).description,
-        details: getDocHelper(context, tspBody.type).details,
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
@@ -216,7 +210,6 @@ function getSdkHttpParameters(
     // if we have a body param and no content type header, we add one
     const contentTypeBase = {
       ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
-      description: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
       doc: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
     if (!methodParameters.some((m) => m.name === "contentType")) {
@@ -261,7 +254,7 @@ function getSdkHttpParameters(
 function createContentTypeOrAcceptHeader(
   context: TCGCContext,
   httpOperation: HttpOperation,
-  bodyObject: SdkBodyParameter | SdkHttpResponse,
+  bodyObject: SdkBodyParameter | SdkHttpResponse | SdkHttpErrorResponse,
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
@@ -413,14 +406,14 @@ function getSdkHttpResponseAndExceptions(
   httpOperation: HttpOperation,
 ): [
   {
-    responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-    exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+    responses: SdkHttpResponse[];
+    exceptions: SdkHttpErrorResponse[];
   },
   readonly Diagnostic[],
 ] {
   const diagnostics = createDiagnosticCollector();
-  const responses: Map<HttpStatusCodeRange | number, SdkHttpResponse> = new Map();
-  const exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse> = new Map();
+  const responses: SdkHttpResponse[] = [];
+  const exceptions: SdkHttpErrorResponse[] = [];
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -434,11 +427,8 @@ function getSdkHttpResponseAndExceptions(
           ? "application/json"
           : innerResponse.body?.contentTypes[0];
         addEncodeInfo(context, header, clientType, defaultContentType);
-        addFormatInfo(context, header, clientType);
         headers.push({
           __raw: header,
-          description: getDocHelper(context, header).description,
-          details: getDocHelper(context, header).details,
           doc: getDoc(context.program, header),
           summary: getSummary(context.program, header),
           serializedName: getHeaderFieldName(context.program, header),
@@ -468,9 +458,8 @@ function getSdkHttpResponseAndExceptions(
             : innerResponse.body.type;
       }
     }
-    const sdkResponse: SdkHttpResponse = {
+    const sdkResponse = {
       __raw: response,
-      kind: "http",
       type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
       headers,
       contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
@@ -485,9 +474,17 @@ function getSdkHttpResponseAndExceptions(
       description: response.description,
     };
     if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
-      exceptions.set(response.statusCodes, sdkResponse);
+      exceptions.push({
+        ...sdkResponse,
+        kind: "http",
+        statusCodes: response.statusCodes,
+      });
     } else {
-      responses.set(response.statusCodes, sdkResponse);
+      responses.push({
+        ...sdkResponse,
+        kind: "http",
+        statusCodes: response.statusCodes,
+      });
     }
   }
   return diagnostics.wrap({ responses, exceptions });
@@ -515,7 +512,7 @@ export function getCorrespondingMethodParams(
   );
   if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
 
-  if (serviceParam.isApiVersionParam) {
+  if (serviceParam.isApiVersionParam && serviceParam.onClient) {
     const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
       diagnostics.add(

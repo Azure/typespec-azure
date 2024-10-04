@@ -170,13 +170,13 @@ describe("typespec-client-generator-core: spread", () => {
     ok(opParams.find((x) => x.kind === "path" && x.serializedName === "checkupId"));
     ok(opParams.find((x) => x.kind === "header" && x.serializedName === "Content-Type"));
     ok(opParams.find((x) => x.kind === "header" && x.serializedName === "Accept"));
-    strictEqual(createOrUpdate.operation.responses.size, 2);
-    const response200 = createOrUpdate.operation.responses.get(200);
+    strictEqual(createOrUpdate.operation.responses.length, 2);
+    const response200 = createOrUpdate.operation.responses.find((x) => x.statusCodes === 200);
     ok(response200);
     ok(response200.type);
     strictEqual(response200.type.kind, "model");
     strictEqual(response200.type.name, "Checkup");
-    const response201 = createOrUpdate.operation.responses.get(201);
+    const response201 = createOrUpdate.operation.responses.find((x) => x.statusCodes === 201);
     ok(response201);
     ok(response201.type);
     deepStrictEqual(response200.type, response201?.type);
@@ -287,8 +287,8 @@ describe("typespec-client-generator-core: spread", () => {
       createOrReplace.operation.bodyParam.correspondingMethodParams[1],
       createOrReplace.parameters[2],
     );
-    strictEqual(createOrReplace.operation.responses.size, 1);
-    const response200 = createOrReplace.operation.responses.get(200);
+    strictEqual(createOrReplace.operation.responses.length, 1);
+    const response200 = createOrReplace.operation.responses.find((x) => x.statusCodes === 200);
     ok(response200);
     ok(response200.type);
     strictEqual(response200.type.kind, "model");
