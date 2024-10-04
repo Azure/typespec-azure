@@ -27,7 +27,7 @@ enum Versions {
 interface Operations extends Azure.ResourceManager.Operations {}
 
 /** Represents a virtual machine size */
-model vmSize {
+model VmSize {
   /** The name of the virtual machine size */
   name: string;
 }
@@ -42,14 +42,14 @@ model LogAnalyticsOperationResult {
 interface ProviderOperations {
   /** Operation to get virtual machines for provider (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
   @get
-  getVmSizes is ArmProviderActionAsync<Response = Page<vmSize>>;
+  getVmSizes is ArmProviderActionAsync<Response = Page<VmSize>>;
   /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
   @get
-  getVmSizesTenant is ArmTenantActionAsync<Response = Page<vmSize>>;
+  getVmSizesTenant is ArmTenantActionAsync<Response = Page<VmSize>>;
   /** Operation to get virtual machines for provider for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation) */
   @get
   getVmSizesLocation is ArmProviderActionAsync<
-    Response = Page<vmSize>,
+    Response = Page<VmSize>,
     Parameters = LocationParameter
   >;
   /** Operation to get throttled Requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
