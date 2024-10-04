@@ -219,20 +219,20 @@ describe("typespec-azure-resource-manager: generates provider paths correctly", 
         @armResourceRead(VmSize)
         @test
         @autoRoute
-        getVmsSizes is ArmProviderActionSync<void, VmSize>;
+        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
         
         @get
         @armResourceRead(VmSize)
         @test
         @autoRoute
-        getVmsSizesAtLocation is ArmProviderActionSync<void, VmSize,  Parameters= LocationParameter>;
+        getVmsSizesAtLocation is ArmProviderActionSync<void, VmSize, SubscriptionActionScope, Parameters= LocationParameter>;
         
         @get
         @armResourceRead(VmSize)
         @test
         @autoRoute
         @action("logAnalytics/apiAccess/getThrottledRequests")
-        getThrottledRequests is ArmProviderActionSync<void, VmSize>;
+        getThrottledRequests is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
       }
       `,
     );
@@ -288,7 +288,7 @@ describe("typespec-azure-resource-manager: generates tenant paths correctly", ()
         @test
         @autoRoute
         @armResourceRead(CoresSize)
-        getCores is ArmTenantActionSync<void, CoresSize>;
+        getCores is ArmProviderActionSync<void, CoresSize, TenantActionScope>;
       }
       `,
     );
