@@ -83,7 +83,7 @@
         "tags": [
           "ProviderOperations"
         ],
-        "description": "Operation to get throttled Requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests)",
+        "description": "Operation to get throttled requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests)",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -145,7 +145,7 @@
         "tags": [
           "ProviderOperations"
         ],
-        "description": "Operation to get virtual machines for provider (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes)",
+        "description": "Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes)",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -179,7 +179,7 @@
         "tags": [
           "ProviderOperations"
         ],
-        "description": "Operation to get virtual machines for provider for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation)",
+        "description": "Operation to get virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation)",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -216,7 +216,7 @@
         "tags": [
           "ProviderOperations"
         ],
-        "description": "Operation to get throttled Requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests)",
+        "description": "Operation to get throttled requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests)",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"

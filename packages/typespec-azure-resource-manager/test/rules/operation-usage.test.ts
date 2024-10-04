@@ -114,7 +114,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       interface ProviderOperations {
         @get
         @armResourceList(VmSize)
-        getVmsSizes is ArmProviderActionSync<void, VmSize>;
+        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
       }
     `,
       )

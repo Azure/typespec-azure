@@ -4,8 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Adding ArmProviderAction templates to ARM library:
-  - ArmProviderActionSync
-  - ArmProviderActionAsync
-  - ArmTenantActionSync
-  - ArmTenantActionAsync
+Adding `ArmProviderActionSync` and `ArmProviderActionAsync` templates to the ARM library to perform actions at the subscription and tenant levels.

@@ -95,7 +95,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       @armResourceOperations
       interface ProviderOperations {
         @get
-        getVmsSizes is ArmProviderActionSync<void, VmSize>;
+        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
       }
     `,
       )
