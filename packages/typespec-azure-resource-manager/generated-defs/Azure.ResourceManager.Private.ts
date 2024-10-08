@@ -4,18 +4,6 @@ import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@t
  *
  *
  *
- * @param propertyName Name of the property to omit
- */
-export type ResourceBaseParametersOfDecorator = (
-  context: DecoratorContext,
-  target: Model,
-  propertyName: Model,
-) => void;
-
-/**
- *
- *
- *
  * @param values Values
  */
 export type ResourceParameterBaseForDecorator = (
@@ -25,12 +13,37 @@ export type ResourceParameterBaseForDecorator = (
 ) => void;
 
 /**
+ *
+ *
+ *
+ * @param propertyName Name of the property to omit
+ */
+export type ResourceBaseParametersOfDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  propertyName: Model,
+) => void;
+
+/**
  * This decorator is used to identify Azure Resource Manager resource. In generated
  * swagger definition, it will be marked with `x-ms-azure-resource`.
  *
  * It is *not* meant to be used directly by a spec author,
  */
 export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Model) => void;
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with
+ *
+ * @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+export type ConditionalClientFlattenDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+) => void;
 
 /**
  * Omit a property in the target model.
@@ -44,19 +57,6 @@ export type OmitIfEmptyDecorator = (
   context: DecoratorContext,
   target: Model,
   propertyName: string,
-) => void;
-
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with
- *
- * @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-export type ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
 ) => void;
 
 /**
@@ -154,11 +154,11 @@ export type ArmResourcePropertiesOptionalityDecorator = (
 ) => void;
 
 export type AzureResourceManagerPrivateDecorators = {
-  resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
+  resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
   azureResourceBase: AzureResourceBaseDecorator;
-  omitIfEmpty: OmitIfEmptyDecorator;
   conditionalClientFlatten: ConditionalClientFlattenDecorator;
+  omitIfEmpty: OmitIfEmptyDecorator;
   assignProviderNameValue: AssignProviderNameValueDecorator;
   armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator;
   armResourceInternal: ArmResourceInternalDecorator;
