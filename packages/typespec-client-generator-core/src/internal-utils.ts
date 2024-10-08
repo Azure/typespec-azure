@@ -572,7 +572,7 @@ export function isOnClient(
 
 export function getValueTypeValue(
   value: Value,
-): string | boolean | null | number | Array<unknown> | Object | undefined {
+): string | boolean | null | number | Array<unknown> | object | undefined {
   switch (value.valueKind) {
     case "ArrayValue":
       return value.values.map((x) => getValueTypeValue(x));
