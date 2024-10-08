@@ -536,7 +536,7 @@ function getEndpointTypeFromSingleServer<
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw.type);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
-      if (sdkParam.isApiVersionParam) {
+      if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
       sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);
