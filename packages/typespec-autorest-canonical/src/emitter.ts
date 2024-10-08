@@ -52,14 +52,14 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
   const resolvedOptions = { ...defaultOptions, ...context.options };
   const tcgcSdkContext = createTCGCContext(
     context.program,
-    "@azure-tools/typespec-autorest-canonical"
+    "@azure-tools/typespec-autorest-canonical",
   );
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
     {
       "project-root": context.program.projectRoot,
       "emitter-output-dir": context.emitterOutputDir,
-    }
+    },
   );
   const options: ResolvedAutorestCanonicalEmitterOptions = {
     outputFile: resolvedOptions["output-file"],
@@ -78,7 +78,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
 async function emitAllServices(
   program: Program,
   tcgcSdkContext: TCGCContext,
-  options: ResolvedAutorestCanonicalEmitterOptions
+  options: ResolvedAutorestCanonicalEmitterOptions,
 ) {
   const services = listServices(program);
   if (services.length === 0) {
@@ -139,7 +139,7 @@ async function emitAllServices(
 function resolveOutputFile(
   service: Service,
   multipleServices: boolean,
-  options: ResolvedAutorestCanonicalEmitterOptions
+  options: ResolvedAutorestCanonicalEmitterOptions,
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
   const interpolated = interpolatePath(options.outputFile, {
@@ -180,7 +180,7 @@ function validateUnsupportedVersioning(program: Program, namespace: Namespace) {
         }
       },
     },
-    {}
+    {},
   );
 
   function reportDisallowedDecorator(decorator: string, type: Type): void {

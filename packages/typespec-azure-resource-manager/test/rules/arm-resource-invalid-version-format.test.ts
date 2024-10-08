@@ -17,7 +17,7 @@ describe("typespec-azure-resource-manager: arm resource versions format rule", (
     tester = createLinterRuleTester(
       runner,
       armResourceInvalidVersionFormatRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -30,7 +30,7 @@ describe("typespec-azure-resource-manager: arm resource versions format rule", (
     namespace Microsoft.Foo;
 
     enum Versions { v1: "2022-02-01", \`2022-02-02\` }
-    `
+    `,
       )
       .toBeValid();
   });
@@ -44,7 +44,7 @@ describe("typespec-azure-resource-manager: arm resource versions format rule", (
     namespace Microsoft.Foo;
 
     enum Versions { v1: "2022-02-01-preview", v2: "2022-02-02-alpha.3" }
-    `
+    `,
       )
       .toBeValid();
   });
@@ -58,7 +58,7 @@ describe("typespec-azure-resource-manager: arm resource versions format rule", (
       namespace Microsoft.Foo;
 
       enum Versions { v1: 1.0 }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format",
@@ -75,7 +75,7 @@ describe("typespec-azure-resource-manager: arm resource versions format rule", (
       namespace Microsoft.Foo;
 
       enum Versions { v1: "1.2.3" }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format",

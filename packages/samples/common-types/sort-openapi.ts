@@ -21,7 +21,7 @@ async function findJsonFiles(folder: string): Promise<string[]> {
         } else {
           return [];
         }
-      })
+      }),
     )
   ).flat();
 }

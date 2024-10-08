@@ -53,7 +53,7 @@ export const patchOperationsRule = createRule({
 function checkPatchModel(
   context: LinterRuleContext<DiagnosticMessages>,
   operation: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) {
   const patchModel = getPatchModel(context.program, operation);
   if (patchModel === undefined) {

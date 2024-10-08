@@ -16,7 +16,7 @@ describe("typespec-azure-core: prefer-csv-collection-format rule", () => {
     tester = createLinterRuleTester(
       runner,
       preferCsvCollectionFormatRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 

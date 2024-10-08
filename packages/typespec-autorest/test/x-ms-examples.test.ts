@@ -27,7 +27,7 @@ describe("with @example decorator", () => {
         @Autorest.example("./someExample.json", "Some example")
         name: string;
       }
-      `
+      `,
     );
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), {
@@ -48,7 +48,7 @@ describe("with @example decorator", () => {
       @operationId("Pets_Get")
       @Autorest.example("./getPet.json", "Get a pet")
       op read(): Pet;
-      `
+      `,
     );
 
     deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
@@ -70,7 +70,7 @@ describe("with @example decorator", () => {
       @Autorest.example("./getPet.json", "Get a pet")
       @Autorest.example("./getAnotherPet.json", "Get another pet")
       op read(): Pet;
-      `
+      `,
     );
 
     deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
@@ -96,7 +96,7 @@ describe("with @example decorator", () => {
       @Autorest.example("./getPet.json", "Get a pet")
       @Autorest.example("./getPet.json", "Get another pet")
       op read(): Pet;
-      `
+      `,
     );
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), {
@@ -118,7 +118,7 @@ describe("with @example decorator", () => {
       @Autorest.example("./getPet.json", "Get a pet")
       @Autorest.example("./getAnotherPet.json", "Get a pet")
       op read(): Pet;
-      `
+      `,
     );
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), {
@@ -153,6 +153,21 @@ describe("explicit example", () => {
     expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/getPet.json"))).toBe(true);
   });
 
+  it("read nested examples from {project-root}/examples", async () => {
+    addExampleFile("./examples/pets/getPet.json", { operationId: "Pets_get", title: "Get a pet" });
+
+    const openapi = await compileOpenAPI(`@operationId("Pets_get") op read(): void;`, {
+      host,
+    });
+
+    deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
+      "Get a pet": {
+        $ref: "./examples/pets/getPet.json",
+      },
+    });
+    expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/pets/getPet.json"))).toBe(true);
+  });
+
   it("read examples from examples-dir", async () => {
     addExampleFile("./my-examples/getPet.json", { operationId: "Pets_get", title: "Get a pet" });
 
@@ -167,6 +182,25 @@ describe("explicit example", () => {
       },
     });
     expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/getPet.json"))).toBe(true);
+  });
+
+  it("read nested examples from examples-dir", async () => {
+    addExampleFile("./my-examples/pets/getPet.json", {
+      operationId: "Pets_get",
+      title: "Get a pet",
+    });
+
+    const openapi = await compileOpenAPI(`@operationId("Pets_get") op read(): void;`, {
+      host,
+      options: { "examples-dir": resolveVirtualPath("./my-examples") },
+    });
+
+    deepStrictEqual(openapi.paths["/"]?.get?.["x-ms-examples"], {
+      "Get a pet": {
+        $ref: "./examples/pets/getPet.json",
+      },
+    });
+    expect(host.fs.has(resolveVirtualPath("./tsp-output/examples/pets/getPet.json"))).toBe(true);
   });
 
   it("emit diagnostic when example files use same operation id", async () => {

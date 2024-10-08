@@ -9,7 +9,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
       @service({title: "My service"})
       @server("https://example.com", "Main server")
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, "example.com");
     strictEqual(res["x-ms-parameterized-host"], undefined);
@@ -22,7 +22,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
       @service({title: "My service"})
       @server("{endpoint}/v2", "Regional account endpoint", {endpoint: url})
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, undefined);
     deepStrictEqual(res["x-ms-parameterized-host"], {
@@ -47,7 +47,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
       @service({title: "My service"})
       @server("https://{account}.{region}.example.com", "Regional account endpoint", {region: string, account: string})
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, undefined);
     deepStrictEqual(res["x-ms-parameterized-host"], {
@@ -69,7 +69,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
         account?: string = "default",
       })
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, undefined);
     deepStrictEqual(res["x-ms-parameterized-host"], {
@@ -91,7 +91,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
         region: string,
       })
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, undefined);
     deepStrictEqual(res["x-ms-parameterized-host"], {
@@ -112,7 +112,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
         region: Region, 
       })
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, undefined);
     deepStrictEqual(res["x-ms-parameterized-host"], {
@@ -140,7 +140,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
         region: "westus", 
       })
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, undefined);
     deepStrictEqual(res["x-ms-parameterized-host"], {
@@ -168,7 +168,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
         region: "westus" | "eastus", 
       })
       namespace MyService {}
-      `
+      `,
     );
     strictEqual(res.host, undefined);
     deepStrictEqual(res["x-ms-parameterized-host"], {

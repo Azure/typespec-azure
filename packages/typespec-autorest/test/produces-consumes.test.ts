@@ -98,7 +98,7 @@ describe("typespec-autorest: produces/consumes", () => {
 });
 
 async function openApiForProducesConsumes(
-  configuration: ProducesConsumesOperation[]
+  configuration: ProducesConsumesOperation[],
 ): Promise<ProducesConsumes> {
   const apiDoc: string[] = createAdlFromConfig(configuration);
 

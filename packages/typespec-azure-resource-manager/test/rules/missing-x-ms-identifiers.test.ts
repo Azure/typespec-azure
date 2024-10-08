@@ -16,7 +16,7 @@ describe("typespec-azure-core: no-enum rule", () => {
     tester = createLinterRuleTester(
       runner,
       missingXmsIdentifiersRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -31,7 +31,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
@@ -51,7 +51,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
@@ -71,7 +71,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
@@ -91,10 +91,30 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           customName: string;
         }
-        `
+        `,
       )
       .toBeValid();
   });
+
+  it(`doesn't emit diagnostic if x-ms-identifiers property is defined in a base class`, async () => {
+    await tester
+      .expect(
+        `
+        model Foo {
+          @OpenAPI.extension("x-ms-identifiers", ["name"])
+          bar: Child[];
+        }
+
+        model Child extends Base {
+          other: string;
+        }
+
+        model Base { name: string;}
+        `,
+      )
+      .toBeValid();
+  });
+
   it(`doesn't emit diagnostic if element is a primitive type`, async () => {
     await tester
       .expect(
@@ -106,7 +126,7 @@ describe("typespec-azure-core: no-enum rule", () => {
         model Bar {
           id: string;
         }
-        `
+        `,
       )
       .toBeValid();
   });

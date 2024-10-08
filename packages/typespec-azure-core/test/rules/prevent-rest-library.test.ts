@@ -16,7 +16,7 @@ describe("typespec-azure-core: no-rest-library-interfaces rule", () => {
     tester = createLinterRuleTester(
       runner,
       preventRestLibraryInterfaces,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -36,7 +36,7 @@ describe("typespec-azure-core: no-rest-library-interfaces rule", () => {
 
       @TypeSpec.Http.route("good")
       interface WidgetsAlt extends MyResourceOperations<Widget> {};
-`
+`,
       )
       .toEmitDiagnostics([
         {

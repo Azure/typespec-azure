@@ -43,7 +43,7 @@ export function sortWithJsonSchema<T>(value: T, jsonSchema: JsonSchema, ref?: st
 function internalSort(
   value: unknown,
   relativeSchema: JsonSchemaType | undefined,
-  reader: JsonSchemaReader
+  reader: JsonSchemaReader,
 ): any {
   if (typeof value !== "object" || value === null) {
     return value;
@@ -165,7 +165,7 @@ function resolveJsonRef(ref: string, baseSchema: JsonSchema): ResolvedJsonSchema
 }
 function resolvePatternProperties(
   key: string,
-  patternProperties: Record<string, JsonSchemaType> | undefined
+  patternProperties: Record<string, JsonSchemaType> | undefined,
 ): JsonSchemaType | undefined {
   if (patternProperties === undefined) {
     return undefined;
@@ -179,7 +179,7 @@ function resolvePatternProperties(
 }
 
 function resolveAdditionalProperties(
-  additionalProperties: boolean | JsonSchemaType | undefined
+  additionalProperties: boolean | JsonSchemaType | undefined,
 ): JsonSchemaType | undefined {
   if (typeof additionalProperties === "boolean") {
     return undefined;

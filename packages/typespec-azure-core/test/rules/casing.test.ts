@@ -21,7 +21,7 @@ describe("typespec-azure-core: casing rule", () => {
   describe("utils", () => {
     it("isPascalCaseNoAcronyms works as expected", () => {
       ["", "A", "PascalCase", "PascalCase123", "SignalR", "VmResource", "Rp"].forEach((name) =>
-        assert.ok(isPascalCaseNoAcronyms(name), `${name} should be PascalCase`)
+        assert.ok(isPascalCaseNoAcronyms(name), `${name} should be PascalCase`),
       );
       ["a", "foo", "fooBar", "foo_bar", "foo-bar", "VMResource", "RP"].forEach((name) => {
         assert.ok(!isPascalCaseNoAcronyms(name), `${name} should not be PascalCase`);
@@ -30,10 +30,10 @@ describe("typespec-azure-core: casing rule", () => {
 
     it("isCamelCaseNoAcronyms works as expected", () => {
       ["", "a", "foo", "fooBar", "office365", "signalR", "aRp", "$aRp", "_aRp"].forEach((name) =>
-        assert.ok(isCamelCaseNoAcronyms(name), `${name} should be camelCase`)
+        assert.ok(isCamelCaseNoAcronyms(name), `${name} should be camelCase`),
       );
       ["Foo", "123", "foo.bar", "foo-bar", "foo_bar", "aRP", "$aRP", "_ARp"].forEach((name) =>
-        assert.ok(!isCamelCaseNoAcronyms(name), `${name} should not be camelCase`)
+        assert.ok(!isCamelCaseNoAcronyms(name), `${name} should not be camelCase`),
       );
     });
   });

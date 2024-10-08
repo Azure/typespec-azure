@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     armResourceNamePatternRule,
-    "@azure-tools/typespec-azure-resource-manager"
+    "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
@@ -42,7 +42,7 @@ it("Emits a warning for an ARM resource that doesn't specify `@pattern` on the n
         @visibility("read")
         name: string;
       }
-    `
+    `,
     )
     .toEmitDiagnostics([
       {
@@ -68,7 +68,7 @@ it("Allows codefix when ARM resource name is missing pattern.", async () => {
         @segment("employees")
         name: string;
       }
-    `
+    `,
     )
     .applyCodeFix("add-pattern-decorator").toEqual(`
       @armProviderNamespace
@@ -109,7 +109,7 @@ it("Does not emit a warning for an ARM resource that specifies `@pattern` on the
       @path
       @visibility("read")
       name: string;
-    }`
+    }`,
     )
     .toBeValid();
 });
@@ -131,7 +131,7 @@ it("Does not emit a warning for an ARM resource that specifies `@pattern` on the
       @segment("employees")
       name: stringResourceName;
     }
-    `
+    `,
     )
     .toBeValid();
 });

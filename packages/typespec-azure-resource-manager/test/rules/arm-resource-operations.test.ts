@@ -17,7 +17,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
     tester = createLinterRuleTester(
       runner,
       armResourceOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -45,7 +45,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
           @put @armResourceCreateOrUpdate(FooResource) create(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<FooResource> | ErrorResponse;
           @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<FooResource>> | ErrorResponse;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
@@ -75,7 +75,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
         interface FooResources {
           @put @armResourceCreateOrUpdate(FooResource) create(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<BarResource> | ErrorResponse;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
@@ -105,7 +105,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
         interface FooResources {
           @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<BarResource>> | ErrorResponse;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
