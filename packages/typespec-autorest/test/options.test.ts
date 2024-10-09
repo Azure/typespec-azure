@@ -388,7 +388,7 @@ op test(): void;
   });
 
   describe("'emit-common-types-schema' option", () => {
-    const commonTypesPath = "../../common-types/resource-management/v3/types.json";
+    const commonTypesPath = "common-types/resource-management/v3/types.json";
     const commonCode = `
       @armProviderNamespace
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
