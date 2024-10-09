@@ -64,6 +64,7 @@ import {
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
+  getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
   updateWithApiVersionInformation,
@@ -531,12 +532,12 @@ function getEndpointTypeFromSingleServer<
     if (sdkParam.kind === "path") {
       templateArguments.push(sdkParam);
       sdkParam.onClient = true;
-      if (param.defaultValue && "value" in param.defaultValue) {
-        sdkParam.clientDefaultValue = param.defaultValue.value;
+      if (param.defaultValue) {
+        sdkParam.clientDefaultValue = getValueTypeValue(param.defaultValue);
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw.type);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
-      if (sdkParam.isApiVersionParam) {
+      if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
       sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);

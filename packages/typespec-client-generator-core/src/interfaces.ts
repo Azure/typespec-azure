@@ -390,7 +390,7 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   summary?: string;
   apiVersions: string[];
   onClient: boolean;
-  clientDefaultValue?: any;
+  clientDefaultValue?: unknown;
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;

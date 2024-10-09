@@ -512,7 +512,7 @@ export function getCorrespondingMethodParams(
   );
   if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
 
-  if (serviceParam.isApiVersionParam) {
+  if (serviceParam.isApiVersionParam && serviceParam.onClient) {
     const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
       diagnostics.add(
