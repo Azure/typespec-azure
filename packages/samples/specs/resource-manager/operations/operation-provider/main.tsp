@@ -39,16 +39,10 @@ model LogAnalyticsOperationResult {
 }
 
 /** Collection of virtual machine size */
-model VmSizeCollection {
-  /** Collection of virtual machine size */
-  vmSizes: Page<VmSize>;
-}
+model VmSizeCollection is Page<VmSize>;
 
 /** LogAnalytics collection of operation status response */
-model LogAnalyticsCollection {
-  /** LogAnalytics collection */
-  logAnalytics: Page<LogAnalyticsOperationResult>;
-}
+model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 
 @armResourceOperations
 interface ProviderOperations {
