@@ -1,6 +1,6 @@
 ---
 jsApi: true
-title: "[I] SdkHttpParameterExample"
+title: "[I] SdkHttpParameterExampleValue"
 
 ---
 ## Properties
@@ -8,4 +8,4 @@ title: "[I] SdkHttpParameterExample"
 | Property | Type |
 | ------ | ------ |
 | `parameter` | [`SdkHttpParameter`](../type-aliases/SdkHttpParameter.md) |
-| `value` | [`SdkTypeExample`](../type-aliases/SdkTypeExample.md) |
+| `value` | [`SdkExampleValue`](../type-aliases/SdkExampleValue.md) |

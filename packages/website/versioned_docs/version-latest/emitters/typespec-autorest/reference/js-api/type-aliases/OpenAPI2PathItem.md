@@ -13,7 +13,7 @@ Describes the operations available on a single path. A Path Item may be empty, d
 
 | Name | Type |
 | ------ | ------ |
-| `parameters` | [`OpenAPI2Parameter`](OpenAPI2Parameter.md)[] |
+| `parameters`? | [`OpenAPI2Parameter`](OpenAPI2Parameter.md)[] |
 
 ## See
 

@@ -20,20 +20,18 @@ title: "[I] SdkModelPropertyTypeBase"
 
 ## Properties
 
-| Property | Type | Description | Inherited from |
-| ------ | ------ | ------ | ------ |
-| `__raw?` | `ModelProperty` | - | - |
-| `apiVersions` | `string`[] | - | - |
-| `clientDefaultValue?` | `any` | - | - |
-| `crossLanguageDefinitionId` | `string` | - | - |
-| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `DecoratedType.decorators` |
-| ~~`description?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - |
-| ~~`details?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - |
-| `doc?` | `string` | - | - |
-| `isApiVersionParam` | `boolean` | - | - |
-| `isGeneratedName` | `boolean` | - | - |
-| `name` | `string` | - | - |
-| `onClient` | `boolean` | - | - |
-| `optional` | `boolean` | - | - |
-| `summary?` | `string` | - | - |
-| `type` | [`SdkType`](../type-aliases/SdkType.md) | - | - |
+| Property | Type | Inherited from |
+| ------ | ------ | ------ |
+| `__raw?` | `ModelProperty` | - |
+| `apiVersions` | `string`[] | - |
+| `clientDefaultValue?` | `unknown` | - |
+| `crossLanguageDefinitionId` | `string` | - |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | `DecoratedType.decorators` |
+| `doc?` | `string` | - |
+| `isApiVersionParam` | `boolean` | - |
+| `isGeneratedName` | `boolean` | - |
+| `name` | `string` | - |
+| `onClient` | `boolean` | - |
+| `optional` | `boolean` | - |
+| `summary?` | `string` | - |
+| `type` | [`SdkType`](../type-aliases/SdkType.md) | - |

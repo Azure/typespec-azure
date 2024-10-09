@@ -12,6 +12,7 @@ original operation to the parameters of the linked operation
 | Property | Type | Description |
 | ------ | ------ | ------ |
 | `kind` | `"reference"` | - |
+| `link?` | [`OperationLink`](OperationLink.md) | headers linking to the operation |
 | `operation` | `Operation` | The referenced operation |
 | `parameterMap?` | `Map`<`string`, [`ParameterSource`](ParameterSource.md)\> | information on how to construct the operation parameters from the original request and response |
 | `parameters?` | `Map`<`string`, `PropertyMap`\> | - |

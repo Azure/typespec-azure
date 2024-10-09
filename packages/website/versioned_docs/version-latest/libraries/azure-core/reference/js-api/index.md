@@ -38,19 +38,19 @@ title: "[P] JS API"
 
 - [ArmResourceDeploymentScope](type-aliases/ArmResourceDeploymentScope.md)
 - [FinalOperationStep](type-aliases/FinalOperationStep.md)
+- [nextOperationStep](type-aliases/nextOperationStep.md)
 - [OperationStep](type-aliases/OperationStep.md)
 - [PollingLocationInfo](type-aliases/PollingLocationInfo.md)
 - [TerminationStatus](type-aliases/TerminationStatus.md)
 - [UnionEnum](type-aliases/UnionEnum.md)
-- [nextOperationStep](type-aliases/nextOperationStep.md)
 
 ## Variables
 
 - [$lib](variables/$lib.md)
 - [$linter](variables/$linter.md)
 - [FinalOperationKey](variables/FinalOperationKey.md)
-- [PollingOperationKey](variables/PollingOperationKey.md)
 - [namespace](variables/namespace.md)
+- [PollingOperationKey](variables/PollingOperationKey.md)
 - [preventRestLibraryInterfaces](variables/preventRestLibraryInterfaces.md)
 - [useStandardOperations](variables/useStandardOperations.md)
 

@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.47.0
+
+### Bug Fixes
+
+- [#1416](https://github.com/Azure/typespec-azure/pull/1416) Fix #1180 Return StatusMonitor result field for non-resource PUT operations in getLroMetadata.finalResult
+- [#1551](https://github.com/Azure/typespec-azure/pull/1551) Correct ManagedServiceIdentityType versioning issue
+- [#1537](https://github.com/Azure/typespec-azure/pull/1537) Fix missing-x-ms-identifier rule not checking base class for properties
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1639](https://github.com/Azure/typespec-azure/pull/1639) Adding `ArmProviderActionSync` and `ArmProviderActionAsync` templates to the ARM library to perform actions at the subscription and tenant levels.
+- [#1512](https://github.com/Azure/typespec-azure/pull/1512) `x-ms-skip-url-encoding` should be replaced with `allowReserved`
+- [#1505](https://github.com/Azure/typespec-azure/pull/1505) Added common-types managed identity with delegation and network security perimeter
+- [#1555](https://github.com/Azure/typespec-azure/pull/1555) Add `no-empty-model` rule
+
+
 ## 0.46.1
 
 ### Bug Fixes

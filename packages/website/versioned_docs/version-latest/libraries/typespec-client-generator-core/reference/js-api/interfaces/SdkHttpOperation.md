@@ -14,10 +14,10 @@ title: "[I] SdkHttpOperation"
 | `__raw` | `HttpOperation` |
 | `bodyParam?` | [`SdkBodyParameter`](SdkBodyParameter.md) |
 | `examples?` | [`SdkHttpOperationExample`](SdkHttpOperationExample.md)[] |
-| `exceptions` | `Map`<`number` \| `"*"` \| `HttpStatusCodeRange`, [`SdkHttpResponse`](SdkHttpResponse.md)\> |
+| `exceptions` | [`SdkHttpErrorResponse`](SdkHttpErrorResponse.md)[] |
 | `kind` | `"http"` |
 | `parameters` | ([`SdkPathParameter`](SdkPathParameter.md) \| [`SdkQueryParameter`](SdkQueryParameter.md) \| [`SdkHeaderParameter`](SdkHeaderParameter.md))[] |
 | `path` | `string` |
-| `responses` | `Map`<`number` \| `HttpStatusCodeRange`, [`SdkHttpResponse`](SdkHttpResponse.md)\> |
+| `responses` | [`SdkHttpResponse`](SdkHttpResponse.md)[] |
 | `uriTemplate` | `string` |
 | `verb` | `HttpVerb` |

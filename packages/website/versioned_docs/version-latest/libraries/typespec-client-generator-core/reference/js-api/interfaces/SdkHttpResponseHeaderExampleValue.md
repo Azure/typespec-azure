@@ -1,6 +1,6 @@
 ---
 jsApi: true
-title: "[I] SdkHttpResponseHeaderExample"
+title: "[I] SdkHttpResponseHeaderExampleValue"
 
 ---
 ## Properties
@@ -8,4 +8,4 @@ title: "[I] SdkHttpResponseHeaderExample"
 | Property | Type |
 | ------ | ------ |
 | `header` | [`SdkServiceResponseHeader`](SdkServiceResponseHeader.md) |
-| `value` | [`SdkTypeExample`](../type-aliases/SdkTypeExample.md) |
+| `value` | [`SdkExampleValue`](../type-aliases/SdkExampleValue.md) |
