@@ -62,7 +62,7 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "$ref": "#/definitions/PagedVmSize"
+              "$ref": "#/definitions/VmSizeCollection"
             }
           },
           "default": {
@@ -71,9 +71,6 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     },
@@ -93,7 +90,7 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "$ref": "#/definitions/PagedLogAnalyticsOperationResult"
+              "$ref": "#/definitions/LogAnalyticsCollection"
             }
           },
           "default": {
@@ -102,9 +99,6 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     },
@@ -158,7 +152,7 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "$ref": "#/definitions/PagedVmSize"
+              "$ref": "#/definitions/VmSizeCollection"
             }
           },
           "default": {
@@ -167,9 +161,6 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     },
@@ -195,7 +186,7 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "$ref": "#/definitions/PagedVmSize"
+              "$ref": "#/definitions/VmSizeCollection"
             }
           },
           "default": {
@@ -204,9 +195,6 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     },
@@ -229,7 +217,7 @@
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "$ref": "#/definitions/PagedLogAnalyticsOperationResult"
+              "$ref": "#/definitions/LogAnalyticsCollection"
             }
           },
           "default": {
@@ -238,14 +226,24 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     }
   },
   "definitions": {
+    "LogAnalyticsCollection": {
+      "type": "object",
+      "description": "LogAnalytics collection of operation status response",
+      "properties": {
+        "logAnalytics": {
+          "$ref": "#/definitions/PagedLogAnalyticsOperationResult",
+          "description": "LogAnalytics collection"
+        }
+      },
+      "required": [
+        "logAnalytics"
+      ]
+    },
     "LogAnalyticsOperationResult": {
       "type": "object",
       "description": "LogAnalytics operation status response",
@@ -314,6 +312,19 @@
       },
       "required": [
         "name"
+      ]
+    },
+    "VmSizeCollection": {
+      "type": "object",
+      "description": "Collection of virtual machine size",
+      "properties": {
+        "vmSizes": {
+          "$ref": "#/definitions/PagedVmSize",
+          "description": "Collection of virtual machine size"
+        }
+      },
+      "required": [
+        "vmSizes"
       ]
     }
   },
