@@ -736,7 +736,7 @@ op ArmProviderActionSync<
 op ArmProviderActionAsync<
   Request extends {} | void = void,
   Response extends {} | void = void,
-  Scope extends {} = SubscriptionActionScope | TenantActionScope,
+  Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
