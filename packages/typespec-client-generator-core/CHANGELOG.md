@@ -1,5 +1,32 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.47.0
+
+### Bug Fixes
+
+- [#1511](https://github.com/Azure/typespec-azure/pull/1511) Fix logic to check conflicting usage for model of multipart body and regular body
+- [#1629](https://github.com/Azure/typespec-azure/pull/1629) do not promote api version param to client if service is not versioned
+- [#1630](https://github.com/Azure/typespec-azure/pull/1630) do not override client default value for api version param in non-versioning service
+- [#1607](https://github.com/Azure/typespec-azure/pull/1607) set service of og in using time instead of setting time
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1631](https://github.com/Azure/typespec-azure/pull/1631) support value type for client default value
+- [#1515](https://github.com/Azure/typespec-azure/pull/1515) add `SdkLroServiceMetadata`
+
+### Deprecations
+
+- [#1613](https://github.com/Azure/typespec-azure/pull/1613) deprecate description in `SdkExampleBase`
+
+### Breaking Changes
+
+- [#1560](https://github.com/Azure/typespec-azure/pull/1560) Remove `.description` and `.details` from deprecated api surface
+
+
 ## 0.46.2
 
 ### Bug Fixes
