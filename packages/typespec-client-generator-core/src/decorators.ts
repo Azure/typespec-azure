@@ -108,29 +108,26 @@ function setScopedDecoratorData(
   value: unknown,
   scope?: LanguageScopes,
 ) {
-  const targetEntry = context.program.stateMap(key).get(target);
-  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
+  // if no scope specified, then set with the new value
+  if (!scope) {
+    context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
+    return;
+  }
 
-  // If target doesn't exist in decorator map, create a new entry
+  // if scope specified, create or overwrite with the new value
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const targetEntry = context.program.stateMap(key).get(target);
+
+  // if target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, newObject);
     return;
   }
 
-  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
-  const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-    return;
-  }
-  // report diagnostic for duplicate decorators on same scope
-  reportDiagnostic(context.program, {
-    code: "duplicate-decorator",
-    format: { decoratorName: "@" + decorator.name.slice(1) },
-    target: context.decoratorTarget,
-  });
+  // if target exists, overwrite existed value
+  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
 }
 
 const clientKey = createStateSymbol("client");
@@ -993,7 +990,7 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
   scope?: LanguageScopes,
-) => {};
+) => { };
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
