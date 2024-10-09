@@ -709,7 +709,7 @@ op checkLocalNameAvailability<
 op ArmProviderActionSync<
   Request extends {} | void = void,
   Response extends {} | void = void,
-  Scope extends {} = SubscriptionActionScope | TenantActionScope,
+  Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 >(
