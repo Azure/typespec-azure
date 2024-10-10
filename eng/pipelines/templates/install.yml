@@ -6,6 +6,9 @@ parameters:
   - name: pnpmStorePath
     type: string
     default: $(Pipeline.Workspace)/.pnpm-store
+  - name: workingDirectory
+    type: string
+    default: $(Build.SourcesDirectory)
 steps:
   - task: UseDotNet@2
     inputs:
@@ -19,7 +22,7 @@ steps:
 
   - task: Cache@2
     inputs:
-      key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+      key: 'pnpm | "$(Agent.OS)" | ${{ parameters.workingDirectory }}/pnpm-lock.yaml'
       path: ${{ parameters.pnpmStorePath }}
     displayName: Cache pnpm store
   - script: |
@@ -40,6 +43,8 @@ steps:
   - script: pnpm install
     displayName: Install JavaScript Dependencies
     retryCountOnTaskFailure: 3
+    workingDirectory: ${{ parameters.workingDirectory }}
 
   - script: dotnet restore core/packages/typespec-vs
     displayName: Restore .NET Dependencies
+    workingDirectory: ${{ parameters.workingDirectory }}
