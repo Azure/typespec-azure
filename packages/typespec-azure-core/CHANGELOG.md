@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.47.0
+
+### Bug Fixes
+
+- [#1416](https://github.com/Azure/typespec-azure/pull/1416) Fix #1180 Return StatusMonitor result field for non-resource PUT operations in getLroMetadata.finalResult
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+
 ## 0.46.0
 
 ### Features

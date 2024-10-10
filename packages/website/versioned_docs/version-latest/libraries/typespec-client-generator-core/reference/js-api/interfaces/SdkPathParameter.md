@@ -14,12 +14,10 @@ title: "[I] SdkPathParameter"
 | `__raw?` | `ModelProperty` | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`__raw` |
 | `allowReserved` | `boolean` | - | - | - |
 | `apiVersions` | `string`[] | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`apiVersions` |
-| `clientDefaultValue?` | `any` | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`clientDefaultValue` |
+| `clientDefaultValue?` | `unknown` | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`clientDefaultValue` |
 | `correspondingMethodParams` | [`SdkModelPropertyType`](../type-aliases/SdkModelPropertyType.md)[] | - | - | - |
 | `crossLanguageDefinitionId` | `string` | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`crossLanguageDefinitionId` |
 | `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`decorators` |
-| ~~`description?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`description` |
-| ~~`details?`~~ | `string` | **Deprecated** Use `doc` and `summary` instead. | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`details` |
 | `doc?` | `string` | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`doc` |
 | `explode` | `boolean` | - | - | - |
 | `isApiVersionParam` | `boolean` | - | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`isApiVersionParam` |

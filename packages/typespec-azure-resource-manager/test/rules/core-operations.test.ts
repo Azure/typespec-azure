@@ -70,6 +70,38 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       ]);
   });
 
+  it("doesn't emit diagnostic for internal operations", async () => {
+    await tester
+      .expect(
+        `
+    @armProviderNamespace
+    @service({title: "Microsoft.Foo"})
+    @versioned(Versions)
+    namespace Microsoft.Foo;
+    enum Versions {
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        "2021-10-01-preview",
+      }
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The VM Size")
+      model VmSize {
+        @doc("number of cpus ")
+        cpus: int32;
+      }
+
+      @armResourceOperations
+      interface ProviderOperations {
+        @get
+        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+      }
+    `,
+      )
+      .toBeValid();
+  });
+
   it("Detects operations outside interfaces", async () => {
     await tester
       .expect(

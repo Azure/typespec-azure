@@ -136,3 +136,31 @@ alias TenantInstanceParameters<Resource extends Foundations.Resource> = Resource
   Resource,
   TenantBaseParameters
 >;
+
+/**
+ * Template used by ArmProviderAction templates.
+ */
+@armVirtualResource
+@subscriptionResource
+model SubscriptionActionScope {
+  @doc("Symbolic name of scope")
+  @path
+  @visibility("read")
+  @key
+  @segment("subscription")
+  name: string;
+}
+
+/**
+ * Template used by ArmTenantAction templates.
+ */
+@armVirtualResource
+@tenantResource
+model TenantActionScope {
+  @doc("Symbolic name of scope")
+  @path
+  @visibility("read")
+  @key
+  @segment("tenant")
+  name: string;
+}

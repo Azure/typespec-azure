@@ -34,8 +34,8 @@ title: "[I] SdkContext"
 | `filterOutCoreModels?` | `boolean` | [`TCGCContext`](TCGCContext.md).`filterOutCoreModels` |
 | `flattenUnionAsEnum?` | `boolean` | [`TCGCContext`](TCGCContext.md).`flattenUnionAsEnum` |
 | `generateConvenienceMethods?` | `boolean` | [`TCGCContext`](TCGCContext.md).`generateConvenienceMethods` |
-| `generateProtocolMethods?` | `boolean` | [`TCGCContext`](TCGCContext.md).`generateProtocolMethods` |
 | `generatedNames?` | `Map`<`Model` \| `Union` \| `TspLiteralType`, `string`\> | [`TCGCContext`](TCGCContext.md).`generatedNames` |
+| `generateProtocolMethods?` | `boolean` | [`TCGCContext`](TCGCContext.md).`generateProtocolMethods` |
 | `httpOperationCache?` | `Map`<`Operation`, `HttpOperation`\> | [`TCGCContext`](TCGCContext.md).`httpOperationCache` |
 | `knownScalars?` | `Record`<`string`, [`SdkBuiltInKinds`](../type-aliases/SdkBuiltInKinds.md)\> | [`TCGCContext`](TCGCContext.md).`knownScalars` |
 | `modelsMap?` | `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\> | [`TCGCContext`](TCGCContext.md).`modelsMap` |

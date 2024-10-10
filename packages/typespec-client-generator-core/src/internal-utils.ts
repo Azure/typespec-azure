@@ -532,9 +532,7 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
     const projectedProgram = context.program as ProjectedProgram;
     // for case: `op test(...Model):void;`
     if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
-      return projectedProgram.projector
-        ? (projectedProgram.projector.projectedTypes.get(innerModel) as Model)
-        : innerModel;
+      return innerModel;
     }
     // for case: `op test(@header h: string, @query q: string, ...Model): void;`
     if (

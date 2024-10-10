@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.47.0
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1547](https://github.com/Azure/typespec-azure/pull/1547) Added support to use Scalar and Object as default types
+- [#1627](https://github.com/Azure/typespec-azure/pull/1627) Adding support for loading example files from nested sub-folders.
+
+
 ## 0.46.0
 
 ### Bug Fixes
