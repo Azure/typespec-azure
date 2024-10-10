@@ -2189,7 +2189,7 @@ importers:
         specifier: ^1.4.10
         version: 1.4.12
       '@types/node':
-        specifier: ^22.1.0
+        specifier: ~22.7.5
         version: 22.7.5
       '@typespec/openapi':
         specifier: workspace:~
