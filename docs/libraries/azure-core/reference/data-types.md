@@ -178,6 +178,21 @@ model Azure.Core.ExpandQueryParameter
 | ------- | ---------- | ------------------------------------------------- |
 | expand? | `string[]` | Expand the indicated resources into the response. |
 
+### `FileWithRequiredMetadata` {#Azure.Core.FileWithRequiredMetadata}
+
+Used in file part of multipart request body
+
+```typespec
+model Azure.Core.FileWithRequiredMetadata
+```
+
+#### Properties
+
+| Name        | Type     | Description                                             |
+| ----------- | -------- | ------------------------------------------------------- |
+| filename    | `string` | The file name in file part of multipart request body    |
+| contentType | `string` | The content type in file part of multipart request body |
+
 ### `FilterParameter` {#Azure.Core.FilterParameter}
 
 Provides the standard 'filter' query parameter for list operations
