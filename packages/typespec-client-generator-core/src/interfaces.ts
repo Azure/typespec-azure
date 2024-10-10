@@ -713,6 +713,8 @@ export enum UsageFlags {
   Json = 1 << 8,
   // Set when model is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
+  // Set when model is used as client initialization model
+  ClientInitialization = 1 << 10,
 }
 
 interface SdkExampleBase {
