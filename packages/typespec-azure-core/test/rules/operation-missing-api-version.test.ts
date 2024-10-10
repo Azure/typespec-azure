@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { apiVersionRule } from "../../src/rules/api-version-parameter.js";
+import { apiVersionRule } from "../../src/rules/operation-missing-api-version.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: api-version-parameter rule", () => {
