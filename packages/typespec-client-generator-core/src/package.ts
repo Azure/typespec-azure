@@ -392,6 +392,7 @@ function getSdkInitializationType(
       clientParams.push(prop);
     }
     initializationModel.access = access;
+    initializationModel.usage = UsageFlags.ClientInitialization;
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
