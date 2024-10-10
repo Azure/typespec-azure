@@ -1,7 +1,12 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkClientType, SdkHttpOperation, SdkServiceMethod, UsageFlags } from "../../src/interfaces.js";
+import {
+  SdkClientType,
+  SdkHttpOperation,
+  SdkServiceMethod,
+  UsageFlags,
+} from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
@@ -942,9 +947,17 @@ describe("typespec-client-generator-core: spread", () => {
     strictEqual(sdkPackage.models[1].access, "public");
 
     const client = sdkPackage.clients[0];
-    deepStrictEqual((client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam?.type, sdkPackage.models[0]);
-    deepStrictEqual((client.methods[1] as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam?.type, sdkPackage.models[0]);
-    deepStrictEqual((client.methods[2] as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam?.type, sdkPackage.models[1]);
-    
+    deepStrictEqual(
+      (client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam?.type,
+      sdkPackage.models[0],
+    );
+    deepStrictEqual(
+      (client.methods[1] as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam?.type,
+      sdkPackage.models[0],
+    );
+    deepStrictEqual(
+      (client.methods[2] as SdkServiceMethod<SdkHttpOperation>).operation.bodyParam?.type,
+      sdkPackage.models[1],
+    );
   });
 });
