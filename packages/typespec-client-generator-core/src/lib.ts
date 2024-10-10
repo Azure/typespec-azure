@@ -210,6 +210,12 @@ export const $lib = createTypeSpecLibrary({
         default: `@usage override conflicts with the usage calculated from operation or other @usage override.`,
       },
     },
+    "duplicate-decorator": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
+      },
+    },
   },
 });
 

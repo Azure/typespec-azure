@@ -272,52 +272,111 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(getAccess(runnerWithJava.context, funcJava), "internal");
     });
 
-    it("duplicate-decorator diagnostic for first non-scoped decorator then scoped decorator", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal)
-      @access(Access.internal, "csharp")
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
+    it("first non-scoped decorator then scoped decorator", async () => {
+      const code = `
+        @test
+        @access(Access.public, "csharp")
+        @access(Access.internal)
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+      `;
 
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "internal");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
     });
 
-    it("duplicate-decorator diagnostic for first scoped decorator then non-scoped decorator", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal, "csharp")
-      @access(Access.internal)
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
+    it("first scoped decorator then non-scoped decorator", async () => {
+      const code = `
+        @test
+        @access(Access.internal)
+        @access(Access.public, "csharp")
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+      `;
 
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "internal");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
     });
 
-    it("duplicate-decorator diagnostic for multiple same scope", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal, "csharp")
-      @access(Access.internal, "csharp")
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
+    it("first non-scoped augmented decorator then scoped augmented decorator", async () => {
+      const code = `
+        @test
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
 
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+        @@access(func, Access.public);
+        @@access(func, Access.internal, "csharp"); 
+      `;
+
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "public");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+    });
+
+    it("first scoped augmented decorator then non-scoped augmented decorator", async () => {
+      const code = `
+        @test
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+
+        @@access(func, Access.internal, "csharp");
+        @@access(func, Access.public);
+      `;
+
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "public");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
+    });
+
+    it("two scoped decorator", async () => {
+      const code = `
+        @test
+        @access(Access.internal, "csharp")
+        @access(Access.internal, "python")
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+      `;
+
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "internal");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
     });
 
     it("csv scope list", async () => {
@@ -378,22 +437,6 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
       strictEqual(getAccess(javaRunner.context, TestJava), "public");
-    });
-
-    it("duplicate-decorator diagnostic for csv scope list", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal, "csharp,ts")
-      @access(Access.internal, "csharp")
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
-      });
     });
   });
 
