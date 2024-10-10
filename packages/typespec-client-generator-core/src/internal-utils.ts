@@ -15,7 +15,6 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
@@ -526,10 +525,9 @@ export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMult
  * @param type
  * @returns
  */
-export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model {
+export function getHttpBodySpreadModel(type: Model): Model {
   if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
     const innerModel = type.sourceModels[0].model;
-    const projectedProgram = context.program as ProjectedProgram;
     // for case: `op test(...Model):void;`
     if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
       return innerModel;
@@ -541,9 +539,7 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
       innerModel.sourceModels[0].model.name !== "" &&
       innerModel.sourceModels[0].model.properties.size === type.properties.size
     ) {
-      return projectedProgram.projector
-        ? (projectedProgram.projector.projectedTypes.get(innerModel.sourceModels[0].model) as Model)
-        : innerModel.sourceModels[0].model;
+      return innerModel.sourceModels[0].model;
     }
   }
   return type;

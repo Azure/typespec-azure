@@ -166,7 +166,7 @@ function getSdkHttpParameters(
         type = diagnostics.pipe(
           getClientTypeWithDiagnostics(
             context,
-            getHttpBodySpreadModel(context, tspBody.type as Model),
+            getHttpBodySpreadModel(tspBody.type as Model),
             httpOperation.operation,
           ),
         );
