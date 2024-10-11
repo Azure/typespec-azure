@@ -8,9 +8,7 @@ TypeSpec Azure Resource Manager library
 npm install @azure-tools/typespec-azure-resource-manager
 ```
 
-## Linter
-
-### Usage
+## Usage
 
 Add the following in `tspconfig.yaml`:
 
@@ -20,13 +18,13 @@ linter:
     - "@azure-tools/typespec-azure-resource-manager/all"
 ```
 
-### RuleSets
+## RuleSets
 
 Available ruleSets:
 
 - `@azure-tools/typespec-azure-resource-manager/all`
 
-### Rules
+## Rules
 
 | Name                                                                                                                                                                                                     | Description                                                                                                                                                                                                                                          |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
