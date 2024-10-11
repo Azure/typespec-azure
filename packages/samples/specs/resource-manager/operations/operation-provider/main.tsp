@@ -48,19 +48,18 @@ model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
   @get
-  getVmSizes is ArmProviderActionAsync<
-    Response = VmSizeCollection,
+  getVmSizes is ArmProviderActionSync<Response = VmSizeCollection, Scope = SubscriptionActionScope>;
+  /** Operation to post virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizes) */
+  postVmSizes is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
     Scope = SubscriptionActionScope
   >;
   /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
   @get
-  getVmSizesTenant is ArmProviderActionAsync<
-    Response = VmSizeCollection,
-    Scope = TenantActionScope
-  >;
+  getVmSizesTenant is ArmProviderActionSync<Response = VmSizeCollection, Scope = TenantActionScope>;
   /** Operation to get virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation) */
   @get
-  getVmSizesLocation is ArmProviderActionAsync<
+  getVmSizesLocation is ArmProviderActionSync<
     Response = VmSizeCollection,
     Scope = SubscriptionActionScope,
     Parameters = LocationParameter
@@ -68,14 +67,14 @@ interface ProviderOperations {
   /** Operation to get throttled requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
-  getThrottledRequestsSubscription is ArmProviderActionAsync<
+  getThrottledRequestsSubscription is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
     Scope = SubscriptionActionScope
   >;
   /** Operation to get throttled requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
-  getThrottledRequestsTenant is ArmProviderActionAsync<
+  getThrottledRequestsTenant is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
     Scope = TenantActionScope
   >;
