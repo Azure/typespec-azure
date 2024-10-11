@@ -44,16 +44,17 @@ model VmSizeCollection is Page<VmSize>;
 /** LogAnalytics collection of operation status response */
 model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 
+/** Retry after header response */
+model RetryAfterHeader is Azure.Core.Foundations.RetryAfterHeader;
+
+/** ArmCombined header response */
+model ArmCombinedHeader is ArmCombinedLroHeaders;
+
 @armResourceOperations
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
   @get
   getVmSizes is ArmProviderActionSync<Response = VmSizeCollection, Scope = SubscriptionActionScope>;
-  /** Operation to post virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizes) */
-  postVmSizes is ArmProviderActionAsync<
-    Response = LogAnalyticsCollection,
-    Scope = SubscriptionActionScope
-  >;
   /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
   @get
   getVmSizesTenant is ArmProviderActionSync<Response = VmSizeCollection, Scope = TenantActionScope>;
@@ -77,5 +78,26 @@ interface ProviderOperations {
   getThrottledRequestsTenant is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
     Scope = TenantActionScope
+  >;
+  /** Operation to post virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizes) */
+  postVmSizes is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = SubscriptionActionScope
+  >;
+  /** Operation to post virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/postVmSizesLocation) */
+  postVmSizesLocation is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = SubscriptionActionScope,
+    Parameters = LocationParameter
+  >;
+  /** Operation to post virtual machines for subscription with retry after header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesRetry) */
+  postVmSizesRetry is ArmProviderActionAsync<
+    Response = RetryAfterHeader,
+    Scope = SubscriptionActionScope
+  >;
+  /** Operation to post virtual machines for subscription with ARM combined header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesArmCombined) */
+  postVmSizesArmCombined is ArmProviderActionAsync<
+    Response = ArmCombinedHeader,
+    Scope = SubscriptionActionScope
   >;
 }
