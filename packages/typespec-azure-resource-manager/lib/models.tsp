@@ -293,7 +293,7 @@ model ResourceKindProperty {
  */
 @doc("The response of a {name} list operation.", Resource)
 @friendlyName("{name}ListResult", Resource)
-model ResourceListResult<Resource extends Foundations.Resource> is Azure.Core.Page<Resource>;
+model ResourceListResult<Resource extends {}> is Azure.Core.Page<Resource>;
 
 #deprecated "`ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead."
 alias ResourcePlan = ResourcePlanProperty;
