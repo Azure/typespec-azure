@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.47.1
+
+### Bug Fixes
+
+- [#1659](https://github.com/Azure/typespec-azure/pull/1659) remove projection for source model since typespec core has already fixed the issue
+
+
 ## 0.47.0
 
 ### Bug Fixes
