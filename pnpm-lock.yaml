@@ -2933,7 +2933,7 @@ importers:
         specifier: workspace:~
         version: link:../../core/packages/playground
       '@typespec/website':
-        specifier: workspace:~
+        specifier: workspace:*
         version: link:../../core/packages/website
       clsx:
         specifier: ^2.1.1
