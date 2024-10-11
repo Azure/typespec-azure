@@ -8,7 +8,7 @@
     {
       "file": ["packages/website/docusaurus.config.ts"],
       "_justification": "Files contains publicly disclosed application key."
-    }
+    },
     {
       "file": ["core/packages/website-astro/astro.ts"],
       "_justification": "Files contains publicly disclosed application key."
