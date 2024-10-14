@@ -793,6 +793,160 @@ public final class Animal implements JsonSerializable<Animal> {
 </TabItem>
 </Tabs>
 
+### Discriminator
+
+TypeSpec uses `@discriminator` decorator to add a discriminator to a model.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+TypeSpec now has two ways to represent a discriminated set.
+
+1. Use model
+
+```typespec
+@discriminator("kind")
+model Cat {
+  kind: string;
+}
+
+model Siamese extends Cat {
+  kind: "siamese";
+}
+
+model RagDoll extends Cat {
+  kind: "ragDoll";
+}
+```
+
+The type of the discriminator property could be an enum (extensible or fixed):
+```typespec
+@discriminator("kind")
+model Cat {
+  kind: CatKind;
+}
+
+model Siamese extends Cat {
+  kind: CatKind.Siamese;
+}
+
+model RagDoll extends Cat {
+  kind: CatKind.RagDoll;
+}
+```
+
+2. Use union
+
+```typespec
+@discriminator("kind")
+union Cat {
+  Siamese,
+  RagDoll
+}
+
+model Siamese {}
+
+model RagDoll {}
+```
+
+</TabItem>
+<TabItem value="tcgc" label="TCGC">
+
+TCGC currently only supports the discriminated set based on models, discriminated union is not supported yet.
+
+This is a brief structure of the models in a discriminated set in the output of TCGC.
+```json
+{
+  "models": [
+    {
+      "kind": "model",
+      "name": "Cat",
+      "properties": [
+        {
+          "kind": "property",
+          "name": "kind",
+          "type": {
+            "kind": "string",
+          },
+          "discriminator": true
+        }
+      ],
+      "discriminatorProperty": {
+        // the same instance of the property in the properties list here
+      },
+      "discriminatedSubtype": {
+        "siamese": {
+          "kind": "model",
+          "name": "Siamese",
+          "properties": []
+        },
+        "ragDoll": {
+          "kind": "model",
+          "name": "RagDoll",
+          "properties": []
+        }
+      }
+    },
+    {
+      // the same instance of the model Siamese as we have above in `discriminatedSubtype` property
+    },
+    {
+      // the same instance of the model RagDoll as we have above in `discriminatedSubtype` property
+    }
+  ]
+}
+```
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+TODO
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+In .Net generated code, the discriminator property will be generated as internal by default, but configurable to be public.
+
+```csharp
+public abstract partial class Cat
+{
+  protected Cat()
+  {
+  }
+
+  internal string Kind { get; set; }
+}
+
+public partial class Siamese : Cat
+{
+  public Siamese() : base()
+  {
+    Kind = "siamese";
+  }
+}
+
+public partial class RagDoll : Cat
+{
+  public RagDoll() : base()
+  {
+    Kind = "ragDoll";
+  }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+TODO
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+TODO
+
+</TabItem>
+</Tabs>
+
 ### Nullable
 
 TypeSpec uses `| null` to represent nullable types. Nullability is handled differently in languages, but emitter authors will find information
