@@ -44,12 +44,6 @@ model VmSizeCollection is Page<VmSize>;
 /** LogAnalytics collection of operation status response */
 model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 
-/** Retry after header response */
-model RetryAfterHeader is Azure.Core.Foundations.RetryAfterHeader;
-
-/** ArmCombined header response */
-model ArmCombinedHeader is ArmCombinedLroHeaders;
-
 @armResourceOperations
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
@@ -92,12 +86,12 @@ interface ProviderOperations {
   >;
   /** Operation to post virtual machines for subscription with retry after header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesRetry) */
   postVmSizesRetry is ArmProviderActionAsync<
-    Response = RetryAfterHeader,
+    Response = Azure.Core.Foundations.RetryAfterHeader,
     Scope = SubscriptionActionScope
   >;
   /** Operation to post virtual machines for subscription with ARM combined header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesArmCombined) */
   postVmSizesArmCombined is ArmProviderActionAsync<
-    Response = ArmCombinedHeader,
+    Response = ArmCombinedLroHeaders,
     Scope = SubscriptionActionScope
   >;
 }
