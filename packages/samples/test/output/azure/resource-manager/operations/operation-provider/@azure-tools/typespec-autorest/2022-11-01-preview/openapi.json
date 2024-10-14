@@ -463,9 +463,13 @@
     }
   },
   "definitions": {
-    "ArmCombinedHeader": {
+    "Azure.Core.Foundations.RetryAfterHeader": {
       "type": "object",
-      "description": "ArmCombined header response"
+      "description": "The retry-after envelope."
+    },
+    "Azure.ResourceManager.ArmCombinedLroHeaders<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, void, TypeSpec.Rest.ResourceLocation, string>": {
+      "type": "object",
+      "description": "Provide Both Azure-AsyncOperation and Location headers"
     },
     "LogAnalyticsCollection": {
       "type": "object",
@@ -501,10 +505,6 @@
       "required": [
         "output"
       ]
-    },
-    "RetryAfterHeader": {
-      "type": "object",
-      "description": "Retry after header response"
     },
     "VmSize": {
       "type": "object",
