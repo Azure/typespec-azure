@@ -814,24 +814,30 @@ model Siamese extends Cat {
   kind: "siamese";
 }
 
-model RagDoll extends Cat {
-  kind: "ragDoll";
+model Ragdoll extends Cat {
+  kind: "ragdoll";
 }
 ```
 
 The type of the discriminator property could be an enum (extensible or fixed):
+
 ```typespec
 @discriminator("kind")
 model Cat {
   kind: CatKind;
 }
 
+union CatKind {
+  Siamese: "siamese",
+  Ragdoll: "ragdoll",
+}
+
 model Siamese extends Cat {
   kind: CatKind.Siamese;
 }
 
-model RagDoll extends Cat {
-  kind: CatKind.RagDoll;
+model Ragdoll extends Cat {
+  kind: CatKind.Ragdoll;
 }
 ```
 
@@ -841,12 +847,12 @@ model RagDoll extends Cat {
 @discriminator("kind")
 union Cat {
   Siamese,
-  RagDoll
+  Ragdoll,
 }
 
 model Siamese {}
 
-model RagDoll {}
+model Ragdoll {}
 ```
 
 </TabItem>
@@ -855,6 +861,7 @@ model RagDoll {}
 TCGC currently only supports the discriminated set based on models, discriminated union is not supported yet.
 
 This is a brief structure of the models in a discriminated set in the output of TCGC.
+
 ```json
 {
   "models": [
@@ -866,7 +873,7 @@ This is a brief structure of the models in a discriminated set in the output of 
           "kind": "property",
           "name": "kind",
           "type": {
-            "kind": "string",
+            "kind": "string"
           },
           "discriminator": true
         }
@@ -878,12 +885,14 @@ This is a brief structure of the models in a discriminated set in the output of 
         "siamese": {
           "kind": "model",
           "name": "Siamese",
-          "properties": []
+          "properties": [],
+          "discriminatorValue": "siamese"
         },
-        "ragDoll": {
+        "ragdoll": {
           "kind": "model",
-          "name": "RagDoll",
-          "properties": []
+          "name": "Ragdoll",
+          "properties": [],
+          "discriminatorValue": "ragdoll"
         }
       }
     },
@@ -891,7 +900,7 @@ This is a brief structure of the models in a discriminated set in the output of 
       // the same instance of the model Siamese as we have above in `discriminatedSubtype` property
     },
     {
-      // the same instance of the model RagDoll as we have above in `discriminatedSubtype` property
+      // the same instance of the model Ragdoll as we have above in `discriminatedSubtype` property
     }
   ]
 }
@@ -925,11 +934,11 @@ public partial class Siamese : Cat
   }
 }
 
-public partial class RagDoll : Cat
+public partial class Ragdoll : Cat
 {
-  public RagDoll() : base()
+  public Ragdoll() : base()
   {
-    Kind = "ragDoll";
+    Kind = "ragdoll";
   }
 }
 ```
