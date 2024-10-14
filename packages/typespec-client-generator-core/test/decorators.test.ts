@@ -2534,6 +2534,10 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
       strictEqual(blobNameOpParam.onClient, true);
+
+      strictEqual(sdkPackage.models.length, 1);
+      const clientInitializationModel = sdkPackage.models[0];
+      ok(clientInitializationModel.usage & UsageFlags.ClientInitialization);
     });
 
     it("On Interface", async () => {

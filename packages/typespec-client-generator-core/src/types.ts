@@ -24,6 +24,7 @@ import {
   getDoc,
   getEncode,
   getKnownValues,
+  getNamespaceFullName,
   getSummary,
   getVisibility,
   ignoreDiagnostics,
@@ -43,6 +44,7 @@ import {
 } from "@typespec/http";
 import {
   getAccessOverride,
+  getClientInitialization,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
@@ -67,6 +69,7 @@ import {
   SdkEnumType,
   SdkEnumValueType,
   SdkInitializationType,
+  SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
@@ -779,6 +782,60 @@ function getSdkEnumValueType(
   }
 
   return diagnostics.wrap(getTypeSpecBuiltInType(context, kind!));
+}
+
+export function createSdkInitializationTypeIfNonExist(context: TCGCContext, client: SdkClient | SdkOperationGroup): SdkInitializationType {
+  const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
+  const name = `${namePrefix.split(".").at(-1)}Options`;
+  return {
+    __raw: client.service,
+    doc: "Initialization class for the client",
+    kind: "model",
+    properties: [],
+    name,
+    isGeneratedName: true,
+    access: client.kind === "SdkClient" ? "public" : "internal",
+    usage: UsageFlags.Input,
+    crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+    decorators: [],
+  };
+}
+
+export function getSdkInitializationType(
+  context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
+  model: Model,
+): SdkInitializationType {
+  // convert to SDK type
+  const sdkModel = getSdkModel(context, model);
+  const initializationProps = sdkModel.properties.map(
+    (property: SdkModelPropertyType): SdkMethodParameter => {
+      property.onClient = true;
+      property.kind = "method";
+      return property as SdkMethodParameter;
+    },
+  );
+  const initializationModel = {
+    ...sdkModel,
+    properties: initializationProps,
+  };
+
+
+  let clientParams = context.__clientToParameters.get(client.type);
+  if (!clientParams) {
+    clientParams = [];
+    context.__clientToParameters.set(client.type, clientParams);
+  }
+  
+  for (const prop of initializationModel.properties) {
+    clientParams.push(prop);
+  }
+  updateUsageOrAccessOfModel(context, UsageFlags.ClientInitialization, initializationModel)
+  updateUsageOrAccessOfModel(context, client.kind === "SdkClient" ? "public" : "internal", initializationModel)
+  initializationModel.usage = UsageFlags.ClientInitialization;
+  updateModelsMap(context, model, initializationModel);
+  return initializationModel;
 }
 
 function getUnionAsEnumValueType(
