@@ -4,6 +4,8 @@ toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
 
+# Data types
+
 ## Azure.ResourceManager
 
 ### `ArmAcceptedLroResponse` {#Azure.ResourceManager.ArmAcceptedLroResponse}
@@ -375,7 +377,7 @@ model Azure.ResourceManager.AvailabilityZonesProperty
 
 ```typescript
 model Foo is TrackedResource<FooProperties> {
-  ...AvailabilityZones;
+  ...AvailabilityZonesProperty;
 }
 ```
 
