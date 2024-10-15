@@ -21,10 +21,10 @@
     "@docusaurus/plugin-content-docs": "~3.5.2",
     "@docusaurus/preset-classic": "^3.5.2",
     "@docusaurus/theme-common": "~3.5.2",
-    "@fluentui/react-components": "~9.54.16",
+    "@fluentui/react-components": "~9.55.0",
     "@mdx-js/react": "^3.0.1",
     "@typespec/playground": "workspace:~",
-    "@typespec/website": "workspace:~",
+    "@typespec/website": "workspace:*",
     "clsx": "^2.1.1",
     "es-module-shims": "~1.10.0",
     "prism-react-renderer": "^2.4.0",
@@ -33,8 +33,8 @@
     "react-dom": "~18.3.1"
   },
   "devDependencies": {
-    "@azure-tools/typespec-autorest-canonical": "workspace:~",
     "@azure-tools/typespec-autorest": "workspace:~",
+    "@azure-tools/typespec-autorest-canonical": "workspace:~",
     "@azure-tools/typespec-azure-core": "workspace:~",
     "@azure-tools/typespec-azure-playground-website": "workspace:~",
     "@azure-tools/typespec-azure-portal-core": "workspace:~",
@@ -45,15 +45,15 @@
     "@docusaurus/module-type-aliases": "^3.5.2",
     "@docusaurus/tsconfig": "^3.5.2",
     "@docusaurus/types": "^3.5.2",
-    "@types/node": "~22.7.1",
-    "@types/react": "~18.3.9",
+    "@types/node": "~22.7.5",
+    "@types/react": "~18.3.11",
     "@typespec/internal-build-utils": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "dotenv": "~16.4.5",
     "file-loader": "~6.2.0",
     "monaco-editor-webpack-plugin": "~7.1.0",
     "rimraf": "~6.0.1",
-    "typescript": "~5.6.2"
+    "typescript": "~5.6.3"
   },
   "browserslist": {
     "production": [
