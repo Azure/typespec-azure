@@ -952,7 +952,22 @@ TODO
 </TabItem>
 <TabItem value="java" label="Java" >
 
-TODO
+```java
+public class Cat implements JsonSerializable<Cat> {
+    public Cat();
+    public String getKind();
+}
+
+public final class Ragdoll extends Cat {
+    public Ragdoll();
+    public String getKind();
+}
+
+public final class Siamese extends Cat {
+    public Siamese();
+    public String getKind();
+}
+```
 
 </TabItem>
 </Tabs>
