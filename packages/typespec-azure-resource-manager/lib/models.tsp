@@ -386,7 +386,6 @@ model EncryptionProperty {
  * }
  * ```
  */
-@doc("Availability zones envelope.")
 model AvailabilityZonesProperty {
   /** The availability zones. */
   zones?: string[];
