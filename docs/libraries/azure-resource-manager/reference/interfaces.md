@@ -672,7 +672,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 ### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters
