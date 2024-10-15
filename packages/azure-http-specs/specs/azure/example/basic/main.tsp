@@ -1,12 +1,12 @@
 import "@typespec/http";
 import "@typespec/rest";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@typespec/versioning";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
-using SpecLib;
+using Spector;
 
 /** Test for loading JSON example and generating sample code. */
 @scenarioService(
@@ -49,7 +49,7 @@ union Enum {
 model ActionResponse is ActionRequest;
 
 interface ServiceOperationGroup {
-  #suppress "@typespec/spec-lib/missing-scenario" "scenario defined in client.tsp"
+  #suppress "@typespec/spector/missing-scenario" "scenario defined in client.tsp"
   @route("/basic")
   @post
   basic(

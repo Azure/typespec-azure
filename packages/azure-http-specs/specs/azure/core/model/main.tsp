@@ -1,5 +1,5 @@
 import "@typespec/http";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 import "@azure-tools/typespec-azure-core";
 import "@typespec/versioning";
@@ -8,7 +8,7 @@ using TypeSpec.Http;
 using global.Azure.ClientGenerator.Core;
 using global.Azure.Core;
 using TypeSpec.Versioning;
-using SpecLib;
+using Spector;
 
 @scenarioService(
   "/azure/core/model",

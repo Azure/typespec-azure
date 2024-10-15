@@ -1,9 +1,9 @@
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 
 using Azure.ClientGenerator.Core;
-using SpecLib;
+using Spector;
 
 @scenarioDoc("""
   This is to show we can have more than one operation group in a client. The client side should be able to call the api like

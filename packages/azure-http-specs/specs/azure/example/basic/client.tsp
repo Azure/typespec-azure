@@ -1,10 +1,10 @@
 import "@azure-tools/typespec-client-generator-core";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "./main.tsp";
 
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
-using SpecLib;
+using Spector;
 
 @TypeSpec.Versioning.useDependency(_Specs_.Azure.Example.Basic.Versions.v2022_12_01_preview)
 @route("/azure/example/basic")
