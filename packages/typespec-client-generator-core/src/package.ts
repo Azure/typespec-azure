@@ -61,10 +61,10 @@ import {
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
-  getDocHelper,
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
+  getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
   updateWithApiVersionInformation,
@@ -231,7 +231,7 @@ function getSdkMethodResponse(
     type = {
       __raw: operation,
       kind: "union",
-      values: allResponseBodies,
+      variantTypes: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
@@ -322,8 +322,6 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     name,
     access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
-    description: getDocHelper(context, operation).description,
-    details: getDocHelper(context, operation).details,
     doc: getDoc(context.program, operation),
     summary: getSummary(context.program, operation),
     operation: serviceOperation,
@@ -429,8 +427,6 @@ function getSdkMethodParameter(
     const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type, operation));
     return diagnostics.wrap({
       kind: "method",
-      description: getDocHelper(context, type).description,
-      details: getDocHelper(context, type).details,
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       apiVersions,
@@ -480,8 +476,6 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       kind: "clientaccessor",
       parameters,
       name,
-      description: getDocHelper(context, operationGroup.type).description,
-      details: getDocHelper(context, operationGroup.type).details,
       doc: getDoc(context.program, operationGroup.type),
       summary: getSummary(context.program, operationGroup.type),
       access: "internal",
@@ -510,7 +504,6 @@ function getEndpointTypeFromSingleServer<
       {
         name: "endpoint",
         isGeneratedName: true,
-        description: "Service host",
         doc: "Service host",
         kind: "path",
         onClient: true,
@@ -539,12 +532,12 @@ function getEndpointTypeFromSingleServer<
     if (sdkParam.kind === "path") {
       templateArguments.push(sdkParam);
       sdkParam.onClient = true;
-      if (param.defaultValue && "value" in param.defaultValue) {
-        sdkParam.clientDefaultValue = param.defaultValue.value;
+      if (param.defaultValue) {
+        sdkParam.clientDefaultValue = getValueTypeValue(param.defaultValue);
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw.type);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
-      if (sdkParam.isApiVersionParam) {
+      if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
       sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);
@@ -602,7 +595,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   if (types.length > 1) {
     type = {
       kind: "union",
-      values: types,
+      variantTypes: types,
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, rawClient.service),
@@ -616,7 +609,6 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     type,
     name: "endpoint",
     isGeneratedName: true,
-    description: "Service host",
     doc: "Service host",
     onClient: true,
     urlEncode: false,
@@ -641,13 +633,10 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   } else {
     name = getClientNameOverride(context, client.type) ?? client.type.name;
   }
-  const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
     name,
-    description: docWrapper.description,
-    details: docWrapper.details,
     doc: getDoc(context.program, client.type),
     summary: getSummary(context.program, client.type),
     methods: [],
@@ -702,7 +691,7 @@ function addDefaultClientParameters<
       subId = context.__clientToParameters
         .get(operationGroup.type)
         ?.find((x) => isSubscriptionId(context, x));
-      if (apiVersionParam) break;
+      if (subId) break;
     }
   }
   if (subId) {

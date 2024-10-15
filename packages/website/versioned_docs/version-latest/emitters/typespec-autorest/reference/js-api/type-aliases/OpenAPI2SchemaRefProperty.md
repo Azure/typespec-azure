@@ -18,4 +18,4 @@ Autorest allows a few properties to be next to $ref of a property.
 
 | Name | Type | Description |
 | ------ | ------ | ------ |
-| `x-ms-client-name` | `string` | Provide a different name to be used in the client. |
+| `x-ms-client-name`? | `string` | Provide a different name to be used in the client. |

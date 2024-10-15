@@ -26,8 +26,8 @@ title: "[I] TCGCContext"
 | `filterOutCoreModels?` | `boolean` |
 | `flattenUnionAsEnum?` | `boolean` |
 | `generateConvenienceMethods?` | `boolean` |
-| `generateProtocolMethods?` | `boolean` |
 | `generatedNames?` | `Map`<`Model` \| `Union` \| `TspLiteralType`, `string`\> |
+| `generateProtocolMethods?` | `boolean` |
 | `httpOperationCache?` | `Map`<`Operation`, `HttpOperation`\> |
 | `knownScalars?` | `Record`<`string`, [`SdkBuiltInKinds`](../type-aliases/SdkBuiltInKinds.md)\> |
 | `modelsMap?` | `Map`<`Type`, [`SdkModelType`](SdkModelType.md) \| [`SdkEnumType`](SdkEnumType.md)\> |

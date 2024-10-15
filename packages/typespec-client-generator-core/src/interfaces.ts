@@ -92,14 +92,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   initialization: SdkInitializationType;
@@ -136,14 +128,6 @@ interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   __accessSet?: boolean;
@@ -167,7 +151,7 @@ export type SdkType =
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
-  encode: string;
+  encode?: string;
   name: string;
   baseType?: SdkBuiltInType;
   crossLanguageDefinitionId: string;
@@ -226,10 +210,10 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   boolean = "boolean",
   plainDate = "plainDate",
   plainTime = "plainTime",
-  any = "any",
+  unknown = "unknown",
 }
 
-export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
+export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "unknown";
 
 type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
 
@@ -311,7 +295,7 @@ export interface SdkArrayType extends SdkTypeBase {
 
 export interface SdkTupleType extends SdkTypeBase {
   kind: "tuple";
-  values: SdkType[];
+  valueTypes: SdkType[];
 }
 
 export interface SdkDictionaryType extends SdkTypeBase {
@@ -360,7 +344,7 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   name: string;
   isGeneratedName: boolean;
   kind: "union";
-  values: TValueType[];
+  variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
 }
 
@@ -402,19 +386,11 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   type: SdkType;
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   apiVersions: string[];
   onClient: boolean;
-  clientDefaultValue?: any;
+  clientDefaultValue?: unknown;
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
@@ -524,14 +500,6 @@ export interface SdkServiceResponseHeader {
   __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
 }
@@ -548,12 +516,20 @@ export interface SdkServiceResponse {
   apiVersions: string[];
 }
 
-export interface SdkHttpResponse extends SdkServiceResponse {
+interface SdkHttpResponseBase extends SdkServiceResponse {
   __raw: HttpOperationResponse;
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
+}
+
+export interface SdkHttpResponse extends SdkHttpResponseBase {
+  statusCodes: number | HttpStatusCodeRange;
+}
+
+export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
+  statusCodes: number | HttpStatusCodeRange | "*";
 }
 
 interface SdkServiceOperationBase {}
@@ -568,8 +544,8 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;
-  responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-  exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  responses: SdkHttpResponse[];
+  exceptions: SdkHttpErrorResponse[];
   examples?: SdkHttpOperationExample[];
 }
 
@@ -586,14 +562,6 @@ interface SdkMethodBase extends DecoratedType {
   access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   crossLanguageDefintionId: string;
@@ -750,51 +718,56 @@ export enum UsageFlags {
 interface SdkExampleBase {
   kind: string;
   name: string;
+  /**
+   * @deprecated Use `doc` instead.
+   */
   description: string;
+  doc: string;
   filePath: string;
   rawExample: any;
 }
 
 export interface SdkHttpOperationExample extends SdkExampleBase {
   kind: "http";
-  parameters: SdkHttpParameterExample[];
-  responses: Map<number, SdkHttpResponseExample>;
+  parameters: SdkHttpParameterExampleValue[];
+  responses: SdkHttpResponseExampleValue[];
 }
 
-export interface SdkHttpParameterExample {
+export interface SdkHttpParameterExampleValue {
   parameter: SdkHttpParameter;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 
-export interface SdkHttpResponseExample {
+export interface SdkHttpResponseExampleValue {
   response: SdkHttpResponse;
-  headers: SdkHttpResponseHeaderExample[];
-  bodyValue?: SdkTypeExample;
+  statusCode: number;
+  headers: SdkHttpResponseHeaderExampleValue[];
+  bodyValue?: SdkExampleValue;
 }
 
-export interface SdkHttpResponseHeaderExample {
+export interface SdkHttpResponseHeaderExampleValue {
   header: SdkServiceResponseHeader;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 
-export type SdkTypeExample =
-  | SdkStringExample
-  | SdkNumberExample
-  | SdkBooleanExample
-  | SdkNullExample
-  | SdkAnyExample
-  | SdkArrayExample
-  | SdkDictionaryExample
-  | SdkUnionExample
-  | SdkModelExample;
+export type SdkExampleValue =
+  | SdkStringExampleValue
+  | SdkNumberExampleValue
+  | SdkBooleanExampleValue
+  | SdkNullExampleValue
+  | SdkUnknownExampleValue
+  | SdkArrayExampleValue
+  | SdkDictionaryExampleValue
+  | SdkUnionExampleValue
+  | SdkModelExampleValue;
 
-export interface SdkExampleTypeBase {
+interface SdkExampleValueBase {
   kind: string;
   type: SdkType;
   value: unknown;
 }
 
-export interface SdkStringExample extends SdkExampleTypeBase {
+export interface SdkStringExampleValue extends SdkExampleValueBase {
   kind: "string";
   type:
     | SdkBuiltInType
@@ -806,7 +779,7 @@ export interface SdkStringExample extends SdkExampleTypeBase {
   value: string;
 }
 
-export interface SdkNumberExample extends SdkExampleTypeBase {
+export interface SdkNumberExampleValue extends SdkExampleValueBase {
   kind: "number";
   type:
     | SdkBuiltInType
@@ -818,45 +791,45 @@ export interface SdkNumberExample extends SdkExampleTypeBase {
   value: number;
 }
 
-export interface SdkBooleanExample extends SdkExampleTypeBase {
+export interface SdkBooleanExampleValue extends SdkExampleValueBase {
   kind: "boolean";
   type: SdkBuiltInType | SdkConstantType;
   value: boolean;
 }
 
-export interface SdkNullExample extends SdkExampleTypeBase {
+export interface SdkNullExampleValue extends SdkExampleValueBase {
   kind: "null";
   type: SdkNullableType;
   value: null;
 }
 
-export interface SdkAnyExample extends SdkExampleTypeBase {
-  kind: "any";
+export interface SdkUnknownExampleValue extends SdkExampleValueBase {
+  kind: "unknown";
   type: SdkBuiltInType;
   value: unknown;
 }
 
-export interface SdkArrayExample extends SdkExampleTypeBase {
+export interface SdkArrayExampleValue extends SdkExampleValueBase {
   kind: "array";
   type: SdkArrayType;
-  value: SdkTypeExample[];
+  value: SdkExampleValue[];
 }
 
-export interface SdkDictionaryExample extends SdkExampleTypeBase {
+export interface SdkDictionaryExampleValue extends SdkExampleValueBase {
   kind: "dict";
   type: SdkDictionaryType;
-  value: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
 }
 
-export interface SdkUnionExample extends SdkExampleTypeBase {
+export interface SdkUnionExampleValue extends SdkExampleValueBase {
   kind: "union";
   type: SdkUnionType;
   value: unknown;
 }
 
-export interface SdkModelExample extends SdkExampleTypeBase {
+export interface SdkModelExampleValue extends SdkExampleValueBase {
   kind: "model";
   type: SdkModelType;
-  value: Record<string, SdkTypeExample>;
-  additionalPropertiesValue?: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
+  additionalPropertiesValue?: Record<string, SdkExampleValue>;
 }

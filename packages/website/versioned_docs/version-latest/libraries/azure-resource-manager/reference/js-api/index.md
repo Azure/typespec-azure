@@ -9,8 +9,8 @@ title: "[P] JS API"
 
 ## Interfaces
 
-- [ArmCommonTypeVersions](interfaces/ArmCommonTypeVersions.md)
 - [ArmCommonTypesResolutionOptions](interfaces/ArmCommonTypesResolutionOptions.md)
+- [ArmCommonTypeVersions](interfaces/ArmCommonTypeVersions.md)
 - [ArmLifecycleOperations](interfaces/ArmLifecycleOperations.md)
 - [ArmResourceDetails](interfaces/ArmResourceDetails.md)
 - [ArmResourceDetailsBase](interfaces/ArmResourceDetailsBase.md)
@@ -33,8 +33,8 @@ title: "[P] JS API"
 
 - [$armCommonTypesVersion](functions/$armCommonTypesVersion.md)
 - [$armLibraryNamespace](functions/$armLibraryNamespace.md)
-- [$armProviderNameValue](functions/$armProviderNameValue.md)
 - [$armProviderNamespace](functions/$armProviderNamespace.md)
+- [$armProviderNameValue](functions/$armProviderNameValue.md)
 - [$armResourceAction](functions/$armResourceAction.md)
 - [$armResourceCollectionAction](functions/$armResourceCollectionAction.md)
 - [$armResourceCreateOrUpdate](functions/$armResourceCreateOrUpdate.md)

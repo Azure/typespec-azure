@@ -18,7 +18,7 @@ import {
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, getHttpOperation, isMetadata } from "@typespec/http";
+import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
@@ -383,7 +383,7 @@ function getContextPath(
       result = [{ name: root.name }];
       let bodyType: Type;
       if (isHttpBodySpread(httpOperation.parameters.body)) {
-        bodyType = getHttpBodySpreadModel(context, httpOperation.parameters.body.type as Model);
+        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
       } else {
         bodyType = httpOperation.parameters.body.type;
       }
@@ -470,17 +470,28 @@ function getContextPath(
     if (currentType === expectedType) {
       result.push({ name: displayName, type: currentType });
       return true;
-    } else if (
-      currentType.kind === "Model" &&
-      currentType.indexer &&
-      currentType.properties.size === 0 &&
-      ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
-        currentType.indexer.key.name === "integer")
-    ) {
-      // handle array or dict
-      const dictOrArrayItemType: Type = currentType.indexer.value;
-      return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
     } else if (currentType.kind === "Model") {
+      // Peel off HttpPart<MyRealType> to get "MyRealType"
+      const typeWrappedByHttpPart = getHttpPart(context.program, currentType);
+      if (typeWrappedByHttpPart) {
+        return dfsModelProperties(expectedType, typeWrappedByHttpPart.type, displayName);
+      }
+
+      if (
+        currentType.indexer &&
+        currentType.properties.size === 0 &&
+        ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
+          currentType.indexer.key.name === "integer")
+      ) {
+        // handle array or dict
+        const dictOrArrayItemType: Type = currentType.indexer.value;
+        return dfsModelProperties(
+          expectedType,
+          dictOrArrayItemType,
+          pluralize.singular(displayName),
+        );
+      }
+
       // handle model
       result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {

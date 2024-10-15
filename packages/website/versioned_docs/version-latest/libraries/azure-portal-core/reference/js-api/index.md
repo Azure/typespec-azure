@@ -16,8 +16,8 @@ title: "[P] JS API"
 ## Variables
 
 - [$lib](variables/$lib.md)
-- [PortalCoreKeys](variables/PortalCoreKeys.md)
 - [namespace](variables/namespace.md)
+- [PortalCoreKeys](variables/PortalCoreKeys.md)
 
 ## Functions
 

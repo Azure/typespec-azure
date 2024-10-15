@@ -4,8 +4,6 @@ toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
 
-# Linter
-
 ## Usage
 
 Add the following in `tspconfig.yaml`:
@@ -56,3 +54,4 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/resource-name`                                                                                                     | Check the resource name.                                                                                                                                                                                                                             |
 | `@azure-tools/typespec-azure-resource-manager/retry-after`                                                                                                       | Check if retry-after header appears in response body.                                                                                                                                                                                                |
 | [`@azure-tools/typespec-azure-resource-manager/unsupported-type`](/libraries/azure-resource-manager/rules/unsupported-type.md)                                   | Check for unsupported ARM types.                                                                                                                                                                                                                     |
+| [`@azure-tools/typespec-azure-resource-manager/no-empty-model`](/libraries/azure-resource-manager/rules/no-empty-model.md)                                       | ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.                                                                        |

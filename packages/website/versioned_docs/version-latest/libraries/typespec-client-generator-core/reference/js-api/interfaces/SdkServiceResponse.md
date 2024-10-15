@@ -3,10 +3,6 @@ jsApi: true
 title: "[I] SdkServiceResponse"
 
 ---
-## Extended by
-
-- [`SdkHttpResponse`](SdkHttpResponse.md)
-
 ## Properties
 
 | Property | Type |
