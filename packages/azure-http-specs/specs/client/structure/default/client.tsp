@@ -1,8 +1,8 @@
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 
-using SpecLib;
+using Spector;
 
 @@scenario(Client.Structure.Service);
 @@scenarioDoc(Client.Structure.Service,

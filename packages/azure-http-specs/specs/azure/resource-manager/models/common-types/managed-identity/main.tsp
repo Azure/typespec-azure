@@ -1,4 +1,4 @@
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
@@ -12,7 +12,7 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 using TypeSpec.OpenAPI;
-using SpecLib;
+using Spector;
 
 @armProviderNamespace
 @service
