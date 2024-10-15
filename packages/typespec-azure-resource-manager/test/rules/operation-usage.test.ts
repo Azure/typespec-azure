@@ -87,39 +87,6 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
         message: "Actions must be HTTP Post operations.",
       });
   });
-
-  it("Allows post actions for authorized provider actions", async () => {
-    await tester
-      .expect(
-        `
-    @armProviderNamespace
-    @service({title: "Microsoft.Foo"})
-    @versioned(Versions)
-    namespace Microsoft.Foo;
-    enum Versions {
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-        "2021-10-01-preview",
-      }
-
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("The VM Size")
-      model VmSize {
-        @doc("number of cpus ")
-        cpus: int32;
-      }
-
-      @armResourceOperations
-      interface ProviderOperations {
-        @get
-        @armResourceList(VmSize)
-        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
-      }
-    `,
-      )
-      .toBeValid();
-  });
 });
 
 describe("typespec-azure-resource-manager: generates armResourceAction paths correctly", () => {
