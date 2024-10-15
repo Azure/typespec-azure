@@ -40,6 +40,11 @@ model PrivateLinkResourceProperties {
 model PrivateLinkResourceListResult {
   /** Array of private link resources */
   value?: PrivateLinkResource[];
+
+  /** URL to get the next set of operation list results (if there are any). */
+  @added(Versions.v6)
+  @visibility("read")
+  nextLink?: string;
 }
 //#region
 /** The private endpoint connection resource */
@@ -52,6 +57,11 @@ model PrivateEndpointConnection extends Resource {
 model PrivateEndpointConnectionListResult {
   /** Array of private endpoint connections. */
   value?: PrivateEndpointConnection[];
+
+  /** URL to get the next set of operation list results (if there are any). */
+  @added(Versions.v6)
+  @visibility("read")
+  nextLink?: string;
 }
 
 /** Properties of the private endpoint connection. */
