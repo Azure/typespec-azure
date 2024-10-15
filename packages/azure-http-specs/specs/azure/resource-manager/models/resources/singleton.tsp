@@ -8,7 +8,7 @@ using TypeSpec.Rest;
 using Azure.Core;
 using Azure.ResourceManager;
 using TypeSpec.OpenAPI;
-using SpecLib;
+using Spector;
 
 namespace Azure.ResourceManager.Models.Resources;
 

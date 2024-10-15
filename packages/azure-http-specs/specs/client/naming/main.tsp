@@ -1,10 +1,10 @@
 import "@typespec/http";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
-using SpecLib;
+using Spector;
 
 /**
  * Describe changing names of types in a client with `@clientName`

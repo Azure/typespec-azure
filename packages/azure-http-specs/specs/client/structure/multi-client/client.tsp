@@ -1,9 +1,9 @@
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 
 using Azure.ClientGenerator.Core;
-using SpecLib;
+using Spector;
 
 @scenarioDoc("""
   Include multiple clients in the same spec.

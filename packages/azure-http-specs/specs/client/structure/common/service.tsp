@@ -1,6 +1,6 @@
 import "@typespec/rest";
 import "@azure-tools/typespec-client-generator-core";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -40,34 +40,34 @@ enum ClientType {
   ClientOperationGroup: "client-operation-group",
 }
 
-#suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+#suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
 @route("/one")
 @post
 op one(): void;
 
-#suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+#suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
 @route("/two")
 @post
 op two(): void;
 
 interface Foo {
-  #suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+  #suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
   @route("/three")
   @post
   three(): void;
 
-  #suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+  #suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
   @route("/four")
   @post
   four(): void;
 }
 
 interface Bar {
-  #suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+  #suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
   @route("/five")
   @post
   five(): void;
-  #suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+  #suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
   @route("/six")
   @post
   six(): void;
@@ -75,7 +75,7 @@ interface Bar {
 
 namespace Baz {
   interface Foo {
-    #suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+    #suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
     @route("/seven")
     @post
     seven(): void;
@@ -83,13 +83,13 @@ namespace Baz {
 }
 
 namespace Qux {
-  #suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+  #suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
   @route("/eight")
   @post
   op eight(): void;
 
   interface Bar {
-    #suppress "@typespec/spec-lib/missing-scenario" "This is by design those operations get defined as scenarios in the client"
+    #suppress "@typespec/spector/missing-scenario" "This is by design those operations get defined as scenarios in the client"
     @route("/nine")
     @post
     nine(): void;
