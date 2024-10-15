@@ -637,18 +637,19 @@ function addDefaultClientParameters<
   let apiVersionParam = context.__clientToParameters
     .get(client.__raw.type)
     ?.find((x) => x.isApiVersionParam);
-  if (apiVersionParam) {
-    client.initialization.properties.push(apiVersionParam);
-  } else {
-    for (const operationGroup of listOperationGroups(context, client.__raw)) {
-      // if any sub operation groups have an api version param, the top level needs
-      // the api version param as well
-      apiVersionParam = context.__clientToParameters
-        .get(operationGroup.type)
-        ?.find((x) => x.isApiVersionParam);
-      if (apiVersionParam) break;
+    if (!apiVersionParam) {
+      for (const operationGroup of listOperationGroups(context, client.__raw)) {
+        // if any sub operation groups have an api version param, the top level needs
+        // the api version param as well
+        apiVersionParam = context.__clientToParameters
+          .get(operationGroup.type)
+          ?.find((x) => x.isApiVersionParam);
+        if (apiVersionParam) break;
+      }
     }
-  }
+    if (apiVersionParam) {
+      client.initialization.properties.push(apiVersionParam);
+    }
   let subId = context.__clientToParameters
     .get(client.__raw.type)
     ?.find((x) => isSubscriptionId(context, x));

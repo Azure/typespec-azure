@@ -816,8 +816,10 @@ export function getSdkInitializationType(
       return property as SdkMethodParameter;
     },
   );
-  const initializationModel = {
+  const initializationModel: SdkInitializationType = {
     ...sdkModel,
+    usage: UsageFlags.ClientInitialization,
+    access: client.kind === "SdkClient" ? "public" : "internal",
     properties: initializationProps,
   };
 
@@ -831,9 +833,6 @@ export function getSdkInitializationType(
   for (const prop of initializationModel.properties) {
     clientParams.push(prop);
   }
-  updateUsageOrAccessOfModel(context, UsageFlags.ClientInitialization, initializationModel)
-  updateUsageOrAccessOfModel(context, client.kind === "SdkClient" ? "public" : "internal", initializationModel)
-  initializationModel.usage = UsageFlags.ClientInitialization;
   updateModelsMap(context, model, initializationModel);
   return initializationModel;
 }
