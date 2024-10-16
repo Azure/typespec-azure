@@ -1,4 +1,4 @@
-import { MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -10,12 +10,6 @@ Scenarios.Client_Naming_Property_client = passOnSuccess({
   },
   response: {
     status: 204,
-  },
-  handler: (req: MockRequest) => {
-    req.expect.bodyEquals({ defaultName: true });
-    return {
-      status: 204,
-    };
   },
   kind: "MockApiDefinition",
 });
@@ -29,12 +23,6 @@ Scenarios.Client_Naming_Property_language = passOnSuccess({
   response: {
     status: 204,
   },
-  handler: (req: MockRequest) => {
-    req.expect.bodyEquals({ defaultName: true });
-    return {
-      status: 204,
-    };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -47,12 +35,6 @@ Scenarios.Client_Naming_Property_compatibleWithEncodedName = passOnSuccess({
   response: {
     status: 204,
   },
-  handler: (req: MockRequest) => {
-    req.expect.bodyEquals({ wireName: true });
-    return {
-      status: 204,
-    };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -62,11 +44,6 @@ Scenarios.Client_Naming_operation = passOnSuccess({
   request: {},
   response: {
     status: 204,
-  },
-  handler: (req: MockRequest) => {
-    return {
-      status: 204,
-    };
   },
   kind: "MockApiDefinition",
 });
@@ -80,12 +57,6 @@ Scenarios.Client_Naming_parameter = passOnSuccess({
   response: {
     status: 204,
   },
-  handler: (req: MockRequest) => {
-    req.expect.containsQueryParam("defaultName", "true");
-    return {
-      status: 204,
-    };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -97,12 +68,6 @@ Scenarios.Client_Naming_Header_request = passOnSuccess({
   },
   response: {
     status: 204,
-  },
-  handler: (req: MockRequest) => {
-    req.expect.containsHeader("default-name", "true");
-    return {
-      status: 204,
-    };
   },
   kind: "MockApiDefinition",
 });
@@ -117,14 +82,6 @@ Scenarios.Client_Naming_Header_response = passOnSuccess({
       "default-name": "true",
     },
   },
-  handler: (req: MockRequest) => {
-    return {
-      status: 204,
-      headers: {
-        "default-name": "true",
-      },
-    };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -137,12 +94,6 @@ Scenarios.Client_Naming_Model_client = passOnSuccess({
   response: {
     status: 204,
   },
-  handler: (req: MockRequest) => {
-    req.expect.bodyEquals({ defaultName: true });
-    return {
-      status: 204,
-    };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -154,12 +105,6 @@ Scenarios.Client_Naming_Model_language = passOnSuccess({
   },
   response: {
     status: 204,
-  },
-  handler: (req: MockRequest) => {
-    req.expect.bodyEquals({ defaultName: true });
-    return {
-      status: 204,
-    };
   },
   kind: "MockApiDefinition",
 });
@@ -176,12 +121,6 @@ Scenarios.Client_Naming_UnionEnum_unionEnumName = passOnSuccess({
   response: {
     status: 204,
   },
-  handler: (req: MockRequest) => {
-    req.expect.bodyEquals("value1");
-    return {
-      status: 204,
-    };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -196,12 +135,6 @@ Scenarios.Client_Naming_UnionEnum_unionEnumMemberName = passOnSuccess({
   },
   response: {
     status: 204,
-  },
-  handler: (req: MockRequest) => {
-    req.expect.bodyEquals("value1");
-    return {
-      status: 204,
-    };
   },
   kind: "MockApiDefinition",
 });
