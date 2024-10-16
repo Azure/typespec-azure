@@ -1,10 +1,10 @@
 import "@typespec/http";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
-using SpecLib;
+using Spector;
 
 @doc("Azure client request id header configurations.")
 @scenarioService("/azure/special-headers/x-ms-client-request-id")

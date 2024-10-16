@@ -1,10 +1,10 @@
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@azure-tools/typespec-azure-core";
 import "@typespec/versioning";
 
 using TypeSpec.Versioning;
 using Azure.Core;
-using SpecLib;
+using Spector;
 
 @doc("Test describing pageable.")
 @scenarioService("/payload/pageable")

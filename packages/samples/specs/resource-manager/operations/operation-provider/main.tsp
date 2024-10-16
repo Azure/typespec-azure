@@ -47,36 +47,51 @@ model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 @armResourceOperations
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
-  @post
-  getVmSizes is ArmProviderActionAsync<
-    Response = VmSizeCollection,
-    Scope = SubscriptionActionScope
-  >;
+  @get
+  getVmSizes is ArmProviderActionSync<Response = VmSizeCollection, Scope = SubscriptionActionScope>;
   /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
-  @post
-  getVmSizesTenant is ArmProviderActionAsync<
-    Response = VmSizeCollection,
-    Scope = TenantActionScope
-  >;
+  @get
+  getVmSizesTenant is ArmProviderActionSync<Response = VmSizeCollection, Scope = TenantActionScope>;
   /** Operation to get virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation) */
-  @post
-  getVmSizesLocation is ArmProviderActionAsync<
+  @get
+  getVmSizesLocation is ArmProviderActionSync<
     Response = VmSizeCollection,
     Scope = SubscriptionActionScope,
     Parameters = LocationParameter
   >;
   /** Operation to get throttled requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
-  @post
+  @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
-  getThrottledRequestsSubscription is ArmProviderActionAsync<
+  getThrottledRequestsSubscription is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
     Scope = SubscriptionActionScope
   >;
   /** Operation to get throttled requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
-  @post
+  @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
-  getThrottledRequestsTenant is ArmProviderActionAsync<
+  getThrottledRequestsTenant is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
     Scope = TenantActionScope
+  >;
+  /** Operation to post virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizes) */
+  postVmSizes is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = SubscriptionActionScope
+  >;
+  /** Operation to post virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/postVmSizesLocation) */
+  postVmSizesLocation is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = SubscriptionActionScope,
+    Parameters = LocationParameter
+  >;
+  /** Operation to post virtual machines for subscription with retry after header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesRetry) */
+  postVmSizesRetry is ArmProviderActionAsync<
+    Response = Azure.Core.Foundations.RetryAfterHeader,
+    Scope = SubscriptionActionScope
+  >;
+  /** Operation to post virtual machines for subscription with ARM combined header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesArmCombined) */
+  postVmSizesArmCombined is ArmProviderActionAsync<
+    Response = ArmCombinedLroHeaders,
+    Scope = SubscriptionActionScope
   >;
 }

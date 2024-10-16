@@ -1,5 +1,5 @@
 import "@azure-tools/typespec-azure-core";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
@@ -9,7 +9,7 @@ using global.Azure.Core.Traits;
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
-using SpecLib;
+using Spector;
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "For spec"
 @doc("Illustrates Azure Core operation customizations by traits")
