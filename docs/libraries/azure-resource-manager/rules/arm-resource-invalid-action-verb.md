@@ -23,7 +23,7 @@ For ARM http operations, the action verb must be `@post`. Any other action verb 
 #### ✅ Correct
 
 ```tsp
-    postAction is ArmProviderActionAsync<
+    op postAction is ArmProviderActionAsync<
       {
         name: string;
       },
