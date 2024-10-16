@@ -133,12 +133,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
     );
   }
-  basic.response.resultPath = getPathFromSegment(context, pagedMetadata.modelType, pagedMetadata.itemsSegments);
+  basic.response.resultPath = getPathFromSegment(
+    context,
+    pagedMetadata.modelType,
+    pagedMetadata.itemsSegments,
+  );
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: getPathFromSegment(context, pagedMetadata.modelType, pagedMetadata?.nextLinkSegments),
+    nextLinkPath: getPathFromSegment(
+      context,
+      pagedMetadata.modelType,
+      pagedMetadata?.nextLinkSegments,
+    ),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
           getSdkServiceOperation<TServiceOperation>(
