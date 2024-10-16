@@ -34,8 +34,7 @@
   "homepage": "https://azure.github.io/typespec-azure",
   "dependencies": {
     "@typespec/spector": "workspace:~",
-    "@typespec/spec-api": "workspace:~",
-    "@typespec/spector": "workspace:~"
+    "@typespec/spec-api": "workspace:~"
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
