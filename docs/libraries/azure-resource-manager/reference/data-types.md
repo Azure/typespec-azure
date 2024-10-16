@@ -1636,9 +1636,10 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 
 #### Properties
 
-| Name   | Type                                                      | Description                            |
-| ------ | --------------------------------------------------------- | -------------------------------------- |
-| value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
+| Name      | Type                                                      | Description                                                           |
+| --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
+| value?    | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections.                                |
+| nextLink? | `string`                                                  | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
 
@@ -1701,9 +1702,10 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
 
 #### Properties
 
-| Name   | Type                                                | Description                     |
-| ------ | --------------------------------------------------- | ------------------------------- |
-| value? | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources |
+| Name      | Type                                                | Description                                                           |
+| --------- | --------------------------------------------------- | --------------------------------------------------------------------- |
+| value?    | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources                                       |
+| nextLink? | `string`                                            | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateLinkResourceParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter}
 
@@ -1858,14 +1860,14 @@ model Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet
 
 #### Properties
 
-| Name       | Type                                                                     | Description                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ---------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| managedBy? | `string`                                                                 | The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource.<br />If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.                                                                                                        |
-| kind?      | `string`                                                                 | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.<br />If supported, the resource provider must validate and persist this value.                                                                                                                                                                     |
-| eTag?      | `string`                                                                 | The etag field is _not_ required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.<br />Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),<br />If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
-| identity?  | [`Identity`](./data-types.md#Azure.ResourceManager.CommonTypes.Identity) |                                                                                                                                                                                                                                                                                                                                                                                                                |
-| sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)           |                                                                                                                                                                                                                                                                                                                                                                                                                |
-| plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)         |                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Name       | Type                                                                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| managedBy? | `string`                                                                                             | The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource.<br />If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource.                                                                                                        |
+| kind?      | `string`                                                                                             | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.<br />If supported, the resource provider must validate and persist this value.                                                                                                                                                                     |
+| eTag?      | `string`                                                                                             | The etag field is _not_ required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.<br />Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),<br />If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
+| identity?  | [`ManagedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.ManagedServiceIdentity) |                                                                                                                                                                                                                                                                                                                                                                                                                |
+| sku?       | [`Sku`](./data-types.md#Azure.ResourceManager.CommonTypes.Sku)                                       |                                                                                                                                                                                                                                                                                                                                                                                                                |
+| plan?      | [`Plan`](./data-types.md#Azure.ResourceManager.CommonTypes.Plan)                                     |                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ### `ScopeParameter` {#Azure.ResourceManager.CommonTypes.ScopeParameter}
 
@@ -2039,6 +2041,7 @@ enum Azure.ResourceManager.CommonTypes.Versions
 | v3   |       | The Azure Resource Manager v3 common types. |
 | v4   |       | The Azure Resource Manager v4 common types. |
 | v5   |       | The Azure Resource Manager v5 common types. |
+| v6   |       | The Azure Resource Manager v6 common types. |
 
 ### `AccessRuleDirection` {#Azure.ResourceManager.CommonTypes.AccessRuleDirection}
 
