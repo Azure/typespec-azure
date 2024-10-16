@@ -829,8 +829,10 @@ export function getSdkInitializationType(
   }
 
   for (const prop of initializationModel.model.properties) {
-    if (!clientParams.filter((p) => p.name === prop.name).length)
-    clientParams.push(prop);
+    if (!clientParams.filter((p) => p.name === prop.name).length) {
+      clientParams.push(prop);
+      prop.onClient = true;
+    }
   }
   updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkModel, { propagation: false });
   updateUsageOrAccessOfModel(context, UsageFlags.ClientInitialization, sdkModel, {
