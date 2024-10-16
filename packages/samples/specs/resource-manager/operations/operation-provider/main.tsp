@@ -47,33 +47,33 @@ model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 @armResourceOperations
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
-  @get
+  @post
   getVmSizes is ArmProviderActionAsync<
     Response = VmSizeCollection,
     Scope = SubscriptionActionScope
   >;
   /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
-  @get
+  @post
   getVmSizesTenant is ArmProviderActionAsync<
     Response = VmSizeCollection,
     Scope = TenantActionScope
   >;
   /** Operation to get virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation) */
-  @get
+  @post
   getVmSizesLocation is ArmProviderActionAsync<
     Response = VmSizeCollection,
     Scope = SubscriptionActionScope,
     Parameters = LocationParameter
   >;
   /** Operation to get throttled requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
-  @get
+  @post
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsSubscription is ArmProviderActionAsync<
     Response = LogAnalyticsCollection,
     Scope = SubscriptionActionScope
   >;
   /** Operation to get throttled requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
-  @get
+  @post
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsTenant is ArmProviderActionAsync<
     Response = LogAnalyticsCollection,
