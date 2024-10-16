@@ -1201,7 +1201,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
-      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+      const apiVersionParam = sdkPackage.clients[0].initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
@@ -1300,7 +1300,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
-      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+      const apiVersionParam = sdkPackage.clients[0].initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
@@ -1398,7 +1398,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
-      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+      const apiVersionParam = sdkPackage.clients[0].initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
@@ -1496,7 +1496,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
-      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+      const apiVersionParam = sdkPackage.clients[0].initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
@@ -1597,7 +1597,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
-      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+      const apiVersionParam = sdkPackage.clients[0].initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
@@ -1686,7 +1686,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const sdkPackage = runnerWithVersion.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
 
-      const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+      const apiVersionParam = sdkPackage.clients[0].initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
@@ -1838,8 +1838,8 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versioningClient);
       strictEqual(versioningClient.methods.length, 2);
 
-      strictEqual(versioningClient.initialization.properties.length, 1);
-      const versioningClientEndpoint = versioningClient.initialization.properties.find(
+      strictEqual(versioningClient.initialization.model.properties.length, 1);
+      const versioningClientEndpoint = versioningClient.initialization.model.properties.find(
         (x) => x.kind === "endpoint",
       );
       ok(versioningClientEndpoint);
@@ -1860,8 +1860,8 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(interfaceV2);
       strictEqual(interfaceV2.methods.length, 1);
 
-      strictEqual(interfaceV2.initialization.properties.length, 1);
-      const interfaceV2Endpoint = interfaceV2.initialization.properties.find(
+      strictEqual(interfaceV2.initialization.model.properties.length, 1);
+      const interfaceV2Endpoint = interfaceV2.initialization.model.properties.find(
         (x) => x.kind === "endpoint",
       );
       ok(interfaceV2Endpoint);
@@ -2554,10 +2554,10 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 2);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      strictEqual(client.initialization.model.properties.length, 2);
+      const endpoint = client.initialization.model.properties.find((x) => x.kind === "endpoint");
       ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      const blobName = client.initialization.model.properties.find((x) => x.name === "blobName");
       ok(blobName);
       strictEqual(blobName.clientDefaultValue, undefined);
       strictEqual(blobName.onClient, true);
@@ -2577,6 +2577,10 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
       strictEqual(blobNameOpParam.onClient, true);
+
+      strictEqual(sdkPackage.models.length, 1);
+      const clientInitializationModel = sdkPackage.models[0];
+      ok(clientInitializationModel.usage & UsageFlags.ClientInitialization);
     });
 
     it("On Interface", async () => {
@@ -2654,9 +2658,9 @@ describe("typespec-client-generator-core: decorators", () => {
       const client = clients[0];
       strictEqual(client.name, "StorageClient");
       strictEqual(client.initialization.access, "public");
-      strictEqual(client.initialization.properties.length, 2);
-      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      strictEqual(client.initialization.model.properties.length, 2);
+      ok(client.initialization.model.properties.find((x) => x.kind === "endpoint"));
+      const blobName = client.initialization.model.properties.find((x) => x.name === "blobName");
       ok(blobName);
       strictEqual(blobName.onClient, true);
 
@@ -2684,10 +2688,10 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobClient.kind, "client");
       strictEqual(blobClient.name, "BlobClient");
       strictEqual(blobClient.initialization.access, "internal");
-      strictEqual(blobClient.initialization.properties.length, 2);
+      strictEqual(blobClient.initialization.model.properties.length, 2);
 
-      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
-      const blobClientBlobInitializationProp = blobClient.initialization.properties.find(
+      ok(blobClient.initialization.model.properties.find((x) => x.kind === "endpoint"));
+      const blobClientBlobInitializationProp = blobClient.initialization.model.properties.find(
         (x) => x.name === "blobName",
       );
       ok(blobClientBlobInitializationProp);
@@ -2729,10 +2733,10 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 2);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      strictEqual(client.initialization.model.properties.length, 2);
+      const endpoint = client.initialization.model.properties.find((x) => x.kind === "endpoint");
       ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      const blobName = client.initialization.model.properties.find((x) => x.name === "blobName");
       ok(blobName);
       strictEqual(blobName.clientDefaultValue, undefined);
       strictEqual(blobName.onClient, true);
@@ -2786,16 +2790,16 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 3);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      strictEqual(client.initialization.model.properties.length, 3);
+      const endpoint = client.initialization.model.properties.find((x) => x.kind === "endpoint");
       ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      const blobName = client.initialization.model.properties.find((x) => x.name === "blobName");
       ok(blobName);
       strictEqual(blobName.clientDefaultValue, undefined);
       strictEqual(blobName.onClient, true);
       strictEqual(blobName.optional, false);
 
-      const containerName = client.initialization.properties.find(
+      const containerName = client.initialization.model.properties.find(
         (x) => x.name === "containerName",
       );
       ok(containerName);
@@ -2847,14 +2851,14 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const client = sdkPackage.clients[0];
       strictEqual(client.initialization.access, "public");
-      strictEqual(client.initialization.properties.length, 3);
-      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      strictEqual(client.initialization.model.properties.length, 3);
+      ok(client.initialization.model.properties.find((x) => x.kind === "endpoint"));
+      const blobName = client.initialization.model.properties.find((x) => x.name === "blobName");
       ok(blobName);
       strictEqual(blobName.clientDefaultValue, undefined);
       strictEqual(blobName.onClient, true);
 
-      const containerName = client.initialization.properties.find(
+      const containerName = client.initialization.model.properties.find(
         (x) => x.name === "containerName",
       );
       ok(containerName);
@@ -2869,10 +2873,10 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(og.kind, "client");
 
       strictEqual(og.initialization.access, "internal");
-      strictEqual(og.initialization.properties.length, 3);
-      ok(og.initialization.properties.find((x) => x.kind === "endpoint"));
-      ok(og.initialization.properties.find((x) => x === blobName));
-      ok(og.initialization.properties.find((x) => x === containerName));
+      strictEqual(og.initialization.model.properties.length, 3);
+      ok(og.initialization.model.properties.find((x) => x.kind === "endpoint"));
+      ok(og.initialization.model.properties.find((x) => x === blobName));
+      ok(og.initialization.model.properties.find((x) => x === containerName));
 
       const download = og.methods[0];
       strictEqual(download.name, "download");
@@ -2928,10 +2932,10 @@ describe("typespec-client-generator-core: decorators", () => {
       const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
       ok(containerClient);
       strictEqual(containerClient.initialization.access, "public");
-      strictEqual(containerClient.initialization.properties.length, 2);
-      ok(containerClient.initialization.properties.find((x) => x.kind === "endpoint"));
+      strictEqual(containerClient.initialization.model.properties.length, 2);
+      ok(containerClient.initialization.model.properties.find((x) => x.kind === "endpoint"));
 
-      const containerName = containerClient.initialization.properties.find(
+      const containerName = containerClient.initialization.model.properties.find(
         (x) => x.name === "containerName",
       );
       ok(containerName);
@@ -2947,15 +2951,17 @@ describe("typespec-client-generator-core: decorators", () => {
       const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
       ok(blobClient);
       strictEqual(blobClient.initialization.access, "public");
-      strictEqual(blobClient.initialization.properties.length, 3);
-      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
+      strictEqual(blobClient.initialization.model.properties.length, 3);
+      ok(blobClient.initialization.model.properties.find((x) => x.kind === "endpoint"));
 
-      const containerNameOnBlobClient = blobClient.initialization.properties.find(
+      const containerNameOnBlobClient = blobClient.initialization.model.properties.find(
         (x) => x.name === "containerName",
       );
       ok(containerNameOnBlobClient);
 
-      const blobName = blobClient.initialization.properties.find((x) => x.name === "blobName");
+      const blobName = blobClient.initialization.model.properties.find(
+        (x) => x.name === "blobName",
+      );
       ok(blobName);
 
       const blobMethods = blobClient.methods;
@@ -2993,10 +2999,10 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 2);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      strictEqual(client.initialization.model.properties.length, 2);
+      const endpoint = client.initialization.model.properties.find((x) => x.kind === "endpoint");
       ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      const blobName = client.initialization.model.properties.find((x) => x.name === "blobName");
       ok(blobName);
       strictEqual(blobName.clientDefaultValue, undefined);
       strictEqual(blobName.onClient, true);
