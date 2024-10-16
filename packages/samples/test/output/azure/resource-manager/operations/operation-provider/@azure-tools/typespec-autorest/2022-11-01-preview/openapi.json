@@ -47,7 +47,7 @@
   ],
   "paths": {
     "/providers/Microsoft.OperationStatusSample/getVmSizesTenant": {
-      "post": {
+      "get": {
         "operationId": "ProviderOperations_GetVmSizesTenant",
         "tags": [
           "ProviderOperations"
@@ -78,7 +78,7 @@
       }
     },
     "/providers/Microsoft.OperationStatusSample/logAnalytics/apiAccess/getThrottledRequests": {
-      "post": {
+      "get": {
         "operationId": "ProviderOperations_GetThrottledRequestsTenant",
         "tags": [
           "ProviderOperations"
@@ -140,7 +140,7 @@
       }
     },
     "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/getVmSizes": {
-      "post": {
+      "get": {
         "operationId": "ProviderOperations_GetVmSizes",
         "tags": [
           "ProviderOperations"
@@ -174,7 +174,7 @@
       }
     },
     "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/locations/{location}/getVmSizesLocation": {
-      "post": {
+      "get": {
         "operationId": "ProviderOperations_GetVmSizesLocation",
         "tags": [
           "ProviderOperations"
@@ -266,7 +266,7 @@
       }
     },
     "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/logAnalytics/apiAccess/getThrottledRequests": {
-      "post": {
+      "get": {
         "operationId": "ProviderOperations_GetThrottledRequestsSubscription",
         "tags": [
           "ProviderOperations"
