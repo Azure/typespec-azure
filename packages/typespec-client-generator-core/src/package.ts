@@ -77,6 +77,7 @@ import {
   getDefaultApiVersion,
   getHttpOperationWithCache,
   getLibraryName,
+  getWireName,
 } from "./public-utils.js";
 import {
   addEncodeInfo,
@@ -133,22 +134,39 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
     );
   }
-  basic.response.resultPath = pagedMetadata.itemsSegments?.join(".");
+  basic.response.resultPath = getPathFromSegment(context, pagedMetadata.modelType, pagedMetadata.itemsSegments);
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
+    nextLinkPath: getPathFromSegment(context, pagedMetadata.modelType, pagedMetadata?.nextLinkSegments),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            basic.parameters,
-          ),
-        )
+        getSdkServiceOperation<TServiceOperation>(
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters,
+        ),
+      )
       : undefined,
   });
+}
+
+function getPathFromSegment(context: TCGCContext, type: Model, segments?: string[]): string {
+  if (!segments || segments.length === 0) {
+    return "";
+  }
+  const wireSegments = [];
+  let current = type;
+  for (const segment of segments) {
+    const property = current.properties.get(segment);
+    if (!property) {
+      return "";
+    }
+    wireSegments.push(getLibraryName(context, property));
+    current = property.type as Model;
+  }
+  return wireSegments.join(".");
 }
 
 function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
@@ -197,14 +215,14 @@ function getServiceMethodLroMetadata(
     finalResponse:
       rawMetadata.finalEnvelopeResult !== undefined && rawMetadata.finalEnvelopeResult !== "void"
         ? {
-            envelopeResult: diagnostics.pipe(
-              getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-            ) as SdkModelType,
-            result: diagnostics.pipe(
-              getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
-            ) as SdkModelType,
-            resultPath: rawMetadata.finalResultPath,
-          }
+          envelopeResult: diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
+          ) as SdkModelType,
+          result: diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
+          ) as SdkModelType,
+          resultPath: rawMetadata.finalResultPath,
+        }
         : undefined,
     finalStep:
       rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,
