@@ -2,7 +2,7 @@ import { Operation, createRule } from "@typespec/compiler";
 import { getOperationVerb } from "@typespec/http";
 import { getActionDetails } from "@typespec/rest";
 
-export const armResourceInvalidActionVerb = createRule({
+export const armResourceInvalidActionVerbRule = createRule({
   name: "arm-resource-invalid-action-verb",
   severity: "warning",
   description: "Actions must be HTTP Post operations.",

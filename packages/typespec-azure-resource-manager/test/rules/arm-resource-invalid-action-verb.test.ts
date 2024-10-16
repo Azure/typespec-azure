@@ -7,7 +7,7 @@ import {
 import { getHttpOperation } from "@typespec/http";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { armResourceInvalidActionVerb } from "../../src/rules/arm-resource-invalid-action-verb.js";
+import { armResourceInvalidActionVerbRule } from "../../src/rules/arm-resource-invalid-action-verb.js";
 import { listBySubscriptionRule } from "../../src/rules/list-operation.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
@@ -19,7 +19,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
-      armResourceInvalidActionVerb,
+      armResourceInvalidActionVerbRule,
       "@azure-tools/typespec-azure-resource-manager",
     );
   });
@@ -80,6 +80,38 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
          @doc("The provisioning State")
          provisioningState: ResourceState;
        }
+    `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb",
+        message: "Actions must be HTTP Post operations.",
+      });
+  });
+  it("Detects non-post actions for internal operations", async () => {
+    await tester
+      .expect(
+        `
+    @armProviderNamespace
+    @service({title: "Microsoft.Foo"})
+    @versioned(Versions)
+    namespace Microsoft.Foo;
+    enum Versions {
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        "2021-10-01-preview",
+      }
+      interface Operations extends Azure.ResourceManager.Operations {}
+      @doc("The VM Size")
+      model VmSize {
+        @doc("number of cpus ")
+        cpus: int32;
+      }
+      @armResourceOperations
+      interface ProviderOperations {
+        @get
+        @armResourceList(VmSize)
+        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+      }
     `,
       )
       .toEmitDiagnostics({
