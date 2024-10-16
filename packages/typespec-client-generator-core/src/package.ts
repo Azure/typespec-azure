@@ -77,7 +77,6 @@ import {
   getDefaultApiVersion,
   getHttpOperationWithCache,
   getLibraryName,
-  getWireName,
 } from "./public-utils.js";
 import {
   addEncodeInfo,
@@ -134,20 +133,28 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
     );
   }
-  basic.response.resultPath = getPathFromSegment(context, pagedMetadata.modelType, pagedMetadata.itemsSegments);
+  basic.response.resultPath = getPathFromSegment(
+    context,
+    pagedMetadata.modelType,
+    pagedMetadata.itemsSegments,
+  );
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: getPathFromSegment(context, pagedMetadata.modelType, pagedMetadata?.nextLinkSegments),
+    nextLinkPath: getPathFromSegment(
+      context,
+      pagedMetadata.modelType,
+      pagedMetadata?.nextLinkSegments,
+    ),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-        getSdkServiceOperation<TServiceOperation>(
-          context,
-          pagedMetadata.nextLinkOperation,
-          basic.parameters,
-        ),
-      )
+          getSdkServiceOperation<TServiceOperation>(
+            context,
+            pagedMetadata.nextLinkOperation,
+            basic.parameters,
+          ),
+        )
       : undefined,
   });
 }
@@ -215,14 +222,14 @@ function getServiceMethodLroMetadata(
     finalResponse:
       rawMetadata.finalEnvelopeResult !== undefined && rawMetadata.finalEnvelopeResult !== "void"
         ? {
-          envelopeResult: diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-          ) as SdkModelType,
-          result: diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
-          ) as SdkModelType,
-          resultPath: rawMetadata.finalResultPath,
-        }
+            envelopeResult: diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
+            ) as SdkModelType,
+            result: diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
+            ) as SdkModelType,
+            resultPath: rawMetadata.finalResultPath,
+          }
         : undefined,
     finalStep:
       rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,
