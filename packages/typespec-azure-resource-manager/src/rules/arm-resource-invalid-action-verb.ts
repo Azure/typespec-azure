@@ -1,27 +1,24 @@
 import { Operation, createRule } from "@typespec/compiler";
 import { getOperationVerb } from "@typespec/http";
-
 import { getActionDetails } from "@typespec/rest";
-import { isInternalTypeSpec } from "./utils.js";
 
-export const invalidActionVerbRule = createRule({
+export const armResourceInvalidActionVerb = createRule({
   name: "arm-resource-invalid-action-verb",
   severity: "warning",
   description: "Actions must be HTTP Post operations.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-action-verb",
   messages: {
     default: "Actions must be HTTP Post operations.",
   },
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (!isInternalTypeSpec(context.program, operation)) {
-          const actionType = getActionDetails(context.program, operation);
-          const verb = getOperationVerb(context.program, operation);
-          if (actionType !== undefined && verb !== "post") {
-            context.reportDiagnostic({
-              target: operation,
-            });
-          }
+        const actionType = getActionDetails(context.program, operation);
+        const verb = getOperationVerb(context.program, operation);
+        if (actionType !== undefined && verb !== "post") {
+          context.reportDiagnostic({
+            target: operation,
+          });
         }
       },
     };

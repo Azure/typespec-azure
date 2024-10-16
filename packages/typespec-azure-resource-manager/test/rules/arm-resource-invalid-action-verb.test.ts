@@ -7,7 +7,7 @@ import {
 import { getHttpOperation } from "@typespec/http";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { invalidActionVerbRule } from "../../src/rules/arm-resource-invalid-action-verb.js";
+import { armResourceInvalidActionVerb } from "../../src/rules/arm-resource-invalid-action-verb.js";
 import { listBySubscriptionRule } from "../../src/rules/list-operation.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
@@ -19,7 +19,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
-      invalidActionVerbRule,
+      armResourceInvalidActionVerb,
       "@azure-tools/typespec-azure-resource-manager",
     );
   });
