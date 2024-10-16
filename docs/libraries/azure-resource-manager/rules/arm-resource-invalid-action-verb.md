@@ -11,23 +11,23 @@ For ARM http operations, the action verb must be `@post`. Any other action verb 
 #### ❌ Incorrect
 
 ```tsp
-    @get op getAction is ArmProviderActionAsync<
-      {
-        name: string;
-      },
-      ArmCombinedLroHeaders,
-      SubscriptionActionScope
-    >;
+@get op getAction is ArmProviderActionAsync<
+  {
+    name: string;
+  },
+  ArmCombinedLroHeaders,
+  SubscriptionActionScope
+>;
 ```
 
 #### ✅ Correct
 
 ```tsp
-    op postAction is ArmProviderActionAsync<
-      {
-        name: string;
-      },
-      ArmCombinedLroHeaders,
-      SubscriptionActionScope
-    >;
+op postAction is ArmProviderActionAsync<
+  {
+    name: string;
+  },
+  ArmCombinedLroHeaders,
+  SubscriptionActionScope
+>;
 ```
