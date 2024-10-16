@@ -3,9 +3,10 @@ import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
-import { isAzureCoreModel } from "../../src/internal-utils.js";
+import { isAzureCoreTspModel } from "../../src/internal-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { isAzureCoreModel } from "../../src/public-utils.js";
 
 describe("typespec-client-generator-core: model types", () => {
   let runner: SdkTestRunner;
@@ -713,13 +714,13 @@ describe("typespec-client-generator-core: model types", () => {
       @doc("Creates or updates a User")
       op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
-    const models = runner.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models.filter(x => !isAzureCoreModel(x));
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
     for (const [type, sdkType] of runner.context.modelsMap?.entries() ?? []) {
-      if (isAzureCoreModel(type)) {
+      if (isAzureCoreTspModel(type)) {
         ok(sdkType.usage !== UsageFlags.None);
       }
     }
@@ -783,7 +784,7 @@ describe("typespec-client-generator-core: model types", () => {
       @pollingOperation(My.Service.getStatus)
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
-    const models = runner.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models.filter(x => !isAzureCoreModel(x));
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
