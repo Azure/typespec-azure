@@ -428,8 +428,11 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     const parameters: SdkParameter[] = [];
     if (tspClientInitialization) {
       const clientInitialization = getSdkInitializationType(context, operationGroup, tspClientInitialization);
-      for (const property of clientInitialization.properties) {
-        parameters.push(property);
+      for (const property of clientInitialization.model.properties) {
+        if (property.kind === "method") {
+          parameters.push(property);
+        }
+        
       }
     } else {
     }
@@ -627,12 +630,12 @@ function addDefaultClientParameters<
 >(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
   const diagnostics = createDiagnosticCollector();
   // there will always be an endpoint property
-  if (!client.initialization.properties.find((x) => x.kind === "endpoint")) {
-    client.initialization.properties.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
+  if (!client.initialization.model.properties.find((x) => x.kind === "endpoint")) {
+    client.initialization.model.properties.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
   }
   const credentialParam = getSdkCredentialParameter(context, client.__raw);
-  if (credentialParam && !client.initialization.properties.find((x) => x.kind === "credential")) {
-    client.initialization.properties.push(credentialParam);
+  if (credentialParam && !client.initialization.model.properties.find((x) => x.kind === "credential")) {
+    client.initialization.model.properties.push(credentialParam);
   }
   let apiVersionParam = context.__clientToParameters
     .get(client.__raw.type)
@@ -648,7 +651,7 @@ function addDefaultClientParameters<
       }
     }
     if (apiVersionParam) {
-      client.initialization.properties.push(apiVersionParam);
+      client.initialization.model.properties.push(apiVersionParam);
     }
   let subId = context.__clientToParameters
     .get(client.__raw.type)
@@ -663,7 +666,7 @@ function addDefaultClientParameters<
     }
   }
   if (subId) {
-    client.initialization.properties.push(subId);
+    client.initialization.model.properties.push(subId);
   }
 }
 

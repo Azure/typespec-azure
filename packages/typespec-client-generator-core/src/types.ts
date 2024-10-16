@@ -74,6 +74,7 @@ import {
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkOperationGroup,
+  SdkParameter,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -688,18 +689,6 @@ export function getSdkModel(
   return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
 }
 
-export function getInitializationType(
-  context: TCGCContext,
-  type: Model,
-  operation?: Operation,
-): SdkInitializationType {
-  const model = ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
-  for (const property of model.properties) {
-    property.kind = "method";
-  }
-  return model as SdkInitializationType;
-}
-
 export function getSdkModelWithDiagnostics(
   context: TCGCContext,
   type: Model,
@@ -784,21 +773,27 @@ function getSdkEnumValueType(
   return diagnostics.wrap(getTypeSpecBuiltInType(context, kind!));
 }
 
-export function createSdkInitializationTypeIfNonExist(context: TCGCContext, client: SdkClient | SdkOperationGroup): SdkInitializationType {
+export function createSdkInitializationTypeIfNonExist(
+  context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
+): SdkInitializationType {
   const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
   const name = `${namePrefix.split(".").at(-1)}Options`;
   return {
-    __raw: client.service,
-    doc: "Initialization class for the client",
-    kind: "model",
-    properties: [],
-    name,
-    isGeneratedName: true,
     access: client.kind === "SdkClient" ? "public" : "internal",
-    usage: UsageFlags.Input,
-    crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-    decorators: [],
+    model: {
+      __raw: client.service,
+      doc: "Initialization class for the client",
+      kind: "model",
+      properties: [],
+      name,
+      isGeneratedName: true,
+      access: "public",
+      usage: UsageFlags.Input | UsageFlags.ClientInitialization,
+      crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
+      apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+      decorators: [],
+    },
   };
 }
 
@@ -808,32 +803,40 @@ export function getSdkInitializationType(
   model: Model,
 ): SdkInitializationType {
   // convert to SDK type
-  const sdkModel = getSdkModel(context, model);
-  const initializationProps = sdkModel.properties.map(
-    (property: SdkModelPropertyType): SdkMethodParameter => {
-      property.onClient = true;
-      property.kind = "method";
-      return property as SdkMethodParameter;
-    },
-  );
+  const existingModel = context.modelsMap?.get(model) as SdkModelType<SdkParameter> | undefined;
+  let sdkModel: SdkModelType<SdkParameter>;
+  if (existingModel) {
+    sdkModel = existingModel;
+  } else {
+    sdkModel = getSdkModel(context, model) as SdkModelType<SdkParameter>;
+
+    sdkModel.properties = sdkModel.properties.map(
+      (property: SdkModelPropertyType): SdkMethodParameter => {
+        property.onClient = true;
+        property.kind = "method";
+        return property as SdkMethodParameter;
+      },
+    );
+  }
   const initializationModel: SdkInitializationType = {
-    ...sdkModel,
-    usage: UsageFlags.ClientInitialization,
     access: client.kind === "SdkClient" ? "public" : "internal",
-    properties: initializationProps,
+    model: sdkModel,
   };
-
-
   let clientParams = context.__clientToParameters.get(client.type);
   if (!clientParams) {
     clientParams = [];
     context.__clientToParameters.set(client.type, clientParams);
   }
-  
-  for (const prop of initializationModel.properties) {
+
+  for (const prop of initializationModel.model.properties) {
+    if (!clientParams.filter((p) => p.name === prop.name).length)
     clientParams.push(prop);
   }
-  updateModelsMap(context, model, initializationModel);
+  updateUsageOrAccessOfModel(context, UsageFlags.Input, sdkModel, { propagation: false });
+  updateUsageOrAccessOfModel(context, UsageFlags.ClientInitialization, sdkModel, {
+    propagation: false,
+  });
+  updateModelsMap(context, model, sdkModel);
   return initializationModel;
 }
 
@@ -1834,6 +1837,10 @@ export function getAllModelsWithDiagnostics(
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
     const ogs = listOperationGroups(context, client);
+    const clientInitModel = getClientInitialization(context, client.type);
+    if (clientInitModel) {
+      getSdkInitializationType(context, client, clientInitModel);
+    }
     while (ogs.length) {
       const operationGroup = ogs.pop();
       for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
