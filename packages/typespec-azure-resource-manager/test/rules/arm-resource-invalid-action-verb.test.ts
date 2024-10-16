@@ -100,12 +100,15 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
         @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
         "2021-10-01-preview",
       }
+
       interface Operations extends Azure.ResourceManager.Operations {}
+      
       @doc("The VM Size")
       model VmSize {
         @doc("number of cpus ")
         cpus: int32;
       }
+        
       @armResourceOperations
       interface ProviderOperations {
         @get
