@@ -551,7 +551,9 @@ describe("typespec-client-generator-core: package", () => {
     strictEqual(endpointTemplateArg.kind, "path");
     strictEqual(endpointTemplateArg.clientDefaultValue, "http://localhost:3000");
 
-    const apiVersionParam = client.initialization.model.properties.filter((p) => p.isApiVersionParam)[0];
+    const apiVersionParam = client.initialization.model.properties.filter(
+      (p) => p.isApiVersionParam,
+    )[0];
     strictEqual(apiVersionParam.name, "apiVersion");
     strictEqual(apiVersionParam.onClient, true);
     strictEqual(apiVersionParam.optional, false);
@@ -621,7 +623,9 @@ describe("typespec-client-generator-core: package", () => {
     strictEqual(templateArg.onClient, true);
     strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
-    const apiVersionParam = client.initialization.model.properties.filter((p) => p.isApiVersionParam)[0];
+    const apiVersionParam = client.initialization.model.properties.filter(
+      (p) => p.isApiVersionParam,
+    )[0];
     strictEqual(apiVersionParam.name, "apiVersion");
     strictEqual(apiVersionParam.onClient, true);
     strictEqual(apiVersionParam.optional, false);

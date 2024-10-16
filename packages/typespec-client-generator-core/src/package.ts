@@ -427,12 +427,15 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     const tspClientInitialization = getClientInitialization(context, operationGroup.type);
     const parameters: SdkParameter[] = [];
     if (tspClientInitialization) {
-      const clientInitialization = getSdkInitializationType(context, operationGroup, tspClientInitialization);
+      const clientInitialization = getSdkInitializationType(
+        context,
+        operationGroup,
+        tspClientInitialization,
+      );
       for (const property of clientInitialization.model.properties) {
         if (property.kind === "method") {
           parameters.push(property);
         }
-        
       }
     } else {
     }
@@ -631,28 +634,33 @@ function addDefaultClientParameters<
   const diagnostics = createDiagnosticCollector();
   // there will always be an endpoint property
   if (!client.initialization.model.properties.find((x) => x.kind === "endpoint")) {
-    client.initialization.model.properties.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
+    client.initialization.model.properties.push(
+      diagnostics.pipe(getSdkEndpointParameter(context, client)),
+    );
   }
   const credentialParam = getSdkCredentialParameter(context, client.__raw);
-  if (credentialParam && !client.initialization.model.properties.find((x) => x.kind === "credential")) {
+  if (
+    credentialParam &&
+    !client.initialization.model.properties.find((x) => x.kind === "credential")
+  ) {
     client.initialization.model.properties.push(credentialParam);
   }
   let apiVersionParam = context.__clientToParameters
     .get(client.__raw.type)
     ?.find((x) => x.isApiVersionParam);
-    if (!apiVersionParam) {
-      for (const operationGroup of listOperationGroups(context, client.__raw)) {
-        // if any sub operation groups have an api version param, the top level needs
-        // the api version param as well
-        apiVersionParam = context.__clientToParameters
-          .get(operationGroup.type)
-          ?.find((x) => x.isApiVersionParam);
-        if (apiVersionParam) break;
-      }
+  if (!apiVersionParam) {
+    for (const operationGroup of listOperationGroups(context, client.__raw)) {
+      // if any sub operation groups have an api version param, the top level needs
+      // the api version param as well
+      apiVersionParam = context.__clientToParameters
+        .get(operationGroup.type)
+        ?.find((x) => x.isApiVersionParam);
+      if (apiVersionParam) break;
     }
-    if (apiVersionParam) {
-      client.initialization.model.properties.push(apiVersionParam);
-    }
+  }
+  if (apiVersionParam) {
+    client.initialization.model.properties.push(apiVersionParam);
+  }
   let subId = context.__clientToParameters
     .get(client.__raw.type)
     ?.find((x) => isSubscriptionId(context, x));

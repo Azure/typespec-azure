@@ -2916,7 +2916,9 @@ describe("typespec-client-generator-core: decorators", () => {
       );
       ok(containerNameOnBlobClient);
 
-      const blobName = blobClient.initialization.model.properties.find((x) => x.name === "blobName");
+      const blobName = blobClient.initialization.model.properties.find(
+        (x) => x.name === "blobName",
+      );
       ok(blobName);
 
       const blobMethods = blobClient.methods;
