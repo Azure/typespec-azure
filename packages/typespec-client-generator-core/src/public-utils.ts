@@ -679,5 +679,5 @@ export function listSubClients<TServiceOperation extends SdkServiceOperation>(
 }
 
 export function isAzureCoreModel(t: SdkType): boolean {
-  return (t.__raw !== undefined && isAzureCoreTspModel(t.__raw))
+  return t.__raw !== undefined && isAzureCoreTspModel(t.__raw);
 }

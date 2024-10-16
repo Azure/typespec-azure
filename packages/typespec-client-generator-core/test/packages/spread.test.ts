@@ -7,10 +7,10 @@ import {
   SdkServiceMethod,
   UsageFlags,
 } from "../../src/interfaces.js";
+import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
-import { isAzureCoreModel } from "../../src/public-utils.js";
 
 describe("typespec-client-generator-core: spread", () => {
   let runner: SdkTestRunner;

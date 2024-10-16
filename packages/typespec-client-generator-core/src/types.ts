@@ -91,7 +91,6 @@ import {
   getSdkTypeBaseHelper,
   getTypeDecorators,
   intOrFloat,
-  isAzureCoreTspModel,
   isHttpBodySpread,
   isJsonContentType,
   isMultipartOperation,
