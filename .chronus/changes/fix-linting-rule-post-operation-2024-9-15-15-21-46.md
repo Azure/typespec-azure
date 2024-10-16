@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Fix linting rule to ensure that the linting rule triggers for @get operations on ArmProviderAction
+Fix `arm-resource-invalid-action-verb` rule to trigger on `@get` operations on ArmProviderAction
