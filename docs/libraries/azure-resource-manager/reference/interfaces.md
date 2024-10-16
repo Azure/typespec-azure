@@ -4,8 +4,6 @@ toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
 
-# Interfaces and Operations
-
 ## Azure.ResourceManager
 
 ### `ExtensionResourceCollectionOperations` {#Azure.ResourceManager.ExtensionResourceCollectionOperations}
@@ -674,7 +672,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 ### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters

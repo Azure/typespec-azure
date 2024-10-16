@@ -4,8 +4,6 @@ toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
 
-# Data types
-
 ## Azure.ResourceManager
 
 ### `ArmAcceptedLroResponse` {#Azure.ResourceManager.ArmAcceptedLroResponse}
@@ -363,6 +361,29 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 | ---------- | -------------- | ---------------- |
 | statusCode | `200`          | The status code. |
 | body       | `ResponseBody` |                  |
+
+### `AvailabilityZonesProperty` {#Azure.ResourceManager.AvailabilityZonesProperty}
+
+Model representing the standard `zones` envelope property for a resource.
+Spread this model into a resource Model if the resource supports ARM `zones`.
+
+```typespec
+model Azure.ResourceManager.AvailabilityZonesProperty
+```
+
+#### Examples
+
+```typescript
+model Foo is TrackedResource<FooProperties> {
+  ...AvailabilityZonesProperty;
+}
+```
+
+#### Properties
+
+| Name   | Type       | Description             |
+| ------ | ---------- | ----------------------- |
+| zones? | `string[]` | The availability zones. |
 
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
