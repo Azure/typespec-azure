@@ -1737,7 +1737,7 @@ function handleServiceOrphanType(
 
 function filterOutModels(context: TCGCContext, filter: number): (SdkModelType | SdkEnumType)[] {
   const result = new Set<SdkModelType | SdkEnumType>();
-  for (const [type, sdkType] of context.modelsMap?.entries() ?? []) {
+  for (const sdkType of context.modelsMap?.values() ?? []) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;
