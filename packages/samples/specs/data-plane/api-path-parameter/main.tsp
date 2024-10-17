@@ -13,6 +13,7 @@ using Azure.Core.Traits;
   title: "Contoso Widget Manager",
 })
 @versioned(Contoso.WidgetManager.Versions)
+@useAuth(ApiKeyAuth<ApiKeyLocation.header, "X-Key">)
 namespace Contoso.WidgetManager;
 
 @doc("The Contoso Widget Manager service version.")
