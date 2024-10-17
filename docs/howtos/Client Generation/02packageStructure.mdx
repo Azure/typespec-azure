@@ -1,9 +1,190 @@
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Client hierarchy
+# Package Structure
 
-This page documents the default client hierarchy behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
+This page documents how to structure your generated package. For an overview of the setup, please visit the previous page.
+
+## Namespaces
+
+The namespaces defined in the `main.tsp` file will directly map to namespaces in our generated libraries. This will make the TypeSpec namespaces and the namespaces in generated libraries consistent.
+
+> Note: There is no concept of namespaces in TypeScript. Thus, the TypeScript emitter only uses namespaces when we need a model name prefix to resolve naming conflicts.
+
+### Default
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+// in main.tsp
+namespace foo {
+    model FooModel {
+        name: string;
+    }
+}
+
+namespace bar {
+    model BarModel {
+        id: string;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```
+├── ${package-dir}
+│   ├── foo
+│   │   ├── _models.py
+│   ├── bar
+│   │   ├── _models.py
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```
+namespace Foo {
+    public class FooModel {
+        public string Name { get; set; }
+    }
+}
+
+namespace Bar {
+    public class BarModel {
+        public string Id { get; set; }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+No concept of namespaces in JS code generator. It's only used as model name prefix to resolve naming conflicts.
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```
+package foo;
+public class FooModel {
+    public String name;
+}
+
+package bar;
+public class BarModel {
+    public String id;
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Overriding
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+// in main.tsp
+namespace foo {
+    model FooModel {
+        name: string;
+    }
+}
+
+namespace bar {
+    model BarModel {
+        id: string;
+    }
+}
+
+namespace foo.buzz {
+    model BuzzModel {
+        name: string;
+    }
+}
+
+// in client.tsp
+
+@@clientName(foo, "Azure.AI.Foo", "csharp");
+@@clientName(foo, "com.azure.ai.foo", "java");
+@@clientName(foo, "azure.ai.foo", "python");
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```
+├── ${package-dir}
+|   ├── azure
+│   |   ├── ai
+│   |   |   ├── foo
+|   │   │   |   ├── _models.py
+│   |   |   |   ├── buzz
+|   │   │   |   |   ├── _models.py
+│   ├── bar
+│   │   ├── _models.py
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```
+namespace Azure.AI.Foo {
+    public class FooModel {
+        public string Name { get; set; }
+    }
+}
+
+namespace Azure.AI.Foo.Buzz {
+    public class BuzzModel {
+        public string Id { get; set; }
+    }
+}
+
+namespace Bar {
+    public class BarModel {
+        public string Id { get; set; }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+No concept of namespaces in JS code generator. It's only used as model name prefix to resolve naming conflicts.
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```
+package com.azure.ai.foo;
+public class FooModel {
+    public String name;
+}
+
+package com.azure.ai.foo.buzz;
+public class BuzzModel {
+    public String id;
+}
+
+package bar;
+public class BarModel {
+    public String id;
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Client Hierarchy
+
+In this section, we will talk about the default client hierarchy, and also possible customizations that can be made to this.
 
 JS RLC is not in the business of customization. it will ignore client.tsp and the follow scenarios will not have impact on the JS RLC user experiences. In this context, TypeScript part means JS Modular Emitter.
 
@@ -11,7 +192,9 @@ JS RLC is not in the business of customization. it will ignore client.tsp and th
 
 By default, each namespace with `@service` decorator will be generated as a root client. The name for that client will be the namespace name concatenating `Client` as suffix.
 
-Other nested namespacess and interfaces of each root client will be generated as operation groups with hierarchy.
+The client will be generated in a namespace corresponding to the `namespace` in the TypeSpec definition
+
+Other nested namespacess and interfaces of each root client will be generated as subclients with hierarchy.
 
 Different language's code generator will have different way to organize clients and operation groups. Please refer the following examples.
 
