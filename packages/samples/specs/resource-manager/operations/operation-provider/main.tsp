@@ -47,12 +47,15 @@ model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 @armResourceOperations
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb" "Action can be used for get"
   @get
   getVmSizes is ArmProviderActionSync<Response = VmSizeCollection, Scope = SubscriptionActionScope>;
   /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb" "Action can be used for get"
   @get
   getVmSizesTenant is ArmProviderActionSync<Response = VmSizeCollection, Scope = TenantActionScope>;
   /** Operation to get virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation) */
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb" "Action can be used for get"
   @get
   getVmSizesLocation is ArmProviderActionSync<
     Response = VmSizeCollection,
@@ -60,6 +63,7 @@ interface ProviderOperations {
     Parameters = LocationParameter
   >;
   /** Operation to get throttled requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb" "Action can be used for get"
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsSubscription is ArmProviderActionSync<
@@ -67,6 +71,7 @@ interface ProviderOperations {
     Scope = SubscriptionActionScope
   >;
   /** Operation to get throttled requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
+  #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb" "Action can be used for get"
   @get
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsTenant is ArmProviderActionSync<

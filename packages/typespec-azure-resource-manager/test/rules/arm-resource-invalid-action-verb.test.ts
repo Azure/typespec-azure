@@ -7,7 +7,7 @@ import {
 import { getHttpOperation } from "@typespec/http";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { invalidActionVerbRule } from "../../src/rules/arm-resource-invalid-action-verb.js";
+import { armResourceInvalidActionVerbRule } from "../../src/rules/arm-resource-invalid-action-verb.js";
 import { listBySubscriptionRule } from "../../src/rules/list-operation.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
@@ -19,7 +19,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
-      invalidActionVerbRule,
+      armResourceInvalidActionVerbRule,
       "@azure-tools/typespec-azure-resource-manager",
     );
   });
@@ -87,8 +87,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
         message: "Actions must be HTTP Post operations.",
       });
   });
-
-  it("Allows post actions for authorized provider actions", async () => {
+  it("Detects non-post actions for internal operations", async () => {
     await tester
       .expect(
         `
@@ -103,13 +102,13 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       }
 
       interface Operations extends Azure.ResourceManager.Operations {}
-
+      
       @doc("The VM Size")
       model VmSize {
         @doc("number of cpus ")
         cpus: int32;
       }
-
+        
       @armResourceOperations
       interface ProviderOperations {
         @get
@@ -118,7 +117,10 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       }
     `,
       )
-      .toBeValid();
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb",
+        message: "Actions must be HTTP Post operations.",
+      });
   });
 });
 
