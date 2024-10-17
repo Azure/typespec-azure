@@ -1,5 +1,5 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: tuple types", () => {
@@ -8,13 +8,21 @@ describe("typespec-client-generator-core: tuple types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("model with tupled properties", async function () {
     await runner.compileAndDiagnose(`
         @service({})
         namespace MyService;
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model MyFlow {
           scopes: ["https://security.microsoft.com/.default"];
           test: [int32, string]
@@ -26,13 +34,13 @@ describe("typespec-client-generator-core: tuple types", () => {
     const scopes = models[0].properties.find((x) => x.name === "scopes");
     ok(scopes);
     strictEqual(scopes.type.kind, "tuple");
-    strictEqual(scopes.type.values[0].kind, "constant");
-    strictEqual(scopes.type.values[0].valueType.kind, "string");
-    strictEqual(scopes.type.values[0].value, "https://security.microsoft.com/.default");
+    strictEqual(scopes.type.valueTypes[0].kind, "constant");
+    strictEqual(scopes.type.valueTypes[0].valueType.kind, "string");
+    strictEqual(scopes.type.valueTypes[0].value, "https://security.microsoft.com/.default");
     const test = models[0].properties.find((x) => x.name === "test");
     ok(test);
     strictEqual(test.type.kind, "tuple");
-    strictEqual(test.type.values[0].kind, "int32");
-    strictEqual(test.type.values[1].kind, "string");
+    strictEqual(test.type.valueTypes[0].kind, "int32");
+    strictEqual(test.type.valueTypes[1].kind, "string");
   });
 });

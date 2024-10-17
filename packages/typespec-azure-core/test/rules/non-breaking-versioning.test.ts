@@ -32,7 +32,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
     tester = createLinterRuleTester(
       runner,
       nonBreakingVersioningRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -43,7 +43,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
           `
             @removed(Versions.v2022_10_29)
             model Foo {}
-          `
+          `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/non-breaking-versioning",
@@ -59,7 +59,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
             @removed(Versions.v2022_10_29)
             bar: string;
           }
-          `
+          `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/non-breaking-versioning",
@@ -73,7 +73,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
           `
           @removed(Versions.v2022_10_29)
           op getTest(): string;
-          `
+          `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/non-breaking-versioning",
@@ -89,7 +89,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
           `
           @renamedFrom(Versions.v2022_10_29, "Bar")
           model Foo {}
-          `
+          `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/non-breaking-versioning",
@@ -105,7 +105,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
             @renamedFrom(Versions.v2022_10_29, "bar")
             baz: string;
           }
-          `
+          `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/non-breaking-versioning",
@@ -121,7 +121,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
           `
           @added(Versions.v2022_10_29)
           model Foo {}
-          `
+          `,
         )
         .toBeValid();
     });
@@ -132,7 +132,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
           `
           @added(Versions.v2022_10_29)
           op getTest(): string;
-          `
+          `,
         )
         .toBeValid();
     });
@@ -145,7 +145,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
             @added(Versions.v2022_10_29)
             bar?: string;
           }
-          `
+          `,
         )
         .toBeValid();
     });
@@ -158,7 +158,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
             @added(Versions.v2022_10_29)
             bar: string;
           }
-          `
+          `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/non-breaking-versioning",
@@ -176,7 +176,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
             @madeOptional(Versions.v2022_10_29)
             bar?: string = "my-default";
           }
-          `
+          `,
         )
         .toBeValid();
     });
@@ -189,7 +189,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
           @madeOptional(Versions.v2022_10_29)
           bar?: string;
         }
-        `
+        `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/non-breaking-versioning",

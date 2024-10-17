@@ -14,11 +14,11 @@ function $useRef(
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `context` | `DecoratorContext` |
-| `entity` | `Model` \| `ModelProperty` |
-| `jsonRef` | `string` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `context` | `DecoratorContext` | - |
+| `entity` | `Model` \| `ModelProperty` | - |
+| `jsonRef` | `string` | path or Uri to an OpenAPI schema. `@useRef` can be specified on Models and ModelProperty. |
 
 ## Returns
 

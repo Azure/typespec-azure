@@ -13,9 +13,11 @@ title: "[I] SdkHttpOperation"
 | ------ | ------ |
 | `__raw` | `HttpOperation` |
 | `bodyParam?` | [`SdkBodyParameter`](SdkBodyParameter.md) |
-| `exceptions` | `Map`<`number` \| `"*"` \| `HttpStatusCodeRange`, [`SdkHttpResponse`](SdkHttpResponse.md)\> |
+| `examples?` | [`SdkHttpOperationExample`](SdkHttpOperationExample.md)[] |
+| `exceptions` | [`SdkHttpErrorResponse`](SdkHttpErrorResponse.md)[] |
 | `kind` | `"http"` |
-| `parameters` | ([`SdkQueryParameter`](SdkQueryParameter.md) \| [`SdkPathParameter`](SdkPathParameter.md) \| [`SdkHeaderParameter`](SdkHeaderParameter.md))[] |
+| `parameters` | ([`SdkPathParameter`](SdkPathParameter.md) \| [`SdkQueryParameter`](SdkQueryParameter.md) \| [`SdkHeaderParameter`](SdkHeaderParameter.md))[] |
 | `path` | `string` |
-| `responses` | `Map`<`number` \| `HttpStatusCodeRange`, [`SdkHttpResponse`](SdkHttpResponse.md)\> |
+| `responses` | [`SdkHttpResponse`](SdkHttpResponse.md)[] |
+| `uriTemplate` | `string` |
 | `verb` | `HttpVerb` |

@@ -4,7 +4,7 @@ title: "[V] $lib"
 
 ---
 ```ts
-const $lib: TypeSpecLibrary<object, AutorestEmitterOptions, never>;
+const $lib: TypeSpecLibrary<object, AutorestEmitterOptions, "example" | "useRef">;
 ```
 
 ## Type declaration
@@ -25,8 +25,6 @@ const $lib: TypeSpecLibrary<object, AutorestEmitterOptions, never>;
 | `example-loading.noOperationId` | `CallableMessage`<[`"filename"`]\> | - |
 | `inline-cycle` | `object` | - |
 | `inline-cycle.default` | `CallableMessage`<[`"type"`]\> | - |
-| `invalid-default` | `object` | - |
-| `invalid-default.default` | `CallableMessage`<[`"type"`]\> | - |
 | `invalid-format` | `object` | - |
 | `invalid-format.default` | `CallableMessage`<[`"schema"`, `"format"`]\> | - |
 | `invalid-multi-collection-format` | `object` | - |

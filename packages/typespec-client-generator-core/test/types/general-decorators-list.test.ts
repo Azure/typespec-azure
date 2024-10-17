@@ -1,8 +1,9 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { XmlTestLibrary } from "@typespec/xml/testing";
-import { deepStrictEqual, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { deepStrictEqual, ok, strictEqual } from "assert";
+import { afterEach, beforeEach, describe, it } from "vitest";
+import { SdkEnumValueType } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: general decorators list", () => {
@@ -11,7 +12,16 @@ describe("typespec-client-generator-core: general decorators list", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("no arg", async function () {
     runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@error"] });
 
@@ -33,7 +43,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   it("basic arg type", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
     );
 
     await runner.compileWithBuiltInService(`
@@ -72,14 +82,11 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].properties[0].decorators, [
-      {
-        name: "TypeSpec.@encode",
-        arguments: {
-          encoding: "base64url",
-        },
-      },
-    ]);
+    strictEqual(models[0].properties[0].decorators[0].name, "TypeSpec.@encode");
+    const encodeInfo = models[0].properties[0].decorators[0].arguments[
+      "encodingOrEncodeAs"
+    ] as SdkEnumValueType;
+    strictEqual((encodeInfo.value as any).value, "base64url");
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
@@ -104,7 +111,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   it("multiple same decorators", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
     );
 
     await runner.compileWithBuiltInService(`
@@ -266,30 +273,17 @@ describe("typespec-client-generator-core: general decorators list", () => {
 
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 1);
-      deepStrictEqual(models[0].decorators, [
-        {
-          name: "TypeSpec.Xml.@ns",
-          arguments: {
-            ns: "https://example.com/ns1",
-          },
-        },
-      ]);
-      deepStrictEqual(models[0].properties[0].decorators, [
-        {
-          name: "TypeSpec.Xml.@ns",
-          arguments: {
-            ns: "https://example.com/ns1",
-          },
-        },
-      ]);
-      deepStrictEqual(models[0].properties[1].decorators, [
-        {
-          name: "TypeSpec.Xml.@ns",
-          arguments: {
-            ns: "https://example.com/ns2",
-          },
-        },
-      ]);
+      strictEqual(models[0].decorators[0].name, "TypeSpec.Xml.@ns");
+      const modelArg = models[0].decorators[0].arguments["ns"] as SdkEnumValueType;
+      strictEqual(modelArg.value, "https://example.com/ns1");
+
+      strictEqual(models[0].properties[0].decorators[0].name, "TypeSpec.Xml.@ns");
+      let propArg = models[0].properties[0].decorators[0].arguments["ns"] as SdkEnumValueType;
+      strictEqual(propArg.value, "https://example.com/ns1");
+
+      strictEqual(models[0].properties[1].decorators[0].name, "TypeSpec.Xml.@ns");
+      propArg = models[0].properties[1].decorators[0].arguments["ns"] as SdkEnumValueType;
+      strictEqual(propArg.value, "https://example.com/ns2");
     });
 
     it("@unwrapped", async function () {
@@ -340,6 +334,34 @@ describe("typespec-client-generator-core: general decorators list", () => {
           },
         },
       ]);
+    });
+  });
+
+  describe("csharp only decorator", () => {
+    it("@useSystemTextJsonConverter", async function () {
+      runner = await createSdkTestRunner(
+        {},
+        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] },
+      );
+
+      await runner.compileWithBuiltInService(`
+        @useSystemTextJsonConverter("csharp")
+        model A {
+          id: string;
+        }
+
+        op test(): A;
+      `);
+
+      const models = runner.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      deepStrictEqual(models[0].decorators, [
+        {
+          name: "Azure.ClientGenerator.Core.@useSystemTextJsonConverter",
+          arguments: { scope: "csharp" },
+        },
+      ]);
+      expectDiagnostics(runner.context.diagnostics, []);
     });
   });
 });

@@ -17,7 +17,7 @@ import type {
  */
 export type LroStatusDecorator = (
   context: DecoratorContext,
-  entity: Enum | Union | ModelProperty
+  entity: Enum | Union | ModelProperty,
 ) => void;
 
 /**
@@ -29,7 +29,7 @@ export type LroStatusDecorator = (
 export type FinalLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  finalResult?: Type
+  finalResult?: Type,
 ) => void;
 
 /**
@@ -42,13 +42,8 @@ export type FinalLocationDecorator = (
 export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  options?: Type
+  options?: Type,
 ) => void;
-
-/**
- * Marks a Model as a paged collection.
- */
-export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
 
 /**
  * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
@@ -59,6 +54,11 @@ export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) 
  * Identifies a ModelProperty that contains the next link value. Can only be used on a Model marked with `@pagedResult`.
  */
 export type NextLinkDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
+
+/**
+ * Marks a Model as a paged collection.
+ */
+export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
 
 /**
  * Marks an Enum as being fixed since enums in Azure are
@@ -72,7 +72,7 @@ export type FixedDecorator = (context: DecoratorContext, target: Enum) => void;
  */
 export type LroSucceededDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => void;
 
 /**
@@ -81,7 +81,7 @@ export type LroSucceededDecorator = (
  */
 export type LroCanceledDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => void;
 
 /**
@@ -90,7 +90,7 @@ export type LroCanceledDecorator = (
  */
 export type LroFailedDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => void;
 
 /**
@@ -120,7 +120,7 @@ export type OperationLinkDecorator = (
   entity: Operation,
   linkedOperation: Operation,
   linkType: string,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
 
 /**
@@ -133,7 +133,7 @@ export type OperationLinkDecorator = (
 export type PollingOperationParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  targetParameter?: Type
+  targetParameter?: Type,
 ) => void;
 
 /**
@@ -147,7 +147,7 @@ export type PollingOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
 
 /**
@@ -161,7 +161,7 @@ export type FinalOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
 
 /**
@@ -172,7 +172,7 @@ export type FinalOperationDecorator = (
 export type UseFinalStateViaDecorator = (
   context: DecoratorContext,
   entity: Operation,
-  finalState: "original-uri" | "operation-location" | "location" | "azure-async-operation"
+  finalState: "original-uri" | "operation-location" | "location" | "azure-async-operation",
 ) => void;
 
 /**
@@ -186,5 +186,26 @@ export type NextPageOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => void;
+
+export type AzureCoreDecorators = {
+  lroStatus: LroStatusDecorator;
+  finalLocation: FinalLocationDecorator;
+  pollingLocation: PollingLocationDecorator;
+  items: ItemsDecorator;
+  nextLink: NextLinkDecorator;
+  pagedResult: PagedResultDecorator;
+  fixed: FixedDecorator;
+  lroSucceeded: LroSucceededDecorator;
+  lroCanceled: LroCanceledDecorator;
+  lroFailed: LroFailedDecorator;
+  lroResult: LroResultDecorator;
+  lroErrorResult: LroErrorResultDecorator;
+  operationLink: OperationLinkDecorator;
+  pollingOperationParameter: PollingOperationParameterDecorator;
+  pollingOperation: PollingOperationDecorator;
+  finalOperation: FinalOperationDecorator;
+  useFinalStateVia: UseFinalStateViaDecorator;
+  nextPageOperation: NextPageOperationDecorator;
+};

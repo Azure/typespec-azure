@@ -15,70 +15,25 @@ title: "[I] SdkLroPagingServiceMethod"
 
 ## Properties
 
-| Property | Type | Inherited from |
-| ------ | ------ | ------ |
-| `__raw?` | `Operation` | `SdkServiceMethodBase.__raw` |
-| `__raw_lro_metadata` | `LroMetadata` | `SdkLroServiceMethodOptions.__raw_lro_metadata` |
-| `__raw_paged_metadata` | `PagedResultMetadata` | `SdkPagingServiceMethodOptions.__raw_paged_metadata` |
-| `access` | [`AccessFlags`](../type-aliases/AccessFlags.md) | `SdkServiceMethodBase.access` |
-| `apiVersions` | `string`[] | `SdkServiceMethodBase.apiVersions` |
-| `crossLanguageDefintionId` | `string` | `SdkServiceMethodBase.crossLanguageDefintionId` |
-| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | `SdkServiceMethodBase.decorators` |
-| `description?` | `string` | `SdkServiceMethodBase.description` |
-| `details?` | `string` | `SdkServiceMethodBase.details` |
-| `exception?` | [`SdkMethodResponse`](SdkMethodResponse.md) | `SdkServiceMethodBase.exception` |
-| `generateConvenient` | `boolean` | `SdkServiceMethodBase.generateConvenient` |
-| `generateProtocol` | `boolean` | `SdkServiceMethodBase.generateProtocol` |
-| `kind` | `"lropaging"` | - |
-| `name` | `string` | `SdkServiceMethodBase.name` |
-| `nextLinkOperation?` | [`SdkHttpOperation`](SdkHttpOperation.md) | `SdkPagingServiceMethodOptions.nextLinkOperation` |
-| `nextLinkPath?` | `string` | `SdkPagingServiceMethodOptions.nextLinkPath` |
-| `operation` | `TServiceOperation` | `SdkServiceMethodBase.operation` |
-| `parameters` | [`SdkMethodParameter`](SdkMethodParameter.md)[] | `SdkServiceMethodBase.parameters` |
-| `response` | [`SdkMethodResponse`](SdkMethodResponse.md) | `SdkServiceMethodBase.response` |
-
-## Methods
-
-### ~~getParameterMapping()~~
-
-```ts
-getParameterMapping(serviceParam): SdkModelPropertyType[]
-```
-
-#### Parameters
-
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `serviceParam` | [`SdkHttpParameter`](../type-aliases/SdkHttpParameter.md) |  |
-
-#### Returns
-
-[`SdkModelPropertyType`](../type-aliases/SdkModelPropertyType.md)[]
-
-#### Deprecated
-
-This property is deprecated. Access .correspondingMethodParams on the service parameters instead.
-
-#### Inherited from
-
-`SdkServiceMethodBase.getParameterMapping`
-
-***
-
-### ~~getResponseMapping()~~
-
-```ts
-getResponseMapping(): undefined | string
-```
-
-#### Returns
-
-`undefined` \| `string`
-
-#### Deprecated
-
-This property is deprecated. Access .resultPath on the method response instead.
-
-#### Inherited from
-
-`SdkServiceMethodBase.getResponseMapping`
+| Property | Type | Description | Inherited from |
+| ------ | ------ | ------ | ------ |
+| `__raw?` | `Operation` | - | `SdkServiceMethodBase.__raw` |
+| ~~`__raw_lro_metadata`~~ | `LroMetadata` | **Deprecated** This property will be removed in future releases. Use `lroMetadata` for synthesized LRO metadata. If you still want to access primitive LRO info, use `lroMetadata.__raw`. | `SdkLroServiceMethodOptions.__raw_lro_metadata` |
+| `__raw_paged_metadata` | `PagedResultMetadata` | - | `SdkPagingServiceMethodOptions.__raw_paged_metadata` |
+| `access` | [`AccessFlags`](../type-aliases/AccessFlags.md) | - | `SdkServiceMethodBase.access` |
+| `apiVersions` | `string`[] | - | `SdkServiceMethodBase.apiVersions` |
+| `crossLanguageDefintionId` | `string` | - | `SdkServiceMethodBase.crossLanguageDefintionId` |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkServiceMethodBase.decorators` |
+| `doc?` | `string` | - | `SdkServiceMethodBase.doc` |
+| `exception?` | [`SdkMethodResponse`](SdkMethodResponse.md) | - | `SdkServiceMethodBase.exception` |
+| `generateConvenient` | `boolean` | - | `SdkServiceMethodBase.generateConvenient` |
+| `generateProtocol` | `boolean` | - | `SdkServiceMethodBase.generateProtocol` |
+| `kind` | `"lropaging"` | - | - |
+| `lroMetadata` | [`SdkLroServiceMetadata`](SdkLroServiceMetadata.md) | - | `SdkLroServiceMethodOptions.lroMetadata` |
+| `name` | `string` | - | `SdkServiceMethodBase.name` |
+| `nextLinkOperation?` | [`SdkHttpOperation`](SdkHttpOperation.md) | - | `SdkPagingServiceMethodOptions.nextLinkOperation` |
+| `nextLinkPath?` | `string` | - | `SdkPagingServiceMethodOptions.nextLinkPath` |
+| `operation` | `TServiceOperation` | - | `SdkServiceMethodBase.operation` |
+| `parameters` | [`SdkMethodParameter`](SdkMethodParameter.md)[] | - | `SdkServiceMethodBase.parameters` |
+| `response` | [`SdkMethodResponse`](SdkMethodResponse.md) | - | `SdkServiceMethodBase.response` |
+| `summary?` | `string` | - | `SdkServiceMethodBase.summary` |

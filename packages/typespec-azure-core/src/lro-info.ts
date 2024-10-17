@@ -10,14 +10,17 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   getEffectiveModelType,
+  ignoreDiagnostics,
   isErrorType,
   isType,
 } from "@typespec/compiler";
 import {
   HttpOperationResponse,
   getHeaderFieldName,
-  getOperationParameters,
+  getHttpOperation,
   getResponsesForOperation,
+  isBody,
+  isBodyRoot,
   isHeader,
   isMetadata,
 } from "@typespec/http";
@@ -86,7 +89,7 @@ export type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
 export function extractStatusMonitorInfo(
   program: Program,
   model: Model,
-  statusProperty: ModelProperty
+  statusProperty: ModelProperty,
 ): [StatusMonitorMetadata | undefined, readonly Diagnostic[]] {
   const diagnosticsToToss = createDiagnosticCollector();
   const diagnosticsToKeep = createDiagnosticCollector();
@@ -94,7 +97,7 @@ export function extractStatusMonitorInfo(
   const successProperty: ModelProperty | undefined =
     lroResult?.kind === "ModelProperty" ? lroResult : undefined;
   const errorProperty: ModelProperty | undefined = diagnosticsToKeep.pipe(
-    getLroErrorResult(program, model, true)
+    getLroErrorResult(program, model, true),
   );
   const states: LongRunningStates | undefined =
     getLongRunningStates(program, statusProperty) ??
@@ -120,15 +123,26 @@ export function extractStatusMonitorInfo(
     },
   });
 }
+
+function getBodyModel(program: Program, model: Model): Model | undefined {
+  const bodyProps = [...getAllProperties(model).values()].filter(
+    (p) => isBody(program, p) || isBodyRoot(program, p),
+  );
+  if (bodyProps.length !== 1) return undefined;
+  const outType = bodyProps[0].type;
+  if (outType.kind !== "Model") return undefined;
+  return outType;
+}
+
 export function getLroOperationInfo(
   program: Program,
   sourceOperation: Operation,
   targetOperation: Operation,
-  parameters?: Model
+  parameters?: Model,
 ): [LroOperationInfo | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const targetResponses = diagnostics.pipe(getResponsesForOperation(program, targetOperation));
-  const targetParameters = diagnostics.pipe(getOperationParameters(program, targetOperation));
+  const targetParameters = ignoreDiagnostics(getHttpOperation(program, targetOperation)).parameters;
   const targetProperties = new Map<string, ModelProperty>();
   const parameterMap = new Map<string, PropertyMap>();
   const unmatchedParameters = new Set<string>(targetParameters.parameters.flatMap((p) => p.name));
@@ -146,7 +160,7 @@ export function getLroOperationInfo(
     }
   }
   const sourceResponses = diagnostics.pipe(getResponsesForOperation(program, sourceOperation));
-  const sourceParameters = diagnostics.pipe(getOperationParameters(program, sourceOperation));
+  const sourceParameters = ignoreDiagnostics(getHttpOperation(program, sourceOperation)).parameters;
   const sourceBodyProperties = new Map<string, ModelProperty>();
   if (sourceParameters.body && sourceParameters.body.type.kind === "Model") {
     for (const [sourceName, sourceProp] of getAllProperties(sourceParameters.body.type)) {
@@ -165,7 +179,12 @@ export function getLroOperationInfo(
   for (const response of targetResponses) {
     visitResponse(program, response, (model) => {
       if (!isErrorType(model) && resultModel === undefined) {
-        resultModel = model;
+        if (resultModel === undefined) {
+          resultModel = getBodyModel(program, model);
+          if (resultModel === undefined) {
+            resultModel = getEffectiveModelType(program, model, (p) => !isMetadata(program, p));
+          }
+        }
       }
     });
   }
@@ -191,21 +210,21 @@ export function getLroOperationInfo(
           targetName,
           targetProperty,
           sourceParamProperties,
-          "RequestParameter"
+          "RequestParameter",
         );
         sourceBodyProperties.size > 0 &&
           getLroParameterFromProperty(
             targetName,
             targetProperty,
             sourceBodyProperties,
-            "RequestBody"
+            "RequestBody",
           );
         sourceResponseProperties.size > 0 &&
           getLroParameterFromProperty(
             targetName,
             targetProperty,
             sourceResponseProperties,
-            "ResponseBody"
+            "ResponseBody",
           );
       }
     }
@@ -256,7 +275,7 @@ export function getLroOperationInfo(
     targetName: string,
     targetProperty: ModelProperty,
     sourceProperties: Map<string, ModelProperty>,
-    sourceKind: SourceKind
+    sourceKind: SourceKind,
   ): void {
     const sourceProperty = sourceProperties.get(targetName);
     if (sourceProperty !== undefined) {
@@ -274,7 +293,7 @@ export function getLroOperationInfo(
     program: Program,
     response: HttpOperationResponse,
     modelAction?: (m: Model) => void,
-    modelPropertyAction?: (name: string, prop: ModelProperty) => void
+    modelPropertyAction?: (name: string, prop: ModelProperty) => void,
   ): void {
     function visitModel(model: Model) {
       modelAction && modelAction(model);
@@ -325,7 +344,7 @@ export function getLroOperationInfo(
           code: "operation-link-parameter-invalid",
           target: sourceOperation,
           format: {},
-        })
+        }),
       );
       return;
     }
@@ -342,7 +361,7 @@ export function getLroOperationInfo(
           code: "operation-link-parameter-invalid",
           target: sourceOperation,
           format: {},
-        })
+        }),
       );
       return;
     }
@@ -353,7 +372,7 @@ export function getLroOperationInfo(
           code: "operation-link-parameter-invalid-target",
           target: targetOperation,
           format: { name: property.name },
-        })
+        }),
       );
       return;
     }
@@ -393,7 +412,7 @@ export function getLroOperationInfo(
               code: "request-parameter-invalid",
               target: sourceOperation,
               format: { name: sourcePropertyName },
-            })
+            }),
           );
           return;
         } else if (typeName === "ResponseProperty") {
@@ -405,7 +424,7 @@ export function getLroOperationInfo(
                 code: "response-property-invalid",
                 target: sourceOperation,
                 format: { name: sourcePropertyName },
-              })
+              }),
             );
             return;
           }
@@ -460,6 +479,6 @@ export function getLroOperationInfo(
   }
 
   return diagnostics.wrap(
-    ValidateInfo() ? { getInvocationInfo, getOperationLink, getResultInfo } : undefined
+    ValidateInfo() ? { getInvocationInfo, getOperationLink, getResultInfo } : undefined,
   );
 }

@@ -2,6 +2,7 @@ import { Diagnostic, EmitContext, Program, Type } from "@typespec/compiler";
 import {
   BasicTestRunner,
   StandardTestLibrary,
+  TestHost,
   TypeSpecTestLibrary,
   createTestHost,
   createTestWrapper,
@@ -29,35 +30,37 @@ export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}
 }
 
 export interface SdkTestRunner extends BasicTestRunner {
+  host: TestHost;
   context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
   compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
   compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
+  compileWithBuiltInAzureResourceManagerService(code: string): Promise<Record<string, Type>>;
   compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
   compileWithVersionedService(code: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
     mainCode: string,
-    clientCode: string
+    clientCode: string,
   ): Promise<[Record<string, Type>, readonly Diagnostic[]]>;
 }
 
-export function createSdkContextTestHelper<
+export async function createSdkContextTestHelper<
   TOptions extends Record<string, any> = CreateSdkTestRunnerOptions,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   program: Program,
   options: TOptions,
-  sdkContextOption?: CreateSdkContextOptions
-): SdkContext<TOptions, TServiceOperation> {
+  sdkContextOption?: CreateSdkContextOptions,
+): Promise<SdkContext<TOptions, TServiceOperation>> {
   const emitContext: EmitContext<TOptions> = {
     program: program,
     emitterOutputDir: "dummy",
     options: options,
     getAssetEmitter: null as any,
   };
-  return createSdkContext(
+  return await createSdkContext(
     emitContext,
     options.emitterName ?? "@azure-tools/typespec-csharp",
-    sdkContextOption
+    sdkContextOption,
   );
 }
 
@@ -70,7 +73,7 @@ export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
 
 export async function createSdkTestRunner(
   options: CreateSdkTestRunnerOptions = {},
-  sdkContextOption?: CreateSdkContextOptions
+  sdkContextOption?: CreateSdkContextOptions,
 ): Promise<SdkTestRunner> {
   const host = await createSdkTestHost(options);
   let autoUsings = [
@@ -86,14 +89,16 @@ export async function createSdkTestRunner(
     autoUsings: autoUsings,
   }) as SdkTestRunner;
 
+  sdkTestRunner.host = host;
+
   // compile
   const baseCompile = sdkTestRunner.compile;
   sdkTestRunner.compile = async function compile(code, compileOptions?) {
     const result = await baseCompile(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -102,10 +107,10 @@ export async function createSdkTestRunner(
   const baseDiagnose = sdkTestRunner.diagnose;
   sdkTestRunner.diagnose = async function diagnose(code, compileOptions?) {
     const result = await baseDiagnose(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -114,10 +119,10 @@ export async function createSdkTestRunner(
   const baseCompileAndDiagnose = sdkTestRunner.compileAndDiagnose;
   sdkTestRunner.compileAndDiagnose = async function compileAndDiagnose(code, compileOptions?) {
     const result = await baseCompileAndDiagnose(code, compileOptions);
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -129,12 +134,12 @@ export async function createSdkTestRunner(
     ${code}`,
       {
         noEmit: true,
-      }
+      },
     );
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -151,12 +156,43 @@ export async function createSdkTestRunner(
       ${code}`,
         {
           noEmit: true,
-        }
+        },
       );
-      sdkTestRunner.context = createSdkContextTestHelper(
+      sdkTestRunner.context = await createSdkContextTestHelper(
         sdkTestRunner.program,
         options,
-        sdkContextOption
+        sdkContextOption,
+      );
+      return result;
+    };
+
+  // compile with dummy arm service definition
+  sdkTestRunner.compileWithBuiltInAzureResourceManagerService =
+    async function compileWithBuiltInAzureResourceManagerService(code) {
+      const result = await baseCompile(
+        `
+    @armProviderNamespace("My.Service")
+    @server("http://localhost:3000", "endpoint")
+    @service({title: "My.Service"})
+    @versioned(Versions)
+    @armCommonTypesVersion(CommonTypes.Versions.v5)
+    namespace My.Service;
+
+    /** Api versions */
+    enum Versions {
+      /** 2024-04-01-preview api version */
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      V2024_04_01_PREVIEW: "2024-04-01-preview",
+    }
+    ${code}`,
+        {
+          noEmit: true,
+        },
+      );
+      sdkTestRunner.context = await createSdkContextTestHelper(
+        sdkTestRunner.program,
+        options,
+        sdkContextOption,
       );
       return result;
     };
@@ -183,10 +219,10 @@ export async function createSdkTestRunner(
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compile("./client.tsp");
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -214,12 +250,12 @@ export async function createSdkTestRunner(
       ${code}`,
       {
         noEmit: true,
-      }
+      },
     );
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -229,10 +265,10 @@ export async function createSdkTestRunner(
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compileAndDiagnose("./client.tsp");
-    sdkTestRunner.context = createSdkContextTestHelper(
+    sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };

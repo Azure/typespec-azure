@@ -1,4 +1,3 @@
-import { __unsupported_enable_checkStandardOperations } from "@azure-tools/typespec-azure-core";
 import {
   DecoratorContext,
   Enum,
@@ -27,7 +26,7 @@ import { ArmStateKeys } from "./state.js";
 
 function getArmCommonTypesVersion(
   context: DecoratorContext,
-  entity: Namespace | EnumMember
+  entity: Namespace | EnumMember,
 ): EnumValue | undefined {
   return entity.decorators.find((x) => x.definition?.name === "@armCommonTypesVersion")?.args[0]
     .jsValue as EnumValue | undefined;
@@ -36,11 +35,11 @@ function getArmCommonTypesVersion(
 function setArmCommonTypesVersionIfDoesnotExist(
   context: DecoratorContext,
   entity: Namespace | EnumMember,
-  commonTypeVersion: string
+  commonTypeVersion: string,
 ) {
   // Determine whether to set a default ARM CommonTypes.Version
   const armCommonTypesVersion = entity.decorators.find(
-    (x) => x.definition?.name === "@armCommonTypesVersion"
+    (x) => x.definition?.name === "@armCommonTypesVersion",
   );
   // if no existing @armCommonTypesVersion decorator, add default.
   // This will NOT cause error if overrode on version enum.
@@ -56,13 +55,9 @@ function setArmCommonTypesVersionIfDoesnotExist(
  */
 export const $armLibraryNamespace: ArmLibraryNamespaceDecorator = (
   context: DecoratorContext,
-  entity: Namespace
+  entity: Namespace,
 ) => {
   const { program } = context;
-
-  // HACK HACK HACK: Disable the linter rule that raises `use-standard-operations`
-  // until Azure.Core-compatible operations are implemented for Azure.ResourceManager
-  __unsupported_enable_checkStandardOperations(false);
 
   program.stateMap(ArmStateKeys.armLibraryNamespaces).set(entity, true);
 
@@ -114,7 +109,7 @@ export const $useLibraryNamespace: UseLibraryNamespaceDecorator = (
  */
 export function getUsedLibraryNamespaces(
   program: Program,
-  namespace: Namespace
+  namespace: Namespace,
 ): Namespace[] | undefined {
   return program.stateMap(ArmStateKeys.usesArmLibraryNamespaces).get(namespace) as Namespace[];
 }
@@ -134,7 +129,7 @@ function setLibraryNamespaceProvider(program: Program, provider: string, namespa
 export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
   context: DecoratorContext,
   entity: Namespace,
-  armProviderNamespace?: string
+  armProviderNamespace?: string,
 ) => {
   const { program } = context;
 
@@ -148,10 +143,6 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
     return;
   }
 
-  // HACK HACK HACK: Disable the linter rule that raises `use-standard-operations`
-  // until Azure.Core-compatible operations are implemented for Azure.ResourceManager
-  __unsupported_enable_checkStandardOperations(false);
-
   // armProviderNamespace will set the service namespace if it's not done already
   if (!override) {
     addService(program, entity);
@@ -161,7 +152,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
         http.$server,
         entity,
         "https://management.azure.com",
-        "Azure Resource Manager url."
+        "Azure Resource Manager url.",
       );
     }
   }
@@ -262,7 +253,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
  */
 export function getArmProviderNamespace(
   program: Program,
-  entity: Namespace | Model
+  entity: Namespace | Model,
 ): string | undefined {
   let currentNamespace: Namespace | undefined =
     entity.kind === "Namespace" ? entity : entity.namespace;

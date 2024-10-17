@@ -1,5 +1,39 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.47.0
+
+### Bug Fixes
+
+- [#1416](https://github.com/Azure/typespec-azure/pull/1416) Fix #1180 Return StatusMonitor result field for non-resource PUT operations in getLroMetadata.finalResult
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+
+## 0.46.0
+
+### Features
+
+- [#1342](https://github.com/Azure/typespec-azure/pull/1342) Replace `no-operation-id` linter rule with a more generic `no-openapi` rule guarding against any use of openapi decorators
+
+
+## 0.45.0
+
+### Bug Fixes
+
+- [#1198](https://github.com/Azure/typespec-azure/pull/1198) Use some more precise types for certain decorators that would have crashed otherwise
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1154](https://github.com/Azure/typespec-azure/pull/1154) Add new `@azure-tools/typespec-azure-core/require-versioned` linting rule to require Azure service to use versioning library.
+- [#1193](https://github.com/Azure/typespec-azure/pull/1193) Add new linter rule to prevent using items from Private namespace from an external library.
+
+
 ## 0.44.0
 
 ### Bug Fixes

@@ -17,7 +17,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
     tester = createLinterRuleTester(
       runner,
       requireDocumentation,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -36,7 +36,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
     it("on model", async () =>
       await checkDocRequired(
         "┆model Foo {}",
-        "The Model named 'Foo' should have a documentation or description, use doc comment /** */ to provide it."
+        "The Model named 'Foo' should have a documentation or description, use doc comment /** */ to provide it.",
       ));
 
     it("on model property", async () =>
@@ -44,25 +44,25 @@ describe("typespec-azure-core: documentation-required rule", () => {
         `@doc("Abc") model Foo {
           ┆x: string;
         }`,
-        "The ModelProperty named 'x' should have a documentation or description, use doc comment /** */ to provide it."
+        "The ModelProperty named 'x' should have a documentation or description, use doc comment /** */ to provide it.",
       ));
 
     it("on operation", async () =>
       await checkDocRequired(
         `┆op read(): void;`,
-        "The Operation named 'read' should have a documentation or description, use doc comment /** */ to provide it."
+        "The Operation named 'read' should have a documentation or description, use doc comment /** */ to provide it.",
       ));
 
     it("on property", async () =>
       await checkDocRequired(
         `@doc("op doc") op read(┆param1: string): void;`,
-        "The ModelProperty named 'param1' should have a documentation or description, use doc comment /** */ to provide it."
+        "The ModelProperty named 'param1' should have a documentation or description, use doc comment /** */ to provide it.",
       ));
 
     it("on enum", async () => {
       await checkDocRequired(
         "┆enum Foo {}",
-        "The Enum named 'Foo' should have a documentation or description, use doc comment /** */ to provide it."
+        "The Enum named 'Foo' should have a documentation or description, use doc comment /** */ to provide it.",
       );
     });
 
@@ -71,7 +71,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
         `@doc(".") enum Foo {
           ┆Bar,
         }`,
-        "The EnumMember named 'Bar' should have a documentation or description, use doc comment /** */ to provide it."
+        "The EnumMember named 'Bar' should have a documentation or description, use doc comment /** */ to provide it.",
       );
     });
 
@@ -85,7 +85,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
           enum Versions {
             @useDependency(Azure.Core.Versions.v1_0_Preview_2)
             "2022-08-30",
-          }`
+          }`,
         )
         .toBeValid();
     });
@@ -111,7 +111,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
           @doc("A Cat")
           model Cat extends Pet {
             kind: PetKind.cat;
-          }`
+          }`,
         )
         .toBeValid();
     });
@@ -134,7 +134,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
           @doc("A Merry Ol' Cat")
           model Cat extends Pet {
             kind: PetKind.cat,
-          }`
+          }`,
         )
         .toBeValid();
     });
@@ -147,7 +147,7 @@ describe("typespec-azure-core: documentation-required rule", () => {
         Cat: "Cat",
         "Dog",
         string,
-      }`
+      }`,
         )
         .toEmitDiagnostics([
           {

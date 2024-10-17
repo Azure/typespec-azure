@@ -247,6 +247,10 @@ op Azure.ResourceManager.ResourceCreateSync.createOrUpdate(provider: "Microsoft.
 
 ### `ResourceDeleteAsync` {#Azure.ResourceManager.ResourceDeleteAsync}
 
+:::warning
+**Deprecated**: This should be deprecated in a future release
+:::
+
 ```typespec
 interface Azure.ResourceManager.ResourceDeleteAsync<Resource, BaseParameters>
 ```
@@ -389,6 +393,10 @@ op Azure.ResourceManager.ResourceListBySubscription.listBySubscription(apiVersio
 ```
 
 ### `ResourceOperations` {#Azure.ResourceManager.ResourceOperations}
+
+:::warning
+**Deprecated**: Use Azure.ResourceManager.TrackedResourceOperations instead
+:::
 
 ```typespec
 interface Azure.ResourceManager.ResourceOperations<Resource, Properties, BaseParameters>
@@ -663,6 +671,39 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 | Response   | Optional. The success response for the list operation     |
 | Error      | Optional. The error response, if non-standard.            |
 
+### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
+
+```typespec
+op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                   |
+| ---------- | ----------------------------------------------------------------------------- |
+| Request    | The request model for the action                                              |
+| Response   | The response type for the action                                              |
+| Scope      | The scope of the action (SubscriptionActionScope or TenantActionScope)        |
+| Parameters | Optional. Additional parameters after the path parameters (e.g. Location)     |
+| LroHeaders | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Error      | Optional. The error response, if non-standard.                                |
+
+### `ArmProviderActionSync` {#Azure.ResourceManager.ArmProviderActionSync}
+
+```typespec
+op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+```
+
+#### Template Parameters
+
+| Name       | Description                                                               |
+| ---------- | ------------------------------------------------------------------------- |
+| Request    | The request model for the action                                          |
+| Response   | The response type for the action                                          |
+| Scope      | The scope of the action (SubscriptionActionScope or TenantActionScope)    |
+| Parameters | Optional. Additional parameters after the path parameters (e.g. Location) |
+| Error      | Optional. The error response, if non-standard.                            |
+
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
 ```typespec
@@ -845,6 +886,10 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.Thi
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 
+:::warning
+**Deprecated**: Please use ArmResourceCreateOrReplaceSync instead
+:::
+
 DEPRECATED: Please use ArmResourceCreateOrReplaceSync instead
 
 ```typespec
@@ -862,6 +907,10 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.This
 | Error          | Optional. The error response, if non-standard.                  |
 
 ### `ArmResourceDeleteAsync` {#Azure.ResourceManager.ArmResourceDeleteAsync}
+
+:::warning
+**Deprecated**: Use 'ArmResourceDeleteWithoutOkAsync' instead
+:::
 
 ```typespec
 op Azure.ResourceManager.ArmResourceDeleteAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -1063,7 +1112,7 @@ op Azure.ResourceManager.checkGlobalNameAvailability(apiVersion: string, subscri
 ### `checkLocalNameAvailability` {#Azure.ResourceManager.checkLocalNameAvailability}
 
 ```typespec
-op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: string, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
+op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced", location: Azure.Core.azureLocation, body: Request): Response | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
 #### Template Parameters

@@ -1,0 +1,14 @@
+{
+  "operationId": "parameters",
+  "title": "parameters",
+  "parameters": {
+    "a": "header",
+    "b": "path",
+    "c": "query",
+    "d": "body",
+    "test-header": "test-header",
+    "testQuery": "testQuery",
+    "renamePath": "renamePath"
+  },
+  "responses": {}
+}

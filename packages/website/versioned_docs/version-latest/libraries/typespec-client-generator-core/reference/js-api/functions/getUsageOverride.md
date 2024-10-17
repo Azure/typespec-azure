@@ -4,16 +4,16 @@ title: "[F] getUsageOverride"
 
 ---
 ```ts
-function getUsageOverride(context, entity): UsageFlags | undefined
+function getUsageOverride(context, entity): number | undefined
 ```
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `entity` | `Enum` \| `Model` \| `Union` |
 
 ## Returns
 
-[`UsageFlags`](../enumerations/UsageFlags.md) \| `undefined`
+`number` \| `undefined`

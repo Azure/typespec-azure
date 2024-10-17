@@ -1,6 +1,6 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: union schema", () => {
@@ -12,7 +12,7 @@ describe("typespec-autorest: union schema", () => {
         properties: Thing | null;
       }
       op doStuff(): Thing;
-      `
+      `,
     );
     deepStrictEqual(res.definitions.Thing.properties.properties, {
       type: "object",
@@ -30,7 +30,7 @@ describe("typespec-autorest: union schema", () => {
       }
       
       op foo(param: "all" | "none" | Params): void;
-      `
+      `,
     );
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-autorest/union-unsupported",
@@ -40,6 +40,12 @@ describe("typespec-autorest: union schema", () => {
   });
 
   describe("unions as enum", () => {
+    it("change definition name with @clientName", async () => {
+      const res = await openApiFor(`@clientName("ClientFoo") union Foo {"a"};`);
+      expect(res.definitions).toHaveProperty("ClientFoo");
+      expect(res.definitions).not.toHaveProperty("Foo");
+    });
+
     it("emit enum for simple union of string literals", async () => {
       const res = await openApiFor(`union Test {"one" , "two"}`);
       deepStrictEqual(res.definitions.Test, {
@@ -104,9 +110,19 @@ describe("typespec-autorest: union schema", () => {
       });
     });
 
+    it("change x-ms-enum.values names with @clientName", async () => {
+      const res = await openApiFor(
+        `union Test {@clientName("OneClient") One: "one" , @clientName("TwoClient") Two: "two"};`,
+      );
+      expect(res.definitions.Test["x-ms-enum"].values).toEqual([
+        { value: "one", name: "OneClient" },
+        { value: "two", name: "TwoClient" },
+      ]);
+    });
+
     it("include the description the x-ms-enum values", async () => {
       const res = await openApiFor(
-        `union Test {@doc("Doc for one") "one" , @doc("Doc for two") Two: "two"}`
+        `union Test {@doc("Doc for one") "one" , @doc("Doc for two") Two: "two"}`,
       );
       deepStrictEqual(res.definitions.Test, {
         type: "string",
@@ -127,7 +143,7 @@ describe("typespec-autorest: union schema", () => {
         `
         union Test { UpDown, "left", "right"} 
         union UpDown { "up", "down" }
-        `
+        `,
       );
       deepStrictEqual(res.definitions.Test, {
         type: "string",
@@ -148,7 +164,7 @@ describe("typespec-autorest: union schema", () => {
         "b";
       }
 
-      `
+      `,
       );
       strictEqual(res.definitions.Foo.description, "FooUnion");
     });

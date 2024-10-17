@@ -1,4 +1,3 @@
-import { __unsupported_enable_checkStandardOperations } from "@azure-tools/typespec-azure-core";
 import {
   BasicTestRunner,
   LinterRuleTester,
@@ -13,12 +12,11 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    __unsupported_enable_checkStandardOperations(false);
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
       noResponseBodyRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -30,7 +28,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
           @statusCode statusCode: 202;
         }
         op walk(): TestAcceptedResponse;
-      `
+      `,
       )
       .toBeValid();
   });
@@ -44,7 +42,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
           @bodyRoot body: string;
         }
         op walk(): TestAcceptedResponse;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/no-response-body",

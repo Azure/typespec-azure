@@ -1,11 +1,5 @@
-import {
-  Enum,
-  Interface,
-  Model,
-  Namespace,
-  Operation,
-  ignoreDiagnostics,
-} from "@typespec/compiler";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { Interface, Model, Operation } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -14,8 +8,6 @@ import {
   getAccess,
   getClient,
   getClientNameOverride,
-  getOperationGroup,
-  getUsage,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -26,10 +18,8 @@ import {
   SdkClientType,
   SdkHttpOperation,
   SdkMethodResponse,
-  SdkOperationGroup,
   UsageFlags,
 } from "../src/interfaces.js";
-import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../src/public-utils.js";
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
@@ -40,6 +30,7 @@ describe("typespec-client-generator-core: decorators", () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
 
+<<<<<<< HEAD
   describe("@client", () => {
     it("mark an namespace as a client", async () => {
       const { MyClient } = await runner.compile(`
@@ -1278,10 +1269,12 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   });
 
+=======
+>>>>>>> 0f289160fadd84b6e0935d014740407f7e10354e
   async function protocolAPITestHelper(
     runner: SdkTestRunner,
     protocolValue: boolean,
-    globalValue: boolean
+    globalValue: boolean,
   ): Promise<void> {
     const testCode = `
           @protocolAPI(${protocolValue})
@@ -1291,11 +1284,11 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateProtocol(
-      createSdkContextTestHelper(runner.context.program, {
+      await createSdkContextTestHelper(runner.context.program, {
         generateProtocolMethods: globalValue,
         generateConvenienceMethods: false,
       }),
-      test as Operation
+      test as Operation,
     );
 
     const method = runner.context.sdkPackage.clients[0].methods[0];
@@ -1322,7 +1315,7 @@ describe("typespec-client-generator-core: decorators", () => {
   async function convenientAPITestHelper(
     runner: SdkTestRunner,
     convenientValue: boolean,
-    globalValue: boolean
+    globalValue: boolean,
   ): Promise<void> {
     const testCode = `
           @convenientAPI(${convenientValue})
@@ -1332,11 +1325,11 @@ describe("typespec-client-generator-core: decorators", () => {
     const { test } = await runner.compileWithBuiltInService(testCode);
 
     const actual = shouldGenerateConvenient(
-      createSdkContextTestHelper(runner.program, {
+      await createSdkContextTestHelper(runner.program, {
         generateProtocolMethods: false,
         generateConvenienceMethods: globalValue,
       }),
-      test as Operation
+      test as Operation,
     );
     strictEqual(actual, convenientValue);
 
@@ -1368,11 +1361,11 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const actual = shouldGenerateConvenient(
-        createSdkContextTestHelper(runner.program, {
+        await createSdkContextTestHelper(runner.program, {
           generateProtocolMethods: false,
           generateConvenienceMethods: false,
         }),
-        test as Operation
+        test as Operation,
       );
       strictEqual(actual, true);
       const method = runner.context.sdkPackage.clients[0].methods[0];
@@ -1407,7 +1400,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(
           shouldGenerateConvenient(runner.context, test),
           false,
-          "convenientAPI should be false for java"
+          "convenientAPI should be false for java",
         );
         strictEqual(method.generateConvenient, false, "convenientAPI should be false for java");
       }
@@ -1423,7 +1416,7 @@ describe("typespec-client-generator-core: decorators", () => {
         strictEqual(
           shouldGenerateProtocol(runner.context, test),
           false,
-          "protocolAPI should be false for csharp"
+          "protocolAPI should be false for csharp",
         );
         strictEqual(method.generateProtocol, false, "protocolAPI should be false for csharp");
 
@@ -1520,52 +1513,111 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(getAccess(runnerWithJava.context, funcJava), "internal");
     });
 
-    it("duplicate-decorator diagnostic for first non-scoped decorator then scoped decorator", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal)
-      @access(Access.internal, "csharp")
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
+    it("first non-scoped decorator then scoped decorator", async () => {
+      const code = `
+        @test
+        @access(Access.public, "csharp")
+        @access(Access.internal)
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+      `;
 
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "internal");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
     });
 
-    it("duplicate-decorator diagnostic for first scoped decorator then non-scoped decorator", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal, "csharp")
-      @access(Access.internal)
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
+    it("first scoped decorator then non-scoped decorator", async () => {
+      const code = `
+        @test
+        @access(Access.internal)
+        @access(Access.public, "csharp")
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+      `;
 
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "internal");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
     });
 
-    it("duplicate-decorator diagnostic for multiple same scope", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal, "csharp")
-      @access(Access.internal, "csharp")
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
+    it("first non-scoped augmented decorator then scoped augmented decorator", async () => {
+      const code = `
+        @test
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
 
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
+        @@access(func, Access.public);
+        @@access(func, Access.internal, "csharp"); 
+      `;
+
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "public");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+    });
+
+    it("first scoped augmented decorator then non-scoped augmented decorator", async () => {
+      const code = `
+        @test
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+
+        @@access(func, Access.internal, "csharp");
+        @@access(func, Access.public);
+      `;
+
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "public");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
+    });
+
+    it("two scoped decorator", async () => {
+      const code = `
+        @test
+        @access(Access.internal, "csharp")
+        @access(Access.internal, "python")
+        op func(
+          @query("createdAt")
+          createdAt: utcDateTime;
+        ): void;
+      `;
+
+      const { func } = (await runner.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runner.context, func), "internal");
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+      strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
     });
 
     it("csv scope list", async () => {
@@ -1626,799 +1678,6 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
       strictEqual(getAccess(javaRunner.context, TestJava), "public");
-    });
-
-    it("duplicate-decorator diagnostic for csv scope list", async () => {
-      const diagnostics = await runner.diagnose(`
-      @test
-      @access(Access.internal, "csharp,ts")
-      @access(Access.internal, "csharp")
-      op func(
-        @query("createdAt")
-        createdAt: utcDateTime;
-      ): void;
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "duplicate-decorator",
-      });
-    });
-  });
-
-  describe("@access", () => {
-    it("mark an operation as internal", async () => {
-      const { test } = (await runner.compile(`
-        @service({title: "Test Service"}) namespace TestService;
-        @test
-        @access(Access.internal)
-        op test(): void;
-      `)) as { test: Operation };
-
-      const actual = getAccess(runner.context, test);
-      strictEqual(actual, "internal");
-    });
-
-    it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
-      const { test, Test } = (await runner.compile(`
-        @test
-        model Test{}
-
-        @test
-        op test(): void;
-      `)) as { test: Operation; Test: Model };
-
-      strictEqual(getAccess(runner.context, test), "public");
-      strictEqual(getAccess(runner.context, Test), "public");
-    });
-
-    it("model access calculated by operation", async () => {
-      const { Test, func } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Test {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          op func(
-            @body body: Test
-          ): void;
-        }
-      `)) as { Test: Model; func: Operation };
-
-      let actual = getAccess(runner.context, Test);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, func);
-      strictEqual(actual, "internal");
-    });
-
-    it("override calculated model with public access", async () => {
-      const { Test, func } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @access(Access.public)
-          model Test {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          op func(
-            @body body: Test
-          ): void;
-        }
-      `)) as { Test: Model; func: Operation };
-
-      let actual = getAccess(runner.context, Test);
-      strictEqual(actual, "public");
-      actual = getAccess(runner.context, func);
-      strictEqual(actual, "internal");
-    });
-
-    it("override calculated model with internal access", async () => {
-      const { Test, func } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @access(Access.internal) // This is an incorrect usage. We will have linter to ban.
-          model Test {
-            prop: string;
-          }
-          @test
-          op func(
-            @body body: Test
-          ): void;
-        }
-        `)) as { Test: Model; func: Operation };
-
-      strictEqual(getAccess(runner.context, Test), "internal");
-      strictEqual(getAccess(runner.context, func), "public");
-    });
-
-    it("access propagation", async () => {
-      const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @discriminator("sharktype")
-          @test
-          model Shark extends Fish {
-            kind: "shark";
-            origin: Origin;
-          }
-
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-          }
-
-          @test
-          model SawShark extends Shark {
-            sharktype: "saw";
-          }
-
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
-
-          @get
-          @access(Access.internal)
-          op getModel(): Fish;
-        }
-      `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
-
-      let actual = getAccess(runner.context, Fish);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, Shark);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, Salmon);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, SawShark);
-      strictEqual(actual, "internal");
-      actual = getAccess(runner.context, Origin);
-      strictEqual(actual, "internal");
-    });
-
-    it("complicated access propagation", async () => {
-      const { Test1, Test2, Test3, Test4, Test5, Test6, func1, func2, func3, func4, func5 } =
-        (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Test1 {
-            prop: Test2;
-          }
-          @test
-          model Test2 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Test1
-          ): void;
-
-          @test
-          model Test3 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func2")
-          op func2(
-            @body body: Test3
-          ): void;
-          @test
-          @route("/func3")
-          op func3(
-            @body body: Test3
-          ): void;
-
-          @test
-          model Test4 {
-            prop: Test5;
-          }
-          @test
-          model Test5 {
-            prop: Test6;
-          }
-          @test
-          model Test6 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func4")
-          op func4(
-            @body body: Test4
-          ): void;
-          @test
-          @route("/func5")
-          op func5(
-            @body body: Test6
-          ): void;
-        }
-      `)) as {
-          Test1: Model;
-          Test2: Model;
-          Test3: Model;
-          Test4: Model;
-          Test5: Model;
-          Test6: Model;
-          func1: Operation;
-          func2: Operation;
-          func3: Operation;
-          func4: Operation;
-          func5: Operation;
-        };
-
-      strictEqual(getAccess(runner.context, func1), "internal");
-      strictEqual(getAccess(runner.context, func2), "internal");
-      strictEqual(getAccess(runner.context, func3), "public");
-      strictEqual(getAccess(runner.context, func4), "internal");
-      strictEqual(getAccess(runner.context, func5), "public");
-
-      strictEqual(getAccess(runner.context, Test1), "internal");
-      strictEqual(getAccess(runner.context, Test2), "internal");
-      strictEqual(getAccess(runner.context, Test3), "public");
-      strictEqual(getAccess(runner.context, Test4), "internal");
-      strictEqual(getAccess(runner.context, Test5), "internal");
-      strictEqual(getAccess(runner.context, Test6), "public");
-    });
-
-    it("access propagation for properties, base models and sub models", async () => {
-      const {
-        Fish,
-        Salmon,
-        Origin,
-        BaseModel,
-        ModelA,
-        ModelB,
-        ModelC,
-        ModelD,
-        ModelE,
-        ModelF,
-        EnumA,
-        func1,
-        func2,
-        func3,
-        func4,
-      } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
-
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-            origin: Origin;
-          }
-
-          @test
-          model BaseModel {
-            base: string;
-          }
-
-          @test
-          model ModelA extends BaseModel {
-            prop1: ModelB;
-            prop2: ModelC[];
-            prop3: Record<ModelD>;
-            prop4: EnumA;
-            prop5: ModelE | ModelF;
-          }
-
-          @test
-          model ModelB {
-            prop: string;
-          }
-
-          @test
-          model ModelC {
-            prop: string;
-          }
-
-          @test
-          model ModelD {
-            prop: string;
-          }
-
-          @test
-          model ModelE {
-            prop: string;
-          }
-
-          @test
-          model ModelF {
-            prop: string;
-          }
-
-          @test
-          enum EnumA {
-            one,
-            two,
-            three,
-          }
-
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Fish
-          ): void;
-          @test
-          @route("/func2")
-          op func2(
-            @body body: Fish
-          ): void;
-
-          @test
-          @access(Access.internal)
-          @route("/func3")
-          op func3(
-            @body body: ModelA
-          ): void;
-          @test
-          @route("/func4")
-          op func4(
-            @body body: ModelA
-          ): void;
-        }
-      `)) as {
-        Fish: Model;
-        Salmon: Model;
-        Origin: Model;
-        BaseModel: Model;
-        ModelA: Model;
-        ModelB: Model;
-        ModelC: Model;
-        ModelD: Model;
-        ModelE: Model;
-        ModelF: Model;
-        EnumA: Model;
-        func1: Operation;
-        func2: Operation;
-        func3: Operation;
-        func4: Operation;
-      };
-
-      strictEqual(getAccess(runner.context, func1), "internal");
-      strictEqual(getAccess(runner.context, func2), "public");
-      strictEqual(getAccess(runner.context, func3), "internal");
-      strictEqual(getAccess(runner.context, func4), "public");
-
-      strictEqual(getAccess(runner.context, Fish), "public");
-      strictEqual(getAccess(runner.context, Salmon), "public");
-      strictEqual(getAccess(runner.context, Origin), "public");
-      strictEqual(getAccess(runner.context, BaseModel), "public");
-      strictEqual(getAccess(runner.context, ModelA), "public");
-      strictEqual(getAccess(runner.context, ModelB), "public");
-      strictEqual(getAccess(runner.context, ModelC), "public");
-      strictEqual(getAccess(runner.context, ModelD), "public");
-      strictEqual(getAccess(runner.context, ModelE), "public");
-      strictEqual(getAccess(runner.context, ModelF), "public");
-      strictEqual(getAccess(runner.context, EnumA), "public");
-
-      strictEqual(runner.context.operationModelsMap?.get(func1)?.size, 3);
-      strictEqual(runner.context.operationModelsMap?.get(func2)?.size, 3);
-      strictEqual(runner.context.operationModelsMap?.get(func3)?.size, 8);
-      strictEqual(runner.context.operationModelsMap?.get(func4)?.size, 8);
-    });
-
-    it("access propagation with override", async () => {
-      const {
-        Test1,
-        Test2,
-        Test3,
-        Test4,
-        Test5,
-        func1,
-        func2,
-        func3,
-        func4,
-        func5,
-        func6,
-        func7,
-        func8,
-      } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Test1 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Test1
-          ): void;
-
-          @test
-          model Test2 {
-          }
-          @test
-          @route("/func2")
-          op func2(
-            @body body: Test2
-          ): void;
-
-          @test
-          model Test3 {
-          }
-          @test
-          @access(Access.public)
-          @route("/func3")
-          op func3(
-            @body body: Test3
-          ): void;
-
-
-          @test
-          model Test4 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func4")
-          op func4(
-            @body body: Test4
-          ): void;
-          @test
-          @route("/func5")
-          op func5(
-            @body body: Test4
-          ): void;
-
-          @test
-          model Test5 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func6")
-          op func6(
-            @body body: Test5
-          ): void;
-          @test
-          @route("/func7")
-          op func7(
-            @body body: Test5
-          ): void;
-          @test
-          @access(Access.public)
-          @route("/func8")
-          op func8(
-            @body body: Test5
-          ): void;
-        }
-      `)) as {
-        Test1: Model;
-        Test2: Model;
-        Test3: Model;
-        Test4: Model;
-        Test5: Model;
-        func1: Operation;
-        func2: Operation;
-        func3: Operation;
-        func4: Operation;
-        func5: Operation;
-        func6: Operation;
-        func7: Operation;
-        func8: Operation;
-      };
-
-      strictEqual(getAccess(runner.context, func1), "internal");
-      strictEqual(getAccess(runner.context, func2), "public");
-      strictEqual(getAccess(runner.context, func3), "public");
-      strictEqual(getAccess(runner.context, func4), "internal");
-      strictEqual(getAccess(runner.context, func5), "public");
-      strictEqual(getAccess(runner.context, func6), "internal");
-      strictEqual(getAccess(runner.context, func7), "public");
-      strictEqual(getAccess(runner.context, func8), "public");
-
-      strictEqual(getAccess(runner.context, Test1), "internal");
-      strictEqual(getAccess(runner.context, Test2), "public");
-      strictEqual(getAccess(runner.context, Test3), "public");
-      strictEqual(getAccess(runner.context, Test4), "public");
-      strictEqual(getAccess(runner.context, Test5), "public");
-    });
-
-    it("access propagation with nullable", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        model RunStep {
-          id: string;
-          lastError: RunStepError | null;
-        }
-
-        model RunStepError {
-          code: string;
-          message: string;
-        }
-
-        @get
-        @route("/threads/{threadId}/runs/{runId}/steps/{stepId}")
-        op getRunStep(
-          @path threadId: string,
-          @path runId: string,
-          @path stepId: string,
-        ): RunStep;
-
-        @get
-        @route("/threads/{threadId}/runs/{runId}/steps")
-        op listRunSteps(
-          @path threadId: string,
-          @path runId: string,
-        ): RunStep[];
-        @@access(listRunSteps, Access.internal);
-        `
-      );
-      const models = runner.context.sdkPackage.models;
-      strictEqual(models.length, 2);
-      strictEqual(models[0].access, "public");
-      strictEqual(models[1].access, "public");
-    });
-  });
-
-  describe("@usage", () => {
-    it("defaults calculated usage", async () => {
-      const { Model1, Model2, Model3, Model4 } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Model1{ prop: string }
-
-          @test
-          model Model2{ prop: string }
-
-          @test
-          model Model3{ prop: string }
-
-          @test
-          model Model4 { prop: string }
-
-          @test
-          @route("/func1")
-          op func1(@body body: Model1): void;
-
-          @test
-          @route("/func2")
-          op func2(): Model2;
-
-          @test
-          @route("/func3")
-          op func3(@body body: Model3): Model3;
-        }
-      `)) as { Model1: Model; Model2: Model; Model3: Model; Model4: Model };
-
-      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Json);
-      strictEqual(getUsage(runner.context, Model2), UsageFlags.Output | UsageFlags.Json);
-      strictEqual(
-        getUsage(runner.context, Model3),
-        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
-      );
-      strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
-    });
-
-    it("usage override", async () => {
-      const { Model1, Model2, Model3, Model4, Enum1, Enum2 } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @usage(Usage.input | Usage.output)
-          @access(Access.public)
-          enum Enum1{
-            one,
-            two,
-            three
-          }
-
-          @test
-          enum Enum2{
-            one,
-            two,
-            three
-          }
-
-          @test
-          @usage(Usage.input | Usage.output)
-          @access(Access.public)
-          model Model1{ prop: string }
-
-          @test
-          model Model4{ prop: string }
-
-          @test
-          @usage(Usage.output)
-          model Model2{ prop: string }
-
-          @test
-          @usage(Usage.input)
-          model Model3{ prop: string }
-
-          @test
-          @route("/func1")
-          op func1(@body body: Model2): void;
-
-          @test
-          @route("/func2")
-          op func2(): Model3;
-        }
-      `)) as {
-        Model1: Model;
-        Model2: Model;
-        Model3: Model;
-        Model4: Model;
-        Enum1: Enum;
-        Enum2: Enum;
-      };
-
-      strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(
-        getUsage(runner.context, Model2),
-        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
-      );
-      strictEqual(
-        getUsage(runner.context, Model3),
-        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
-      );
-      strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
-      strictEqual(getUsage(runner.context, Enum1), UsageFlags.Input | UsageFlags.Output);
-      strictEqual(getUsage(runner.context, Enum2), UsageFlags.None);
-    });
-
-    it("wrong usage value", async () => {
-      const diagnostics = await runner.diagnose(`
-        @test
-        @usage(1)
-        model Model1{}
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "invalid-argument",
-      });
-    });
-
-    it("usage propagation", async () => {
-      const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @discriminator("sharktype")
-          @test
-          @usage(Usage.input)
-          model Shark extends Fish {
-            kind: "shark";
-            origin: Origin;
-          }
-
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-          }
-
-          @test
-          model SawShark extends Shark {
-            sharktype: "saw";
-          }
-
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
-
-          @get
-          op getModel(): Fish;
-        }
-      `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
-
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Output | UsageFlags.Json);
-      strictEqual(
-        getUsage(runner.context, Shark),
-        UsageFlags.Input | UsageFlags.Output | UsageFlags.Json
-      );
-      strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
-      strictEqual(getUsage(runner.context, SawShark), UsageFlags.Output | UsageFlags.Json);
-      strictEqual(getUsage(runner.context, Origin), UsageFlags.Output | UsageFlags.Json);
-    });
-
-    it("usage and convenience", async () => {
-      const { Fish } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Fish {
-            age: int32;
-          }
-
-          @put
-          @convenientAPI(true)
-          op putModel(@body body: Fish): void;
-
-          @get
-          @convenientAPI(false)
-          op getModel(): Fish;
-        }
-      `)) as { Fish: Model };
-
-      strictEqual(getUsage(runner.context, Fish), UsageFlags.Input | UsageFlags.Json);
-
-      const { Dog } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model Dog {
-            age: int32;
-          }
-
-          @put
-          @convenientAPI(false)
-          op putModel(@body body: Dog): void;
-
-          @get
-          @convenientAPI(true)
-          op getModel(): Dog;
-        }
-      `)) as { Dog: Model };
-
-      strictEqual(getUsage(runner.context, Dog), UsageFlags.Output | UsageFlags.Json);
-    });
-
-    it("patch usage", async () => {
-      const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
-        @service({})
-        @test namespace MyService {
-          @test
-          model PatchModel {
-            age: int32;
-          }
-
-          @test
-          model JsonMergePatchModel {
-            prop: string
-          }
-
-          @patch
-          @route("/patch")
-          op patchModel(@body body: PatchModel): void;
-
-          @patch
-          @route("/jsonMergePatch")
-          op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
-        }
-      `)) as { PatchModel: Model; JsonMergePatchModel: Model };
-
-      strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input | UsageFlags.Json);
-      strictEqual(
-        getUsage(runner.context, JsonMergePatchModel),
-        UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json
-      );
     });
   });
 
@@ -2522,6 +1781,30 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "decorator-wrong-target",
       });
     });
+
+    it("throws error when used on a polymorphism type", async () => {
+      const diagnostics = await runner.diagnose(`
+        @service
+        @test namespace MyService {
+          #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+          @test
+          model Model1{
+            @flattenProperty
+            child: Model2;
+          }
+
+          @test
+          @discriminator("kind")
+          model Model2{
+            kind: string;
+          }
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",
+      });
+    });
   });
 
   describe("@clientName", () => {
@@ -2578,7 +1861,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @@clientName(MyService.Test1, "Test1Rename");
         @@clientName(MyService.func1, "func1Rename");
-      `
+      `,
       )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
 
       strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
@@ -2734,7 +2017,7 @@ describe("typespec-client-generator-core: decorators", () => {
       model Test {
         prop1: string;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2765,7 +2048,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       @clientName("B")
       union C {}
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2797,7 +2080,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       @route("/b")
       op b(): void;
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2827,7 +2110,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @route("/b")
         op b(): void;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2853,7 +2136,7 @@ describe("typespec-client-generator-core: decorators", () => {
       scalar a extends string;
 
       scalar b extends string;
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2883,7 +2166,7 @@ describe("typespec-client-generator-core: decorators", () => {
       @route("/b")
       interface B {
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2910,7 +2193,7 @@ describe("typespec-client-generator-core: decorators", () => {
         prop1: string;
         prop2: string;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2937,7 +2220,7 @@ describe("typespec-client-generator-core: decorators", () => {
         one,
         two
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2964,7 +2247,7 @@ describe("typespec-client-generator-core: decorators", () => {
           a: {}, 
           b: {} 
         }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -2989,7 +2272,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @clientName("B")
           namespace C {}
         }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -3022,7 +2305,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @clientName("B")
           model A {}
         }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -3045,7 +2328,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
         @clientName("Foo")
         model Bar {}
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -3077,7 +2360,7 @@ describe("typespec-client-generator-core: decorators", () => {
       model Test {
         prop1: string;
       }
-      `
+      `,
       );
 
       expectDiagnostics(diagnostics, [
@@ -3160,7 +2443,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -3198,7 +2481,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -3259,7 +2542,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -3296,7 +2579,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -3357,7 +2640,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -3394,7 +2677,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -3455,7 +2738,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v2");
@@ -3495,7 +2778,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2"]
+        ["v1", "v2"],
       );
     });
 
@@ -3556,7 +2839,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v1");
@@ -3584,7 +2867,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1"]
+        ["v1"],
       );
     });
 
@@ -3645,7 +2928,7 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(sdkPackage.clients.length, 1);
 
       const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
-        (x) => x.isApiVersionParam
+        (x) => x.isApiVersionParam,
       );
       ok(apiVersionParam);
       strictEqual(apiVersionParam.clientDefaultValue, "v3");
@@ -3685,7 +2968,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(versions);
       deepStrictEqual(
         versions.values.map((v) => v.value),
-        ["v1", "v2", "v3"]
+        ["v1", "v2", "v3"],
       );
     });
 
@@ -3730,21 +3013,17 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 2);
       strictEqual(
         runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
-        "previewFunctionality"
+        "previewFunctionality",
       );
       strictEqual(
         runnerWithVersion.context.sdkPackage.clients[0].methods[1].name,
-        "stableFunctionality"
+        "stableFunctionality",
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
-      strictEqual(
-        runnerWithVersion.context.sdkPackage.models[0].name,
-        "PreviewFunctionalityRequest"
-      );
-      strictEqual(
-        runnerWithVersion.context.sdkPackage.models[1].name,
-        "StableFunctionalityRequest"
-      );
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "PreviewModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[1].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[1].access, "internal");
 
       runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",
@@ -3756,12 +3035,14 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 1);
       strictEqual(
         runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
-        "stableFunctionality"
+        "stableFunctionality",
       );
       strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
+      strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
       strictEqual(
-        runnerWithVersion.context.sdkPackage.models[0].name,
-        "StableFunctionalityRequest"
+        runnerWithVersion.context.sdkPackage.models[0].usage,
+        UsageFlags.Spread | UsageFlags.Json,
       );
     });
     it("add client", async () => {
@@ -3790,7 +3071,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkPackage = runner.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
@@ -3800,7 +3081,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(versioningClient.initialization.properties.length, 1);
       const versioningClientEndpoint = versioningClient.initialization.properties.find(
-        (x) => x.kind === "endpoint"
+        (x) => x.kind === "endpoint",
       );
       ok(versioningClientEndpoint);
       deepStrictEqual(versioningClientEndpoint.apiVersions, ["v1", "v2"]);
@@ -3822,7 +3103,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       strictEqual(interfaceV2.initialization.properties.length, 1);
       const interfaceV2Endpoint = interfaceV2.initialization.properties.find(
-        (x) => x.kind === "endpoint"
+        (x) => x.kind === "endpoint",
       );
       ok(interfaceV2Endpoint);
       deepStrictEqual(interfaceV2Endpoint.apiVersions, ["v2"]);
@@ -3858,7 +3139,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
@@ -3891,7 +3172,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
@@ -3933,7 +3214,7 @@ describe("typespec-client-generator-core: decorators", () => {
           @route("/v2")
           test2(): void;
         }
-        `
+        `,
       );
       const sdkVersionsEnum = runnerWithVersion.context.sdkPackage.enums[0];
       strictEqual(sdkVersionsEnum.name, "Versions");
@@ -4182,10 +3463,809 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(clients.length, 1);
       ok(clients[0].type);
 
-      const newSdkContext = createSdkContext(runnerWithVersion.context.emitContext);
+      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
       clients = listClients(newSdkContext);
       strictEqual(clients.length, 1);
       ok(clients[0].type);
+    });
+  });
+
+  describe("@override", () => {
+    it("basic", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        op func(params: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+      strictEqual(paramsModel, paramsParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
+    });
+
+    it("basic with scope", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        op func(params: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func, "csharp");
+        `;
+      await runner.compileWithCustomization(mainCode, customizationCode);
+      // runner has python scope, so shouldn't be overridden
+
+      ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 3);
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+
+      const fooParam = method.parameters.find((x) => x.name === "foo");
+      ok(fooParam);
+
+      const barParam = method.parameters.find((x) => x.name === "bar");
+      ok(barParam);
+
+      const httpOp = method.operation;
+      strictEqual(httpOp.parameters.length, 1);
+      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+      ok(httpOp.bodyParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], fooParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], barParam);
+
+      const runnerWithCsharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCsharp.compileWithCustomization(mainCode, customizationCode);
+      ok(runnerWithCsharp.context.sdkPackage.models.find((x) => x.name === "Params"));
+
+      const sdkPackageWithCsharp = runnerWithCsharp.context.sdkPackage;
+      strictEqual(sdkPackageWithCsharp.clients.length, 1);
+
+      strictEqual(sdkPackageWithCsharp.clients[0].methods.length, 1);
+      const methodWithCsharp = sdkPackageWithCsharp.clients[0].methods[0];
+      strictEqual(methodWithCsharp.kind, "basic");
+      strictEqual(methodWithCsharp.name, "func");
+      strictEqual(methodWithCsharp.parameters.length, 2);
+      const contentTypeParamWithCsharp = methodWithCsharp.parameters.find(
+        (x) => x.name === "contentType",
+      );
+      ok(contentTypeParamWithCsharp);
+
+      const paramsParamWithCsharp = methodWithCsharp.parameters.find((x) => x.name === "params");
+      ok(paramsParamWithCsharp);
+      strictEqual(
+        sdkPackageWithCsharp.models.find((x) => x.name === "Params"),
+        paramsParamWithCsharp.type,
+      );
+
+      const httpOpWithCsharp = methodWithCsharp.operation;
+      strictEqual(httpOpWithCsharp.parameters.length, 1);
+      strictEqual(
+        httpOpWithCsharp.parameters[0].correspondingMethodParams[0],
+        contentTypeParamWithCsharp,
+      );
+      ok(httpOpWithCsharp.bodyParam);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
+    });
+
+    it("regrouping", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+          fooBar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        model ParamsCustomized {
+          ...PickProperties<MyService.Params, "foo" | "bar">;
+        }
+
+        op func(params: MyCustomizations.ParamsCustomized, ...PickProperties<MyService.Params, "fooBar">): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `;
+      await runner.compileWithCustomization(mainCode, customizationCode);
+      // runner has python scope, so shouldn't be overridden
+
+      ok(!runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 3);
+
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+
+      const fooBarParam = method.parameters.find((x) => x.name === "fooBar");
+      ok(fooBarParam);
+
+      const httpOp = method.operation;
+      strictEqual(httpOp.parameters.length, 1);
+      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+      ok(httpOp.bodyParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], paramsParam);
+      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], fooBarParam);
+    });
+
+    it("params mismatch", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          bar: string;
+        }
+
+        op func(...Params): void;
+        `;
+
+      const customizationCode = `
+        namespace MyCustomizations;
+
+        model ParamsCustomized {
+          foo: string;
+          bar: string;
+        }
+
+        op func(params: MyCustomizations.ParamsCustomized): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `;
+      const diagnostics = (
+        await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
+      )[1];
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/override-method-parameters-mismatch",
+      });
+    });
+
+    it("recursive params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        op func(...Params): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        op func(input: MyService.Params): void;
+
+        @@override(MyService.func, MyCustomizations.func);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+
+      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
+      ok(paramsModel);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+      const method = client.methods[0];
+
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "func");
+      strictEqual(method.parameters.length, 2);
+      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+      ok(contentTypeParam);
+      const inputParam = method.parameters.find((x) => x.name === "input");
+      ok(inputParam);
+      strictEqual(paramsModel, inputParam.type);
+
+      ok(method.operation.bodyParam);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
+    });
+
+    it("core template", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compileWithCustomization(
+        `
+        @useDependency(Versions.v1_0_Preview_2)
+        @server("http://localhost:3000", "endpoint")
+        @service()
+        namespace My.Service;
+
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        @route("/template")
+        op templateOp is Azure.Core.RpcOperation<
+          Params,
+          Params
+        >;
+        `,
+        `
+        namespace My.Customizations;
+
+        op templateOp(params: My.Service.Params): My.Service.Params;
+
+        @@override(My.Service.templateOp, My.Customizations.templateOp);
+        `,
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const method = sdkPackage.clients[0].methods[0];
+      strictEqual(method.parameters.length, 3);
+      ok(method.parameters.find((x) => x.name === "contentType"));
+      ok(method.parameters.find((x) => x.name === "accept"));
+
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+      strictEqual(paramsParam.type.kind, "model");
+      strictEqual(paramsParam.type.name, "Params");
+    });
+  });
+  describe("@clientInitialization", () => {
+    it("main client", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(@path blobName: string): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          blobName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 2);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 1);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 0);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 1);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+      strictEqual(blobNameOpParam.onClient, true);
+    });
+
+    it("On Interface", async () => {
+      await runner.compileWithBuiltInService(
+        `
+        model clientInitModel
+        {
+            p1: string;
+        }
+
+        @route("/bump")
+        @clientInitialization(clientInitModel)
+        interface bumpParameter {
+            @route("/op1")
+            @doc("bump parameter")
+            @post
+            @convenientAPI(true)
+            op op1(@path p1: string, @query q1: string): void;
+
+            @route("/op2")
+            @doc("bump parameter")
+            @post
+            @convenientAPI(true)
+            op op2(@path p1: string): void;
+        }
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const clientAccessor = sdkPackage.clients[0].methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      const bumpParameterClient = clientAccessor.response;
+
+      const methods = bumpParameterClient.methods;
+      strictEqual(methods.length, 2);
+
+      const op1Method = methods.find((x) => x.name === "op1");
+      ok(op1Method);
+      strictEqual(op1Method.kind, "basic");
+      strictEqual(op1Method.parameters.length, 1);
+      strictEqual(op1Method.parameters[0].name, "q1");
+      const op1Op = op1Method.operation;
+      strictEqual(op1Op.parameters.length, 2);
+      strictEqual(op1Op.parameters[0].name, "p1");
+      strictEqual(op1Op.parameters[0].onClient, true);
+      strictEqual(op1Op.parameters[1].name, "q1");
+      strictEqual(op1Op.parameters[1].onClient, false);
+    });
+    it("subclient", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace StorageClient {
+
+          @route("/main")
+          op download(@path blobName: string): void;
+
+          interface BlobClient {
+            @route("/blob")
+            op download(@path blobName: string): void;
+          }
+        }
+        `,
+        `
+        model ClientInitialization {
+          blobName: string
+        };
+
+        @@clientInitialization(StorageClient, ClientInitialization);
+        @@clientInitialization(StorageClient.BlobClient, ClientInitialization);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const clients = sdkPackage.clients;
+      strictEqual(clients.length, 1);
+      const client = clients[0];
+      strictEqual(client.name, "StorageClient");
+      strictEqual(client.initialization.access, "public");
+      strictEqual(client.initialization.properties.length, 2);
+      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.onClient, true);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 2);
+
+      // the main client's function should not have `blobName` as a client method parameter
+      const mainClientDownload = methods.find((x) => x.kind === "basic" && x.name === "download");
+      ok(mainClientDownload);
+      strictEqual(mainClientDownload.parameters.length, 0);
+
+      const getBlobClient = methods.find((x) => x.kind === "clientaccessor");
+      ok(getBlobClient);
+      strictEqual(getBlobClient.kind, "clientaccessor");
+      strictEqual(getBlobClient.name, "getBlobClient");
+      strictEqual(getBlobClient.parameters.length, 1);
+      const blobNameParam = getBlobClient.parameters.find((x) => x.name === "blobName");
+      ok(blobNameParam);
+      strictEqual(blobNameParam.onClient, true);
+      strictEqual(blobNameParam.optional, false);
+      strictEqual(blobNameParam.kind, "method");
+
+      const blobClient = getBlobClient.response;
+
+      strictEqual(blobClient.kind, "client");
+      strictEqual(blobClient.name, "BlobClient");
+      strictEqual(blobClient.initialization.access, "internal");
+      strictEqual(blobClient.initialization.properties.length, 2);
+
+      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
+      const blobClientBlobInitializationProp = blobClient.initialization.properties.find(
+        (x) => x.name === "blobName",
+      );
+      ok(blobClientBlobInitializationProp);
+      strictEqual(blobClientBlobInitializationProp.kind, "method");
+      strictEqual(blobClientBlobInitializationProp.onClient, true);
+      strictEqual(blobClient.methods.length, 1);
+
+      const download = blobClient.methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 0);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 1);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobClientBlobInitializationProp);
+      strictEqual(blobNameOpParam.onClient, true);
+    });
+    it("some methods don't have client initialization params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(@path blobName: string, @header header: int32): void;
+        op noClientParams(@query query: int32): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          blobName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 2);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 2);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 1);
+
+      const headerParam = download.parameters.find((x) => x.name === "header");
+      ok(headerParam);
+      strictEqual(headerParam.onClient, false);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 2);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+      strictEqual(blobNameOpParam.onClient, true);
+
+      const noClientParamsMethod = methods[1];
+      strictEqual(noClientParamsMethod.name, "noClientParams");
+      strictEqual(noClientParamsMethod.kind, "basic");
+      strictEqual(noClientParamsMethod.parameters.length, 1);
+      strictEqual(noClientParamsMethod.parameters[0].name, "query");
+      strictEqual(noClientParamsMethod.parameters[0].onClient, false);
+    });
+
+    it("multiple client params", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(@path blobName: string, @path containerName: string): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          blobName: string;
+          containerName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 3);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+
+      const containerName = client.initialization.properties.find(
+        (x) => x.name === "containerName",
+      );
+      ok(containerName);
+      strictEqual(containerName.clientDefaultValue, undefined);
+      strictEqual(containerName.onClient, true);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 1);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 0);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 2);
+      const blobNameOpParam = downloadOp.parameters[0];
+      strictEqual(blobNameOpParam.name, "blobName");
+      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+
+      const containerNameOpParam = downloadOp.parameters[1];
+      strictEqual(containerNameOpParam.name, "containerName");
+      strictEqual(containerNameOpParam.correspondingMethodParams.length, 1);
+      strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
+    });
+
+    it("@operationGroup with same model on parent client", async () => {
+      await runner.compile(
+        `
+        @service
+        namespace MyService;
+
+        @operationGroup
+        interface MyInterface {
+          op download(@path blobName: string, @path containerName: string): void;
+        }
+
+        model MyClientInitialization {
+          blobName: string;
+          containerName: string;
+        }
+
+        @@clientInitialization(MyService, MyClientInitialization);
+        @@clientInitialization(MyService.MyInterface, MyClientInitialization);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 1);
+
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.access, "public");
+      strictEqual(client.initialization.properties.length, 3);
+      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+
+      const containerName = client.initialization.properties.find(
+        (x) => x.name === "containerName",
+      );
+      ok(containerName);
+      strictEqual(containerName.clientDefaultValue, undefined);
+      strictEqual(containerName.onClient, true);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 1);
+      const clientAccessor = methods[0];
+      strictEqual(clientAccessor.kind, "clientaccessor");
+      const og = clientAccessor.response;
+      strictEqual(og.kind, "client");
+
+      strictEqual(og.initialization.access, "internal");
+      strictEqual(og.initialization.properties.length, 3);
+      ok(og.initialization.properties.find((x) => x.kind === "endpoint"));
+      ok(og.initialization.properties.find((x) => x === blobName));
+      ok(og.initialization.properties.find((x) => x === containerName));
+
+      const download = og.methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 0);
+
+      const op = download.operation;
+      strictEqual(op.parameters.length, 2);
+      strictEqual(op.parameters[0].correspondingMethodParams[0], blobName);
+      strictEqual(op.parameters[1].correspondingMethodParams[0], containerName);
+      strictEqual(op.parameters[0].onClient, true);
+      strictEqual(op.parameters[1].onClient, true);
+    });
+
+    it("redefine client structure", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op uploadContainer(@path containerName: string): void;
+        op uploadBlob(@path containerName: string, @path blobName: string): void;
+        `,
+        `
+        namespace MyCustomizations {
+          model ContainerClientInitialization {
+            containerName: string;
+          }
+          @client({service: MyService})
+          @clientInitialization(ContainerClientInitialization)
+          namespace ContainerClient {
+            op upload is MyService.uploadContainer;
+
+
+            model BlobClientInitialization {
+              containerName: string;
+              blobName: string;
+            }
+
+            @client({service: MyService})
+            @clientInitialization(BlobClientInitialization)
+            namespace BlobClient {
+              op upload is MyService.uploadBlob;
+            }
+          }
+        }
+        
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      strictEqual(sdkPackage.clients.length, 2);
+
+      const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
+      ok(containerClient);
+      strictEqual(containerClient.initialization.access, "public");
+      strictEqual(containerClient.initialization.properties.length, 2);
+      ok(containerClient.initialization.properties.find((x) => x.kind === "endpoint"));
+
+      const containerName = containerClient.initialization.properties.find(
+        (x) => x.name === "containerName",
+      );
+      ok(containerName);
+
+      const methods = containerClient.methods;
+      strictEqual(methods.length, 1);
+      strictEqual(methods[0].name, "upload");
+      strictEqual(methods[0].kind, "basic");
+      strictEqual(methods[0].parameters.length, 0);
+      strictEqual(methods[0].operation.parameters.length, 1);
+      strictEqual(methods[0].operation.parameters[0].correspondingMethodParams[0], containerName);
+
+      const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
+      ok(blobClient);
+      strictEqual(blobClient.initialization.access, "public");
+      strictEqual(blobClient.initialization.properties.length, 3);
+      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
+
+      const containerNameOnBlobClient = blobClient.initialization.properties.find(
+        (x) => x.name === "containerName",
+      );
+      ok(containerNameOnBlobClient);
+
+      const blobName = blobClient.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+
+      const blobMethods = blobClient.methods;
+      strictEqual(blobMethods.length, 1);
+      strictEqual(blobMethods[0].name, "upload");
+      strictEqual(blobMethods[0].kind, "basic");
+      strictEqual(blobMethods[0].parameters.length, 0);
+      strictEqual(blobMethods[0].operation.parameters.length, 2);
+      strictEqual(
+        blobMethods[0].operation.parameters[0].correspondingMethodParams[0],
+        containerNameOnBlobClient,
+      );
+      strictEqual(blobMethods[0].operation.parameters[1].correspondingMethodParams[0], blobName);
+    });
+
+    it("@paramAlias", async () => {
+      await runner.compileWithCustomization(
+        `
+        @service
+        namespace MyService;
+
+        op download(@path blob: string): void;
+        op upload(@path blobName: string): void;
+        `,
+        `
+        namespace MyCustomizations;
+
+        model MyClientInitialization {
+          @paramAlias("blob")
+          blobName: string;
+        }
+
+        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+        `,
+      );
+      const sdkPackage = runner.context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.initialization.properties.length, 2);
+      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
+      ok(endpoint);
+      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
+      ok(blobName);
+      strictEqual(blobName.clientDefaultValue, undefined);
+      strictEqual(blobName.onClient, true);
+      strictEqual(blobName.optional, false);
+
+      const methods = client.methods;
+      strictEqual(methods.length, 2);
+      const download = methods[0];
+      strictEqual(download.name, "download");
+      strictEqual(download.kind, "basic");
+      strictEqual(download.parameters.length, 0);
+
+      const downloadOp = download.operation;
+      strictEqual(downloadOp.parameters.length, 1);
+      strictEqual(downloadOp.parameters[0].name, "blob");
+      strictEqual(downloadOp.parameters[0].correspondingMethodParams.length, 1);
+      strictEqual(downloadOp.parameters[0].correspondingMethodParams[0], blobName);
+
+      const upload = methods[1];
+      strictEqual(upload.name, "upload");
+      strictEqual(upload.kind, "basic");
+      strictEqual(upload.parameters.length, 0);
+
+      const uploadOp = upload.operation;
+      strictEqual(uploadOp.parameters.length, 1);
+      strictEqual(uploadOp.parameters[0].name, "blobName");
+      strictEqual(uploadOp.parameters[0].correspondingMethodParams.length, 1);
+      strictEqual(uploadOp.parameters[0].correspondingMethodParams[0], blobName);
     });
   });
 });

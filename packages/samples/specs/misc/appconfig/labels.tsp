@@ -34,9 +34,7 @@ namespace LabelsResource {
     @query name?: string,
     @query after?: string,
 
-    @query({
-      format: "multi",
-    })
+    @query(#{ explode: true })
     $Select?: LabelField[],
   ): {
     ...Response<200>;

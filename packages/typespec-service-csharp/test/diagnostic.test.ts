@@ -14,7 +14,7 @@ describe("typespec-service-csharp: diagnostics", () => {
       getStandardService(`
       /** bar scalar */
       scalar bar;
-    `)
+    `),
     );
 
     expectDiagnostics(diagnostics, [
@@ -34,7 +34,7 @@ describe("typespec-service-csharp: diagnostics", () => {
         /**An imprecise integer property */
         integerProp: integer;
       }
-    `)
+    `),
     );
 
     expectDiagnostics(diagnostics, [
@@ -59,7 +59,7 @@ describe("typespec-service-csharp: diagnostics", () => {
         /**An imprecise floating point property */
         floatProp: float;
       }
-    `)
+    `),
     );
 
     expectDiagnostics(diagnostics, [
@@ -84,7 +84,7 @@ describe("typespec-service-csharp: diagnostics", () => {
         /**An imprecise numeric property */
         numericProp: numeric;
       }
-    `)
+    `),
     );
 
     expectDiagnostics(diagnostics, [
@@ -110,7 +110,7 @@ describe("typespec-service-csharp: diagnostics", () => {
       /** An invalid name test */
       \`**()invalid~~Name\`?: string = "This is a string literal";
     }
-    `)
+    `),
     );
 
     expectDiagnostics(diagnostics, [

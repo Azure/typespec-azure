@@ -1,0 +1,10 @@
+{
+  "operationId": "getStringFromEnumDiagnostic",
+  "title": "getStringFromEnumDiagnostic",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "four"
+    }
+  }
+}

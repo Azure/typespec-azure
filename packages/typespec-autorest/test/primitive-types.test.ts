@@ -37,7 +37,7 @@ describe("typespec-autorest: primitives", () => {
           "Pet",
           `
           model Pet { name: ${test[0]} };
-          `
+          `,
         );
 
         const schema = res.defs.Pet.properties.name;
@@ -74,7 +74,7 @@ describe("typespec-autorest: primitives", () => {
 
             model Pet { name: ${test[0]} };
           }
-          `
+          `,
         );
 
         expectDiagnostics(res, {
@@ -91,7 +91,7 @@ describe("typespec-autorest: primitives", () => {
       `
       scalar shortString extends string;
       model Pet { name: shortString };
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -108,7 +108,7 @@ describe("typespec-autorest: primitives", () => {
       `
       @doc("My custom description")
       scalar shortString extends string;
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -124,7 +124,7 @@ describe("typespec-autorest: primitives", () => {
       `
       @doc("My custom description")
       scalar specialInt extends int32;
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -143,7 +143,7 @@ describe("typespec-autorest: primitives", () => {
     scalar specialint extends int32;
     @doc("Override specialint description")
     scalar superSpecialint extends specialint;
-    `
+    `,
     );
 
     ok(res.isRef);
@@ -161,7 +161,7 @@ describe("typespec-autorest: primitives", () => {
       @maxLength(10) @minLength(10)
       scalar shortString extends string;
       model Pet { name: shortString };
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -183,7 +183,7 @@ describe("typespec-autorest: primitives", () => {
       @minLength(1)
       scalar shortButNotEmptyString extends shortString;
       model Pet { name: shortButNotEmptyString, breed: shortString };
-      `
+      `,
     );
     ok(res.isRef);
     ok(res.defs.shortString, "expected definition named shortString");
@@ -207,7 +207,7 @@ describe("typespec-autorest: primitives", () => {
       `
     @extension("x-custom", "my-value")
     scalar Pet extends string;
-    `
+    `,
     );
 
     ok(res.defs.Pet, "expected definition named Pet");
@@ -221,11 +221,16 @@ describe("typespec-autorest: primitives", () => {
     async function testEncode(
       scalar: string,
       expectedOpenApi: OpenAPI2Schema,
-      encoding?: string,
-      encodeAs?: string
+      encoding?: string | null,
+      encodeAs?: string,
     ) {
       const encodeAsParam = encodeAs ? `, ${encodeAs}` : "";
-      const encodeDecorator = encoding ? `@encode("${encoding}"${encodeAsParam})` : "";
+      const encodeDecorator =
+        encoding === null
+          ? `@encode(${encodeAs})`
+          : encoding !== undefined
+            ? `@encode("${encoding}"${encodeAsParam})`
+            : "";
       const res1 = await oapiForModel("s", `${encodeDecorator} scalar s extends ${scalar};`);
       deepStrictEqual(res1.defs.s, expectedOpenApi);
       const res2 = await oapiForModel("Test", `model Test {${encodeDecorator} prop: ${scalar}};`);
@@ -286,6 +291,20 @@ describe("typespec-autorest: primitives", () => {
         testEncode("bytes", { type: "string", format: "byte" }));
       it("set format to base64url when encoding bytes as base64url", () =>
         testEncode("bytes", { type: "string", format: "base64url" }, "base64url"));
+    });
+
+    describe("int64", () => {
+      it("set type: integer and format to 'int64' by default", () =>
+        testEncode("int64", { type: "integer", format: "int64" }));
+      it("set type: string and format to int64 when @encode(string)", () =>
+        testEncode("int64", { type: "string", format: "int64" }, null, "string"));
+    });
+
+    describe("decimal128", () => {
+      it("set type: integer and format to 'int64' by default", () =>
+        testEncode("decimal128", { type: "number", format: "decimal" }));
+      it("set type: string and format to int64 when @encode(string)", () =>
+        testEncode("decimal128", { type: "string", format: "decimal" }, null, "string"));
     });
   });
 });

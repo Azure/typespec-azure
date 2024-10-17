@@ -14,7 +14,7 @@ function getSdkEnum(
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
 | `type` | `Enum` |
 | `operation`? | `Operation` |
 

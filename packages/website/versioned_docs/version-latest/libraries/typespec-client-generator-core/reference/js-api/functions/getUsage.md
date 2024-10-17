@@ -11,8 +11,8 @@ function getUsage(context, entity): UsageFlags
 
 | Parameter | Type |
 | ------ | ------ |
-| `context` | `TCGCContext` |
-| `entity` | `Enum` \| `Model` |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) |
+| `entity` | `Enum` \| `Model` \| `Union` |
 
 ## Returns
 

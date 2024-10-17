@@ -16,7 +16,7 @@ describe("typespec-azure-core: rpc-operation-request-body", () => {
     tester = createLinterRuleTester(
       runner,
       rpcOperationRequestBodyRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -31,7 +31,7 @@ describe("typespec-azure-core: rpc-operation-request-body", () => {
         @get
         @route ("/")
         op getWidget is RpcOperation<{}, Widget>;
-      `
+      `,
       )
       .toBeValid();
   });
@@ -47,7 +47,7 @@ describe("typespec-azure-core: rpc-operation-request-body", () => {
         @delete
         @route ("/")
         op deleteWidget is RpcOperation<{}, Widget>;
-      `
+      `,
       )
       .toBeValid();
   });
@@ -63,7 +63,7 @@ describe("typespec-azure-core: rpc-operation-request-body", () => {
         @get
         @route ("/")
         op getWidget is RpcOperation<{@body body: Widget}, Widget>;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/rpc-operation-request-body",
@@ -83,7 +83,7 @@ describe("typespec-azure-core: rpc-operation-request-body", () => {
         @delete
         @route ("/")
         op deleteWidget is RpcOperation<{@body body: Widget}, Widget>;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/rpc-operation-request-body",

@@ -1,4 +1,3 @@
-import { __unsupported_enable_checkStandardOperations } from "@azure-tools/typespec-azure-core";
 import {
   BasicTestRunner,
   LinterRuleTester,
@@ -13,12 +12,11 @@ describe("typespec-azure-resource-manager: unsupported types rule", () => {
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    __unsupported_enable_checkStandardOperations(false);
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
       unsupportedTypeRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 

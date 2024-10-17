@@ -45,6 +45,7 @@ import {
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
   NeedsRouteDecorator,
+  SpreadCustomParametersDecorator,
   SpreadCustomResponsePropertiesDecorator,
 } from "../generated-defs/Azure.Core.Foundations.Private.js";
 import {
@@ -123,7 +124,7 @@ function findPathToProperty(
   program: Program,
   entity: Model,
   condition: (prop: ModelProperty) => boolean,
-  current: string[] = []
+  current: string[] = [],
 ): PropertyPath | undefined {
   for (const prop of entity.properties.values()) {
     const match = condition(prop);
@@ -179,7 +180,7 @@ function getNamedSourceModels(property: ModelProperty): Set<Model> | undefined {
  */
 export function getPagedResult(
   program: Program,
-  entity: Model | Operation
+  entity: Model | Operation,
 ): PagedResultMetadata | undefined {
   let metadata: PagedResultMetadata | undefined = undefined;
   switch (entity.kind) {
@@ -189,14 +190,14 @@ export function getPagedResult(
         const items = _getItems(program, entity);
         if (items !== undefined) {
           metadata.itemsProperty = items.property;
-          // eslint-disable-next-line deprecation/deprecation
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
           metadata.itemsPath = items.path;
           metadata.itemsSegments = items.segments;
         }
         const nextLink = _getNextLink(program, entity);
         if (nextLink !== undefined) {
           metadata.nextLinkProperty = nextLink.property;
-          // eslint-disable-next-line deprecation/deprecation
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
           metadata.nextLinkPath = nextLink.path;
           metadata.nextLinkSegments = nextLink.segments;
         }
@@ -298,7 +299,7 @@ export interface LongRunningStates {
 
 export const $lroStatus: LroStatusDecorator = (
   context: DecoratorContext,
-  entity: Enum | Union | ModelProperty
+  entity: Enum | Union | ModelProperty,
 ) => {
   const [states, diagnostics] = extractLroStates(context.program, entity);
   if (diagnostics.length > 0) context.program.reportDiagnostics(diagnostics);
@@ -316,7 +317,7 @@ function storeLroState(
   program: Program,
   states: PartialLongRunningStates,
   name: string,
-  member?: EnumMember | UnionVariant
+  member?: EnumMember | UnionVariant,
 ) {
   const expectedStates: [
     string,
@@ -341,7 +342,7 @@ function extractLroStatesFromUnion(
   program: Program,
   entity: Type,
   lroStateResult: PartialLongRunningStates,
-  diagnostics: DiagnosticCollector
+  diagnostics: DiagnosticCollector,
 ) {
   if (entity.kind === "Union") {
     for (const variant of entity.variants.values()) {
@@ -363,7 +364,7 @@ function extractLroStatesFromUnion(
             format: {
               type: option.kind,
             },
-          })
+          }),
         );
 
         return diagnostics.wrap(undefined);
@@ -372,7 +373,7 @@ function extractLroStatesFromUnion(
           program,
           lroStateResult,
           typeof variant.name === "string" ? variant.name : option.value,
-          variant
+          variant,
         );
       }
     }
@@ -382,7 +383,7 @@ function extractLroStatesFromUnion(
 
 export function extractLroStates(
   program: Program,
-  entity: Type
+  entity: Type,
 ): [LongRunningStates | undefined, readonly Diagnostic[]] {
   const result: PartialLongRunningStates = {
     states: [],
@@ -408,7 +409,7 @@ export function extractLroStates(
         format: {
           type: entity.kind,
         },
-      })
+      }),
     );
 
     return diagnostics.wrap(undefined);
@@ -431,7 +432,7 @@ export function extractLroStates(
         format: {
           states: missingStates.join(", "),
         },
-      })
+      }),
     );
 
     return diagnostics.wrap(undefined);
@@ -445,7 +446,7 @@ export function extractLroStates(
  */
 export function getLongRunningStates(
   program: Program,
-  entity: Enum | Model | Scalar | ModelProperty
+  entity: Enum | Model | Scalar | ModelProperty,
 ): LongRunningStates | undefined {
   // Is the type a string with known values?
   if (isStringType(program, entity)) {
@@ -521,7 +522,7 @@ export const $lroResult = (context: DecoratorContext, entity: ModelProperty) => 
 export function getLroResult(
   program: Program,
   entity: Model,
-  useDefault: boolean = true
+  useDefault: boolean = true,
 ): [ModelProperty | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let count = 0;
@@ -543,7 +544,7 @@ export function getLroResult(
         code: "lro-status-monitor-invalid-result-property",
         target: entity,
         format: { resultType: "result", decorator: "@lroResult" },
-      })
+      }),
     );
   }
 
@@ -562,7 +563,7 @@ export function getLroResult(
  */
 export const $lroErrorResult: LroErrorResultDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty
+  entity: ModelProperty,
 ) => {
   const { program } = context;
   program.stateMap(AzureCoreStateKeys.lroErrorResult).set(entity, entity);
@@ -578,7 +579,7 @@ export const $lroErrorResult: LroErrorResultDecorator = (
 export function getLroErrorResult(
   program: Program,
   entity: Model,
-  useDefault: boolean = true
+  useDefault: boolean = true,
 ): [ModelProperty | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let count = 0;
@@ -600,7 +601,7 @@ export function getLroErrorResult(
         code: "lro-status-monitor-invalid-result-property",
         target: entity,
         format: { resultType: "error", decorator: "@lroErrorResult" },
-      })
+      }),
     );
   }
 
@@ -613,7 +614,7 @@ export function getLroErrorResult(
 export const $pollingOperationParameter: PollingOperationParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  target?: Type
+  target?: Type,
 ) => {
   const { program } = context;
   let storedValue: ModelProperty | string | undefined;
@@ -634,7 +635,7 @@ export const $pollingOperationParameter: PollingOperationParameterDecorator = (
 
 export function getPollingOperationParameter(
   program: Program,
-  entity: ModelProperty
+  entity: ModelProperty,
 ): string | ModelProperty | undefined {
   return program.stateMap(AzureCoreStateKeys.pollingOperationParameter).get(entity);
 }
@@ -643,7 +644,7 @@ export function getPollingOperationParameter(
 
 export const $lroSucceeded: LroSucceededDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => {
   context.program.stateSet(AzureCoreStateKeys.lroSucceeded).add(entity);
 };
@@ -659,7 +660,7 @@ export function isLroSucceededState(program: Program, entity: EnumMember | Union
 
 export const $lroCanceled: LroCanceledDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => {
   context.program.stateSet(AzureCoreStateKeys.lroCanceled).add(entity);
 };
@@ -675,7 +676,7 @@ export function isLroCanceledState(program: Program, entity: EnumMember | UnionV
 
 export const $lroFailed: LroFailedDecorator = (
   context: DecoratorContext,
-  entity: EnumMember | UnionVariant
+  entity: EnumMember | UnionVariant,
 ) => {
   context.program.stateSet(AzureCoreStateKeys.lroFailed).add(entity);
 };
@@ -724,7 +725,7 @@ export enum pollingOptionsKind {
 export const $pollingLocation: PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  options?: Type
+  options?: Type,
 ) => {
   const { program } = context;
   if (options) {
@@ -745,7 +746,7 @@ export const $pollingLocation: PollingLocationDecorator = (
  */
 export function getPollingLocationInfo(
   program: Program,
-  target: ModelProperty
+  target: ModelProperty,
 ): PollingLocationInfo | undefined {
   return program.stateMap(AzureCoreStateKeys.pollingLocationInfo).get(target);
 }
@@ -758,7 +759,7 @@ function extractUnionVariantValue(type: Type): string | undefined {
 function extractPollingLocationInfo(
   program: Program,
   target: ModelProperty,
-  options: Type
+  options: Type,
 ): PollingLocationInfo | undefined {
   if (options.kind !== "Model") return undefined;
   const kind = options.properties.get(optionsKindKey);
@@ -793,7 +794,7 @@ function extractStatusMonitorLocationInfo(
     finalResult?: Model | IntrinsicType;
     target: ModelProperty;
     useForFInalState?: boolean;
-  }
+  },
 ): StatusMonitorPollingLocationInfo | undefined {
   const kind = options.properties.get(optionsKindKey);
   if (kind === undefined || extractUnionVariantValue(kind.type) !== "statusMonitor")
@@ -815,7 +816,7 @@ function extractStatusMonitorLocationInfo(
   const statusProperty = getLroStatusProperty(program, baseInfo.pollingModel);
   if (statusProperty === undefined) return undefined;
   const statusMonitor = ignoreDiagnostics(
-    extractStatusMonitorInfo(program, baseInfo.pollingModel, statusProperty)
+    extractStatusMonitorInfo(program, baseInfo.pollingModel, statusProperty),
   );
   if (statusMonitor === undefined) return undefined;
   statusMonitor.successProperty = finalPropertyValue;
@@ -840,7 +841,7 @@ export function isPollingLocation(program: Program, entity: ModelProperty): bool
 export const $finalLocation: FinalLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  finalResult?: Type
+  finalResult?: Type,
 ) => {
   const { program } = context;
   if (finalResult !== undefined && isNeverType(finalResult)) return;
@@ -865,7 +866,7 @@ export function isFinalLocation(program: Program, entity: ModelProperty): boolea
 
 export function getFinalLocationValue(
   program: Program,
-  entity: ModelProperty
+  entity: ModelProperty,
 ): Model | IntrinsicType | undefined {
   return program.stateMap(AzureCoreStateKeys.finalLocationResults).get(entity);
 }
@@ -879,7 +880,7 @@ export function getFinalLocationValue(
 export const $useFinalStateVia: UseFinalStateViaDecorator = (
   context: DecoratorContext,
   entity: Operation,
-  finalState: string
+  finalState: string,
 ) => {
   const { program } = context;
   let finalStateVia: FinalStateValue;
@@ -974,7 +975,7 @@ function getLroHeaders(response: HttpOperationResponse): Set<LroHeader> | undefi
 function validateFinalState(
   program: Program,
   operation: HttpOperation,
-  finalState: FinalStateValue
+  finalState: FinalStateValue,
 ): FinalStateValue | undefined {
   if (finalState === FinalStateValue.originalUri) {
     if (operation.verb !== "put") {
@@ -1013,7 +1014,7 @@ function validateFinalState(
 function validateFinalStates(
   program: Program,
   operation: Operation,
-  finalStates: FinalStateValue[]
+  finalStates: FinalStateValue[],
 ): FinalStateValue | undefined {
   const httpOp = ignoreDiagnostics(getHttpOperation(program, operation));
   for (const state of finalStates) {
@@ -1031,14 +1032,14 @@ function validateFinalStates(
  */
 export function getFinalStateOverride(
   program: Program,
-  operation: Operation
+  operation: Operation,
 ): FinalStateValue | undefined {
   return program.stateMap(AzureCoreStateKeys.finalStateOverride).get(operation);
 }
 
 export const $omitKeyProperties: OmitKeyPropertiesDecorator = (
   context: DecoratorContext,
-  entity: Model
+  entity: Model,
 ) => {
   // Delete any key properties from the model
   for (const [key, prop] of entity.properties) {
@@ -1063,7 +1064,7 @@ export const $operationLink: OperationLinkDecorator = (
   entity: Operation,
   linkedOperation: Operation,
   linkType: string,
-  parameters?: Type
+  parameters?: Type,
 ) => {
   if (parameters && parameters.kind !== "Model") {
     return;
@@ -1073,7 +1074,7 @@ export const $operationLink: OperationLinkDecorator = (
     program,
     entity,
     linkedOperation,
-    parameters
+    parameters,
   );
   if (diagnostics.length > 0) {
     program.reportDiagnostics(diagnostics);
@@ -1104,7 +1105,7 @@ export const $operationLink: OperationLinkDecorator = (
 export function getOperationLink(
   program: Program,
   entity: Operation,
-  linkType: string
+  linkType: string,
 ): OperationLinkMetadata | undefined {
   const items = program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
     string,
@@ -1121,7 +1122,7 @@ export function getOperationLink(
  */
 export function getOperationLinks(
   program: Program,
-  entity: Operation
+  entity: Operation,
 ): Map<string, OperationLinkMetadata> | undefined {
   return program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
     string,
@@ -1133,7 +1134,7 @@ export const $pollingOperation: PollingOperationDecorator = (
   context: DecoratorContext,
   target: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => {
   const { program } = context;
   const isValidReturnType =
@@ -1192,7 +1193,7 @@ export const $finalOperation: FinalOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => {
   const { program } = context;
   context.call($operationLink, entity, linkedOperation, FinalOperationKey, parameters);
@@ -1210,7 +1211,7 @@ export const $nextPageOperation: NextPageOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
   linkedOperation: Operation,
-  parameters?: Type
+  parameters?: Type,
 ) => {
   context.call($operationLink, entity, linkedOperation, "nextPage", parameters);
 };
@@ -1239,10 +1240,10 @@ export function getResponseProperty(program: Program, entity: ModelProperty): st
   return parameterName;
 }
 
-export const $spreadCustomParameters = (
+export const $spreadCustomParameters: SpreadCustomParametersDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Model
+  customizations: Model,
 ) => {
   const customParameters: Type | undefined = customizations.properties.get("parameters")?.type;
   if (customParameters) {
@@ -1260,7 +1261,7 @@ export const $spreadCustomParameters = (
         context.program.checker.cloneType(value, {
           sourceProperty: value,
           model: entity,
-        })
+        }),
       );
     }
   }
@@ -1269,11 +1270,10 @@ export const $spreadCustomParameters = (
 export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDecorator = (
   context: DecoratorContext,
   entity: Model,
-  customizations: Type
+  customizations: Model,
 ) => {
-  const customResponseProperties: Type | undefined = (customizations as any).properties.get(
-    "response"
-  )?.type;
+  const customResponseProperties: Type | undefined =
+    customizations.properties.get("response")?.type;
   if (customResponseProperties) {
     if (customResponseProperties.kind !== "Model") {
       // The constraint checker will have complained about this already.
@@ -1289,7 +1289,7 @@ export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDeco
         context.program.checker.cloneType(value, {
           sourceProperty: value,
           model: entity,
-        })
+        }),
       );
     }
   }
@@ -1298,7 +1298,7 @@ export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDeco
 export const $ensureResourceType: EnsureResourceTypeDecorator = (
   context: DecoratorContext,
   entity: Operation,
-  resourceType: Type
+  resourceType: Type,
 ) => {
   if (resourceType.kind === "TemplateParameter") {
     return;
@@ -1381,7 +1381,7 @@ export const $ensureVerb: EnsureVerbDecorator = (
   context: DecoratorContext,
   entity: Operation,
   templateName: string,
-  verb: string
+  verb: string,
 ) => {
   context.program.stateMap(AzureCoreStateKeys.ensureVerb).set(entity, [templateName, verb]);
 };
@@ -1414,7 +1414,7 @@ export interface EmbeddingVectorMetadata {
 export const $embeddingVector: EmbeddingVectorDecorator = (
   context: DecoratorContext,
   entity: Model,
-  elementType: Type
+  elementType: Type,
 ) => {
   const metadata: EmbeddingVectorMetadata = {
     elementType: elementType,
@@ -1430,7 +1430,7 @@ export const $embeddingVector: EmbeddingVectorDecorator = (
  */
 export function getAsEmbeddingVector(
   program: Program,
-  model: Model
+  model: Model,
 ): EmbeddingVectorMetadata | undefined {
   return program.stateMap(AzureCoreStateKeys.embeddingVector).get(model);
 }
@@ -1461,14 +1461,14 @@ export interface ArmResourceIdentifierAllowedResource {
 export const $armResourceIdentifierConfig: ArmResourceIdentifierConfigDecorator = (
   context: DecoratorContext,
   entity: Scalar,
-  config: Type
+  config: Type,
 ) => {
   if (config.kind !== "Model") return;
   const prop = config.properties.get("allowedResources");
   if (prop === undefined || prop.type.kind !== "Tuple") return;
   const [data, diagnostics] = typespecTypeToJson<ArmResourceIdentifierConfig>(
     prop.type,
-    context.getArgumentTarget(0)!
+    context.getArgumentTarget(0)!,
   );
   context.program.reportDiagnostics(diagnostics);
 
@@ -1482,7 +1482,7 @@ export const $armResourceIdentifierConfig: ArmResourceIdentifierConfigDecorator 
 /** Returns the config attached to an armResourceIdentifierScalar */
 export function getArmResourceIdentifierConfig(
   program: Program,
-  entity: Scalar
+  entity: Scalar,
 ): ArmResourceIdentifierConfig {
   return program.stateMap(AzureCoreStateKeys.armResourceIdentifierConfig).get(entity);
 }
@@ -1490,7 +1490,7 @@ export function getArmResourceIdentifierConfig(
 export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
   context: DecoratorContext,
   target: Operation,
-  states: unknown // TODO: replace with actual type when available
+  states: unknown, // TODO: replace with actual type when available
 ) => {
   const { program } = context;
   const finalStateValues: FinalStateValue[] = [];
@@ -1531,5 +1531,5 @@ setTypeSpecNamespace(
   $ensureVerb,
   $embeddingVector,
   $armResourceIdentifierConfig,
-  $defaultFinalStateVia
+  $defaultFinalStateVia,
 );

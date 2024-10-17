@@ -4,8 +4,6 @@ toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
 
-# Emitter
-
 ## Usage
 
 1. Via the command line
@@ -19,6 +17,16 @@ tsp compile . --emit=@azure-tools/typespec-autorest
 ```yaml
 emit:
   - "@azure-tools/typespec-autorest"
+```
+
+The config can be extended with options as follows:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-autorest"
+options:
+  "@azure-tools/typespec-autorest":
+    option: value
 ```
 
 ## Emitter options
@@ -69,11 +77,17 @@ Example: azureResourceProviderFolder is provided
 - `arm-folder/AzureService/preview/2020-01-01.yaml`
 - `arm-folder/AzureService/preview/2020-01-01.yaml`
 
+### `examples-dir`
+
+**Type:** `string`
+
+Directory where the examples are located. Default: `{project-root}/examples`.
+
 ### `examples-directory`
 
 **Type:** `string`
 
-Directory where the examples are located. Default: `{cwd}/examples`.
+DEPRECATED. Use examples-dir instead
 
 ### `version`
 

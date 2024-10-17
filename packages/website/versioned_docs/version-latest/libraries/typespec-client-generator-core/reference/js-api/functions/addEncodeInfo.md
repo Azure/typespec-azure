@@ -19,7 +19,7 @@ type.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `context` | `TCGCContext` | sdk context |
+| `context` | [`TCGCContext`](../interfaces/TCGCContext.md) | sdk context |
 | `type` | `ModelProperty` \| `Scalar` | the original typespec type. Used to grab the encoding decorator off of |
 | `propertyType` | [`SdkType`](../type-aliases/SdkType.md) | the type of the property, i.e. the internal type that we add the encoding info onto |
 | `defaultContentType`? | `string` | - |

@@ -4,24 +4,24 @@ import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@t
  *
  *
  *
- * @param propertyName Name of the property to omit
+ * @param values Values
  */
-export type ResourceBaseParametersOfDecorator = (
+export type ResourceParameterBaseForDecorator = (
   context: DecoratorContext,
-  target: Model,
-  propertyName: Model
+  target: ModelProperty,
+  values: Type,
 ) => void;
 
 /**
  *
  *
  *
- * @param values Values
+ * @param propertyName Name of the property to omit
  */
-export type ResourceParameterBaseForDecorator = (
+export type ResourceBaseParametersOfDecorator = (
   context: DecoratorContext,
-  target: ModelProperty,
-  values: Type
+  target: Model,
+  propertyName: Model,
 ) => void;
 
 /**
@@ -31,6 +31,19 @@ export type ResourceParameterBaseForDecorator = (
  * It is *not* meant to be used directly by a spec author,
  */
 export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Model) => void;
+
+/**
+ * Please DO NOT USE in RestAPI specs.
+ * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
+ * It will programatically enabled/disable client flattening with
+ *
+ * @flattenProperty with autorest
+ * emitter flags to maintain compatibility in swagger.
+ */
+export type ConditionalClientFlattenDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+) => void;
 
 /**
  * Omit a property in the target model.
@@ -43,20 +56,7 @@ export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Mod
 export type OmitIfEmptyDecorator = (
   context: DecoratorContext,
   target: Model,
-  propertyName: string
-) => void;
-
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with
- *
- * @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-export type ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty
+  propertyName: string,
 ) => void;
 
 /**
@@ -68,7 +68,7 @@ export type ConditionalClientFlattenDecorator = (
 export type AssignProviderNameValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  resource: Model
+  resource: Model,
 ) => void;
 
 /**
@@ -76,7 +76,7 @@ export type AssignProviderNameValueDecorator = (
  */
 export type ArmUpdateProviderNamespaceDecorator = (
   context: DecoratorContext,
-  target: Operation
+  target: Operation,
 ) => void;
 
 /**
@@ -95,7 +95,7 @@ export type ArmUpdateProviderNamespaceDecorator = (
 export type ArmResourceInternalDecorator = (
   context: DecoratorContext,
   target: Model,
-  properties: Model
+  properties: Model,
 ) => void;
 
 /**
@@ -107,7 +107,7 @@ export type DefaultResourceKeySegmentNameDecorator = (
   target: ModelProperty,
   armResource: Model,
   keyName: string,
-  segment: string
+  segment: string,
 ) => void;
 
 /**
@@ -123,7 +123,7 @@ export type EnforceConstraintDecorator = (
   context: DecoratorContext,
   target: Operation | Model,
   sourceType: Model,
-  constraintType: Model
+  constraintType: Model,
 ) => void;
 
 /**
@@ -140,7 +140,7 @@ export type ArmRenameListByOperationDecorator = (
   resourceType: Model,
   parentTypeName?: string,
   parentFriendlyTypeName?: string,
-  applyOperationRename?: boolean
+  applyOperationRename?: boolean,
 ) => void;
 
 /**
@@ -150,5 +150,20 @@ export type ArmRenameListByOperationDecorator = (
 export type ArmResourcePropertiesOptionalityDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  isOptional: boolean
+  isOptional: boolean,
 ) => void;
+
+export type AzureResourceManagerPrivateDecorators = {
+  resourceParameterBaseFor: ResourceParameterBaseForDecorator;
+  resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
+  azureResourceBase: AzureResourceBaseDecorator;
+  conditionalClientFlatten: ConditionalClientFlattenDecorator;
+  omitIfEmpty: OmitIfEmptyDecorator;
+  assignProviderNameValue: AssignProviderNameValueDecorator;
+  armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator;
+  armResourceInternal: ArmResourceInternalDecorator;
+  defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator;
+  enforceConstraint: EnforceConstraintDecorator;
+  armRenameListByOperation: ArmRenameListByOperationDecorator;
+  armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
+};

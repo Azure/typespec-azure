@@ -210,7 +210,7 @@ export type OpenAPI2Schema = Extensions & {
    * Declares the value of the property that the server will use if none is provided,
    * for example a "count" to control the number of results per page might default to 100 if not supplied by the client in the request.
    *
-   * @note "default" has no meaning for required parameters.) See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.2. Unlike JSON Schema this value MUST conform to the defined type for this parameter. */
+   * "default" has no meaning for required parameters.) See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.2. Unlike JSON Schema this value MUST conform to the defined type for this parameter. */
   default?: string | boolean | number | Record<string, unknown>;
 
   /**
@@ -301,10 +301,10 @@ export type OpenAPI2ParameterType = OpenAPI2Parameter["in"];
 
 export interface OpenAPI2HeaderDefinition {
   type: "string" | "number" | "integer" | "boolean" | "array";
-  items?: OpenAPI2Schema;
   collectionFormat?: "csv" | "ssv" | "tsv" | "pipes";
   description?: string;
   format?: string;
+  items?: PrimitiveItems;
 }
 
 export type OpenAPI2Parameter =
@@ -315,6 +315,10 @@ export type OpenAPI2Parameter =
   | OpenAPI2PathParameter;
 
 export interface OpenAPI2ParameterBase extends Extensions {
+  name: string;
+  description?: string;
+  required?: boolean;
+
   /**
    * Provide a different name to be used in the client.
    */
@@ -323,11 +327,8 @@ export interface OpenAPI2ParameterBase extends Extensions {
 }
 
 export interface OpenAPI2BodyParameter extends OpenAPI2ParameterBase {
-  name: string;
   in: "body";
   schema: OpenAPI2Schema;
-  description?: string;
-  required?: boolean;
   allowEmptyValue?: boolean;
   example?: unknown;
 
@@ -338,6 +339,7 @@ export interface OpenAPI2HeaderParameter extends OpenAPI2HeaderDefinition, OpenA
   name: string;
   in: "header";
   required?: boolean;
+  default?: unknown;
 }
 
 export interface OpenAPI2FormDataParameter extends OpenAPI2ParameterBase {
@@ -359,7 +361,7 @@ export interface OpenAPI2FormDataParameter extends OpenAPI2ParameterBase {
   "x-ms-client-flatten"?: boolean;
 }
 
-export interface PrimitiveItems extends OpenAPI2ParameterBase {
+export interface PrimitiveItems {
   type: "string" | "number" | "integer" | "boolean" | "array" | "file";
   format?: string;
   items?: PrimitiveItems;
@@ -376,7 +378,9 @@ export interface OpenAPI2PathParameter extends OpenAPI2ParameterBase {
   required?: boolean;
   format?: string;
   enum?: string[];
+  items?: PrimitiveItems;
   "x-ms-skip-url-encoding"?: boolean;
+  default?: unknown;
 }
 
 export interface OpenAPI2QueryParameter extends OpenAPI2ParameterBase {
@@ -389,6 +393,8 @@ export interface OpenAPI2QueryParameter extends OpenAPI2ParameterBase {
   required?: boolean;
   format?: string;
   enum?: string[];
+  items?: PrimitiveItems;
+  default?: unknown;
 }
 
 export type HttpMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
@@ -449,6 +455,7 @@ export type OpenAPI2Operation = Extensions & {
   tags?: Array<string>;
 
   "x-ms-examples"?: Record<string, Ref<unknown>>;
+  "x-ms-pageable"?: XmsPageable;
 
   "x-ms-long-running-operation"?: boolean;
 
@@ -466,6 +473,19 @@ export type XMSLongRunningOperationOptions = {
   "final-state-via": XMSLongRunningFinalState;
 
   "final-state-schema"?: string;
+};
+
+/**
+ * Model for x-ms-pageable extension.
+ * https://github.com/Azure/autorest/blob/main/docs/extensions/readme.md#x-ms-pageable
+ */
+export type XmsPageable = {
+  /** Name of the property containing url to the next link.  */
+  nextLinkName: string;
+  /** Name of the property containing the page items. Default: "value" */
+  itemName?: string;
+  /** Specifies the name (operationId) of the operation for retrieving the next page. Default: "<operationId>Next" */
+  operationName?: string;
 };
 
 export type OpenAPI2StatusCode = string | "default" | "1XX" | "2XX" | "3XX" | "4XX" | "5XX";

@@ -4,8 +4,6 @@ toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
 
-# Data types
-
 ## Azure.Core
 
 ### `AadOauth2Auth` {#Azure.Core.AadOauth2Auth}
@@ -479,6 +477,11 @@ Supported versions of Azure.Core TypeSpec building blocks.
 enum Azure.Core.Versions
 ```
 
+| Name           | Value             | Description           |
+| -------------- | ----------------- | --------------------- |
+| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
+| v1_0_Preview_2 | `"1.0-preview.2"` | Version 1.0-preview.2 |
+
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
 
 ```typespec
@@ -505,13 +508,33 @@ union Azure.Core.RepeatabilityResult
 
 A type definition that refers the id to an Azure Resource Manager resource.
 
-Sample usage:
-otherArmId: ResourceIdentifier;
-networkId: ResourceIdentifier<[{type:"\\Microsoft.Network\\vnet"}]>
-vmIds: ResourceIdentifier<[{type:"\\Microsoft.Compute\\vm", scopes["*"]}]>
-
 ```typespec
 scalar Azure.Core.armResourceIdentifier
+```
+
+#### Examples
+
+```tsp
+model MyModel {
+  otherArmId: armResourceIdentifier;
+  networkId: armResourceIdentifier<[
+    {
+      type: "Microsoft.Network/vnet";
+    }
+  ]>;
+  vmIds: armResourceIdentifier<[
+    {
+      type: "Microsoft.Compute/vm";
+      scopes: ["*"];
+    }
+  ]>;
+  scoped: armResourceIdentifier<[
+    {
+      type: "Microsoft.Compute/vm";
+      scopes: ["tenant", "resourceGroup"];
+    }
+  ]>;
+}
 ```
 
 ### `azureLocation` {#Azure.Core.azureLocation}
@@ -1231,6 +1254,16 @@ Enumerates the standard trait contexts for Azure.Core operations.
 enum Azure.Core.Traits.TraitContext
 ```
 
+| Name      | Value | Description                                                                                    |
+| --------- | ----- | ---------------------------------------------------------------------------------------------- |
+| Read      |       | Trait is applicable for resource 'read' operations.                                            |
+| Create    |       | Trait is applicable for resource 'create' operations.                                          |
+| Update    |       | Trait is applicable for resource 'update' operations.                                          |
+| Delete    |       | Trait is applicable for resource 'delete' operations.                                          |
+| List      |       | Trait is applicable for resource 'list' operations.                                            |
+| Action    |       | Trait is applicable for resource actions.                                                      |
+| Undefined |       | Only traits that did not specify a trait context (and therefore always apply) will be exposed. |
+
 ### `TraitLocation` {#Azure.Core.Traits.TraitLocation}
 
 Enumerates the standard trait locations for Azure.Core operations.
@@ -1238,3 +1271,9 @@ Enumerates the standard trait locations for Azure.Core operations.
 ```typespec
 enum Azure.Core.Traits.TraitLocation
 ```
+
+| Name                | Value | Description                                               |
+| ------------------- | ----- | --------------------------------------------------------- |
+| Parameters          |       | Identifies operation parameters as the trait target.      |
+| Response            |       | Identifies operation response as the trait target.        |
+| ApiVersionParameter |       | Identifies the API version parameter as the trait target. |

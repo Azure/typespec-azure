@@ -16,7 +16,7 @@ describe("typespec-azure-core: no-offsetdatetime rule", () => {
     tester = createLinterRuleTester(
       runner,
       noOffsetDateTimeRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 

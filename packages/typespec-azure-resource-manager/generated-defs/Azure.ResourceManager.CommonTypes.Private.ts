@@ -1,4 +1,11 @@
-import type { DecoratorContext, Enum, Model, ModelProperty, Union } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Enum,
+  EnumValue,
+  Model,
+  ModelProperty,
+  Union,
+} from "@typespec/compiler";
 
 /**
  * Marks an enum as representing the valid `common-types` versions.
@@ -17,8 +24,11 @@ export type ArmCommonParameterDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   definitionName?: string,
-  version?: unknown | unknown | string,
-  referenceFile?: string
+  version?:
+    | EnumValue
+    | { readonly version: string | EnumValue; readonly isDefault: boolean }
+    | string,
+  referenceFile?: string,
 ) => void;
 
 /**
@@ -33,6 +43,15 @@ export type ArmCommonDefinitionDecorator = (
   context: DecoratorContext,
   target: Model | Enum | Union,
   definitionName?: string,
-  version?: unknown | unknown | string,
-  referenceFile?: string
+  version?:
+    | EnumValue
+    | { readonly version: string | EnumValue; readonly isDefault: boolean }
+    | string,
+  referenceFile?: string,
 ) => void;
+
+export type AzureResourceManagerCommonTypesPrivateDecorators = {
+  armCommonTypesVersions: ArmCommonTypesVersionsDecorator;
+  armCommonParameter: ArmCommonParameterDecorator;
+  armCommonDefinition: ArmCommonDefinitionDecorator;
+};

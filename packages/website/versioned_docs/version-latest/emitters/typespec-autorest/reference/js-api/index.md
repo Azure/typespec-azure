@@ -55,9 +55,11 @@ title: "[P] JS API"
 - [Refable](type-aliases/Refable.md)
 - [XMSLongRunningFinalState](type-aliases/XMSLongRunningFinalState.md)
 - [XMSLongRunningOperationOptions](type-aliases/XMSLongRunningOperationOptions.md)
+- [XmsPageable](type-aliases/XmsPageable.md)
 
 ## Variables
 
+- [$decorators](variables/$decorators.md)
 - [$lib](variables/$lib.md)
 - [namespace](variables/namespace.md)
 

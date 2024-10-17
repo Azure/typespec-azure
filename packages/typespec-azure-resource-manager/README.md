@@ -8,9 +8,7 @@ TypeSpec Azure Resource Manager library
 npm install @azure-tools/typespec-azure-resource-manager
 ```
 
-## Linter
-
-### Usage
+## Usage
 
 Add the following in `tspconfig.yaml`:
 
@@ -20,17 +18,17 @@ linter:
     - "@azure-tools/typespec-azure-resource-manager/all"
 ```
 
-### RuleSets
+## RuleSets
 
 Available ruleSets:
 
 - `@azure-tools/typespec-azure-resource-manager/all`
 
-### Rules
+## Rules
 
 | Name                                                                                                                                                                                                     | Description                                                                                                                                                                                                                                          |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-record)                                             | Don't use Record types for ARM resources.                                                                                                                                                                                                            |
+| [`@azure-tools/typespec-azure-resource-manager/arm-no-record`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-no-record)                                         | Don't use Record types for ARM resources.                                                                                                                                                                                                            |
 | `@azure-tools/typespec-azure-resource-manager/arm-common-types-version`                                                                                                                                  | Specify the ARM common-types version using @armCommonTypesVersion.                                                                                                                                                                                   |
 | [`@azure-tools/typespec-azure-resource-manager/arm-delete-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/delete-operation-response-codes) | Ensure delete operations have the appropriate status codes.                                                                                                                                                                                          |
 | [`@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/put-operation-response-codes)       | Ensure put operations have the appropriate status codes.                                                                                                                                                                                             |
@@ -60,6 +58,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/resource-name`                                                                                                                                             | Check the resource name.                                                                                                                                                                                                                             |
 | `@azure-tools/typespec-azure-resource-manager/retry-after`                                                                                                                                               | Check if retry-after header appears in response body.                                                                                                                                                                                                |
 | [`@azure-tools/typespec-azure-resource-manager/unsupported-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/unsupported-type)                                   | Check for unsupported ARM types.                                                                                                                                                                                                                     |
+| [`@azure-tools/typespec-azure-resource-manager/no-empty-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-empty-model)                                       | ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.                                                                        |
 
 ## Decorators
 

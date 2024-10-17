@@ -11,10 +11,11 @@ title: "[I] SdkTupleType"
 
 | Property | Type | Overrides | Inherited from |
 | ------ | ------ | ------ | ------ |
+| `__accessSet?` | `boolean` | - | `SdkTypeBase.__accessSet` |
 | `__raw?` | `Type` | - | `SdkTypeBase.__raw` |
 | `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `SdkTypeBase.decorators` |
 | `deprecation?` | `string` | - | `SdkTypeBase.deprecation` |
-| `description?` | `string` | - | `SdkTypeBase.description` |
-| `details?` | `string` | - | `SdkTypeBase.details` |
+| `doc?` | `string` | - | `SdkTypeBase.doc` |
 | `kind` | `"tuple"` | `SdkTypeBase.kind` | - |
-| `values` | [`SdkType`](../type-aliases/SdkType.md)[] | - | - |
+| `summary?` | `string` | - | `SdkTypeBase.summary` |
+| `valueTypes` | [`SdkType`](../type-aliases/SdkType.md)[] | - | - |

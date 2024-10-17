@@ -1,5 +1,218 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.47.2
+
+### Bug Fixes
+
+- [#1606](https://github.com/Azure/typespec-azure/pull/1606) overwrite original value when set multiple value for same decorator
+
+
+## 0.47.1
+
+### Bug Fixes
+
+- [#1659](https://github.com/Azure/typespec-azure/pull/1659) remove projection for source model since typespec core has already fixed the issue
+
+
+## 0.47.0
+
+### Bug Fixes
+
+- [#1511](https://github.com/Azure/typespec-azure/pull/1511) Fix logic to check conflicting usage for model of multipart body and regular body
+- [#1629](https://github.com/Azure/typespec-azure/pull/1629) do not promote api version param to client if service is not versioned
+- [#1630](https://github.com/Azure/typespec-azure/pull/1630) do not override client default value for api version param in non-versioning service
+- [#1607](https://github.com/Azure/typespec-azure/pull/1607) set service of og in using time instead of setting time
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1631](https://github.com/Azure/typespec-azure/pull/1631) support value type for client default value
+- [#1515](https://github.com/Azure/typespec-azure/pull/1515) add `SdkLroServiceMetadata`
+
+### Deprecations
+
+- [#1613](https://github.com/Azure/typespec-azure/pull/1613) deprecate description in `SdkExampleBase`
+
+### Breaking Changes
+
+- [#1560](https://github.com/Azure/typespec-azure/pull/1560) Remove `.description` and `.details` from deprecated api surface
+
+
+## 0.46.2
+
+### Bug Fixes
+
+- [#1592](https://github.com/Azure/typespec-azure/pull/1592) change example mapping logic to allow operation id with/without renaming
+- [#1589](https://github.com/Azure/typespec-azure/pull/1589) In `0.46.1` we changed the type of `responses` in `SdkHttpOperation` from `Map<number | HttpRange, SdkHttpResponse>` to `SdkHttpResponse[]`, `exceptions` in `SdkHttpOperation` from `Map<number | HttpRange | "*", SdkHttpResponse>` to `SdkHttpResponse[]`,
+and added a `statusCodes` property to `SdkHttpResponse`. But the `statusCodes` is defined as `number | HttpRange | "*"`, which loses the information that the responses in `responses` property could never have a `*` as its statusCodes.
+This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number | HttpRange | "*"`, and changes the type of `statusCodes` in `SdkHttpResponse` to `number | HttpRange` to be precise.
+
+
+## 0.46.1
+
+### Bug Fixes
+
+- [#1491](https://github.com/Azure/typespec-azure/pull/1491) Fix naming logic for anonymous model wrapped by `HttpPart`
+- [#1542](https://github.com/Azure/typespec-azure/pull/1542) Fix `subscriptionId` for ARM SDK
+- [#1558](https://github.com/Azure/typespec-azure/pull/1558) Handle orphan types in nested namespaces
+- [#1554](https://github.com/Azure/typespec-azure/pull/1554) Fix `onClient` setting for client initialization parameters applied to an interface
+
+### Breaking Changes
+
+- [#1540](https://github.com/Azure/typespec-azure/pull/1540)
+  1. The type of `responses` and `exceptions` in `SdkHttpOperation` changed from `Map<number | HttpStatusCodeRange | "*", SdkHttpResponse>` to `SdkHttpResponse[]`.
+  2. The type of `responses` in `SdkHttpOperationExample` changed from `Map<number, SdkHttpResponseExampleValue>` to `SdkHttpResponseExampleValue[]`.
+  3. `SdkHttpResponse` adds a new property `statusCodes` to store its corresponding status code or status code range.
+  Migration hints:
+  The type changed from map to array, and the key of the map is moved as a new property of the value type. For example, for code like this:
+  ```
+  for (const [statusCodes, response] of operation.responses)
+  ```
+  you could do the same in this way:
+  ```
+  for (const response of operation.responses)
+  {
+    const statusCodes = response.statusCodes;
+  }
+  ```
+- [#1463](https://github.com/Azure/typespec-azure/pull/1463)
+  1. The kind for `unknown` renamed from `any` to `unknown`.
+  2. The `values` property in `SdkUnionType` renamed to `variantTypes`.
+  3. The `values` property in `SdkTupleType` renamed to `valueTypes`.
+  4. The example types for parameter, response and `SdkType` has been renamed to `XXXExampleValue` to emphasize that they are values instead of the example itself.
+  5. The `@format` decorator is no longer able to change the type of the property.
+- [#1539](https://github.com/Azure/typespec-azure/pull/1539)
+  1. change `encode` in `SdkBuiltInType` to optional.
+  2. no longer use the value of `kind` as `encode` when there is no encode on this type.
+- [#1541](https://github.com/Azure/typespec-azure/pull/1541) no longer export the `SdkExampleValueBase` interface. This type should have no usage in downstream consumer's code. If there is any usage, please replace it with `SdkExampleValue`.
+
+
+## 0.46.0
+
+### Bug Fixes
+
+- [#1476](https://github.com/Azure/typespec-azure/pull/1476) Fix to add client signature `subscriptionId` for ARM SDK
+- [#1424](https://github.com/Azure/typespec-azure/pull/1424) do not handle example value with null for model type
+- [#1424](https://github.com/Azure/typespec-azure/pull/1424) consider renaming for parameter or property
+- [#1431](https://github.com/Azure/typespec-azure/pull/1431) consider renaming when mapping examples
+- [#1452](https://github.com/Azure/typespec-azure/pull/1452) TCGC, make content type optional when request body is optional
+- [#1399](https://github.com/Azure/typespec-azure/pull/1399) remove import of `UnionEnumVariant`
+- [#1432](https://github.com/Azure/typespec-azure/pull/1432) need to handle projection when finding spread original model
+- [#1377](https://github.com/Azure/typespec-azure/pull/1377) Fix getLibraryName for anonymous model which is derived from template
+- [#1435](https://github.com/Azure/typespec-azure/pull/1435) Don't require params introduced by `Azure.Core` with `@override`
+- [#1410](https://github.com/Azure/typespec-azure/pull/1410) set sdk method body parameter encode with http content type
+
+### Features
+
+- [#1305](https://github.com/Azure/typespec-azure/pull/1305) Add Namespace as target for @access decorator
+- [#1398](https://github.com/Azure/typespec-azure/pull/1398) add `@clientInitialization` decorator
+- [#1253](https://github.com/Azure/typespec-azure/pull/1253) add parent client info to `SdkClientType`
+- [#1253](https://github.com/Azure/typespec-azure/pull/1253) add `listSubClients` helper func
+- [#1379](https://github.com/Azure/typespec-azure/pull/1379) add `doc` and `summary` to tcgc types
+- [#1387](https://github.com/Azure/typespec-azure/pull/1387) add default path for example detection
+- [#1395](https://github.com/Azure/typespec-azure/pull/1395) do propagation when override access or usage
+- [#1388](https://github.com/Azure/typespec-azure/pull/1388) use original model for spread if it is from a simple spread
+- [#1303](https://github.com/Azure/typespec-azure/pull/1303) allow `@usage` to apply to namespaces
+
+### Deprecations
+
+- [#1395](https://github.com/Azure/typespec-azure/pull/1395) deprecate `@internal` decorator and `isInternal` helper function
+
+### Breaking Changes
+
+- [#1440](https://github.com/Azure/typespec-azure/pull/1440) Filter Core models directly instead of clear their usage
+- [#1451](https://github.com/Azure/typespec-azure/pull/1451) Have no client parameters appear on method signatures
+- [#1420](https://github.com/Azure/typespec-azure/pull/1420) clean up deprecation exports of previous version
+
+
+## 0.45.4
+
+### Bug Fixes
+
+- [#1392](https://github.com/Azure/typespec-azure/pull/1392) Fix multipart for client customization
+
+
+## 0.45.3
+
+### Bug Fixes
+
+- [#1328](https://github.com/Azure/typespec-azure/pull/1328) change example file path to relative file path
+- [#1338](https://github.com/Azure/typespec-azure/pull/1338) consider scope when find service of a client
+- [#1376](https://github.com/Azure/typespec-azure/pull/1376) no need to add access override along with usage override for orphan model
+
+### Features
+
+- [#1363](https://github.com/Azure/typespec-azure/pull/1363) URI template support
+
+
+## 0.45.2
+
+### Bug Fixes
+
+- [#1336](https://github.com/Azure/typespec-azure/pull/1336) Add `@hasJsonConverter` for csharp only to indicate if JSON converter is needed
+- [#1350](https://github.com/Azure/typespec-azure/pull/1350) Bug fix for encode as string on ModelProperty.
+- [#1343](https://github.com/Azure/typespec-azure/pull/1343) Add generic parameter inputs to `SdkUnionType` to clearly define the union types of `endpoint` and `credential` params
+
+
+## 0.45.1
+
+### Bug Fixes
+
+- [#1330](https://github.com/Azure/typespec-azure/pull/1330) Fix collectionFormat for "csv"
+
+
+## 0.45.0
+
+### Bug Fixes
+
+- [#1238](https://github.com/Azure/typespec-azure/pull/1238) TCGC, add `crossLanguageDefinitionId` to `SdkClientType`
+- [#1266](https://github.com/Azure/typespec-azure/pull/1266) expose default values for endpoint template arguments through `.clientDefaultValue`
+- [#1281](https://github.com/Azure/typespec-azure/pull/1281) Support @multipartBody for `bodyParam` of `SdkHttpOperation`
+- [#1233](https://github.com/Azure/typespec-azure/pull/1233) don't move server description onto endpoints parameter
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1258](https://github.com/Azure/typespec-azure/pull/1258) add support for encoding an int as a string
+- [#1155](https://github.com/Azure/typespec-azure/pull/1155) Make literal endpoints overridable
+- [#1148](https://github.com/Azure/typespec-azure/pull/1148) add `@override` decorator that allows authors to explicitly describe their desired client method
+
+
+## 0.44.3
+
+### Bug Fixes
+
+- [#1244](https://github.com/Azure/typespec-azure/pull/1244) The baseType will be undefined if the `SdkBuiltInType`, `SdkDateTimeType`, `SdkDurationType` is a std type
+- [#1251](https://github.com/Azure/typespec-azure/pull/1251) Change output for `HttpPart<T>[]`
+
+
+## 0.44.2
+
+### Bug Fixes
+
+- [#1231](https://github.com/Azure/typespec-azure/pull/1231) Fix the duplicate usageflags values for json and xml
+- [#1203](https://github.com/Azure/typespec-azure/pull/1203) Have `@clientName` work for operation groups as well
+- [#1222](https://github.com/Azure/typespec-azure/pull/1222) Validate `@clientName` conflict for operations inside interface
+
+### Features
+
+- [#1090](https://github.com/Azure/typespec-azure/pull/1090) Support model format of `@multipartBody`
+- [#1237](https://github.com/Azure/typespec-azure/pull/1237) Expose createTcgcContext, which is the minimal context object that handles scope
+- [#1223](https://github.com/Azure/typespec-azure/pull/1223) Report error diagnostic when trying to flattening a model with polymorphism
+- [#1076](https://github.com/Azure/typespec-azure/pull/1076) Add example types support
+- [#1204](https://github.com/Azure/typespec-azure/pull/1204) Add xml usage and change enumvalue arg representation in generic decorators
+
+### Breaking Changes
+
+- [#1015](https://github.com/Azure/typespec-azure/pull/1015) Refactor tcgc build-in types, please refer pr's description for details and migration guides
+
+
 ## 0.44.1
 
 ### Bug Fixes

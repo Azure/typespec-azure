@@ -4,8 +4,6 @@ toc_min_heading_level: 2
 toc_max_heading_level: 3
 ---
 
-# Emitter
-
 ## Usage
 
 1. Via the command line
@@ -19,6 +17,16 @@ tsp compile . --emit=@azure-tools/typespec-autorest-canonical
 ```yaml
 emit:
   - "@azure-tools/typespec-autorest-canonical"
+```
+
+The config can be extended with options as follows:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-autorest-canonical"
+options:
+  "@azure-tools/typespec-autorest-canonical":
+    option: value
 ```
 
 ## Emitter options

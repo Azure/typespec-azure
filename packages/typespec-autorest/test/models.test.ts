@@ -9,7 +9,7 @@ describe("typespec-autorest: model definitions", () => {
       "Foo",
       `model Foo {
         x: int32;
-      };`
+      };`,
     );
 
     ok(res.isRef);
@@ -22,6 +22,12 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it("change definition name with @clientName", async () => {
+    const res = await openApiFor(`@clientName("ClientFoo") model Foo {};`);
+    expect(res.definitions).toHaveProperty("ClientFoo");
+    expect(res.definitions).not.toHaveProperty("Foo");
+  });
+
   it(`@projectedName("json", <>) updates the property name and set "x-ms-client-name" with the original name  - (LEGACY)`, async () => {
     const res = await oapiForModel(
       "Foo",
@@ -29,7 +35,7 @@ describe("typespec-autorest: model definitions", () => {
         #suppress "deprecated" "for testing"
         @projectedName("json", "xJson")
         x: int32;
-      };`
+      };`,
     );
 
     expect(res.defs.Foo).toMatchObject({
@@ -46,7 +52,7 @@ describe("typespec-autorest: model definitions", () => {
         #suppress "deprecated" "for testing"
         @projectedName("client", "x")
         xJson: int32;
-      };`
+      };`,
     );
 
     expect(res.defs.Foo).toMatchObject({
@@ -62,7 +68,7 @@ describe("typespec-autorest: model definitions", () => {
       `model Foo {
         @clientName("x")
         xJson: int32;
-      };`
+      };`,
     );
 
     expect(res.defs.Foo).toMatchObject({
@@ -80,7 +86,7 @@ describe("typespec-autorest: model definitions", () => {
         @clientName("x")
         @projectedName("client", "y")
         xJson: int32;
-      };`
+      };`,
     );
 
     expect(res.defs.Foo).toMatchObject({
@@ -99,7 +105,7 @@ describe("typespec-autorest: model definitions", () => {
         @summary("YProp")
         y: int32;
       };
-      `
+      `,
     );
     strictEqual(res.defs.Foo.title, "FooModel");
     strictEqual(res.defs.Foo.properties.y.title, "YProp");
@@ -111,7 +117,7 @@ describe("typespec-autorest: model definitions", () => {
       `model Foo {
         @encodedName("application/json", "xJson")
         x: int32;
-      };`
+      };`,
     );
 
     expect(res.defs.Foo).toMatchObject({
@@ -129,7 +135,7 @@ describe("typespec-autorest: model definitions", () => {
         @encodedName("application/json", "xJson")
         @projectedName("json", "projectedJson")
         x: int32;
-      };`
+      };`,
     );
 
     expect(res.defs.Foo).toMatchObject({
@@ -155,7 +161,7 @@ describe("typespec-autorest: model definitions", () => {
       @route("/test1")
       @get
       op test1(p: P): Q;
-      `
+      `,
     );
 
     expectDiagnostics(diagnostics, [
@@ -171,7 +177,7 @@ describe("typespec-autorest: model definitions", () => {
       "{ ... Foo }",
       `model Foo {
         x: int32;
-      };`
+      };`,
     );
 
     ok(res.isRef);
@@ -186,7 +192,7 @@ describe("typespec-autorest: model definitions", () => {
       "Foo<int32>",
       `model Foo<T> {
         x: T;
-      };`
+      };`,
     );
 
     ok(!res.isRef);
@@ -208,7 +214,7 @@ describe("typespec-autorest: model definitions", () => {
       }
       model Foo<T> {
         x: T;
-      };`
+      };`,
     );
 
     ok(!res.isRef);
@@ -228,7 +234,7 @@ describe("typespec-autorest: model definitions", () => {
       model Foo {
         y: int32;
       };
-      model Bar extends Foo {}`
+      model Bar extends Foo {}`,
     );
 
     ok(res.isRef);
@@ -253,7 +259,7 @@ describe("typespec-autorest: model definitions", () => {
       model Foo {
         optional?: string | null = null;
       };
-      `
+      `,
     );
 
     ok(res.defs.Foo, "expected definition named Foo");
@@ -279,7 +285,7 @@ describe("typespec-autorest: model definitions", () => {
         y?: int32;
       }
       @route("/") op test(): Parent;
-      `
+      `,
     );
     deepStrictEqual(res.definitions.Parent, {
       type: "object",
@@ -304,7 +310,7 @@ describe("typespec-autorest: model definitions", () => {
         a: "a-value",
         b,
       }
-      `
+      `,
     );
     deepStrictEqual(res.defs.Foo, {
       type: "object",
@@ -338,7 +344,7 @@ describe("typespec-autorest: model definitions", () => {
         a: "a-value",
         b: "b-value",
       }
-      `
+      `,
     );
 
     deepStrictEqual(res.defs.Foo, {
@@ -372,7 +378,7 @@ describe("typespec-autorest: model definitions", () => {
 
       @route("/")
       op foo(): Foo;
-      `
+      `,
     );
 
     expectDiagnostics(diagnostics, [
@@ -399,7 +405,7 @@ describe("typespec-autorest: model definitions", () => {
         y?: int32;
       }
       @route("/") op test(): Parent;
-      `
+      `,
     );
     ok(!("TParent" in res.definitions), "Parent templated type shouldn't be included in OpenAPI");
     deepStrictEqual(res.definitions.Parent, {
@@ -432,11 +438,11 @@ describe("typespec-autorest: model definitions", () => {
         y?: int32;
       }
       @route("/") op test(): Parent;
-      `
+      `,
     );
     ok(
       !("TParent_string" in res.definitions),
-      "Parent instantiated templated type shouldn't be included in OpenAPI"
+      "Parent instantiated templated type shouldn't be included in OpenAPI",
     );
   });
 
@@ -449,7 +455,7 @@ describe("typespec-autorest: model definitions", () => {
       };
       model Bar extends Foo {
         x: int32;
-      }`
+      }`,
     );
 
     ok(res.isRef);
@@ -476,7 +482,7 @@ describe("typespec-autorest: model definitions", () => {
       model Foo<T> {
         y: T;
       };
-      model Bar extends Foo<int32> {}`
+      model Bar extends Foo<int32> {}`,
     );
 
     ok(res.isRef);
@@ -498,7 +504,7 @@ describe("typespec-autorest: model definitions", () => {
       };
       model Bar extends Foo<int32> {
         x: int32
-      }`
+      }`,
     );
 
     ok(res.isRef);
@@ -528,7 +534,7 @@ describe("typespec-autorest: model definitions", () => {
       @friendlyName("Bar_{name}", T)
       model Bar<T> extends Foo<T> {
         x: T
-      }`
+      }`,
     );
 
     ok(res.isRef);
@@ -552,7 +558,7 @@ describe("typespec-autorest: model definitions", () => {
     const res = await oapiForModel(
       "Foo",
       `
-      model Foo { @statusCode code: 200, @header x: string};`
+      model Foo { @statusCode code: 200, @header x: string};`,
     );
 
     ok(!res.isRef);
@@ -568,7 +574,7 @@ describe("typespec-autorest: model definitions", () => {
       "Bar",
       `
       model Foo { x?: string};
-      model Bar extends Foo {};`
+      model Bar extends Foo {};`,
     );
 
     ok(res.isRef);
@@ -591,7 +597,7 @@ describe("typespec-autorest: model definitions", () => {
       `
       model Foo { x: int32 };
       model Bar extends Foo {};
-      model Baz extends Bar {};`
+      model Baz extends Bar {};`,
     );
 
     ok(res.isRef);
@@ -627,7 +633,7 @@ describe("typespec-autorest: model definitions", () => {
       model Pet {
         someString?: string = "withDefault"
       }
-      `
+      `,
     );
 
     ok(res.isRef);
@@ -643,7 +649,7 @@ describe("typespec-autorest: model definitions", () => {
       model Pet {
         name: string | null;
       };
-      `
+      `,
       );
       ok(res.isRef);
       deepStrictEqual(res.defs.Pet, {
@@ -665,7 +671,7 @@ describe("typespec-autorest: model definitions", () => {
       model Pet {
         name: int32[] | null;
       };
-      `
+      `,
       );
       ok(res.isRef);
       deepStrictEqual(res.defs.Pet, {
@@ -692,7 +698,7 @@ describe("typespec-autorest: model definitions", () => {
       model Pet {
         kind: PetKind | null;
       };
-      `
+      `,
       );
       ok(res.isRef);
       deepStrictEqual(res.defs.Pet, {
@@ -723,7 +729,7 @@ describe("typespec-autorest: model definitions", () => {
       model Pet {
         kind: PetKind | null;
       };
-      `
+      `,
       );
       ok(res.isRef);
       deepStrictEqual(res.defs.Pet, {
@@ -757,7 +763,7 @@ describe("typespec-autorest: model definitions", () => {
       @route("/things/{id}")
       @get
       op get(@path id: string, @query test: string, ...Thing): Thing & { @header test: string; };
-      `
+      `,
     );
 
     deepStrictEqual(oapi.definitions.Thing, {
@@ -773,7 +779,7 @@ describe("typespec-autorest: model definitions", () => {
       oapi.paths["/things/{id}"].get.parameters.find((p: any) => p.in === "body").schema,
       {
         $ref: "#/definitions/Thing",
-      }
+      },
     );
 
     deepStrictEqual(oapi.paths["/things/{id}"].get.responses["200"].schema, {
@@ -789,7 +795,7 @@ describe("typespec-autorest: model definitions", () => {
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
       op get(): Thing<string>;
       `,
-      { "omit-unreachable-types": true }
+      { "omit-unreachable-types": true },
     );
 
     expectDiagnostics(diagnostics, [{ code: "@azure-tools/typespec-autorest/inline-cycle" }]);
@@ -805,7 +811,7 @@ describe("typespec-autorest: model definitions", () => {
       };
       model Bar extends Foo {
         x: int32;
-      }`
+      }`,
     );
 
     ok(res.isRef);
@@ -835,7 +841,7 @@ describe("typespec-autorest: model definitions", () => {
         }
         model Bar {
           x: Foo.name
-        }`
+        }`,
       );
 
       ok(res.defs.Bar, "expected definition named Bar");
@@ -854,7 +860,7 @@ describe("typespec-autorest: model definitions", () => {
         }
         model Bar {
           x: Foo.name
-        }`
+        }`,
       );
 
       ok(res.defs.Bar, "expected definition named Bar");
@@ -874,7 +880,7 @@ describe("typespec-autorest: model definitions", () => {
         model Bar {
           @doc("My doc")
           x: Foo.name
-        }`
+        }`,
       );
 
       ok(res.defs.Bar, "expected definition named Bar");
@@ -896,7 +902,7 @@ describe("typespec-autorest: model definitions", () => {
         model Bar {
           @doc("My doc override")
           x: Foo.name
-        }`
+        }`,
       );
 
       ok(res.defs.Bar, "expected definition named Bar");
@@ -905,5 +911,28 @@ describe("typespec-autorest: model definitions", () => {
         description: "My doc override",
       });
     });
+  });
+
+  it("encode know scalar as a default value", async () => {
+    const res = await oapiForModel(
+      "Test",
+      `
+        model Test { @encode("rfc7231") minDate: utcDateTime = utcDateTime.fromISO("2024-01-01T11:32:00Z"); }
+      `,
+    );
+
+    expect(res.defs.Test.properties.minDate.default).toEqual("Mon, 01 Jan 2024 11:32:00 GMT");
+  });
+
+  it("object value used as a default value", async () => {
+    const res = await oapiForModel(
+      "Test",
+      `
+        model Test { Pet: {name: string;  @encode("rfc7231")birthday: utcDateTime} = #{ name: "Dog", birthday:utcDateTime.fromISO("2024-01-01T11:32:00Z")}}
+      `,
+    );
+
+    expect(res.defs.Test.properties.Pet.default.name).toEqual("Dog");
+    expect(res.defs.Test.properties.Pet.default.birthday).toEqual("Mon, 01 Jan 2024 11:32:00 GMT");
   });
 });

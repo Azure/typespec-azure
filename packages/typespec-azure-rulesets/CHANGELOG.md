@@ -1,5 +1,43 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.47.0
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1555](https://github.com/Azure/typespec-azure/pull/1555) Add `no-empty-model` rule to ruleset
+
+
+## 0.46.0
+
+### Bug Fixes
+
+- [#1357](https://github.com/Azure/typespec-azure/pull/1357) Disable `use-standard-operations` azure core linter rule from `resource-manager` ruleset
+
+### Features
+
+- [#1342](https://github.com/Azure/typespec-azure/pull/1342) Replace `no-operation-id` linter rule with a more generic `no-openapi` rule guarding against any use of openapi decorators
+
+
+## 0.45.0
+
+### Bug Fixes
+
+- [#1154](https://github.com/Azure/typespec-azure/pull/1154) Add `@azure-tools/typespec-azure-core/require-versioned` rule to `data-plane` and `resource-manager` rulesets
+
+### Bump dependencies
+
+- [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
+
+### Features
+
+- [#1194](https://github.com/Azure/typespec-azure/pull/1194) Add `friendly-name` rule to `data-plane` and `resource-manager` rulesets
+- [#1193](https://github.com/Azure/typespec-azure/pull/1193) Add new `no-private-usage` linter rule to `data-plane` and `resource-manager` rulesets
+
+
 ## 0.44.0
 
 ### Bug Fixes

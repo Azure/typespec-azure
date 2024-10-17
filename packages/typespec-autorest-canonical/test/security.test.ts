@@ -9,7 +9,7 @@ it("set a basic auth", async () => {
     @service({title: "My service"})
     @useAuth(BasicAuth)
     namespace MyService {}
-    `
+    `,
   );
   deepStrictEqual(res.securityDefinitions, {
     BasicAuth: {
@@ -25,7 +25,7 @@ it("set a ApiKeyAuth ", async () => {
     @service({title: "My service"})
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-my-header">)
     namespace MyService {}
-    `
+    `,
   );
   deepStrictEqual(res.securityDefinitions, {
     ApiKeyAuth: {
@@ -51,7 +51,7 @@ it("set a oauth2 auth", async () => {
         scopes: ["read", "write"];
       }
     }
-    `
+    `,
   );
   deepStrictEqual(res.securityDefinitions, {
     OAuth2Auth: {
@@ -76,7 +76,7 @@ it("can specify custom auth name with description", async () => {
       @doc("My custom basic auth")
       model MyAuth is BasicAuth;
     }
-    `
+    `,
   );
   deepStrictEqual(res.securityDefinitions, {
     MyAuth: {
@@ -93,7 +93,7 @@ it("can use multiple auth", async () => {
     @service({title: "My service"})
     @useAuth(BasicAuth | [ApiKeyAuth<ApiKeyLocation.header, "x-my-header">, BasicAuth])
     namespace MyService {}
-    `
+    `,
   );
   deepStrictEqual(res.securityDefinitions, {
     ApiKeyAuth: {
@@ -122,7 +122,7 @@ it("emits a diagnostic for unsupported HTTP authentication schemes", async () =>
     @service({title: "My service"})
     @useAuth(BearerAuth)
     namespace MyService {}
-    `
+    `,
   );
 
   expectDiagnostics(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]), [

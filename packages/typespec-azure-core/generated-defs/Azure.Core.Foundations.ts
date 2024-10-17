@@ -13,7 +13,7 @@ export type OmitKeyPropertiesDecorator = (context: DecoratorContext, entity: Mod
 export type RequestParameterDecorator = (
   context: DecoratorContext,
   entity: Model,
-  name: string
+  name: string,
 ) => void;
 
 /**
@@ -24,5 +24,11 @@ export type RequestParameterDecorator = (
 export type ResponsePropertyDecorator = (
   context: DecoratorContext,
   entity: Model,
-  name: string
+  name: string,
 ) => void;
+
+export type AzureCoreFoundationsDecorators = {
+  omitKeyProperties: OmitKeyPropertiesDecorator;
+  requestParameter: RequestParameterDecorator;
+  responseProperty: ResponsePropertyDecorator;
+};

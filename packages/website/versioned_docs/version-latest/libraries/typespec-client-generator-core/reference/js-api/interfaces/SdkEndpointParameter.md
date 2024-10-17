@@ -13,11 +13,10 @@ title: "[I] SdkEndpointParameter"
 | ------ | ------ | ------ | ------ |
 | `__raw?` | `ModelProperty` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`__raw` |
 | `apiVersions` | `string`[] | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`apiVersions` |
-| `clientDefaultValue?` | `any` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`clientDefaultValue` |
+| `clientDefaultValue?` | `unknown` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`clientDefaultValue` |
 | `crossLanguageDefinitionId` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`crossLanguageDefinitionId` |
 | `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`decorators` |
-| `description?` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`description` |
-| `details?` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`details` |
+| `doc?` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`doc` |
 | `isApiVersionParam` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`isApiVersionParam` |
 | `isGeneratedName` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`isGeneratedName` |
 | `kind` | `"endpoint"` | - | - |
@@ -25,5 +24,6 @@ title: "[I] SdkEndpointParameter"
 | `onClient` | `true` | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`onClient` | - |
 | `optional` | `boolean` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`optional` |
 | `serializedName?` | `string` | - | - |
-| `type` | [`SdkEndpointType`](SdkEndpointType.md) | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`type` | - |
+| `summary?` | `string` | - | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`summary` |
+| `type` | [`SdkEndpointType`](SdkEndpointType.md) \| [`SdkUnionType`](SdkUnionType.md)<[`SdkEndpointType`](SdkEndpointType.md)\> | [`SdkModelPropertyTypeBase`](SdkModelPropertyTypeBase.md).`type` | - |
 | `urlEncode` | `boolean` | - | - |

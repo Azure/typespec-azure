@@ -42,10 +42,17 @@ export interface AutorestEmitterOptions {
 
   /**
    * Directory where the examples are located.
-   * @default `{cwd}/examples`
+   * @default `{project-root}/examples`
+   */
+  "examples-dir"?: string;
+
+  /**
+   * @deprecated use {@link examples-dir}
    */
   "examples-directory"?: string;
+
   version?: string;
+
   "azure-resource-provider-folder"?: string;
 
   /**
@@ -149,10 +156,17 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
       ].join("\n"),
     },
+    "examples-dir": {
+      type: "string",
+      nullable: true,
+      description: "Directory where the examples are located. Default: `{project-root}/examples`.",
+      format: "absolute-path",
+    },
     "examples-directory": {
       type: "string",
       nullable: true,
-      description: "Directory where the examples are located. Default: `{cwd}/examples`.",
+      deprecated: true,
+      description: "DEPRECATED. Use examples-dir instead",
     },
     version: { type: "string", nullable: true },
     "azure-resource-provider-folder": { type: "string", nullable: true },
@@ -269,12 +283,6 @@ export const $lib = createTypeSpecLibrary({
           "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
         empty:
           "Empty unions are not supported for OpenAPI v2 - enums must have at least one value.",
-      },
-    },
-    "invalid-default": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Invalid type '${"type"}' for a default value`,
       },
     },
     "invalid-multi-collection-format": {

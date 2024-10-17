@@ -1,5 +1,0 @@
-emit:
-  - "@azure-tools/typespec-autorest"
-options:
-  "@azure-tools/typespec-autorest":
-    examples-directory: "{project-root}/examples"

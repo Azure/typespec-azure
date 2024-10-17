@@ -1,6 +1,7 @@
 import type {
   DecoratorContext,
   EnumMember,
+  EnumValue,
   Interface,
   Model,
   Namespace,
@@ -13,7 +14,7 @@ import type {
  */
 export type ArmResourceCollectionActionDecorator = (
   context: DecoratorContext,
-  target: Operation
+  target: Operation,
 ) => void;
 
 /**
@@ -44,7 +45,7 @@ export type ArmProviderNameValueDecorator = (context: DecoratorContext, target: 
 export type ArmProviderNamespaceDecorator = (
   context: DecoratorContext,
   target: Namespace,
-  providerNamespace?: string
+  providerNamespace?: string,
 ) => void;
 
 /**
@@ -83,7 +84,7 @@ export type ArmLibraryNamespaceDecorator = (context: DecoratorContext, target: N
 export type SingletonDecorator = (
   context: DecoratorContext,
   target: Model,
-  keyValue?: string | "default"
+  keyValue?: string | "default",
 ) => void;
 
 /**
@@ -147,7 +148,7 @@ export type ExtensionResourceDecorator = (context: DecoratorContext, target: Mod
 export type ArmResourceActionDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => void;
 
 /**
@@ -159,7 +160,7 @@ export type ArmResourceActionDecorator = (
 export type ArmResourceCreateOrUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => void;
 
 /**
@@ -171,7 +172,7 @@ export type ArmResourceCreateOrUpdateDecorator = (
 export type ArmResourceReadDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => void;
 
 /**
@@ -183,7 +184,7 @@ export type ArmResourceReadDecorator = (
 export type ArmResourceUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => void;
 
 /**
@@ -195,7 +196,7 @@ export type ArmResourceUpdateDecorator = (
 export type ArmResourceDeleteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => void;
 
 /**
@@ -207,7 +208,7 @@ export type ArmResourceDeleteDecorator = (
 export type ArmResourceListDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model
+  resourceType: Model,
 ) => void;
 
 /**
@@ -225,7 +226,7 @@ export type ArmResourceListDecorator = (
 export type ArmResourceOperationsDecorator = (
   context: DecoratorContext,
   target: Interface,
-  _?: Type
+  _?: Type,
 ) => void;
 
 /**
@@ -237,7 +238,7 @@ export type ArmResourceOperationsDecorator = (
 export type ArmCommonTypesVersionDecorator = (
   context: DecoratorContext,
   target: Namespace | EnumMember,
-  version: string | unknown
+  version: string | EnumValue,
 ) => void;
 
 /**
@@ -256,5 +257,29 @@ export type ArmVirtualResourceDecorator = (context: DecoratorContext, target: Mo
 export type ResourceBaseTypeDecorator = (
   context: DecoratorContext,
   target: Model,
-  baseType: Type
+  baseType: Type,
 ) => void;
+
+export type AzureResourceManagerDecorators = {
+  armResourceCollectionAction: ArmResourceCollectionActionDecorator;
+  armProviderNameValue: ArmProviderNameValueDecorator;
+  armProviderNamespace: ArmProviderNamespaceDecorator;
+  useLibraryNamespace: UseLibraryNamespaceDecorator;
+  armLibraryNamespace: ArmLibraryNamespaceDecorator;
+  singleton: SingletonDecorator;
+  tenantResource: TenantResourceDecorator;
+  subscriptionResource: SubscriptionResourceDecorator;
+  locationResource: LocationResourceDecorator;
+  resourceGroupResource: ResourceGroupResourceDecorator;
+  extensionResource: ExtensionResourceDecorator;
+  armResourceAction: ArmResourceActionDecorator;
+  armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator;
+  armResourceRead: ArmResourceReadDecorator;
+  armResourceUpdate: ArmResourceUpdateDecorator;
+  armResourceDelete: ArmResourceDeleteDecorator;
+  armResourceList: ArmResourceListDecorator;
+  armResourceOperations: ArmResourceOperationsDecorator;
+  armCommonTypesVersion: ArmCommonTypesVersionDecorator;
+  armVirtualResource: ArmVirtualResourceDecorator;
+  resourceBaseType: ResourceBaseTypeDecorator;
+};

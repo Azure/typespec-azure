@@ -1,0 +1,15 @@
+{
+  "operationId": "getModel",
+  "title": "getModel",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "a": "a",
+        "b": 2,
+        "prop": "prop",
+        "nullProp": null
+      }
+    }
+  }
+}

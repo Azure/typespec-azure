@@ -82,12 +82,12 @@ it("emits correct paths for tenant resources", async () => {
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}/flanges/{flangeName}"].get);
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}/flanges/{flangeName}"].put);
   ok(
-    openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}/flanges/{flangeName}"].delete
+    openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}/flanges/{flangeName}"].delete,
   );
   ok(
     openApi.paths[
       "/providers/Microsoft.Contoso/widgets/{widgetName}/flanges/{flangeName}/increaseWeight"
-    ].post
+    ].post,
   );
 });
 
@@ -128,12 +128,12 @@ it("emits correct paths for checkLocalName endpoints", async () => {
   ok(
     openApi.paths[
       "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/checkNameAvailability"
-    ].post
+    ].post,
   );
   ok(
     openApi.paths[
       "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/locations/{location}/checkNameAvailability"
-    ].post
+    ].post,
   );
 });
 

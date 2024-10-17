@@ -8,7 +8,7 @@ describe("typespec-autorest: info", () => {
       `
       @service({title: "My Service"})
       namespace Foo {}
-      `
+      `,
     );
     strictEqual(res.info.title, "My Service");
   });
@@ -21,7 +21,7 @@ describe("typespec-autorest: info", () => {
         version: "1.2.3-test"
       })
       namespace Foo {}
-      `
+      `,
     );
     strictEqual(res.info.version, "1.2.3-test");
   });
@@ -32,7 +32,7 @@ describe("typespec-autorest: info", () => {
       @doc("My service description")
       @service({title: "My Service"})
       namespace Foo {}
-      `
+      `,
     );
     strictEqual(res.info.description, "My service description");
   });
@@ -43,7 +43,7 @@ describe("typespec-autorest: info", () => {
       @externalDocs("https://example.com", "more info")
       @service({title: "My Service"})
       namespace Foo {}
-      `
+      `,
     );
     deepStrictEqual(res.externalDocs, {
       url: "https://example.com",
@@ -56,7 +56,7 @@ describe("typespec-autorest: info", () => {
       @doc("My service description")
       @service({title: "My Service"})
       namespace Foo {}
-      `
+      `,
     );
     deepStrictEqual(res.info["x-typespec-generated"], [
       { emitter: "@azure-tools/typespec-autorest" },
@@ -82,7 +82,7 @@ describe("typespec-autorest: info", () => {
       namespace Foo {
         op test(): string;
       }
-      `
+      `,
     );
     deepStrictEqual(res.info, {
       title: "(title)",

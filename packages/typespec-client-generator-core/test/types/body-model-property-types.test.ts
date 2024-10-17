@@ -1,6 +1,5 @@
-/* eslint-disable deprecation/deprecation */
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { isReadOnly } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkBodyModelPropertyTypeHelper } from "./utils.js";
@@ -11,11 +10,19 @@ describe("typespec-client-generator-core: body model property types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("required", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: string | int32;
         }
@@ -27,7 +34,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("optional", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name?: string;
         }
@@ -39,7 +45,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("readonly", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @visibility("read")
           name?: string;
@@ -52,7 +57,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("not readonly", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @visibility("read", "create", "update")
           name?: string;
@@ -67,7 +71,6 @@ describe("typespec-client-generator-core: body model property types", () => {
         #suppress "deprecated" "for testing"
         @test
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         @projectedName("java", "JavaTest")
         model Test {
           @projectedName("java", "javaProjectedName")
@@ -103,21 +106,21 @@ describe("typespec-client-generator-core: body model property types", () => {
 
     // wire name test with encoded and projected
     const jsonEncodedProp = sdkModel.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "encodedWireName"
+      (x) => x.kind === "property" && x.serializedName === "encodedWireName",
     );
     ok(jsonEncodedProp);
     strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
 
     // wire name test with deprecated projected
     const jsonProjectedProp = sdkModel.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "realWireName"
+      (x) => x.kind === "property" && x.serializedName === "realWireName",
     );
     ok(jsonProjectedProp);
     strictEqual(jsonProjectedProp.name, "jsonProjectedName");
 
     // regular
     const regularProp = sdkModel.properties.find(
-      (x) => x.kind === "property" && x.serializedName === "regular"
+      (x) => x.kind === "property" && x.serializedName === "regular",
     );
     ok(regularProp);
     strictEqual(regularProp.name, "regular");
@@ -125,7 +128,6 @@ describe("typespec-client-generator-core: body model property types", () => {
   it("union type", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           name: string | int32;
         }
@@ -135,18 +137,18 @@ describe("typespec-client-generator-core: body model property types", () => {
     strictEqual(prop.kind, "property");
     const sdkType = prop.type;
     strictEqual(sdkType.kind, "union");
-    const values = sdkType.values;
-    strictEqual(values.length, 2);
-    strictEqual(values[0].kind, "string");
-    strictEqual(values[1].kind, "int32");
+    const variants = sdkType.variantTypes;
+    strictEqual(variants.length, 2);
+    strictEqual(variants[0].kind, "string");
+    strictEqual(variants[1].kind, "int32");
   });
   it("versioning", async function () {
-    const runnerWithVersion = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       "api-version": "all",
       emitterName: "@azure-tools/typespec-python",
     });
 
-    await runnerWithVersion.compile(`
+    await runner.compile(`
         @versioned(Versions)
         @service({title: "Widget Service"})
         namespace DemoService;
@@ -159,7 +161,6 @@ describe("typespec-client-generator-core: body model property types", () => {
         }
 
         @usage(Usage.input | Usage.output)
-        @access(Access.public)
         model Test {
           @added(Versions.v1)
           @removed(Versions.v2)
@@ -172,7 +173,7 @@ describe("typespec-client-generator-core: body model property types", () => {
           removedProp: string;
         }
       `);
-    const sdkModel = runnerWithVersion.context.sdkPackage.models.find((x) => x.kind === "model");
+    const sdkModel = runner.context.sdkPackage.models.find((x) => x.kind === "model");
     ok(sdkModel);
     strictEqual(sdkModel.kind, "model");
 
