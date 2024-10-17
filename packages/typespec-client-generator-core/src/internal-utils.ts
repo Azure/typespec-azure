@@ -329,7 +329,7 @@ export function intOrFloat(value: number): "int32" | "float32" {
  * @param t
  * @returns
  */
-export function isAzureCoreModel(t: Type): boolean {
+export function isAzureCoreTspModel(t: Type): boolean {
   return (
     (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&

@@ -10,6 +10,7 @@ import {
   SdkPackage,
   SdkServiceMethod,
 } from "../src/interfaces.js";
+import { isAzureCoreModel } from "../src/public-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: package", () => {
@@ -1038,14 +1039,13 @@ describe("typespec-client-generator-core: package", () => {
       ok(exception.type);
       strictEqual(exception.type.kind, "model");
       strictEqual(exception.type.crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
-      // we shouldn't generate this model
-      strictEqual(
+      ok(
         sdkPackage.models.find(
-          (x) => x.crossLanguageDefinitionId === "Azure.Core.Foundations.ErrorResponse",
+          (x) =>
+            x.crossLanguageDefinitionId === "Azure.Core.Foundations.ErrorResponse" &&
+            isAzureCoreModel(x),
         ),
-        undefined,
       );
-
       const methodResponse = createOrUpdate.response;
       strictEqual(methodResponse.kind, "method");
       strictEqual(methodResponse.type, widgetModel);
@@ -1067,8 +1067,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type, undefined);
-      strictEqual(runnerWithCore.context.sdkPackage.models.length, 0);
-      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
+      strictEqual(runnerWithCore.context.sdkPackage.models.length, 3);
+      strictEqual(
+        runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length,
+        0,
+      );
+      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 2);
+      strictEqual(
+        runnerWithCore.context.sdkPackage.enums.filter((x) => !isAzureCoreModel(x)).length,
+        1,
+      );
     });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -1085,8 +1093,12 @@ describe("typespec-client-generator-core: package", () => {
       );
       const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(sdkPackage.models[0].name, "Manufacturer");
+      strictEqual(sdkPackage.models.length, 5);
+      strictEqual(sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length, 1);
+      const manufacturerModel = sdkPackage.models.find(
+        (x) => !isAzureCoreModel(x) && x.name === "Manufacturer",
+      );
+      ok(manufacturerModel);
       const widgetClient = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
       ok(widgetClient);
@@ -1115,7 +1127,7 @@ describe("typespec-client-generator-core: package", () => {
       const methodResponse = listManufacturers.response.type;
       ok(methodResponse);
       strictEqual(methodResponse.kind, "array");
-      deepStrictEqual(methodResponse.valueType, sdkPackage.models[0]);
+      deepStrictEqual(methodResponse.valueType, manufacturerModel);
 
       const operation = listManufacturers.operation;
       strictEqual(operation.kind, "http");
@@ -1154,7 +1166,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(valueProperty);
       strictEqual(valueProperty.kind, "property");
       strictEqual(valueProperty.type.kind, "array");
-      strictEqual(valueProperty.type.valueType, sdkPackage.models[0]);
+      strictEqual(valueProperty.type.valueType, manufacturerModel);
 
       const nextLinkProperty = pagingModel.properties.find((x) => x.name === "nextLink");
       ok(nextLinkProperty);
