@@ -18,8 +18,6 @@ model Widget {
 
 #### ✅ Ok
 
-Using items from a private namespace within the same library is allowed.
-
 ```ts
 model Widget {
   widgetName: string;

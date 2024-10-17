@@ -5,7 +5,7 @@ For information about linter rules in typespec in general, view [here][generic-l
 In the `@azure-tools/typespec-client-generator-core` library, we have two main types of rules:
 
 1. Generic rule that applies to all emitted languages
-2. Specific rule that applies to a subset of all language: it can even apply to just one language
+2. Specific rule that applies to a subset of all languages: it can even apply to just one language
 
 The process for adding a rule starts off the same for both: for language-specific rules, there is an extra step
 
@@ -30,7 +30,7 @@ Finally, we recommend that every warning or error you throw in your language emi
 ### Links
 
 [generic-linter]: https://typespec.io/docs/next/extending-typespec/linters "Generic Linter Docs"
-[tcgc-linter]: https://github.com/typespec-azure/packages/typespec-client-generator-core/src/linter.ts "Linter TS File"
-[rulesets]: https://github.com/typespec-azure/packages/typespec-azure-rulesets "Rulesets package"
-[data-plane-ruleset]: https://github.com/typespec-azure/packages/typespec-azure-rulesets/src/rulesets/data-plane.ts "Data Plane Ruleset"
-[resource-manager-ruleset]: https://github.com/typespec-azure/packages/typespec-azure-rulesets/src/rulesets/resource-manager.ts "Resource Manager Ruleset"
+[tcgc-linter]: https://github.com/Azure/typespec-azure/blob/main/packages/typespec-client-generator-core/src/linter.ts "Linter TS File"
+[rulesets]: https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-rulesets "Rulesets package"
+[data-plane-ruleset]: https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-rulesets/src/rulesets/data-plane.ts "Data Plane Ruleset"
+[resource-manager-ruleset]: https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-rulesets/src/rulesets/resource-manager.ts "Resource Manager Ruleset"
