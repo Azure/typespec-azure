@@ -1,10 +1,4 @@
-import {
-  json,
-  MockRequest,
-  passOnSuccess,
-  ScenarioMockApi,
-  ValidationError,
-} from "@typespec/spec-api";
+import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 const validUser = { id: 1, name: "Madge", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" };
@@ -23,16 +17,6 @@ Scenarios.Azure_Core_Basic_createOrUpdate = passOnSuccess({
     body: { name: "Madge" },
   },
   response: { status: 200, body: json(validUser) },
-  handler: (req: MockRequest) => {
-    if (req.params.id !== "1") {
-      throw new ValidationError("Expected path param id=1", "1", req.params.id);
-    }
-    req.expect.containsHeader("content-type", "application/merge-patch+json");
-    req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-    const validBody = { name: "Madge" };
-    req.expect.bodyEquals(validBody);
-    return { status: 200, body: json(validUser) };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -47,16 +31,6 @@ Scenarios.Azure_Core_Basic_createOrReplace = passOnSuccess({
     body: { name: "Madge" },
   },
   response: { status: 200, body: json(validUser) },
-  handler: (req: MockRequest) => {
-    if (req.params.id !== "1") {
-      throw new ValidationError("Expected path param id=1", "1", req.params.id);
-    }
-    req.expect.containsHeader("content-type", "application/json");
-    req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-    const validBody = { name: "Madge" };
-    req.expect.bodyEquals(validBody);
-    return { status: 200, body: json(validUser) };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -70,13 +44,6 @@ Scenarios.Azure_Core_Basic_get = passOnSuccess({
     },
   },
   response: { status: 200, body: json(validUser) },
-  handler: (req: MockRequest) => {
-    if (req.params.id !== "1") {
-      throw new ValidationError("Expected path param id=1", "1", req.params.id);
-    }
-    req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-    return { status: 200, body: json(validUser) };
-  },
   kind: "MockApiDefinition",
 });
 const responseBody = {
@@ -110,22 +77,6 @@ Scenarios.Azure_Core_Basic_list = passOnSuccess({
     },
   },
   response: { status: 200, body: json(responseBody) },
-  handler: (req: MockRequest) => {
-    req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-    req.expect.containsQueryParam("top", "5");
-    req.expect.containsQueryParam("skip", "10");
-    req.expect.containsQueryParam("orderby", "id");
-    req.expect.containsQueryParam("filter", "id lt 10");
-    if (!req.originalRequest.originalUrl.includes("select[]=id&select[]=orders&select[]=etag")) {
-      throw new ValidationError(
-        "Expected query param select[]=id&select[]=orders&select[]=etag ",
-        "select[]=id&select[]=orders&select[]=etag",
-        req.originalRequest.originalUrl,
-      );
-    }
-    req.expect.containsQueryParam("expand", "orders");
-    return { status: 200, body: json(responseBody) };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -140,13 +91,6 @@ Scenarios.Azure_Core_Basic_delete = passOnSuccess({
   },
   response: {
     status: 204,
-  },
-  handler: (req: MockRequest) => {
-    if (req.params.id !== "1") {
-      throw new ValidationError("Expected path param id=1", "1", req.params.id);
-    }
-    req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-    return { status: 204 };
   },
   kind: "MockApiDefinition",
 });
@@ -165,14 +109,6 @@ Scenarios.Azure_Core_Basic_export = passOnSuccess({
     status: 200,
     body: json(validUser),
   },
-  handler: (req: MockRequest) => {
-    if (req.params.id !== "1") {
-      throw new ValidationError("Expected path param id=1", "1", req.params.id);
-    }
-    req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-    req.expect.containsQueryParam("format", "json");
-    return { status: 200, body: json(validUser) };
-  },
   kind: "MockApiDefinition",
 });
 
@@ -187,10 +123,5 @@ Scenarios.Azure_Core_Basic_exportAllUsers = passOnSuccess({
     },
   },
   response: { status: 200, body: json(expectBody) },
-  handler: (req: MockRequest) => {
-    req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-    req.expect.containsQueryParam("format", "json");
-    return { status: 200, body: json(expectBody) };
-  },
   kind: "MockApiDefinition",
 });

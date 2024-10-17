@@ -1,4 +1,4 @@
-import { json, MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -14,11 +14,6 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => {
-      const validBody = { name: "Madge" };
-      req.expect.bodyEquals(validBody);
-      return { status: 204 };
-    },
     kind: "MockApiDefinition",
   },
   {
@@ -29,12 +24,6 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
       status: 200,
       body: json({ name: "Madge" }),
     },
-    handler: (req: MockRequest) => {
-      return {
-        status: 200,
-        body: json({ name: "Madge" }),
-      };
-    },
     kind: "MockApiDefinition",
   },
   {
@@ -44,12 +33,6 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
     response: {
       status: 200,
       body: json({ result: { name: "Madge" } }),
-    },
-    handler: (req: MockRequest) => {
-      return {
-        status: 200,
-        body: json({ result: { name: "Madge" } }),
-      };
     },
     kind: "MockApiDefinition",
   },
