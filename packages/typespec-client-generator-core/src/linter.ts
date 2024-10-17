@@ -15,7 +15,7 @@ export const $linter = defineLinter({
           csharpRules.map((rule) => [
             `@azure-tools/typespec-client-generator-core/${rule.name}`,
             true,
-          ])
+          ]),
         ),
       },
     },

@@ -16,7 +16,7 @@ describe("typespec-client-generator-core: require-client-suffix", () => {
     tester = createLinterRuleTester(
       runner,
       requireClientSuffixRule,
-      "@azure-tools/typespec-client-generator-core"
+      "@azure-tools/typespec-client-generator-core",
     );
   });
 
@@ -27,7 +27,7 @@ describe("typespec-client-generator-core: require-client-suffix", () => {
       @client
       @service({})
       namespace MyService;
-      `
+      `,
       )
       .toEmitDiagnostics([
         {
@@ -45,7 +45,7 @@ describe("typespec-client-generator-core: require-client-suffix", () => {
       @client({name: "MySDK"})
       @service({})
       namespace MyService;
-      `
+      `,
       )
       .toEmitDiagnostics([
         {
@@ -68,7 +68,7 @@ describe("typespec-client-generator-core: require-client-suffix", () => {
         interface MyInterface {
         };
       }
-      `
+      `,
       )
       .toEmitDiagnostics([
         {

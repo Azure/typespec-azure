@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     propertyNameConflictRule,
-    "@azure-tools/typespec-azure-core"
+    "@azure-tools/typespec-azure-core",
   );
 });
 
@@ -32,7 +32,7 @@ it.skip(`is valid if conflict resolved through @clientName("newName", "csharp")`
     .expect(
       `model Foo { 
         @clientName("bar", "csharp") foo: string
-       }`
+       }`,
     )
     .toBeValid();
 });
@@ -43,7 +43,7 @@ it.skip(`is valid if conflict resolved through @clientName("newName")`, async ()
     .expect(
       `model Foo { 
         @clientName("bar") foo: string
-      }`
+      }`,
     )
     .toBeValid();
 });
@@ -54,7 +54,7 @@ it.skip("emit warning if conflict not resolved through @clientName", async () =>
     .expect(
       `model Foo { 
         @clientName("bar", "python") foo: string 
-      }`
+      }`,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-core/property-name-conflict",
@@ -68,7 +68,7 @@ it.skip(`emit warning if @clientName("newName") introduces conflict`, async () =
     .expect(
       `model Foo { 
         @clientName("foo") bar: string;
-       }`
+       }`,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-core/property-name-conflict",
@@ -82,7 +82,7 @@ it.skip(`emit warning if @clientName("newName", "csharp") introduces conflict`, 
     .expect(
       `model Foo { 
         @clientName("foo", "csharp") bar: string;
-      }`
+      }`,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-core/property-name-conflict",
@@ -96,7 +96,7 @@ it.skip(`is valid if @clientName("newName") causes conflict but @clientName("new
     .expect(
       `model Foo {
           @clientName("foo") @"client", ("baz", "csharp") bar: string;
-        }`
+        }`,
     )
     .toBeValid();
 });
@@ -121,7 +121,7 @@ it("emit warning if property name conflicts with model name when using `is`", as
       }
 
       model Foo is Base {}
-      `
+      `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-core/property-name-conflict",
@@ -138,7 +138,7 @@ it("is valid if inherited property name conflicts with model name", async () => 
       }
 
       model Foo extends Base {}
-      `
+      `,
     )
     .toBeValid();
 });
@@ -154,7 +154,7 @@ it("emit warning if spread property name conflicts with model name", async () =>
       model Foo {
         ...Base;
       }
-      `
+      `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-core/property-name-conflict",
