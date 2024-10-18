@@ -400,3 +400,12 @@ model ArmResourceIdentifierAllowedResource {
    */
   scopes?: ArmResourceDeploymentScope[];
 }
+
+@doc("Used in file part of multipart request body")
+model FileWithRequiredMetadata extends File {
+  /** The file name in file part of multipart request body */
+  filename: string;
+
+  /** The content type in file part of multipart request body */
+  contentType: string;
+}
