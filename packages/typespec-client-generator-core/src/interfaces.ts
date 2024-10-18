@@ -350,9 +350,10 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
 
 export type AccessFlags = "internal" | "public";
 
-export interface SdkModelType extends SdkTypeBase {
+export interface SdkModelType<TPropertyType extends SdkModelPropertyType = SdkModelPropertyType>
+  extends SdkTypeBase {
   kind: "model";
-  properties: SdkModelPropertyType[];
+  properties: TPropertyType[];
   name: string;
   isGeneratedName: boolean;
   access: AccessFlags;
@@ -360,14 +361,15 @@ export interface SdkModelType extends SdkTypeBase {
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
-  discriminatorProperty?: SdkModelPropertyType;
+  discriminatorProperty?: TPropertyType;
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
 }
 
-export interface SdkInitializationType extends SdkModelType {
-  properties: SdkParameter[];
+export interface SdkInitializationType {
+  access: AccessFlags;
+  model: SdkModelType<SdkParameter>;
 }
 
 export interface SdkCredentialType extends SdkTypeBase {
@@ -713,6 +715,8 @@ export enum UsageFlags {
   Json = 1 << 8,
   // Set when model is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
+  // Set when model is used as client initialization model
+  ClientInitialization = 1 << 10,
 }
 
 interface SdkExampleBase {

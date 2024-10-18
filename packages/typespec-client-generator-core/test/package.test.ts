@@ -822,12 +822,12 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(queryParam.onClient, true);
       strictEqual(
         queryParam.correspondingMethodParams[0],
-        parentClient.initialization.properties.find((x) => x.isApiVersionParam),
+        parentClient.initialization.model.properties.find((x) => x.isApiVersionParam),
       );
       ok(parentClient.initialization);
       strictEqual(
         queryParam.correspondingMethodParams[0],
-        parentClient.initialization.properties.find((x) => x.isApiVersionParam),
+        parentClient.initialization.model.properties.find((x) => x.isApiVersionParam),
       );
 
       const methodAcceptParam = method.parameters.find((x) => x.name === "accept");
@@ -946,7 +946,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(parentClient.initialization);
       strictEqual(
         apiVersionParam.correspondingMethodParams[0],
-        parentClient.initialization.properties.find((x) => x.isApiVersionParam),
+        parentClient.initialization.model.properties.find((x) => x.isApiVersionParam),
       );
 
       const operationAcceptParam = getStatus.operation.parameters.find((x) => x.kind === "header");
@@ -1091,8 +1091,8 @@ describe("typespec-client-generator-core: package", () => {
         ?.response as SdkClientType<SdkHttpOperation>;
       ok(widgetClient);
 
-      strictEqual(widgetClient.initialization.properties.length, 3);
-      const apiVersionClientParam = widgetClient.initialization.properties.find(
+      strictEqual(widgetClient.initialization.model.properties.length, 3);
+      const apiVersionClientParam = widgetClient.initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionClientParam);
@@ -1225,7 +1225,7 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runner.context.sdkPackage;
       const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
-      const apiVersionClientParam = client.initialization.properties.find(
+      const apiVersionClientParam = client.initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(apiVersionClientParam);
@@ -1275,10 +1275,10 @@ describe("typespec-client-generator-core: package", () => {
       const sdkPackage = runnerWithArm.context.sdkPackage;
       const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
-      for (const p of client.initialization.properties) {
+      for (const p of client.initialization.model.properties) {
         ok(p.onClient);
       }
-      deepStrictEqual(client.initialization.properties.map((x) => x.name).sort(), [
+      deepStrictEqual(client.initialization.model.properties.map((x) => x.name).sort(), [
         "apiVersion",
         "credential",
         "endpoint",
@@ -1317,7 +1317,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(apiVersionParam.isApiVersionParam, true);
       strictEqual(apiVersionParam.clientDefaultValue, "v2");
       strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
-      const clientApiVersionParam = client.initialization.properties.find(
+      const clientApiVersionParam = client.initialization.model.properties.find(
         (x) => x.isApiVersionParam,
       );
       ok(clientApiVersionParam);
