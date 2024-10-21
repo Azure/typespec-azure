@@ -1839,7 +1839,7 @@ export function getAllModelsWithDiagnostics(
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
     const ogs = listOperationGroups(context, client);
-    const clientInitModel = getClientInitialization(context, client.type);
+    let clientInitModel = getClientInitialization(context, client.type);
     if (clientInitModel) {
       getSdkInitializationType(context, client, clientInitModel);
     }
@@ -1848,6 +1848,10 @@ export function getAllModelsWithDiagnostics(
       for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
         // operations on operation groups
         diagnostics.pipe(updateTypesFromOperation(context, operation));
+      }
+      clientInitModel = getClientInitialization(context, operationGroup!.type);
+      if (clientInitModel) {
+        getSdkInitializationType(context, operationGroup!, clientInitModel);
       }
       if (operationGroup?.subOperationGroups) {
         ogs.push(...operationGroup.subOperationGroups);

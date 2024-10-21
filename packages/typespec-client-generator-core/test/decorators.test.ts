@@ -2668,6 +2668,10 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(blobNameOpParam.correspondingMethodParams[0], blobClientBlobInitializationProp);
       strictEqual(blobNameOpParam.onClient, true);
+
+      strictEqual(sdkPackage.models.length, 1);
+      const clientInitializationModel = sdkPackage.models[0];
+      ok(clientInitializationModel.usage & UsageFlags.ClientInitialization);
     });
     it("some methods don't have client initialization params", async () => {
       await runner.compileWithCustomization(
@@ -2781,6 +2785,10 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(containerNameOpParam.name, "containerName");
       strictEqual(containerNameOpParam.correspondingMethodParams.length, 1);
       strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
+
+      strictEqual(sdkPackage.models.length, 1);
+      const clientInitializationModel = sdkPackage.models[0];
+      ok(clientInitializationModel.usage & UsageFlags.ClientInitialization);
     });
 
     it("@operationGroup with same model on parent client", async () => {
@@ -2932,6 +2940,19 @@ describe("typespec-client-generator-core: decorators", () => {
         containerNameOnBlobClient,
       );
       strictEqual(blobMethods[0].operation.parameters[1].correspondingMethodParams[0], blobName);
+
+      strictEqual(sdkPackage.models.length, 2);
+      const containerClientInitializationModel = sdkPackage.models.find(
+        (x) => x.name === "ContainerClientInitialization",
+      );
+      ok(containerClientInitializationModel);
+      ok(containerClientInitializationModel.usage & UsageFlags.ClientInitialization);
+
+      const blobClientInitializationModel = sdkPackage.models.find(
+        (x) => x.name === "BlobClientInitialization",
+      );
+      ok(blobClientInitializationModel);
+      ok(blobClientInitializationModel.usage & UsageFlags.ClientInitialization);
     });
 
     it("@paramAlias", async () => {
