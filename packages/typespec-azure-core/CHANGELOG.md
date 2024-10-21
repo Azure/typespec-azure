@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.47.0
+
+### Bug Fixes
+
+- [#1416](https://github.com/Azure/typespec-azure/pull/1416) Fix #1180 Return StatusMonitor result field for non-resource PUT operations in getLroMetadata.finalResult
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+
+## 0.46.0
+
+### Features
+
+- [#1342](https://github.com/Azure/typespec-azure/pull/1342) Replace `no-operation-id` linter rule with a more generic `no-openapi` rule guarding against any use of openapi decorators
+
+
 ## 0.45.0
 
 ### Bug Fixes

@@ -26,7 +26,7 @@ describe("path parameters", () => {
 
   it("set x-ms-client-name with @clientName", async () => {
     const param = await getPathParam(
-      `op test(@clientName("myParamClient") @path myParam: string): void;`
+      `op test(@clientName("myParamClient") @path myParam: string): void;`,
     );
     expect(param).toMatchObject({
       name: "myParam",
@@ -37,7 +37,7 @@ describe("path parameters", () => {
   describe("setting reserved expansion attribute applies the x-ms-skip-url-encoding property", () => {
     it("with option", async () => {
       const param = await getPathParam(
-        `op test(@path(#{allowReserved: true}) myParam: string[]): void;`
+        `op test(@path(#{allowReserved: true}) myParam: string[]): void;`,
       );
       expect(param).toMatchObject({
         "x-ms-skip-url-encoding": true,
@@ -83,7 +83,7 @@ describe("query parameters", () => {
 
   it("set x-ms-client-name with @clientName", async () => {
     const param = await getQueryParam(
-      `op test(@clientName("myParamClient") @query myParam: string): void;`
+      `op test(@clientName("myParamClient") @query myParam: string): void;`,
     );
     expect(param).toMatchObject({
       name: "myParam",
@@ -94,7 +94,7 @@ describe("query parameters", () => {
   describe("setting parameter explode modifier set collectionFormat to multi", () => {
     it("with option", async () => {
       const param = await getQueryParam(
-        `op test(@query(#{explode: true}) myParam: string[]): void;`
+        `op test(@query(#{explode: true}) myParam: string[]): void;`,
       );
       expect(param).toMatchObject({
         collectionFormat: "multi",
@@ -114,7 +114,7 @@ describe("query parameters", () => {
       `
       #suppress "deprecated" "test"
       op test(@query({format: "multi"}) arg1: string[], @query({format: "csv"}) arg2: string[]): void;
-      `
+      `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {
       in: "query",
@@ -142,7 +142,7 @@ describe("query parameters", () => {
       model UserContext {
         id: string;
       }
-      `
+      `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {
       in: "query",
@@ -156,7 +156,7 @@ describe("query parameters", () => {
     const res = await openApiFor(
       `
       op test(@query @doc("my-doc") arg1: string): void;
-      `
+      `,
     );
     strictEqual(res.paths["/"].get.parameters[0].description, "my-doc");
   });
@@ -167,7 +167,7 @@ describe("query parameters", () => {
       @doc("This is a shared scalar")
       scalar myString extends string; 
       op test(@query @doc("my-doc") arg1: myString): void;
-      `
+      `,
     );
     strictEqual(res.paths["/"].get.parameters[0].description, "my-doc");
   });
@@ -178,7 +178,7 @@ describe("header parameters", () => {
     const res = await openApiFor(
       `
       op test(@header({format: "csv"}) arg1: string[]): void;
-      `
+      `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {
       in: "header",
@@ -208,9 +208,8 @@ describe("header parameters", () => {
       @route("/test2")
       op test2(...Q): void;
       `,
-      { "omit-unreachable-types": true }
+      { "omit-unreachable-types": true },
     );
-    ``;
 
     expectDiagnostics(ignoreUseStandardOps(diagnostics), [
       {
@@ -234,7 +233,7 @@ describe("header parameters", () => {
       @route("/Pets")
       @get()
       op get(... Pet$Id): Pet;
-      `
+      `,
     );
 
     ok(oapi.paths["/Pets/{petId}"].get);
@@ -251,7 +250,7 @@ describe("header parameters", () => {
         petId: string;
       }
       @get op get(...PetId): void;
-      `
+      `,
     );
 
     strictEqual(oapi.parameters["PetId"]["x-ms-parameter-location"], "client");
@@ -262,7 +261,7 @@ describe("header parameters", () => {
       `
       op template<TParameters, TReturn>(...TParameters): TReturn;
       op instantiation is template<{@path id: string}, void>;
-      `
+      `,
     );
 
     ok(oapi.paths["/{id}"].get);
@@ -281,7 +280,7 @@ describe("header parameters", () => {
     const res = await openApiFor(
       `
       op test(@query select: never, @query top: int32): void;
-      `
+      `,
     );
     strictEqual(res.paths["/"].get.parameters.length, 1);
     strictEqual(res.paths["/"].get.parameters[0].in, "query");
@@ -290,7 +289,7 @@ describe("header parameters", () => {
 
   it("set x-ms-client-name with @clientName", async () => {
     const res = await openApiFor(
-      `op test(@clientName("myParamClient") @header myParam: string): void;`
+      `op test(@clientName("myParamClient") @header myParam: string): void;`,
     );
     expect(res.paths["/"].get.parameters[0]).toMatchObject({
       name: "my-param",
@@ -308,6 +307,19 @@ describe("body parameters", () => {
   it("set name with @clientName", async () => {
     const res = await openApiFor(`op test(@body @clientName("bar") foo: string): void;`);
     expect(res.paths["/"].post.parameters[0]).toMatchObject({ in: "body", name: "bar" });
+  });
+
+  it("set x-ms-client-name with @clientName when also using encodedName", async () => {
+    const res = await openApiFor(
+      `
+      #suppress "deprecated" "For tests"
+      op test(@body @encodedName("application/json", "jsonName") @clientName("bar") foo: string): void;`,
+    );
+    expect(res.paths["/"].post.parameters[0]).toMatchObject({
+      in: "body",
+      name: "jsonName",
+      "x-ms-client-name": "bar",
+    });
   });
 
   it("using @body ignore any metadata property underneath", async () => {
@@ -338,7 +350,7 @@ describe("body parameters", () => {
       async (params) => {
         const res = await openApiFor(`op test${params}: void;`);
         strictEqual(res.paths["/"].get.requestBody, undefined);
-      }
+      },
     );
   });
 
@@ -386,7 +398,7 @@ describe("content type parameter", () => {
         @header("Content-Type") explicitContentType: "application/octet-stream",
         @body foo: string
       ): void;
-      `
+      `,
     );
     deepStrictEqual(res.paths["/"].post.consumes, ["application/octet-stream"]);
   });
@@ -398,7 +410,7 @@ describe("content type parameter", () => {
         @header contentType: "application/octet-stream",
         @body foo: string
       ): void;
-      `
+      `,
     );
     deepStrictEqual(res.paths["/"].post.consumes, ["application/octet-stream"]);
   });
@@ -410,7 +422,7 @@ describe("content type parameter", () => {
         @query contentType: "application/octet-stream",
         @body foo: string
       ): void;
-      `
+      `,
     );
     strictEqual(res.paths["/"].post.consumes, undefined);
   });
@@ -420,14 +432,14 @@ describe("misc", () => {
   describe("type can only be primitive items without $ref", () => {
     async function testParameter(
       decorator: string,
-      type: string
+      type: string,
     ): Promise<OpenAPI2HeaderParameter | OpenAPI2QueryParameter> {
       const res = await openApiFor(
         `
         union NamedUnion {"one", "two"}
         enum Foo {one, two}
         op test(${decorator} arg1: ${type}): void;
-        `
+        `,
       );
       return res.paths["/"].get.parameters[0];
     }
@@ -451,7 +463,7 @@ describe("misc", () => {
               `
             #suppress "deprecated" "For tests"
             @${kind}({format: "csv"})`,
-              "Foo[]"
+              "Foo[]",
             ),
             {
               in: kind,
@@ -464,7 +476,7 @@ describe("misc", () => {
                 enum: ["one", "two"],
                 "x-ms-enum": { modelAsString: false, name: "Foo" },
               },
-            }
+            },
           );
         });
 

@@ -15,6 +15,9 @@ const outDir = resolve(dir, "openapi");
 await rm(outDir, { recursive: true, force: true });
 await emitCommonTypesSwagger("customer-managed-keys");
 await emitCommonTypesSwagger("managed-identity");
+await emitCommonTypesSwagger("managed-identity-with-delegation");
+await emitCommonTypesSwagger("mobo");
+await emitCommonTypesSwagger("network-security-perimeter");
 await emitCommonTypesSwagger("private-links");
 await emitCommonTypesSwagger("types");
 
@@ -34,7 +37,7 @@ async function emitCommonTypesSwagger(name: string) {
 
   const output = await getAllServicesAtAllVersions(
     program,
-    resolveAutorestOptions(program, dir, {})
+    resolveAutorestOptions(program, dir, {}),
   );
   if (program.diagnostics.length > 0) {
     logDiagnostics(program.diagnostics, NodeHost.logSink);

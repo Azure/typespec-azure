@@ -22,7 +22,7 @@ describe("@operationId", () => {
         `
         @OpenAPI.operationId("foo")
         op test(): string;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/no-openapi",
@@ -38,7 +38,7 @@ describe("@extension", () => {
         `
         @OpenAPI.extension("x-foo", "bar")
         op test(): string;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/no-openapi",
@@ -54,7 +54,7 @@ describe("@extension", () => {
           @OpenAPI.extension("x-ms-identifiers", ["prop"])
           items: Bar;
         }
-        model Bar { prop: string;}`
+        model Bar { prop: string;}`,
       )
       .toBeValid();
   });
@@ -69,7 +69,7 @@ describe.skip("@example", () => {
         `
         @Autorest.example("x-foo", "bar")
         op test(): string;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/no-openapi",
@@ -85,7 +85,7 @@ describe.skip("@useRef", () => {
         `
         @Autorest.useRef("foo.json")
         model Foo {}
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/no-openapi",

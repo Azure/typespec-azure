@@ -18,21 +18,21 @@ describe("typespec-autorest: shared routes", () => {
     const pathSummary = [
       "paths:",
       ...Object.entries(doc.paths).map(
-        ([path, values]) => `  ${path}: [${Object.keys(values).join(", ")}]`
+        ([path, values]) => `  ${path}: [${Object.keys(values).join(", ")}]`,
       ),
       "x-ms-paths:",
       ...Object.entries(doc["x-ms-paths"] ?? {}).map(
-        ([path, values]) => `  ${[path]}: [${Object.keys(values).join(", ")}]`
+        ([path, values]) => `  ${[path]}: [${Object.keys(values).join(", ")}]`,
       ),
     ].join("\n");
     ok(
       pathItem,
-      `Expected path ${expect.path} to exist in ${expect.in}. But path founds are:\n${pathSummary}`
+      `Expected path ${expect.path} to exist in ${expect.in}. But path founds are:\n${pathSummary}`,
     );
     const operation = pathItem[expect.verb];
     ok(
       operation,
-      `Expected path ${expect.path} to have verb ${expect.verb} to exist in ${expect.in}. But path founds are:\n${pathSummary}`
+      `Expected path ${expect.path} to have verb ${expect.verb} to exist in ${expect.in}. But path founds are:\n${pathSummary}`,
     );
 
     strictEqual(operation.operationId, expect.operationId);
@@ -56,7 +56,7 @@ describe("typespec-autorest: shared routes", () => {
       @sharedRoute
       @route("/sharedroutes/resources")
       op listBySubscription(...Thing, @query subscription: string, @query foo?: string): Thing[];
-      `
+      `,
     );
     expectOperation(results, {
       in: "paths",
@@ -88,7 +88,7 @@ describe("typespec-autorest: shared routes", () => {
       @sharedRoute
       @route("/sharedroutes/resources")
       op listBySubscription(...Thing, @query filter: "subscription"): Thing[];
-      `
+      `,
     );
 
     expectOperation(results, {
@@ -126,7 +126,7 @@ describe("typespec-autorest: shared routes", () => {
       @sharedRoute
       @route("/sharedroutes/resources")
       op listByNothing(...Thing, @query apiVersion: string): Thing[];
-      `
+      `,
     );
 
     // The first shared route ends up in paths
@@ -171,7 +171,7 @@ describe("typespec-autorest: shared routes", () => {
       @sharedRoute
       @route("/sharedroutes/resources")
       op listByNothing(...Thing): Thing[];
-      `
+      `,
     );
     // The first shared route ends up in paths
     expectOperation(results, {
@@ -215,7 +215,7 @@ describe("typespec-autorest: shared routes", () => {
         @key @path
         id: string;
       }
-      `
+      `,
     );
     expectOperation(results, {
       in: "paths",

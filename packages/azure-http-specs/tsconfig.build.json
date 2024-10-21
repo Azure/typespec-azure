@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "references": [
+    { "path": "../../core/packages/spec-api/tsconfig.build.json" },
+    { "path": "../../core/packages/spector/tsconfig.build.json" }
+  ],
+  "exclude": ["**/*.test.*", "test/**/*"]
+}

@@ -565,7 +565,7 @@ import { PythonSdkContext } from "./lib.js";
 import { PythonSdkClientType } from "./interfaces.js";
 
 function linkSubClients<TServiceOperation extends PythonSdkServiceOperation>(
-  sdkContext: PythonSdkContext<TServiceOperation>
+  sdkContext: PythonSdkContext<TServiceOperation>,
 ): void {
   for (const client of sdkContext.clients) {
     client.subclients = client.methods
@@ -601,7 +601,7 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
 ```ts
 function serializeServiceMethod<TServiceOperation extends PythonSdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
-  method: SdkServiceMethod<TServiceOperation>
+  method: SdkServiceMethod<TServiceOperation>,
 ): PythonSdkServiceMethod {
   switch (method.kind) {
     case "basic":
@@ -911,8 +911,8 @@ export interface SdkHttpOperation {
   bodyParam: SdkBodyParameter;
   // mapping of status codes to SdkHttpResponse for valid responses
   // HttpStatusCodeRange can represent either a single status code or a range.
-  responses: Map<HttpStatusCodeRange, SdkHttpResponse>;
-  exceptions: Map<HttpStatusCodeRange, SdkHttpResponse>;
+  responses: SdkHttpResponse[];
+  exceptions: SdkHttpResponse[];
   examples?: SdkHttpOperationExample[];
 }
 ```
@@ -968,7 +968,7 @@ const sdkHttpOperation = {
 function serializeServiceOperation<TServiceOperation extends PythonSdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
   method: SdkServiceMethod<TServiceOperation>,
-  operation: TServiceOperation
+  operation: TServiceOperation,
 ): TServiceOperation {
   switch (operation.kind) {
     case "http":
@@ -1252,7 +1252,7 @@ import { getPythonSdkType } from "./types.js";
 
 function serializeMethodResponse<TServiceOperation extends SdkServiceOperation>(
   context: PythonSdkContext<TServiceOperation>,
-  response: SdkMethodResponse
+  response: SdkMethodResponse,
 ): PythonSdkMethodResponse {
   return {
     ...response,
@@ -1277,6 +1277,7 @@ interface HttpStatusCodeRange {
 
 export interface SdkHttpResponse {
   kind: "http";
+  statusCodes: number | HttpStatusCodeRange | "*";
   headers: SdkServiceResponseHeader[];
   apiVersions: string[];
   type?: SdkType;
@@ -1305,8 +1306,8 @@ interface SdkTypeBase {
 
 ### SdkBuiltInType
 
-These are the mappings from the built in scalar TypeSpec types.
-We add `encode` onto these types, telling us how to encode when sending to the service.
+A `SdkBuiltInType` represents a built-in scalar TypeSpec type or scalar type that derives from a built-in scalar TypeSpec type, but datetime and duration are not included.
+We add `encode` onto these types if `@encode` decorator exists, telling us how to encode when sending to the service.
 
 There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuiltInKinds`.
 
@@ -1315,12 +1316,16 @@ There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuil
 ```ts
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
-  encode: string;
   name: string;
+  encode?: string;
   baseType?: SdkBuiltInType;
   crossLanguageDefinitionId: string;
 }
 ```
+
+The `crossLanguageDefinitionId` represents the fully qualified name of this type in TypeSpec language for the emitter to distinguish from the built-in TypeSpec types.
+
+For a full list of types defined in `@azure-tools/typespec-azure-core` library, please refer to its reference doc.
 
 ### SdkDateTimeType
 
@@ -1430,8 +1435,17 @@ export interface SdkUnionType extends SdkTypeBase {
   // determines if the union name was generated or not
   isGeneratedName: boolean;
   kind: "union";
-  values: SdkType[];
+  variantTypes: SdkType[];
   crossLanguageDefinitionId: string;
+}
+```
+
+### SdkTupleType
+
+```ts
+export interface SdkTupleType extends SdkTypeBase {
+  kind: "tuple";
+  valueTypes: SdkType[];
 }
 ```
 
@@ -1502,7 +1516,7 @@ These types are used to represent an example of a service operation.
 
 We currently only support HTTP calls to the service.
 
-So, we have `SdkHttpoperationExample` bind to `SdkHttpOperation`, `SdkHttpParameterExample` bind to `SdkHttpParameter`, `SdkHttpResponseExample` bind to `SdkHttpResponse`, and `SdkHttpResponseHeaderExample` bind to `SdkHttpResponseHeader`.
+So, we have `SdkHttpoperationExample` bind to `SdkHttpOperation`, `SdkHttpParameterExampleValue` bind to `SdkHttpParameter`, `SdkHttpResponseExampleValue` bind to `SdkHttpResponse`, and `SdkHttpResponseHeaderExampleValue` bind to `SdkHttpResponseHeader`.
 
 Each type will have the example value type and its cooresponding definition type.
 
@@ -1517,53 +1531,54 @@ interface SdkExampleBase {
 
 export interface SdkHttpOperationExample extends SdkExampleBase {
   kind: "http";
-  parameters: SdkHttpParameterExample[];
-  responses: Map<number, SdkHttpResponseExample>;
+  parameters: SdkHttpParameterExampleValue[];
+  responses: SdkHttpResponseExampleValue[];
 }
 
-export interface SdkHttpParameterExample {
+export interface SdkHttpParameterExampleValue {
   parameter: SdkHttpParameter;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 
-export interface SdkHttpResponseExample {
+export interface SdkHttpResponseExampleValue {
   response: SdkHttpResponse;
-  headers: SdkHttpResponseHeaderExample[];
-  bodyValue?: SdkTypeExample;
+  statusCode: number;
+  headers: SdkHttpResponseHeaderExampleValue[];
+  bodyValue?: SdkExampleValue;
 }
 
-export interface SdkHttpResponseHeaderExample {
+export interface SdkHttpResponseHeaderExampleValue {
   header: SdkServiceResponseHeader;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 ```
 
-### SdkExampleType
+### SdkExampleValue
 
 These types are used to represent the example value of a type. One definition types will have different example value types.
-For `SdkUnionExample`, since it is hard to determine whether the example value should belong to which union variant, we will keep the raw value and leave the work for the emitter.
-For `SdkModelExample`, we will help to map the example type to the right subtype for the discriminated type, and we will separate the additional properties value from the property value.
+For `SdkUnionExampleValue`, since it is hard to determine whether the example value should belong to which union variant, we will keep the raw value and leave the work for the emitter.
+For `SdkModelExampleValue`, we will help to map the example type to the right subtype for the discriminated type, and we will separate the additional properties value from the property value.
 But for the model with inheritance, we will not break down the type graph, just put all the example value in the child model.
 
 ```ts
-export type SdkTypeExample =
-  | SdkStringExample
-  | SdkNumberExample
-  | SdkBooleanExample
-  | SdkNullExample
-  | SdkAnyExample
-  | SdkArrayExample
-  | SdkDictionaryExample
-  | SdkUnionExample
-  | SdkModelExample;
+export type SdkExampleValue =
+  | SdkStringExampleValue
+  | SdkNumberExampleValue
+  | SdkBooleanExampleValue
+  | SdkNullExampleValue
+  | SdkUnknownExampleValue
+  | SdkArrayExampleValue
+  | SdkDictionaryExampleValue
+  | SdkUnionExampleValue
+  | SdkModelExampleValue;
 
-export interface SdkExampleTypeBase {
+interface SdkExampleValueBase {
   kind: string;
   type: SdkType;
   value: unknown;
 }
 
-export interface SdkStringExample extends SdkExampleTypeBase {
+export interface SdkStringExampleValue extends SdkExampleTypeBase {
   kind: "string";
   type:
     | SdkBuiltInType
@@ -1575,7 +1590,7 @@ export interface SdkStringExample extends SdkExampleTypeBase {
   value: string;
 }
 
-export interface SdkNumberExample extends SdkExampleTypeBase {
+export interface SdkNumberExampleValue extends SdkExampleTypeBase {
   kind: "number";
   type:
     | SdkBuiltInType
@@ -1587,47 +1602,47 @@ export interface SdkNumberExample extends SdkExampleTypeBase {
   value: number;
 }
 
-export interface SdkBooleanExample extends SdkExampleTypeBase {
+export interface SdkBooleanExampleValue extends SdkExampleTypeBase {
   kind: "boolean";
   type: SdkBuiltInType | SdkConstantType;
   value: boolean;
 }
 
-export interface SdkNullExample extends SdkExampleTypeBase {
+export interface SdkNullExampleValue extends SdkExampleTypeBase {
   kind: "null";
   type: SdkNullableType;
   value: null;
 }
 
-export interface SdkAnyExample extends SdkExampleTypeBase {
-  kind: "any";
+export interface SdkUnknownExampleValue extends SdkExampleTypeBase {
+  kind: "unknown";
   type: SdkBuiltInType;
   value: unknown;
 }
 
-export interface SdkArrayExample extends SdkExampleTypeBase {
+export interface SdkArrayExampleValue extends SdkExampleTypeBase {
   kind: "array";
   type: SdkArrayType;
-  value: SdkTypeExample[];
+  value: SdkExampleValue[];
 }
 
-export interface SdkDictionaryExample extends SdkExampleTypeBase {
+export interface SdkDictionaryExampleValue extends SdkExampleTypeBase {
   kind: "dict";
   type: SdkDictionaryType;
-  value: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
 }
 
-export interface SdkUnionExample extends SdkExampleTypeBase {
+export interface SdkUnionExampleValue extends SdkExampleTypeBase {
   kind: "union";
   type: SdkUnionType;
   value: unknown;
 }
 
-export interface SdkModelExample extends SdkExampleTypeBase {
+export interface SdkModelExampleValue extends SdkExampleTypeBase {
   kind: "model";
   type: SdkModelType;
-  value: Record<string, SdkTypeExample>;
-  additionalPropertiesValue?: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
+  additionalPropertiesValue?: Record<string, SdkExampleValue>;
 }
 ```
 
@@ -1699,7 +1714,7 @@ const sdkHttpOperationExample = {
 ```ts
 function serializeServiceOperationExample(
   context: PythonSdkContext<SdkHttpOperation>,
-  operation: SdkHttpOperation
+  operation: SdkHttpOperation,
 ): PythonSdkHttpOperationExample {
   for (const example of operation.examples) {
     return {
@@ -1720,7 +1735,7 @@ function serializeServiceOperationExample(
             })),
             bodyValue: serializeTypeExample(context, value.bodyValue),
           },
-        ])
+        ]),
       ),
     };
   }
@@ -1728,7 +1743,7 @@ function serializeServiceOperationExample(
 
 function serializeTypeExample(
   context: PythonSdkContext<SdkHttpOperation>,
-  example: SdkTypeExample
+  example: SdkExampleValue,
 ): PythonSdkTypeExample {
   switch (example.kind) {
     case "string":
@@ -1751,7 +1766,7 @@ function serializeTypeExample(
         ...example,
         type: getPythonSdkType(context, example.type),
       };
-    case "any":
+    case "unknown":
       return {
         ...example,
         type: getPythonSdkType(context, example.type),
@@ -1770,7 +1785,7 @@ function serializeTypeExample(
           Object.entries(example.value).map(([key, value]) => [
             key,
             serializeTypeExample(context, value),
-          ])
+          ]),
         ),
       };
     case "union":
@@ -1786,14 +1801,14 @@ function serializeTypeExample(
           Object.entries(example.value).map(([key, value]) => [
             key,
             serializeTypeExample(context, value),
-          ])
+          ]),
         ),
         additionalPropertiesValue: example.additionalPropertiesValue
           ? Object.fromEntries(
               Object.entries(example.additionalPropertiesValue).map(([key, value]) => [
                 key,
                 serializeTypeExample(context, value),
-              ])
+              ]),
             )
           : undefined,
       };
@@ -1862,12 +1877,12 @@ export async function $onEmit(context: EmitContext<PythonEmitterOptions>) {
 
 function serializeClient<TServiceOperation extends PythonSdkServiceOperation>(
   sdkContext: PythonSdkContext<TServiceOperation>,
-  client: SdkClientType<TServiceOperation>
+  client: SdkClientType<TServiceOperation>,
 ): PythonSdkClientType {
   const pythonClient = {
     ...client,
     parameters: client.initialization?.properties.map((x) =>
-      getSdkModelPropertyType(sdkContext, x)
+      getSdkModelPropertyType(sdkContext, x),
     ),
     subClients: client.methods
       .filter((x) => x.kind === "clientaccessor")
@@ -1882,7 +1897,7 @@ function serializeClient<TServiceOperation extends PythonSdkServiceOperation>(
 }
 
 function linkSubClients<TServiceOperation extends PythonSdkServiceOperation>(
-  sdkContext: PythonSdkContext<TServiceOperation>
+  sdkContext: PythonSdkContext<TServiceOperation>,
 ): void {
   for (const client of sdkContext.clients) {
     client.subclients = client.methods
@@ -2037,7 +2052,7 @@ import { getPythonSdkType, getSdkModelPropertyType } from "./types.js";
 function serializeHttpServiceOperation(
   context: PythonSdkContext<SdkHttpOperation>,
   method: SdkServiceMethod<SdkHttpOperation>,
-  operation: SdkHttpOperation
+  operation: SdkHttpOperation,
 ): PythonSdkHttpOperation {
   return {
     ...operation,
@@ -2046,16 +2061,16 @@ function serializeHttpServiceOperation(
       ? getSdkModelPropertyType(context, operation.bodyParam)
       : undefined,
     responses: Object.entries(operation.responses).map(([statusCode, responses]) =>
-      serializeHttpResponse(context, method, statusCode, responses)
+      serializeHttpResponse(context, method, statusCode, responses),
     ),
     exceptions: Object.entries(operation.exceptions).map(([statusCode, exceptions]) =>
-      serializeHttpResponse(context, method, statusCode, exceptions)
+      serializeHttpResponse(context, method, statusCode, exceptions),
     ),
   };
 
   function serializeHttpResponse(
     context: PythonSdkContext<SdkHttpOperation>,
-    response: SdkHttpResponse
+    response: SdkHttpResponse,
   ): PythonSdkHttpResponse {
     return {
       ...response,

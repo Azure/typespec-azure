@@ -8,8 +8,8 @@ title: "[I] OperationLinkMetadata"
 | Property | Type |
 | ------ | ------ |
 | `link?` | [`OperationLink`](OperationLink.md) |
-| `linkType` | `string` |
 | `linkedOperation` | `Operation` |
+| `linkType` | `string` |
 | `parameterMap?` | `Map`<`string`, `PropertyMap`\> |
 | `parameters?` | `Type` |
 | `result?` | `ResultInfo` |

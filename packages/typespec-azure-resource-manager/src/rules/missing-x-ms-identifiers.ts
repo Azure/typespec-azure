@@ -37,7 +37,7 @@ export const missingXmsIdentifiersRule = createRule({
     function isArrayMissingIdentifier(
       program: Program,
       array: ArrayModelType,
-      property: ModelProperty
+      property: ModelProperty,
     ) {
       const elementType = array.indexer.value;
       if (elementType.kind !== "Model") {
@@ -60,7 +60,7 @@ export const missingXmsIdentifiersRule = createRule({
       if (Array.isArray(xmsIdentifiers)) {
         for (const prop of xmsIdentifiers) {
           if (typeof prop === "string") {
-            if (!elementType.properties.has(prop)) {
+            if (getProperty(elementType, prop) === undefined) {
               context.reportDiagnostic({
                 messageId: "missingProperty",
                 format: { propertyName: prop, targetModelName: elementType.name },

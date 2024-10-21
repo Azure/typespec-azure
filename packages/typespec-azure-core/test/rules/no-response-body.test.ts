@@ -26,7 +26,7 @@ describe("typespec-azure-core: require response body for non-204 responses", () 
         op readWidget(name: string): {
            @statusCode statusCode: 200;
         };
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -50,7 +50,7 @@ describe("typespec-azure-core: require response body for non-204 responses", () 
 
         @route("/api/widgets/{name}")
         op readWidget(name: string): Error;
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -72,7 +72,7 @@ describe("typespec-azure-core: require response body for non-204 responses", () 
           @statusCode statusCode: 204;
           @body body: Widget;
         };
-        `
+        `,
       )
       .toEmitDiagnostics([
         {
@@ -93,7 +93,7 @@ describe("typespec-azure-core: require response body for non-204 responses", () 
         op readWidget(name: string): {
           @statusCode statusCode: 204;
         };
-        `
+        `,
       )
       .toBeValid();
   });

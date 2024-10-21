@@ -16,7 +16,7 @@ describe("typespec-azure-core: response-schema-multi-status-code rule", () => {
     tester = createLinterRuleTester(
       runner,
       responseSchemaMultiStatusCodeRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -42,7 +42,7 @@ describe("typespec-azure-core: response-schema-multi-status-code rule", () => {
 
       @test op test(): Return200 | Return201 | Error;
 
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/response-schema-problem",
@@ -73,7 +73,7 @@ describe("typespec-azure-core: response-schema-multi-status-code rule", () => {
 
       @test op test(): Return200 | Return201 | Error;
 
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/response-schema-problem",

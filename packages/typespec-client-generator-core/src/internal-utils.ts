@@ -3,9 +3,7 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
-  getDoc,
   getNamespaceFullName,
-  getSummary,
   Interface,
   isNeverType,
   isNullType,
@@ -17,7 +15,6 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
@@ -28,9 +25,9 @@ import {
   HttpOperationBody,
   HttpOperationMultipartBody,
   HttpOperationResponseContent,
-  HttpStatusCodeRange,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -61,7 +58,7 @@ export const clientNameKey = createStateSymbol("clientName");
  */
 export function parseEmitterName(
   program: Program,
-  emitterName?: string
+  emitterName?: string,
 ): [string, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (!emitterName) {
@@ -70,7 +67,7 @@ export function parseEmitterName(
         code: "no-emitter-name",
         format: {},
         target: program.getGlobalNamespaceType(),
-      })
+      }),
     );
     return diagnostics.wrap("none");
   }
@@ -90,7 +87,7 @@ export function parseEmitterName(
  */
 export function getClientNamespaceStringHelper(
   context: TCGCContext,
-  namespace?: Namespace
+  namespace?: Namespace,
 ): string | undefined {
   let packageName = context.packageName;
   if (packageName) {
@@ -114,27 +111,25 @@ export function getClientNamespaceStringHelper(
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: { name: string },
-  namespace?: Namespace | Interface
+  namespace?: Namespace | Interface,
 ): {
   isApiVersionParam: boolean;
-  clientDefaultValue?: unknown;
-  onClient: boolean;
+  clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
   return {
     isApiVersionParam,
     clientDefaultValue:
       isApiVersionParam && namespace
-        ? context.__namespaceToApiVersionClientDefaultValue.get(namespace)
+        ? context.__clientToApiVersionClientDefaultValue.get(namespace)
         : undefined,
-    onClient: onClient(context, type),
   };
 }
 
 export function filterApiVersionsWithDecorators(
   context: TCGCContext,
   type: Type,
-  apiVersions: string[]
+  apiVersions: string[],
 ): string[] {
   const addedOnVersions = getAddedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
   const removedOnVersions = getRemovedOnVersions(context.program, type)?.map((x) => x.value) ?? [];
@@ -182,7 +177,7 @@ function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]
 export function getAvailableApiVersions(
   context: TCGCContext,
   type: Type,
-  wrapper?: Type
+  wrapper?: Type,
 ): string[] {
   let wrapperApiVersions: string[] = [];
   if (wrapper) {
@@ -210,30 +205,6 @@ export function getAvailableApiVersions(
   return retval;
 }
 
-interface DocWrapper {
-  description?: string;
-  details?: string;
-}
-
-/**
- *
- * @param context
- * @param type
- * @returns Returns the description and details of a type
- */
-export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
-  const program = context.program;
-  if (getSummary(program, type)) {
-    return {
-      description: getSummary(program, type),
-      details: getDoc(program, type),
-    };
-  }
-  return {
-    description: getDoc(program, type),
-  };
-}
-
 /**
  *
  * @param type
@@ -245,7 +216,7 @@ export function getHashForType(type: SdkType): string {
   }
   if (type.kind === "enum" || type.kind === "model" || type.kind === "enumvalue") return type.name;
   if (type.kind === "union") {
-    return type.values.map((x) => getHashForType(x)).join("|");
+    return type.variantTypes.map((x) => getHashForType(x)).join("|");
   }
   return type.kind;
 }
@@ -264,7 +235,7 @@ interface DefaultSdkTypeBase<TKind> {
 export function getSdkTypeBaseHelper<TKind>(
   context: TCGCContext,
   type: Type,
-  kind: TKind
+  kind: TKind,
 ): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
@@ -281,7 +252,7 @@ export function getNamespacePrefix(namespace: Namespace): string {
 
 export function getTypeDecorators(
   context: TCGCContext,
-  type: Type
+  type: Type,
 ): [DecoratorInfo[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const retval: DecoratorInfo[] = [];
@@ -304,7 +275,7 @@ export function getTypeDecorators(
         };
         for (let i = 0; i < decorator.args.length; i++) {
           decoratorInfo.arguments[decorator.definition.parameters[i].name] = diagnostics.pipe(
-            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName)
+            getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }
         retval.push(decoratorInfo);
@@ -327,7 +298,7 @@ function getDecoratorArgValue(
     | Numeric
     | null,
   type: Type,
-  decoratorName: string
+  decoratorName: string,
 ): [any, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof arg === "object" && arg !== null && "kind" in arg) {
@@ -342,7 +313,7 @@ function getDecoratorArgValue(
         code: "unsupported-generic-decorator-arg-type",
         target: type,
         format: { decoratorName },
-      })
+      }),
     );
     return diagnostics.wrap(undefined);
   }
@@ -398,15 +369,13 @@ export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
 }
 
-export function getAllResponseBodiesAndNonBodyExists(
-  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
-): {
+export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[]): {
   allResponseBodies: SdkType[];
   nonBodyExists: boolean;
 } {
   const allResponseBodies: SdkType[] = [];
   let nonBodyExists = false;
-  for (const response of responses.values()) {
+  for (const response of responses) {
     if (response.type) {
       if (response.type.kind === "nullable") {
         nonBodyExists = true;
@@ -419,9 +388,7 @@ export function getAllResponseBodiesAndNonBodyExists(
   return { allResponseBodies, nonBodyExists };
 }
 
-export function getAllResponseBodies(
-  responses: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>
-): SdkType[] {
+export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
   return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
@@ -434,17 +401,13 @@ export function getAllResponseBodies(
 export function createGeneratedName(
   context: TCGCContext,
   type: Namespace | Operation,
-  suffix: string
+  suffix: string,
 ): string {
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
 }
 
 export function isSubscriptionId(context: TCGCContext, parameter: { name: string }): boolean {
   return Boolean(context.arm) && parameter.name === "subscriptionId";
-}
-
-export function onClient(context: TCGCContext, parameter: { name: string }): boolean {
-  return isSubscriptionId(context, parameter) || isApiVersion(context, parameter);
 }
 
 export function getLocationOfOperation(operation: Operation): Namespace | Interface {
@@ -458,12 +421,12 @@ export function isNeverOrVoidType(type: Type): boolean {
 
 export function getAnyType(
   context: TCGCContext,
-  type: Type
+  type: Type,
 ): [SdkBuiltInType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    kind: "any",
-    name: "any",
+    kind: "unknown",
+    name: "unknown",
     encode: "string",
     crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
@@ -482,7 +445,7 @@ export function getValidApiVersion(context: TCGCContext, versions: string[]): st
 }
 
 export function getHttpOperationResponseHeaders(
-  response: HttpOperationResponseContent
+  response: HttpOperationResponseContent,
 ): ModelProperty[] {
   const headers: ModelProperty[] = response.headers ? Object.values(response.headers) : [];
   if (response.body?.contentTypeProperty) {
@@ -493,7 +456,7 @@ export function getHttpOperationResponseHeaders(
 
 export function removeVersionsLargerThanExplicitlySpecified(
   context: TCGCContext,
-  versions: { value: string | number }[]
+  versions: { value: string | number }[],
 ): void {
   // filter with specific api version
   if (
@@ -511,14 +474,14 @@ export function removeVersionsLargerThanExplicitlySpecified(
 export function filterApiVersionsInEnum(
   context: TCGCContext,
   client: SdkClient,
-  sdkVersionsEnum: SdkEnumType
+  sdkVersionsEnum: SdkEnumType,
 ): void {
   // if they explicitly set an api version, remove larger versions
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value)
+      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value),
     );
   }
 }
@@ -533,6 +496,20 @@ export function isXmlContentType(contentType: string): boolean {
   return regex.test(contentType);
 }
 
+export function twoParamsEquivalent(
+  context: TCGCContext,
+  param1?: ModelProperty,
+  param2?: ModelProperty,
+): boolean {
+  if (!param1 || !param2) {
+    return false;
+  }
+  return (
+    param1.name === param2.name ||
+    getParamAlias(context, param1) === param2.name ||
+    param1.name === getParamAlias(context, param2)
+  );
+}
 /**
  * If body is from spread, then it does not directly from a model property.
  * @param httpBody
@@ -548,15 +525,12 @@ export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMult
  * @param type
  * @returns
  */
-export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model {
+export function getHttpBodySpreadModel(type: Model): Model {
   if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
     const innerModel = type.sourceModels[0].model;
-    const projectedProgram = context.program as ProjectedProgram;
     // for case: `op test(...Model):void;`
     if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
-      return projectedProgram.projector
-        ? (projectedProgram.projector.projectedTypes.get(innerModel) as Model)
-        : innerModel;
+      return innerModel;
     }
     // for case: `op test(@header h: string, @query q: string, ...Model): void;`
     if (
@@ -565,10 +539,54 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
       innerModel.sourceModels[0].model.name !== "" &&
       innerModel.sourceModels[0].model.properties.size === type.properties.size
     ) {
-      return projectedProgram.projector
-        ? (projectedProgram.projector.projectedTypes.get(innerModel.sourceModels[0].model) as Model)
-        : innerModel.sourceModels[0].model;
+      return innerModel.sourceModels[0].model;
     }
   }
   return type;
+}
+
+export function isOnClient(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation?: Operation,
+  versioning?: boolean,
+): boolean {
+  const namespace = operation ? getLocationOfOperation(operation) : type.model?.namespace;
+  return (
+    isSubscriptionId(context, type) ||
+    (isApiVersion(context, type) && versioning) ||
+    Boolean(
+      namespace &&
+        context.__clientToParameters
+          .get(namespace)
+          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
+    )
+  );
+}
+
+export function getValueTypeValue(
+  value: Value,
+): string | boolean | null | number | Array<unknown> | object | undefined {
+  switch (value.valueKind) {
+    case "ArrayValue":
+      return value.values.map((x) => getValueTypeValue(x));
+    case "BooleanValue":
+    case "StringValue":
+    case "NullValue":
+      return value.value;
+    case "NumericValue":
+      return value.value.asNumber();
+    case "EnumValue":
+      return value.value.value ?? value.value.name;
+    case "ObjectValue":
+      return Object.fromEntries(
+        [...value.properties.keys()].map((x) => [
+          x,
+          getValueTypeValue(value.properties.get(x)!.value),
+        ]),
+      );
+    case "ScalarValue":
+      // TODO: handle scalar value
+      return undefined;
+  }
 }

@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: arm resource invalid chars in path ru
     tester = createLinterRuleTester(
       runner,
       armResourcePathInvalidCharsRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -33,7 +33,7 @@ describe("typespec-azure-resource-manager: arm resource invalid chars in path ru
           @path
           name: string;
         }
-      `
+      `,
       )
       .toBeValid();
   });
@@ -51,7 +51,7 @@ describe("typespec-azure-resource-manager: arm resource invalid chars in path ru
           @path
           name: string;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars",

@@ -31,7 +31,7 @@ describe("typespec-azure-core: avoid orderBy parameter rule", () => {
           alias MyTraits = Azure.Core.Traits.QueryParametersTrait<OrderByQueryParameter>;
     
           @test op list is Azure.Core.ResourceList<TestModel, MyTraits>;
-        `
+        `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/no-order-by",
@@ -54,7 +54,7 @@ describe("typespec-azure-core: avoid orderBy parameter rule", () => {
       alias MyTraits = Azure.Core.Traits.QueryParametersTrait<{@query orderBy: string}>;
 
       @test op list is Azure.Core.ResourceList<TestModel, MyTraits>;
-      `
+      `,
         )
         .toEmitDiagnostics({
           code: "@azure-tools/typespec-azure-core/no-order-by",

@@ -34,7 +34,7 @@ export type ClientNameDecorator = (
   context: DecoratorContext,
   target: Type,
   rename: string,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -52,7 +52,7 @@ export type ConvenientAPIDecorator = (
   context: DecoratorContext,
   target: Operation,
   value?: boolean,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -70,7 +70,7 @@ export type ProtocolAPIDecorator = (
   context: DecoratorContext,
   target: Operation,
   value?: boolean,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -103,7 +103,7 @@ export type ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   value?: Model,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -119,7 +119,7 @@ export type ClientDecorator = (
 export type OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -192,7 +192,7 @@ export type UsageDecorator = (
   context: DecoratorContext,
   target: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -340,7 +340,7 @@ export type AccessDecorator = (
   context: DecoratorContext,
   target: Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -360,7 +360,7 @@ export type AccessDecorator = (
 export type FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -412,7 +412,7 @@ export type OverrideDecorator = (
   context: DecoratorContext,
   original: Operation,
   override: Operation,
-  scope?: string
+  scope?: string,
 ) => void;
 
 /**
@@ -430,7 +430,68 @@ export type OverrideDecorator = (
 export type UseSystemTextJsonConverterDecorator = (
   context: DecoratorContext,
   target: Model,
-  scope?: string
+  scope?: string,
+) => void;
+
+/**
+ * Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ *
+ * op upload(blobName: string): void;
+ * op download(blobName: string): void;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ * model MyServiceClientOptions {
+ *   blobName: string;
+ * }
+ *
+ * @@clientInitialization(MyService, MyServiceClientOptions)
+ * // The generated client will have `blobName` on it. We will also
+ * // elevate the existing `blobName` parameter to the client level.
+ * ```
+ */
+export type ClientInitializationDecorator = (
+  context: DecoratorContext,
+  target: Namespace | Interface,
+  options: Model,
+  scope?: string,
+) => void;
+
+/**
+ * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @example
+ * ```typespec
+ * // main.tsp
+ * namespace MyService;
+ *
+ * op upload(blobName: string): void;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
+ * model MyServiceClientOptions {
+ *   blob: string;
+ * }
+ *
+ * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@paramAlias(MyServiceClientOptions.blob, "blobName")
+ *
+ * // The generated client will have `blobName` on it. We will also
+ * // elevate the existing `blob` parameter to the client level.
+ * ```
+ */
+export type ParamAliasDecorator = (
+  context: DecoratorContext,
+  original: ModelProperty,
+  paramAlias: string,
+  scope?: string,
 ) => void;
 
 export type AzureClientGeneratorCoreDecorators = {
@@ -444,4 +505,6 @@ export type AzureClientGeneratorCoreDecorators = {
   flattenProperty: FlattenPropertyDecorator;
   override: OverrideDecorator;
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
+  clientInitialization: ClientInitializationDecorator;
+  paramAlias: ParamAliasDecorator;
 };

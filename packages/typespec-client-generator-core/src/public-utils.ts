@@ -18,7 +18,7 @@ import {
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, getHttpOperation, isMetadata } from "@typespec/http";
+import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
@@ -53,7 +53,7 @@ import { createDiagnostic } from "./lib.js";
  */
 export function getDefaultApiVersion(
   context: TCGCContext,
-  serviceNamespace: Namespace
+  serviceNamespace: Namespace,
 ): Version | undefined {
   try {
     const versions = getVersions(context.program, serviceNamespace)[1]!.getVersions();
@@ -123,8 +123,8 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
  */
 export function getEmitterTargetName(context: TCGCContext): string {
   return ignoreDiagnostics(
-    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name)
-  ); // eslint-disable-line deprecation/deprecation
+    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name),
+  );
 }
 
 /**
@@ -153,7 +153,7 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
  */
 export function getLibraryName(
   context: TCGCContext,
-  type: Type & { name?: string | symbol }
+  type: Type & { name?: string | symbol },
 ): string {
   // 1. check if there's a client name
   let emitterSpecificName = getClientNameOverride(context, type);
@@ -186,7 +186,7 @@ export function getLibraryName(
             "kind" in arg &&
             (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
             arg.name !== undefined &&
-            arg.name.length > 0
+            arg.name.length > 0,
         )
         .map((arg) => pascalCase(arg.name))
         .join("")
@@ -219,7 +219,7 @@ export function getCrossLanguageDefinitionId(
   context: TCGCContext,
   type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
   operation?: Operation,
-  appendNamespace: boolean = true
+  appendNamespace: boolean = true,
 ): string {
   let retval = type.name || "anonymous";
   const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
@@ -239,7 +239,7 @@ export function getCrossLanguageDefinitionId(
           .map((x) =>
             x.type?.kind === "Model" || x.type?.kind === "Union"
               ? x.type.name || x.name
-              : x.name || "anonymous"
+              : x.name || "anonymous",
           )
           .join(".") +
         "." +
@@ -278,7 +278,7 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
         format: {
           service: serviceNamespace,
         },
-      })
+      }),
     );
   }
   return diagnostics.wrap(serviceNamespace);
@@ -292,7 +292,7 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
 export function getGeneratedName(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
-  operation?: Operation
+  operation?: Operation,
 ): string {
   if (!context.generatedNames) {
     context.generatedNames = new Map<Union | Model | TspLiteralType, string>();
@@ -315,7 +315,7 @@ export function getGeneratedName(
  */
 function findContextPath(
   context: TCGCContext,
-  type: Model | Union | TspLiteralType
+  type: Model | Union | TspLiteralType,
 ): ContextNode[] {
   for (const client of listClients(context)) {
     // orphan models
@@ -369,7 +369,7 @@ interface ContextNode {
 function getContextPath(
   context: TCGCContext,
   root: Operation | Model,
-  typeToFind: Model | Union | TspLiteralType
+  typeToFind: Model | Union | TspLiteralType,
 ): ContextNode[] {
   // use visited set to avoid cycle model reference
   const visited: Set<Type> = new Set<Type>();
@@ -383,7 +383,7 @@ function getContextPath(
       result = [{ name: root.name }];
       let bodyType: Type;
       if (isHttpBodySpread(httpOperation.parameters.body)) {
-        bodyType = getHttpBodySpreadModel(context, httpOperation.parameters.body.type as Model);
+        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
       } else {
         bodyType = httpOperation.parameters.body.type;
       }
@@ -454,7 +454,7 @@ function getContextPath(
   function dfsModelProperties(
     expectedType: Model | Union | TspLiteralType,
     currentType: Type,
-    displayName: string
+    displayName: string,
   ): boolean {
     if (currentType == null || visited.has(currentType)) {
       // cycle reference detected
@@ -470,17 +470,28 @@ function getContextPath(
     if (currentType === expectedType) {
       result.push({ name: displayName, type: currentType });
       return true;
-    } else if (
-      currentType.kind === "Model" &&
-      currentType.indexer &&
-      currentType.properties.size === 0 &&
-      ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
-        currentType.indexer.key.name === "integer")
-    ) {
-      // handle array or dict
-      const dictOrArrayItemType: Type = currentType.indexer.value;
-      return dfsModelProperties(expectedType, dictOrArrayItemType, pluralize.singular(displayName));
     } else if (currentType.kind === "Model") {
+      // Peel off HttpPart<MyRealType> to get "MyRealType"
+      const typeWrappedByHttpPart = getHttpPart(context.program, currentType);
+      if (typeWrappedByHttpPart) {
+        return dfsModelProperties(expectedType, typeWrappedByHttpPart.type, displayName);
+      }
+
+      if (
+        currentType.indexer &&
+        currentType.properties.size === 0 &&
+        ((currentType.indexer.key.name === "string" && currentType.name === "Record") ||
+          currentType.indexer.key.name === "integer")
+      ) {
+        // handle array or dict
+        const dictOrArrayItemType: Type = currentType.indexer.value;
+        return dfsModelProperties(
+          expectedType,
+          dictOrArrayItemType,
+          pluralize.singular(displayName),
+        );
+      }
+
       // handle model
       result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {
@@ -494,7 +505,7 @@ function getContextPath(
         const result = dfsModelProperties(
           expectedType,
           currentType.sourceModel!.indexer!.value!,
-          "AdditionalProperty"
+          "AdditionalProperty",
         );
         if (result) return true;
       }
@@ -503,7 +514,7 @@ function getContextPath(
         const result = dfsModelProperties(
           expectedType,
           currentType.indexer.value,
-          "AdditionalProperty"
+          "AdditionalProperty",
         );
         if (result) return true;
       }
@@ -513,7 +524,7 @@ function getContextPath(
           const result = dfsModelProperties(
             expectedType,
             currentType.baseModel.indexer!.value!,
-            "AdditionalProperty"
+            "AdditionalProperty",
           );
           if (result) return true;
         }
@@ -523,7 +534,7 @@ function getContextPath(
         const result = dfsModelProperties(
           expectedType,
           currentType.baseModel,
-          currentType.baseModel.name
+          currentType.baseModel.name,
         );
         if (result) return true;
       }
@@ -575,7 +586,7 @@ function findLastNonAnonymousModelNode(contextPath: ContextNode[]): number {
 function buildNameFromContextPaths(
   context: TCGCContext,
   type: Union | Model | TspLiteralType,
-  contextPath: ContextNode[]
+  contextPath: ContextNode[],
 ): string {
   // fallback to empty name for corner case
   if (contextPath.length === 0) {
@@ -620,7 +631,7 @@ function buildNameFromContextPaths(
 
 export function getHttpOperationWithCache(
   context: TCGCContext,
-  operation: Operation
+  operation: Operation,
 ): HttpOperation {
   if (context.httpOperationCache === undefined) {
     context.httpOperationCache = new Map<Operation, HttpOperation>();
@@ -638,7 +649,7 @@ export function getHttpOperationWithCache(
  */
 export function getHttpOperationExamples(
   context: TCGCContext,
-  operation: HttpOperation
+  operation: HttpOperation,
 ): SdkHttpOperationExample[] {
   return context.__httpOperationExamples?.get(operation) ?? [];
 }
@@ -652,7 +663,7 @@ export function getHttpOperationExamples(
  */
 export function listSubClients<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
-  listNestedClients: boolean = false
+  listNestedClients: boolean = false,
 ): SdkClientType<TServiceOperation>[] {
   const subClients: SdkClientType<TServiceOperation>[] = client.methods
     .filter((c) => c.kind === "clientaccessor")

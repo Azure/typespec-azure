@@ -4,5 +4,5 @@ title: "[T] SdkBuiltInKinds"
 
 ---
 ```ts
-type SdkBuiltInKinds: Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
+type SdkBuiltInKinds: Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "unknown";
 ```

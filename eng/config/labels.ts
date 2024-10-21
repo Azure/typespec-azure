@@ -37,7 +37,7 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   eng: ["eng/", ".github/"],
   "lib:azure-core": ["packages/typespec-azure-core/"],
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
-  "emitter:autorest": ["packages/typespec-azurerest/"],
+  "emitter:autorest": ["packages/typespec-autorest/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
 };
 

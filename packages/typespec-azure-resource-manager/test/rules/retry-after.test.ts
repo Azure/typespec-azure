@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
     tester = createLinterRuleTester(
       runner,
       retryAfterRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -57,7 +57,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
           @patch
           update(): UpdateFooResponse;
         }
-      `
+      `,
       )
       .toBeValid();
   });
@@ -82,7 +82,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
           @patch 
           op update(): FooResource;
         }
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/retry-after",

@@ -17,6 +17,10 @@ const $lib: TypeSpecLibrary<object, Record<string, any>, never>;
 | `client-name.default` | `CallableMessage`<[`"name"`]\> | - |
 | `client-service` | `object` | - |
 | `client-service.default` | `CallableMessage`<[`"name"`]\> | - |
+| `conflict-access-override` | `object` | - |
+| `conflict-access-override.default` | `"@access override conflicts with the access calculated from operation or other @access override."` | - |
+| `conflict-usage-override` | `object` | - |
+| `conflict-usage-override.default` | `"@usage override conflicts with the usage calculated from operation or other @usage override."` | - |
 | `conflicting-multipart-model-usage` | `object` | - |
 | `conflicting-multipart-model-usage.default` | `"Invalid encoding"` | "Invalid encoding" |
 | `conflicting-multipart-model-usage.wrongType` | `CallableMessage`<[`"modelName"`, `"modelName"`, `"modelName"`]\> | - |

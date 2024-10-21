@@ -6,13 +6,13 @@ export const $lib = createTypeSpecLibrary({
     "client-name": {
       severity: "warning",
       messages: {
-        default: paramMessage`Client name "${"name"}" must end with Client. Use @client({name: "...Client"}`,
+        default: paramMessage`Client name "${"name"}" must end with Client. Use @client({name: "...Client"})`,
       },
     },
     "client-service": {
       severity: "warning",
       messages: {
-        default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS}`,
+        default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS})`,
       },
     },
     "unknown-client-format": {
@@ -208,6 +208,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: `@usage override conflicts with the usage calculated from operation or other @usage override.`,
+      },
+    },
+    "duplicate-decorator": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
       },
     },
   },

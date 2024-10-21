@@ -8,7 +8,7 @@ title: "[I] SdkServiceResponseHeader"
 | Property | Type |
 | ------ | ------ |
 | `__raw` | `ModelProperty` |
-| `description?` | `string` |
-| `details?` | `string` |
+| `doc?` | `string` |
 | `serializedName` | `string` |
+| `summary?` | `string` |
 | `type` | [`SdkType`](../type-aliases/SdkType.md) |

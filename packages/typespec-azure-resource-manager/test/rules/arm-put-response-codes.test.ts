@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     armPutResponseCodesRule,
-    "@azure-tools/typespec-azure-resource-manager"
+    "@azure-tools/typespec-azure-resource-manager",
   );
 });
 
@@ -44,7 +44,7 @@ it("Emits a warning for put operation that does not contain the appropriate resp
           result: boolean;
         }
       }
-      `
+      `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes",
@@ -76,7 +76,7 @@ it("Emits a warning for put action that does not contain the appropriate respons
           result: boolean;
         }
       }
-      `
+      `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-put-operation-response-codes",
@@ -111,7 +111,7 @@ it("Does not emit a warning for put operation that contains the appropriate resp
           result: boolean;
         } | ErrorResponse;
       }
-    `
+    `,
     )
     .toBeValid();
 });
@@ -136,7 +136,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrUpda
       interface Employees {
         createOrUpdate is ArmResourceCreateOrUpdateAsync<Employee>;
       }
-    `
+    `,
     )
     .toBeValid();
 });
@@ -161,7 +161,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
       interface Employees {
         createOrReplace is ArmResourceCreateOrReplaceAsync<Employee>;
       }
-    `
+    `,
     )
     .toBeValid();
 });
@@ -186,7 +186,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
       interface Employees {
         createOrReplace is ArmResourceCreateOrReplaceSync<Employee>;
       }
-    `
+    `,
     )
     .toBeValid();
 });
@@ -219,7 +219,7 @@ it("Does not emit a warning for put action that contains the appropriate respons
           result: boolean;
         } | ErrorResponse;
       }
-    `
+    `,
     )
     .toBeValid();
 });

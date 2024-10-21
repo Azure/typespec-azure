@@ -15,16 +15,17 @@ title: "[I] SdkClientType"
 
 ## Properties
 
-| Property | Type | Description | Inherited from |
-| ------ | ------ | ------ | ------ |
-| `apiVersions` | `string`[] | - | - |
-| ~~`arm`~~ | `boolean` | **Deprecated** This property is deprecated. Look at `.arm` on `SdkContext` instead. | - |
-| `crossLanguageDefinitionId` | `string` | - | - |
-| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | - | `DecoratedType.decorators` |
-| `description?` | `string` | - | - |
-| `details?` | `string` | - | - |
-| `initialization` | [`SdkInitializationType`](SdkInitializationType.md) | - | - |
-| `kind` | `"client"` | - | - |
-| `methods` | [`SdkMethod`](../type-aliases/SdkMethod.md)<`TServiceOperation`\>[] | - | - |
-| `name` | `string` | - | - |
-| `nameSpace` | `string` | - | - |
+| Property | Type | Inherited from |
+| ------ | ------ | ------ |
+| `__raw` | [`SdkClient`](SdkClient.md) \| [`SdkOperationGroup`](SdkOperationGroup.md) | - |
+| `apiVersions` | `string`[] | - |
+| `crossLanguageDefinitionId` | `string` | - |
+| `decorators` | [`DecoratorInfo`](DecoratorInfo.md)[] | `DecoratedType.decorators` |
+| `doc?` | `string` | - |
+| `initialization` | [`SdkInitializationType`](SdkInitializationType.md) | - |
+| `kind` | `"client"` | - |
+| `methods` | [`SdkMethod`](../type-aliases/SdkMethod.md)<`TServiceOperation`\>[] | - |
+| `name` | `string` | - |
+| `nameSpace` | `string` | - |
+| `parent?` | [`SdkClientType`](SdkClientType.md)<`TServiceOperation`\> | - |
+| `summary?` | `string` | - |
