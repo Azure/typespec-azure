@@ -20,7 +20,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-generic-numeric": true,
     "@azure-tools/typespec-azure-core/no-nullable": true,
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
-    "@azure-tools/typespec-azure-core/no-response-body": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,
     "@azure-tools/typespec-azure-core/prefer-csv-collection-format": true,
@@ -40,6 +39,9 @@ export default {
     "@azure-tools/typespec-azure-core/no-private-usage": true,
     "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/no-query-explode": true,
+
+    // Azure core not enable - Arm has its own conflicting rule
+    "@azure-tools/typespec-azure-core/no-response-body": false,
 
     // Azure core not enabled - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/bad-record-type": false,
