@@ -1,9 +1,9 @@
+import { Model, Operation } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getClientNameOverride } from "../../src/decorators.js";
-import { Model, Operation } from "@typespec/compiler";
+import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("@clientName", () => {
   let runner: SdkTestRunner;

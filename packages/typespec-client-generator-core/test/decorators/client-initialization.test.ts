@@ -549,7 +549,7 @@ describe("@clientInitialization", () => {
     const model = sdkPackage.models.find((x) => x.name === "StorageBlobOptions");
     ok(model);
     ok(model.usage & UsageFlags.ClientInitialization);
-    const version = model.properties.find(x =>  x.name === "version");
+    const version = model.properties.find((x) => x.name === "version");
     ok(version);
 
     const client = sdkPackage.clients[0];
@@ -564,6 +564,6 @@ describe("@clientInitialization", () => {
     strictEqual(versionParam.name, "version");
     strictEqual(versionParam.onClient, true);
     strictEqual(versionParam.serializedName, "x-ms-version");
-    strictEqual(versionParam.correspondingMethodParams[0], version)
+    strictEqual(versionParam.correspondingMethodParams[0], version);
   });
 });
