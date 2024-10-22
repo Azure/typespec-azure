@@ -8,9 +8,7 @@ TypeSpec Azure Core library
 npm install @azure-tools/typespec-azure-core
 ```
 
-## Linter
-
-### Usage
+## Usage
 
 Add the following in `tspconfig.yaml`:
 
@@ -20,14 +18,14 @@ linter:
     - "@azure-tools/typespec-azure-core/all"
 ```
 
-### RuleSets
+## RuleSets
 
 Available ruleSets:
 
 - `@azure-tools/typespec-azure-core/all`
 - `@azure-tools/typespec-azure-core/canonical-versioning`
 
-### Rules
+## Rules
 
 | Name                                                                                                                                                               | Description                                                                                                                                          |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
