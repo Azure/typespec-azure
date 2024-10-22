@@ -42,6 +42,9 @@ extends:
       psscriptanalyzer:
         compiled: true
         break: true
+      eslint:
+        enabled: false # we are running our own
+
     stages:
       - ${{ each stage in parameters.stages }}:
           - ${{ each pair in stage }}:

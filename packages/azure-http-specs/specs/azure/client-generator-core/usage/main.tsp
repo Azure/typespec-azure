@@ -28,7 +28,7 @@ namespace ModelInOperation {
     Expected body parameter: 
     ```json
     {
-      "name": <any string>
+      "name": "Madge"
     }
     ```
     """)
@@ -48,7 +48,7 @@ namespace ModelInOperation {
     Expected response body: 
     ```json
     {
-      "name": <any string>
+      "name": "Madge"
     }
     ```
     """)
@@ -78,7 +78,7 @@ namespace ModelInOperation {
     ```json
     {
       "result": {
-        "name": <any string>
+        "name": "Madge"
       }
     }
     ```
