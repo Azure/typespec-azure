@@ -6,7 +6,7 @@ title: "auth-required"
 @azure-tools/typespec-azure-core/auth-required
 ```
 
-Ensure Azure Service define the authentication requirements. See https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions
+Ensure Azure services define their authentication requirements. See https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions
 
 #### ❌ Incorrect
 
