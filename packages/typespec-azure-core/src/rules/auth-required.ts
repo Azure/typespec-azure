@@ -1,11 +1,11 @@
 import { Namespace, createRule, getService } from "@typespec/compiler";
 import { getAuthentication } from "@typespec/http";
-import { isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
 
 export const authRequiredRule = createRule({
   name: "auth-required",
   description: "Enforce service authentication.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/auth-required",
   messages: {
     default:
       "Provide an authentication scheme using the `@useAuth` decorator. See: https://azure.github.io/typespec-azure/docs/reference/azure-style-guide#security-definitions",
@@ -13,9 +13,6 @@ export const authRequiredRule = createRule({
   create(context) {
     return {
       namespace: (namespace: Namespace) => {
-        if (isExcludedCoreType(context.program, namespace)) return;
-        if (!isAzureSubNamespace(context.program, namespace)) return;
-
         const service = getService(context.program, namespace);
         if (!service) return;
 
