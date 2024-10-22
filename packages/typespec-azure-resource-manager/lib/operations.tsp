@@ -751,4 +751,4 @@ op ArmProviderActionAsync<
 
   /** The request body */
   @bodyRoot body: Request,
-): Response | ErrorResponse;
+): ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response | ErrorResponse;

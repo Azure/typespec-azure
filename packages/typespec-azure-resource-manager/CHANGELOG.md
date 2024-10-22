@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.47.1
+
+### Bug Fixes
+
+- [#1673](https://github.com/Azure/typespec-azure/pull/1673) Fix `ArmProviderActionAsync` to correctly return 202 responses.
+
+
 ## 0.47.0
 
 ### Bug Fixes

@@ -376,4 +376,19 @@ model EncryptionProperty {
   encryption: EncryptionConfiguration;
 }
 
+/**
+ * Model representing the standard `zones` envelope property for a resource.
+ * Spread this model into a resource Model if the resource supports ARM `zones`.
+ * @example
+ * ```typescript
+ * model Foo is TrackedResource<FooProperties> {
+ *   ...AvailabilityZonesProperty;
+ * }
+ * ```
+ */
+model AvailabilityZonesProperty {
+  /** The availability zones. */
+  zones?: string[];
+}
+
 //#endregion

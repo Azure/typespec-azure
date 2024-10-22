@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.47.2
+
+### Bug Fixes
+
+- [#1606](https://github.com/Azure/typespec-azure/pull/1606) overwrite original value when set multiple value for same decorator
+
+
 ## 0.47.1
 
 ### Bug Fixes
