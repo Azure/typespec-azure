@@ -51,9 +51,6 @@ import {
   SdkContext,
   SdkEmitterOptions,
   SdkHttpOperation,
-  SdkInitializationType,
-  SdkMethodParameter,
-  SdkModelPropertyType,
   SdkOperationGroup,
   SdkServiceOperation,
   TCGCContext,
@@ -1013,21 +1010,8 @@ export const $clientInitialization: ClientInitializationDecorator = (
 export function getClientInitialization(
   context: TCGCContext,
   entity: Namespace | Interface,
-): SdkInitializationType | undefined {
-  const model = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (!model) return model;
-  const sdkModel = getSdkModel(context, model);
-  const initializationProps = sdkModel.properties.map(
-    (property: SdkModelPropertyType): SdkMethodParameter => {
-      property.onClient = true;
-      property.kind = "method";
-      return property as SdkMethodParameter;
-    },
-  );
-  return {
-    ...sdkModel,
-    properties: initializationProps,
-  };
+): Model | undefined {
+  return getScopedDecoratorData(context, clientInitializationKey, entity);
 }
 
 const paramAliasKey = createStateSymbol("paramAlias");
