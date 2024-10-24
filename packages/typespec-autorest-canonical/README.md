@@ -8,9 +8,7 @@ TypeSpec library for emitting canonical swagger
 npm install @azure-tools/typespec-autorest-canonical
 ```
 
-## Emitter
-
-### Usage
+## Usage
 
 1. Via the command line
 
@@ -35,9 +33,9 @@ options:
     option: value
 ```
 
-### Emitter options
+## Emitter options
 
-#### `output-file`
+### `output-file`
 
 **Type:** `string`
 
@@ -58,29 +56,29 @@ Example: Multiple services
 - `Service1.canonical.openapi.json`
 - `Service2.canonical.openapi.json`
 
-#### `azure-resource-provider-folder`
+### `azure-resource-provider-folder`
 
 **Type:** `string`
 
-#### `arm-types-dir`
+### `arm-types-dir`
 
 **Type:** `string`
 
 Path to the common-types.json file folder. Default: '${project-root}/../../common-types/resource-management'
 
-#### `new-line`
+### `new-line`
 
 **Type:** `"crlf" | "lf"`
 
 Set the newline character for emitting files.
 
-#### `omit-unreachable-types`
+### `omit-unreachable-types`
 
 **Type:** `boolean`
 
 Omit unreachable types. By default all types declared under the service namespace will be included. With this flag on only types references in an operation will be emitted.
 
-#### `include-x-typespec-name`
+### `include-x-typespec-name`
 
 **Type:** `"inline-only" | "never"`
 
