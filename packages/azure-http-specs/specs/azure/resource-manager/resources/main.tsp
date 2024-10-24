@@ -1,4 +1,3 @@
-import "@typespec/spector";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
@@ -15,13 +14,12 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 using TypeSpec.OpenAPI;
-using Spector;
 
 @armProviderNamespace
 @service
 @versioned(Versions)
 @doc("Arm Resource Provider management API.")
-namespace Azure.ResourceManager.Models.Resources;
+namespace Azure.ResourceManager.Resources;
 
 @doc("Azure API versions.")
 enum Versions {
