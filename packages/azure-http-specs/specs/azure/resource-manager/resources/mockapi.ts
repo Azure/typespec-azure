@@ -111,7 +111,7 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
       "api-version": "2023-12-01-preview",
     },
     body: {
-      location: "eastus2",
+      location: "eastus",
       properties: {
         description: "valid2",
       },
@@ -124,7 +124,7 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
     status: 200,
     body: json({
       ...validSingletonResource,
-      location: "eastus2",
+      location: "eastus",
       properties: {
         provisioningState: "Succeeded",
         description: "valid2",
