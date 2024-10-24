@@ -7,7 +7,7 @@ import {
 import { getHttpOperation } from "@typespec/http";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { invalidActionVerbRule } from "../../src/rules/arm-resource-invalid-action-verb.js";
+import { armResourceInvalidActionVerbRule } from "../../src/rules/arm-resource-invalid-action-verb.js";
 import { listBySubscriptionRule } from "../../src/rules/list-operation.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
@@ -19,11 +19,11 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     runner = await createAzureResourceManagerTestRunner();
     tester = createLinterRuleTester(
       runner,
-      invalidActionVerbRule,
+      armResourceInvalidActionVerbRule,
       "@azure-tools/typespec-azure-resource-manager",
     );
   });
-  it("Detects non-post actions", async () => {
+  it("Detects non-post/non-get actions", async () => {
     await tester
       .expect(
         `
@@ -63,7 +63,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
         extends ResourceCreate<FooResource>,ResourceDelete<FooResource> {
           @doc("Gets my Foos")
           @armResourceRead(FooResource)
-          @action @get getFooAction(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
+          @action @delete deleteFooAction(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
         }
 
         @doc("The state of the resource")
@@ -84,11 +84,11 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb",
-        message: "Actions must be HTTP Post operations.",
+        message: "Actions must be HTTP Post or Get operations.",
       });
   });
 
-  it("Allows post actions for authorized provider actions", async () => {
+  it("Allows get actions for provider actions", async () => {
     await tester
       .expect(
         `
@@ -113,6 +113,39 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       @armResourceOperations
       interface ProviderOperations {
         @get
+        @armResourceList(VmSize)
+        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+      }
+    `,
+      )
+      .toBeValid();
+  });
+
+  it("Allows post actions for any provider", async () => {
+    await tester
+      .expect(
+        `
+    @armProviderNamespace
+    @service({title: "Microsoft.Foo"})
+    @versioned(Versions)
+    namespace Microsoft.Foo;
+    enum Versions {
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        "2021-10-01-preview",
+      }
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The VM Size")
+      model VmSize {
+        @doc("number of cpus ")
+        cpus: int32;
+      }
+
+      @armResourceOperations
+      interface ProviderOperations {
+        @post
         @armResourceList(VmSize)
         getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
       }
