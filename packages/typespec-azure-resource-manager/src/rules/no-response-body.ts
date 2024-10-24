@@ -1,7 +1,7 @@
 import { createRule, Operation } from "@typespec/compiler";
 import { getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
 
-import { isTemplatedInterfaceOperation } from "./utils.js";
+import { isAzureSubNamespace, isTemplatedInterfaceOperation } from "./utils.js";
 
 /**
  * verify an operation returns 202 or 204 should not contain response body.
@@ -22,6 +22,7 @@ export const noResponseBodyRule = createRule({
     return {
       operation: (op: Operation) => {
         if (isTemplatedInterfaceOperation(op)) return;
+        if (!isAzureSubNamespace(context.program, op.namespace)) return;
 
         const responses = getResponsesForOperation(context.program, op)[0].find(
           (v) => v.statusCodes !== 204 && v.statusCodes !== 202,

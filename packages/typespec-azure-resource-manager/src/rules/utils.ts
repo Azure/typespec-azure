@@ -28,6 +28,12 @@ export function isTemplatedInterfaceOperation(target: Operation) {
   );
 }
 
+export function isAzureSubNamespace(program: Program, ns: Namespace | undefined): boolean {
+  if (!ns) return false;
+  const nsName = getNamespaceName(program, ns);
+  return nsName.startsWith("Azure.");
+}
+
 export function isTrackedResource(resourceType: Model) {
   const resultKind = getArmResourceKind(resourceType);
   return resultKind === "Tracked";
