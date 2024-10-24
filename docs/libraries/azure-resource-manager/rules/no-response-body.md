@@ -58,10 +58,10 @@ op walk(): Test204EmptyResponse;
 #### ❌ Incorrect
 
 ```tsp
-model Test201EmtpyResponse {
+model Test201EmptyResponse {
   @statusCode statusCode: 201;
 }
-op walk(): Test201EmtpyResponse;
+op walk(): Test201EmptyResponse;
 ```
 
 ```json
