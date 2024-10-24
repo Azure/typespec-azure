@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Update of arm no-response-body to have a similar behavior of the core rule, but with the difference that it will exclude also 202 response, meaning that 202 should also be empty.
+Update the `arm no-response-body` rule to behave similarly to the core rule, but with the additional requirement that the 202 response can and should also be empty
