@@ -16,4 +16,7 @@ enum Versions {
 
   @doc("The Azure Resource Manager v5 common types.")
   v5,
+
+  @doc("The Azure Resource Manager v6 common types.")
+  v6,
 }
