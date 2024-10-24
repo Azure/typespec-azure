@@ -405,13 +405,9 @@ function getContextPath(
     for (const response of httpOperation.responses) {
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
-          const body =
-            innerResponse.body.type.kind === "Model"
-              ? getEffectivePayloadType(context, innerResponse.body.type)
-              : innerResponse.body.type;
           visited.clear();
           result = [{ name: root.name }];
-          if (dfsModelProperties(typeToFind, body, "Response")) {
+          if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response", true)) {
             return result;
           }
         }
@@ -455,6 +451,7 @@ function getContextPath(
     expectedType: Model | Union | TspLiteralType,
     currentType: Type,
     displayName: string,
+    needFindEffectiveType: boolean = false,
   ): boolean {
     if (currentType == null || visited.has(currentType)) {
       // cycle reference detected
@@ -493,6 +490,9 @@ function getContextPath(
       }
 
       // handle model
+      if (needFindEffectiveType) {
+        currentType = getEffectiveModelType(context.program, currentType);
+      }
       result.push({ name: displayName, type: currentType });
       for (const property of currentType.properties.values()) {
         // traverse model property
