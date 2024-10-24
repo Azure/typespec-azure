@@ -24,6 +24,8 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
+        namespace Azure.MyService;
+
         model TestAcceptedResponse {
           @statusCode statusCode: 202;
         }
@@ -37,6 +39,8 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
+        namespace Azure.MyService;
+
         model TestAcceptedResponse {
           @statusCode statusCode: 204;
         }
@@ -50,6 +54,8 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
+        namespace Azure.MyService;
+        
         model TestAcceptedResponse {
           @statusCode statusCode: 204;
           @bodyRoot body: string;
@@ -67,6 +73,8 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
+        namespace Azure.MyService;
+
         model TestAcceptedResponse {
           @statusCode statusCode: 202;
           @bodyRoot body: string;
@@ -84,6 +92,8 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
+        namespace Azure.MyService;
+
         model TestAcceptedResponse {
           @statusCode statusCode: 201;
         }
