@@ -133,12 +133,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
     );
   }
-  basic.response.resultPath = pagedMetadata.itemsSegments?.join(".");
+  basic.response.resultPath = getPathFromSegment(
+    context,
+    pagedMetadata.modelType,
+    pagedMetadata.itemsSegments,
+  );
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
+    nextLinkPath: getPathFromSegment(
+      context,
+      pagedMetadata.modelType,
+      pagedMetadata?.nextLinkSegments,
+    ),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
           getSdkServiceOperation<TServiceOperation>(
@@ -149,6 +157,23 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         )
       : undefined,
   });
+}
+
+function getPathFromSegment(context: TCGCContext, type: Model, segments?: string[]): string {
+  if (!segments || segments.length === 0) {
+    return "";
+  }
+  const wireSegments = [];
+  let current = type;
+  for (const segment of segments) {
+    const property = current.properties.get(segment);
+    if (!property) {
+      return "";
+    }
+    wireSegments.push(getLibraryName(context, property));
+    current = property.type as Model;
+  }
+  return wireSegments.join(".");
 }
 
 function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
