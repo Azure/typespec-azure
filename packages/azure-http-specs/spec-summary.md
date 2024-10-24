@@ -8,12 +8,12 @@
   - `get /azure/client-generator-core/access/internalOperation/publicDecoratorInInternal`
 
 This scenario contains internal operations. All should be generated but not exposed.
-Expected query parameter: name=<any string>
+Expected query parameter: name="sample"
 Expected response body:
 
 ```json
 {
-  "name": <any string>
+  "name": "sample"
 }
 ```
 
@@ -24,12 +24,12 @@ Expected response body:
   - `get /azure/client-generator-core/access/publicOperation/publicDecoratorInPublic`
 
 This scenario contains public operations. It should be generated and exported.
-Expected query parameter: name=<any string>
+Expected query parameter: name="sample"
 Expected response body:
 
 ```json
 {
-  "name": <any string>
+  "name": "sample"
 }
 ```
 
@@ -48,12 +48,12 @@ This scenario contains internal operations. All should be generated but not expo
   - `get /azure/client-generator-core/access/sharedModelInOperation/internal`
 
 This scenario contains two operations, one public, another internal. The public one should be generated and exported while the internal one should be generated but not exposed.
-Expected query parameter: name=<any string>
+Expected query parameter: name="sample"
 Expected response body:
 
 ```json
 {
-  "name": <any string>
+  "name": "sample"
 }
 ```
 
