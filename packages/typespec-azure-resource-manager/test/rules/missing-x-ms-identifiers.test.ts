@@ -130,4 +130,29 @@ describe("typespec-azure-core: no-enum rule", () => {
       )
       .toBeValid();
   });
+
+  it("allow array of x-ms-identifiers", async () => {
+    await tester
+      .expect(
+        `
+        model Pet {
+          @OpenAPI.extension("x-ms-identifiers", ["food/brand/name"])
+          pet: Dog[];
+        }
+ 
+        model Dog {
+          food: Food;
+        }
+        
+        model Food {
+          brand: Brand;
+        }
+        
+        model Brand {
+          name: string;
+        }
+        `,
+      )
+      .toBeValid();
+  });
 });
