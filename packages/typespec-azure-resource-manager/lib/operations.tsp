@@ -49,13 +49,23 @@ op ArmResourceListByParent<
   ParentName extends valueof string = "",
   ParentFriendlyName extends valueof string = "",
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+  Response = ArmResponse<ResourceListResult<Resource>>,
   Error extends {} = ErrorResponse
-> is ArmReadOperation<
+> is ArmCustomReadOperation<
   ResourceParentParameters<Resource, BaseParameters> & Parameters,
   Response,
   Error
 >;
+
+/**
+ * @dev Template for Azure Resource Manager GET and HEAD Operations.
+ * @param Parameters The parameter object for the operation.
+ * @param Response The response or union of responses for success, it can be any type.
+ * @param ErrorResponse The error response.
+ */
+op ArmCustomReadOperation<Parameters extends {}, Response, ErrorResponse extends {}>(
+  ...Parameters,
+): Response | ErrorResponse;
 
 /**
  * A resource list operation, with scope determined by BaseParameters

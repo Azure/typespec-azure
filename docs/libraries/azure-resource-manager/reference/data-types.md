@@ -728,6 +728,27 @@ model Foo is TrackedResource<FooProperties> {
 | ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | kind? | `string` | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type. If supported, the resource provider must validate and persist this value. |
 
+### `ResourceListCustomResult` {#Azure.ResourceManager.ResourceListCustomResult}
+
+Paged response containing results
+
+```typespec
+model Azure.ResourceManager.ResourceListCustomResult<Result>
+```
+
+#### Template Parameters
+
+| Name   | Description                                           |
+| ------ | ----------------------------------------------------- |
+| Result | The type of the values returned in the paged response |
+
+#### Properties
+
+| Name      | Type             | Description                        |
+| --------- | ---------------- | ---------------------------------- |
+| value     | `Array<Element>` | The items on this page             |
+| nextLink? | `string`         | The link to the next page of items |
+
 ### `ResourceListResult` {#Azure.ResourceManager.ResourceListResult}
 
 Paged response containing resources

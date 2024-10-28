@@ -650,6 +650,20 @@ op Azure.ResourceManager.ArmCustomPatchSync(provider: "Microsoft.ThisWillBeRepla
 | Response       | Optional. The success response for the patch operation    |
 | Error          | Optional. The error response, if non-standard.            |
 
+### `ArmCustomReadOperation` {#Azure.ResourceManager.ArmCustomReadOperation}
+
+```typespec
+op Azure.ResourceManager.ArmCustomReadOperation(): Response | ErrorResponse
+```
+
+#### Template Parameters
+
+| Name          | Description |
+| ------------- | ----------- |
+| Parameters    |             |
+| Response      |             |
+| ErrorResponse |             |
+
 ### `ArmListBySubscription` {#Azure.ResourceManager.ArmListBySubscription}
 
 A resource list operation, at the subscription scope

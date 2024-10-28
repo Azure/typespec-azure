@@ -293,7 +293,24 @@ model ResourceKindProperty {
  */
 @doc("The response of a {name} list operation.", Resource)
 @friendlyName("{name}ListResult", Resource)
-model ResourceListResult<Resource extends {}> is Azure.Core.Page<Resource>;
+model ResourceListResult<Resource extends Foundations.Resource> is Azure.Core.Page<Resource>;
+
+/**
+ * Paged response containing results
+ * @template Result The type of the values returned in the paged response
+ */
+@doc("The custom response of a list operation.")
+@friendlyName("{name}ListResult", Result)
+@pagedResult
+model ResourceListCustomResult<Result> {
+  /** The items on this page */
+  @items
+  value: Result[];
+
+  /** The link to the next page of items */
+  @nextLink
+  nextLink?: string;
+}
 
 #deprecated "`ResourcePlan` will be deprecated. Please use `ResourcePlanProperty` instead."
 alias ResourcePlan = ResourcePlanProperty;
