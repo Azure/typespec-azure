@@ -60,7 +60,7 @@ export const missingXmsIdentifiersRule = createRule({
       if (Array.isArray(xmsIdentifiers)) {
         for (const propIdentifier of xmsIdentifiers) {
           if (typeof propIdentifier === "string") {
-            const props = propIdentifier.split("/");
+            const props = propIdentifier.replace(/^\//, "").split("/");
             let element = elementType;
             for (const prop of props) {
               const propertyValue = getProperty(element, prop);
