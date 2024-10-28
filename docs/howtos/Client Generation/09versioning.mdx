@@ -295,16 +295,16 @@ using TypeSpec.Http;
 namespace My.Service;
 
 enum Versions {
-v2023_11_01_preview: "2023-11-01-preview",
-v2023_11_01: "2023-11-01",
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_01: "2023-11-01",
 }
 
 model PreviewModel {
-betaFeature: string;
+  betaFeature: string;
 }
 
 model StableModel {
-stableFeature: string;
+  stableFeature: string;
 }
 
 @added(Versions.v2023_11_01_preview)
