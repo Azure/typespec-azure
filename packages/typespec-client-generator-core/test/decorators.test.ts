@@ -644,9 +644,17 @@ describe("typespec-client-generator-core: decorators", () => {
         
         @clientName("TestJava", "java")
         @clientName("TestCSharp", "csharp")
+        @clientName("TestOAS3", "@typespec/openapi3")
         model Test {}
         op test(@body body: Test): void;
       `;
+
+      // OAS3
+      {
+        const runner = await createSdkTestRunner({ emitterName: "@typespec/openapi3" });
+        await runner.compile(testCode);
+        strictEqual(runner.context.sdkPackage.models[0].name, "TestOAS3");
+      }
 
       // java
       {
