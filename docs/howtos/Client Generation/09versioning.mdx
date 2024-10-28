@@ -265,20 +265,20 @@ In this example, we are going to override to return the preview api surface area
 <Tabs>
 <TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
 
-  ```yaml
-  ---
-  options:
-  "@azure-tools/typespec-python":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-csharp":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-ts":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-java":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-go":
-  api-version: "2023-11-01-preview"
-  ```
+```yaml
+---
+options:
+"@azure-tools/typespec-python":
+api-version: "2023-11-01-preview"
+"@azure-tools/typespec-csharp":
+api-version: "2023-11-01-preview"
+"@azure-tools/typespec-ts":
+api-version: "2023-11-01-preview"
+"@azure-tools/typespec-java":
+api-version: "2023-11-01-preview"
+"@azure-tools/typespec-go":
+api-version: "2023-11-01-preview"
+```
 
 </TabItem>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -403,6 +403,7 @@ serviceClientClient.previewFunctionality(previewModel);
 </Tabs>
 
 ### Override to return all
+
 You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation.
 
 In the following examples, you can observe how this change is made in `tspconfig.yaml`.
@@ -410,20 +411,20 @@ In the following examples, you can observe how this change is made in `tspconfig
 <Tabs>
 <TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
 
-  ```yaml
-  ---
-  options:
-  "@azure-tools/typespec-python":
-  api-version: "all"
-  "@azure-tools/typespec-csharp":
-  api-version: "all"
-  "@azure-tools/typespec-ts":
-  api-version: "all"
-  "@azure-tools/typespec-java":
-  api-version: "all"
-  "@azure-tools/typespec-go":
-  api-version: "all"
-  ```
+```yaml
+---
+options:
+"@azure-tools/typespec-python":
+api-version: "all"
+"@azure-tools/typespec-csharp":
+api-version: "all"
+"@azure-tools/typespec-ts":
+api-version: "all"
+"@azure-tools/typespec-java":
+api-version: "all"
+"@azure-tools/typespec-go":
+api-version: "all"
+```
 
 </TabItem>
 <TabItem value="typespec" label="TypeSpec" default>
