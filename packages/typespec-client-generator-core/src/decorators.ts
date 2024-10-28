@@ -859,7 +859,6 @@ export const $clientName: ClientNameDecorator = (
 ) => {
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
-  console.log('test');
   if (entity.kind === "Model" || entity.kind === "Operation") {
     if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
       if (
