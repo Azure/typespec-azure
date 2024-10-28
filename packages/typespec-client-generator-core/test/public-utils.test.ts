@@ -17,6 +17,7 @@ import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
   getGeneratedName,
+  getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
   isApiVersion,
@@ -1610,11 +1611,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(repeatabilityResult.type.kind, "Union");
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
-        strictEqual(unionEnum.name, "ResponseWithAnonymousUnionRepeatabilityResult");
+        strictEqual(unionEnum.name, "TestResponseRepeatabilityResult");
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "ResponseWithAnonymousUnion.repeatabilityResult.anonymous",
+          "test.ResponseRepeatabilityResult.anonymous",
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1703,90 +1704,107 @@ describe("typespec-client-generator-core: public-utils", () => {
         );
         strictEqual(name, "TestModelAnonymousProp");
       });
-    });
 
-    describe("getLroMetadata", () => {
-      const lroCode = `
-      @versioned(Versions)
-      @service({title: "Test Service"})
-      namespace TestService;
-      alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
-      NoRepeatableRequests &
-      NoClientRequestId>;
+      it("anonymous model in response", async () => {
+        const { test } = (await runner.compile(`
+        @service({})
+        namespace MyService {
+          @test
+          op test(): {@header header: string, prop: string};
+        }
+        `)) as { test: Operation };
 
-      @doc("The API version.")
-      enum Versions {
-        @doc("The 2022-12-01-preview version.")
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        v2022_12_01_preview: "2022-12-01-preview",
-      }
-
-      @resource("users")
-      @doc("Details about a user.")
-      model User {
-      @key
-      @visibility("read")
-      @doc("The name of user.")
-      name: string;
-
-      @doc("The role of user")
-      role: string;
-      }
-
-      @doc("The parameters for exporting a user.")
-      model UserExportParams {
-      @query
-      @doc("The format of the data.")
-      format: string;
-      }
-
-      @doc("The exported user data.")
-      model ExportedUser {
-      @doc("The name of user.")
-      name: string;
-
-      @doc("The exported URI.")
-      resourceUri: string;
-      }
-
-      op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
-    `;
-      it("filter-out-core-models true", async () => {
-        const runnerWithCore = await createSdkTestRunner({
-          librariesToAdd: [AzureCoreTestLibrary],
-          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-          emitterName: "@azure-tools/typespec-java",
-        });
-        await runnerWithCore.compile(lroCode);
-        const models = runnerWithCore.context.sdkPackage.models;
-        strictEqual(models.length, 1);
-        deepStrictEqual(models[0].name, "ExportedUser");
-      });
-      it("filter-out-core-models false", async () => {
-        const runnerWithCore = await createSdkTestRunner({
-          librariesToAdd: [AzureCoreTestLibrary],
-          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-          emitterName: "@azure-tools/typespec-java",
-        });
-        await runnerWithCore.compile(lroCode);
-        runnerWithCore.context.filterOutCoreModels = false;
-        const models = getAllModels(runnerWithCore.context);
-        strictEqual(models.length, 8);
-        // there should only be one non-core model
-        deepStrictEqual(
-          models.map((x) => x.name).sort(),
-          [
-            "ResourceOperationStatusUserExportedUserError",
-            "OperationState",
-            "Error",
-            "InnerError",
-            "ExportedUser",
-            "ErrorResponse",
-            "OperationStatusExportedUserError",
-            "Versions",
-          ].sort(),
+        const httpOperation = getHttpOperationWithCache(runner.context, test);
+        const name = getGeneratedName(
+          runner.context,
+          httpOperation.responses[0].responses[0].body?.type as Model,
         );
+        strictEqual(name, "TestResponse");
       });
+    });
+  });
+
+  describe("getLroMetadata", () => {
+    const lroCode = `
+    @versioned(Versions)
+    @service({title: "Test Service"})
+    namespace TestService;
+    alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
+    NoRepeatableRequests &
+    NoClientRequestId>;
+
+    @doc("The API version.")
+    enum Versions {
+      @doc("The 2022-12-01-preview version.")
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
+
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+    @key
+    @visibility("read")
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The role of user")
+    role: string;
+    }
+
+    @doc("The parameters for exporting a user.")
+    model UserExportParams {
+    @query
+    @doc("The format of the data.")
+    format: string;
+    }
+
+    @doc("The exported user data.")
+    model ExportedUser {
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The exported URI.")
+    resourceUri: string;
+    }
+
+    op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+  `;
+    it("filter-out-core-models true", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(lroCode);
+      const models = runnerWithCore.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      deepStrictEqual(models[0].name, "ExportedUser");
+    });
+    it("filter-out-core-models false", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(lroCode);
+      runnerWithCore.context.filterOutCoreModels = false;
+      const models = getAllModels(runnerWithCore.context);
+      strictEqual(models.length, 8);
+      // there should only be one non-core model
+      deepStrictEqual(
+        models.map((x) => x.name).sort(),
+        [
+          "ResourceOperationStatusUserExportedUserError",
+          "OperationState",
+          "Error",
+          "InnerError",
+          "ExportedUser",
+          "ErrorResponse",
+          "OperationStatusExportedUserError",
+          "Versions",
+        ].sort(),
+      );
     });
   });
 });
