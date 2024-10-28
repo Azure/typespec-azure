@@ -258,11 +258,29 @@ serviceClientClient.stableFunctionality(stableModel);
 
 ### Override to a specific version
 
-You can override the signature to return the api surface area for a specific api version.
+You can override the signature to return the api surface area for a specific api version, this change is done in `tspconfig.yaml`.
 
 In this example, we are going to override to return the preview api surface area for our spec. The preview api surface area contains all of the functionality.
 
 <Tabs>
+<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
+
+  ```yaml
+  ---
+  options:
+  "@azure-tools/typespec-python":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-csharp":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-ts":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-java":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-go":
+  api-version: "2023-11-01-preview"
+  ```
+
+</TabItem>
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
@@ -277,16 +295,16 @@ using TypeSpec.Http;
 namespace My.Service;
 
 enum Versions {
-  v2023_11_01_preview: "2023-11-01-preview",
-  v2023_11_01: "2023-11-01",
+v2023_11_01_preview: "2023-11-01-preview",
+v2023_11_01: "2023-11-01",
 }
 
 model PreviewModel {
-  betaFeature: string;
+betaFeature: string;
 }
 
 model StableModel {
-  stableFeature: string;
+stableFeature: string;
 }
 
 @added(Versions.v2023_11_01_preview)
@@ -297,26 +315,6 @@ op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 </TabItem>
-
-<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
-
-```yaml
----
-options:
-  "@azure-tools/typespec-python":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-csharp":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-ts":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-java":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-go":
-    api-version: "2023-11-01-preview"
-```
-
-</TabItem>
-
 <TabItem value="python" label="Python">
 
 ```python
@@ -405,10 +403,29 @@ serviceClientClient.previewFunctionality(previewModel);
 </Tabs>
 
 ### Override to return all
+You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation.
 
-You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
+In the following examples, you can observe how this change is made in `tspconfig.yaml`.
 
 <Tabs>
+<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
+
+  ```yaml
+  ---
+  options:
+  "@azure-tools/typespec-python":
+  api-version: "all"
+  "@azure-tools/typespec-csharp":
+  api-version: "all"
+  "@azure-tools/typespec-ts":
+  api-version: "all"
+  "@azure-tools/typespec-java":
+  api-version: "all"
+  "@azure-tools/typespec-go":
+  api-version: "all"
+  ```
+
+</TabItem>
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
@@ -443,26 +460,6 @@ op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 </TabItem>
-
-<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
-
-```yaml
----
-options:
-  "@azure-tools/typespec-python":
-    api-version: "all"
-  "@azure-tools/typespec-csharp":
-    api-version: "all"
-  "@azure-tools/typespec-ts":
-    api-version: "all"
-  "@azure-tools/typespec-java":
-    api-version: "all"
-  "@azure-tools/typespec-go":
-    api-version: "all"
-```
-
-</TabItem>
-
 <TabItem value="python" label="Python">
 
 ```python
