@@ -408,12 +408,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation,
 ): [
-    {
-      responses: SdkHttpResponse[];
-      exceptions: SdkHttpErrorResponse[];
-    },
-    readonly Diagnostic[],
-  ] {
+  {
+    responses: SdkHttpResponse[];
+    exceptions: SdkHttpErrorResponse[];
+  },
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
