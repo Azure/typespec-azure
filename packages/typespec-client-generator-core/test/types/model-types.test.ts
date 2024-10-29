@@ -720,7 +720,11 @@ describe("typespec-client-generator-core: model types", () => {
 
     for (const [type, sdkType] of runner.context.referencedTypeMap?.entries() ?? []) {
       if (isAzureCoreModel(type)) {
-        ok(sdkType.kind !== "union" && sdkType.kind !== "nullable" && sdkType.usage !== UsageFlags.None);
+        ok(
+          sdkType.kind !== "union" &&
+            sdkType.kind !== "nullable" &&
+            sdkType.usage !== UsageFlags.None,
+        );
       }
     }
   });

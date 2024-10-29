@@ -505,7 +505,9 @@ export function getSdkUnionWithDiagnostics(
 
     // if a union is `type | null`, then we will return a nullable wrapper type of the type
     if (nonNullOptions.length === 1 && nullOption !== undefined) {
-      retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, nonNullOptions[0], operation));
+      retval = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, nonNullOptions[0], operation),
+      );
     } else if (
       // judge if the union can be converted to enum
       // if language does not need flatten union as enum
@@ -748,7 +750,9 @@ export function getSdkModelWithDiagnostics(
     // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     if (type.baseModel) {
-      sdkType.baseModel = context.referencedTypeMap?.get(type.baseModel) as SdkModelType | undefined;
+      sdkType.baseModel = context.referencedTypeMap?.get(type.baseModel) as
+        | SdkModelType
+        | undefined;
       if (sdkType.baseModel === undefined) {
         const baseModel = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, type.baseModel, operation),
@@ -1279,8 +1283,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
-        )
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
+          )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1391,7 +1395,12 @@ function addPropertiesToModelType(
 }
 
 function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkType) {
-  if (sdkType.kind !== "model" && sdkType.kind !== "enum" && sdkType.kind !== "union" && sdkType.kind !== "nullable") {
+  if (
+    sdkType.kind !== "model" &&
+    sdkType.kind !== "enum" &&
+    sdkType.kind !== "union" &&
+    sdkType.kind !== "nullable"
+  ) {
     return;
   }
   if (context.referencedTypeMap === undefined) {
@@ -1432,7 +1441,13 @@ function updateUsageOrAccess(
     diagnostics.pipe(updateUsageOrAccess(context, value, type.enumType, options));
     return diagnostics.wrap(undefined);
   }
-  if (type.kind !== "model" && type.kind !== "enum" && type.kind !== "union" && type.kind !== "nullable") return diagnostics.wrap(undefined);
+  if (
+    type.kind !== "model" &&
+    type.kind !== "enum" &&
+    type.kind !== "union" &&
+    type.kind !== "nullable"
+  )
+    return diagnostics.wrap(undefined);
   options.seenTypes.add(type);
 
   if (!options.skipFirst) {
@@ -1508,9 +1523,7 @@ function updateUsageOrAccess(
   }
   if (type.additionalProperties) {
     options.ignoreSubTypeStack.push(false);
-    diagnostics.pipe(
-      updateUsageOrAccess(context, value, type.additionalProperties, options),
-    );
+    diagnostics.pipe(updateUsageOrAccess(context, value, type.additionalProperties, options));
     options.ignoreSubTypeStack.pop();
   }
   for (const property of type.properties) {
@@ -1691,9 +1704,7 @@ function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[
   for (const sdkType of context.referencedTypeMap?.values() ?? []) {
     const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (accessOverride) {
-      diagnostics.pipe(
-        updateUsageOrAccess(context, accessOverride, sdkType, { isOverride: true }),
-      );
+      diagnostics.pipe(updateUsageOrAccess(context, accessOverride, sdkType, { isOverride: true }));
     }
   }
   return diagnostics.wrap(undefined);
@@ -1704,9 +1715,7 @@ function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]
   for (const sdkType of context.referencedTypeMap?.values() ?? []) {
     const usageOverride = getUsageOverride(context, sdkType.__raw as any);
     if (usageOverride) {
-      diagnostics.pipe(
-        updateUsageOrAccess(context, usageOverride, sdkType, { isOverride: true }),
-      );
+      diagnostics.pipe(updateUsageOrAccess(context, usageOverride, sdkType, { isOverride: true }));
     }
   }
   return diagnostics.wrap(undefined);
@@ -1740,7 +1749,10 @@ function handleServiceOrphanType(
   return diagnostics.wrap(undefined);
 }
 
-function filterOutTypes(context: TCGCContext, filter: number): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
+function filterOutTypes(
+  context: TCGCContext,
+  filter: number,
+): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
   const result = new Set<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   for (const [type, sdkType] of context.referencedTypeMap?.entries() ?? []) {
     // filter models/enums/union of Core
@@ -1765,7 +1777,11 @@ export function getAllModelsWithDiagnostics(
   options: UsageFilteringOptions = {},
 ): [(SdkModelType | SdkEnumType)[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap(filterOutTypes(context, getFilterNumber(options)).filter(x => x.kind === "model" || x.kind === "enum"));
+  return diagnostics.wrap(
+    filterOutTypes(context, getFilterNumber(options)).filter(
+      (x) => x.kind === "model" || x.kind === "enum",
+    ),
+  );
 }
 
 export function getAllModels(
@@ -1791,14 +1807,20 @@ function getFilterNumber(options: UsageFilteringOptions = {}): number {
   return filter;
 }
 
-export function getAllReferencedTypes(context: TCGCContext, options: UsageFilteringOptions = {}): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
+export function getAllReferencedTypes(
+  context: TCGCContext,
+  options: UsageFilteringOptions = {},
+): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
   return filterOutTypes(context, getFilterNumber(options));
 }
 
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (context.referencedTypeMap === undefined) {
-    context.referencedTypeMap = new Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
+    context.referencedTypeMap = new Map<
+      Type,
+      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
+    >();
   }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
@@ -1832,9 +1854,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
         getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
       );
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
-      diagnostics.pipe(
-        updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum),
-      );
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }
   // update for orphan models/enums/unions

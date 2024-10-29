@@ -81,7 +81,6 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
-  getAllModelsWithDiagnostics,
   getAllReferencedTypes,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
@@ -152,12 +151,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     ),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-        getSdkServiceOperation<TServiceOperation>(
-          context,
-          pagedMetadata.nextLinkOperation,
-          basic.parameters,
-        ),
-      )
+          getSdkServiceOperation<TServiceOperation>(
+            context,
+            pagedMetadata.nextLinkOperation,
+            basic.parameters,
+          ),
+        )
       : undefined,
   });
 }
@@ -225,14 +224,14 @@ function getServiceMethodLroMetadata(
     finalResponse:
       rawMetadata.finalEnvelopeResult !== undefined && rawMetadata.finalEnvelopeResult !== "void"
         ? {
-          envelopeResult: diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-          ) as SdkModelType,
-          result: diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
-          ) as SdkModelType,
-          resultPath: rawMetadata.finalResultPath,
-        }
+            envelopeResult: diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
+            ) as SdkModelType,
+            result: diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
+            ) as SdkModelType,
+            resultPath: rawMetadata.finalResultPath,
+          }
         : undefined,
     finalStep:
       rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,
@@ -778,7 +777,9 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
-    unions: allReferencedTypes.filter((x): x is SdkUnionType | SdkNullableType => x.kind === "union" || x.kind === "nullable"),
+    unions: allReferencedTypes.filter(
+      (x): x is SdkUnionType | SdkNullableType => x.kind === "union" || x.kind === "nullable",
+    ),
     crossLanguagePackageId,
   });
 }
