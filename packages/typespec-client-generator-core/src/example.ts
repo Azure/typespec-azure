@@ -269,7 +269,7 @@ function handleHttpParameters(
   ) {
     for (const name of Object.keys(example.parameters)) {
       let parameter = parameters.find(
-        (p) => (p.kind !== "body" && p.serializedName === name) || p.name === name,
+        (p) => p.serializedName === name,
       );
       // fallback to body in example for any body parameter
       if (!parameter && name === "body") {
