@@ -38,10 +38,9 @@ export interface TCGCContext {
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  referencedTypeMap?: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
@@ -159,8 +158,8 @@ export interface SdkBuiltInType extends SdkTypeBase {
 
 type TypeEquality<T, U> = keyof T extends keyof U
   ? keyof U extends keyof T
-    ? true
-    : false
+  ? true
+  : false
   : false;
 
 // these two vars are used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
@@ -307,6 +306,8 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   type: SdkType;
+  usage: UsageFlags;
+  access: AccessFlags;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
@@ -346,6 +347,8 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
+  access: AccessFlags;
+  usage: UsageFlags;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -532,7 +535,7 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
   statusCodes: number | HttpStatusCodeRange | "*";
 }
 
-interface SdkServiceOperationBase {}
+interface SdkServiceOperationBase { }
 
 export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
@@ -590,7 +593,7 @@ interface SdkPagingServiceMethodOptions {
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+  SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
@@ -633,10 +636,10 @@ export interface SdkLroServicePollingStep {
 export interface SdkLroServiceFinalStep {
   /** Final step kind */
   kind:
-    | "finalOperationLink"
-    | "finalOperationReference"
-    | "pollingSuccessProperty"
-    | "noPollingResult";
+  | "finalOperationLink"
+  | "finalOperationReference"
+  | "pollingSuccessProperty"
+  | "noPollingResult";
 }
 
 /**
@@ -653,14 +656,14 @@ export interface SdkLroServiceFinalResponse {
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions {
+  SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+  SdkLroServiceMethodOptions,
+  SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
@@ -686,6 +689,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
 }
 
@@ -770,24 +774,24 @@ interface SdkExampleValueBase {
 export interface SdkStringExampleValue extends SdkExampleValueBase {
   kind: "string";
   type:
-    | SdkBuiltInType
-    | SdkDateTimeType
-    | SdkDurationType
-    | SdkEnumType
-    | SdkEnumValueType
-    | SdkConstantType;
+  | SdkBuiltInType
+  | SdkDateTimeType
+  | SdkDurationType
+  | SdkEnumType
+  | SdkEnumValueType
+  | SdkConstantType;
   value: string;
 }
 
 export interface SdkNumberExampleValue extends SdkExampleValueBase {
   kind: "number";
   type:
-    | SdkBuiltInType
-    | SdkDateTimeType
-    | SdkDurationType
-    | SdkEnumType
-    | SdkEnumValueType
-    | SdkConstantType;
+  | SdkBuiltInType
+  | SdkDateTimeType
+  | SdkDurationType
+  | SdkEnumType
+  | SdkEnumValueType
+  | SdkConstantType;
   value: number;
 }
 
