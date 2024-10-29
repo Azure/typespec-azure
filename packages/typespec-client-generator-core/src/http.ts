@@ -592,7 +592,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      methodParam.__raw.node === serviceParam.__raw.node
+      findRootSourceProperty(methodParam.__raw) === findRootSourceProperty(serviceParam.__raw)
     ) {
       return methodParam;
     }
@@ -623,6 +623,13 @@ function findMapping(
     }
   }
   return undefined;
+}
+
+function findRootSourceProperty(property: ModelProperty): ModelProperty {
+  while (property.sourceProperty) {
+    property = property.sourceProperty;
+  }
+  return property;
 }
 
 function getCollectionFormat(
