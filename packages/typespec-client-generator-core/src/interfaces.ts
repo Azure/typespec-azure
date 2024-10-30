@@ -38,10 +38,9 @@ export interface TCGCContext {
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  referencedTypeMap?: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
@@ -307,6 +306,8 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   type: SdkType;
+  usage: UsageFlags;
+  access: AccessFlags;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
@@ -346,6 +347,8 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
+  access: AccessFlags;
+  usage: UsageFlags;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -687,6 +690,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
 }
 
