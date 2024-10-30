@@ -35,7 +35,7 @@ op postAction is ArmProviderActionAsync<
 #### ✅ Correct
 
 ```tsp
-@get op getAction is ArmProviderActionAsync<
+@get op getAction is ArmProviderActionSync<
   {
     name: string;
   },
