@@ -1056,5 +1056,35 @@ describe("typespec-client-generator-core: parameters", () => {
       strictEqual(param.collectionFormat, undefined);
       strictEqual(param.explode, true);
     });
+
+    it("body param: serialized name with encoded name", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(@body @encodedName("application/json", "test") param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "test");
+    });
+
+    it("body param: serialized name without encoded name", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(@body param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "param");
+    });
+
+    it("body param: serialized name of implicit body", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "body");
+    });
   });
 });
