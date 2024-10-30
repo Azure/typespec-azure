@@ -62,6 +62,7 @@ import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
+  getWireName,
   isApiVersion,
 } from "./public-utils.js";
 import {
@@ -180,6 +181,7 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
+        serializedName: "body",
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
@@ -361,6 +363,7 @@ export function getSdkHttpParameter(
     return diagnostics.wrap({
       ...base,
       kind: "body",
+      serializedName: param.name === "" ? "body" : getWireName(context, param),
       contentTypes: ["application/json"], // will update when we get to the operation level
       defaultContentType: "application/json", // will update when we get to the operation level
       optional: param.optional,

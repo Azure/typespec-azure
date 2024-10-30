@@ -483,6 +483,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
 
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
+  serializedName: string;
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
