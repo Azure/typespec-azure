@@ -203,7 +203,7 @@ async function rebuildAndRegenSamplesToBumpTemplateVersions() {
   await typespecAzureRunWithOptions(
     { env: { ...process.env, TYPESPEC_SKIP_DOCUSAURUS_BUILD: true } },
     "pnpm",
-    "build"
+    "build",
   );
   if (!args.values.onlyBumpVersions) {
     await typespecAzureRun("pnpm", "build");
@@ -216,7 +216,7 @@ async function rebuildAndRegenSamplesToBumpTemplateVersions() {
       "git",
       "commit",
       "-m",
-      "Rebuild and regen samples to bump template versions"
+      "Rebuild and regen samples to bump template versions",
     );
   }
 }

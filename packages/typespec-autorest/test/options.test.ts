@@ -13,7 +13,7 @@ import { createAutorestTestRunner, ignoreDiagnostics } from "./test-host.js";
 
 async function openapiWithOptions(
   code: string,
-  options: AutorestEmitterOptions
+  options: AutorestEmitterOptions,
 ): Promise<OpenAPI2Document> {
   const runner = await createAutorestTestRunner();
 
@@ -49,7 +49,7 @@ describe("typespec-autorest: options", () => {
         ignoreDiagnostics(diagnostics, [
           "@typespec/http/no-service-found",
           "@azure-tools/typespec-azure-core/use-standard-operations",
-        ])
+        ]),
       );
 
       return runner.fs.get(outPath)!;
@@ -108,7 +108,7 @@ describe("typespec-autorest: options", () => {
           emitters: {
             "@azure-tools/typespec-autorest": { "emitter-output-dir": emitterOutputDir },
           },
-        }
+        },
       );
       ok(runner.fs.has(resolvePath(emitterOutputDir, "openapi.json")));
     });
@@ -126,7 +126,7 @@ describe("typespec-autorest: options", () => {
               "emitter-output-dir": emitterOutputDir,
             },
           },
-        }
+        },
       );
       ok(runner.fs.has(resolveVirtualPath("./my-output/openapi.json")));
     });
@@ -151,11 +151,11 @@ op test(): void;
               "emitter-output-dir": emitterOutputDir,
             },
           },
-        }
+        },
       );
       ok(
         !versionedRunner.fs.has(resolveVirtualPath("./my-output/openapi.json")),
-        "Shouldn't have created the non versioned file name"
+        "Shouldn't have created the non versioned file name",
       );
       ok(versionedRunner.fs.has(resolveVirtualPath("./my-output/v1/openapi.json")));
       ok(versionedRunner.fs.has(resolveVirtualPath("./my-output/v2/openapi.json")));
@@ -182,18 +182,18 @@ op test(): void;
               "azure-resource-provider-folder": "./arm-folder",
             },
           },
-        }
+        },
       );
 
       ok(
         versionedRunner.fs.has(
-          resolveVirtualPath("./my-output/arm-folder/TestService/stable/v1/openapi.json")
-        )
+          resolveVirtualPath("./my-output/arm-folder/TestService/stable/v1/openapi.json"),
+        ),
       );
       ok(
         versionedRunner.fs.has(
-          resolveVirtualPath("./my-output/arm-folder/TestService/preview/v2-preview/openapi.json")
-        )
+          resolveVirtualPath("./my-output/arm-folder/TestService/preview/v2-preview/openapi.json"),
+        ),
       );
     });
   });
@@ -206,7 +206,7 @@ op test(): void;
         model Referenced {name: string}
         op test(): Referenced;
       `,
-        {}
+        {},
       );
       deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced", "Referenced"]);
     });
@@ -220,7 +220,7 @@ op test(): void;
       `,
         {
           "omit-unreachable-types": true,
-        }
+        },
       );
       deepStrictEqual(Object.keys(output.definitions!), ["Referenced"]);
     });
@@ -255,7 +255,7 @@ op test(): void;
           enum Versions {v1, v2}
           enum NotReferenced {a, b}
         }`,
-        {}
+        {},
       );
       deepStrictEqual(Object.keys(output.definitions!), ["NotReferenced"]);
     });
@@ -267,7 +267,7 @@ op test(): void;
         `
         model Foo {names: string[]}
       `,
-        {}
+        {},
       );
       ok(!("x-typespec-name" in output.definitions!.Foo.properties!.names));
     });
@@ -277,7 +277,7 @@ op test(): void;
         `
         model Foo {names: string[]}
       `,
-        { "include-x-typespec-name": "never" }
+        { "include-x-typespec-name": "never" },
       );
       ok(!("x-typespec-name" in output.definitions!.Foo.properties!.names));
     });
@@ -287,7 +287,7 @@ op test(): void;
         `
         model Foo {names: string[]}
       `,
-        { "include-x-typespec-name": "inline-only" }
+        { "include-x-typespec-name": "inline-only" },
       );
       const prop: any = output.definitions!.Foo.properties!.names;
       strictEqual(prop["x-typespec-name"], `string[]`);
@@ -388,7 +388,8 @@ op test(): void;
   });
 
   describe("'emit-common-types-schema' option", () => {
-    const commonTypesPath = "../../common-types/resource-management/v3/types.json";
+    const commonTypesFolder = resolveVirtualPath("/common-types/resource-management");
+    const commonTypesPath = "common-types/resource-management/v3/types.json";
     const commonCode = `
       @armProviderNamespace
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
@@ -436,6 +437,7 @@ op test(): void;
     it("emits only schema references with 'never' setting", async () => {
       const output = await openapiWithOptions(commonCode, {
         "emit-common-types-schema": "never",
+        "arm-types-dir": commonTypesFolder,
       });
       ok(output.definitions);
       ok(output.definitions["WidgetUpdate"]);
@@ -447,7 +449,9 @@ op test(): void;
     });
 
     it("emits an update schema for TrackedResource by default", async () => {
-      const output = await openapiWithOptions(commonCode, {});
+      const output = await openapiWithOptions(commonCode, {
+        "arm-types-dir": commonTypesFolder,
+      });
       ok(output.definitions);
       ok(output.definitions["WidgetUpdate"]);
       deepStrictEqual(output.definitions["WidgetUpdate"].allOf, [
@@ -460,6 +464,7 @@ op test(): void;
     it("emits update schema when set to `for-visibility-changes`", async () => {
       const output = await openapiWithOptions(commonCode, {
         "emit-common-types-schema": "for-visibility-changes",
+        "arm-types-dir": commonTypesFolder,
       });
       ok(output.definitions);
       ok(output.definitions["WidgetUpdate"]);

@@ -83,7 +83,7 @@ export function getSourceProperty(property: ModelProperty): ModelProperty {
 
 export function isInternalTypeSpec(
   program: Program,
-  type: Model | Operation | ModelProperty | Interface | Namespace
+  type: Model | Operation | ModelProperty | Interface | Namespace,
 ): boolean {
   const namespace = getNamespaceName(program, type);
   return (
@@ -93,9 +93,20 @@ export function isInternalTypeSpec(
   );
 }
 
+export function isSourceOperationResourceManagerInternal(
+  operation: Operation | undefined,
+): boolean {
+  if (!operation?.sourceOperation?.namespace) {
+    return false;
+  }
+
+  const namespace = getNamespaceFullName(operation.sourceOperation.namespace);
+  return namespace.startsWith("Azure.ResourceManager");
+}
+
 export function getNamespaceName(
   program: Program,
-  type: Model | Operation | ModelProperty | Interface | Namespace | undefined
+  type: Model | Operation | ModelProperty | Interface | Namespace | undefined,
 ): string {
   if (type === undefined) return "";
   if (type.kind === "ModelProperty") return type.model ? getNamespaceName(program, type.model) : "";
@@ -117,7 +128,7 @@ function getDecorator(type: Model | ModelProperty, name: string): DecoratorAppli
 
 export function getDecoratorParam(
   type: Model | ModelProperty,
-  name: string
+  name: string,
 ): DecoratorArgument | undefined {
   const call = getDecorator(type, name);
   if (call === undefined) return undefined;

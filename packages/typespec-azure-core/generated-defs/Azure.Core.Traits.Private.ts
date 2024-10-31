@@ -18,7 +18,7 @@ import type {
 export type ApplyTraitOverrideDecorator = (
   context: DecoratorContext,
   target: Model,
-  traitModel: Model
+  traitModel: Model,
 ) => void;
 
 /**
@@ -31,7 +31,7 @@ export type ApplyTraitOverrideDecorator = (
 export type EnsureAllQueryParamsDecorator = (
   context: DecoratorContext,
   target: Model,
-  paramModel: Model
+  paramModel: Model,
 ) => void;
 
 /**
@@ -44,7 +44,7 @@ export type EnsureAllQueryParamsDecorator = (
 export type EnsureAllHeaderParamsDecorator = (
   context: DecoratorContext,
   target: Model,
-  paramModel: Model
+  paramModel: Model,
 ) => void;
 
 /**
@@ -60,7 +60,7 @@ export type AddTraitPropertiesDecorator = (
   target: Model,
   traitModel: Model,
   traitLocation: EnumMember,
-  traitContexts: Type
+  traitContexts: Type,
 ) => void;
 
 /**
@@ -72,7 +72,7 @@ export type AddTraitPropertiesDecorator = (
 export type TraitSourceDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  traitName: string
+  traitName: string,
 ) => void;
 
 /**
@@ -87,7 +87,7 @@ export type EnsureTraitsPresentDecorator = (
   context: DecoratorContext,
   target: Interface | Operation,
   traitModel: Model,
-  expectedTraits: Type
+  expectedTraits: Type,
 ) => void;
 
 export type AzureCoreTraitsPrivateDecorators = {

@@ -1,4 +1,6 @@
-# Installation
+---
+title: Installation
+---
 
 ## Try TypeSpec without installing anything
 

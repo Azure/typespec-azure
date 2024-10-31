@@ -39,7 +39,7 @@ export interface SdkTestRunner extends BasicTestRunner {
   compileWithVersionedService(code: string): Promise<Record<string, Type>>;
   compileAndDiagnoseWithCustomization(
     mainCode: string,
-    clientCode: string
+    clientCode: string,
   ): Promise<[Record<string, Type>, readonly Diagnostic[]]>;
 }
 
@@ -49,7 +49,7 @@ export async function createSdkContextTestHelper<
 >(
   program: Program,
   options: TOptions,
-  sdkContextOption?: CreateSdkContextOptions
+  sdkContextOption?: CreateSdkContextOptions,
 ): Promise<SdkContext<TOptions, TServiceOperation>> {
   const emitContext: EmitContext<TOptions> = {
     program: program,
@@ -60,7 +60,7 @@ export async function createSdkContextTestHelper<
   return await createSdkContext(
     emitContext,
     options.emitterName ?? "@azure-tools/typespec-csharp",
-    sdkContextOption
+    sdkContextOption,
   );
 }
 
@@ -73,7 +73,7 @@ export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
 
 export async function createSdkTestRunner(
   options: CreateSdkTestRunnerOptions = {},
-  sdkContextOption?: CreateSdkContextOptions
+  sdkContextOption?: CreateSdkContextOptions,
 ): Promise<SdkTestRunner> {
   const host = await createSdkTestHost(options);
   let autoUsings = [
@@ -98,7 +98,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -110,7 +110,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -122,7 +122,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -134,12 +134,12 @@ export async function createSdkTestRunner(
     ${code}`,
       {
         noEmit: true,
-      }
+      },
     );
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -156,12 +156,12 @@ export async function createSdkTestRunner(
       ${code}`,
         {
           noEmit: true,
-        }
+        },
       );
       sdkTestRunner.context = await createSdkContextTestHelper(
         sdkTestRunner.program,
         options,
-        sdkContextOption
+        sdkContextOption,
       );
       return result;
     };
@@ -187,12 +187,12 @@ export async function createSdkTestRunner(
     ${code}`,
         {
           noEmit: true,
-        }
+        },
       );
       sdkTestRunner.context = await createSdkContextTestHelper(
         sdkTestRunner.program,
         options,
-        sdkContextOption
+        sdkContextOption,
       );
       return result;
     };
@@ -222,7 +222,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -250,12 +250,12 @@ export async function createSdkTestRunner(
       ${code}`,
       {
         noEmit: true,
-      }
+      },
     );
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };
@@ -268,7 +268,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption
+      sdkContextOption,
     );
     return result;
   };

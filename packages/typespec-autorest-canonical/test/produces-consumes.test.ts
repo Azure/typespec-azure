@@ -96,7 +96,7 @@ it("produces individual produces/consumes if differences in methods", async () =
 });
 
 async function openApiForProducesConsumes(
-  configuration: ProducesConsumesOperation[]
+  configuration: ProducesConsumesOperation[],
 ): Promise<ProducesConsumes> {
   const apiDoc: string[] = createAdlFromConfig(configuration);
 

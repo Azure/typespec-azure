@@ -15,7 +15,7 @@ it("allows supported formats", async () => {
     }
 
     op get(): void;
-    `
+    `,
   );
   const model = res.definitions["Widget"]!;
   deepStrictEqual(model, {
@@ -42,7 +42,7 @@ it("emits diagnostic for unsupported formats", async () => {
     }
 
     op get(): void;
-    `
+    `,
   );
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-autorest/invalid-format",

@@ -1,8 +1,8 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { XmlTestLibrary } from "@typespec/xml/testing";
-import { deepStrictEqual, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { deepStrictEqual, ok, strictEqual } from "assert";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkEnumValueType } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -12,7 +12,16 @@ describe("typespec-client-generator-core: general decorators list", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("no arg", async function () {
     runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@error"] });
 
@@ -34,7 +43,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   it("basic arg type", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
     );
 
     await runner.compileWithBuiltInService(`
@@ -102,7 +111,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
   it("multiple same decorators", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] }
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
     );
 
     await runner.compileWithBuiltInService(`
@@ -332,7 +341,7 @@ describe("typespec-client-generator-core: general decorators list", () => {
     it("@useSystemTextJsonConverter", async function () {
       runner = await createSdkTestRunner(
         {},
-        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] }
+        { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] },
       );
 
       await runner.compileWithBuiltInService(`

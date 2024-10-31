@@ -1,4 +1,6 @@
-# ARM Resource Types
+---
+title: ARM Resource Types
+---
 
 ## Introductions
 

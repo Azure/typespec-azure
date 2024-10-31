@@ -11,5 +11,5 @@ type XMSLongRunningOperationOptions: object;
 
 | Name | Type |
 | ------ | ------ |
-| `final-state-schema` | `string` |
+| `final-state-schema`? | `string` |
 | `final-state-via` | [`XMSLongRunningFinalState`](XMSLongRunningFinalState.md) |

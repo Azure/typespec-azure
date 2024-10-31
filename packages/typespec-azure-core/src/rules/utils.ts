@@ -43,7 +43,6 @@ export function getNamespaceName(program: Program, type: DeclarableType | undefi
   if (type === undefined) {
     return "";
   }
-  getNamespaceFullName;
   return getNamespaceFullName(type);
 }
 

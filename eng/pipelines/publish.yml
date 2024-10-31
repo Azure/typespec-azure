@@ -82,6 +82,7 @@ extends:
                   scriptLocation: inlineScript
                   inlineScript: |
                     az storage blob upload-batch ^
+                      --auth-mode login ^
                       --destination $web ^
                       --account-name "cadlplayground" ^
                       --destination-path cadl-azure/ ^

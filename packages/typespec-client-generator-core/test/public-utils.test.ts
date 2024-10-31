@@ -17,6 +17,7 @@ import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
   getGeneratedName,
+  getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
   isApiVersion,
@@ -169,7 +170,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       const defaultApiVersion = getDefaultApiVersion(
         runnerWithVersion.context,
-        MyService as Namespace
+        MyService as Namespace,
       );
       ok(defaultApiVersion);
       strictEqual(defaultApiVersion.value, "1.1.0");
@@ -194,7 +195,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       const defaultApiVersion = getDefaultApiVersion(
         runnerWithVersion.context,
-        MyService as Namespace
+        MyService as Namespace,
       );
       ok(defaultApiVersion);
       strictEqual(defaultApiVersion.value, "1.1.0");
@@ -219,7 +220,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       `);
       const defaultApiVersion = getDefaultApiVersion(
         runnerWithVersion.context,
-        MyService as Namespace
+        MyService as Namespace,
       );
       ok(defaultApiVersion);
       strictEqual(defaultApiVersion.value, "1.0.1");
@@ -295,9 +296,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
-          })
+          }),
         ),
-        "Azure.Pick.Me"
+        "Azure.Pick.Me",
       );
     });
     it("default to service namespace with client", async () => {
@@ -311,9 +312,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
-          })
+          }),
         ),
-        "Azure.Pick.Me"
+        "Azure.Pick.Me",
       );
     });
     it("package-name override kebab case", async () => {
@@ -326,9 +327,9 @@ describe("typespec-client-generator-core: public-utils", () => {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "azure-pick-me",
-          })
+          }),
         ),
-        "Azure.Pick.Me"
+        "Azure.Pick.Me",
       );
     });
     it("package-name override pascal case", async () => {
@@ -341,9 +342,9 @@ describe("typespec-client-generator-core: public-utils", () => {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "Azure.Pick.Me",
-          })
+          }),
         ),
-        "Azure.Pick.Me"
+        "Azure.Pick.Me",
       );
     });
 
@@ -359,9 +360,9 @@ describe("typespec-client-generator-core: public-utils", () => {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
             "package-name": "azure.pick.me",
-          })
+          }),
         ),
-        "Azure.Pick.Me"
+        "Azure.Pick.Me",
       );
     });
     it("no namespace or package name", async () => {
@@ -373,9 +374,9 @@ describe("typespec-client-generator-core: public-utils", () => {
           await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
             "generate-convenience-methods": true,
             "generate-protocol-methods": true,
-          })
+          }),
         ),
-        undefined
+        undefined,
       );
     });
   });
@@ -908,7 +909,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       const models = runner.context.sdkPackage.models;
       strictEqual(models.length, 2);
       const model = models.filter(
-        (x) => x.name === "RelationshipOriginInformationDependencyOfOrigins"
+        (x) => x.name === "RelationshipOriginInformationDependencyOfOrigins",
       )[0];
       ok(model);
     });
@@ -949,16 +950,16 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "TestRequest" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.test.Request.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.test.Request.anonymous",
+          ),
         );
         ok(
           models.find(
             (x) =>
               x.name === "TestResponse" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.test.Response.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.test.Response.anonymous",
+          ),
         );
       });
 
@@ -978,8 +979,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "APForA" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous",
+          ),
         );
       });
 
@@ -993,7 +994,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
 
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
@@ -1002,8 +1003,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "APForA" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous",
+          ),
         );
       });
 
@@ -1017,7 +1018,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
 
           op test(@body body: A): A;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
@@ -1026,8 +1027,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "APForA" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous",
+          ),
         );
       });
     });
@@ -1040,7 +1041,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             members: {name: string}[];
           }
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
@@ -1049,8 +1050,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AMember" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.member.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.member.anonymous",
+          ),
         );
       });
 
@@ -1058,7 +1059,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(
           `
           op test(@body body: {name: string}[]): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
@@ -1071,7 +1072,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(
           `
           op test(@body body: Record<{name: string}>): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
@@ -1087,7 +1088,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             members: Record<{name: {value: string}}>;
           }
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
@@ -1096,16 +1097,16 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AMember" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.member.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.member.anonymous",
+          ),
         );
         ok(
           models.find(
             (x) =>
               x.name === "AMemberName" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.member.name.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.member.name.anonymous",
+          ),
         );
       });
     });
@@ -1122,7 +1123,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             };
           }
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
@@ -1131,8 +1132,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "BPForB" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.B.pForB.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.B.pForB.anonymous",
+          ),
         );
       });
 
@@ -1159,7 +1160,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             };
           }
           op test(@body body: Fish): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 5);
@@ -1168,16 +1169,16 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "SharkPForShark" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.Shark.pForShark.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.Shark.pForShark.anonymous",
+          ),
         );
         ok(
           models.find(
             (x) =>
               x.name === "SalmonPForSalmon" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.Salmon.pForSalmon.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.Salmon.pForSalmon.anonymous",
+          ),
         );
       });
     });
@@ -1196,7 +1197,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
 
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
@@ -1205,8 +1206,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "BPForB" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.B.pForB.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.B.pForB.anonymous",
+          ),
         );
       });
 
@@ -1228,7 +1229,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
 
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 4);
@@ -1237,8 +1238,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "CP1ForC" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.C.p1ForC.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.C.p1ForC.anonymous",
+          ),
         );
       });
 
@@ -1257,7 +1258,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
 
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
@@ -1266,8 +1267,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "BP2ForB" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.B.p2ForB.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.B.p2ForB.anonymous",
+          ),
         );
       });
 
@@ -1279,7 +1280,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
 
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
@@ -1288,8 +1289,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AAdditionalProperty" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.AdditionalProperty.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.AdditionalProperty.anonymous",
+          ),
         );
       });
 
@@ -1305,7 +1306,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           }
 
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
@@ -1314,16 +1315,16 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "APForA" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous",
+          ),
         );
         ok(
           models.find(
             (x) =>
               x.name === "APForAPForAnonymousModel" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.pForAnonymousModel.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.pForA.pForAnonymousModel.anonymous",
+          ),
         );
       });
 
@@ -1334,7 +1335,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             pForA: Record<{name: {value: string}}>;
           }
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
@@ -1343,16 +1344,16 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "APForA" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.pForA.anonymous",
+          ),
         );
         ok(
           models.find(
             (x) =>
               x.name === "APForAName" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.pForA.name.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.pForA.name.anonymous",
+          ),
         );
       });
 
@@ -1365,7 +1366,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             };
           };
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
@@ -1374,8 +1375,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "AB" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.A.b.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.A.b.anonymous",
+          ),
         );
       });
     });
@@ -1388,7 +1389,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             status: "start" | "stop";
           }
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
@@ -1424,7 +1425,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             pForB: string;
           }
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         const diagnostics = runner.context.diagnostics;
@@ -1434,11 +1435,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(union.kind, "union");
         strictEqual(union.name, "AItems");
         ok(union.isGeneratedName);
-        const model1 = union.values[0];
+        const model1 = union.variantTypes[0];
         strictEqual(model1.kind, "model");
         strictEqual(model1.name, "AItems1");
         ok(model1.isGeneratedName);
-        const model2 = union.values[1];
+        const model2 = union.variantTypes[1];
         strictEqual(model2.kind, "model");
         strictEqual(model2.name, "AItems2");
         ok(model2.isGeneratedName);
@@ -1453,7 +1454,7 @@ describe("typespec-client-generator-core: public-utils", () => {
             choices: {status: "start" | "stop"}[];
           }
           op test(@body body: A): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
@@ -1461,7 +1462,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           (x) =>
             x.name === "AChoice" &&
             x.isGeneratedName &&
-            x.crossLanguageDefinitionId === "TestService.A.choice.anonymous"
+            x.crossLanguageDefinitionId === "TestService.A.choice.anonymous",
         );
         ok(test1);
         strictEqual(test1.properties[0].type.kind, "enum");
@@ -1496,7 +1497,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           @post
           @route("/op3")
           op op3(@body body: B): boolean;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 3);
@@ -1505,8 +1506,8 @@ describe("typespec-client-generator-core: public-utils", () => {
             (x) =>
               x.name === "BPForB" &&
               x.isGeneratedName &&
-              x.crossLanguageDefinitionId === "TestService.B.pForB.anonymous"
-          )
+              x.crossLanguageDefinitionId === "TestService.B.pForB.anonymous",
+          ),
         );
       });
     });
@@ -1521,7 +1522,7 @@ describe("typespec-client-generator-core: public-utils", () => {
               name: string;
             };
           }
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 2);
@@ -1546,7 +1547,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           model A {
             status: "start" | "stop";
           }
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
@@ -1571,7 +1572,7 @@ describe("typespec-client-generator-core: public-utils", () => {
           };
   
           op test(...RequestParameter): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
@@ -1583,7 +1584,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         await runner.compileWithBuiltInService(
           `
           op test(foo: string, bar: string): void;
-        `
+        `,
         );
         const models = runner.context.sdkPackage.models;
         strictEqual(models.length, 1);
@@ -1610,11 +1611,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(repeatabilityResult.type.kind, "Union");
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
-        strictEqual(unionEnum.name, "ResponseWithAnonymousUnionRepeatabilityResult");
+        strictEqual(unionEnum.name, "TestResponseRepeatabilityResult");
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "ResponseWithAnonymousUnion.repeatabilityResult.anonymous"
+          "test.ResponseRepeatabilityResult.anonymous",
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1642,7 +1643,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "test.RequestRepeatabilityResult.anonymous"
+          "test.RequestRepeatabilityResult.anonymous",
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1676,7 +1677,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.isGeneratedName, true);
         strictEqual(
           stringType.crossLanguageDefinitionId,
-          "test.RequestRepeatabilityResult.anonymous"
+          "test.RequestRepeatabilityResult.anonymous",
         );
       });
 
@@ -1699,94 +1700,111 @@ describe("typespec-client-generator-core: public-utils", () => {
         runner.context.generatedNames?.clear();
         const name = getGeneratedName(
           runner.context,
-          [...TestModel.properties.values()][0].type as Model
+          [...TestModel.properties.values()][0].type as Model,
         );
         strictEqual(name, "TestModelAnonymousProp");
       });
-    });
 
-    describe("getLroMetadata", () => {
-      const lroCode = `
-      @versioned(Versions)
-      @service({title: "Test Service"})
-      namespace TestService;
-      alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
-      NoRepeatableRequests &
-      NoClientRequestId>;
+      it("anonymous model in response", async () => {
+        const { test } = (await runner.compile(`
+        @service({})
+        namespace MyService {
+          @test
+          op test(): {@header header: string, prop: string};
+        }
+        `)) as { test: Operation };
 
-      @doc("The API version.")
-      enum Versions {
-        @doc("The 2022-12-01-preview version.")
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        v2022_12_01_preview: "2022-12-01-preview",
-      }
-
-      @resource("users")
-      @doc("Details about a user.")
-      model User {
-      @key
-      @visibility("read")
-      @doc("The name of user.")
-      name: string;
-
-      @doc("The role of user")
-      role: string;
-      }
-
-      @doc("The parameters for exporting a user.")
-      model UserExportParams {
-      @query
-      @doc("The format of the data.")
-      format: string;
-      }
-
-      @doc("The exported user data.")
-      model ExportedUser {
-      @doc("The name of user.")
-      name: string;
-
-      @doc("The exported URI.")
-      resourceUri: string;
-      }
-
-      op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
-    `;
-      it("filter-out-core-models true", async () => {
-        const runnerWithCore = await createSdkTestRunner({
-          librariesToAdd: [AzureCoreTestLibrary],
-          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-          emitterName: "@azure-tools/typespec-java",
-        });
-        await runnerWithCore.compile(lroCode);
-        const models = runnerWithCore.context.sdkPackage.models;
-        strictEqual(models.length, 1);
-        deepStrictEqual(models[0].name, "ExportedUser");
-      });
-      it("filter-out-core-models false", async () => {
-        const runnerWithCore = await createSdkTestRunner({
-          librariesToAdd: [AzureCoreTestLibrary],
-          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-          emitterName: "@azure-tools/typespec-java",
-        });
-        await runnerWithCore.compile(lroCode);
-        runnerWithCore.context.filterOutCoreModels = false;
-        const models = getAllModels(runnerWithCore.context);
-        strictEqual(models.length, 8);
-        // there should only be one non-core model
-        deepStrictEqual(
-          models.map((x) => x.name).sort(),
-          [
-            "ResourceOperationStatusUserExportedUserError",
-            "OperationState",
-            "Error",
-            "InnerError",
-            "ExportedUser",
-            "ErrorResponse",
-            "OperationStatusExportedUserError",
-            "Versions",
-          ].sort()
+        const httpOperation = getHttpOperationWithCache(runner.context, test);
+        const name = getGeneratedName(
+          runner.context,
+          httpOperation.responses[0].responses[0].body?.type as Model,
         );
+        strictEqual(name, "TestResponse");
       });
+    });
+  });
+
+  describe("getLroMetadata", () => {
+    const lroCode = `
+    @versioned(Versions)
+    @service({title: "Test Service"})
+    namespace TestService;
+    alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
+    NoRepeatableRequests &
+    NoClientRequestId>;
+
+    @doc("The API version.")
+    enum Versions {
+      @doc("The 2022-12-01-preview version.")
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
+
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+    @key
+    @visibility("read")
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The role of user")
+    role: string;
+    }
+
+    @doc("The parameters for exporting a user.")
+    model UserExportParams {
+    @query
+    @doc("The format of the data.")
+    format: string;
+    }
+
+    @doc("The exported user data.")
+    model ExportedUser {
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The exported URI.")
+    resourceUri: string;
+    }
+
+    op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+  `;
+    it("filter-out-core-models true", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(lroCode);
+      const models = runnerWithCore.context.sdkPackage.models;
+      strictEqual(models.length, 1);
+      deepStrictEqual(models[0].name, "ExportedUser");
+    });
+    it("filter-out-core-models false", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(lroCode);
+      runnerWithCore.context.filterOutCoreModels = false;
+      const models = getAllModels(runnerWithCore.context);
+      strictEqual(models.length, 8);
+      // there should only be one non-core model
+      deepStrictEqual(
+        models.map((x) => x.name).sort(),
+        [
+          "ResourceOperationStatusUserExportedUserError",
+          "OperationState",
+          "Error",
+          "InnerError",
+          "ExportedUser",
+          "ErrorResponse",
+          "OperationStatusExportedUserError",
+          "Versions",
+        ].sort(),
+      );
     });
   });
 });

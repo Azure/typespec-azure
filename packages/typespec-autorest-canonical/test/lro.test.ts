@@ -52,17 +52,17 @@ it("includes x-ms-long-running-operation", async () => {
   
     @pollingOperation(getWidgetOperationStatus)
     op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
-    `
+    `,
   );
 
   deepStrictEqual(
     openapi.paths["/widgets/{widgetName}"].patch["x-ms-long-running-operation"],
-    true
+    true,
   );
   deepStrictEqual(
     openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get[
       "x-ms-long-running-operation"
     ],
-    undefined
+    undefined,
   );
 });

@@ -3,7 +3,7 @@ import TabItem from "@theme/TabItem";
 
 # Method Inputs
 
-This doc details what method input signatures language emitters will output.
+This document outlines the method input signatures that language emitters will generate.
 
 ## Basic
 
@@ -55,7 +55,7 @@ export type DemoServiceContext = Client & {
     /** Resource for '/analyze' has methods for the following verbs: post */
     (path: "/users"): {
       get(
-        options: RequestParameters
+        options: RequestParameters,
       ): StreamableMethod<GetUser200Response | GetUserDefaultResponse>;
     };
   };
@@ -152,7 +152,7 @@ export type DemoServiceContext = Client & {
       post(
         options: {
           body: User;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -192,10 +192,10 @@ func (client *Client) Post(ctx context.Context, user User, options *ClientPostOp
 
 ## Spread
 
-Please use the _spread_ feature with caution.
+Please exercise caution when using the _spread_ feature.
 
-- The model to be spread should have less than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
-- The model to be spread should be stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
+- The model to be spread should have fewer than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
+- The model to be spread should remain stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
 - The model to be spread should not be used in [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386).
 
 ### Alias
@@ -217,7 +217,7 @@ op upload(...User): void;
 
 <TabItem value="python" label="Python">
 
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(first_name: str, last_name: str) -> None:
@@ -252,7 +252,7 @@ export type DemoServiceContext = Client & {
             firstName: string;
             lastName: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -262,7 +262,7 @@ export type DemoServiceContext = Client & {
 export async function upload(
   firstName: string,
   lastName: string,
-  options: UploadOptionalParams
+  options: UploadOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -314,7 +314,7 @@ op upload(...User): void;
 
 <TabItem value="python" label="Python">
 
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(self, id: str, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
@@ -344,7 +344,7 @@ export type DemoServiceContext = Client & {
     /** Resource for '/completions' has methods for the following verbs: post */
     (
       path: "/users/{id}",
-      id
+      id,
     ): {
       post(
         options: {
@@ -352,7 +352,7 @@ export type DemoServiceContext = Client & {
             firstName: string;
             lastName: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -363,7 +363,7 @@ export async function upload(
   id: string,
   firstName: string,
   lastName: string,
-  options: UploadOptionalParams
+  options: UploadOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -372,7 +372,7 @@ export class DemoServiceClient {
     id: string,
     firstName: string,
     lastName: string,
-    options: UploadOptionalParams
+    options: UploadOptionalParams,
   ): Promise<void>;
 }
 ```
@@ -417,7 +417,7 @@ op upload(...User): void;
 </TabItem>
 
 <TabItem value="python" label="Python">
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(self, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
@@ -458,7 +458,7 @@ export type DemoServiceContext = Client & {
             firstName: string;
             lastName: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -468,7 +468,7 @@ export type DemoServiceContext = Client & {
 export async function upload(
   firstName: string,
   lastName: string,
-  options: UploadOptionalParams
+  options: UploadOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -522,7 +522,7 @@ op upload(...UserRequest): void;
 
 <TabItem value="python" label="Python">
 
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(self, body: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
@@ -561,7 +561,7 @@ export type DemoServiceContext = Client & {
       post(
         options: {
           body: User;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -633,7 +633,7 @@ op getBlobProperties(...BlobProperties): void;
 </TabItem>
 
 <TabItem value="python" label="Python">
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 
@@ -730,7 +730,7 @@ op register(...Schema): void;
 </TabItem>
 
 <TabItem value="python" label="Python">
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 class Schema:
@@ -775,7 +775,7 @@ export type DemoServiceContext = Client & {
           body: {
             schema: string;
           };
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -789,7 +789,7 @@ export interface Schema {
 // Modular api layer
 export async function register(
   body: Schema,
-  options: GetBlobPropertiesOptionalParams
+  options: GetBlobPropertiesOptionalParams,
 ): Promise<void>;
 
 // Modular classical client layer
@@ -864,7 +864,7 @@ op scheduleRepairs is Operations.ResourceAction<Widget, RepairInfo, RepairResult
 </TabItem>
 
 <TabItem value="python" label="Python">
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 class RepairInfo:
@@ -901,12 +901,12 @@ export type WidgetServiceContext = Client & {
   path: {
     (
       path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string
+      widgetName: string,
     ): {
       post(
         options: {
           body: RepairInfo;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -918,7 +918,7 @@ export async function scheduleRepairs(
   widgetName: string,
   problem: string,
   contact: string,
-  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
 // Modular classical client layer
@@ -927,7 +927,7 @@ export class WidgetServiceClient {
     widgetName: string,
     problem: string,
     contact: string,
-    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} },
   ): Promise<RepairResult>;
 }
 ```
@@ -970,7 +970,32 @@ If you want to keep the model, you have two options to prevent spreading:
 
 <TabItem value="Service Definition" label="TypeSpec">
 
+### 1. `@override`
+
+The `@override` decorator allows you to replace the default client method generated by TCGC based on your service definition.
+
+If your service definition spreads a model into the method signature, but you prefer that the generated client SDKs maintain the model intact, the `@override` decorator provides a solution.
+
+Additionally, you can specify a language `scope` to limit the changes to a specific language emitter.
+
+```tsp
+// client.tsp
+namespace Widget.Client;
+
+op scheduleRepairs(
+  body: RepairInfo,
+  `api-version`: Azure.Core.Foundations.ApiVersionParameter,
+): RepairResult;
+
+@@override(Widget.Service.scheduleRepairs, Widget.Client.scheduleRepairs);
+```
+
+### 2. wrapper
+
+If you prefer not to implement customizations in `client.tsp`, you can add `@bodyRoot` to the input in `main.tsp` prior to passing the model to the template.
+
 ```typespec
+// main.tsp
 namespace Widget.Service;
 
 @resource("widgets")
@@ -991,39 +1016,6 @@ model RepairResult {
 
 alias Operations = Azure.Core.ResourceOperations<{}>;
 
-op scheduleRepairs is Operations.ResourceAction<Widget, BodyParameter<RepairInfo>, RepairResult>;
-```
-
-</TabItem>
-
-<TabItem value="Client Customizations" label="TypeSpec">
-
-With the `@override` decorator, you have the ability to override the default client method generated by TCGC from your service definition.
-
-In the case of spread, if the service definition spreads a model onto the method signature, but you would like either all or some of the generated client SDKs to still generate with the model grouped together, this is where the `@override` decorator comes in.
-
-With `@override`, you can also specify language `scope` to scope the changes to a specific language emitter.
-
-```tsp
-// client.tsp
-namespace Widget.Client;
-
-op scheduleRepairs(
-  body: RepairInfo,
-  `api-version`: Azure.Core.Foundations.ApiVersionParameter,
-): RepairResult;
-
-@@override(Widget.Service.scheduleRepairs, Widget.Client.scheduleRepairs);
-```
-
-</TabItem>
-
-<TabItem value="`@bodyRoot`" label="TypeSpec">
-
-If you do not want to use customizations in `client.tsp`, you can also add `@bodyRoot` onto the input in the `main.tsp` before you pass the model to the template.
-
-```typespec
-// main.tsp
 alias BodyParameter<
   T,
   TName extends valueof string = "body",
@@ -1041,7 +1033,7 @@ op scheduleRepairs is Operations.ResourceAction<Widget, BodyParameter<RepairInfo
 </TabItem>
 
 <TabItem value="python" label="Python">
-For Python, we will also generate the overloads described in the Http Post section, but omitting for brevity
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 class RepairInfo:
@@ -1078,12 +1070,12 @@ export type WidgetServiceContext = Client & {
   path: {
     (
       path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string
+      widgetName: string,
     ): {
       post(
         options: {
           body: RepairInfo;
-        } & RequestParameters
+        } & RequestParameters,
       ): StreamableMethod<PostUserDefaultResponse>;
     };
   };
@@ -1094,7 +1086,7 @@ export async function scheduleRepairs(
   context: Client,
   widgetName: string,
   body: RepairInfo,
-  options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
 // Modular classical client layer
@@ -1102,7 +1094,7 @@ export class WidgetServiceClient {
   scheduleRepairs(
     widgetName: string,
     body: RepairInfo,
-    options: ScheduleRepairsOptionalParams = { requestOptions: {} }
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} },
   ): Promise<RepairResult>;
 }
 ```

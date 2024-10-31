@@ -17,7 +17,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     tester = createLinterRuleTester(
       runner,
       coreOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -42,7 +42,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           @delete delete(...ResourceInstanceParameters<FooResource>): | ArmDeletedResponse | ArmDeleteAcceptedResponse | ArmDeletedNoContentResponse | ErrorResponse;
           @post action(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
         }
-      `
+      `,
       )
       .toEmitDiagnostics([
         {
@@ -68,6 +68,38 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
             "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction.",
         },
       ]);
+  });
+
+  it("doesn't emit diagnostic for internal operations", async () => {
+    await tester
+      .expect(
+        `
+    @armProviderNamespace
+    @service({title: "Microsoft.Foo"})
+    @versioned(Versions)
+    namespace Microsoft.Foo;
+    enum Versions {
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        "2021-10-01-preview",
+      }
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @doc("The VM Size")
+      model VmSize {
+        @doc("number of cpus ")
+        cpus: int32;
+      }
+
+      @armResourceOperations
+      interface ProviderOperations {
+        @get
+        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+      }
+    `,
+      )
+      .toBeValid();
   });
 
   it("Detects operations outside interfaces", async () => {
@@ -128,7 +160,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
              @doc("The provisioning State")
              provisioningState: ResourceState;
            }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
@@ -205,7 +237,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
              @doc("The provisioning State")
              provisioningState: ResourceState;
            }
-        `
+        `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",

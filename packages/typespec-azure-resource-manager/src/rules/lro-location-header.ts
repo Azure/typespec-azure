@@ -3,7 +3,7 @@ import { getHttpOperation } from "@typespec/http";
 
 function getCaseInsensitiveHeader(
   headers: Record<string, ModelProperty> | undefined,
-  key: string
+  key: string,
 ): string | undefined {
   if (!headers) {
     return undefined;

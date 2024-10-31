@@ -1,4 +1,6 @@
-# ARM Rules, TypeSpec Linting, and Suppression
+---
+title: ARM Rules, TypeSpec Linting, and Suppression
+---
 
 ARM includes many rules on the structure of resources and the details of resource operations that ensure a consistent user experience when managing services inside Azure. TypeSpec encodes many fo these rules into linting checks that occur on each compilation. If you use an IDE and install the [TypeSpec IDE Tools](../../getstarted/azure-resource-manager/step00.md#installing-ide-tools), violations of rules will show up as yellow highlights in your tsp code. If you hover over these, you will get a message indicating the issue and how to fix it in your specification. If you use the typespec command-line, violations of rules will be printed as warnings, with a description and steps to correct the issue, and a pointer to the location in the specification where the violation occurred.
 

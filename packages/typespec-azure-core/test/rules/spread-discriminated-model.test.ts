@@ -17,7 +17,7 @@ describe("typespec-azure-core: spread-discriminated-model rule", () => {
     tester = createLinterRuleTester(
       runner,
       spreadDiscriminatedModelRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -42,7 +42,7 @@ describe("typespec-azure-core: spread-discriminated-model rule", () => {
         `
         @discriminator("kind") model Pet { kind: string }
         model Cat extends Pet { kind: "cat" }
-        model Dog extends Pet { kind: "dog" }`
+        model Dog extends Pet { kind: "dog" }`,
       )
       .toBeValid();
   });
@@ -53,7 +53,7 @@ describe("typespec-azure-core: spread-discriminated-model rule", () => {
         `
         @discriminator("kind")
         model Pet { kind: string; }
-        model Dog is Pet {}`
+        model Dog is Pet {}`,
       )
       .toBeValid();
   });
@@ -66,7 +66,7 @@ describe("typespec-azure-core: spread-discriminated-model rule", () => {
         model Pet { kind: string; }
         model Bar {
           pet: Pet & { name: string; };
-        }`
+        }`,
       )
       .toBeValid();
   });

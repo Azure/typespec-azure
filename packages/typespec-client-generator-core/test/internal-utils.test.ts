@@ -1,7 +1,7 @@
-import { Operation } from "@typespec/compiler";
-import { ok, strictEqual } from "assert";
+import { Model } from "@typespec/compiler";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { getDocHelper } from "../src/internal-utils.js";
+import { getValueTypeValue } from "../src/internal-utils.js";
 import { listSubClients } from "../src/public-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
@@ -11,47 +11,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
-  describe("getDocHelper", () => {
-    it("no doc or summary", async () => {
-      const { func } = (await runner.compile(`
-        op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, undefined);
-      strictEqual(docHelper.details, undefined);
-    });
-    it("just doc", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @doc("This is a description")
-        op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, "This is a description");
-      strictEqual(docHelper.details, undefined);
-    });
-    it("just summary", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @summary("This is a summary")
-        op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, "This is a summary");
-      strictEqual(docHelper.details, undefined);
-    });
-    it("doc and summary", async () => {
-      const { func } = (await runner.compile(`
-        @test
-        @doc("This is a description")
-        @summary("This is a summary")
-        op func(@query("api-version") myApiVersion: string): void;
-      `)) as { func: Operation };
-      const docHelper = getDocHelper(runner.context, func);
-      strictEqual(docHelper.description, "This is a summary");
-      strictEqual(docHelper.details, "This is a description");
-    });
-  });
+
   describe("parseEmitterName", () => {
     it("@azure-tools/typespec-{language}", async () => {
       const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
@@ -196,6 +156,152 @@ describe("typespec-client-generator-core: internal-utils", () => {
       strictEqual(subClients[4].name, "AAG");
       strictEqual(subClients[5].name, "AABGroup1");
       strictEqual(subClients[6].name, "AABGroup2");
+    });
+  });
+
+  describe("getValueTypeValue", () => {
+    it("string default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: string = "default";
+        }
+      `)) as { Test: Model };
+
+      strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "default");
+    });
+
+    it("boolean default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: boolean = false;
+        }
+      `)) as { Test: Model };
+
+      strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), false);
+    });
+
+    it("null default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: boolean | null = null;
+        }
+      `)) as { Test: Model };
+
+      strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), null);
+    });
+
+    it("numeric int default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: int32 = 1;
+        }
+      `)) as { Test: Model };
+
+      strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), 1);
+    });
+
+    it("numeric float default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: float32 = 1.234;
+        }
+      `)) as { Test: Model };
+
+      strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), 1.234);
+    });
+
+    it("enum member default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: MyEnum = MyEnum.A;
+        }
+
+        enum MyEnum {
+          A: "A",
+          B: "B",
+        }
+      `)) as { Test: Model };
+
+      strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "A");
+    });
+
+    it("enum member without value default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: MyEnum = MyEnum.A;
+        }
+
+        enum MyEnum {
+          A,
+          B,
+        }
+      `)) as { Test: Model };
+
+      strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "A");
+    });
+
+    it("array default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: string[] = #["a", "b"];
+        }
+      `)) as { Test: Model };
+
+      deepStrictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), ["a", "b"]);
+    });
+
+    it("object default value", async () => {
+      const { Test } = (await runner.compile(`
+        @service({})
+        namespace My.Service;
+
+        @test
+        model Test {
+          prop: Point = #{ x: 0, y: 0 };
+        }
+
+        model Point {
+          x: int32;
+          y: int32;
+        }
+      `)) as { Test: Model };
+
+      deepStrictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), {
+        x: 0,
+        y: 0,
+      });
     });
   });
 });

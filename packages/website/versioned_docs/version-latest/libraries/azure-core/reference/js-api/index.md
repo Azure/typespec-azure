@@ -38,19 +38,19 @@ title: "[P] JS API"
 
 - [ArmResourceDeploymentScope](type-aliases/ArmResourceDeploymentScope.md)
 - [FinalOperationStep](type-aliases/FinalOperationStep.md)
+- [nextOperationStep](type-aliases/nextOperationStep.md)
 - [OperationStep](type-aliases/OperationStep.md)
 - [PollingLocationInfo](type-aliases/PollingLocationInfo.md)
 - [TerminationStatus](type-aliases/TerminationStatus.md)
 - [UnionEnum](type-aliases/UnionEnum.md)
-- [nextOperationStep](type-aliases/nextOperationStep.md)
 
 ## Variables
 
 - [$lib](variables/$lib.md)
 - [$linter](variables/$linter.md)
 - [FinalOperationKey](variables/FinalOperationKey.md)
-- [PollingOperationKey](variables/PollingOperationKey.md)
 - [namespace](variables/namespace.md)
+- [PollingOperationKey](variables/PollingOperationKey.md)
 - [preventRestLibraryInterfaces](variables/preventRestLibraryInterfaces.md)
 - [useStandardOperations](variables/useStandardOperations.md)
 
@@ -78,7 +78,6 @@ title: "[P] JS API"
 - [$nextLink](functions/$nextLink.md)
 - [$nextPageOperation](functions/$nextPageOperation.md)
 - [$omitKeyProperties](functions/$omitKeyProperties.md)
-- [$onValidate](functions/$onValidate.md)
 - [$operationLink](functions/$operationLink.md)
 - [$pagedResult](functions/$pagedResult.md)
 - [$pollingLocation](functions/$pollingLocation.md)
@@ -94,7 +93,6 @@ title: "[P] JS API"
 - [$traitLocation](functions/$traitLocation.md)
 - [$traitSource](functions/$traitSource.md)
 - [$useFinalStateVia](functions/$useFinalStateVia.md)
-- [\_\_unsupported\_enable\_checkStandardOperations](functions/unsupported_enable_checkStandardOperations.md)
 - [checkEnsureVerb](functions/checkEnsureVerb.md)
 - [checkRpcRoutes](functions/checkRpcRoutes.md)
 - [extractLroStates](functions/extractLroStates.md)

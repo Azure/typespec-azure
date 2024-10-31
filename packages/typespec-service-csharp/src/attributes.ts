@@ -14,7 +14,7 @@ import { getCSharpIdentifier, getCSharpTypeForScalar } from "./utils.js";
 
 export function getEncodingValue(
   program: Program,
-  type: Scalar | ModelProperty
+  type: Scalar | ModelProperty,
 ): string | undefined {
   const value = getEncode(program, type);
   return value ? value.encoding : undefined;
@@ -26,7 +26,7 @@ export function getFormatValue(program: Program, type: Scalar | ModelProperty): 
 
 export function getPatternAttribute(
   program: Program,
-  type: ModelProperty | Scalar
+  type: ModelProperty | Scalar,
 ): Attribute | undefined {
   const pattern = getPattern(program, type);
   if (!pattern) return undefined;
@@ -49,7 +49,7 @@ export function getPatternAttribute(
 
 export function getLengthAttribute(
   program: Program,
-  type: ModelProperty | Scalar
+  type: ModelProperty | Scalar,
 ): Attribute | undefined {
   let minLength: number | undefined = getMinLength(program, type);
   const maxLength = getMaxLength(program, type);

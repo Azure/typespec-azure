@@ -16,7 +16,7 @@ describe("typespec-azure-core: no-closed-literal-union rule", () => {
     tester = createLinterRuleTester(
       runner,
       noClosedLiteralUnionRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 

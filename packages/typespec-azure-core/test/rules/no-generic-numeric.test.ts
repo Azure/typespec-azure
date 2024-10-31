@@ -27,7 +27,7 @@ it("emits a warning for generic numeric types", async () => {
         prop3: float;
         prop4: decimal;
       }
-      `
+      `,
     )
     .toEmitDiagnostics([
       {
@@ -70,7 +70,7 @@ it("emits a warning when extending generic numeric types", async () => {
         prop3: GenericFloat;
         prop4: GenericDecimal;
       }
-      `
+      `,
     )
     .toEmitDiagnostics([
       {

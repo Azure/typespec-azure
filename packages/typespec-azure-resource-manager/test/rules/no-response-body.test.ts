@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     tester = createLinterRuleTester(
       runner,
       noResponseBodyRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -28,7 +28,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
           @statusCode statusCode: 202;
         }
         op walk(): TestAcceptedResponse;
-      `
+      `,
       )
       .toBeValid();
   });
@@ -42,7 +42,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
           @bodyRoot body: string;
         }
         op walk(): TestAcceptedResponse;
-      `
+      `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/no-response-body",

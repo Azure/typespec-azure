@@ -1,4 +1,6 @@
-# 5. Defining standard resource operations
+---
+title: 5. Defining standard resource operations
+---
 
 The `Azure.Core` namespace provides a variety of [standard lifecycle operations](https://azure.github.io/typespec-azure/docs/libraries/azure-core/reference/interfaces#Azure.Core.ResourceOperations) for resource types. These operations adhere to the requirements of the [Azure REST API Guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md).
 
