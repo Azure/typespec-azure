@@ -1753,7 +1753,7 @@ function filterOutTypes(
   context: TCGCContext,
   filter: number,
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
-  const result = new Set<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
+  const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   for (const [type, sdkType] of context.referencedTypeMap?.entries() ?? []) {
     // filter models/enums/union of Core
     if (
@@ -1767,9 +1767,11 @@ function filterOutTypes(
     if ((sdkType.usage & filter) === 0) {
       continue;
     }
-    result.add(sdkType);
+    if (!result.includes(sdkType)) {
+      result.push(sdkType);
+    }
   }
-  return [...result];
+  return result;
 }
 
 export function getAllModelsWithDiagnostics(
