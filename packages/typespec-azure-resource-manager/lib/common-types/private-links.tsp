@@ -2,6 +2,8 @@ using TypeSpec.Http;
 using TypeSpec.Versioning;
 using OpenAPI;
 
+using Azure.Core;
+
 namespace Azure.ResourceManager.CommonTypes;
 
 /** The Private Endpoint resource. */
@@ -37,6 +39,7 @@ model PrivateLinkResourceProperties {
 }
 
 /** A list of private link resources. */
+@pagedResult
 model PrivateLinkResourceListResult {
   /** Array of private link resources */
   value?: PrivateLinkResource[];
@@ -54,6 +57,7 @@ model PrivateEndpointConnection extends Resource {
 }
 
 /** List of private endpoint connections associated with the specified resource. */
+@pagedResult
 model PrivateEndpointConnectionListResult {
   /** Array of private endpoint connections. */
   value?: PrivateEndpointConnection[];
