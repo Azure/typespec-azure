@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-remove useless path parameter from method
+remove unused path parameter from method
