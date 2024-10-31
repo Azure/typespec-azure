@@ -3,17 +3,17 @@ import TabItem from "@theme/TabItem";
 
 # Client hierarchy
 
-This page documents the default client hierarchy behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
+This page documents the default client hierarchy behavior as well as how to customize clients. To get a summary of the setup, please check out the previous page.
 
-JS RLC is not in the business of customization. it will ignore client.tsp and the follow scenarios will not have impact on the JS RLC user experiences. In this context, TypeScript part means JS Modular Emitter.
+The JS RLC doesn't support client hierarchy customization and will ignore client.tsp. Therefore, the following scenarios won't affect the JS RLC user experience. In this context, the TypeScript part refers to the JS Modular Emitter.
 
 ## Default behavior
 
-By default, each namespace with `@service` decorator will be generated as a root client. The name for that client will be the namespace name concatenating `Client` as suffix.
+Each namespace with `@service` decorator will automatically be generated as a root client by default. The client's name will be the namespace name with `Client` added as suffix.
 
-Other nested namespacess and interfaces of each root client will be generated as operation groups with hierarchy.
+Nested namespaces and interfaces within each root client will be generated as operation groups with hierarchy.
 
-Different language's code generator will have different way to organize clients and operation groups. Please refer the following examples.
+Code generators for different languages will organize clients and operation groups in various ways. Please refer the following examples:
 
 ### Single client
 
@@ -21,11 +21,18 @@ Different language's code generator will have different way to organize clients 
 <TabItem value="typespec" label="TypeSpec" default>
 
 ```typespec
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+
+@versioned(Versions)
 @service({
-  title: "Pet Store",
-  version: "v1",
+  title: "Pet Store"
 })
 namespace PetStore;
+
+enum Versions {
+  v1,
+}
 
 @route("/feed")
 op feed(): void;
@@ -50,9 +57,23 @@ client.pet()
 <TabItem value="csharp" label="CSharp" >
 
 ```csharp
+namespace PetStore
+{
+  public partial class PetStoreClient
+  {
+      public PetStoreClient(Uri endpoint, PetStoreClientOptions options){}
+
+      public virtual async Task<Response> FeedAsync(RequestContext context = null) {}
+      public virtual Response Feed(RequestContext context = null) {}
+      public virtual async Task<Response> PetAsync(RequestContext context = null) {}
+      public virtual Response Pet(RequestContext context = null) {}
+  }
+}
+
+// Create the client and invoke the operations
 using PetStore;
 
-PetStoreClient client = new PetStoreClient();
+PetStoreClient client = new PetStoreClient(url, options);
 client.Feed();
 client.Pet();
 ```

@@ -1,11 +1,11 @@
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Setup for SDK customization
+# Setup for SDK Customization
 
-This page explains how to setup customization of a generator if necessary.
+This page provides instructions on setting up customization for TypeSpec to include client-specific customizations in the generated code.
 
-Your `package.json` needs to contains a link to the customization library, `typespec-client-generator-core`:
+Ensure that your `package.json` includes a link to the customization library, `typespec-client-generator-core`:
 
 ```json
 {
@@ -21,7 +21,7 @@ Your `package.json` needs to contains a link to the customization library, `type
 }
 ```
 
-Customization should always be done in a file called `client.tsp` along with the `main.tsp`.
+Customization should be implemented in a file named `client.tsp`, which should be used alongside with the `main.tsp`.
 
 ```typespec
 // client.tsp
@@ -30,10 +30,10 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-// Your customizations here
+// Add your customizations here
 ```
 
-Once you have a customization file, you should compile with your client.tsp to get output that includes the customizations:
+After you've created your customization file, use the command `tsp compile client.tsp` to generate output that includes your customizations:
 
 ```shell
 tsp compile client.tsp
