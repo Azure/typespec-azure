@@ -10,6 +10,8 @@ import {
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient, getServiceWithDefaultApiVersion } from "./utils.js";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 
 describe("typespec-client-generator-core: parameters", () => {
   let runner: SdkTestRunner;
@@ -1085,6 +1087,48 @@ describe("typespec-client-generator-core: parameters", () => {
 
       const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
       strictEqual(method.operation.bodyParam?.serializedName, "body");
+    });
+  });
+
+  describe("method parameter not used in operation", () => {
+    it("autoroute with constant", async () => {
+      await runner.compileWithBuiltInService(`
+          @autoRoute
+          op test(@path param: "test"): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.parameters.length, 0);
+      strictEqual(method.operation.parameters.length, 0);
+      strictEqual(method.operation.uriTemplate, "/test");
+    });
+
+    it("singleton resource", async () => {
+      const runnerWithArm = await createSdkTestRunner({
+        librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+        autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
+        @singleton("default")
+        model SingletonTrackedResource is TrackedResource<SingletonTrackedResourceProperties> {
+          ...ResourceNameParameter<SingletonTrackedResource>;
+        }
+
+        model SingletonTrackedResourceProperties {
+          description?: string;
+        }
+
+        @armResourceOperations
+        interface Singleton {
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<SingletonTrackedResource>;
+        }
+      `);
+
+      const sdkPackage = runnerWithArm.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      deepStrictEqual(method.parameters.map(p => p.name), ["resourceGroupName", "resource", "contentType", "accept"]);
+      deepStrictEqual(method.operation.parameters.map(p => p.name), ["apiVersion", "subscriptionId", "resourceGroupName", "contentType", "accept"]);
     });
   });
 });
