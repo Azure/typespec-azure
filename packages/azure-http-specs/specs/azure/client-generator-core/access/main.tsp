@@ -1,10 +1,10 @@
 import "@typespec/http";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
-using SpecLib;
+using Spector;
 
 @doc("Test for internal decorator.")
 @scenarioService("/azure/client-generator-core/access")
@@ -15,11 +15,11 @@ namespace _Specs_.Azure.ClientGenerator.Core.Access;
 @scenario
 @scenarioDoc("""
   This scenario contains public operations. It should be generated and exported.
-  Expected query parameter: name=<any string>
+  Expected query parameter: name="sample"
   Expected response body:
   ```json
   {
-    "name": <any string>
+    "name": "sample"
   }
   ```
   """)
@@ -51,11 +51,11 @@ namespace PublicOperation {
 @scenario
 @scenarioDoc("""
   This scenario contains internal operations. All should be generated but not exposed.
-  Expected query parameter: name=<any string>
+  Expected query parameter: name="sample"
   Expected response body:
   ```json
   {
-    "name": <any string>
+    "name": "sample"
   }
   ```
   """)
@@ -98,11 +98,11 @@ namespace InternalOperation {
 @scenario
 @scenarioDoc("""
   This scenario contains two operations, one public, another internal. The public one should be generated and exported while the internal one should be generated but not exposed.
-  Expected query parameter: name=<any string>
+  Expected query parameter: name="sample"
   Expected response body:
   ```json
   {
-    "name": <any string>
+    "name": "sample"
   }
   ```
   """)
@@ -157,14 +157,14 @@ namespace RelativeModelInOperation {
   }
 
   @doc("""
-    Expected query parameter: name=<any string>
+    Expected query parameter: name="Madge"
     Expected response body:
     ```json
     {
-      "name": <any string>,
+      "name": "Madge",
       "inner":
       {
-        "name": <any string>
+        "name": "Madge"
       }
     }
     ```
@@ -175,11 +175,11 @@ namespace RelativeModelInOperation {
   op operation(@query name: string): OuterModel;
 
   @doc("""
-    Expected query parameter: kind=<any string>
+    Expected query parameter: kind="real"
     Expected response body:
     ```json
     {
-      "name": <any string>,
+      "name": "real",
       "kind": "real"
     }
     ```

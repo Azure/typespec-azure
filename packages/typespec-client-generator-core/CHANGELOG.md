@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.47.3
+
+### Bug Fixes
+
+- [#1731](https://github.com/Azure/typespec-azure/pull/1731) fix wrong compare target for response body with anonymous model when finding anonymous model context
+- [#1698](https://github.com/Azure/typespec-azure/pull/1698) have paging respect renames
+
+
+## 0.47.2
+
+### Bug Fixes
+
+- [#1606](https://github.com/Azure/typespec-azure/pull/1606) overwrite original value when set multiple value for same decorator
+
+
 ## 0.47.1
 
 ### Bug Fixes

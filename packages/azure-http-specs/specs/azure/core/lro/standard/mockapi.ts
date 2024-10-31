@@ -110,9 +110,6 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
       status: 200,
       body: json(validUser),
     },
-    handler: (req: MockRequest) => {
-      return { status: 200, body: json(validUser) };
-    },
     kind: "MockApiDefinition",
   },
 ]);

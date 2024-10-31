@@ -1,12 +1,12 @@
 import "@typespec/http";
 import "@typespec/versioning";
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
 using TypeSpec.Versioning;
-using SpecLib;
+using Spector;
 
 @versioned(Versions)
 @doc("""
