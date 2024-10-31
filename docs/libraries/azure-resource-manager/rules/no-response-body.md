@@ -7,7 +7,7 @@ title: no-empty-model
 
 ```
 
-ARM response operations with status code 202 or 204 should not contain response body. Operations that are different for 202 and 204 should contain a response body.
+ARM operation responses with status code 202 or 204 should not contain a response body. Operation responses with other success (2xx) status codes should contain a response body.
 
 ### For 202 and 204 status codes (response body should be empty)
 
