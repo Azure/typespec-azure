@@ -352,7 +352,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.parameters.length, 4);
       deepStrictEqual(
         method.parameters.map((x) => x.name),
-        ["id", "weight", "color", "contentType", "accept"],
+        ["weight", "color", "contentType", "accept"],
       );
 
       const bodyParameter = method.operation.bodyParam;
