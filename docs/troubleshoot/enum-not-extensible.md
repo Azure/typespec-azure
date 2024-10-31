@@ -1,4 +1,6 @@
-# My enums are not extensible anymore
+---
+title: My enums are not extensible anymore
+---
 
 ## Symptoms
 

@@ -1,4 +1,6 @@
-# Duplicate Body Error When Instantiating `ProxyResourceOperations`
+---
+title: Duplicate Body Error When Instantiating `ProxyResourceOperations`
+---
 
 When instantiating the `ProxyResourceOperations<TResource>` template with an incorrect second parameter, a "duplicate body" error like the following may result:
 

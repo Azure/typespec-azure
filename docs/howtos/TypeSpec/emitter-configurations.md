@@ -1,3 +1,0 @@
-# Emitter configurations
-
-TBA

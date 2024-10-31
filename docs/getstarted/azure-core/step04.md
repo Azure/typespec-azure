@@ -1,4 +1,6 @@
-# 4. Defining your first resource
+---
+title: 4. Defining your first resource
+---
 
 In the context of your service, a "resource" is a fundamental entity that your service manages. For our `WidgetService`, the most basic entity we need is a `Widget`.
 
