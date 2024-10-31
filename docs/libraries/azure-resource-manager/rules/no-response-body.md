@@ -48,7 +48,7 @@ op walk(): ArmAcceptedResponse;
 }
 ```
 
-### For operations different than 202 and 204 status codes (response body should not be empty)
+### For other success (2xx) response status codes (response body should not be empty)
 
 #### ❌ Incorrect
 
