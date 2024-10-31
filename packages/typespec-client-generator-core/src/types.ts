@@ -92,7 +92,6 @@ import {
   getSdkTypeBaseHelper,
   getTypeDecorators,
   intOrFloat,
-  isAzureCoreModel,
   isHttpBodySpread,
   isJsonContentType,
   isMultipartOperation,
@@ -1754,15 +1753,7 @@ function filterOutTypes(
   filter: number,
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
   const result = new Set<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
-  for (const [type, sdkType] of context.referencedTypeMap?.entries() ?? []) {
-    // filter models/enums/union of Core
-    if (
-      context.filterOutCoreModels &&
-      ["Enum", "Model", "Union"].includes(type.kind) &&
-      isAzureCoreModel(type)
-    ) {
-      continue;
-    }
+  for (const sdkType of context.referencedTypeMap?.values() ?? []) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;

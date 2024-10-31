@@ -34,7 +34,6 @@ export interface TCGCContext {
   emitterName: string;
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
