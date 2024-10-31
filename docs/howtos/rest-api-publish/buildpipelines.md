@@ -1,4 +1,6 @@
-# Using Build Pipelines with TypeSpec
+---
+title: Using Build Pipelines with TypeSpec
+---
 
 This doc will help you get started with using TypeSpec in your build pipelines in your own repository. [See here for more how to use in the azure-rest-api-specs repo](./checking-in-api-specs-guide.md)
 

@@ -1,4 +1,6 @@
-# Azure TypeSpec Style Guide
+---
+title: Azure TypeSpec Style Guide
+---
 
 ## History
 

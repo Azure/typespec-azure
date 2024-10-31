@@ -1,4 +1,6 @@
-# 4. Defining Child Resource Types
+---
+title: 4. Defining Child Resource Types
+---
 
 You can create parent/child relationships between resource types by using the `@parentResource` decorator when defining a resource type.
 

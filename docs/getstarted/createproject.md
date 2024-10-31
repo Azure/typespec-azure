@@ -1,4 +1,6 @@
-# Creating a project
+---
+title: Creating a project
+---
 
 If you've installed TypeSpec on your local machine, you can create a new TypeSpec project by following these steps:
 
