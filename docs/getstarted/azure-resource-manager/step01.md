@@ -1,4 +1,6 @@
-# 2. Defining the Service
+---
+title: 2. Defining the Service
+---
 
 To define an Azure Resource Manager service, the first thing you will need to do is define the service namespace and decorate it with the `service` and `armProviderNamespace` decorators:
 

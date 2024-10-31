@@ -1,4 +1,6 @@
-# Resolving Swagger Lint Diff Violations
+---
+title: Resolving Swagger Lint Diff Violations
+---
 
 The Swagger Converter will not be able to accurately represent every part of every API in TypeSpec. This document
 outlines some common changes you might need to make to a converted TypeSpec to make it conform to your existing service API and  

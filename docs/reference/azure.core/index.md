@@ -1,4 +1,6 @@
-# Library Tour
+---
+title: Library Tour
+---
 
 The `@azure-tools/typespec-azure-core` library defines the following artifacts:
 

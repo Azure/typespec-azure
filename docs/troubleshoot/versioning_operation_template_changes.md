@@ -1,4 +1,6 @@
-# How can I change the operation template of an operation in newer versions
+---
+title: How can I change the operation template of an operation in newer versions
+---
 
 ## Symtoms
 
