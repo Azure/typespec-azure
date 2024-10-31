@@ -1752,15 +1752,17 @@ function filterOutTypes(
   context: TCGCContext,
   filter: number,
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
-  const result = new Set<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
+  const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   for (const sdkType of context.referencedTypeMap?.values() ?? []) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;
     }
-    result.add(sdkType);
+    if (!result.includes(sdkType)) {
+      result.push(sdkType);
+    }
   }
-  return [...result];
+  return result;
 }
 
 export function getAllModelsWithDiagnostics(
