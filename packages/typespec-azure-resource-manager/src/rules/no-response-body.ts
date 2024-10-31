@@ -1,8 +1,7 @@
+import { isAzureSubNamespace } from "@azure-tools/typespec-azure-core";
 import { createRule, Operation } from "@typespec/compiler";
 import { getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
-
-import { isAzureSubNamespace, isTemplatedInterfaceOperation } from "./utils.js";
-
+import { isTemplatedInterfaceOperation } from "./utils.js";
 /**
  * verify an operation returns 202 or 204 should not contain response body.
  * verify that operations that are different for 202 and 204 should contain a response body.
@@ -10,11 +9,11 @@ import { isAzureSubNamespace, isTemplatedInterfaceOperation } from "./utils.js";
 export const noResponseBodyRule = createRule({
   name: "no-response-body",
   description:
-    "Check that the body is empty for 202 and 204 responses, and not empty for non-204/non-202 responses.",
+    "Check that the body is empty for 202 and 204 responses, and not empty for other success (2xx) responses.",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-response-body",
   severity: "warning",
   messages: {
-    default: `The body of non-204/non-202 responses should not be empty.`,
+    default: `The body of responses with success (2xx) status codes other than 202 and 204 should not be empty.`,
     shouldBeEmpty202: `The body of 202 response should be empty.`,
     shouldBeEmpty204: `The body of 204 response should be empty.`,
   },

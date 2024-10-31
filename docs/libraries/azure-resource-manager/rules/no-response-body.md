@@ -14,11 +14,9 @@ ARM response operations with status code 202 or 204 should not contain response 
 #### ❌ Incorrect
 
 ```tsp
-model Test204BodyResponse {
-  @statusCode statusCode: 204;
-  @bodyRoot body: string;
-}
-op walk(): Test204BodyResponse;
+op walk(): ArmNoContentResponse & {
+  @body body: string;
+};
 ```
 
 ```json
@@ -37,10 +35,7 @@ op walk(): Test204BodyResponse;
 #### ✅ Correct
 
 ```tsp
-model Test204EmptyResponse {
-  @statusCode statusCode: 202;
-}
-op walk(): Test204EmptyResponse;
+op walk(): ArmAcceptedResponse;
 ```
 
 ```json
@@ -58,10 +53,7 @@ op walk(): Test204EmptyResponse;
 #### ❌ Incorrect
 
 ```tsp
-model Test201EmptyResponse {
-  @statusCode statusCode: 201;
-}
-op walk(): Test201EmptyResponse;
+op walk(): CreatedResponse;
 ```
 
 ```json
@@ -77,20 +69,24 @@ op walk(): Test201EmptyResponse;
 #### ✅ Correct
 
 ```tsp
-model Test201BodyResponse {
-  @statusCode statusCode: 201;
-  @bodyRoot body: string;
-}
-op walk(): Test201BodyResponse;
+op walk(): ArmCreatedResponse<{
+  name: string;
+}>;
 ```
 
 ```json
 {
   "responses": {
     "201": {
-      "description": "The request has succeeded and a new resource has been created as a result.",
+      "description": "Azure create operation completed successfully.",
       "schema": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
       }
     }
   }

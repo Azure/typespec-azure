@@ -25,7 +25,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
       .expect(
         `
         namespace Azure.MyService;
-
+        
         model TestAcceptedResponse {
           @statusCode statusCode: 202;
         }
@@ -55,12 +55,9 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
       .expect(
         `
         namespace Azure.MyService;
-        
-        model TestAcceptedResponse {
-          @statusCode statusCode: 204;
-          @bodyRoot body: string;
-        }
-        op walk(): TestAcceptedResponse;
+        op walk(): ArmNoContentResponse & {
+          @body body: string;
+        };
       `,
       )
       .toEmitDiagnostics({
@@ -94,15 +91,12 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
         `
         namespace Azure.MyService;
 
-        model TestAcceptedResponse {
-          @statusCode statusCode: 201;
-        }
-        op walk(): TestAcceptedResponse;
+        op walk(): CreatedResponse;
       `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
-        message: `The body of non-204/non-202 responses should not be empty.`,
+        message: `The body of responses with success (2xx) status codes other than 202 and 204 should not be empty.`,
       });
   });
 });
