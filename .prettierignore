@@ -54,6 +54,7 @@ core/packages/website/versioned_docs/**/standard-library/built-in-data-types.md
 
 # Auto generated version list
 packages/website/playground-versions.json
+core/website/playground-versions.json
 core/packages/website/playground-versions.json
 
 /core/eng/feeds/

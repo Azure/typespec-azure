@@ -1,10 +1,6 @@
 ---
 title: "Linter usage"
-toc_min_heading_level: 2
-toc_max_heading_level: 3
 ---
-
-# Linter
 
 ## Usage
 
@@ -45,7 +41,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`                                                                                      | Check for resources that must have a delete operation.                                                                                                                                                                                               |
 | `@azure-tools/typespec-azure-resource-manager/empty-updateable-properties`                                                                                       | Should have updateable properties.                                                                                                                                                                                                                   |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator`                                                                         | Each resource interface must have an @armResourceOperations decorator.                                                                                                                                                                               |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb`                                                                                  | Actions must be HTTP Post operations.                                                                                                                                                                                                                |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb`](/libraries/azure-resource-manager/rules/arm-resource-invalid-action-verb.md)   | Actions must be HTTP Post or Get operations.                                                                                                                                                                                                         |
 | `@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation`                                                                              | Tenant and Extension resources should not define a list by subscription operation.                                                                                                                                                                   |
 | [`@azure-tools/typespec-azure-resource-manager/lro-location-header`](/libraries/azure-resource-manager/rules/lro-location-header.md)                             | A 202 response should include a Location response header.                                                                                                                                                                                            |
 | [`@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers`](/libraries/azure-resource-manager/rules/missing-x-ms-identifiers.md)                   | Array properties should describe their identifying properties with x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", [id-prop]) where "id-prop" is a list of the names of identifying properties in the item type. |

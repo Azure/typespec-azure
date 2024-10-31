@@ -8,9 +8,7 @@ TypeSpec Azure Resource Manager library
 npm install @azure-tools/typespec-azure-resource-manager
 ```
 
-## Linter
-
-### Usage
+## Usage
 
 Add the following in `tspconfig.yaml`:
 
@@ -20,13 +18,13 @@ linter:
     - "@azure-tools/typespec-azure-resource-manager/all"
 ```
 
-### RuleSets
+## RuleSets
 
 Available ruleSets:
 
 - `@azure-tools/typespec-azure-resource-manager/all`
 
-### Rules
+## Rules
 
 | Name                                                                                                                                                                                                     | Description                                                                                                                                                                                                                                          |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -49,7 +47,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`                                                                                                                              | Check for resources that must have a delete operation.                                                                                                                                                                                               |
 | `@azure-tools/typespec-azure-resource-manager/empty-updateable-properties`                                                                                                                               | Should have updateable properties.                                                                                                                                                                                                                   |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator`                                                                                                                 | Each resource interface must have an @armResourceOperations decorator.                                                                                                                                                                               |
-| `@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb`                                                                                                                          | Actions must be HTTP Post operations.                                                                                                                                                                                                                |
+| [`@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-action-verb`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-action-verb)   | Actions must be HTTP Post or Get operations.                                                                                                                                                                                                         |
 | `@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation`                                                                                                                      | Tenant and Extension resources should not define a list by subscription operation.                                                                                                                                                                   |
 | [`@azure-tools/typespec-azure-resource-manager/lro-location-header`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-location-header)                             | A 202 response should include a Location response header.                                                                                                                                                                                            |
 | [`@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers)                   | Array properties should describe their identifying properties with x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", [id-prop]) where "id-prop" is a list of the names of identifying properties in the item type. |

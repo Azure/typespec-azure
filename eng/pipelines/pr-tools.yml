@@ -27,6 +27,7 @@ extends:
                 persistCredentials: true
 
               - template: /eng/pipelines/templates/install.yml@self
+              - template: /eng/tsp-core/pipelines/templates/install-browsers.yml
 
               - script: pnpm run build
                 displayName: Build

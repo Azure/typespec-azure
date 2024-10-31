@@ -7,7 +7,7 @@ import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
 import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
 import { interfacesRule } from "./rules/arm-resource-interfaces.js";
-import { invalidActionVerbRule } from "./rules/arm-resource-invalid-action-verb.js";
+import { armResourceInvalidActionVerbRule } from "./rules/arm-resource-invalid-action-verb.js";
 import { armResourceEnvelopeProperties } from "./rules/arm-resource-invalid-envelope-property.js";
 import { armResourceInvalidVersionFormatRule } from "./rules/arm-resource-invalid-version-format.js";
 import { armResourceKeyInvalidCharsRule } from "./rules/arm-resource-key-invalid-chars.js";
@@ -51,7 +51,7 @@ const rules = [
   deleteOperationMissingRule,
   envelopePropertiesRules,
   interfacesRule,
-  invalidActionVerbRule,
+  armResourceInvalidActionVerbRule,
   listBySubscriptionRule,
   lroLocationHeaderRule,
   missingXmsIdentifiersRule,
