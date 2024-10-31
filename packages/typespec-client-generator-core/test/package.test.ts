@@ -729,9 +729,9 @@ describe("typespec-client-generator-core: package", () => {
     @parentResource(Widget)
     model WidgetAnalytics {
       @key("analyticsId")
-      @doc("The identifier for the analytics object.  There is only one named 'current'.")
+      @doc("The identifier for the analytics object.")
       @visibility("read")
-      id: "current";
+      id: string;
 
       @doc("The number of uses of the widget.")
       useCount: int64;
@@ -1186,6 +1186,66 @@ describe("typespec-client-generator-core: package", () => {
       );
       ok(clientRequestIdProperty);
       strictEqual(clientRequestIdProperty.kind, "header");
+    });
+
+    it("azure widget getWidgetAnalytics", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await compileAzureWidgetService(
+        runnerWithCore,
+        `
+      @doc("Get a WidgetAnalytics")
+      getWidgetAnalytics is Operations.ResourceRead<WidgetAnalytics>;
+      `,
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const parentClient = sdkPackage.clients.filter(
+        (c) => c.initialization.access === "public",
+      )[0];
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(parentClient.name, "WidgetManagerClient");
+      strictEqual(method.name, "getWidgetAnalytics");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 8);
+
+      const methodWidgetName = method.parameters.find((p) => p.name === "widgetName");
+      ok(methodWidgetName);
+      strictEqual(methodWidgetName.kind, "method");
+      strictEqual(methodWidgetName.isApiVersionParam, false);
+      deepStrictEqual(methodWidgetName.apiVersions, ["2022-08-30"]);
+      strictEqual(methodWidgetName.onClient, false);
+      strictEqual(methodWidgetName.optional, false);
+
+      const operationWidgetName = method.operation.parameters.find((x) => x.name === "widgetName");
+      ok(operationWidgetName);
+      strictEqual(operationWidgetName.kind, "path");
+      strictEqual(operationWidgetName.name, "widgetName");
+      strictEqual(operationWidgetName.serializedName, "widgetName");
+      strictEqual(operationWidgetName.onClient, false);
+      strictEqual(operationWidgetName.correspondingMethodParams.length, 1);
+      strictEqual(operationWidgetName.correspondingMethodParams[0], methodWidgetName);
+
+      const methodAnalyticsId = method.parameters.find((p) => p.name === "analyticsId");
+      ok(methodAnalyticsId);
+      strictEqual(methodAnalyticsId.kind, "method");
+      strictEqual(methodAnalyticsId.isApiVersionParam, false);
+      deepStrictEqual(methodAnalyticsId.apiVersions, ["2022-08-30"]);
+      strictEqual(methodAnalyticsId.onClient, false);
+      strictEqual(methodAnalyticsId.optional, false);
+
+      const operationAnalyticsId = method.operation.parameters.find(
+        (x) => x.name === "analyticsId",
+      );
+      ok(operationAnalyticsId);
+      strictEqual(operationAnalyticsId.kind, "path");
+      strictEqual(operationAnalyticsId.name, "analyticsId");
+      strictEqual(operationAnalyticsId.serializedName, "analyticsId");
+      strictEqual(operationAnalyticsId.onClient, false);
+      strictEqual(operationAnalyticsId.correspondingMethodParams.length, 1);
+      strictEqual(operationAnalyticsId.correspondingMethodParams[0], methodAnalyticsId);
     });
   });
 

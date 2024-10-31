@@ -709,7 +709,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-    for (const [type, sdkType] of runner.context.modelsMap?.entries() ?? []) {
+    for (const [type, sdkType] of runner.context.referencedTypeMap?.entries() ?? []) {
       if (isAzureCoreTspModel(type)) {
         ok(sdkType.usage !== UsageFlags.None);
       }
