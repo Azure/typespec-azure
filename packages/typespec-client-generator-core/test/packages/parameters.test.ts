@@ -1,4 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -10,8 +12,6 @@ import {
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient, getServiceWithDefaultApiVersion } from "./utils.js";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 
 describe("typespec-client-generator-core: parameters", () => {
   let runner: SdkTestRunner;
@@ -1127,8 +1127,14 @@ describe("typespec-client-generator-core: parameters", () => {
 
       const sdkPackage = runnerWithArm.context.sdkPackage;
       const method = getServiceMethodOfClient(sdkPackage);
-      deepStrictEqual(method.parameters.map(p => p.name), ["resourceGroupName", "resource", "contentType", "accept"]);
-      deepStrictEqual(method.operation.parameters.map(p => p.name), ["apiVersion", "subscriptionId", "resourceGroupName", "contentType", "accept"]);
+      deepStrictEqual(
+        method.parameters.map((p) => p.name),
+        ["resourceGroupName", "resource", "contentType", "accept"],
+      );
+      deepStrictEqual(
+        method.operation.parameters.map((p) => p.name),
+        ["apiVersion", "subscriptionId", "resourceGroupName", "contentType", "accept"],
+      );
     });
   });
 });

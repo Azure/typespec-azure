@@ -629,13 +629,25 @@ function findMapping(
   return undefined;
 }
 
-function filterOutUselessPathParameters(context: TCGCContext, httpOperation: HttpOperation, methodParameters: SdkMethodParameter[]) {
-  // for autoroute with constant or singleton arm resource operation,
-  // some path parameters will be added to route directly with the constant value,
+function filterOutUselessPathParameters(
+  context: TCGCContext,
+  httpOperation: HttpOperation,
+  methodParameters: SdkMethodParameter[],
+) {
+  // there are some cases that method path parameter is not in operation:
+  // 1. autoroute with constant parameter
+  // 2. singleton arm resource name
+  // 3. visibility mis-match
   // so we will remove the method parameter for consistent
   for (let i = 0; i < methodParameters.length; i++) {
     const param = methodParameters[i];
-    if (param.__raw && isPathParam(context.program, param.__raw) && httpOperation.parameters.parameters.filter(p => p.type === "path" && p.name === getWireName(context, param.__raw!)).length === 0) {
+    if (
+      param.__raw &&
+      isPathParam(context.program, param.__raw) &&
+      httpOperation.parameters.parameters.filter(
+        (p) => p.type === "path" && p.name === getWireName(context, param.__raw!),
+      ).length === 0
+    ) {
       methodParameters.splice(i, 1);
       i--;
     }
