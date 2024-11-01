@@ -18,6 +18,9 @@ export default defineConfig({
   base,
   site: "https://azure.github.io/typespec-azure",
   trailingSlash: "always",
+  redirects: {
+    "/docs/": "/docs/intro/",
+  },
   integrations: [
     astroExpressiveCode(),
     starlight({
