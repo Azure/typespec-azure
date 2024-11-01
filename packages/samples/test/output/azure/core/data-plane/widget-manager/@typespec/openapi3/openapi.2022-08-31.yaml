@@ -1270,6 +1270,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WidgetRepairRequest'
+security:
+  - ApiKeyAuth: []
 components:
   parameters:
     Azure.Core.ClientRequestIdHeader:
@@ -1681,3 +1683,8 @@ components:
             - Canceled
             - SentToManufacturer
       description: The repair state of a widget.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Key

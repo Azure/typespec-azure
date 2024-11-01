@@ -45,6 +45,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WidgetServiceErrorResponse'
+security:
+  - ApiKeyAuth: []
 components:
   parameters:
     Azure.Core.ClientRequestIdHeader:
@@ -170,3 +172,8 @@ components:
           type: string
           description: The error message.
       description: A custom error type for the Widget Manager service.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Key
