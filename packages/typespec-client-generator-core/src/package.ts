@@ -805,34 +805,34 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
 }
 
 function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
-  sdkPacakge: SdkPackage<TServiceOperation>,
+  sdkPackage: SdkPackage<TServiceOperation>,
 ) {
-  const clients = [...sdkPacakge.clients];
+  const clients = [...sdkPackage.clients];
   while (clients.length > 0) {
     const client = clients.shift()!;
-    getSdkNamespace(sdkPacakge, client.clientNamespace).clients.push(client);
+    getSdkNamespace(sdkPackage, client.clientNamespace).clients.push(client);
     client.methods
       .filter((m) => m.kind === "clientaccessor")
       .map((m) => m.response)
       .map((c) => clients.push(c));
   }
-  for (const model of sdkPacakge.models) {
-    getSdkNamespace(sdkPacakge, model.clientNamespace).models.push(model);
+  for (const model of sdkPackage.models) {
+    getSdkNamespace(sdkPackage, model.clientNamespace).models.push(model);
   }
-  for (const enumType of sdkPacakge.enums) {
-    getSdkNamespace(sdkPacakge, enumType.clientNamespace).enums.push(enumType);
+  for (const enumType of sdkPackage.enums) {
+    getSdkNamespace(sdkPackage, enumType.clientNamespace).enums.push(enumType);
   }
-  for (const unionType of sdkPacakge.unions) {
-    getSdkNamespace(sdkPacakge, unionType.clientNamespace).unions.push(unionType);
+  for (const unionType of sdkPackage.unions) {
+    getSdkNamespace(sdkPackage, unionType.clientNamespace).unions.push(unionType);
   }
 }
 
 function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
-  sdkPacakge: SdkPackage<TServiceOperation>,
+  sdkPackage: SdkPackage<TServiceOperation>,
   namespace: string,
 ) {
   const segments = namespace.split(".");
-  let current: SdkPackage<TServiceOperation> | SdkNamespace<TServiceOperation> = sdkPacakge;
+  let current: SdkPackage<TServiceOperation> | SdkNamespace<TServiceOperation> = sdkPackage;
   let fullName = "";
   for (const segment of segments) {
     fullName = fullName === "" ? segment : `${fullName}.${segment}`;
