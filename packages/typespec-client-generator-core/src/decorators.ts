@@ -64,8 +64,8 @@ import {
   clientNameKey,
   getValidApiVersion,
   isAzureCoreModel,
-  parseEmitterName,
   negationScopesKey,
+  parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
@@ -88,7 +88,7 @@ function getScopedDecoratorData(
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
     if (Object.keys(retval).includes(scope)) return retval[scope];
-    
+
     // if the scope is negated, we should return undefined
     const negationScopes = retval[negationScopesKey];
     if (negationScopes !== undefined && negationScopes.includes(scope)) {
@@ -124,19 +124,18 @@ function setScopedDecoratorData(
     context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
     return;
   }
-  
+
   const negationScopes = getNegationScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
-    const newObject = Object.fromEntries([AllScopes].map((scope) => [scope, value])); 
+    const newObject = Object.fromEntries([AllScopes].map((scope) => [scope, value]));
     newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
     return;
-  }
-  else {
+  } else {
     const splitScopes = scope.split(",").map((s) => s.trim());
 
     // if negation scope is combined with normal scope, report error
-    if (splitScopes.length > 1 && splitScopes.some((s) => s.startsWith("!"))) {  
+    if (splitScopes.length > 1 && splitScopes.some((s) => s.startsWith("!"))) {
       reportDiagnostic(context.program, {
         code: "invalid-negation-scope",
         target: context.decoratorTarget,
@@ -165,12 +164,11 @@ function getNegationScopes(scope?: LanguageScopes): string[] | undefined {
     return undefined;
   }
 
-  const negationScopeRegex = new RegExp(/\!\((.*?)\)/);
+  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
   const negationScopeMatch = scope.match(negationScopeRegex);
   if (negationScopeMatch) {
     return negationScopeMatch[1].split(",").map((s) => s.trim());
-  }
-  else if (!scope.includes(",") && scope.startsWith("!")) {
+  } else if (!scope.includes(",") && scope.startsWith("!")) {
     return [scope.substring(1)];
   }
   return undefined;

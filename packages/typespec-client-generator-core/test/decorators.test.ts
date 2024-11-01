@@ -3027,13 +3027,13 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(uploadOp.parameters[0].correspondingMethodParams[0], blobName);
     });
   });
-  
+
   describe("scope negation", () => {
     it("single scope negation", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const result = (await runnerWithCSharp.compile(`
+      await runnerWithCSharp.compile(`
         @service
         @test namespace MyService {
           @test
@@ -3047,7 +3047,7 @@ describe("typespec-client-generator-core: decorators", () => {
             @body body: Test
           ): void;
         }
-      `));
+      `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
       const testModel = sdkPackage.models.find((x) => x.name === "Test");
@@ -3058,7 +3058,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const result = (await runnerWithCSharp.compile(`
+      await runnerWithCSharp.compile(`
         @service
         @test namespace MyService {
           @test
@@ -3072,7 +3072,7 @@ describe("typespec-client-generator-core: decorators", () => {
             @body body: Test
           ): void;
         }
-      `));
+      `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
       const testModel = sdkPackage.models.find((x) => x.name === "Test");
@@ -3083,7 +3083,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const diagnostics = (await runnerWithCSharp.diagnose(`
+      const diagnostics = await runnerWithCSharp.diagnose(`
         @service
         @test namespace MyService {
           @test
@@ -3097,7 +3097,7 @@ describe("typespec-client-generator-core: decorators", () => {
             @body body: Test
           ): void;
         }
-      `));
+      `);
 
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
@@ -3108,7 +3108,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const diagnostics = (await runnerWithCSharp.diagnose(`
+      const diagnostics = await runnerWithCSharp.diagnose(`
         @service
         @test namespace MyService {
           @test
@@ -3122,12 +3122,11 @@ describe("typespec-client-generator-core: decorators", () => {
             @body body: Test
           ): void;
         }
-      `));
+      `);
 
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
       });
     });
-
   });
 });
