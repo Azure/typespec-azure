@@ -313,6 +313,7 @@ Area of the codebase
 | `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library            |
 | `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter              |
 | `eng`                        | #65bfff |                                                                |
+| `ide`                        | #846da1 | Issues for Azure specific ide features                         |
 
 #### issue_kinds
 
