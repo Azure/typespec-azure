@@ -3178,5 +3178,31 @@ describe("typespec-client-generator-core: decorators", () => {
       const testModel = sdkPackage.models.find((x) => x.name === "Test");
       ok(testModel);
     });
+
+    it("negation scope override normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.diagnose(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamedAgain", "!csharp, !java")
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
   });
 });
