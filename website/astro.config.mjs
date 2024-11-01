@@ -6,33 +6,27 @@ import { defineConfig } from "astro/config";
 import { resolve } from "path";
 import current from "./src/content/current-sidebar";
 
+const base = process.env.TYPESPEC_WEBSITE_BASE_PATH ?? "/";
+
 // https://astro.build/config
 export default defineConfig({
+  base,
+  site: "https://azure.github.io/typespec-azure",
+  trailingSlash: "always",
   integrations: [
     astroExpressiveCode(),
     starlight({
-      title: "My Docs",
+      title: "TypeSpec Azure",
       sidebar: await processSidebar(
         resolve(import.meta.dirname, "src/content/docs"),
         "docs",
         current,
       ),
+      favicon: "/azure.svg",
+      expressiveCode: false, // defined directly above
       social: {
-        github: "https://github.com/withastro/starlight",
+        github: "https://github.com/Azure/typespec-azure",
       },
-      sidebar: [
-        {
-          label: "Guides",
-          items: [
-            // Each item here is one entry in the navigation menu.
-            { label: "Example Guide", slug: "guides/example" },
-          ],
-        },
-        {
-          label: "Reference",
-          autogenerate: { directory: "reference" },
-        },
-      ],
     }),
   ],
 });
