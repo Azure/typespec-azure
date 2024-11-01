@@ -43,6 +43,7 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
   "emitter:autorest": ["packages/typespec-autorest/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
+  ide: [],
 };
 
 export default defineConfig({
