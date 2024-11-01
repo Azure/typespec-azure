@@ -43,7 +43,7 @@ extends:
                       --destination \$web \
                       --account-name "cadlplayground" \
                       --destination-path $(TYPESPEC_WEBSITE_BASE_PATH) \
-                      --source "./packages/typespec-azure-playground-website/dist/" \
+                      --source "./website/dist/" \
                       --overwrite
 
               - task: AzureCLI@1
