@@ -45,8 +45,8 @@ packages/website/versions.json
 # Auto generated reference docs.
 **/docs/**/reference/
 packages/website/versioned_docs/**/reference/
-core/src/content/docs/docs/standard-library/built-in-decorators.md
-core/src/content/docs/docs/standard-library/built-in-data-types.md
+core/website/src/content/docs/docs/standard-library/built-in-decorators.md
+core/website/src/content/docs/docs/standard-library/built-in-data-types.md
 
 # Auto generated version list
 packages/website/playground-versions.json
