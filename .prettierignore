@@ -43,9 +43,8 @@ packages/website/versions.json
 
 
 # Auto generated reference docs.
-docs/**/reference/
+**/docs/**/reference/
 packages/website/versioned_docs/**/reference/
-core/docs/**/reference/
 core/docs/standard-library/built-in-decorators.md
 core/docs/standard-library/built-in-data-types.md
 core/packages/website/versioned_docs/**/reference/
