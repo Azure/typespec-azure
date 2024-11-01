@@ -1,4 +1,6 @@
-# 10. Versioning
+---
+title: 10. Versioning
+---
 
 ## Versioning your service
 

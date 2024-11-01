@@ -1,4 +1,6 @@
-# 11. Complete Example
+---
+title: 11. Complete Example
+---
 
 A complete version of the `Contoso.WidgetManager` specification can be found in the [`widget-manager` sample folder](https://github.com/Azure/typespec-azure/blob/main/packages/samples/specs/data-plane/widget-manager/main.tsp).
 
