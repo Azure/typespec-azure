@@ -133,17 +133,11 @@ function setScopedDecoratorData(
   } else if (scopes !== undefined && scopes.length > 0) {
     // if scope specified, create or overwrite with the new value
     const targetEntry = context.program.stateMap(key).get(target);
+    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
 
     // if target doesn't exist in decorator map, create a new entry
-    if (!targetEntry) {
-      const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
-      context.program.stateMap(key).set(target, newObject);
-      return;
-    }
-
-    // if target exists, overwrite existed value
-    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+    // otherwise, overwrite existed value
+    context.program.stateMap(key).set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
   }
 }
 
