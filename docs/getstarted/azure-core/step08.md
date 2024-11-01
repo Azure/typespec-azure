@@ -1,4 +1,6 @@
-# 8. Defining custom resource actions
+---
+title: 8. Defining custom resource actions
+---
 
 Often your resource types will need additional operations that are not covered by the standard resource operation shapes. For this, there are a set of operation signatures for defining _resource actions_ at the instance and collection level.
 

@@ -1,4 +1,6 @@
-# Library Tour
+---
+title:  Library Tour
+---
 
 The `@azure-tools/typespec-azure-resource-manager` library defines the following artifacts:
 

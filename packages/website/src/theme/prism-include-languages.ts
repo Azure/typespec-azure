@@ -1,5 +1,5 @@
 import siteConfig from "@generated/docusaurus.config";
-import typespecPrismDefinition from "@typespec/website/src/theme/typespec-lang-prism";
+import typespecPrismDefinition from "./typespec-lang-prism";
 
 export default function prismIncludeLanguages(PrismObject) {
   const {
