@@ -11,15 +11,23 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.28.4",
+    "@astrojs/starlight": "^0.28.5",
+    "@astrojs/react": "^3.6.2",
     "copy": "cp -r ../docs/. ./src/content/docs/docs",
     "astro": "^4.15.3",
     "sharp": "^0.32.5",
     "@astrojs/check": "^0.9.4",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "react": "~18.3.1",
+    "react-dom": "~18.3.1"
   },
   "devDependencies": {
+    "@types/remark-heading-id": "^1.0.0",
+    "@types/react": "~18.3.11",
+    "@types/react-dom": "~18.3.0",
     "@typespec/astro-utils": "workspace:~",
-    "astro-expressive-code": "^0.37.0"
+    "astro-expressive-code": "^0.37.0",
+    "astro-rehype-relative-markdown-links": "^0.15.0",
+    "remark-heading-id": "^1.0.1"
   }
 }
