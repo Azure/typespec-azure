@@ -62,7 +62,7 @@ const sidebar: SidebarItem[] = [
     },
   },
   {
-    label: "Libraries",
+    label: "📚 Libraries",
     items: [
       createLibraryReferenceStructure("libraries/azure-core", "Azure.Core", true),
       createLibraryReferenceStructure(
@@ -79,13 +79,13 @@ const sidebar: SidebarItem[] = [
     ],
   },
   {
-    label: "Emitters",
+    label: "🖨️ Emitters",
     items: [
       createLibraryReferenceStructure("emitters/typespec-autorest", "Autorest / Swagger", false),
     ],
   },
   {
-    label: "Troubleshoot",
+    label: "🔎 Troubleshoot",
     autogenerate: {
       directory: "troubleshoot",
     },
