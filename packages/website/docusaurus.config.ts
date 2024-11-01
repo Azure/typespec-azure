@@ -131,6 +131,28 @@ const config: Config = {
       } satisfies Options,
     ],
   ],
+  webpack: {
+    jsLoader: (isServer) => ({
+      loader: require.resolve("swc-loader"),
+      options: {
+        jsc: {
+          parser: {
+            syntax: "typescript",
+            tsx: true,
+          },
+          transform: {
+            react: {
+              runtime: "automatic",
+            },
+          },
+          target: "es2022",
+        },
+        module: {
+          type: isServer ? "commonjs" : "es6",
+        },
+      },
+    }),
+  },
   themeConfig: {
     navbar: {
       title: "TypeSpec Azure",
