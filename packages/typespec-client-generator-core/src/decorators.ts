@@ -34,6 +34,7 @@ import {
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
+  ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
@@ -61,6 +62,7 @@ import {
 import {
   AllScopes,
   clientNameKey,
+  clientNamespaceKey,
   getValidApiVersion,
   isAzureCoreTspModel,
   parseEmitterName,
@@ -1040,4 +1042,33 @@ export const paramAliasDecorator: ParamAliasDecorator = (
 
 export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
   return getScopedDecoratorData(context, paramAliasKey, original);
+}
+
+export const $clientNamespace: ClientNamespaceDecorator = (
+  context: DecoratorContext,
+  entity: Namespace | Interface | Model | Enum | Union,
+  value: string,
+  scope?: LanguageScopes,
+) => {
+  if (value.trim() === "") {
+    reportDiagnostic(context.program, {
+      code: "empty-client-namespace",
+      format: {},
+      target: entity,
+    });
+  }
+  setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
+};
+
+export function getClientNamespace(
+  context: TCGCContext,
+  entity: Namespace | Interface | Model | Enum | Union,
+): string {
+  const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
+  if (override) return override;
+  return entity.kind === "Namespace"
+    ? getNamespaceFullName(entity)
+    : entity.namespace
+      ? getNamespaceFullName(entity.namespace)
+      : "";
 }
