@@ -1,4 +1,3 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   AugmentDecoratorStatementNode,
   DecoratorContext,
@@ -63,13 +62,13 @@ import {
   AllScopes,
   clientNameKey,
   getValidApiVersion,
-  isAzureCoreModel,
+  isAzureCoreTspModel,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel, getSdkUnion, getSdkUnionEnumWithDiagnostics } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -651,7 +650,6 @@ export async function createSdkContext<
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
@@ -749,12 +747,11 @@ export function getUsageOverride(
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
-  const diagnostics = createDiagnosticCollector();
   switch (entity.kind) {
     case "Union":
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(entity));
-      if (unionAsEnum) {
-        return diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum)).usage;
+      const type = getSdkUnion(context, entity);
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+        return type.usage;
       }
       return UsageFlags.None;
     case "Model":
@@ -808,7 +805,7 @@ export function getAccess(context: TCGCContext, entity: Model | Enum | Operation
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "model") {
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
         return type.access;
       }
       return "public";
@@ -912,7 +909,7 @@ function collectParams(
         while (sourceProp.sourceProperty) {
           sourceProp = sourceProp.sourceProperty;
         }
-        if (sourceProp.model && !isAzureCoreModel(sourceProp.model)) {
+        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
           params.push(value);
         } else if (!sourceProp.model) {
           params.push(value);
