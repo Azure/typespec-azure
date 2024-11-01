@@ -1,9 +1,10 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { afterEach, beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
-import { isAzureCoreModel } from "../../src/internal-utils.js";
+import { isAzureCoreTspModel } from "../../src/internal-utils.js";
+import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -12,16 +13,6 @@ describe("typespec-client-generator-core: model types", () => {
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-  });
-  afterEach(async () => {
-    for (const modelsOrEnums of [
-      runner.context.sdkPackage.models,
-      runner.context.sdkPackage.enums,
-    ]) {
-      for (const item of modelsOrEnums) {
-        ok(item.name !== "");
-      }
-    }
   });
   it("basic", async () => {
     await runner.compile(`
@@ -713,13 +704,13 @@ describe("typespec-client-generator-core: model types", () => {
       @doc("Creates or updates a User")
       op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
       `);
-    const models = runner.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-    for (const [type, sdkType] of runner.context.modelsMap?.entries() ?? []) {
-      if (isAzureCoreModel(type)) {
+    for (const [type, sdkType] of runner.context.referencedTypeMap?.entries() ?? []) {
+      if (isAzureCoreTspModel(type)) {
         ok(sdkType.usage !== UsageFlags.None);
       }
     }
@@ -783,7 +774,7 @@ describe("typespec-client-generator-core: model types", () => {
       @pollingOperation(My.Service.getStatus)
       op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
       `);
-    const models = runner.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
@@ -827,6 +818,35 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[4].crossLanguageDefinitionId, "My.Service.User");
     strictEqual(runner.context.sdkPackage.enums.length, 1);
     strictEqual(runner.context.sdkPackage.enums[0].name, "OperationState");
+  });
+
+  it("model with core property", async () => {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      @usage(Usage.input)
+      model MyError {
+        innerError: Azure.Core.Foundations.Error;
+      }
+      `);
+    const models = runnerWithCore.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    const myError = models.find((x) => x.name === "MyError");
+    ok(myError);
+
+    const azureError = models.find((x) => x.name === "Error");
+    ok(azureError);
+    strictEqual(isAzureCoreModel(azureError), true);
+
+    const azureInnerError = models.find((x) => x.name === "InnerError");
+    ok(azureInnerError);
+    strictEqual(isAzureCoreModel(azureInnerError), true);
+
+    strictEqual(myError.properties.length, 1);
+    strictEqual(myError.properties[0].type, azureError);
   });
   it("no models filter core", async () => {
     await runner.compile(`

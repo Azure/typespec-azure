@@ -1,4 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -1055,6 +1057,84 @@ describe("typespec-client-generator-core: parameters", () => {
       param = method.operation.parameters[0] as SdkQueryParameter;
       strictEqual(param.collectionFormat, undefined);
       strictEqual(param.explode, true);
+    });
+
+    it("body param: serialized name with encoded name", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(@body @encodedName("application/json", "test") param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "test");
+    });
+
+    it("body param: serialized name without encoded name", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(@body param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "param");
+    });
+
+    it("body param: serialized name of implicit body", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "body");
+    });
+  });
+
+  describe("method parameter not used in operation", () => {
+    it("autoroute with constant", async () => {
+      await runner.compileWithBuiltInService(`
+          @autoRoute
+          op test(@path param: "test"): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.parameters.length, 0);
+      strictEqual(method.operation.parameters.length, 0);
+      strictEqual(method.operation.uriTemplate, "/test");
+    });
+
+    it("singleton resource", async () => {
+      const runnerWithArm = await createSdkTestRunner({
+        librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+        autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
+        @singleton("default")
+        model SingletonTrackedResource is TrackedResource<SingletonTrackedResourceProperties> {
+          ...ResourceNameParameter<SingletonTrackedResource>;
+        }
+
+        model SingletonTrackedResourceProperties {
+          description?: string;
+        }
+
+        @armResourceOperations
+        interface Singleton {
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<SingletonTrackedResource>;
+        }
+      `);
+
+      const sdkPackage = runnerWithArm.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      deepStrictEqual(
+        method.parameters.map((p) => p.name),
+        ["resourceGroupName", "resource", "contentType", "accept"],
+      );
+      deepStrictEqual(
+        method.operation.parameters.map((p) => p.name),
+        ["apiVersion", "subscriptionId", "resourceGroupName", "contentType", "accept"],
+      );
     });
   });
 });

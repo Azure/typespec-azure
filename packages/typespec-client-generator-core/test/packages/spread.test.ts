@@ -7,6 +7,7 @@ import {
   SdkServiceMethod,
   UsageFlags,
 } from "../../src/interfaces.js";
+import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
@@ -250,7 +251,8 @@ describe("typespec-client-generator-core: spread", () => {
         }
       `);
     const sdkPackage = runnerWithCore.context.sdkPackage;
-    strictEqual(sdkPackage.models.length, 2);
+    const nonCoreModels = sdkPackage.models.filter((x) => !isAzureCoreModel(x));
+    strictEqual(nonCoreModels.length, 2);
 
     const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
       ?.response as SdkClientType<SdkHttpOperation>;

@@ -21,7 +21,7 @@ async function findMarkdownFiles(folder) {
           return files.map((x) => resolve(folder, x));
         }
 
-        if (item.name.endsWith(".md")) {
+        if (item.name.endsWith(".md") || item.name.endsWith(".mdx")) {
           return [resolve(folder, item.name)];
         } else {
           return [];

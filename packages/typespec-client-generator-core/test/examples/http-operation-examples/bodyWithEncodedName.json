@@ -1,0 +1,8 @@
+{
+  "operationId": "encodedname",
+  "title": "encodedname",
+  "parameters": {
+    "b": "body"
+  },
+  "responses": {}
+}

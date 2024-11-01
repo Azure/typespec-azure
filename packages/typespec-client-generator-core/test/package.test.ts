@@ -10,6 +10,7 @@ import {
   SdkPackage,
   SdkServiceMethod,
 } from "../src/interfaces.js";
+import { isAzureCoreModel } from "../src/public-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: package", () => {
@@ -349,10 +350,10 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "create");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 5);
+      strictEqual(method.parameters.length, 4);
       deepStrictEqual(
         method.parameters.map((x) => x.name),
-        ["id", "weight", "color", "contentType", "accept"],
+        ["weight", "color", "contentType", "accept"],
       );
 
       const bodyParameter = method.operation.bodyParam;
@@ -728,9 +729,9 @@ describe("typespec-client-generator-core: package", () => {
     @parentResource(Widget)
     model WidgetAnalytics {
       @key("analyticsId")
-      @doc("The identifier for the analytics object.  There is only one named 'current'.")
+      @doc("The identifier for the analytics object.")
       @visibility("read")
-      id: "current";
+      id: string;
 
       @doc("The number of uses of the widget.")
       useCount: int64;
@@ -1038,14 +1039,13 @@ describe("typespec-client-generator-core: package", () => {
       ok(exception.type);
       strictEqual(exception.type.kind, "model");
       strictEqual(exception.type.crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
-      // we shouldn't generate this model
-      strictEqual(
+      ok(
         sdkPackage.models.find(
-          (x) => x.crossLanguageDefinitionId === "Azure.Core.Foundations.ErrorResponse",
+          (x) =>
+            x.crossLanguageDefinitionId === "Azure.Core.Foundations.ErrorResponse" &&
+            isAzureCoreModel(x),
         ),
-        undefined,
       );
-
       const methodResponse = createOrUpdate.response;
       strictEqual(methodResponse.kind, "method");
       strictEqual(methodResponse.type, widgetModel);
@@ -1067,8 +1067,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type, undefined);
-      strictEqual(runnerWithCore.context.sdkPackage.models.length, 0);
-      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
+      strictEqual(runnerWithCore.context.sdkPackage.models.length, 3);
+      strictEqual(
+        runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length,
+        0,
+      );
+      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 2);
+      strictEqual(
+        runnerWithCore.context.sdkPackage.enums.filter((x) => !isAzureCoreModel(x)).length,
+        1,
+      );
     });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -1085,8 +1093,12 @@ describe("typespec-client-generator-core: package", () => {
       );
       const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(sdkPackage.models[0].name, "Manufacturer");
+      strictEqual(sdkPackage.models.length, 5);
+      strictEqual(sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length, 1);
+      const manufacturerModel = sdkPackage.models.find(
+        (x) => !isAzureCoreModel(x) && x.name === "Manufacturer",
+      );
+      ok(manufacturerModel);
       const widgetClient = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
       ok(widgetClient);
@@ -1115,7 +1127,7 @@ describe("typespec-client-generator-core: package", () => {
       const methodResponse = listManufacturers.response.type;
       ok(methodResponse);
       strictEqual(methodResponse.kind, "array");
-      deepStrictEqual(methodResponse.valueType, sdkPackage.models[0]);
+      deepStrictEqual(methodResponse.valueType, manufacturerModel);
 
       const operation = listManufacturers.operation;
       strictEqual(operation.kind, "http");
@@ -1154,7 +1166,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(valueProperty);
       strictEqual(valueProperty.kind, "property");
       strictEqual(valueProperty.type.kind, "array");
-      strictEqual(valueProperty.type.valueType, sdkPackage.models[0]);
+      strictEqual(valueProperty.type.valueType, manufacturerModel);
 
       const nextLinkProperty = pagingModel.properties.find((x) => x.name === "nextLink");
       ok(nextLinkProperty);
@@ -1174,6 +1186,66 @@ describe("typespec-client-generator-core: package", () => {
       );
       ok(clientRequestIdProperty);
       strictEqual(clientRequestIdProperty.kind, "header");
+    });
+
+    it("azure widget getWidgetAnalytics", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await compileAzureWidgetService(
+        runnerWithCore,
+        `
+      @doc("Get a WidgetAnalytics")
+      getWidgetAnalytics is Operations.ResourceRead<WidgetAnalytics>;
+      `,
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const parentClient = sdkPackage.clients.filter(
+        (c) => c.initialization.access === "public",
+      )[0];
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(parentClient.name, "WidgetManagerClient");
+      strictEqual(method.name, "getWidgetAnalytics");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 8);
+
+      const methodWidgetName = method.parameters.find((p) => p.name === "widgetName");
+      ok(methodWidgetName);
+      strictEqual(methodWidgetName.kind, "method");
+      strictEqual(methodWidgetName.isApiVersionParam, false);
+      deepStrictEqual(methodWidgetName.apiVersions, ["2022-08-30"]);
+      strictEqual(methodWidgetName.onClient, false);
+      strictEqual(methodWidgetName.optional, false);
+
+      const operationWidgetName = method.operation.parameters.find((x) => x.name === "widgetName");
+      ok(operationWidgetName);
+      strictEqual(operationWidgetName.kind, "path");
+      strictEqual(operationWidgetName.name, "widgetName");
+      strictEqual(operationWidgetName.serializedName, "widgetName");
+      strictEqual(operationWidgetName.onClient, false);
+      strictEqual(operationWidgetName.correspondingMethodParams.length, 1);
+      strictEqual(operationWidgetName.correspondingMethodParams[0], methodWidgetName);
+
+      const methodAnalyticsId = method.parameters.find((p) => p.name === "analyticsId");
+      ok(methodAnalyticsId);
+      strictEqual(methodAnalyticsId.kind, "method");
+      strictEqual(methodAnalyticsId.isApiVersionParam, false);
+      deepStrictEqual(methodAnalyticsId.apiVersions, ["2022-08-30"]);
+      strictEqual(methodAnalyticsId.onClient, false);
+      strictEqual(methodAnalyticsId.optional, false);
+
+      const operationAnalyticsId = method.operation.parameters.find(
+        (x) => x.name === "analyticsId",
+      );
+      ok(operationAnalyticsId);
+      strictEqual(operationAnalyticsId.kind, "path");
+      strictEqual(operationAnalyticsId.name, "analyticsId");
+      strictEqual(operationAnalyticsId.serializedName, "analyticsId");
+      strictEqual(operationAnalyticsId.onClient, false);
+      strictEqual(operationAnalyticsId.correspondingMethodParams.length, 1);
+      strictEqual(operationAnalyticsId.correspondingMethodParams[0], methodAnalyticsId);
     });
   });
 
