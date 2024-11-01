@@ -1,4 +1,6 @@
-# 9. Customizing operations with traits
+---
+title: 9. Customizing operations with traits
+---
 
 For all standard lifecycle operations you can customize the operation parameters and response body by passing a special model type to the `Traits` parameter of the operation template, typically the second parameter of the operation template. You can also customize the whole set of resource operations by passing traits to the `ResourceOperations` interface.
 

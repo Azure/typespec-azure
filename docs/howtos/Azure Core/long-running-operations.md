@@ -1,4 +1,6 @@
-# Deep Dive: Long-running (Asynchronous) Operations
+---
+title: "Deep Dive: Long-running (Asynchronous) Operations"
+---
 
 Long-running, or asynchronous operations (LROs for short) are Http Operations that are not complete in a single request/response sequence. Such operations require multiple requests and responses, usually to different endpoints before the operation is complete. Some common patterns that services use for LROs include:
 

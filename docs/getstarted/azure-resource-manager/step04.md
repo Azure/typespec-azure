@@ -1,4 +1,6 @@
-# 5. Defining Custom Actions
+---
+title: 5. Defining Custom Actions
+---
 
 Some resources will provide more than the standard CRUD operations and will need to define a custom action endpoint. Additional resource operations can be added to the `interface` where you defined standard resource operations, using the `ArmResourceAction` templates.
 
