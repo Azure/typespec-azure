@@ -1,6 +1,7 @@
 // @ts-check
 import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
+import tailwind from "@astrojs/tailwind";
 import { TypeSpecLang } from "@typespec/astro-utils/shiki";
 import { processSidebar } from "@typespec/astro-utils/sidebar";
 import astroExpressiveCode from "astro-expressive-code";
@@ -31,8 +32,13 @@ export default defineConfig({
       social: {
         github: "https://github.com/Azure/typespec-azure",
       },
+      customCss: ["./src/css/custom.css"],
+      components: {
+        Header: "./src/components/header/header.astro",
+      },
     }),
     react(),
+    tailwind({ applyBaseStyles: false }),
   ],
   markdown: {
     // @ts-expect-error wrong type

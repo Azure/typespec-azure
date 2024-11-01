@@ -11,21 +11,28 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.28.5",
-    "@astrojs/react": "^3.6.2",
-    "copy": "cp -r ../docs/. ./src/content/docs/docs",
-    "astro": "^4.15.3",
-    "sharp": "^0.32.5",
     "@astrojs/check": "^0.9.4",
-    "typescript": "^5.6.3",
+    "@astrojs/react": "^3.6.2",
+    "@astrojs/starlight": "^0.28.5",
+    "@astrojs/tailwind": "^5.1.2",
+    "@docsearch/css": "^3.6.3",
+    "@docsearch/js": "^3.6.3",
+    "@fluentui/react-components": "~9.55.0",
+    "@typespec/playground": "workspace:~",
+    "astro": "^4.15.3",
+    "copy": "cp -r ../docs/. ./src/content/docs/docs",
+    "es-module-shims": "~1.10.0",
     "react": "~18.3.1",
-    "react-dom": "~18.3.1"
+    "react-dom": "~18.3.1",
+    "sharp": "^0.32.5",
+    "typescript": "^5.6.3"
   },
   "devDependencies": {
-    "@types/remark-heading-id": "^1.0.0",
     "@types/react": "~18.3.11",
     "@types/react-dom": "~18.3.0",
+    "@types/remark-heading-id": "^1.0.0",
     "@typespec/astro-utils": "workspace:~",
+    "@azure-tools/typespec-azure-playground-website": "workspace:~",
     "astro-expressive-code": "^0.37.0",
     "astro-rehype-relative-markdown-links": "^0.15.0",
     "remark-heading-id": "^1.0.1"

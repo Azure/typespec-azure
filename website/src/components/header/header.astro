@@ -1,0 +1,151 @@
+---
+import ThemePicker from "@typespec/astro-utils/components/theme-picker.astro";
+import Link from "@typespec/astro-utils/components/link.astro";
+import { baseUrl } from "@typespec/astro-utils/utils/base-url";
+import { Icon } from "@astrojs/starlight/components";
+import Search from "./search.astro";
+---
+
+<style>
+  .navbar {
+    display: flex;
+    align-items: center;
+    background-color: var(--colorNeutralBackground3);
+    padding: 0.5rem 1rem;
+    margin: 0;
+    box-shadow: var(--shadow4);
+    height: var(--header-height);
+  }
+
+  .nav-content {
+    display: none;
+  }
+
+  .brand-item {
+    flex-grow: 1;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    word-break: normal;
+    color: var(--colorNeutralForeground1);
+  }
+  .brand-icon {
+    height: 32px;
+    width: 32px;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  .item {
+    display: inline-block;
+  }
+
+  .item.link {
+    cursor: pointer;
+    color: var(--colorNeutralForeground1);
+  }
+
+  .icon {
+    font-size: 1.5rem;
+    color: var(--colorNeutralForeground1);
+  }
+
+  .icon:hover {
+    color: var(--colorNeutralForeground3);
+  }
+
+  @media screen and (max-width: 1023px) {
+    .nav-content[data-open="true"] {
+      display: block;
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      background-color: var(--colorNeutralBackground2);
+      width: 100vw;
+      height: calc(100vh - var(--header-height));
+      overflow-y: auto;
+    }
+
+    .item {
+      display: flex;
+      border-bottom: 1px solid var(--colorNeutralStroke1);
+      padding: 1rem;
+    }
+
+    .item:active {
+      background-color: var(--colorNeutralBackground1Pressed);
+    }
+  }
+
+  @media screen and (min-width: 1024px) {
+    #header-drawer-button {
+      display: none;
+    }
+
+    .nav-content {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+
+    .nav-content .item {
+      padding: 0 0.5rem;
+    }
+
+    .brand-item {
+      flex-shrink: 0;
+      flex-grow: 0;
+      margin-right: 1rem;
+    }
+
+    .items {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .items.right {
+      justify-content: flex-end;
+      flex: 0 0 auto;
+    }
+  }
+</style>
+<nav aria-label="Main" class="navbar">
+  <li class="brand-item">
+    <Link href="/" class="brand">
+      <img class="brand-icon" src={baseUrl("/azure.svg")} alt="Brand icon" /><b>TypeSpec Azure</b
+      ></Link
+    >
+  </li>
+
+  <div id="header-nav-content" class="nav-content">
+    <div class="items">
+      <Link class="item link" href="/docs/intro">Docs</Link>
+      <Link class="item link" href="/playground">Playground</Link>
+      <Link class="item link" href="https://typespec.io">TypeSpec Core Docs</Link>
+    </div>
+    <div class="items right">
+      <Link
+        class="item icon link"
+        href="https://github.com/microsoft/typespec"
+        target="_blank"
+        rel="noopener noreferrer"><Icon name="github" /></Link
+      >
+      <Link
+        class="item icon link"
+        href="https://aka.ms/typespec/discord"
+        target="_blank"
+        rel="noopener noreferrer"><Icon name="discord" /></Link
+      >
+      <div class="item">
+        <ThemePicker />
+      </div>
+    </div>
+  </div>
+  <Search />
+</nav>
