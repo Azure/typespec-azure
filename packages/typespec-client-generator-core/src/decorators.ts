@@ -124,53 +124,65 @@ function setScopedDecoratorData(
     return;
   }
 
-  const negationScopes = getNegationScopes(scope);
+  const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     const newObject = Object.fromEntries([AllScopes].map((scope) => [scope, value]));
     newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
     return;
-  } else {
-    const splitScopes = scope.split(",").map((s) => s.trim());
-
-    // if negation scope is combined with normal scope, report error
-    if (splitScopes.length > 1 && splitScopes.some((s) => s.startsWith("!"))) {
-      reportDiagnostic(context.program, {
-        code: "invalid-negation-scope",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
-
+  } else if (scopes !== undefined && scopes.length > 0) {
     // if scope specified, create or overwrite with the new value
     const targetEntry = context.program.stateMap(key).get(target);
 
     // if target doesn't exist in decorator map, create a new entry
     if (!targetEntry) {
-      const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+      const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
       context.program.stateMap(key).set(target, newObject);
       return;
     }
 
     // if target exists, overwrite existed value
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
   }
 }
 
-function getNegationScopes(scope?: LanguageScopes): string[] | undefined {
+// This function is used to parse the scopes from the decorator and return the negation scopes and normal scopes
+// When the scope is !(scope1, scope2,...), it will return [negationScopes, undefined]
+// When the scope is !scope1, !scope2, ..., it will return [negationScopes, undefined]
+// When the scope is !scope1, scope2, ..., it will report error of invalid-negation-scope
+// When the scope is scope1, scope2, ..., it will return [undefined, normalScopes]
+function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
   if (scope === undefined) {
-    return undefined;
+    return [undefined, undefined];
   }
 
+  // handle !(scope1, scope2,...) syntax
   const negationScopeRegex = new RegExp(/!\((.*?)\)/);
   const negationScopeMatch = scope.match(negationScopeRegex);
   if (negationScopeMatch) {
-    return negationScopeMatch[1].split(",").map((s) => s.trim());
-  } else if (!scope.includes(",") && scope.startsWith("!")) {
-    return [scope.substring(1)];
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
   }
-  return undefined;
+
+  // handle !scope1, !scope2, ... syntax and throw on the combination of negation and normal scopes
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const negationScopes = [];
+  const scopes = [];
+  for (const s of splitScopes) {
+    if (s.startsWith("!")) {
+      negationScopes.push(s.slice(1));
+    } else {
+      scopes.push(s);
+    }
+  }
+  if (negationScopes.length > 0 && scopes.length > 0) {
+    reportDiagnostic(context.program, {
+      code: "invalid-negation-scope",
+      target: context.decoratorTarget,
+    });
+    return [undefined, undefined];
+  }
+  return [negationScopes, scopes];
 }
 
 const clientKey = createStateSymbol("client");

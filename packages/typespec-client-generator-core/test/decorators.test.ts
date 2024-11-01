@@ -3154,11 +3154,11 @@ describe("typespec-client-generator-core: decorators", () => {
       });
     });
 
-    it("disallow multiple separated negation scopes", async () => {
+    it("allow multiple separated negation scopes", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const diagnostics = await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.diagnose(`
         @service
         @test namespace MyService {
           @test
@@ -3174,9 +3174,9 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `);
 
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
-      });
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
     });
   });
 });
