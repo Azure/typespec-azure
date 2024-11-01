@@ -28,6 +28,10 @@ export const AreaLabels = defineLabels({
     color: "65bfff",
     description: "",
   },
+  "ide": {
+    color: "846da1",
+    description: "Issues for Azure specific ide features",
+  },
 });
 
 /**
