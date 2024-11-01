@@ -21,6 +21,7 @@ import {
   getLibraryName,
   getPropertyNames,
   isApiVersion,
+  isAzureCoreModel,
 } from "../src/public-utils.js";
 import { getAllModels, getSdkUnion } from "../src/types.js";
 import {
@@ -1777,7 +1778,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         emitterName: "@azure-tools/typespec-java",
       });
       await runnerWithCore.compile(lroCode);
-      const models = runnerWithCore.context.sdkPackage.models;
+      const models = runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].name, "ExportedUser");
     });
@@ -1788,7 +1789,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         emitterName: "@azure-tools/typespec-java",
       });
       await runnerWithCore.compile(lroCode);
-      runnerWithCore.context.filterOutCoreModels = false;
       const models = getAllModels(runnerWithCore.context);
       strictEqual(models.length, 8);
       // there should only be one non-core model
