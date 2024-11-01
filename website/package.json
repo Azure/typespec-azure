@@ -39,6 +39,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-azure-rulesets": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
+    "@typespec/internal-build-utils": "workspace:~",
     "@types/react-dom": "~18.3.0",
     "@types/react": "~18.3.11",
     "@types/remark-heading-id": "^1.0.0",
