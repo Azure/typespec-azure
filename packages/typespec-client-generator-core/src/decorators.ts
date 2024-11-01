@@ -137,7 +137,9 @@ function setScopedDecoratorData(
 
     // if target doesn't exist in decorator map, create a new entry
     // otherwise, overwrite existed value
-    context.program.stateMap(key).set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+    context.program
+      .stateMap(key)
+      .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
   }
 }
 
