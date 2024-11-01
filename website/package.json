@@ -1,6 +1,7 @@
 {
   "name": "@azure-tools/typespec-azure-website-astro",
   "type": "module",
+  "private": true,
   "version": "0.0.1",
   "scripts": {
     "copy": "cp -r ../docs/. ./src/content/docs/docs",
