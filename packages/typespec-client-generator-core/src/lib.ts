@@ -216,6 +216,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
       },
     },
+    "invalid-negation-scope": {
+      severity: "error",
+      messages: {
+        default: `Negation scope should not be combined with normal scope.`,
+      },
+    },
   },
 });
 

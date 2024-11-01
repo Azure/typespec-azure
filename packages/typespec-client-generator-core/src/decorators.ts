@@ -65,6 +65,7 @@ import {
   getValidApiVersion,
   isAzureCoreModel,
   parseEmitterName,
+  negationScopesKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
@@ -87,6 +88,16 @@ function getScopedDecoratorData(
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
     if (Object.keys(retval).includes(scope)) return retval[scope];
+    
+    // if the scope is negated, we should return undefined
+    const negationScopes = retval[negationScopesKey];
+    if (negationScopes !== undefined && negationScopes.includes(scope)) {
+      return undefined;
+    }
+    // if the scope is not negated, we should return the value for AllScopes
+    else {
+      return retval[AllScopes];
+    }
   }
   return retval[AllScopes]; // in this case it applies to all languages
 }
@@ -113,21 +124,56 @@ function setScopedDecoratorData(
     context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
     return;
   }
-
-  // if scope specified, create or overwrite with the new value
-  const splitScopes = scope.split(",").map((s) => s.trim());
-  const targetEntry = context.program.stateMap(key).get(target);
-
-  // if target doesn't exist in decorator map, create a new entry
-  if (!targetEntry) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  
+  const negationScopes = getNegationScopes(scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    const newObject = Object.fromEntries([AllScopes].map((scope) => [scope, value])); 
+    newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
     return;
   }
+  else {
+    const splitScopes = scope.split(",").map((s) => s.trim());
 
-  // if target exists, overwrite existed value
-  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+    // if negation scope is combined with normal scope, report error
+    if (splitScopes.length > 1 && splitScopes.some((s) => s.startsWith("!"))) {  
+      reportDiagnostic(context.program, {
+        code: "invalid-negation-scope",
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+
+    // if scope specified, create or overwrite with the new value
+    const targetEntry = context.program.stateMap(key).get(target);
+
+    // if target doesn't exist in decorator map, create a new entry
+    if (!targetEntry) {
+      const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+      context.program.stateMap(key).set(target, newObject);
+      return;
+    }
+
+    // if target exists, overwrite existed value
+    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+  }
+}
+
+function getNegationScopes(scope?: LanguageScopes): string[] | undefined {
+  if (scope === undefined) {
+    return undefined;
+  }
+
+  const negationScopeRegex = new RegExp(/\!\((.*?)\)/);
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    return negationScopeMatch[1].split(",").map((s) => s.trim());
+  }
+  else if (!scope.includes(",") && scope.startsWith("!")) {
+    return [scope.substring(1)];
+  }
+  return undefined;
 }
 
 const clientKey = createStateSymbol("client");

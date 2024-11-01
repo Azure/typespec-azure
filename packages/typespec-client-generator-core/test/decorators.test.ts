@@ -3027,4 +3027,107 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(uploadOp.parameters[0].correspondingMethodParams[0], blobName);
     });
   });
+  
+  describe("scope negation", () => {
+    it("single scope negation", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const result = (await runnerWithCSharp.compile(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamed", "!csharp")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `));
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
+
+    it("multiple scopes negation", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const result = (await runnerWithCSharp.compile(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamed", "!(csharp, java)")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `));
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
+
+    it("disallow combination of negation scope and normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const diagnostics = (await runnerWithCSharp.diagnose(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamed", "csharp, !java")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `));
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
+      });
+    });
+
+    it("disallow combination of negation scope and normal scope, starting with !", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const diagnostics = (await runnerWithCSharp.diagnose(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamed", "!csharp, java")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `));
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
+      });
+    });
+
+  });
 });

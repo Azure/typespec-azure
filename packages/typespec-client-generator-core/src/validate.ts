@@ -18,7 +18,7 @@ import {
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { createTCGCContext, getClientNameOverride } from "./decorators.js";
 import { TCGCContext } from "./interfaces.js";
-import { AllScopes, clientNameKey } from "./internal-utils.js";
+import { AllScopes, clientNameKey, negationScopesKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 export function $onValidate(program: Program) {
@@ -36,7 +36,9 @@ function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScop
       languageScopes.add(AllScopes);
     }
     for (const languageScope of Object.keys(value)) {
-      languageScopes.add(languageScope);
+      if (languageScope !== negationScopesKey) {
+        languageScopes.add(languageScope);
+      }
     }
   }
   return languageScopes;

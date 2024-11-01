@@ -51,6 +51,8 @@ export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/
 
 export const clientNameKey = createStateSymbol("clientName");
 
+export const negationScopesKey = "negationScopes";
+
 /**
  *
  * @param emitterName Full emitter name
