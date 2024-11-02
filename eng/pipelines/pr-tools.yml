@@ -46,20 +46,6 @@ extends:
                       --source "./website/dist/" \
                       --overwrite
 
-              - task: AzureCLI@1
-                displayName: "Publish website to PR endpoint"
-                inputs:
-                  azureSubscription: "Azure SDK Engineering System"
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    az storage blob upload-batch \
-                      --auth-mode login \
-                      --destination \$web \
-                      --account-name "tspwebsitepr" \
-                      --destination-path $(TYPESPEC_WEBSITE_BASE_PATH) \
-                      --source "./packages/website/build/" \
-                      --overwrite
-
               - script: npx tsx core/eng/tsp-core/scripts/create-tryit-comment.ts "typespec-azure"
                 displayName: Check already commented
                 env:
