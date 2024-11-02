@@ -89,13 +89,10 @@ function getScopedDecoratorData(
     if (Object.keys(retval).includes(scope)) return retval[scope];
 
     // if the scope is negated, we should return undefined
+    // if the scope is not negated, we should return the value for AllScopes
     const negationScopes = retval[negationScopesKey];
     if (negationScopes !== undefined && negationScopes.includes(scope)) {
       return undefined;
-    }
-    // if the scope is not negated, we should return the value for AllScopes
-    else {
-      return retval[AllScopes];
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
