@@ -124,10 +124,13 @@ function getSdkHttpParameters(
     parameters: [],
     bodyParam: undefined,
   };
+
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+      diagnostics.pipe(
+        getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type as any),
+      ),
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
