@@ -1076,6 +1076,10 @@ export async function getOpenAPIForService(
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
+      if (httpOpParam.type === "cookie") {
+        reportDiagnostic(program, { code: "cookies-unsupported", target: httpOpParam.param });
+        continue;
+      }
       emitParameter(httpOpParam.param, () =>
         getOpenAPI2Parameter(httpOpParam, { visibility, ignoreMetadataAnnotations: false }),
       );
@@ -1437,6 +1441,9 @@ export async function getOpenAPIForService(
         return getOpenAPI2PathParameter(param, schemaContext);
       case "header":
         return getOpenAPI2HeaderParameter(param.param, schemaContext, param.name);
+      case "cookie":
+        compilerAssert(false, "Should verify cookies before");
+        break;
       default:
         const _assertNever: never = param;
         compilerAssert(false, "Unreachable");
