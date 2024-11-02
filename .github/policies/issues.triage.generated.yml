@@ -27,6 +27,8 @@ configuration:
                     label: emitter:autorest
                 - hasLabel:
                     label: eng
+                - hasLabel:
+                    label: ide
         then:
           - addLabel:
               label: needs-area
@@ -47,6 +49,8 @@ configuration:
                   label: emitter:autorest
               - labelAdded:
                   label: eng
+              - labelAdded:
+                  label: ide
         then:
           - removeLabel:
               label: needs-area
@@ -68,6 +72,8 @@ configuration:
                   label: emitter:autorest
               - labelRemoved:
                   label: eng
+              - labelRemoved:
+                  label: ide
           - not:
               or:
                 - hasLabel:
@@ -80,6 +86,8 @@ configuration:
                     label: emitter:autorest
                 - hasLabel:
                     label: eng
+                - hasLabel:
+                    label: ide
         then:
           - addLabel:
               label: needs-area
