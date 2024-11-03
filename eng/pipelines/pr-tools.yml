@@ -43,6 +43,20 @@ extends:
                       --destination \$web \
                       --account-name "cadlplayground" \
                       --destination-path $(TYPESPEC_WEBSITE_BASE_PATH) \
+                      --source "./package/typespec-azure-playground-website/dist/" \
+                      --overwrite
+
+              - task: AzureCLI@1
+                displayName: "Publish website to PR endpoint"
+                inputs:
+                  azureSubscription: "Azure SDK Engineering System"
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    az storage blob upload-batch \
+                      --auth-mode login \
+                      --destination \$web \
+                      --account-name "tspwebsitepr" \
+                      --destination-path $(TYPESPEC_WEBSITE_BASE_PATH) \
                       --source "./website/dist/" \
                       --overwrite
 
