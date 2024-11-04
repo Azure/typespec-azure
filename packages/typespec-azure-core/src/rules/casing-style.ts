@@ -8,19 +8,19 @@ import {
   isTemplateDeclarationOrInstance,
   paramMessage,
 } from "@typespec/compiler";
-import { isCamelCaseNoAcronyms, isExcludedCoreType, isPascalCaseNoAcronyms } from "./utils.js";
+import { isCamelCaseNoAcronyms, isPascalCaseNoAcronyms } from "./utils.js";
 
 export const casingRule = createRule({
   name: "casing-style",
   description: "Ensure proper casing style.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/casing-style",
   messages: {
     default: paramMessage`The names of ${"type"} types must use ${"casing"}`,
   },
   create(context) {
     return {
       model: (model: Model) => {
-        if (isExcludedCoreType(context.program, model)) return;
         if (!isPascalCaseNoAcronyms(model.name)) {
           context.reportDiagnostic({
             format: { type: "Model", casing: "PascalCase" },
@@ -30,7 +30,6 @@ export const casingRule = createRule({
       },
       modelProperty: (property: ModelProperty) => {
         if (property.name === "_") return;
-        if (isExcludedCoreType(context.program, property)) return;
         if (!isCamelCaseNoAcronyms(property.name)) {
           context.reportDiagnostic({
             format: { type: "Property", casing: "camelCase" },
@@ -39,7 +38,6 @@ export const casingRule = createRule({
         }
       },
       operation: (operation: Operation) => {
-        if (isExcludedCoreType(context.program, operation)) return;
         if (isTemplateDeclarationOrInstance(operation)) {
           if (!isPascalCaseNoAcronyms(operation.name)) {
             context.reportDiagnostic({
@@ -55,7 +53,6 @@ export const casingRule = createRule({
         }
       },
       interface: (operationGroup: Interface) => {
-        if (isExcludedCoreType(context.program, operationGroup)) return;
         if (!isPascalCaseNoAcronyms(operationGroup.name)) {
           context.reportDiagnostic({
             format: { type: "Interface", casing: "PascalCase" },
@@ -64,7 +61,6 @@ export const casingRule = createRule({
         }
       },
       namespace: (namespace: Namespace) => {
-        if (isExcludedCoreType(context.program, namespace)) return;
         if (!isPascalCaseNoAcronyms(namespace.name)) {
           context.reportDiagnostic({
             format: { type: "Namespace", casing: "PascalCase" },

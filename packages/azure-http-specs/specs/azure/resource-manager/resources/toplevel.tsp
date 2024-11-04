@@ -2,15 +2,16 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "@typespec/spector";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using Azure.Core;
 using Azure.ResourceManager;
 using TypeSpec.OpenAPI;
-using SpecLib;
+using Spector;
 
-namespace Azure.ResourceManager.Models.Resources;
+namespace Azure.ResourceManager.Resources;
 
 @resource("topLevelTrackedResources")
 model TopLevelTrackedResource is TrackedResource<TopLevelTrackedResourceProperties> {
@@ -42,17 +43,17 @@ model NotificationDetails {
 }
 
 @armResourceOperations
-interface TopLevelTrackedResources {
+interface TopLevel {
   @scenario
   @scenarioDoc("""
     Resource GET operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top",
       "name": "top",
       "type": "topLevel",
       "location": "eastus",
@@ -76,7 +77,7 @@ interface TopLevelTrackedResources {
   @scenario
   @scenarioDoc("""
     Resource PUT operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
     Expected query parameter: api-version=2023-12-01-preview
     Expected request body:
     ```json
@@ -90,7 +91,7 @@ interface TopLevelTrackedResources {
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top",
       "name": "top",
       "type": "topLevel",
       "location": "eastus",
@@ -114,7 +115,7 @@ interface TopLevelTrackedResources {
   @scenario
   @scenarioDoc("""
     Resource PATCH operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
     Expected query parameter: api-version=2023-12-01-preview
     Expected request body:
     ```json
@@ -127,7 +128,7 @@ interface TopLevelTrackedResources {
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top",
       "name": "top",
       "type": "topLevel",
       "location": "eastus",
@@ -151,7 +152,7 @@ interface TopLevelTrackedResources {
   @scenario
   @scenarioDoc("""
     Resource DELETE operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
     Expected query parameter: api-version=2023-12-01-preview
     ```
     Expected response status code: 204
@@ -161,14 +162,14 @@ interface TopLevelTrackedResources {
   @scenario
   @scenarioDoc("""
     Resource LIST by resource group operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected response body:
     ```json
     {
       "value": [{
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top",
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top",
         "name": "top",
         "type": "topLevel",
         "location": "eastus",
@@ -193,14 +194,14 @@ interface TopLevelTrackedResources {
   @scenario
   @scenarioDoc("""
     Resource LIST by subscription operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected response body:
     ```json
     {
       "value": [{
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top",
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top",
         "name": "top",
         "type": "topLevel",
         "location": "eastus",
@@ -225,7 +226,7 @@ interface TopLevelTrackedResources {
   @scenario
   @scenarioDoc("""
       Resource sync action.
-      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/actionSync
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/actionSync
       Expected query parameter: api-version=2023-12-01-preview
       Expected request body:
       ```json

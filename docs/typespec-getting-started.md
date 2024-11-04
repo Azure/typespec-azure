@@ -1,4 +1,6 @@
-## What is TypeSpec?
+---
+title: What is TypeSpec?
+---
 
 TypeSpec (Compact API Definition Language) is a typescript-like language for defining APIs. TypeSpec is designed for code reuse,
 and for Azure services, there are Azure service extensions for TypeSpec that provide high level building blocks you should use to build

@@ -210,6 +210,61 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/locations/{location}/postVmSizesLocation": {
+      "post": {
+        "operationId": "ProviderOperations_PostVmSizesLocation",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "Operation to post virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/postVmSizesLocation)",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/LocationParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/LogAnalyticsCollection"
+            }
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/logAnalytics/apiAccess/getThrottledRequests": {
       "get": {
         "operationId": "ProviderOperations_GetThrottledRequestsSubscription",
@@ -243,9 +298,179 @@
           "nextLinkName": "nextLink"
         }
       }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/postVmSizes": {
+      "post": {
+        "operationId": "ProviderOperations_PostVmSizes",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "Operation to post virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizes)",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/LogAnalyticsCollection"
+            }
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/postVmSizesArmCombined": {
+      "post": {
+        "operationId": "ProviderOperations_PostVmSizesArmCombined",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "Operation to post virtual machines for subscription with ARM combined header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesArmCombined)",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "format": "uri",
+                "description": "A link to the status monitor"
+              },
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              }
+            }
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/postVmSizesRetry": {
+      "post": {
+        "operationId": "ProviderOperations_PostVmSizesRetry",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "Operation to post virtual machines for subscription with retry after header (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizesRetry)",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
     }
   },
   "definitions": {
+    "Azure.Core.Foundations.RetryAfterHeader": {
+      "type": "object",
+      "description": "The retry-after envelope."
+    },
+    "Azure.ResourceManager.ArmCombinedLroHeaders<Azure.ResourceManager.ArmOperationStatus<never, Azure.ResourceManager.ResourceProvisioningState>, void, TypeSpec.Rest.ResourceLocation, string>": {
+      "type": "object",
+      "description": "Provide Both Azure-AsyncOperation and Location headers"
+    },
     "LogAnalyticsCollection": {
       "type": "object",
       "description": "LogAnalytics collection of operation status response",

@@ -1,4 +1,6 @@
-# OneBranch SDL
+---
+title: OneBranch SDL
+---
 
 SDL violations for [Nuget Multifeed Config](https://docs.opensource.microsoft.com/tools/cg/how-to/nuget-multifeed-configuration/)
 

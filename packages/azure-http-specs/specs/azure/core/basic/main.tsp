@@ -1,4 +1,4 @@
-import "@typespec/spec-lib";
+import "@typespec/spector";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-client-generator-core";
 import "@typespec/http";
@@ -11,7 +11,7 @@ using global.Azure.Core.Foundations;
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
-using SpecLib;
+using Spector;
 
 #suppress "@azure-tools/typespec-azure-core/casing-style" "For spec"
 @doc("Illustrates bodies templated with Azure Core")

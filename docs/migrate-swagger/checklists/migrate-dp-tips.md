@@ -1,4 +1,6 @@
-# Migrate data-plane specs
+---
+title: Migrate data-plane specs
+---
 
 The swagger converter will not be able to accurately represent every part of every API in TypeSpec. This document outlines some common changes you may need to make to a converted TypeSpec to make it conform to your existing service API and pass validation checks.
 

@@ -1,10 +1,6 @@
 ---
 title: "Data types"
-toc_min_heading_level: 2
-toc_max_heading_level: 3
 ---
-
-# Data types
 
 ## Azure.ResourceManager
 
@@ -254,7 +250,7 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 | ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status |
 | status           | `StatusValues`                                                                 | The operation status                                                                                             |
-| id               | `Core.uuid`                                                                    | The unique identifier for the operationStatus resource                                                           |
+| id               | `string`                                                                       | The unique identifier for the operationStatus resource                                                           |
 | name?            | `string`                                                                       | The name of the operationStatus resource                                                                         |
 | startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
 | endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
@@ -363,6 +359,29 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 | ---------- | -------------- | ---------------- |
 | statusCode | `200`          | The status code. |
 | body       | `ResponseBody` |                  |
+
+### `AvailabilityZonesProperty` {#Azure.ResourceManager.AvailabilityZonesProperty}
+
+Model representing the standard `zones` envelope property for a resource.
+Spread this model into a resource Model if the resource supports ARM `zones`.
+
+```typespec
+model Azure.ResourceManager.AvailabilityZonesProperty
+```
+
+#### Examples
+
+```typescript
+model Foo is TrackedResource<FooProperties> {
+  ...AvailabilityZonesProperty;
+}
+```
+
+#### Properties
+
+| Name   | Type       | Description             |
+| ------ | ---------- | ----------------------- |
+| zones? | `string[]` | The availability zones. |
 
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 

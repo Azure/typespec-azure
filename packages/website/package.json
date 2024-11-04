@@ -14,7 +14,7 @@
     "write-heading-ids": "docusaurus write-heading-ids",
     "update-latest-docs": "rimraf versions.json ./versioned_docs ./versioned_sidebars && docusaurus docs:version latest && npm run update-playground-versions",
     "update-playground-versions": "node ./.scripts/update-playground-versions.mjs",
-    "regen-all-packages-docs": "pnpm -w --filter \"@azure-tools/typespec-azure-website...\" run regen-docs"
+    "regen-all-packages-docs": "pnpm -w --filter \"@azure-tools/typespec-azure-website...\" --filter \"!@typespec/monorepo\" --filter \"!@azure-tools/typespec-azure-monorepo\" run regen-docs"
   },
   "dependencies": {
     "@docusaurus/core": "^3.5.2",
@@ -24,7 +24,6 @@
     "@fluentui/react-components": "~9.55.0",
     "@mdx-js/react": "^3.0.1",
     "@typespec/playground": "workspace:~",
-    "@typespec/website": "workspace:~",
     "clsx": "^2.1.1",
     "es-module-shims": "~1.10.0",
     "prism-react-renderer": "^2.4.0",

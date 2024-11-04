@@ -1,4 +1,3 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   AugmentDecoratorStatementNode,
   DecoratorContext,
@@ -28,7 +27,6 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
-  validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
@@ -64,13 +62,13 @@ import {
   AllScopes,
   clientNameKey,
   getValidApiVersion,
-  isAzureCoreModel,
+  isAzureCoreTspModel,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel, getSdkUnion, getSdkUnionEnumWithDiagnostics } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -108,36 +106,27 @@ function setScopedDecoratorData(
   target: Type,
   value: unknown,
   scope?: LanguageScopes,
-  transitivity: boolean = false,
-): boolean {
-  const targetEntry = context.program.stateMap(key).get(target);
-  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
+) {
+  // if no scope specified, then set with the new value
+  if (!scope) {
+    context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
+    return;
+  }
 
-  // If target doesn't exist in decorator map, create a new entry
+  // if scope specified, create or overwrite with the new value
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const targetEntry = context.program.stateMap(key).get(target);
+
+  // if target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, newObject);
-    return true;
+    return;
   }
 
-  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
-  const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-    return true;
-  }
-  // we only want to allow multiple decorators if they each specify a different scope
-  if (!transitivity) {
-    validateDecoratorUniqueOnNode(context, target, decorator);
-    return false;
-  }
-  // for transitivity situation, we could allow scope extension
-  if (!scopes.includes(AllScopes) && !scope) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-  }
-  return false;
+  // if target exists, overwrite existed value
+  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
 }
 
 const clientKey = createStateSymbol("client");
@@ -661,7 +650,6 @@ export async function createSdkContext<
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
@@ -759,12 +747,11 @@ export function getUsageOverride(
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
-  const diagnostics = createDiagnosticCollector();
   switch (entity.kind) {
     case "Union":
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(entity));
-      if (unionAsEnum) {
-        return diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum)).usage;
+      const type = getSdkUnion(context, entity);
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+        return type.usage;
       }
       return UsageFlags.None;
     case "Model":
@@ -818,7 +805,7 @@ export function getAccess(context: TCGCContext, entity: Model | Enum | Operation
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "model") {
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
         return type.access;
       }
       return "public";
@@ -922,7 +909,7 @@ function collectParams(
         while (sourceProp.sourceProperty) {
           sourceProp = sourceProp.sourceProperty;
         }
-        if (sourceProp.model && !isAzureCoreModel(sourceProp.model)) {
+        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
           params.push(value);
         } else if (!sourceProp.model) {
           params.push(value);

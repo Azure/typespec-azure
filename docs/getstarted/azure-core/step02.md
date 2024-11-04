@@ -1,4 +1,6 @@
-# 2. Create the service namespace
+---
+title: 2. Create the service namespace
+---
 
 To describe a service, you first need to define a "blockless" (file-level, no curly braces) namespace and use the `@service` decorator to mark it as the service namespace:
 

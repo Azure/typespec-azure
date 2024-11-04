@@ -1,5 +1,32 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.47.4
+
+### Bug Fixes
+
+- [#1763](https://github.com/Azure/typespec-azure/pull/1763) support serialized name for body parameter to avoid example mis-mapping
+- [#1761](https://github.com/Azure/typespec-azure/pull/1761) use root source property to map operation params to method
+- [#1775](https://github.com/Azure/typespec-azure/pull/1775) remove unused path parameter from method
+- [#1700](https://github.com/Azure/typespec-azure/pull/1700) We no longer filter out core models. The `filter-out-core-models` parameter to `SdkContext` is also removed
+- [#1772](https://github.com/Azure/typespec-azure/pull/1772) use array instead of set to make the types ordered by typespec definition
+- [#1762](https://github.com/Azure/typespec-azure/pull/1762) make union/nullable type to be reference type and add usage/access support for them
+
+
+## 0.47.3
+
+### Bug Fixes
+
+- [#1731](https://github.com/Azure/typespec-azure/pull/1731) fix wrong compare target for response body with anonymous model when finding anonymous model context
+- [#1698](https://github.com/Azure/typespec-azure/pull/1698) have paging respect renames
+
+
+## 0.47.2
+
+### Bug Fixes
+
+- [#1606](https://github.com/Azure/typespec-azure/pull/1606) overwrite original value when set multiple value for same decorator
+
+
 ## 0.47.1
 
 ### Bug Fixes

@@ -2,15 +2,16 @@ import "@typespec/http";
 import "@typespec/rest";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "@typespec/spector";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using Azure.Core;
 using Azure.ResourceManager;
 using TypeSpec.OpenAPI;
-using SpecLib;
+using Spector;
 
-namespace Azure.ResourceManager.Models.Resources;
+namespace Azure.ResourceManager.Resources;
 
 @doc("Nested child of Top Level Tracked Resource.")
 @parentResource(TopLevelTrackedResource)
@@ -35,17 +36,17 @@ model NestedProxyResourceProperties {
 }
 
 @armResourceOperations
-interface NestedProxyResources {
+interface Nested {
   @scenario
   @scenarioDoc("""
     Resource GET operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
       "name": "nested",
       "type": "nested",
       "properties":{
@@ -68,7 +69,7 @@ interface NestedProxyResources {
   @scenario
   @scenarioDoc("""
     Resource PUT operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
     Expected query parameter: api-version=2023-12-01-preview
     Expected request body:
     ```json
@@ -81,7 +82,7 @@ interface NestedProxyResources {
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
       "name": "nested",
       "type": "nested",
       "properties":{
@@ -104,7 +105,7 @@ interface NestedProxyResources {
   @scenario
   @scenarioDoc("""
     Resource PATCH operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
     Expected query parameter: api-version=2023-12-01-preview
     Expected request body:
     ```json
@@ -117,7 +118,7 @@ interface NestedProxyResources {
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
       "name": "nested",
       "type": "nested",
       "properties":{
@@ -140,7 +141,7 @@ interface NestedProxyResources {
   @scenario
   @scenarioDoc("""
     Resource DELETE operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
     """)
@@ -149,14 +150,14 @@ interface NestedProxyResources {
   @scenario
   @scenarioDoc("""
     Resource LIST by parent resource operation.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested
     Expected query parameter: api-version=2023-12-01-preview
     
     Expected response body:
     ```json
     {
       "value": [{
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Models.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/nestedProxyResources/nested",
         "name": "nested",
         "type": "nested",
         "properties":{

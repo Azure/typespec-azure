@@ -19,7 +19,13 @@ interface RegisterParams {
 
   // Params added in v4
   @Versioning.added(Versions.v4)
-  v4(...ManagementGroupNameParameter, ...ScopeParameter, ...TenantIdParameter): void;
+  v4(
+    ...ManagementGroupNameParameter,
+    ...ScopeParameter,
+    ...TenantIdParameter,
+    ...IfMatchHeader,
+    ...IfNoneMatchHeader,
+  ): void;
 }
 @@extension(ErrorDetail.details, "x-ms-identifiers", ["message", "target"]);
 

@@ -1,4 +1,6 @@
-# Getting started with `tsp-client`
+---
+title: Getting started with `tsp-client`
+---
 
 :::info
 **Short link:** [aka.ms/azsdk/tsp-client](https://aka.ms/azsdk/tsp-client)
