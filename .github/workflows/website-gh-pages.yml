@@ -39,7 +39,7 @@ jobs:
         working-directory: packages/typespec-azure-playground-website
 
       - name: Build
-        run: pnpm --filter "@azure-tools/typespec-azure-website-astro..." --filter '!@typespec/website' run build
+        run: pnpm --filter "@azure-tools/typespec-azure-website..." --filter '!@typespec/website' run build
         env:
           TYPESPEC_WEBSITE_BASE_PATH: "/typespec-azure/"
           NODE_OPTIONS: "--max_old_space_size=4096"
