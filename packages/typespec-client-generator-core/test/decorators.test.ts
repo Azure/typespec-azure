@@ -3214,7 +3214,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @service
         @test namespace MyService {
           @test
-          @clientName("TestRenamedAgain", "!csharp, !java")
+          @clientName("TestRenamedAgain", "!python, !java")
           @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
@@ -3228,7 +3228,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
       ok(testModel);
     });
 
