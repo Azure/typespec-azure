@@ -335,6 +335,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part '${"part"}'.`,
       },
     },
+    "cookies-unsupported": {
+      severity: "warning",
+      messages: {
+        default: `Cookies are not supported in Swagger 2.0. Parameter was ignored.`,
+      },
+    },
     "invalid-format": {
       severity: "warning",
       messages: {
