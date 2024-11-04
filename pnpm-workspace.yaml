@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - core/ # Install core workspace dependencies too. Needed for prettier plugins
+  - website/
   - eng/feeds/
   - core/packages/*
   - "!core/packages/http-client-csharp/**"

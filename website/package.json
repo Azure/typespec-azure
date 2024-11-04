@@ -1,0 +1,51 @@
+{
+  "name": "@azure-tools/typespec-azure-website-astro",
+  "type": "module",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "copy": "cp -r ../docs/. ./src/content/docs/docs",
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "pnpm copy && tsx ./.scripts/build.ts",
+    "build:web": "pnpm regen-all-packages-docs && astro check --minimumFailingSeverity warning && astro build",
+    "preview": "astro preview",
+    "regen-all-packages-docs": "pnpm -w --filter \"@azure-tools/typespec-azure-website-astro...\" --filter \"!@typespec/monorepo\" --filter \"!@azure-tools/typespec-azure-monorepo\" run regen-docs",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/react": "^3.6.2",
+    "@astrojs/starlight": "^0.28.5",
+    "@astrojs/tailwind": "^5.1.2",
+    "@docsearch/css": "^3.6.3",
+    "@docsearch/js": "^3.6.3",
+    "@fluentui/react-components": "~9.55.0",
+    "@typespec/playground": "workspace:~",
+    "astro": "^4.16.8",
+    "copy": "cp -r ../docs/. ./src/content/docs/docs",
+    "es-module-shims": "~1.10.0",
+    "react": "~18.3.1",
+    "react-dom": "~18.3.1",
+    "sharp": "^0.32.5",
+    "typescript": "~5.6.3"
+  },
+  "devDependencies": {
+    "@azure-tools/typespec-autorest-canonical": "workspace:~",
+    "@azure-tools/typespec-autorest": "workspace:~",
+    "@azure-tools/typespec-azure-core": "workspace:~",
+    "@azure-tools/typespec-azure-playground-website": "workspace:~",
+    "@azure-tools/typespec-azure-portal-core": "workspace:~",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
+    "@azure-tools/typespec-azure-rulesets": "workspace:~",
+    "@azure-tools/typespec-client-generator-core": "workspace:~",
+    "@typespec/internal-build-utils": "workspace:~",
+    "@types/react-dom": "~18.3.0",
+    "@types/react": "~18.3.11",
+    "@types/remark-heading-id": "^1.0.0",
+    "@typespec/astro-utils": "workspace:~",
+    "astro-expressive-code": "^0.37.0",
+    "astro-rehype-relative-markdown-links": "^0.15.0",
+    "remark-heading-id": "^1.0.1"
+  }
+}
