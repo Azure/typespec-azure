@@ -3240,8 +3240,8 @@ describe("typespec-client-generator-core: decorators", () => {
         @service
         @test namespace MyService {
           @test
-          @clientName("TestRenamed", "csharp")
-          @clientName("TestRenamedAgain", "!python, !java")
+          @clientName("TestRenamedAgain", "csharp")
+          @clientName("TestRenamed", "!python, !java")
           model Test {
             prop: string;
           }
@@ -3254,7 +3254,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
       ok(testModel);
     });
 
@@ -3266,8 +3266,8 @@ describe("typespec-client-generator-core: decorators", () => {
         @service
         @test namespace MyService {
           @test
-          @clientName("TestRenamed", "csharp")
-          @clientName("TestRenamedAgain", "!csharp, !java")
+          @clientName("TestRenamedAgain", "csharp")
+          @clientName("TestRenamed", "!csharp, !java")
           model Test {
             prop: string;
           }
@@ -3283,6 +3283,32 @@ describe("typespec-client-generator-core: decorators", () => {
         code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
         message: "Negation scopes 'csharp' should not be combined with normal scope.",
       });
+    });
+
+    it("negation scope override negation scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.diagnose(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamedAgain", "!python, !java")
+          @clientName("TestRenamed", "!go")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
     });
   });
 });
