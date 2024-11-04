@@ -3108,7 +3108,7 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const diagnostics = await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.diagnose(`
         @service
         @test namespace MyService {
           @test

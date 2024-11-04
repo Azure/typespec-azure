@@ -181,7 +181,7 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
 
   // throw on the combination of negation and normal scopes for the same scopes
   if (negationScopes.length > 0 && scopes.length > 0) {
-    var intersections = negationScopes.filter((x) => scopes.includes(x));
+    const intersections = negationScopes.filter((x) => scopes.includes(x));
     if (intersections.length > 0) {
       reportDiagnostic(context.program, {
         code: "invalid-negation-scope",
