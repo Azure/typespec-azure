@@ -40,7 +40,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm --filter "@azure-tools/typespec-azure-website..." --filter '!@typespec/website' run build
+        run: pnpm --filter "@azure-tools/typespec-azure-website-astro..." --filter '!@typespec/website' run build
         env:
           TYPESPEC_WEBSITE_BASE_PATH: "/typespec-azure/"
           NODE_OPTIONS: "--max_old_space_size=4096"
@@ -48,7 +48,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./packages/website/build
+          path: ./website/dist
 
   # Deployment job
   deploy:
