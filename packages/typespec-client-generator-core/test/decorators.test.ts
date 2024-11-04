@@ -3151,10 +3151,10 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
-        message: "Negation scopes 'csharp' should not be combined with normal scope."
+        message: "Negation scopes 'csharp' should not be combined with normal scope.",
       });
     });
-    
+
     it("disallow combination of negation scope and normal scope for the same multiple scopes", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
@@ -3177,7 +3177,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
-        message: "Negation scopes 'csharp, python' should not be combined with normal scope."
+        message: "Negation scopes 'csharp, python' should not be combined with normal scope.",
       });
     });
 

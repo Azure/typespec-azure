@@ -128,7 +128,8 @@ function setScopedDecoratorData(
     newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
     return;
-  } else if (scopes !== undefined && scopes.length > 0) { // for normal scopes, we add them incrementally
+  } else if (scopes !== undefined && scopes.length > 0) {
+    // for normal scopes, we add them incrementally
     // if scope specified, create or overwrite with the new value
     const targetEntry = context.program.stateMap(key).get(target);
     const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
