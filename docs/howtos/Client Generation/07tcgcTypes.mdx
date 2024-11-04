@@ -1,7 +1,9 @@
+---
+title: TypeSpec Type Representation in TCGC
+---
+
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
-
-# TypeSpec Type Representation in TCGC
 
 This page documents what type definitions in TypeSpec would look like when returned by TCGC
 
@@ -1306,8 +1308,8 @@ interface SdkTypeBase {
 
 ### SdkBuiltInType
 
-These are the mappings from the built in scalar TypeSpec types.
-We add `encode` onto these types, telling us how to encode when sending to the service.
+A `SdkBuiltInType` represents a built-in scalar TypeSpec type or scalar type that derives from a built-in scalar TypeSpec type, but datetime and duration are not included.
+We add `encode` onto these types if `@encode` decorator exists, telling us how to encode when sending to the service.
 
 There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuiltInKinds`.
 
@@ -1316,12 +1318,16 @@ There is a one-to-one mapping between the TypeSpec scalar kinds and the `SdkBuil
 ```ts
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
-  encode?: string;
   name: string;
+  encode?: string;
   baseType?: SdkBuiltInType;
   crossLanguageDefinitionId: string;
 }
 ```
+
+The `crossLanguageDefinitionId` represents the fully qualified name of this type in TypeSpec language for the emitter to distinguish from the built-in TypeSpec types.
+
+For a full list of types defined in `@azure-tools/typespec-azure-core` library, please refer to its reference doc.
 
 ### SdkDateTimeType
 

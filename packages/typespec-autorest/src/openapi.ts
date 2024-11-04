@@ -51,6 +51,7 @@ import {
   createDiagnosticCollector,
   explainStringTemplateNotSerializable,
   getAllTags,
+  getAnyExtensionFromPath,
   getDirectoryPath,
   getDiscriminator,
   getDoc,
@@ -90,7 +91,9 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
+  joinPaths,
   navigateTypesInNamespace,
+  normalizePath,
   reportDeprecated,
   resolveEncodedName,
   resolvePath,
@@ -1101,6 +1104,10 @@ export async function getOpenAPIForService(
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
+      if (httpOpParam.type === "cookie") {
+        reportDiagnostic(program, { code: "cookies-unsupported", target: httpOpParam.param });
+        continue;
+      }
       emitParameter(httpOpParam.param, () =>
         getOpenAPI2Parameter(httpOpParam, { visibility, ignoreMetadataAnnotations: false }),
       );
@@ -1462,6 +1469,9 @@ export async function getOpenAPIForService(
         return getOpenAPI2PathParameter(param, schemaContext);
       case "header":
         return getOpenAPI2HeaderParameter(param.param, schemaContext, param.name);
+      case "cookie":
+        compilerAssert(false, "Should verify cookies before");
+        break;
       default:
         const _assertNever: never = param;
         compilerAssert(false, "Unreachable");
@@ -2582,6 +2592,33 @@ async function checkExamplesDirExists(host: CompilerHost, dir: string) {
   }
 }
 
+async function searchExampleJsonFiles(program: Program, exampleDir: string): Promise<string[]> {
+  const host = program.host;
+  const exampleFiles: string[] = [];
+
+  // Recursive file search
+  async function recursiveSearch(dir: string): Promise<void> {
+    const fileItems = await host.readDir(dir);
+
+    for (const item of fileItems) {
+      const fullPath = joinPaths(dir, item);
+      const relativePath = getRelativePathFromDirectory(exampleDir, fullPath, false);
+
+      if ((await host.stat(fullPath)).isDirectory()) {
+        await recursiveSearch(fullPath);
+      } else if (
+        (await host.stat(fullPath)).isFile() &&
+        getAnyExtensionFromPath(item) === ".json"
+      ) {
+        exampleFiles.push(normalizePath(relativePath));
+      }
+    }
+  }
+
+  await recursiveSearch(exampleDir);
+  return exampleFiles;
+}
+
 async function loadExamples(
   program: Program,
   options: AutorestDocumentEmitterOptions,
@@ -2607,7 +2644,7 @@ async function loadExamples(
   }
 
   const map = new Map<string, Record<string, LoadedExample>>();
-  const exampleFiles = await host.readDir(exampleDir);
+  const exampleFiles = await searchExampleJsonFiles(program, exampleDir);
   for (const fileName of exampleFiles) {
     try {
       const exampleFile = await host.readFile(resolvePath(exampleDir, fileName));

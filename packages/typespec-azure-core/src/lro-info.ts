@@ -19,6 +19,8 @@ import {
   getHeaderFieldName,
   getHttpOperation,
   getResponsesForOperation,
+  isBody,
+  isBodyRoot,
   isHeader,
   isMetadata,
 } from "@typespec/http";
@@ -121,6 +123,17 @@ export function extractStatusMonitorInfo(
     },
   });
 }
+
+function getBodyModel(program: Program, model: Model): Model | undefined {
+  const bodyProps = [...getAllProperties(model).values()].filter(
+    (p) => isBody(program, p) || isBodyRoot(program, p),
+  );
+  if (bodyProps.length !== 1) return undefined;
+  const outType = bodyProps[0].type;
+  if (outType.kind !== "Model") return undefined;
+  return outType;
+}
+
 export function getLroOperationInfo(
   program: Program,
   sourceOperation: Operation,
@@ -166,7 +179,12 @@ export function getLroOperationInfo(
   for (const response of targetResponses) {
     visitResponse(program, response, (model) => {
       if (!isErrorType(model) && resultModel === undefined) {
-        resultModel = model;
+        if (resultModel === undefined) {
+          resultModel = getBodyModel(program, model);
+          if (resultModel === undefined) {
+            resultModel = getEffectiveModelType(program, model, (p) => !isMetadata(program, p));
+          }
+        }
       }
     });
   }

@@ -8,9 +8,7 @@ Azure TypeSpec service code generator for c-sharp
 npm install @azure-tools/typespec-service-csharp
 ```
 
-## Emitter
-
-### Usage
+## Usage
 
 1. Via the command line
 
@@ -35,9 +33,9 @@ options:
     option: value
 ```
 
-### Emitter options
+## Emitter options
 
-#### `skip-format`
+### `skip-format`
 
 **Type:** `boolean`
 

@@ -1,5 +1,16 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.47.0
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1555](https://github.com/Azure/typespec-azure/pull/1555) Add `no-empty-model` rule to ruleset
+
+
 ## 0.46.0
 
 ### Bug Fixes

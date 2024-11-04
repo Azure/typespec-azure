@@ -1,0 +1,161 @@
+---
+title: Multipart
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+This doc details what emitters will generate for multipart request.
+
+## Common multipart request
+
+When content-type of operation is "multipart/form-data", the body payload is multipart payload.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Address {
+  city: string;
+}
+model MultipartRequest {
+  id: string;
+  address: Address;
+  profileImage: bytes;
+  pictures: bytes[];
+}
+
+@post
+op upload(
+  @header contentType: "multipart/form-data",
+  @body body: MultipartRequest,
+): NoContentResponse;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+class MultipartRequest:
+    id: str = rest_field()
+    address: "Address" = rest_field()
+    profile_image: FileType = rest_field(name="profileImage", is_multipart_file_input=True)
+    pictures: List[FileType] = rest_field(is_multipart_file_input=True)
+
+def upload(
+    self, body: Union[_models.MultipartRequest, JSON], **kwargs: Any
+) -> None:
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+// Model class
+@Immutable
+public final class MultipartRequest {
+    public MultipartRequest(String id, Address address, ProfileImageFileDetails profileImage, List<PicturesFileDetails> pictures);
+}
+
+// Client API
+public void upload(MultipartRequest body);
+```
+
+</TabItem>
+</Tabs>
+
+## Multipart request with `@multipartBody`
+
+With `@multipartBody`, typespec author could define part of multipart request with more detailed info.
+For example, typespec author could use `File` model predefined in `@typespec/http` to declare the requiredness of filename and
+contentType.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+model Address {
+  city: string;
+}
+model MultipartRequest {
+  id: HttpPart<string>;
+  address: HttpPart<Address>;
+  profileImage: HttpPart<File>;
+  previousAddresses: HttpPart<Address[]>;
+  pictures: HttpPart<File>[];
+}
+
+@post
+op upload(
+  @header contentType: "multipart/form-data",
+  @multipartBody body: MultipartRequest,
+): NoContentResponse;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+class MultipartRequest:
+    id: str = rest_field()
+    address: "Address" = rest_field()
+    profile_image: FileType = rest_field(name="profileImage", is_multipart_file_input=True)
+    pictures: List[FileType] = rest_field(is_multipart_file_input=True)
+
+def upload(
+    self, body: Union[_models.MultipartRequest, JSON], **kwargs: Any
+) -> None:
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+// Model class
+@Immutable
+public final class MultipartRequest {
+    public MultipartRequest(String id, Address address, FileDetails profileImage, List<Address> previousAddresses, List<FileDetails> pictures);
+}
+
+// Client API
+public void upload(MultipartRequest body);
+```
+
+</TabItem>
+</Tabs>

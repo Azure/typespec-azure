@@ -1,4 +1,6 @@
-# Change the provider namespace
+---
+title: Change the provider namespace
+---
 
 If you want to have a different provider namespace than the TypeSpec namespec you'll have to change the following
 

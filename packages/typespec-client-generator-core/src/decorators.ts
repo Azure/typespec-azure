@@ -1,4 +1,3 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   AugmentDecoratorStatementNode,
   DecoratorContext,
@@ -28,7 +27,6 @@ import {
   isTemplateDeclarationOrInstance,
   listServices,
   projectProgram,
-  validateDecoratorUniqueOnNode,
 } from "@typespec/compiler";
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
@@ -64,13 +62,13 @@ import {
   AllScopes,
   clientNameKey,
   getValidApiVersion,
-  isAzureCoreModel,
+  isAzureCoreTspModel,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel, getSdkUnion, getSdkUnionEnumWithDiagnostics } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -108,36 +106,27 @@ function setScopedDecoratorData(
   target: Type,
   value: unknown,
   scope?: LanguageScopes,
-  transitivity: boolean = false,
-): boolean {
-  const targetEntry = context.program.stateMap(key).get(target);
-  const splitScopes = scope?.split(",").map((s) => s.trim()) || [AllScopes];
+) {
+  // if no scope specified, then set with the new value
+  if (!scope) {
+    context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
+    return;
+  }
 
-  // If target doesn't exist in decorator map, create a new entry
+  // if scope specified, create or overwrite with the new value
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const targetEntry = context.program.stateMap(key).get(target);
+
+  // if target doesn't exist in decorator map, create a new entry
   if (!targetEntry) {
     const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
     context.program.stateMap(key).set(target, newObject);
-    return true;
+    return;
   }
 
-  // If target exists, but there's a specified scope and it doesn't exist in the target entry, add mapping of scope and value to target entry
-  const scopes = Reflect.ownKeys(targetEntry);
-  if (!scopes.includes(AllScopes) && scope && !splitScopes.some((s) => scopes.includes(s))) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-    return true;
-  }
-  // we only want to allow multiple decorators if they each specify a different scope
-  if (!transitivity) {
-    validateDecoratorUniqueOnNode(context, target, decorator);
-    return false;
-  }
-  // for transitivity situation, we could allow scope extension
-  if (!scopes.includes(AllScopes) && !scope) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-    context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
-  }
-  return false;
+  // if target exists, overwrite existed value
+  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
 }
 
 const clientKey = createStateSymbol("client");
@@ -167,7 +156,7 @@ export const $client: ClientDecorator = (
   const service =
     explicitService?.kind === "Namespace"
       ? explicitService
-      : (findClientService(context.program, target, scope) ?? (target as any));
+      : (findClientService(context.program, target) ?? (target as any));
   if (!name.endsWith("Client")) {
     reportDiagnostic(context.program, {
       code: "client-name",
@@ -197,7 +186,21 @@ export const $client: ClientDecorator = (
 function findClientService(
   program: Program,
   client: Namespace | Interface,
-  scope?: LanguageScopes,
+): Namespace | Interface | undefined {
+  let current: Namespace | undefined = client as any;
+  while (current) {
+    if (isService(program, current)) {
+      return current;
+    }
+    current = current.namespace;
+  }
+  return undefined;
+}
+
+function findOperationGroupService(
+  program: Program,
+  client: Namespace | Interface,
+  scope: LanguageScopes,
 ): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
@@ -206,8 +209,8 @@ function findClientService(
       return current;
     }
     const client = program.stateMap(clientKey).get(current);
-    if (client && client[scope ?? AllScopes]) {
-      return client[scope ?? AllScopes].service;
+    if (client && (client[scope] || client[AllScopes])) {
+      return (client[scope] ?? client[AllScopes]).service;
     }
     current = current.namespace;
   }
@@ -359,14 +362,6 @@ export const $operationGroup: OperationGroupDecorator = (
     });
     return;
   }
-  const service = findClientService(context.program, target, scope) ?? (target as any);
-  if (!isService(context.program, service)) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name: target.name },
-      target: context.decoratorTarget,
-    });
-  }
 
   setScopedDecoratorData(
     context,
@@ -376,7 +371,6 @@ export const $operationGroup: OperationGroupDecorator = (
     {
       kind: "SdkOperationGroup",
       type: target,
-      service,
     },
     scope,
   );
@@ -458,7 +452,8 @@ export function getOperationGroup(
   type: Namespace | Interface,
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-  const service = findClientService(context.program, type, context.emitterName) ?? (type as any);
+  const service =
+    findOperationGroupService(context.program, type, context.emitterName) ?? (type as any);
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
       code: "client-service",
@@ -470,6 +465,7 @@ export function getOperationGroup(
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
       operationGroup.groupPath = buildOperationGroupPath(context, type);
+      operationGroup.service = service;
     }
   } else {
     // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
@@ -654,7 +650,6 @@ export async function createSdkContext<
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
@@ -752,12 +747,11 @@ export function getUsageOverride(
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
-  const diagnostics = createDiagnosticCollector();
   switch (entity.kind) {
     case "Union":
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(entity));
-      if (unionAsEnum) {
-        return diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum)).usage;
+      const type = getSdkUnion(context, entity);
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+        return type.usage;
       }
       return UsageFlags.None;
     case "Model":
@@ -811,7 +805,7 @@ export function getAccess(context: TCGCContext, entity: Model | Enum | Operation
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "model") {
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
         return type.access;
       }
       return "public";
@@ -915,7 +909,7 @@ function collectParams(
         while (sourceProp.sourceProperty) {
           sourceProp = sourceProp.sourceProperty;
         }
-        if (sourceProp.model && !isAzureCoreModel(sourceProp.model)) {
+        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
           params.push(value);
         } else if (!sourceProp.model) {
           params.push(value);

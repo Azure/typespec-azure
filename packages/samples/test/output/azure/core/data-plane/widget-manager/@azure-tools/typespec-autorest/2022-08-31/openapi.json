@@ -18,6 +18,18 @@
   "consumes": [
     "application/json"
   ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "X-Key",
+      "in": "header"
+    }
+  },
   "tags": [],
   "paths": {
     "/manufacturers": {

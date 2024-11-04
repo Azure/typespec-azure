@@ -42,6 +42,7 @@ import {
   SdkMethodResponse,
   SdkModelPropertyType,
   SdkModelType,
+  SdkNullableType,
   SdkOperationGroup,
   SdkPackage,
   SdkPagingServiceMethod,
@@ -61,10 +62,10 @@ import {
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
-  getDocHelper,
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
+  getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
   updateWithApiVersionInformation,
@@ -80,11 +81,12 @@ import {
 } from "./public-utils.js";
 import {
   addEncodeInfo,
-  getAllModelsWithDiagnostics,
+  getAllReferencedTypes,
   getClientTypeWithDiagnostics,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
   getTypeSpecBuiltInType,
+  handleAllTypes,
 } from "./types.js";
 
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
@@ -133,12 +135,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
     );
   }
-  basic.response.resultPath = pagedMetadata.itemsSegments?.join(".");
+  basic.response.resultPath = getPathFromSegment(
+    context,
+    pagedMetadata.modelType,
+    pagedMetadata.itemsSegments,
+  );
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: pagedMetadata?.nextLinkSegments?.join("."),
+    nextLinkPath: getPathFromSegment(
+      context,
+      pagedMetadata.modelType,
+      pagedMetadata?.nextLinkSegments,
+    ),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
           getSdkServiceOperation<TServiceOperation>(
@@ -149,6 +159,23 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         )
       : undefined,
   });
+}
+
+function getPathFromSegment(context: TCGCContext, type: Model, segments?: string[]): string {
+  if (!segments || segments.length === 0) {
+    return "";
+  }
+  const wireSegments = [];
+  let current = type;
+  for (const segment of segments) {
+    const property = current.properties.get(segment);
+    if (!property) {
+      return "";
+    }
+    wireSegments.push(getLibraryName(context, property));
+    current = property.type as Model;
+  }
+  return wireSegments.join(".");
 }
 
 function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
@@ -231,6 +258,8 @@ function getSdkMethodResponse(
     type = {
       __raw: operation,
       kind: "union",
+      access: "public",
+      usage: UsageFlags.Output,
       variantTypes: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
@@ -245,6 +274,8 @@ function getSdkMethodResponse(
       kind: "nullable",
       type: type,
       decorators: [],
+      access: "public",
+      usage: UsageFlags.Output,
     };
   }
   return {
@@ -322,8 +353,6 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     name,
     access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
-    description: getDocHelper(context, operation).description,
-    details: getDocHelper(context, operation).details,
     doc: getDoc(context.program, operation),
     summary: getSummary(context.program, operation),
     operation: serviceOperation,
@@ -429,8 +458,6 @@ function getSdkMethodParameter(
     const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type, operation));
     return diagnostics.wrap({
       kind: "method",
-      description: getDocHelper(context, type).description,
-      details: getDocHelper(context, type).details,
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       apiVersions,
@@ -480,8 +507,6 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       kind: "clientaccessor",
       parameters,
       name,
-      description: getDocHelper(context, operationGroup.type).description,
-      details: getDocHelper(context, operationGroup.type).details,
       doc: getDoc(context.program, operationGroup.type),
       summary: getSummary(context.program, operationGroup.type),
       access: "internal",
@@ -510,7 +535,6 @@ function getEndpointTypeFromSingleServer<
       {
         name: "endpoint",
         isGeneratedName: true,
-        description: "Service host",
         doc: "Service host",
         kind: "path",
         onClient: true,
@@ -539,12 +563,12 @@ function getEndpointTypeFromSingleServer<
     if (sdkParam.kind === "path") {
       templateArguments.push(sdkParam);
       sdkParam.onClient = true;
-      if (param.defaultValue && "value" in param.defaultValue) {
-        sdkParam.clientDefaultValue = param.defaultValue.value;
+      if (param.defaultValue) {
+        sdkParam.clientDefaultValue = getValueTypeValue(param.defaultValue);
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw.type);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
-      if (sdkParam.isApiVersionParam) {
+      if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
       sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);
@@ -602,6 +626,8 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   if (types.length > 1) {
     type = {
       kind: "union",
+      access: "public",
+      usage: UsageFlags.None,
       variantTypes: types,
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
@@ -616,7 +642,6 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     type,
     name: "endpoint",
     isGeneratedName: true,
-    description: "Service host",
     doc: "Service host",
     onClient: true,
     urlEncode: false,
@@ -641,13 +666,10 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   } else {
     name = getClientNameOverride(context, client.type) ?? client.type.name;
   }
-  const docWrapper = getDocHelper(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
     name,
-    description: docWrapper.description,
-    details: docWrapper.details,
     doc: getDoc(context.program, client.type),
     summary: getSummary(context.program, client.type),
     methods: [],
@@ -746,14 +768,18 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
 ): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
-  const modelsAndEnums = diagnostics.pipe(getAllModelsWithDiagnostics(context));
+  diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
+  const allReferencedTypes = getAllReferencedTypes(context);
   return diagnostics.wrap({
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
-    models: modelsAndEnums.filter((x): x is SdkModelType => x.kind === "model"),
-    enums: modelsAndEnums.filter((x): x is SdkEnumType => x.kind === "enum"),
+    models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
+    enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
+    unions: allReferencedTypes.filter(
+      (x): x is SdkUnionType | SdkNullableType => x.kind === "union" || x.kind === "nullable",
+    ),
     crossLanguagePackageId,
   });
 }
