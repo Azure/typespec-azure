@@ -989,7 +989,7 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
   scope?: LanguageScopes,
-) => {};
+) => { };
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
@@ -1066,9 +1066,26 @@ export function getClientNamespace(
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) return override;
-  return entity.kind === "Namespace"
-    ? getNamespaceFullName(entity)
-    : entity.namespace
-      ? getNamespaceFullName(entity.namespace)
-      : "";
+  if (!entity.namespace) {
+    return "";
+  }
+  if (entity.kind === "Namespace") {
+    return getNamespaceFullNameWithOverride(context, entity);
+  }
+  return getNamespaceFullNameWithOverride(context, entity.namespace);
+}
+
+function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
+  const segments = [];
+  let current: Namespace | undefined = namespace;
+  while (current && current.name !== "") {
+    const override = getScopedDecoratorData(context, clientNamespaceKey, current);
+    if (override) {
+      segments.unshift(override);
+      break;
+    }
+    segments.unshift(current.name);
+    current = current.namespace;
+  }
+  return segments.join(".");
 }

@@ -215,5 +215,49 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
         "MyNamespace",
       );
     });
+
+    it("namespace override propagation", async () => {
+      await runner.compileWithBuiltInService(
+        `
+      namespace Inner {
+        model Baz {
+          prop: string;
+        }
+        
+        namespace Test {
+          model Foo {
+            prop: string;
+          }
+
+          op bar(@body body: Baz): Foo;
+        }
+      }
+
+      @@clientNamespace(Inner, "MyNamespace");
+      `,
+      );
+      strictEqual(
+        runner.context.sdkPackage.clients[0].clientNamespace,
+        "TestService",
+      ); // root namespace
+      strictEqual(
+        (
+          runner.context.sdkPackage.clients[0].methods[0]
+            .response as SdkClientType<SdkServiceOperation>
+        ).clientNamespace,
+        "MyNamespace",
+      ); // Inner namespace with override
+      strictEqual(
+        ((
+          runner.context.sdkPackage.clients[0].methods[0]
+            .response as SdkClientType<SdkServiceOperation>
+        ).methods[0]
+          .response as SdkClientType<SdkServiceOperation>).clientNamespace,
+        "MyNamespace.Test",
+      ); // Test namespace affected by Inner namespace override
+      strictEqual(runner.context.sdkPackage.models[0].clientNamespace, "MyNamespace");
+      strictEqual(runner.context.sdkPackage.models[1].clientNamespace, "MyNamespace.Test");
+    });
+
   });
 });

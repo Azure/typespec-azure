@@ -194,4 +194,47 @@ describe("typespec-client-generator-core: namespaces", () => {
     strictEqual(aabNamespace.unions.length, 0);
     strictEqual(aabNamespace.namespaces.length, 0);
   });
+
+  it("restructure client hierarchy with renaming of client name and client namespace name", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service({
+        title: "Pet Store",
+      })
+      namespace PetStore;
+
+      @route("/feed")
+      op feed(): void;
+
+      @route("/op2")
+      op pet(): void;
+    `,
+      `
+      namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
+
+      @client({
+        name: "FoodClient",
+        service: PetStore
+      })
+      interface Client1 {
+        feed is PetStore.feed
+      }
+
+      @client({
+        name: "PetActionClient",
+        service: PetStore
+      })
+      @clientNamespace("PetStoreRenamed.SubNamespace") // use @clientNamespace to specify the namespace of the client
+      interface Client2 {
+        pet is PetStore.pet
+      }
+    `,);
+    const sdkPackage = runner.context.sdkPackage;
+    const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
+    ok(foodClient);
+    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
+    ok(petActionClient);
+    strictEqual(petActionClient.clientNamespace, "PetStoreRenamed.SubNamespace");
+  });
 });
