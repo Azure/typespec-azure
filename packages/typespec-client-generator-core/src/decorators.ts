@@ -132,6 +132,19 @@ function setScopedDecoratorData(
     // for normal scopes, we add them incrementally
     // if scope specified, create or overwrite with the new value
     const targetEntry = context.program.stateMap(key).get(target);
+    const existingNegationScopes: string[] = targetEntry?.[negationScopesKey];
+    if (existingNegationScopes !== undefined && existingNegationScopes.length > 0) {
+      const intersections = existingNegationScopes.filter((x) => scopes.includes(x));
+      if (intersections.length > 0) {
+        reportDiagnostic(context.program, {
+          code: "invalid-negation-scope",
+          target: context.decoratorTarget,
+          format: { scopes: `'${intersections.join(", ")}'` },
+        });
+        return;
+      }
+    }
+
     const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
 
     // if target doesn't exist in decorator map, create a new entry
