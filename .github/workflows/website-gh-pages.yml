@@ -36,7 +36,7 @@ jobs:
 
       - name: Install browsers
         run: pnpm exec playwright install
-        working-directory: packages/playground-website
+        working-directory: packages/typespec-azure-playground-website
 
       - name: Build
         run: pnpm --filter "@azure-tools/typespec-azure-website-astro..." --filter '!@typespec/website' run build
