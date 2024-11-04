@@ -1,4 +1,6 @@
-# 1. Installing Tools
+---
+title: 1. Installing Tools
+---
 
 ## Installing IDE Tools
 

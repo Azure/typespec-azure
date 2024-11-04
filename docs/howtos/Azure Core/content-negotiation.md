@@ -1,4 +1,6 @@
-# Content Type Negotiation
+---
+title: Content Type Negotiation
+---
 
 See [Http documentation on content type negotiation](https://typespec.io/docs/next/libraries/http/content-types#content-type-negotiation) for the general concept
 

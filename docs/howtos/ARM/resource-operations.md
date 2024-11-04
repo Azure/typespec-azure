@@ -1,4 +1,6 @@
-# ARM Resource Operations
+---
+title: ARM Resource Operations
+---
 
 ## Recommended and Required Operations
 
