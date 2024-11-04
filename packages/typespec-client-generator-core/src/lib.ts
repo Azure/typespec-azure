@@ -219,7 +219,7 @@ export const $lib = createTypeSpecLibrary({
     "invalid-negation-scope": {
       severity: "error",
       messages: {
-        default: `Negation scope should not be combined with normal scope.`,
+        default: paramMessage`Negation scopes ${"scopes"} should not be combined with normal scope.`,
       },
     },
   },

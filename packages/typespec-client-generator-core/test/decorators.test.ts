@@ -3124,12 +3124,12 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `);
 
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
-      });
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
     });
 
-    it("disallow combination of negation scope and normal scope, starting with !", async () => {
+    it("disallow combination of negation scope and normal scope for the same scope", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
@@ -3137,7 +3137,7 @@ describe("typespec-client-generator-core: decorators", () => {
         @service
         @test namespace MyService {
           @test
-          @clientName("TestRenamed", "!csharp, java")
+          @clientName("TestRenamed", "!csharp, csharp")
           model Test {
             prop: string;
           }
@@ -3151,6 +3151,33 @@ describe("typespec-client-generator-core: decorators", () => {
 
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
+        message: "Negation scopes 'csharp' should not be combined with normal scope."
+      });
+    });
+    
+    it("disallow combination of negation scope and normal scope for the same multiple scopes", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const diagnostics = await runnerWithCSharp.diagnose(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamed", "!csharp, csharp, python, !python, java")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
+        message: "Negation scopes 'csharp, python' should not be combined with normal scope."
       });
     });
 
@@ -3202,6 +3229,32 @@ describe("typespec-client-generator-core: decorators", () => {
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
       const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
+
+    it("normal scope incrementally add", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.diagnose(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamed", "csharp")
+          @clientName("TestRenamedAgain", "!csharp, !java")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
       ok(testModel);
     });
   });

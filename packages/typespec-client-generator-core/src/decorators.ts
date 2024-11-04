@@ -121,13 +121,14 @@ function setScopedDecoratorData(
     return;
   }
 
+  // for scope negation, we just override the previous value
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
-    const newObject = Object.fromEntries([AllScopes].map((scope) => [scope, value]));
+    const newObject = Object.fromEntries([AllScopes, scopes].map((scope) => [scope, value]));
     newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
     return;
-  } else if (scopes !== undefined && scopes.length > 0) {
+  } else if (scopes !== undefined && scopes.length > 0) { // for normal scopes, we add them incrementally
     // if scope specified, create or overwrite with the new value
     const targetEntry = context.program.stateMap(key).get(target);
     const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
@@ -140,11 +141,6 @@ function setScopedDecoratorData(
   }
 }
 
-// This function is used to parse the scopes from the decorator and return the negation scopes and normal scopes
-// When the scope is !(scope1, scope2,...), it will return [negationScopes, undefined]
-// When the scope is !scope1, !scope2, ..., it will return [negationScopes, undefined]
-// When the scope is !scope1, scope2, ..., it will report error of invalid-negation-scope
-// When the scope is scope1, scope2, ..., it will return [undefined, normalScopes]
 function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
   if (scope === undefined) {
     return [undefined, undefined];
@@ -157,10 +153,10 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
     return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
   }
 
-  // handle !scope1, !scope2, ... syntax and throw on the combination of negation and normal scopes
+  // handle !scope1, !scope2, scope3, ... syntax
   const splitScopes = scope.split(",").map((s) => s.trim());
-  const negationScopes = [];
-  const scopes = [];
+  const negationScopes: string[] = [];
+  const scopes: string[] = [];
   for (const s of splitScopes) {
     if (s.startsWith("!")) {
       negationScopes.push(s.slice(1));
@@ -168,12 +164,18 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
       scopes.push(s);
     }
   }
+
+  // throw on the combination of negation and normal scopes for the same scopes
   if (negationScopes.length > 0 && scopes.length > 0) {
-    reportDiagnostic(context.program, {
-      code: "invalid-negation-scope",
-      target: context.decoratorTarget,
-    });
-    return [undefined, undefined];
+    var intersections = negationScopes.filter((x) => scopes.includes(x));
+    if (intersections.length > 0) {
+      reportDiagnostic(context.program, {
+        code: "invalid-negation-scope",
+        target: context.decoratorTarget,
+        format: { scopes: `'${intersections.join(", ")}'` },
+      });
+      return [undefined, undefined];
+    }
   }
   return [negationScopes, scopes];
 }
