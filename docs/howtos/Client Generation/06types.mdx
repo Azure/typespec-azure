@@ -984,6 +984,53 @@ public final class Siamese extends Cat {
 ```
 
 </TabItem>
+
+<TabItem value="go" label="Go" >
+
+```go
+// CatClassification provides polymorphic access to related types.
+// Call the interface's GetCat() method to access the common type.
+// Use a type switch to determine the concrete type.  The possible types are:
+// - *Cat, *Ragdoll, *Siamese
+type CatClassification interface {
+	// GetCat returns the Cat content of the underlying type.
+	GetCat() *Cat
+}
+
+type Cat struct {
+	// REQUIRED
+	Kind *string
+}
+
+// GetCat implements the CatClassification interface for type Cat.
+func (c *Cat) GetCat() *Cat { return c }
+
+type Ragdoll struct {
+	// CONSTANT; undefinedField has constant value "ragdoll", any specified value is ignored.
+	Kind *string
+}
+
+// GetCat implements the CatClassification interface for type Ragdoll.
+func (e *Ragdoll) GetCat() *Cat {
+	return &Cat{
+		Kind:     e.Kind,
+	}
+}
+
+type Siamese struct {
+	// CONSTANT; undefinedField has constant value "siamese", any specified value is ignored.
+	Kind *string
+}
+
+// GetCat implements the CatClassification interface for type Siamese.
+func (e *Siamese) GetCat() *Cat {
+	return &Cat{
+		Kind:     e.Kind,
+	}
+}
+```
+
+</TabItem>
 </Tabs>
 
 ### Nullable
