@@ -294,7 +294,8 @@ op nameInService: void;
 
 #### `@clientNamespace`
 
-Changes the namespace of a client, or model generated in the client SDK
+Changes the namespace of a client, model, enum or union generated in the client SDK.
+By default, the client namespace for them will follow the TypeSpec namespace.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientNamespace(rename: valueof string, scope?: valueof string)
@@ -302,7 +303,7 @@ Changes the namespace of a client, or model generated in the client SDK
 
 ##### Target
 
-`unknown`
+`Namespace | Interface | Model | Enum | Union`
 
 ##### Parameters
 
