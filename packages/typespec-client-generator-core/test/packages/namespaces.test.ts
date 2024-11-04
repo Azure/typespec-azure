@@ -228,7 +228,8 @@ describe("typespec-client-generator-core: namespaces", () => {
       interface Client2 {
         pet is PetStore.pet
       }
-    `,);
+    `,
+    );
     const sdkPackage = runner.context.sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
     ok(foodClient);

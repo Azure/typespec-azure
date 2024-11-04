@@ -989,7 +989,7 @@ export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
   scope?: LanguageScopes,
-) => { };
+) => {};
 
 const clientInitializationKey = createStateSymbol("clientInitialization");
 
