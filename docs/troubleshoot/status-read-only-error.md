@@ -1,5 +1,5 @@
 ---
-title: `ProvisioningStateMustBeReadOnly` lintdiff violation in TypeSpec for ARM Service
+title: "`ProvisioningStateMustBeReadOnly` lintdiff violation in TypeSpec for ARM Service"
 ---
 
 When trying to check in an ARM specification to the `azure-rest-api-specs` repository, your specification

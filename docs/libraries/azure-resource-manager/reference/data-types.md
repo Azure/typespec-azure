@@ -250,7 +250,7 @@ model Azure.ResourceManager.ArmOperationStatus<Properties, StatusValues>
 | ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | properties?      | `Properties`                                                                   | RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status |
 | status           | `StatusValues`                                                                 | The operation status                                                                                             |
-| id               | `Core.uuid`                                                                    | The unique identifier for the operationStatus resource                                                           |
+| id               | `string`                                                                       | The unique identifier for the operationStatus resource                                                           |
 | name?            | `string`                                                                       | The name of the operationStatus resource                                                                         |
 | startTime?       | `utcDateTime`                                                                  | Operation start time                                                                                             |
 | endTime?         | `utcDateTime`                                                                  | Operation complete time                                                                                          |
@@ -727,6 +727,27 @@ model Foo is TrackedResource<FooProperties> {
 | Name  | Type     | Description                                                                                                                                                                                                                           |
 | ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | kind? | `string` | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type. If supported, the resource provider must validate and persist this value. |
+
+### `ResourceListCustomResult` {#Azure.ResourceManager.ResourceListCustomResult}
+
+Paged response containing results
+
+```typespec
+model Azure.ResourceManager.ResourceListCustomResult<Result>
+```
+
+#### Template Parameters
+
+| Name   | Description                                           |
+| ------ | ----------------------------------------------------- |
+| Result | The type of the values returned in the paged response |
+
+#### Properties
+
+| Name      | Type             | Description                        |
+| --------- | ---------------- | ---------------------------------- |
+| value     | `Array<Element>` | The items on this page             |
+| nextLink? | `string`         | The link to the next page of items |
 
 ### `ResourceListResult` {#Azure.ResourceManager.ResourceListResult}
 

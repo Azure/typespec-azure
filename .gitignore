@@ -208,3 +208,7 @@ docs/**/js-api/
 
 # Playwright temp file
 .last_run.json
+
+
+# Astro
+.astro/
