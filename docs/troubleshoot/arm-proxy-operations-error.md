@@ -4,7 +4,7 @@ title: Duplicate Body Error When Instantiating `ProxyResourceOperations`
 
 When instantiating the `ProxyResourceOperations<TResource>` template with an incorrect second parameter, a "duplicate body" error like the following may result:
 
-```javascript
+```
 error @typespec/http/duplicate-body
 Operation has a @body and an unannotated parameter. There can only be one representing the body
 ```
@@ -20,7 +20,7 @@ interface MyResourceOperations extends ProxyResourceOperations<MyResource, MyRes
 
 However, this usage is **incorrect**, the second parameter to `ProxyResourceOperations` is optional and, if provided, is expecting an entirely different TypeSpec type. If the resource properties are supplied instead, a "duplicate body" error like the following will result:
 
-```javascript
+```
 error @typespec/http/duplicate-body
 Operation has a @body and an unannotated parameter. There can only be one representing the body
 ```
