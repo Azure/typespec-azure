@@ -15,7 +15,6 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       runner = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
         autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-        "filter-out-core-models": false, // need to check some Azure.Core models
       });
       const baseCompile = runner.compile;
       runner.compileWithVersionedService = async function (code) {
@@ -379,7 +378,6 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       runner = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary, AzureResourceManagerTestLibrary, OpenAPITestLibrary],
         autoUsings: ["Azure.Core", "Azure.Core.Traits", "Azure.ResourceManager"],
-        "filter-out-core-models": false, // need to check some Azure.Core models
       });
       const baseCompile = runner.compile;
       runner.compileWithVersionedService = async function (code) {
