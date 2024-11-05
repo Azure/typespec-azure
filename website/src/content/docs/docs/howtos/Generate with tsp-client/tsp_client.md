@@ -1,5 +1,5 @@
 ---
-title: `tsp-client` commands
+title: `tsp-client`
 ---
 
 :::info
