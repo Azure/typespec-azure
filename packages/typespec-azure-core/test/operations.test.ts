@@ -3081,7 +3081,7 @@ op createJob(
       [
         {
           code: "invalid-ref",
-          message: "Cannot resolve abc",
+          message: "Unknown identifier abc",
         },
         {
           code: "invalid-argument",
