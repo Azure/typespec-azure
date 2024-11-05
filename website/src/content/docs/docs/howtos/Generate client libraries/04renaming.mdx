@@ -1,10 +1,10 @@
 ---
-title: Client renaming
+title: Renaming
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-This page documents how to customize names for client generation. For an overview of the setup, please visit the setup page.
+This page documents how to customize the name of models, operations, and parameters. For an overview of the setup, please visit the setup page.
 
 :::note
 The TypeSpec compiler provides an `@encodedName` decorator that allows changing the name of the property for a given serialization format.
@@ -105,7 +105,7 @@ public final class PetStoreNamespaceClient {
 
 ## Customizations
 
-### Model names
+### Renaming models and attributes
 
 Renames in the context of models can be done on the model name and the attribute name. [Renames have a target](https://microsoft.github.io/typespec/standard-library/projected-names#known-targets):
 
@@ -194,7 +194,7 @@ public final class PetStoreNamespaceClient {
 </TabItem>
 </Tabs>
 
-### Rename operations and parameters
+### Renaming operations and parameters
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
@@ -205,8 +205,8 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@clientName(GetModel, "ReadModel"); // Use InputOptions as a base name in clients
-@@clientName(GetModel, "GetComputedModel", "python"); // Note that Python will still snake_case it
+@@clientName(Get, "Read"); // Use InputOptions as a base name in clients
+@@clientName(Get, "GetComputed", "python"); // Note that Python will still snake_case it
 ```
 
 </TabItem>
