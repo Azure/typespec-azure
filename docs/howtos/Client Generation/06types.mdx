@@ -2383,7 +2383,7 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 
 ## Namespace
 
-All models, enums, unions will follow the TypeSpec namespace as their default client namespaces. This can be overridden by the `@clientNamespace` decorator.
+The namespace for models, enums, and unions will follow the namespace they belong to. You can use `@clientNamespace` to override it if needed.
 
 <Tabs>
 <TabItem value="typespec" label="TypeSpec" default>
