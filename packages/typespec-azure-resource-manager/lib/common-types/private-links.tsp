@@ -39,6 +39,15 @@ model PrivateLinkResourceProperties {
 }
 
 /** A list of private link resources. */
+@removed(Versions.v6)
+@friendlyName("PrivateLinkResourceListResult")
+model PrivateLinkResourceListResultV5 {
+  /** Array of private link resources */
+  value?: PrivateLinkResource[];
+}
+
+/** A list of private link resources. */
+@added(Versions.v6)
 @pagedResult
 model PrivateLinkResourceListResult {
   /** Array of private link resources */

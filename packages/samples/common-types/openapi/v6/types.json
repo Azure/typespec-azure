@@ -211,14 +211,6 @@
         }
       ]
     },
-    "IfMatchHeader": {
-      "type": "object",
-      "description": "The default ARM If-Match header type."
-    },
-    "IfNoneMatchHeader": {
-      "type": "object",
-      "description": "The default ARM If-Match header type."
-    },
     "KeyVaultProperties": {
       "type": "object",
       "properties": {
@@ -719,6 +711,24 @@
       "minLength": 1,
       "x-ms-parameter-location": "client",
       "x-ms-client-name": "apiVersion"
+    },
+    "IfMatchHeader": {
+      "name": "If-Match",
+      "in": "header",
+      "description": "The If-Match header that makes a request conditional.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "ifMatch"
+    },
+    "IfNoneMatchHeader": {
+      "name": "If-None-Match",
+      "in": "header",
+      "description": "The If-None-Match header that makes a request conditional.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "ifNoneMatch"
     },
     "LocationParameter": {
       "name": "location",
