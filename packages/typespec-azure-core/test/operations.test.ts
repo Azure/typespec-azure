@@ -3080,7 +3080,7 @@ op createJob(
       diagnostics.filter((x) => x.severity === "error"),
       [
         {
-          code: "unknown-identifier",
+          code: "invalid-ref",
           message: "Unknown identifier abc",
         },
         {
