@@ -33,7 +33,7 @@ model InputModel {
 }
 
 @doc("Read my resource")
-op GetModel is ResourceRead<InputModel>;
+op Get is ResourceRead<InputModel>;
 ```
 
 </TabItem>
@@ -64,11 +64,11 @@ namespace PetStoreNamespace
   public partial class PetStoreNamespaceClient
   {
     // protocol method
-    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
-    public virtual Response GetModel(string name, RequestContext context) {}
+    public virtual async Task<Response> GetAsync(string name, RequestContext context) {}
+    public virtual Response Get(string name, RequestContext context) {}
     // convenience method
-    public virtual async Task<Response<InputModel>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
-    public virtual Response<InputModel> GetModel(string name, CancellationToken cancellationToken = default) {}
+    public virtual async Task<Response<InputModel>> GetAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<InputModel> Get(string name, CancellationToken cancellationToken = default) {}
   }
 }
 ```
@@ -95,8 +95,8 @@ public final class InputModel {
 
 package com.petstorenamespace;
 public final class PetStoreNamespaceClient {
-    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
-    public InputModel getModel(String name)
+    public Response<BinaryData> getWithResponse(String name, RequestOptions requestOptions)
+    public InputModel get(String name)
 }
 ```
 
@@ -107,7 +107,7 @@ public final class PetStoreNamespaceClient {
 
 ### Renaming models and attributes
 
-Renames in the context of models can be done on the model name and the attribute name. [Renames have a target](https://microsoft.github.io/typespec/standard-library/projected-names#known-targets):
+You can rename models and attributes. [Renames have a target](https://microsoft.github.io/typespec/standard-library/projected-names#known-targets):
 
 - `client` means that all client will use that name
 - `csharp`, `javascript`, `python`, `java` means you target this specific language
@@ -159,11 +159,11 @@ namespace PetStoreNamespace
   public partial class PetStoreNamespaceClient
   {
     // protocol method
-    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
-    public virtual Response GetModel(string name, RequestContext context) {}
+    public virtual async Task<Response> GetAsync(string name, RequestContext context) {}
+    public virtual Response Get(string name, RequestContext context) {}
     // convenience method
-    public virtual async Task<Response<ParameterOptions>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
-    public virtual Response<ParameterOptions> GetModel(string name, CancellationToken cancellationToken = default) {}
+    public virtual async Task<Response<ParameterOptions>> GetAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<ParameterOptions> Get(string name, CancellationToken cancellationToken = default) {}
   }
 }
 ```
@@ -186,8 +186,8 @@ public final class InputOptions {
 
 package com.petstorenamespace;
 public final class PetStoreNamespaceClient {
-    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
-    public InputOptions getModel(String name)
+    public Response<BinaryData> getWithResponse(String name, RequestOptions requestOptions)
+    public InputOptions get(String name)
 }
 ```
 
