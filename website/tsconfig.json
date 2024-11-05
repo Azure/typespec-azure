@@ -2,10 +2,8 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "baseUrl": "./",
-    "paths": {
-      "@theme/*": ["src/components/docusaurus/theme/*"]
-    },
     "jsx": "react-jsx",
     "jsxImportSource": "react"
-  }
+  },
+  "exclude": ["dist/"]
 }
