@@ -1,5 +1,5 @@
 ---
-title: Getting started with `tsp-client`
+title: `tsp-client` commands
 ---
 
 :::info
@@ -29,7 +29,7 @@ the `-o` or `--output-dir` option.
 
 ### init
 
-Initialize the client library directory using a tspconfig.yaml. When running this command pass in a path to a local or remote tspconfig.yaml with the `-c` or `--tsp-config` flag.
+Initialize the client library directory using a tspconfig.yaml. When running this command pass in a path to a local or the URL of a remote tspconfig.yaml with the `-c` or `--tsp-config` flag. If remote, The tspconfig.yaml must include the specific commit in the path. (See example)
 
 The `init` command generates a directory structure following the standard pattern used across Azure SDK language repositories, creates a [tsp-location.yaml](#tsp-locationyaml) file to control generation, and performs an initial generation of the client library. If you want to skip client library generation, then pass the `--skip-sync-and-generate` flag.
 
