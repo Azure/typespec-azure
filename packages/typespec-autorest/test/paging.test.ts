@@ -23,7 +23,6 @@ it("define a custom paged operation with custom next link", async () => {
     `
     model CustomPageModel<T> {
       @pageItems myItems: T[];
-
       @TypeSpec.nextLink
       \`@odata.nextLink\`?: string;
     }
