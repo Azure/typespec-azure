@@ -25,7 +25,7 @@ it("define a custom paged operation with custom next link", async () => {
       model CustomPageModel<T> {
         items: T[];
 
-        @nextLink
+        @Azure.Core.nextLink
         \`@odata.nextLink\`?: string;
       }
       op list(): CustomPageModel<{}>;
@@ -45,7 +45,7 @@ it("define a custom paged operation with custom item name", async () => {
       @items
       itemList?: string[];
 
-      @nextLink
+      @Azure.Core.nextLink
       nextLink?: string;
     }
       
