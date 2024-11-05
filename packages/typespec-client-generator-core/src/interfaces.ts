@@ -66,7 +66,6 @@ export interface SdkContext<
 export interface SdkEmitterOptions {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "filter-out-core-models"?: boolean;
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
