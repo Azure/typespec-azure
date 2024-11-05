@@ -32,7 +32,7 @@ it("define a custom paged operation with custom next link", async () => {
         @doc("List of items.")
         items: T[];
 
-        @nextLink
+        @Azure.Core.nextLink
         @doc("Link to fetch more items.")
         \`@odata.nextLink\`?: string;
       }
