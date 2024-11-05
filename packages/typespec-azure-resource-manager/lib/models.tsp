@@ -308,7 +308,7 @@ model ResourceListCustomResult<Result> {
   value: Result[];
 
   /** The link to the next page of items */
-  @nextLink
+  @Azure.Core.nextLink
   nextLink?: string;
 }
 

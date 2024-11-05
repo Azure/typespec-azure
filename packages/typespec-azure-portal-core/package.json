@@ -17,7 +17,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
-    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/libraries/azure-portal-core/reference"
+    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/libraries/azure-portal-core/reference"
   },
   "keywords": [
     "Azure",

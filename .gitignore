@@ -201,7 +201,7 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 # JetBrains Rider
 .idea/
 
-docs/**/js-api/
+**/docs/**/js-api/
 
 # vitest temporary files
 **/vitest.config.ts.timestamp*
