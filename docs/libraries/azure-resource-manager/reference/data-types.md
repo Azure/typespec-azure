@@ -1747,6 +1747,20 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
 | value?    | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources                                       |
 | nextLink? | `string`                                            | URL to get the next set of operation list results (if there are any). |
 
+### `PrivateLinkResourceListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5}
+
+A list of private link resources.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5
+```
+
+#### Properties
+
+| Name   | Type                                                | Description                     |
+| ------ | --------------------------------------------------- | ------------------------------- |
+| value? | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources |
+
 ### `PrivateLinkResourceParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter}
 
 The name of the private link associated with the Azure resource.
