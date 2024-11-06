@@ -86,6 +86,7 @@ func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (Clien
 op post(@body body: User): void;
 ```
 
+<ClientTabItem lang="python">
 For model inputs, Python automatically generates an overload that allows SDK users to input through a file stream.
 
 ```python
@@ -104,6 +105,8 @@ def post(body: IO[bytes], **kwargs: Any) -> None:
 def post(body: [User, JSON, IO[bytes]], **kwargs: Any) -> None:
   ...
 ```
+
+</ClientTabItem>
 
 ```csharp
 //protocol method
