@@ -30,6 +30,7 @@ const KnownLanguages = {
   },
   tcgc: {
     label: "tcgc",
+    icon: "seti:json",
   },
 } as const;
 
@@ -99,7 +100,7 @@ export interface Result {
   outputs: Array<{
     language: Language;
     label: string;
-    icon: string;
+    icon?: string;
     html: string;
   }>;
 }
