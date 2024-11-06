@@ -21,6 +21,7 @@ import {
   getQueryParamName,
   getQueryParamOptions,
   isBody,
+  isCookieParam,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -129,7 +130,7 @@ function getSdkHttpParameters(
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
       diagnostics.pipe(
-        getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type as any),
+        getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type),
       ),
     )
     .filter(
@@ -336,7 +337,7 @@ export function getSdkHttpParameter(
   param: ModelProperty,
   operation?: Operation,
   httpParam?: HttpOperationParameter,
-  location?: "path" | "query" | "header" | "body",
+  location?: "path" | "query" | "header" | "body" | "cookie",
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
@@ -361,6 +362,15 @@ export function getSdkHttpParameter(
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,
+    });
+  }
+  if (isCookieParam(context.program, param) || location === "cookie") {
+    return diagnostics.wrap({
+      ...base,
+      kind: "cookie",
+      serializedName: param.name,
+      correspondingMethodParams,
+      optional: param.optional,
     });
   }
   if (isBody(context.program, param) || location === "body") {
@@ -412,12 +422,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation,
 ): [
-  {
-    responses: SdkHttpResponse[];
-    exceptions: SdkHttpErrorResponse[];
-  },
-  readonly Diagnostic[],
-] {
+    {
+      responses: SdkHttpResponse[];
+      exceptions: SdkHttpErrorResponse[];
+    },
+    readonly Diagnostic[],
+  ] {
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
