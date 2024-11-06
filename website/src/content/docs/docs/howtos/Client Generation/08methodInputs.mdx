@@ -10,25 +10,17 @@ This document outlines the method input signatures that language emitters will g
 
 ### HTTP Get
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @get
 op get(): User;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 def get() -> User:
   ...
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 //protocol method
@@ -38,9 +30,6 @@ public virtual Response GetUser(RequestContext context){}
 public virtual async Task<Response<User>> GetUser(CancellationToken cancellationToken = default)
 public virtual Response<User> GetUser(CancellationToken cancellationToken = default)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -71,15 +60,9 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public User get();
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type ClientGetOptions struct {
@@ -92,22 +75,16 @@ func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (Clien
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### HTTP Post
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @post
 op post(@body body: User): void;
 ```
-
-</TabItem>
-
-<TabItem value="python" label="Python">
 
 For model inputs, Python automatically generates an overload that allows SDK users to input through a file stream.
 
@@ -128,9 +105,6 @@ def post(body: [User, JSON, IO[bytes]], **kwargs: Any) -> None:
   ...
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
 ```csharp
 //protocol method
 public virtual async Task<Response> PostAsync(RequestContent content, RequestContext context = null)
@@ -139,9 +113,6 @@ public virtual Response Post(RequestContent content, RequestContext context = nu
 public virtual async Task<Response> PostAsync(User user, CancellationToken cancellationToken = default)
 public virtual Response Post(User user, CancellationToken cancellationToken = default)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -168,15 +139,9 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public void post(User user);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type ClientPostOptions struct {
@@ -188,8 +153,7 @@ type ClientPostResponse struct {
 func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Spread
 
@@ -201,8 +165,7 @@ Please exercise caution when using the _spread_ feature.
 
 ### Alias
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 alias User = {
@@ -214,19 +177,12 @@ alias User = {
 op upload(...User): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(first_name: str, last_name: str) -> None:
   ...
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 //protocol method
@@ -236,9 +192,6 @@ public virtual Response Upload(RequestContent content, RequestContext context = 
 public virtual async Task<Response> UploadAsync(string firstName, string lastName, CancellationToken cancellationToken = default)
 public virtual Response Upload(string firstName, string lastName, CancellationToken cancellationToken = default)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -272,15 +225,9 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public void upload(String firstName, String lastName);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type ClientUploadOptions struct {
@@ -293,13 +240,11 @@ func (client *Client) Upload(ctx context.Context, firstName string, lastName str
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Alias with @header/@query/@path properties
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 alias User = {
@@ -311,19 +256,12 @@ alias User = {
 op upload(...User): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(self, id: str, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
   ...
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 //protocol method
@@ -333,9 +271,6 @@ public virtual Response Upload(string id, RequestContent content, RequestContext
 public virtual async Task<Response> UploadAsync(string id, string firstName, string lastName, CancellationToken cancellationToken = default)
 public virtual Response Upload(string id, string firstName, string lastName, CancellationToken cancellationToken = default)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -378,15 +313,9 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public void upload(String id, String firstName, String lastName);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type ClientUploadOptions struct {
@@ -398,13 +327,11 @@ type ClientUploadResponse struct {
 func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Named model
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 model User {
@@ -415,18 +342,12 @@ model User {
 op upload(...User): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(self, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
   ...
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 public partial class User
@@ -442,9 +363,6 @@ public virtual Response Upload(RequestContent content, RequestContext context = 
 public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
 public virtual Response Upload(string firstName, string lastName, CancellationToken cancellationToken = default)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -478,15 +396,9 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public void upload(String firstName, String lastName);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type ClientUploadOptions struct {
@@ -498,13 +410,11 @@ type ClientUploadResponse struct {
 func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Model with `@body` property
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 model User {
@@ -519,20 +429,12 @@ model UserRequest {
 op upload(...UserRequest): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
 def upload(self, body: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
   ...
 ```
-
-</TabItem>
-
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 public partial class User
@@ -548,9 +450,6 @@ public virtual Response Upload(RequestContent content, RequestContext context = 
 public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
 public virtual Response Upload(User user, CancellationToken cancellationToken = default)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -577,9 +476,6 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 // Model class
 @Immutable
@@ -592,9 +488,6 @@ public final class User implements JsonSerializable<User> {
 // Client API
 public void upload(User user);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type User struct {
@@ -611,13 +504,11 @@ type ClientUploadResponse struct {
 func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Model with @header/@query/@path properties
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 model BlobProperties {
@@ -631,9 +522,6 @@ model BlobProperties {
 op getBlobProperties(...BlobProperties): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
@@ -642,17 +530,11 @@ def get_blob_properties(self, name: str, *, test_header: string, content_type: s
   ...
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
 ```csharp
 //protocol method
 public virtual async Task<Response> GetBlobPropertiesAsync(string name, string testHeader, RequestContext context = null)
 public virtual Response GetBlobProperties(string name, string testHeader, RequestContext context = null)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -690,15 +572,9 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public void getBlobProperties(String name, String testHeader);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type ClientGetBlobPropertiesOptions struct {
@@ -710,13 +586,11 @@ type ClientGetBlobPropertiesResponse struct {
 func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Model mixed with normal and @header/@query/@path properties
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 model Schema {
@@ -728,9 +602,6 @@ model Schema {
 op register(...Schema): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
@@ -740,9 +611,6 @@ class Schema:
 def register(self, body: [Schema, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
   ...
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 public partial class Schema
@@ -757,9 +625,6 @@ public virtual Response Register(RequestContent content, RequestContext context 
 public virtual async Task<Response> RegisterAsync(Schema schema, CancellationToken cancellationToken = default)
 public virtual Response Register(Schema schema, CancellationToken cancellationToken = default)
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -799,9 +664,6 @@ export class DemoServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 // Model class
 @Immutable
@@ -814,9 +676,6 @@ public final class Schema implements JsonSerializable<Schema> {
 public void register(Schema schema);
 ```
 
-</TabItem>
-<TabItem value="go" label="Go" >
-
 ```go
 type ClientRegisterOptions struct {
 }
@@ -827,8 +686,7 @@ type ClientRegisterResponse struct {
 func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Using Azure.Core.ResourceOperations template
 
@@ -837,8 +695,7 @@ Only resource action operations are impacted by spread.
 
 If the action parameter is a model, then the model will be spread.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @resource("widgets")
@@ -862,9 +719,6 @@ alias Operations = Azure.Core.ResourceOperations<{}>;
 op scheduleRepairs is Operations.ResourceAction<Widget, RepairInfo, RepairResult>;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
@@ -880,15 +734,9 @@ def scheduleRepairs(self, widget_name: str, problem: str, contact: str, *, conte
   ...
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
 ```csharp
 
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -933,15 +781,9 @@ export class WidgetServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public RepairResult scheduleRepairs(String widgetName, String problem, String contact);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type ClientScheduleRepairsOptions struct {
@@ -959,17 +801,14 @@ type ClientScheduleRepairsResponse struct {
 func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 If you want to keep the model, you have two options to prevent spreading:
 
 1. `@override`
 2. If you don't want to do client customizations, you could use a wrapper to explicitly set the body to prevent spread.
 
-<Tabs>
-
-<TabItem value="Service Definition" label="TypeSpec">
+<ClientTabs>
 
 ### 1. `@override`
 
@@ -1031,9 +870,6 @@ alias BodyParameter<
 op scheduleRepairs is Operations.ResourceAction<Widget, BodyParameter<RepairInfo>, RepairResult>;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
 For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
 
 ```python
@@ -1049,15 +885,9 @@ def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str 
   ...
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
 ```csharp
 
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -1100,9 +930,6 @@ export class WidgetServiceClient {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 // Model class
 @Immutable
@@ -1121,9 +948,6 @@ public final class RepairResult implements JsonSerializable<RepairResult> {
 // Client API
 public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 ```
-
-</TabItem>
-<TabItem value="go" label="Go" >
 
 ```go
 type RepairInfo struct {
@@ -1146,5 +970,4 @@ type ClientScheduleRepairsResponse struct {
 func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>

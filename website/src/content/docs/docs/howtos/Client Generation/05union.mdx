@@ -11,10 +11,9 @@ This page documents emitter behavior and customization when you use union operat
 The simplest way to express a combination of input in TypeSpec is to use the union operator `|`.
 At a glance, JS and Python supports natively union, while Java and C# will use overloads.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
-```typespec
+```typespec title=client.tsp
 @service({
   title: "Analyze",
   version: "v1",
@@ -33,10 +32,6 @@ model CompletionInput {
 op completions(@body input: CompletionInput): CompletionResult;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 def analyze(image: bytes, *, mode: Literal["strict", "lenient"]) -> AnalyzeResult:
   ...
@@ -47,9 +42,6 @@ class CompletionInput:
 def completions(input: CompletionInput) -> CompletionResult:
   ...
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 // Union "strict" | "lenient" will be generate as extensible enum
@@ -94,9 +86,6 @@ namespace Analyze
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 // from user experience perspective
 
@@ -129,9 +118,6 @@ export type DemoServiceContext = Client & {
 };
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public enum Mode {
     STRICT("strict"),
@@ -151,14 +137,12 @@ public final class AnalyzeClient {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
 you must use `@sharedRoute`. By default, codegen will generate one method per operation name.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @sharedRoute
@@ -170,10 +154,6 @@ op a(x: int32): float;
 op b(x: string): int64;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 def a(x: int) -> float:
   # code
@@ -181,9 +161,6 @@ def a(x: int) -> float:
 def b(x: string) -> int:
   # code
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 //protocol
@@ -194,9 +171,6 @@ public Response B(RequestContent content, RequestContext context);
 public Response<float> A(int x, CancellationToken token);
 public Response<long> B(string x, Cancellation token);
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 // from user experience perspective
@@ -224,9 +198,6 @@ export type DemoServiceContext = Client & {
 };
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 public final class Client {
     public Response<BinaryData> aWithResponse(BinaryData request, RequestOptions requestOptions)
@@ -236,8 +207,7 @@ public final class Client {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Customizations
 
@@ -245,8 +215,7 @@ public final class Client {
 
 If your shared routes are actually one unique semantic operation, you may want to configure codegen to use a unique name. This is simply done by renaming both operations to the same name using `@clientName`
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typescript
 // main.tsp
@@ -268,9 +237,6 @@ using Azure.ClientGenerator.Core;
 @@clientName(b, "Foo");
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 @overload
 def foo(x: int) -> float:
@@ -284,9 +250,6 @@ def foo(x: string | int) -> float | int:
    # Code here
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
 ```csharp
 //protocol
 public Response Foo(RequestContent content, RequestContext context);
@@ -296,19 +259,12 @@ public Response<float> Foo(int x, CancellationToken token);
 public Response<long> Foo(string x, Cancellation token);
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 JS RLC is not in the business of customization with client.tsp
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 NOT_SUPPORTED
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
