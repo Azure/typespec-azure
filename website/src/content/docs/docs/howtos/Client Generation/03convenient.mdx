@@ -2,7 +2,7 @@
 title: Convenient method generation
 ---
 
-import ClientTabs from "@components/client-tabs.astro";
+import { ClientTabs, ClientTabItem } from "@components/client-tabs.astro";
 
 This page documents how to customize method generation for the emitters. For an overview of the setup, please visit the setup page.
 
@@ -116,7 +116,7 @@ using Azure.ClientGenerator.Core;
 # Python do not change behavior based on protocolAPI or convenientAPI
 ```
 
-```c#
+```csharp
 // Model class is not generated.
 // Convenient method is not generated.
 
@@ -151,6 +151,8 @@ public final class PetStoreNamespaceClient {
 
 Sometimes it may be useful to still generate the method, but to make it private, so it can be re-used by a manual code wrapper.
 
+The two possible value for the `Access` enum are `internal` and `public`.
+
 <ClientTabs>
 
 ```typespec title=client.tsp
@@ -161,8 +163,6 @@ using Azure.ClientGenerator.Core;
 
 @@access(PetStoreNamespace.GetModel, "internal");
 ```
-
-The two possible value for the `Access` enum are `internal` and `public`.
 
 ```python
 # can't import form models directly

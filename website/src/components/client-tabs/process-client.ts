@@ -24,11 +24,30 @@ const KnownLanguages = {
     label: "Java",
     icon: "seti:java",
   },
+  go: {
+    label: "Go",
+    icon: "seti:go",
+  },
+  tcgc: {
+    label: "tcgc",
+  },
 } as const;
 
-type Language = keyof typeof KnownLanguages;
+export type Language = keyof typeof KnownLanguages;
 
-function getLanguage(el: ElementContent): Language | "typespec" {
+function getLanguage(node: ElementContent): Language | "typespec" {
+  const language = (node as any).properties.dataLanguage as string;
+  if (!language) {
+    throw new Error(`Missing language data code block: ${toHtml(node)}`);
+  }
+  if (language !== "typespec" && !KnownLanguages[language as Language]) {
+    throw new Error(`Unknown language '${language}' used in code block in <ClientTabs>`);
+  }
+
+  return language as any;
+}
+
+function getLanguageForCodeBlock(el: ElementContent): Language | "typespec" {
   let resolved;
   visit(el, "element", (node) => {
     if (node.tagName !== "pre" || !node.properties) {
@@ -57,11 +76,20 @@ const tabsProcessor = rehype()
     return (tree: Element, file) => {
       const results: any[] = (file.data.results = []);
       for (const item of tree.children) {
-        if (!(item as any).properties.className.includes("expressive-code")) {
-          throw `Unexpected item ${item} should only have code blocks`;
+        if (item.type === "element" && item.tagName === "client-tab-item") {
+          const language = getLanguage(item);
+          results.push({ language, html: toHtml(item.children) });
+        } else if (
+          item.type === "element" &&
+          (item.properties.className as any)?.includes("expressive-code")
+        ) {
+          const language = getLanguageForCodeBlock(item);
+          results.push({ language, html: toHtml(item) });
+        } else {
+          throw new Error(
+            `Unexpected item should only have code blocks or ClientTabItem but got:\n${toHtml(item)}`,
+          );
         }
-        const language = getLanguage(item);
-        results.push({ language, html: toHtml(item) });
       }
     };
   });
@@ -75,7 +103,7 @@ export interface Result {
     html: string;
   }>;
 }
-export function processPanels(html: string): Result {
+export function processContent(html: string): Result {
   const file = tabsProcessor.processSync({ value: html });
   const codeBlocks = file.data.results as any[];
   let typespec;

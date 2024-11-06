@@ -2,7 +2,7 @@
 title: Client renaming
 ---
 
-import ClientTabs from "@components/client-tabs.astro";
+import { ClientTabs, ClientTabItem } from "@components/client-tabs.astro";
 
 This page documents how to customize names for client generation. For an overview of the setup, please visit the setup page.
 
@@ -123,7 +123,7 @@ class InputOptions:
 response: InputOptions = client.get_computed_model(input_name="name")
 ```
 
-```c#
+```csharp
 namespace PetStoreNamespace.Models
 {
   public partial class ParameterOptions

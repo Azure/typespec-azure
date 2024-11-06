@@ -1,10 +1,9 @@
 ---
 import { TabItem, Tabs } from "@astrojs/starlight/components";
-import { processPanels } from "./process-client";
+import { processContent } from "./process-client.js";
 const content = await Astro.slots.render("default");
 
-const result = processPanels(content);
-console.log("Results", result);
+const result = processContent(content);
 ---
 
 <Fragment set:html={result.typespec} />
