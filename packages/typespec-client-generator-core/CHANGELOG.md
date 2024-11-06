@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.48.1
+
+### Bug Fixes
+
+- [#1813](https://github.com/Azure/typespec-azure/pull/1813) fix wrong encode for body response of binary type
+- [#1786](https://github.com/Azure/typespec-azure/pull/1786) support client namespace
+
+
 ## 0.48.0
 
 ### Bug Fixes
