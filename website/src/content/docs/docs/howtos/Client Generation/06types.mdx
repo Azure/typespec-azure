@@ -963,26 +963,26 @@ public partial class Ragdoll : Cat
 ```ts
 // RLC input models
 export interface Siamese extends CatParent {
-    "kind": "siamese";
+  kind: "siamese";
 }
 
 export interface Ragdoll extends CatParent {
-    "kind": "ragdoll";
+  kind: "ragdoll";
 }
 
 export type Cat = CatParent | Siamese | Ragdoll;
 
 // RLC output models
 export interface CatOutputParent {
-    "kind": string;
+  kind: string;
 }
 
 export interface SiameseOutput extends CatOutputParent {
-    "kind": "siamese";
+  kind: "siamese";
 }
 
 export interface RagdollOutput extends CatOutputParent {
-    "kind": "ragdoll";
+  kind: "ragdoll";
 }
 
 export type CatOutput = CatOutputParent | SiameseOutput | RagdollOutput;
