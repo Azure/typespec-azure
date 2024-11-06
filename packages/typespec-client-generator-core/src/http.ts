@@ -412,12 +412,12 @@ function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation,
 ): [
-    {
-      responses: SdkHttpResponse[];
-      exceptions: SdkHttpErrorResponse[];
-    },
-    readonly Diagnostic[],
-  ] {
+  {
+    responses: SdkHttpResponse[];
+    exceptions: SdkHttpErrorResponse[];
+  },
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
@@ -464,7 +464,9 @@ function getSdkHttpResponseAndExceptions(
           innerResponse.body.type.kind === "Model"
             ? getEffectivePayloadType(context, innerResponse.body.type)
             : innerResponse.body.type;
-        type = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, httpOperation.operation));
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+        );
         if (innerResponse.body.property) {
           addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
         }
