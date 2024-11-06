@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.48.0
+
+### Bug Fixes
+
+- [#1806](https://github.com/Azure/typespec-azure/pull/1806) remove filtering core model flag
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
 ## 0.47.4
 
 ### Bug Fixes
