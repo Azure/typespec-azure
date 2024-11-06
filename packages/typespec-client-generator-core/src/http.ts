@@ -15,6 +15,7 @@ import {
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
+  getCookieParamOptions,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getPathParamName,
@@ -31,6 +32,7 @@ import { getParamAlias } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
+  SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
   SdkHttpOperation,
@@ -105,12 +107,13 @@ export function isSdkHttpParameter(context: TCGCContext, type: ModelProperty): b
     isPathParam(program, type) ||
     isQueryParam(program, type) ||
     isHeader(program, type) ||
-    isBody(program, type)
+    isBody(program, type) ||
+    isCookieParam(program, type)
   );
 }
 
 interface SdkHttpParameters {
-  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   bodyParam?: SdkBodyParameter;
 }
 
@@ -129,14 +132,8 @@ function getSdkHttpParameters(
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(
-        getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type),
-      ),
-    )
-    .filter(
-      (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
-        x.kind === "header" || x.kind === "query" || x.kind === "path",
-    );
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+    ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   const headerParams = retval.parameters.filter(
     (x): x is SdkHeaderParameter => x.kind === "header",
   );
@@ -368,7 +365,7 @@ export function getSdkHttpParameter(
     return diagnostics.wrap({
       ...base,
       kind: "cookie",
-      serializedName: param.name,
+      serializedName: getCookieParamOptions(program, param)?.name ?? base.name,
       correspondingMethodParams,
       optional: param.optional,
     });

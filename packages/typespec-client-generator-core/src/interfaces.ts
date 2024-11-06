@@ -156,8 +156,8 @@ export interface SdkBuiltInType extends SdkTypeBase {
 
 type TypeEquality<T, U> = keyof T extends keyof U
   ? keyof U extends keyof T
-  ? true
-  : false
+    ? true
+    : false
   : false;
 
 // these two vars are used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
@@ -419,7 +419,8 @@ export type SdkModelPropertyType =
   | SdkQueryParameter
   | SdkPathParameter
   | SdkBodyParameter
-  | SdkHeaderParameter;
+  | SdkHeaderParameter
+  | SdkCookieParameter;
 
 export interface MultipartOptions {
   // whether this part is for file
@@ -541,7 +542,7 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
   statusCodes: number | HttpStatusCodeRange | "*";
 }
 
-interface SdkServiceOperationBase { }
+interface SdkServiceOperationBase {}
 
 export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
@@ -599,7 +600,7 @@ interface SdkPagingServiceMethodOptions {
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-  SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions {
   kind: "paging";
 }
 
@@ -642,10 +643,10 @@ export interface SdkLroServicePollingStep {
 export interface SdkLroServiceFinalStep {
   /** Final step kind */
   kind:
-  | "finalOperationLink"
-  | "finalOperationReference"
-  | "pollingSuccessProperty"
-  | "noPollingResult";
+    | "finalOperationLink"
+    | "finalOperationReference"
+    | "pollingSuccessProperty"
+    | "noPollingResult";
 }
 
 /**
@@ -662,14 +663,14 @@ export interface SdkLroServiceFinalResponse {
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-  SdkLroServiceMethodOptions {
+    SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-  SdkLroServiceMethodOptions,
-  SdkPagingServiceMethodOptions {
+    SdkLroServiceMethodOptions,
+    SdkPagingServiceMethodOptions {
   kind: "lropaging";
 }
 
@@ -780,24 +781,24 @@ interface SdkExampleValueBase {
 export interface SdkStringExampleValue extends SdkExampleValueBase {
   kind: "string";
   type:
-  | SdkBuiltInType
-  | SdkDateTimeType
-  | SdkDurationType
-  | SdkEnumType
-  | SdkEnumValueType
-  | SdkConstantType;
+    | SdkBuiltInType
+    | SdkDateTimeType
+    | SdkDurationType
+    | SdkEnumType
+    | SdkEnumValueType
+    | SdkConstantType;
   value: string;
 }
 
 export interface SdkNumberExampleValue extends SdkExampleValueBase {
   kind: "number";
   type:
-  | SdkBuiltInType
-  | SdkDateTimeType
-  | SdkDurationType
-  | SdkEnumType
-  | SdkEnumValueType
-  | SdkConstantType;
+    | SdkBuiltInType
+    | SdkDateTimeType
+    | SdkDurationType
+    | SdkEnumType
+    | SdkEnumValueType
+    | SdkConstantType;
   value: number;
 }
 

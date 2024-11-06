@@ -310,7 +310,7 @@ describe("typespec-client-generator-core: parameters", () => {
       @service({})
       namespace My.Service;
 
-      op myOp(@cookie({name: "token"}) auth: string): void;
+      op myOp(@cookie(#{name: "token"}) auth: string): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
@@ -318,6 +318,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
     strictEqual(method.operation.parameters.length, 1);
     const cookieParam = method.operation.parameters[0];
+    strictEqual(cookieParam.name, "auth");
     strictEqual(cookieParam.kind, "cookie");
     strictEqual(cookieParam.serializedName, "token");
   });
