@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.48.0
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+### Features
+
+- [#1566](https://github.com/Azure/typespec-azure/pull/1566) Emit `x-ms-pageable` whenever possible for new core paging model
+
+
 ## 0.47.0
 
 ### Bump dependencies

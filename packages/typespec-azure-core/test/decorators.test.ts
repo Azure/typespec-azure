@@ -46,7 +46,7 @@ describe("typespec-azure-core: decorators", () => {
           @items
           foos: string[];
 
-          @nextLink
+          @Azure.Core.nextLink
           nextThing?: string;
         }
       `);
@@ -68,7 +68,7 @@ describe("typespec-azure-core: decorators", () => {
             things: string[];
 
             doo: {
-              @nextLink
+              @Azure.Core.nextLink
               next?: string;  
             }
           }
@@ -90,7 +90,7 @@ describe("typespec-azure-core: decorators", () => {
           @items
           \`base.things\`: string[];
 
-          @nextLink
+          @Azure.Core.nextLink
           \`base.next\`?: string;  
         }
       `);
@@ -170,7 +170,7 @@ describe("typespec-azure-core: decorators", () => {
 
           @doc(".")
           nested: {
-            @nextLink
+            @Azure.Core.nextLink
             @doc(".")
             nextLink: string;
           }
@@ -187,7 +187,6 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        @list
         op foo is Azure.Core.Foundations.Operation<{}, ETagParam & MyPage>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);
@@ -210,7 +209,7 @@ describe("typespec-azure-core: decorators", () => {
             @doc(".")
             values?: string[];
 
-            @nextLink
+            @Azure.Core.nextLink
             @doc(".")
             nextLink: string;
           }
@@ -227,7 +226,6 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        @list
         op foo is Azure.Core.Foundations.Operation<{}, MyFooPageResult>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);

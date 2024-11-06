@@ -1,0 +1,202 @@
+---
+title: Long-Running Operations
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+This doc details what emitters will generate for long-running operations.
+
+## Resource create or replace
+
+Long-running operation to create or replace a resource.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
+  NoRepeatableRequests &
+  NoClientRequestId>;
+
+@resource("users")
+@doc("Details about a user.")
+model User {
+  @key
+  @visibility("read")
+  @doc("The name of user.")
+  name: string;
+
+  @doc("The role of user")
+  role: string;
+}
+
+// Operation for polling the status of the LRO. SDK may exclude this operation from client.
+@sharedRoute
+op getOperationStatus is ResourceOperations.GetResourceOperationStatus<User, never>;
+
+@pollingOperation(getOperationStatus)
+op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+def begin_create_or_replace(
+    self, name: str, resource: Union[User, JSON, IO[bytes]], **kwargs: Any
+) -> LROPoller[User]
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+public SyncPoller<PollOperationDetails, User> beginCreateOrReplace(String name, User resource);
+```
+
+</TabItem>
+</Tabs>
+
+## Resource delete
+
+Long-running operation to delete a resource.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@pollingOperation(getOperationStatus)
+op delete is ResourceOperations.LongRunningResourceDelete<User>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+def begin_delete(self, name: str, **kwargs: Any) -> LROPoller[None]
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+public SyncPoller<PollOperationDetails, Void> beginDelete(String name);
+```
+
+</TabItem>
+</Tabs>
+
+## Resource action
+
+Long-running operation to invoke an action on a resource.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```typespec
+@resource("users")
+@doc("Details about a user.")
+model User {
+  @key
+  @visibility("read")
+  @doc("The name of user.")
+  name: string;
+
+  @doc("The role of user")
+  role: string;
+}
+
+@doc("The parameters for exporting a user.")
+model UserExportParams {
+  @query
+  @doc("The format of the data.")
+  format: string;
+}
+
+@doc("The exported user data.")
+model ExportedUser {
+  @doc("The name of user.")
+  name: string;
+
+  @doc("The exported URI.")
+  resourceUri: string;
+}
+
+// Operation for polling the status of the LRO. SDK may exclude this operation from client.
+@sharedRoute
+op getExportOperationStatus is ResourceOperations.GetResourceOperationStatus<User, ExportedUser>;
+
+@pollingOperation(getExportOperationStatus)
+op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+def begin_export(self, name: str, *, format: str, **kwargs: Any) -> LROPoller[ExportedUser]
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="CSharp">
+
+```csharp
+
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="Typescript">
+
+```typescript
+
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+public SyncPoller<PollOperationDetails, ExportedUser> beginExport(String name, String format);
+```
+
+</TabItem>
+</Tabs>

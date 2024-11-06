@@ -12,6 +12,10 @@
     {
       "file": ["core/website/algolia.ts"],
       "_justification": "Files contains publicly disclosed application key."
+    },
+    {
+      "file": ["website/algolia.ts"],
+      "_justification": "Files contains publicly disclosed application key."
     }
   ]
 }

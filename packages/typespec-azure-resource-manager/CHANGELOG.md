@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.48.0
+
+### Bug Fixes
+
+- [#1759](https://github.com/Azure/typespec-azure/pull/1759) Fix the `ArmOperationStatus` model to match the Azure-AsyncOperation Resource format, where the `id` is of type `string` instead of `Core.uuid`.
+- [#1741](https://github.com/Azure/typespec-azure/pull/1741) Fix the `arm-resource-invalid-action-verb` rule. The rule should only allow `@post` and `@get` verbs, but it wasn't flagging other verbs.
+- [#1744](https://github.com/Azure/typespec-azure/pull/1744) Fix the `x-ms-identifier` rule. The `x-ms-identifier` supports indexing into inner properties, but the linter does not support that and reports a warning.
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+### Features
+
+- [#1670](https://github.com/Azure/typespec-azure/pull/1670) Add an envelope model for a standard availability zones API contract.
+- [#1674](https://github.com/Azure/typespec-azure/pull/1674) Remove restrictions requiring Foundation.Resource in ArmResourceListByParent. This will allow using the template for non-standard resources / collection actions that return a list.
+As part of the change, the response can now return any type. This will be specified in the response section using a new  `ResourceListCustomResult<type>` model.
+
+
 ## 0.47.1
 
 ### Bug Fixes
