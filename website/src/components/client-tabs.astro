@@ -1,0 +1,22 @@
+---
+import { TabItem, Tabs } from "@astrojs/starlight/components";
+import { processPanels } from "./process-client";
+const content = await Astro.slots.render("default");
+
+const result = processPanels(content);
+console.log("Results", result);
+---
+
+<Fragment set:html={result.typespec} />
+
+<Tabs syncKey="client-outputs">
+  {
+    result.outputs.map((value) => {
+      return (
+        <TabItem label={value.label} icon={value.icon as any}>
+          <Fragment set:html={value.html} />
+        </TabItem>
+      );
+    })
+  }
+</Tabs>

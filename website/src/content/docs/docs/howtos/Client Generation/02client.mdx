@@ -3,6 +3,7 @@ title: Client hierarchy
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
+import ClientTabs from "@components/client-tabs.astro";
 
 This page documents the default client hierarchy behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
 
@@ -18,8 +19,7 @@ Different language's code generator will have different way to organize clients 
 
 ### Single client
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @service({
@@ -35,10 +35,6 @@ op feed(): void;
 op pet(): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 from pet_store import PetStoreClient
 
@@ -46,9 +42,6 @@ client = PetStoreClient()
 client.feed()
 client.pet()
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 using PetStore;
@@ -58,9 +51,6 @@ client.Feed();
 client.Pet();
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 import { PetStoreClient } from "@azure/package-name";
 
@@ -69,22 +59,17 @@ client.feed();
 client.pet();
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
 client.feed();
 client.pet();
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Client with one-layer child operation groups
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @service({
@@ -106,10 +91,6 @@ namespace Cats {
 }
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 from pet_store import PetStoreClient
 
@@ -119,9 +100,6 @@ client.dogs.pet()
 client.cats.feed()
 client.cats.pet()
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 using PetStore;
@@ -133,9 +111,6 @@ client.GetCatsClient().Feed();
 client.GetCatsClient().Pet();
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 import { PetStoreClient } from "@azure/package-name";
 
@@ -145,9 +120,6 @@ client.dogs.pet();
 client.cats.feed();
 client.cats.pet();
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
@@ -161,13 +133,11 @@ catsClient.feed();
 catsClient.pet();
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Client with multi-layer child operation group
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @service({
@@ -204,10 +174,6 @@ interface Actions {
 }
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 from pet_store import PetStoreClient
 
@@ -220,9 +186,6 @@ client.pets.actions.pet()
 client.actions.open()
 client.actions.close()
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 using PetStore;
@@ -237,9 +200,6 @@ client.GetActionsClient().Open();
 client.GetActionsClient().Close();
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 import { PetStoreClient } from "@azure/package-name";
 
@@ -252,9 +212,6 @@ client.pets.actions.pet();
 client.actions.open();
 client.actions.close();
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
@@ -277,8 +234,7 @@ actionsClient.open();
 actionsClient.close();
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Customizations
 
@@ -291,8 +247,7 @@ For this section, we will assume that you have service called `PetStore` in the 
 
 This can be achieved with the augment operator and the emitter package
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 import "./main.tsp";
@@ -303,9 +258,6 @@ using Azure.ClientGenerator.Core;
 @@clientName(PetStore, "PetStoreGreatClient");
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 from pet_store import PetStoreGreatClient
 
@@ -314,19 +266,13 @@ client.feed()
 client.pet()
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
-```c#
+```csharp
 using PetStore;
 
 PetStoreGreatClient client = new PetStoreGreatClient();
 client.Feed();
 client.Pet();
 ```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
 
 ```typescript
 import { PetStoreGreatClient } from "@azure/package-name";
@@ -336,24 +282,19 @@ client.feed();
 client.pet();
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 PetStoreGreatClient client = new PetStoreGreatClientBuilder().buildClient();
 client.feed();
 client.pet();
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Splitting the operations into two clients
 
 Two clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`:
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 import "./main.tsp"
@@ -380,9 +321,6 @@ interface Client2 {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 from pet_store import FoodClient, PetActionClient
 
@@ -392,9 +330,6 @@ client2 = PetActionClient()
 client1.feed()
 client2.pet()
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 using PetStore;
@@ -406,9 +341,6 @@ petActionClient.Pet();
 foodClient.Feed();
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 import { FoodClient, PetActionClient } from "@azure/package-name";
 
@@ -418,9 +350,6 @@ client1.pet();
 client2.feed();
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
-
 ```java
 FoodClient foodClient = new FoodClientBuilder().buildClient();
 PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
@@ -429,15 +358,13 @@ foodClient.feed()
 petActionClient.pet()
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### One client and two operation groups
 
 Two clients that separate the operations can be declared using the `@client` decorator and the `@operationGroup` decorator from `typespec-client-generator-core`:
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 import "./main.tsp"
@@ -462,9 +389,6 @@ interface OpGrp2 {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 from pet_store import PetStoreClient
 
@@ -473,9 +397,6 @@ client = PetStoreClient()
 client.op_grp_1.feed()
 client.op_grp_2.pet()
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 using PetStore;
@@ -486,9 +407,6 @@ client.GetOpGrp1Client().Feed();
 client.GetOpGrp2Client().Pet();
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 import { PetStoreClient } from "@azure/package-name";
 
@@ -496,9 +414,6 @@ const client = new PetStoreClient();
 client.opGrp1.feed();
 client.opGrp2.pet();
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
@@ -510,15 +425,13 @@ OpGrp2Client opGrp2Client = builder.buildOpGrp2Client();
 opGrp2Client.pet();
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Splitting the operations in two clients and have clients in different namespace
 
 Two clients that separates the operations can be declared using the `client` decorator of `typespec-client-generator-core`:
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 import "./main.tsp"
@@ -545,9 +458,6 @@ interface Client2 {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 from pet_store import FoodClient
 from pet_store.sub_namespace import PetActionClient
@@ -558,9 +468,6 @@ client2 = PetActionClient()
 client1.feed()
 client2.pet()
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 using PetStore;
@@ -573,15 +480,9 @@ petActionClient.Pet();
 foodClient.Feed();
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 NOT_SUPPORTED;
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 import com.petstorenamespace.FoodClient;
@@ -596,5 +497,4 @@ foodClient.feed();
 petActionClient.pet();
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>

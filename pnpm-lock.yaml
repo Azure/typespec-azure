@@ -2754,6 +2754,9 @@ importers:
       '@azure-tools/typespec-client-generator-core':
         specifier: workspace:~
         version: link:../packages/typespec-client-generator-core
+      '@types/hast':
+        specifier: ^3.0.4
+        version: 3.0.4
       '@types/react':
         specifier: ~18.3.11
         version: 18.3.11
@@ -2775,9 +2778,18 @@ importers:
       astro-rehype-relative-markdown-links:
         specifier: ^0.15.0
         version: 0.15.0(astro@4.16.8(@types/node@22.7.5)(rollup@4.24.0)(terser@5.34.1)(typescript@5.6.3))
+      hast-util-to-html:
+        specifier: ^9.0.3
+        version: 9.0.3
+      rehype:
+        specifier: ^13.0.2
+        version: 13.0.2
       remark-heading-id:
         specifier: ^1.0.1
         version: 1.0.1
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
 
 packages:
 
