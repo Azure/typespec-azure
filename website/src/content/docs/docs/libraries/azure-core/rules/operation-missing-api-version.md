@@ -8,7 +8,7 @@ title: "operation-missing-api-version"
 
 Ensure all operations have an `apiVersion` parameter.
 
-:::warning
+:::caution
 Seeing this error is also a sign that you are not using the Azure Standard templates. First double check why you cannot use them.
 :::
 
