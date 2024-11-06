@@ -139,7 +139,7 @@ catsClient.pet();
 
 <ClientTabs>
 
-```typespec
+```typespec title="main.tsp"
 @service({
   title: "Pet Store",
   version: "v1",
@@ -249,7 +249,7 @@ This can be achieved with the augment operator and the emitter package
 
 <ClientTabs>
 
-```typespec
+```typespec title="client.tsp"
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
@@ -296,7 +296,7 @@ Two clients that separate the operations can be declared using the `@client` dec
 
 <ClientTabs>
 
-```typespec
+```typespec title="client.tsp"
 import "./main.tsp"
 import "@azure-tools/typespec-client-generator-core"
 
@@ -366,7 +366,7 @@ Two clients that separate the operations can be declared using the `@client` dec
 
 <ClientTabs>
 
-```typespec
+```typespec title="client.tsp"
 import "./main.tsp"
 import "@azure-tools/typespec-client-generator-core"
 
@@ -433,7 +433,7 @@ Two clients that separates the operations can be declared using the `client` dec
 
 <ClientTabs>
 
-```typespec
+```typespec title="client.tsp"
 import "./main.tsp"
 import "@azure-tools/typespec-client-generator-core"
 
