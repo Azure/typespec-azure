@@ -1,4 +1,10 @@
-import { json, MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import {
+  json,
+  MockRequest,
+  passOnSuccess,
+  ScenarioMockApi,
+  ValidationError,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -26,8 +32,9 @@ let createOrReplacePollCount = 0;
 let deletePollCount = 0;
 
 // lro resource
-Scenarios.Azure_ResourceManager_Resources_Lro_createOrReplace = passOnSuccess([
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnSuccess([
   {
+    // LRO PUT initial request
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName",
     method: "put",
     request: {
@@ -47,42 +54,62 @@ Scenarios.Azure_ResourceManager_Resources_Lro_createOrReplace = passOnSuccess([
     response: {
       status: 201,
       headers: {
-        Location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/operations/create_or_replace`,
+        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
       },
-      body: json(validLroResource),
+      body: json({
+        ...validLroResource,
+        properties: {
+          description: "valid",
+          provisioningState: "InProgress",
+        },
+      }),
     },
     handler: (req: MockRequest) => {
       createOrReplacePollCount = 0;
       return {
         status: 201,
         headers: {
-          Location: `${req.baseUrl}/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/operations/create_or_replace`,
+          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
         },
-        body: json(validLroResource),
+        body: json({
+          ...validLroResource,
+          properties: {
+            description: "valid",
+            provisioningState: "InProgress",
+          },
+        }),
       };
     },
     kind: "MockApiDefinition",
   },
   {
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/operations/create_or_replace",
+    // LRO PUT poll intermediate/get final result
+    uri: "/subscriptions/:subscriptionId/locations/eastus/lro_create/aao",
     method: "get",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        resourceGroup: RESOURCE_GROUP_EXPECTED,
         "api-version": "2023-12-01-preview",
       },
     },
     response: {
-      status: 200,
-      body: json({ id: "create_or_replace", status: "InProgress" }),
+      status: 202,
+      body: json({
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
+        name: "aao",
+        status: "InProgress",
+      }),
     },
     handler: (req: MockRequest) => {
+      const aaoResponse = {
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
+        name: "aao",
+      };
       const response =
         createOrReplacePollCount > 0
-          ? { id: "create_or_replace", status: "Succeeded" }
-          : { id: "create_or_replace", status: "InProgress" };
-      const statusCode = createOrReplacePollCount > 0 ? 202 : 200;
+          ? { ...aaoResponse, status: "Succeeded" }
+          : { ...aaoResponse, status: "InProgress" };
+      const statusCode = createOrReplacePollCount > 0 ? 200 : 202;
       createOrReplacePollCount += 1;
       return {
         status: statusCode,
@@ -92,13 +119,14 @@ Scenarios.Azure_ResourceManager_Resources_Lro_createOrReplace = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
+    // (Optional) LRO PUT get final result through initial request uri
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName",
     method: "get",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
-        topLevelResourceName: "lro",
+        lroResourceName: "lro",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -110,10 +138,11 @@ Scenarios.Azure_ResourceManager_Resources_Lro_createOrReplace = passOnSuccess([
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_Lro_delete = passOnSuccess([
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
   {
+    // LRO DELETE initial request
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName",
-    method: "put",
+    method: "delete",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
@@ -131,7 +160,8 @@ Scenarios.Azure_ResourceManager_Resources_Lro_delete = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        Location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/operations/delete`,
+        location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_delete/location`,
+        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_delete/aao`,
       },
     },
     handler: (req: MockRequest) => {
@@ -139,7 +169,8 @@ Scenarios.Azure_ResourceManager_Resources_Lro_delete = passOnSuccess([
       return {
         status: 202,
         headers: {
-          Location: `${req.baseUrl}/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/operations/delete`,
+          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_delete/location`,
+          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_delete/aao`,
         },
         body: json({ id: "delete", status: "InProgress" }),
       };
@@ -147,28 +178,47 @@ Scenarios.Azure_ResourceManager_Resources_Lro_delete = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/operations/delete",
+    // LRO DELETE poll intermediate/get final result
+    uri: "/subscriptions/:subscriptionId/locations/eastus/lro_delete/:lro_header",
     method: "get",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        resourceGroup: RESOURCE_GROUP_EXPECTED,
         "api-version": "2023-12-01-preview",
+        lro_header: "aao", // lro_header can be "location" or "aao", depending on the header you choose to poll. "aao" here is just for passing e2e test
       },
     },
     response: {
-      status: 202,
+      status: 200, // This is for passing e2e test. For actual status code, see "handler" definition below
     },
     handler: (req: MockRequest) => {
-      const response =
-        deletePollCount > 0
-          ? {
-              status: 202,
-              body: json({ id: "delete", status: "InProgress" }),
-            }
-          : {
-              status: 204,
-            };
+      let response;
+      const lro_header = req.params["lro_header"];
+      if (lro_header === "location") {
+        response =
+          // first status will be 202, second and forward be 204
+          deletePollCount > 0
+            ? { status: 204 }
+            : { status: 202, body: json({ id: "delete", status: "InProgress" }) };
+      } else if (lro_header === "aao") {
+        const aaoResponse = {
+          id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_delete/aao`,
+          name: "aao",
+        };
+        // first provisioningState will be "InProgress", second and forward be "Succeeded"
+        const responseBody =
+          deletePollCount > 0
+            ? { ...aaoResponse, status: "Succeeded" }
+            : { ...aaoResponse, status: "InProgress" };
+
+        response = {
+          status: 200, // aao always returns 200 with response body
+          body: json(responseBody),
+        };
+      } else {
+        throw new ValidationError(`Unexpected lro header: ${lro_header}`, undefined, undefined);
+      }
+
       deletePollCount += 1;
 
       return response;
