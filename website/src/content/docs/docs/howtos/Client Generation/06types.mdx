@@ -2379,3 +2379,59 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 
 </TabItem>
 </Tabs>
+
+## Namespace
+
+The namespace for models, enums, and unions will follow the namespace they belong to. You can use `@clientNamespace` to override it if needed.
+
+<Tabs>
+<TabItem value="typespec" label="TypeSpec" default>
+
+```tsp
+namespace My.Service;
+
+model Foo {
+  prop: string;
+}
+
+@clientNamespace("My.Service.Temp")
+model Bar {
+  prop: string;
+}
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+from my.service import Foo
+from my.service.temp import Bar
+
+foo = Foo(prop="hello")
+bar = Bar(prop="world")
+```
+
+</TabItem>
+<TabItem value="csharp" label="CSharp" >
+
+```csharp
+TODO
+```
+
+</TabItem>
+<TabItem value="typescript" label="Typescript" >
+
+```typescript
+TODO;
+```
+
+</TabItem>
+<TabItem value="java" label="Java" >
+
+```java
+TODO
+```
+
+</TabItem>
+</Tabs>

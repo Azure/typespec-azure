@@ -4,6 +4,7 @@ import {
   $client,
   $clientInitialization,
   $clientName,
+  $clientNamespace,
   $convenientAPI,
   $flattenProperty,
   $operationGroup,
@@ -32,5 +33,6 @@ export const $decorators = {
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
     paramAlias: paramAliasDecorator,
+    clientNamespace: $clientNamespace,
   } as AzureClientGeneratorCoreDecorators,
 };
