@@ -14,6 +14,8 @@ By default, each namespace with `@service` decorator will be generated as a root
 
 Other nested namespacess and interfaces of each root client will be generated as operation groups with hierarchy.
 
+The root client's namespace will follow the namespace decorated with `@service`. If an operation group comes from a nested namespace, it will follow that namespace. If it comes from a nested interface, it will follow the namespace to which the interface belongs.
+
 Different language's code generator will have different way to organize clients and operation groups. Please refer the following examples.
 
 ### Single client
@@ -23,7 +25,6 @@ Different language's code generator will have different way to organize clients 
 ```typespec title="main.tsp"
 @service({
   title: "Pet Store",
-  version: "v1",
 })
 namespace PetStore;
 
@@ -238,13 +239,16 @@ actionsClient.close();
 ## Customizations
 
 Customization SHOULD always be done in a file called `client.tsp` along with the `main.tsp`.
-If there is any customizations including `@client` and `@operationGroup`, client hierarchy will only be inferred from them. The logic defined in the default behaviors will not take affect anymore.
+
+You can use `@client` and `@operationGroup` to reconstruct the client hierarchy. However, if any customizations are made, the client hierarchy will only be inferred from those customizations. The logic defined in the default behaviors will no longer take effect.
+
+If any customizations are made, the client's namespace will follow the namespace decorated with `@client` or the namespace to which the interface decorated with `@client` belongs. The operation group's namespace follows the same logic for `@operationGroup`. You can use `@clientNamespace` to override it if needed.
 
 For this section, we will assume that you have service called `PetStore` in the namespace `PetStore`, defining the two operations `feed` and `pet`.
 
-### Renaming the single client
+### Renaming the client name
 
-This can be achieved with the augment operator and the emitter package
+This can be achieved with the augment decorator: `@clientName` from `typespec-client-generator-core`.
 
 <ClientTabs>
 
@@ -289,39 +293,88 @@ client.pet();
 
 </ClientTabs>
 
-### Splitting the operations into two clients
+### Renaming the client namespace
 
-Two clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`:
+This can be achieved with the augment decorator: `@clientNamespace` from `typespec-client-generator-core`.
 
 <ClientTabs>
 
 ```typespec title="client.tsp"
-import "./main.tsp"
-import "@azure-tools/typespec-client-generator-core"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-namespace Customizations;   # The actual name here doesn't matter and is here for organization purposes only
+@@clientNamespace(PetStore, "PetStoreRenamed");
+```
+
+```python
+from pet_store_renamed import PetStoreClient
+
+client = PetStoreClient()
+client.feed()
+client.pet()
+```
+
+```csharp
+using PetStoreRenamed;
+
+PetStoreClient client = new PetStoreClient();
+client.Feed();
+client.Pet();
+```
+
+```typescript
+import { PetStoreClient } from "@azure/package-name";
+
+const client = new PetStoreClient();
+client.feed();
+client.pet();
+```
+
+```java
+package com.petstorerenamed;
+
+PetStoreClient client = new PetStoreClientBuilder().buildClient();
+client.feed();
+client.pet();
+```
+
+</ClientTabs>
+
+### Splitting the operations into two clients
+
+Two clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`.
+
+<ClientTabs>
+
+```typespec
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
 
 @client({
   name: "FoodClient",
-  service: PetStoreNamespace
+  service: PetStore,
 })
 interface Client1 {
-  feed is PetStoreNamespace.feed;
+  feed is PetStore.feed;
 }
 
 @client({
   name: "PetActionClient",
-  service: PetStoreNamespace
+  service: PetStore,
 })
 interface Client2 {
-  pet is PetStoreNamespace.pet;
+  pet is PetStore.pet;
 }
 ```
 
 ```python
-from pet_store import FoodClient, PetActionClient
+from pet_store_renamed import FoodClient, PetActionClient
 
 client1 = FoodClient()
 client2 = PetActionClient()
@@ -331,7 +384,7 @@ client2.pet()
 ```
 
 ```csharp
-using PetStore;
+using PetStoreRenamed;
 
 PetActionClient petActionClient = new PetActionClient();
 FoodClient foodClient = new FoodClient();
@@ -350,6 +403,8 @@ client2.feed();
 ```
 
 ```java
+package com.petstorerenamed;
+
 FoodClient foodClient = new FoodClientBuilder().buildClient();
 PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
 
@@ -366,30 +421,30 @@ Two clients that separate the operations can be declared using the `@client` dec
 <ClientTabs>
 
 ```typespec title="client.tsp"
-import "./main.tsp"
-import "@azure-tools/typespec-client-generator-core"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
 @client({
   name: "PetStoreClient",
-  service: PetStoreNamespace
+  service: PetStore,
 })
-namespace Customizations;   # The actual name here doesn't matter and is here for organization purposes only
+namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
 
 @operationGroup
-interface OpGrp1{
-  feed is PetStoreNamespace.feed
+interface OpGrp1 {
+  feed is PetStore.feed;
 }
 
 @operationGroup
 interface OpGrp2 {
-  pet is PetStoreNamespace.pet
+  pet is PetStore.pet;
 }
 ```
 
 ```python
-from pet_store import PetStoreClient
+from pet_store_renamed import PetStoreClient
 
 client = PetStoreClient()
 
@@ -398,7 +453,7 @@ client.op_grp_2.pet()
 ```
 
 ```csharp
-using PetStore;
+using PetStoreRenamed;
 
 PetStoreClient client = new PetStoreClient();
 
@@ -415,6 +470,8 @@ client.opGrp2.pet();
 ```
 
 ```java
+package com.petstorerenamed;
+
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
 
 OpGrp1Client opGrp1Client = builder.buildOpGrp1Client();
@@ -433,33 +490,34 @@ Two clients that separates the operations can be declared using the `client` dec
 <ClientTabs>
 
 ```typespec title="client.tsp"
-import "./main.tsp"
-import "@azure-tools/typespec-client-generator-core"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-namespace Customizations;   # The actual name here doesn't matter and is here for organization purposes only
+namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
 
 @client({
   name: "FoodClient",
-  service: PetStoreNamespace
+  service: PetStore,
 })
 interface Client1 {
-  feed is PetStoreNamespace.feed
+  feed is PetStore.feed;
 }
 
 @client({
-  name: "SubNamespace.PetActionClient",
-  service: PetStoreNamespace
+  name: "PetActionClient",
+  service: PetStore,
 })
+@clientNamespace("PetStoreRenamed.SubNamespace") // use @clientNamespace to specify the namespace of the client
 interface Client2 {
-  pet is PetStoreNamespace.pet
+  pet is PetStore.pet;
 }
 ```
 
 ```python
-from pet_store import FoodClient
-from pet_store.sub_namespace import PetActionClient
+from pet_store_renamed import FoodClient
+from pet_store_renamed.sub_namespace import PetActionClient
 
 client1 = FoodClient()
 client2 = PetActionClient()
@@ -469,8 +527,8 @@ client2.pet()
 ```
 
 ```csharp
-using PetStore;
-using PetStore.SubNamespace;
+using PetStoreRenamed;
+using PetStoreRenamed.SubNamespace;
 
 SubNamespacePetActionClient petActionClient = new SubNamespacePetActionClient();
 FoodClient foodClient = new FoodClient();
@@ -484,10 +542,10 @@ NOT_SUPPORTED;
 ```
 
 ```java
-import com.petstorenamespace.FoodClient;
-import com.petstorenamespace.FoodClientBuilder;
-import com.petstorenamespace.subnamespace.PetActionClient;
-import com.petstorenamespace.subnamespace.PetActionClientBuilder;
+import com.petstorerenamed.FoodClient;
+import com.petstorerenamed.FoodClientBuilder;
+import com.petstorerenamed.subnamespace.PetActionClient;
+import com.petstorerenamed.subnamespace.PetActionClientBuilder;
 
 FoodClient foodClient = new FoodClientBuilder().buildClient();
 PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
