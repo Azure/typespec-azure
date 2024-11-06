@@ -3,6 +3,10 @@ import { toHtml } from "hast-util-to-html";
 import { rehype } from "rehype";
 import { CONTINUE, EXIT, visit } from "unist-util-visit";
 
+/**
+ * Update this list to register a new language
+ * For icons see https://starlight.astro.build/reference/icons/#all-icons
+ */
 const KnownLanguages = {
   python: {
     label: "Python",
@@ -21,6 +25,7 @@ const KnownLanguages = {
     icon: "seti:java",
   },
 } as const;
+
 type Language = keyof typeof KnownLanguages;
 
 function getLanguage(el: ElementContent): Language | "typespec" {
