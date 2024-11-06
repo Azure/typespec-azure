@@ -960,7 +960,51 @@ public partial class Ragdoll : Cat
 </TabItem>
 <TabItem value="typescript" label="Typescript" >
 
-TODO
+```ts
+// RLC input models
+export interface Siamese extends CatParent {
+    "kind": "siamese";
+}
+
+export interface Ragdoll extends CatParent {
+    "kind": "ragdoll";
+}
+
+export type Cat = CatParent | Siamese | Ragdoll;
+
+// RLC output models
+export interface CatOutputParent {
+    "kind": string;
+}
+
+export interface SiameseOutput extends CatOutputParent {
+    "kind": "siamese";
+}
+
+export interface RagdollOutput extends CatOutputParent {
+    "kind": "ragdoll";
+}
+
+export type CatOutput = CatOutputParent | SiameseOutput | RagdollOutput;
+
+// Modular models
+/** model interface Cat */
+export interface Cat {
+  kind: string;
+}
+
+/** Alias for CatUnion */
+export type CatUnion = Siamese | Ragdoll | Cat;
+
+/** model interface Siamese */
+export interface Siamese extends Cat {
+  kind: "siamese";
+}
+/** model interface Ragdoll */
+export interface Ragdoll extends Cat {
+  kind: "ragdoll";
+}
+```
 
 </TabItem>
 <TabItem value="java" label="Java" >
