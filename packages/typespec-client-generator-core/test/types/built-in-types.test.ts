@@ -267,7 +267,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
-      "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
     await runner.compileWithBuiltInAzureCoreService(`
