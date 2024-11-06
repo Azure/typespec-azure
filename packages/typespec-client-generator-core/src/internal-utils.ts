@@ -50,6 +50,7 @@ import { getClientTypeWithDiagnostics } from "./types.js";
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 export const clientNameKey = createStateSymbol("clientName");
+export const clientNamespaceKey = createStateSymbol("clientNamespace");
 
 /**
  *
