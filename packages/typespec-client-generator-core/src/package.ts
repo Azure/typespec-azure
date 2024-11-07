@@ -18,6 +18,7 @@ import {
   getAccess,
   getClientInitialization,
   getClientNameOverride,
+  getClientNamespace,
   getOverriddenClientMethod,
   listClients,
   listOperationGroups,
@@ -42,6 +43,7 @@ import {
   SdkMethodResponse,
   SdkModelPropertyType,
   SdkModelType,
+  SdkNamespace,
   SdkNullableType,
   SdkOperationGroup,
   SdkPackage,
@@ -114,11 +116,12 @@ function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
 function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): [SdkLroPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkLroServiceMethod<TServiceOperation>(context, operation)),
-    ...diagnostics.pipe(getSdkPagingServiceMethod<TServiceOperation>(context, operation)),
+    ...diagnostics.pipe(getSdkLroServiceMethod<TServiceOperation>(context, operation, client)),
+    ...diagnostics.pipe(getSdkPagingServiceMethod<TServiceOperation>(context, operation, client)),
     kind: "lropaging",
   });
 }
@@ -126,10 +129,13 @@ function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperat
 function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const pagedMetadata = getPagedResult(context.program, operation)!;
-  const basic = diagnostics.pipe(getSdkBasicServiceMethod<TServiceOperation>(context, operation));
+  const basic = diagnostics.pipe(
+    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
+  );
   if (pagedMetadata.itemsProperty) {
     basic.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
@@ -181,11 +187,12 @@ function getPathFromSegment(context: TCGCContext, type: Model, segments?: string
 function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const metadata = getServiceMethodLroMetadata(context, operation)!;
   const basicServiceMethod = diagnostics.pipe(
-    getSdkBasicServiceMethod<TServiceOperation>(context, operation),
+    getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
   basicServiceMethod.response.type = metadata.finalResponse?.result;
@@ -247,6 +254,7 @@ function getSdkMethodResponse(
   context: TCGCContext,
   operation: Operation,
   sdkOperation: SdkServiceOperation,
+  client: SdkClientType<SdkServiceOperation>,
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
   // TODO: put head as bool here
@@ -263,6 +271,7 @@ function getSdkMethodResponse(
       variantTypes: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
+      clientNamespace: client.clientNamespace,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
       decorators: [],
     };
@@ -276,6 +285,7 @@ function getSdkMethodResponse(
       decorators: [],
       access: "public",
       usage: UsageFlags.Output,
+      clientNamespace: client.clientNamespace,
     };
   }
   return {
@@ -287,6 +297,7 @@ function getSdkMethodResponse(
 function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const methodParameters: SdkMethodParameter[] = [];
@@ -345,7 +356,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
       addEncodeInfo(context, methodBodyParam.__raw!, methodBodyParam.type, defaultContentType),
     );
   }
-  const response = getSdkMethodResponse(context, operation, serviceOperation);
+  const response = getSdkMethodResponse(context, operation, serviceOperation, client);
   const name = getLibraryName(context, operation);
   return diagnostics.wrap({
     __raw: operation,
@@ -378,17 +389,18 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
 function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getLroMetadata(context.program, operation);
   const paging = getPagedResult(context.program, operation);
   if (lro && paging) {
-    return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation);
+    return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
-    return getSdkPagingServiceMethod<TServiceOperation>(context, operation);
+    return getSdkPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (lro) {
-    return getSdkLroServiceMethod<TServiceOperation>(context, operation);
+    return getSdkLroServiceMethod<TServiceOperation>(context, operation, client);
   }
-  return getSdkBasicServiceMethod<TServiceOperation>(context, operation);
+  return getSdkBasicServiceMethod<TServiceOperation>(context, operation, client);
 }
 
 function getClientDefaultApiVersion(
@@ -436,6 +448,7 @@ function getSdkInitializationType(
       access,
       usage: UsageFlags.Input,
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
+      clientNamespace: getClientNamespace(context, client.type),
       apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
       decorators: [],
     };
@@ -487,7 +500,9 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
   for (const operation of listOperationsInOperationGroup(context, client)) {
-    retval.push(diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation)));
+    retval.push(
+      diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
+    );
   }
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
@@ -632,6 +647,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, rawClient.service),
+      clientNamespace: getClientNamespace(context, rawClient.service),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -675,6 +691,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
+    clientNamespace: getClientNamespace(context, client.type),
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
@@ -771,7 +788,7 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
-  return diagnostics.wrap({
+  const sdkPackage: SdkPackage<TServiceOperation> = {
     name: getClientNamespaceString(context)!,
     rootNamespace: getClientNamespaceString(context)!,
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
@@ -781,5 +798,62 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
       (x): x is SdkUnionType | SdkNullableType => x.kind === "union" || x.kind === "nullable",
     ),
     crossLanguagePackageId,
-  });
+    namespaces: [],
+  };
+  organizeNamespaces(sdkPackage);
+  return diagnostics.wrap(sdkPackage);
+}
+
+function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
+  sdkPackage: SdkPackage<TServiceOperation>,
+) {
+  const clients = [...sdkPackage.clients];
+  while (clients.length > 0) {
+    const client = clients.shift()!;
+    getSdkNamespace(sdkPackage, client.clientNamespace).clients.push(client);
+    client.methods
+      .filter((m) => m.kind === "clientaccessor")
+      .map((m) => m.response)
+      .map((c) => clients.push(c));
+  }
+  for (const model of sdkPackage.models) {
+    getSdkNamespace(sdkPackage, model.clientNamespace).models.push(model);
+  }
+  for (const enumType of sdkPackage.enums) {
+    getSdkNamespace(sdkPackage, enumType.clientNamespace).enums.push(enumType);
+  }
+  for (const unionType of sdkPackage.unions) {
+    getSdkNamespace(sdkPackage, unionType.clientNamespace).unions.push(unionType);
+  }
+}
+
+function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
+  sdkPackage: SdkPackage<TServiceOperation>,
+  namespace: string,
+) {
+  const segments = namespace.split(".");
+  let current: SdkPackage<TServiceOperation> | SdkNamespace<TServiceOperation> = sdkPackage;
+  let fullName = "";
+  for (const segment of segments) {
+    fullName = fullName === "" ? segment : `${fullName}.${segment}`;
+    const ns: SdkNamespace<TServiceOperation> | undefined = current.namespaces.find(
+      (ns) => ns.name === segment,
+    );
+    if (ns === undefined) {
+      const newNs = {
+        name: segment,
+        fullName,
+        clients: [],
+        models: [],
+        enums: [],
+        unions: [],
+        namespaces: [],
+      };
+      current.namespaces.push(newNs);
+      current = newNs;
+    } else {
+      current = ns;
+    }
+  }
+  return current;
 }

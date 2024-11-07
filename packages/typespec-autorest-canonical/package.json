@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest-canonical",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting canonical swagger",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -44,7 +44,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
-    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-autorest-canonical/reference"
+    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/emitters/typespec-autorest-canonical/reference"
   },
   "files": [
     "lib/*.tsp",
