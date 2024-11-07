@@ -1,5 +1,5 @@
 ---
-title: `tsp-client`
+title: `tsp-client usage`
 ---
 
 :::info
