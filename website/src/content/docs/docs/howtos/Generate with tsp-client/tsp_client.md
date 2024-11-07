@@ -33,7 +33,7 @@ Initialize the client library directory using a tspconfig.yaml. When running thi
 
 The `init` command generates a directory structure following the standard pattern used across Azure SDK language repositories, creates a [tsp-location.yaml](#tsp-locationyaml) file to control generation, and performs an initial generation of the client library. If you want to skip client library generation, then pass the `--skip-sync-and-generate` flag.
 
-:::warning
+:::caution
 This command should be run from the root of the repository. Example repository root: `azure-sdk-for-python/`
 :::
 
@@ -195,6 +195,6 @@ This file replaces the package.json checked into the `azure-rest-api-spec` repos
 `emitter-package-lock.json` will be used the same as a `package-lock.json`. The tool will run a clean npm installation before generating client libraries. This file allows consistent dependency trees and allows each repository to control their dependency installation.
 The file should be checked into this location: `<root of repo>/eng/emitter-package-lock.json`
 
-:::warning
+:::caution
 The tool will run `npm ci` to install dependencies, so ensure that the `emitter-package-lock.json` and `emitter-package.json` files both exist and are in sync with each other.
 :::

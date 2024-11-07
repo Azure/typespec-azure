@@ -474,3 +474,30 @@ extern dec clientInitialization(
  * ```
  */
 extern dec paramAlias(original: ModelProperty, paramAlias: valueof string, scope?: valueof string);
+
+/**
+ * Changes the namespace of a client, model, enum or union generated in the client SDK.
+ * By default, the client namespace for them will follow the TypeSpec namespace.
+ * @param rename The rename you want applied to the object
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ *
+ * @example
+ * ```typespec
+ * @clientNamespace("ContosoClient")
+ * namespace Contoso;
+ * ```
+ *
+ * @example
+ * ```typespec
+ * @clientName("ContosoJava", "java")
+ * @clientName("ContosoPython", "python")
+ * @clientName("ContosoCSharp", "csharp")
+ * @clientName("ContosoJavascript", "javascript")
+ * namespace Contoso;
+ * ```
+ */
+extern dec clientNamespace(
+  target: Namespace | Interface | Model | Enum | Union,
+  rename: valueof string,
+  scope?: valueof string
+);

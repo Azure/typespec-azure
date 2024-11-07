@@ -1,5 +1,16 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.48.0
+
+### Bug Fixes
+
+- [#1545](https://github.com/Azure/typespec-azure/pull/1545) Disable `@azure-tools/typespec-azure-core/standard-names` for `resource-manager` ruleset. Rule was already excluding ARM operations automatically this just configure the ruleset correctly
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
 ## 0.47.0
 
 ### Bump dependencies
