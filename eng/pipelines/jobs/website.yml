@@ -1,4 +1,7 @@
 steps:
+  - checkout: self
+    submodules: true
+
   - template: /eng/pipelines/templates/install.yml
 
   - script: pnpm exec playwright install
