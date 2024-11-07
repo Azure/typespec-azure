@@ -494,6 +494,33 @@ export type ParamAliasDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Changes the namespace of a client, model, enum or union generated in the client SDK.
+ * By default, the client namespace for them will follow the TypeSpec namespace.
+ *
+ * @param rename The rename you want applied to the object
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @example
+ * ```typespec
+ * @clientNamespace("ContosoClient")
+ * namespace Contoso;
+ * ```
+ * @example
+ * ```typespec
+ * @clientName("ContosoJava", "java")
+ * @clientName("ContosoPython", "python")
+ * @clientName("ContosoCSharp", "csharp")
+ * @clientName("ContosoJavascript", "javascript")
+ * namespace Contoso;
+ * ```
+ */
+export type ClientNamespaceDecorator = (
+  context: DecoratorContext,
+  target: Namespace | Interface | Model | Enum | Union,
+  rename: string,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -507,4 +534,5 @@ export type AzureClientGeneratorCoreDecorators = {
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
   clientInitialization: ClientInitializationDecorator;
   paramAlias: ParamAliasDecorator;
+  clientNamespace: ClientNamespaceDecorator;
 };

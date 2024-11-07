@@ -216,12 +216,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
       },
     },
+    "empty-client-namespace": {
+      severity: "warning",
+      messages: {
+        default: `Cannot pass an empty value to the @clientNamespace decorator`,
+      },
+    },
     "invalid-negation-scope": {
       severity: "error",
       messages: {
         default: paramMessage`Negation scopes ${"scopes"} should not be combined with normal scope.`,
-      },
-    },
+      }
+    }
   },
 });
 

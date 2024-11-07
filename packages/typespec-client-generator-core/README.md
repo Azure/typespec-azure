@@ -16,6 +16,7 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@client`](#@client)
 - [`@clientInitialization`](#@clientinitialization)
 - [`@clientName`](#@clientname)
+- [`@clientNamespace`](#@clientnamespace)
 - [`@convenientAPI`](#@convenientapi)
 - [`@flattenProperty`](#@flattenproperty)
 - [`@operationGroup`](#@operationgroup)
@@ -289,6 +290,41 @@ op nameInService: void;
 @clientName("nameForCsharp", "csharp")
 @clientName("nameForJavascript", "javascript")
 op nameInService: void;
+```
+
+#### `@clientNamespace`
+
+Changes the namespace of a client, model, enum or union generated in the client SDK.
+By default, the client namespace for them will follow the TypeSpec namespace.
+
+```typespec
+@Azure.ClientGenerator.Core.clientNamespace(rename: valueof string, scope?: valueof string)
+```
+
+##### Target
+
+`Namespace | Interface | Model | Enum | Union`
+
+##### Parameters
+
+| Name   | Type             | Description                                                                                                   |
+| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object                                                                     |
+| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+##### Examples
+
+```typespec
+@clientNamespace("ContosoClient")
+namespace Contoso;
+```
+
+```typespec
+@clientName("ContosoJava", "java")
+@clientName("ContosoPython", "python")
+@clientName("ContosoCSharp", "csharp")
+@clientName("ContosoJavascript", "javascript")
+namespace Contoso;
 ```
 
 #### `@convenientAPI`

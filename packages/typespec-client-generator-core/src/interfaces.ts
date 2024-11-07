@@ -89,11 +89,15 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
+  clientNamespace: string; // fully qualified namespace
   doc?: string;
   summary?: string;
   initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
+  /**
+   * @deprecated Use `clientNamespace` instead.
+   */
   nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
   parent?: SdkClientType<TServiceOperation>;
@@ -306,12 +310,14 @@ export interface SdkNullableType extends SdkTypeBase {
   type: SdkType;
   usage: UsageFlags;
   access: AccessFlags;
+  clientNamespace: string; // fully qualified namespace
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -342,6 +348,7 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
@@ -356,6 +363,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
@@ -690,6 +698,17 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   enums: SdkEnumType[];
   unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
+  namespaces: SdkNamespace<TServiceOperation>[];
+}
+
+export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  fullName: string;
+  clients: SdkClientType<TServiceOperation>[];
+  models: SdkModelType[];
+  enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
+  namespaces: SdkNamespace<TServiceOperation>[];
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
