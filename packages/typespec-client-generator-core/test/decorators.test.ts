@@ -3258,16 +3258,16 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(testModel);
     });
 
-    it("throw on normal scope incrementally add with same scope", async () => {
+    it("negation scope override negation scope", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const diagnostics = await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.diagnose(`
         @service
         @test namespace MyService {
           @test
-          @clientName("TestRenamedAgain", "csharp")
-          @clientName("TestRenamed", "!csharp, !java")
+          @clientName("TestRenamedAgain", "!python, !java")
+          @clientName("TestRenamed", "!go")
           model Test {
             prop: string;
           }
@@ -3279,13 +3279,12 @@ describe("typespec-client-generator-core: decorators", () => {
         }
       `);
 
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/invalid-negation-scope",
-        message: "Negation scopes 'csharp' should not be combined with normal scope.",
-      });
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
     });
 
-    it("negation scope override negation scope", async () => {
+    it("negation scope override normal scope with the same scope", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
@@ -3293,8 +3292,34 @@ describe("typespec-client-generator-core: decorators", () => {
         @service
         @test namespace MyService {
           @test
-          @clientName("TestRenamedAgain", "!python, !java")
-          @clientName("TestRenamed", "!go")
+          @clientName("TestRenamedAgain", "!csharp")
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("normal scope override negation scope with the same scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.diagnose(`
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamedAgain", "csharp")
+          @clientName("TestRenamed", "!csharp")
           model Test {
             prop: string;
           }
