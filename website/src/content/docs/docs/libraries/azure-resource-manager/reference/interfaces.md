@@ -243,7 +243,7 @@ op Azure.ResourceManager.ResourceCreateSync.createOrUpdate(provider: "Microsoft.
 
 ### `ResourceDeleteAsync` {#Azure.ResourceManager.ResourceDeleteAsync}
 
-:::warning
+:::caution
 **Deprecated**: This should be deprecated in a future release
 :::
 
@@ -390,7 +390,7 @@ op Azure.ResourceManager.ResourceListBySubscription.listBySubscription(apiVersio
 
 ### `ResourceOperations` {#Azure.ResourceManager.ResourceOperations}
 
-:::warning
+:::caution
 **Deprecated**: Use Azure.ResourceManager.TrackedResourceOperations instead
 :::
 
@@ -882,7 +882,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateAsync(provider: "Microsoft.Thi
 
 ### `ArmResourceCreateOrUpdateSync` {#Azure.ResourceManager.ArmResourceCreateOrUpdateSync}
 
-:::warning
+:::caution
 **Deprecated**: Please use ArmResourceCreateOrReplaceSync instead
 :::
 
@@ -904,7 +904,7 @@ op Azure.ResourceManager.ArmResourceCreateOrUpdateSync(provider: "Microsoft.This
 
 ### `ArmResourceDeleteAsync` {#Azure.ResourceManager.ArmResourceDeleteAsync}
 
-:::warning
+:::caution
 **Deprecated**: Use 'ArmResourceDeleteWithoutOkAsync' instead
 :::
 
