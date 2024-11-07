@@ -2,7 +2,7 @@
 title: Multipart
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This doc details what emitters will generate for multipart request.
 
@@ -10,8 +10,7 @@ This doc details what emitters will generate for multipart request.
 
 When content-type of operation is "multipart/form-data", the body payload is multipart payload.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 model Address {
@@ -31,10 +30,6 @@ op upload(
 ): NoContentResponse;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 class MultipartRequest:
     id: str = rest_field()
@@ -47,25 +42,13 @@ def upload(
 ) -> None:
 ```
 
-</TabItem>
-
-<TabItem value="csharp" label="CSharp">
-
 ```csharp
 
 ```
 
-</TabItem>
-
-<TabItem value="typescript" label="Typescript">
-
 ```typescript
 
 ```
-
-</TabItem>
-
-<TabItem value="java" label="Java">
 
 ```java
 // Model class
@@ -78,8 +61,7 @@ public final class MultipartRequest {
 public void upload(MultipartRequest body);
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Multipart request with `@multipartBody`
 
@@ -87,8 +69,7 @@ With `@multipartBody`, typespec author could define part of multipart request wi
 For example, typespec author could use `File` model predefined in `@typespec/http` to declare the requiredness of filename and
 contentType.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 model Address {
@@ -109,10 +90,6 @@ op upload(
 ): NoContentResponse;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 class MultipartRequest:
     id: str = rest_field()
@@ -125,25 +102,13 @@ def upload(
 ) -> None:
 ```
 
-</TabItem>
-
-<TabItem value="csharp" label="CSharp">
-
 ```csharp
 
 ```
 
-</TabItem>
-
-<TabItem value="typescript" label="Typescript">
-
 ```typescript
 
 ```
-
-</TabItem>
-
-<TabItem value="java" label="Java">
 
 ```java
 // Model class
@@ -156,5 +121,4 @@ public final class MultipartRequest {
 public void upload(MultipartRequest body);
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>

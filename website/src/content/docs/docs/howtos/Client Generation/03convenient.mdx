@@ -2,7 +2,7 @@
 title: Convenient method generation
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents how to customize method generation for the emitters. For an overview of the setup, please visit the setup page.
 
@@ -12,10 +12,9 @@ By default, any language code generator will generate both protocol methods and 
 
 > **NOTE:** Python and Typescript don't have a separation of convenient/protocol methods.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
-```typespec
+```typespec title=main.tsp
 namespace PetStoreNamespace;
 
 @doc("This is the input I need")
@@ -31,18 +30,11 @@ model OutputModel {
 op GetModel is ResourceRead<OutputModel>;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 class OutputModel:
   name: str = rest_field(readonly=True)
 response: OutputModel = client.get(name="name")
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 namespace PetStoreNamespace.Models
@@ -67,9 +59,6 @@ namespace PetStoreNamespace
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 interface OutputModel {
   name: string;
@@ -77,9 +66,6 @@ interface OutputModel {
 
 const model: OutputModel = await client.path("/petStore/model/{name}").get();
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 package com.petstorenamespace.models;
@@ -96,8 +82,7 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Customizations
 
@@ -116,10 +101,9 @@ For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can b
 
 This can be achieved with the augment operator and the emitter package
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
-```typespec
+```typespec title=client.tsp
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
@@ -128,17 +112,11 @@ using Azure.ClientGenerator.Core;
 @@convenientAPI(PetStoreNamespace.GetModel, false);
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 # Python do not change behavior based on protocolAPI or convenientAPI
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
-
-```c#
+```csharp
 // Model class is not generated.
 // Convenient method is not generated.
 
@@ -153,15 +131,9 @@ namespace PetStoreNamespace
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 // Typescript do not change behavior based on protocolAPI or convenientAPI
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 // Model class is not generated.
@@ -173,17 +145,17 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Make methods private/internal
 
 Sometimes it may be useful to still generate the method, but to make it private, so it can be re-used by a manual code wrapper.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+The two possible value for the `Access` enum are `internal` and `public`.
 
-```typespec
+<ClientTabs>
+
+```typespec title=client.tsp
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
@@ -192,18 +164,10 @@ using Azure.ClientGenerator.Core;
 @@access(PetStoreNamespace.GetModel, "internal");
 ```
 
-The two possible value for the `Access` enum are `internal` and `public`.
-
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 # can't import form models directly
 from petstorenamespace.models import GetModel # will report error
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 // Model class is internal
@@ -229,15 +193,9 @@ namespace PetStoreNamespace
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 // Typescript do not change behavior based on protocolAPI or convenientAPI
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 // Model class resides in implementation package.
@@ -257,8 +215,7 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Decide the usage of a model
 
@@ -271,10 +228,9 @@ correspond to expectation, this can be customized with the `usage` decorator. Po
 
 > **NOTE:** If a model is never used, it will not be generated. Assigning a usage will force generation.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
-```typespec
+```typespec title=client.tsp
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
@@ -286,17 +242,11 @@ using Azure.ClientGenerator.Core;
 @@usage(Azure.OpenAI.ImageGenerations, Usage.input | Usage.output);
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
-
 ```python
 # Python doesn't generate different code based on usage
 # However, the model may not be generated if it's never used
 # In that case, set a usage for the model
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 // If a model is input-only, it has one public constructor with all required properties as parameters.
@@ -334,17 +284,11 @@ namespace Azure.AI.OpenAI.Models
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 // JS doesn't generate different code based on usage
 // However, the model may not be generated if it's never used
 // In that case, set a usage for the model
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 // If a model class is output-only, its constructor is not public.
@@ -366,5 +310,4 @@ public final class ImageGenerations {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>

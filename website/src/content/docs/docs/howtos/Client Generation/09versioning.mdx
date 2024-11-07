@@ -2,7 +2,7 @@
 title: Versioning
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This doc details what emitters will generate for versioned specs
 
@@ -10,8 +10,7 @@ This doc details what emitters will generate for versioned specs
 
 If there is just one api version in the spec, we will generate the api surface area for that one version.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 import "@typespec/versioning";
@@ -35,10 +34,6 @@ model StableModel {
 op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 import pytest
 from my.service import MyServiceClient, models
@@ -53,9 +48,6 @@ client.stable_functionality(stable_model) # call goes through
 preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01")
 # python allows you to override the api version, even if only one version is defined in the spec
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 //ServiceVersion enum
@@ -78,15 +70,9 @@ ServiceClient client = new ServiceClient(endpoint, options);
 //You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01"
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 // there's no apiVersion defined in the all the operations, TypeScript emitter will ignore it.
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 // ServiceVersion enum
@@ -110,15 +96,11 @@ StableModel stableModel = new StableModel("present");
 serviceClientClient.stableFunctionality(stableModel);
 ```
 
-</TabItem>
-<TabItem value="go" label="Go" >
-
 ```go
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Multiple api versions
 
@@ -136,8 +118,7 @@ Documentation and enums showing the available api versions will still include al
 
 For the below example, all languages will generate the api surface of default version `v2023_11_01`. There will be no generation of the operation `previewFunctionality`, and we will also not generate the `PreviewModel` because it's only used in `previewFunctionality`, and therefore is not used in the api surface of `v2023_11_01`.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 import "@typespec/versioning";
@@ -170,10 +151,6 @@ op previewFunctionality(@body previewModel: PreviewModel): void;
 op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 import pytest
 from my.service import MyServiceClient, models
@@ -191,9 +168,6 @@ with pytest.expect(ImportError):
 with pytest.expect(AttributeError):
   client.preview_functionality({"previewFunctionality": "not present"})
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 //ServiceVersion enum
@@ -215,15 +189,9 @@ Response response = client.StableFunctionality(stableModel);
 //neither PreviewModel nor PreviewFunctionality will be generated
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 // there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 // ServiceVersion enum
@@ -247,15 +215,11 @@ serviceClientClient.stableFunctionality(stableModel);
 // neither PreviewModel nor previewFunctionality will be generated
 ```
 
-</TabItem>
-<TabItem value="go" label="Go" >
-
 ```go
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Override to a specific version
 
@@ -263,8 +227,9 @@ You can override the signature to return the api surface area for a specific api
 
 In this example, we are going to override to return the preview api surface area for our spec. The preview api surface area contains all of the functionality.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+
+<ClientTabItem lang="typespec">
 
 ```typespec
 import "@typespec/versioning";
@@ -297,12 +262,7 @@ op previewFunctionality(@body previewModel: PreviewModel): void;
 op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
-</TabItem>
-
-<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
-
 ```yaml
----
 options:
   "@azure-tools/typespec-python":
     api-version: "2023-11-01-preview"
@@ -316,15 +276,13 @@ options:
     api-version: "2023-11-01-preview"
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
+</ClientTabItem>
 ```python
 import pytest
 from my.service import MyServiceClient, models
 
 preview_client = MyServiceClient(endpoint=..., credential=...)
+
 # client's api_version will be "2023-11-01-preview"
 
 stable_model = models.StableModel(stable_feature="present")
@@ -332,13 +290,12 @@ print(stable_model)
 preview_client.stable_functionality(stable_model) # call goes through
 
 preview_model = models.PreviewModel(preview_functionality="present")
+
 # the model is generated as part of the api surface
 
 preview_client.preview_functionality(preview_model) # call goes through
-```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+````
 
 ```csharp
 // ServiceVersion enum
@@ -359,17 +316,11 @@ Response response = client.PreviewFunctionality(previewModel);
 //call StableFunctionality
 StableModel stableModel = new StableModel("<stableFeature>");
 Response response = client.StableFunctionality(stableModel);
-```
-
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+````
 
 ```typescript
 // there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 // ServiceVersion enum
@@ -395,22 +346,19 @@ PreviewModel previewModel = new PreviewModel("present");
 serviceClientClient.previewFunctionality(previewModel);
 ```
 
-</TabItem>
-<TabItem value="go" label="Go" >
-
 ```go
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ### Override to return all
 
 You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+
+<ClientTabItem lang="typespec">
 
 ```typespec
 import "@typespec/versioning";
@@ -443,12 +391,7 @@ op previewFunctionality(@body previewModel: PreviewModel): void;
 op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
-</TabItem>
-
-<TabItem value="tspconfig.yaml" label="tspconfig.yaml" default>
-
 ```yaml
----
 options:
   "@azure-tools/typespec-python":
     api-version: "all"
@@ -462,9 +405,7 @@ options:
     api-version: "all"
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
+</ClientTabItem>
 
 ```python
 import pytest
@@ -488,9 +429,6 @@ preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023
 
 preview_client.preview_functionality(preview_model) # call goes through
 ```
-
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
 
 ```csharp
 //ServiceVersion enum
@@ -520,26 +458,16 @@ ServiceClient client = new ServiceClient(endpoint, options);
 //You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01-preview"
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
-
 ```typescript
 // there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
 ```
-
-</TabItem>
-<TabItem value="java" label="Java" >
 
 ```java
 
 ```
 
-</TabItem>
-<TabItem value="go" label="Go" >
-
 ```go
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
