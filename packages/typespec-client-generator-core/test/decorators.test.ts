@@ -3035,14 +3035,11 @@ describe("typespec-client-generator-core: decorators", () => {
       });
       await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamed", "!csharp")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3060,14 +3057,11 @@ describe("typespec-client-generator-core: decorators", () => {
       });
       await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamed", "!(csharp, java)")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3085,14 +3079,11 @@ describe("typespec-client-generator-core: decorators", () => {
       });
       await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamed", "!(python, java)")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3108,16 +3099,13 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamed", "csharp, !java")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3133,16 +3121,13 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamed", "!csharp, csharp")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3158,16 +3143,13 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamed", "!csharp, csharp, python, !python, java")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3183,16 +3165,13 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamed", "!csharp, !java")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3208,17 +3187,14 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamedAgain", "!python, !java")
           @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3231,10 +3207,7 @@ describe("typespec-client-generator-core: decorators", () => {
     });
 
     it("normal scope incrementally add", async () => {
-      const runnerWithCSharp = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-csharp",
-      });
-      await runnerWithCSharp.diagnose(`
+      const tsp = `
         @service
         @test namespace MyService {
           @test
@@ -3249,28 +3222,36 @@ describe("typespec-client-generator-core: decorators", () => {
             @body body: Test
           ): void;
         }
-      `);
+      `
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(tsp);
+      const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+      const csharpTestModel = csharpSdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(csharpTestModel);
 
-      const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
-      ok(testModel);
+      const runnerWithPython = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      await runnerWithPython.compile(tsp);
+      const pythonSdkPackage = runnerWithPython.context.sdkPackage;
+      const pythonTestModel = pythonSdkPackage.models.find((x) => x.name === "Test");
+      ok(pythonTestModel);
     });
 
     it("negation scope override negation scope", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamedAgain", "!python, !java")
           @clientName("TestRenamed", "!go")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3286,17 +3267,14 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamedAgain", "!csharp")
           @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
@@ -3312,17 +3290,14 @@ describe("typespec-client-generator-core: decorators", () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCSharp.diagnose(`
+      await runnerWithCSharp.compile(`
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamedAgain", "csharp")
           @clientName("TestRenamed", "!csharp")
           model Test {
             prop: string;
           }
-          @test
-          @access(Access.internal)
           op func(
             @body body: Test
           ): void;
