@@ -335,7 +335,7 @@ op test: void;
 
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
 
-:::warning
+:::caution
 **Deprecated**: @flattenProperty decorator is not recommended to use.
 :::
 

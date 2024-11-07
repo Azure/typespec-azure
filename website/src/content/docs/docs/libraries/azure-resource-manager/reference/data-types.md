@@ -2019,7 +2019,7 @@ model Azure.ResourceManager.CommonTypes.TrackedResource
 
 ### `UserAssignedIdentities` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentities}
 
-:::warning
+:::caution
 **Deprecated**: Do not use this model. Instead, use Record<UserAssignedIdentity | null> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger.
 :::
 
