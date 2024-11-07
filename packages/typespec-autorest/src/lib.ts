@@ -285,12 +285,6 @@ export const $lib = createTypeSpecLibrary({
           "Empty unions are not supported for OpenAPI v2 - enums must have at least one value.",
       },
     },
-    "invalid-default": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Invalid type '${"type"}' for a default value`,
-      },
-    },
     "invalid-multi-collection-format": {
       severity: "error",
       messages: {
@@ -339,6 +333,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: paramMessage`Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part '${"part"}'.`,
+      },
+    },
+    "cookies-unsupported": {
+      severity: "warning",
+      messages: {
+        default: `Cookies are not supported in Swagger 2.0. Parameter was ignored.`,
       },
     },
     "invalid-format": {

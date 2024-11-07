@@ -21,7 +21,7 @@ it("emits a warning if service is missing @versioned", async () => {
       `        
         @service
         namespace Azure.MyService;
-        `
+        `,
     )
     .toEmitDiagnostics([
       {
@@ -44,7 +44,7 @@ it("emits a warning if one service is missing @versioned even if another has it"
             v1, v2
             }
         }
-        `
+        `,
     )
     .toEmitDiagnostics([
       {
@@ -63,7 +63,7 @@ it("ok if service has the @versioned decorator", async () => {
         enum Versions {
           v1, v2
         }
-        `
+        `,
     )
     .toBeValid();
 });
@@ -75,7 +75,7 @@ describe("codefix", () => {
         `        
         @service
         namespace Azure.MyService;
-        `
+        `,
       )
       .applyCodeFix("add-versioned").toEqual(`
         @versioned(Versions /* create an enum called Versions with your service version */)

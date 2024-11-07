@@ -1,6 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: array types", () => {
@@ -9,7 +9,16 @@ describe("typespec-client-generator-core: array types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("use model is to represent array", async () => {
     await runner.compile(`
       @service({})
@@ -40,13 +49,12 @@ describe("typespec-client-generator-core: array types", () => {
   });
 
   it("EmbeddingVector from azure-core", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
-      "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
       @service({})
       namespace TestClient {
         model ModelWithEmbeddingVector {
@@ -56,7 +64,7 @@ describe("typespec-client-generator-core: array types", () => {
         op get(): ModelWithEmbeddingVector;
       }
     `);
-    const models = runnerWithCore.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const model = models[0];
     const property = model.properties[0];
@@ -67,13 +75,12 @@ describe("typespec-client-generator-core: array types", () => {
   });
 
   it("alias of EmbeddingVector", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
-      "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
       @service({})
       namespace TestClient {
         alias MyEmbeddingVector = EmbeddingVector<int32>;
@@ -85,7 +92,7 @@ describe("typespec-client-generator-core: array types", () => {
         op get(): ModelWithEmbeddingVector;
       }
     `);
-    const models = runnerWithCore.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const model = models[0];
     const property = model.properties[0];

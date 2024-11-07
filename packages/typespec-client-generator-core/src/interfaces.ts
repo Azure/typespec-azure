@@ -1,4 +1,8 @@
-import { LroMetadata, PagedResultMetadata } from "@azure-tools/typespec-azure-core";
+import {
+  FinalStateValue,
+  LroMetadata,
+  PagedResultMetadata,
+} from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
   Diagnostic,
@@ -30,14 +34,12 @@ export interface TCGCContext {
   emitterName: string;
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  referencedTypeMap?: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
@@ -64,7 +66,6 @@ export interface SdkContext<
 export interface SdkEmitterOptions {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "filter-out-core-models"?: boolean;
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
@@ -88,19 +89,15 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
+  clientNamespace: string; // fully qualified namespace
   doc?: string;
   summary?: string;
   initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
+  /**
+   * @deprecated Use `clientNamespace` instead.
+   */
   nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
   parent?: SdkClientType<TServiceOperation>;
@@ -132,14 +129,6 @@ interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   __accessSet?: boolean;
@@ -163,7 +152,7 @@ export type SdkType =
 
 export interface SdkBuiltInType extends SdkTypeBase {
   kind: SdkBuiltInKinds;
-  encode: string;
+  encode?: string;
   name: string;
   baseType?: SdkBuiltInType;
   crossLanguageDefinitionId: string;
@@ -222,10 +211,10 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   boolean = "boolean",
   plainDate = "plainDate",
   plainTime = "plainTime",
-  any = "any",
+  unknown = "unknown",
 }
 
-export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "any";
+export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "unknown";
 
 type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
 
@@ -307,7 +296,7 @@ export interface SdkArrayType extends SdkTypeBase {
 
 export interface SdkTupleType extends SdkTypeBase {
   kind: "tuple";
-  values: SdkType[];
+  valueTypes: SdkType[];
 }
 
 export interface SdkDictionaryType extends SdkTypeBase {
@@ -319,12 +308,16 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   type: SdkType;
+  usage: UsageFlags;
+  access: AccessFlags;
+  clientNamespace: string; // fully qualified namespace
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -355,9 +348,12 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   kind: "union";
-  values: TValueType[];
+  variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
+  access: AccessFlags;
+  usage: UsageFlags;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -367,6 +363,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
@@ -398,19 +395,11 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   type: SdkType;
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   apiVersions: string[];
   onClient: boolean;
-  clientDefaultValue?: any;
+  clientDefaultValue?: unknown;
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
@@ -500,6 +489,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
 
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
+  serializedName: string;
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
@@ -520,14 +510,6 @@ export interface SdkServiceResponseHeader {
   __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
 }
@@ -544,12 +526,20 @@ export interface SdkServiceResponse {
   apiVersions: string[];
 }
 
-export interface SdkHttpResponse extends SdkServiceResponse {
+interface SdkHttpResponseBase extends SdkServiceResponse {
   __raw: HttpOperationResponse;
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
+}
+
+export interface SdkHttpResponse extends SdkHttpResponseBase {
+  statusCodes: number | HttpStatusCodeRange;
+}
+
+export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
+  statusCodes: number | HttpStatusCodeRange | "*";
 }
 
 interface SdkServiceOperationBase {}
@@ -564,8 +554,8 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   verb: HttpVerb;
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;
-  responses: Map<HttpStatusCodeRange | number, SdkHttpResponse>;
-  exceptions: Map<HttpStatusCodeRange | number | "*", SdkHttpResponse>;
+  responses: SdkHttpResponse[];
+  exceptions: SdkHttpErrorResponse[];
   examples?: SdkHttpOperationExample[];
 }
 
@@ -582,14 +572,6 @@ interface SdkMethodBase extends DecoratedType {
   access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   crossLanguageDefintionId: string;
@@ -623,7 +605,60 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
 }
 
 interface SdkLroServiceMethodOptions {
+  /**
+   * @deprecated This property will be removed in future releases. Use `lroMetadata` for synthesized LRO metadata. If you still want to access primitive LRO info, use `lroMetadata.__raw`.
+   */
   __raw_lro_metadata: LroMetadata;
+  lroMetadata: SdkLroServiceMetadata;
+}
+
+/**
+ * Long running operation metadata.
+ */
+export interface SdkLroServiceMetadata {
+  /** LRO metadata from TypeSpec core library */
+  __raw: LroMetadata;
+
+  /** Legacy `finalStateVia` value */
+  finalStateVia: FinalStateValue;
+  /** Polling step metadata */
+  pollingStep: SdkLroServicePollingStep;
+  /** Final step metadata */
+  finalStep?: SdkLroServiceFinalStep;
+  /** Synthesized final response metadata */
+  finalResponse?: SdkLroServiceFinalResponse;
+}
+
+/**
+ * Long running operation polling step metadata.
+ */
+export interface SdkLroServicePollingStep {
+  /** Response body type */
+  responseBody?: SdkModelType;
+}
+
+/**
+ * Long running operation final step metadata.
+ */
+export interface SdkLroServiceFinalStep {
+  /** Final step kind */
+  kind:
+    | "finalOperationLink"
+    | "finalOperationReference"
+    | "pollingSuccessProperty"
+    | "noPollingResult";
+}
+
+/**
+ * Synthesized long running operation response metadata.
+ */
+export interface SdkLroServiceFinalResponse {
+  /** Intact response type */
+  envelopeResult: SdkModelType;
+  /** Meaningful result type */
+  result: SdkModelType;
+  /** Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns. */
+  resultPath?: string;
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -661,7 +696,19 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
+  namespaces: SdkNamespace<TServiceOperation>[];
+}
+
+export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  fullName: string;
+  clients: SdkClientType<TServiceOperation>[];
+  models: SdkModelType[];
+  enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
+  namespaces: SdkNamespace<TServiceOperation>[];
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
@@ -693,51 +740,56 @@ export enum UsageFlags {
 interface SdkExampleBase {
   kind: string;
   name: string;
+  /**
+   * @deprecated Use `doc` instead.
+   */
   description: string;
+  doc: string;
   filePath: string;
   rawExample: any;
 }
 
 export interface SdkHttpOperationExample extends SdkExampleBase {
   kind: "http";
-  parameters: SdkHttpParameterExample[];
-  responses: Map<number, SdkHttpResponseExample>;
+  parameters: SdkHttpParameterExampleValue[];
+  responses: SdkHttpResponseExampleValue[];
 }
 
-export interface SdkHttpParameterExample {
+export interface SdkHttpParameterExampleValue {
   parameter: SdkHttpParameter;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 
-export interface SdkHttpResponseExample {
+export interface SdkHttpResponseExampleValue {
   response: SdkHttpResponse;
-  headers: SdkHttpResponseHeaderExample[];
-  bodyValue?: SdkTypeExample;
+  statusCode: number;
+  headers: SdkHttpResponseHeaderExampleValue[];
+  bodyValue?: SdkExampleValue;
 }
 
-export interface SdkHttpResponseHeaderExample {
+export interface SdkHttpResponseHeaderExampleValue {
   header: SdkServiceResponseHeader;
-  value: SdkTypeExample;
+  value: SdkExampleValue;
 }
 
-export type SdkTypeExample =
-  | SdkStringExample
-  | SdkNumberExample
-  | SdkBooleanExample
-  | SdkNullExample
-  | SdkAnyExample
-  | SdkArrayExample
-  | SdkDictionaryExample
-  | SdkUnionExample
-  | SdkModelExample;
+export type SdkExampleValue =
+  | SdkStringExampleValue
+  | SdkNumberExampleValue
+  | SdkBooleanExampleValue
+  | SdkNullExampleValue
+  | SdkUnknownExampleValue
+  | SdkArrayExampleValue
+  | SdkDictionaryExampleValue
+  | SdkUnionExampleValue
+  | SdkModelExampleValue;
 
-export interface SdkExampleTypeBase {
+interface SdkExampleValueBase {
   kind: string;
   type: SdkType;
   value: unknown;
 }
 
-export interface SdkStringExample extends SdkExampleTypeBase {
+export interface SdkStringExampleValue extends SdkExampleValueBase {
   kind: "string";
   type:
     | SdkBuiltInType
@@ -749,7 +801,7 @@ export interface SdkStringExample extends SdkExampleTypeBase {
   value: string;
 }
 
-export interface SdkNumberExample extends SdkExampleTypeBase {
+export interface SdkNumberExampleValue extends SdkExampleValueBase {
   kind: "number";
   type:
     | SdkBuiltInType
@@ -761,45 +813,45 @@ export interface SdkNumberExample extends SdkExampleTypeBase {
   value: number;
 }
 
-export interface SdkBooleanExample extends SdkExampleTypeBase {
+export interface SdkBooleanExampleValue extends SdkExampleValueBase {
   kind: "boolean";
   type: SdkBuiltInType | SdkConstantType;
   value: boolean;
 }
 
-export interface SdkNullExample extends SdkExampleTypeBase {
+export interface SdkNullExampleValue extends SdkExampleValueBase {
   kind: "null";
   type: SdkNullableType;
   value: null;
 }
 
-export interface SdkAnyExample extends SdkExampleTypeBase {
-  kind: "any";
+export interface SdkUnknownExampleValue extends SdkExampleValueBase {
+  kind: "unknown";
   type: SdkBuiltInType;
   value: unknown;
 }
 
-export interface SdkArrayExample extends SdkExampleTypeBase {
+export interface SdkArrayExampleValue extends SdkExampleValueBase {
   kind: "array";
   type: SdkArrayType;
-  value: SdkTypeExample[];
+  value: SdkExampleValue[];
 }
 
-export interface SdkDictionaryExample extends SdkExampleTypeBase {
+export interface SdkDictionaryExampleValue extends SdkExampleValueBase {
   kind: "dict";
   type: SdkDictionaryType;
-  value: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
 }
 
-export interface SdkUnionExample extends SdkExampleTypeBase {
+export interface SdkUnionExampleValue extends SdkExampleValueBase {
   kind: "union";
   type: SdkUnionType;
   value: unknown;
 }
 
-export interface SdkModelExample extends SdkExampleTypeBase {
+export interface SdkModelExampleValue extends SdkExampleValueBase {
   kind: "model";
   type: SdkModelType;
-  value: Record<string, SdkTypeExample>;
-  additionalPropertiesValue?: Record<string, SdkTypeExample>;
+  value: Record<string, SdkExampleValue>;
+  additionalPropertiesValue?: Record<string, SdkExampleValue>;
 }

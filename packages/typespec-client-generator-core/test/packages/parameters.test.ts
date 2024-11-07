@@ -1,4 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -42,7 +44,10 @@ describe("typespec-client-generator-core: parameters", () => {
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.bodyParam, undefined);
-    strictEqual(serviceOperation.exceptions.get("*"), undefined);
+    strictEqual(
+      serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
+      undefined,
+    );
 
     strictEqual(serviceOperation.parameters.length, 1);
     const pathParam = serviceOperation.parameters[0];
@@ -54,7 +59,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(pathParam.onClient, false);
     strictEqual(pathParam.isApiVersionParam, false);
     strictEqual(pathParam.type.kind, "string");
-    strictEqual(pathParam.urlEncode, true); // eslint-disable-line deprecation/deprecation
+    strictEqual(pathParam.urlEncode, true);
     strictEqual(method.response.kind, "method");
     strictEqual(method.response.type, undefined);
 
@@ -118,7 +123,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(pathParam.onClient, false);
     strictEqual(pathParam.isApiVersionParam, false);
     strictEqual(pathParam.type.kind, "string");
-    strictEqual(pathParam.urlEncode, true); // eslint-disable-line deprecation/deprecation
+    strictEqual(pathParam.urlEncode, true);
     strictEqual(pathParam.correspondingMethodParams.length, 1);
     deepStrictEqual(pathParam.correspondingMethodParams[0], pathMethod);
   });
@@ -147,7 +152,10 @@ describe("typespec-client-generator-core: parameters", () => {
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.bodyParam, undefined);
-    strictEqual(serviceOperation.exceptions.get("*"), undefined);
+    strictEqual(
+      serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
+      undefined,
+    );
 
     strictEqual(serviceOperation.parameters.length, 1);
     const headerParam = serviceOperation.parameters[0];
@@ -223,7 +231,10 @@ describe("typespec-client-generator-core: parameters", () => {
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.bodyParam, undefined);
-    strictEqual(serviceOperation.exceptions.get("*"), undefined);
+    strictEqual(
+      serviceOperation.exceptions.find((x) => x.statusCodes === "*"),
+      undefined,
+    );
 
     strictEqual(serviceOperation.parameters.length, 1);
     const queryParam = serviceOperation.parameters[0];
@@ -665,8 +676,8 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(serviceContentTypeParam.type.value, "application/json");
     strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
 
-    strictEqual(serviceOperation.responses.size, 1);
-    const response = serviceOperation.responses.get(200);
+    strictEqual(serviceOperation.responses.length, 1);
+    const response = serviceOperation.responses.find((x) => x.statusCodes === 200);
     ok(response);
     strictEqual(response.kind, "http");
     strictEqual(response.type, sdkPackage.models[0]);
@@ -705,8 +716,8 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(serviceContentTypeParam.type.value, "image/png");
     strictEqual(serviceContentTypeParam.type.valueType.kind, "string");
 
-    strictEqual(serviceOperation.responses.size, 1);
-    const response = serviceOperation.responses.get(200);
+    strictEqual(serviceOperation.responses.length, 1);
+    const response = serviceOperation.responses.find((x) => x.statusCodes === 200);
     ok(response);
     strictEqual(response.kind, "http");
     strictEqual(sdkPackage.models.length, 0);
@@ -738,7 +749,7 @@ describe("typespec-client-generator-core: parameters", () => {
         
         @route("/generations:submit")
         op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
-      `)
+      `),
     );
     const sdkPackage = runnerWithCore.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
@@ -779,8 +790,10 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(method.parameters.length, 0);
     strictEqual(method.response.type, undefined);
     strictEqual(method.operation.parameters.length, 0);
-    strictEqual(method.operation.responses.get(200)?.headers.length, 0);
-    strictEqual(method.operation.responses.get(200)?.type, undefined);
+    const response = method.operation.responses.find((x) => x.statusCodes === 200);
+    ok(response);
+    strictEqual(response.headers.length, 0);
+    strictEqual(response.type, undefined);
   });
 
   describe("uri template related", () => {
@@ -1044,6 +1057,84 @@ describe("typespec-client-generator-core: parameters", () => {
       param = method.operation.parameters[0] as SdkQueryParameter;
       strictEqual(param.collectionFormat, undefined);
       strictEqual(param.explode, true);
+    });
+
+    it("body param: serialized name with encoded name", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(@body @encodedName("application/json", "test") param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "test");
+    });
+
+    it("body param: serialized name without encoded name", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(@body param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "param");
+    });
+
+    it("body param: serialized name of implicit body", async () => {
+      await runner.compileWithBuiltInService(`
+        op explode(param: string): void;
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+
+      const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+      strictEqual(method.operation.bodyParam?.serializedName, "body");
+    });
+  });
+
+  describe("method parameter not used in operation", () => {
+    it("autoroute with constant", async () => {
+      await runner.compileWithBuiltInService(`
+          @autoRoute
+          op test(@path param: "test"): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.parameters.length, 0);
+      strictEqual(method.operation.parameters.length, 0);
+      strictEqual(method.operation.uriTemplate, "/test");
+    });
+
+    it("singleton resource", async () => {
+      const runnerWithArm = await createSdkTestRunner({
+        librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+        autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
+        @singleton("default")
+        model SingletonTrackedResource is TrackedResource<SingletonTrackedResourceProperties> {
+          ...ResourceNameParameter<SingletonTrackedResource>;
+        }
+
+        model SingletonTrackedResourceProperties {
+          description?: string;
+        }
+
+        @armResourceOperations
+        interface Singleton {
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<SingletonTrackedResource>;
+        }
+      `);
+
+      const sdkPackage = runnerWithArm.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      deepStrictEqual(
+        method.parameters.map((p) => p.name),
+        ["resourceGroupName", "resource", "contentType", "accept"],
+      );
+      deepStrictEqual(
+        method.operation.parameters.map((p) => p.name),
+        ["apiVersion", "subscriptionId", "resourceGroupName", "contentType", "accept"],
+      );
     });
   });
 });

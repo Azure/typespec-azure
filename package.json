@@ -14,14 +14,13 @@
     "cspell": "cspell --no-progress .",
     "dogfood": "pnpm install && pnpm build && pnpm run-all dogfood",
     "fix-version-mismatch": "syncpack fix-mismatches",
-    "format": "pnpm run prettier --write",
-    "format:check": "pnpm run prettier --check",
+    "format": "prettier --write .",
+    "format:check": "prettier . --check",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "pack:all": "chronus pack --pack-destination ./temp/artifacts",
     "preinstall": "npx only-allow pnpm",
     "prepare-publish": "node ./eng/scripts/prepare-publish.js",
-    "prettier": "prettier . --config .prettierrc.json",
     "purge": "rimraf --glob \"packages/*/node_modules/\" --glob \"core/packages/*/node_modules/\"",
     "regen-docs": "pnpm run-all  --parallel --aggregate-output --reporter=append-only run regen-docs",
     "regen-samples": "pnpm run-all run regen-samples",
@@ -33,28 +32,28 @@
     "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config ./eng/config/labels.ts"
   },
   "devDependencies": {
-    "@chronus/chronus": "^0.11.0",
-    "@chronus/github": "^0.4.1",
-    "@eslint/js": "^8.57.0",
+    "@chronus/chronus": "^0.13.0",
+    "@chronus/github": "^0.4.4",
+    "@eslint/js": "^9.12.0",
     "@pnpm/find-workspace-packages": "^6.0.9",
-    "@types/node": "~18.11.19",
-    "@typescript-eslint/parser": "^7.17.0",
-    "@typescript-eslint/utils": "^7.17.0",
+    "@types/node": "~22.7.5",
     "c8": "^10.1.2",
-    "cspell": "^8.12.1",
-    "eslint": "^8.57.0",
+    "cspell": "^8.14.4",
+    "eslint": "^9.12.0",
     "eslint-plugin-deprecation": "^3.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-unicorn": "^54.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-unicorn": "^56.0.0",
     "eslint-plugin-vitest": "^0.5.4",
+    "playwright": "^1.48.2",
     "prettier": "~3.3.3",
-    "prettier-plugin-organize-imports": "~4.0.0",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-organize-imports": "~4.1.0",
     "rimraf": "~6.0.1",
-    "syncpack": "^12.3.3",
-    "tsx": "^4.16.2",
-    "typescript": "~5.5.4",
-    "typescript-eslint": "^7.17.0",
-    "vitest": "^2.0.4"
+    "syncpack": "^13.0.0",
+    "tsx": "^4.19.1",
+    "typescript": "~5.6.3",
+    "typescript-eslint": "^8.8.1",
+    "vitest": "^2.1.2"
   },
   "syncpack": {
     "dependencyTypes": [
@@ -67,7 +66,7 @@
     ]
   },
   "dependencies": {
-    "picocolors": "~1.0.1"
+    "picocolors": "~1.1.0"
   },
   "pnpm": {
     "overrides": {

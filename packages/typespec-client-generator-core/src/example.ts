@@ -9,31 +9,27 @@ import {
   isService,
   resolvePath,
 } from "@typespec/compiler";
-import { HttpStatusCodeRange } from "@typespec/http";
 import { getOperationId } from "@typespec/openapi";
 import {
-  SdkAnyExample,
-  SdkArrayExample,
+  SdkArrayExampleValue,
   SdkArrayType,
   SdkBodyModelPropertyType,
   SdkClientType,
-  SdkDictionaryExample,
+  SdkDictionaryExampleValue,
   SdkDictionaryType,
+  SdkExampleValue,
   SdkHttpOperation,
   SdkHttpOperationExample,
   SdkHttpParameter,
-  SdkHttpParameterExample,
+  SdkHttpParameterExampleValue,
   SdkHttpResponse,
-  SdkHttpResponseExample,
-  SdkModelExample,
+  SdkHttpResponseExampleValue,
+  SdkModelExampleValue,
   SdkModelPropertyType,
   SdkModelType,
-  SdkNullExample,
   SdkServiceMethod,
   SdkServiceOperation,
   SdkType,
-  SdkTypeExample,
-  SdkUnionExample,
   TCGCContext,
   isSdkFloatKind,
   isSdkIntKind,
@@ -65,7 +61,7 @@ async function checkExamplesDirExists(host: CompilerHost, dir: string) {
  */
 async function loadExamples(
   context: TCGCContext,
-  apiVersion: string | undefined
+  apiVersion: string | undefined,
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
   const examplesBaseDir =
@@ -82,7 +78,7 @@ async function loadExamples(
           messageId: "noDirectory",
           format: { directory: exampleDir },
           target: NoTarget,
-        })
+        }),
       );
     }
     return diagnostics.wrap(new Map());
@@ -101,7 +97,7 @@ async function loadExamples(
             messageId: "noOperationId",
             format: { filename: fileName },
             target: NoTarget,
-          })
+          }),
         );
         continue;
       }
@@ -121,7 +117,7 @@ async function loadExamples(
               operationId: example.operationId,
               title: example.title,
             },
-          })
+          }),
         );
       }
 
@@ -136,14 +132,14 @@ async function loadExamples(
           messageId: "default",
           format: { filename: fileName, error: err?.toString() ?? "" },
           target: NoTarget,
-        })
+        }),
       );
     }
   }
   return diagnostics.wrap(map);
 }
 
-function resolveOperationId(context: TCGCContext, operation: Operation) {
+function resolveOperationId(context: TCGCContext, operation: Operation, honorRenaming: boolean) {
   const { program } = context;
   // if @operationId was specified use that value
   const explicitOperationId = getOperationId(program, operation);
@@ -151,9 +147,9 @@ function resolveOperationId(context: TCGCContext, operation: Operation) {
     return explicitOperationId;
   }
 
-  const operationName = getLibraryName(context, operation);
+  const operationName = honorRenaming ? getLibraryName(context, operation) : operation.name;
   if (operation.interface) {
-    return `${getLibraryName(context, operation.interface)}_${operationName}`;
+    return `${honorRenaming ? getLibraryName(context, operation.interface) : operation.interface.name}_${operationName}`;
   }
   const namespace = operation.namespace;
   if (
@@ -164,17 +160,17 @@ function resolveOperationId(context: TCGCContext, operation: Operation) {
     return operationName;
   }
 
-  return `${getLibraryName(context, namespace)}_${operationName}`;
+  return `${honorRenaming ? getLibraryName(context, namespace) : namespace.name}_${operationName}`;
 }
 
 export async function handleClientExamples(
   context: TCGCContext,
-  client: SdkClientType<SdkServiceOperation>
+  client: SdkClientType<SdkServiceOperation>,
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
   const examples = diagnostics.pipe(
-    await loadExamples(context, getValidApiVersion(context, client.apiVersions))
+    await loadExamples(context, getValidApiVersion(context, client.apiVersions)),
   );
   const methodQueue = [...client.methods];
   while (methodQueue.length > 0) {
@@ -185,7 +181,14 @@ export async function handleClientExamples(
       // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
       let operation = method.__raw;
       while (operation && operation.templateMapper === undefined) {
-        const operationId = resolveOperationId(context, operation).toLowerCase();
+        // try operation id with renaming
+        let operationId = resolveOperationId(context, operation, true).toLowerCase();
+        if (examples.has(operationId)) {
+          diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
+          break;
+        }
+        // try operation id without renaming
+        operationId = resolveOperationId(context, operation, false).toLowerCase();
         if (examples.has(operationId)) {
           diagnostics.pipe(handleMethodExamples(context, method, examples.get(operationId)!));
           break;
@@ -200,7 +203,7 @@ export async function handleClientExamples(
 function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   method: SdkServiceMethod<TServiceOperation>,
-  examples: Record<string, LoadedExample>
+  examples: Record<string, LoadedExample>,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
@@ -219,16 +222,17 @@ function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
 
 function handleHttpOperationExamples(
   operation: SdkHttpOperation,
-  examples: Record<string, LoadedExample>
+  examples: Record<string, LoadedExample>,
 ) {
   const diagnostics = createDiagnosticCollector();
   operation.examples = [];
 
   for (const [title, example] of Object.entries(examples)) {
-    const operationExample = {
+    const operationExample: SdkHttpOperationExample = {
       kind: "http",
       name: title,
       description: title,
+      doc: title,
       filePath: example.relativePath,
       parameters: diagnostics.pipe(
         handleHttpParameters(
@@ -236,14 +240,14 @@ function handleHttpOperationExamples(
             ? [...operation.parameters, operation.bodyParam]
             : operation.parameters,
           example.data,
-          example.relativePath
-        )
+          example.relativePath,
+        ),
       ),
       responses: diagnostics.pipe(
-        handleHttpResponses(operation.responses, example.data, example.relativePath)
+        handleHttpResponses(operation.responses, example.data, example.relativePath),
       ),
       rawExample: example.data,
-    } as SdkHttpOperationExample;
+    };
 
     operation.examples.push(operationExample);
   }
@@ -254,26 +258,24 @@ function handleHttpOperationExamples(
 function handleHttpParameters(
   parameters: SdkHttpParameter[],
   example: any,
-  relativePath: string
-): [SdkHttpParameterExample[], readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkHttpParameterExampleValue[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const parameterExamples = [] as SdkHttpParameterExample[];
+  const parameterExamples: SdkHttpParameterExampleValue[] = [];
   if (
     "parameters" in example &&
     typeof example.parameters === "object" &&
     example.parameters !== null
   ) {
     for (const name of Object.keys(example.parameters)) {
-      let parameter = parameters.find(
-        (p) => (p.kind !== "body" && p.serializedName === name) || p.name === name
-      );
+      let parameter = parameters.find((p) => p.serializedName === name);
       // fallback to body in example for any body parameter
       if (!parameter && name === "body") {
         parameter = parameters.find((p) => p.kind === "body");
       }
       if (parameter) {
         const value = diagnostics.pipe(
-          getSdkTypeExample(parameter.type, example.parameters[name], relativePath)
+          getSdkTypeExample(parameter.type, example.parameters[name], relativePath),
         );
         if (value) {
           parameterExamples.push({
@@ -285,7 +287,7 @@ function handleHttpParameters(
         addExampleValueNoMappingDignostic(
           diagnostics,
           { [name]: example.parameters[name] },
-          relativePath
+          relativePath,
         );
       }
     }
@@ -294,12 +296,12 @@ function handleHttpParameters(
 }
 
 function handleHttpResponses(
-  responses: Map<number | HttpStatusCodeRange, SdkHttpResponse>,
+  responses: SdkHttpResponse[],
   example: any,
-  relativePath: string
-): [Map<number, SdkHttpResponseExample>, readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkHttpResponseExampleValue[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const responseExamples = new Map<number, SdkHttpResponseExample>();
+  const responseExamples: SdkHttpResponseExampleValue[] = [];
   if (
     "responses" in example &&
     typeof example.responses === "object" &&
@@ -308,11 +310,13 @@ function handleHttpResponses(
     for (const code of Object.keys(example.responses)) {
       const statusCode = parseInt(code, 10);
       let found = false;
-      for (const [responseCode, response] of responses.entries()) {
+      for (const response of responses) {
+        const responseCode = response.statusCodes;
         if (responseCode === statusCode) {
-          responseExamples.set(
-            statusCode,
-            diagnostics.pipe(handleHttpResponse(response, example.responses[code], relativePath))
+          responseExamples.push(
+            diagnostics.pipe(
+              handleHttpResponse(response, statusCode, example.responses[code], relativePath),
+            ),
           );
           found = true;
           break;
@@ -322,9 +326,10 @@ function handleHttpResponses(
           responseCode.start <= statusCode &&
           responseCode.end >= statusCode
         ) {
-          responseExamples.set(
-            statusCode,
-            diagnostics.pipe(handleHttpResponse(response, example.responses[code], relativePath))
+          responseExamples.push(
+            diagnostics.pipe(
+              handleHttpResponse(response, statusCode, example.responses[code], relativePath),
+            ),
           );
           found = true;
           break;
@@ -334,7 +339,7 @@ function handleHttpResponses(
         addExampleValueNoMappingDignostic(
           diagnostics,
           { [code]: example.responses[code] },
-          relativePath
+          relativePath,
         );
       }
     }
@@ -344,14 +349,16 @@ function handleHttpResponses(
 
 function handleHttpResponse(
   response: SdkHttpResponse,
+  statusCode: number,
   example: any,
-  relativePath: string
-): [SdkHttpResponseExample, readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkHttpResponseExampleValue, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const responseExample = {
+  const responseExample: SdkHttpResponseExampleValue = {
     response,
+    statusCode,
     headers: [],
-  } as SdkHttpResponseExample;
+  };
   if (typeof example === "object" && example !== null) {
     for (const name of Object.keys(example)) {
       if (name === "description") {
@@ -359,7 +366,7 @@ function handleHttpResponse(
       } else if (name === "body") {
         if (response.type) {
           responseExample.bodyValue = diagnostics.pipe(
-            getSdkTypeExample(response.type, example.body, relativePath)
+            getSdkTypeExample(response.type, example.body, relativePath),
           );
         } else {
           addExampleValueNoMappingDignostic(diagnostics, { body: example.body }, relativePath);
@@ -369,7 +376,7 @@ function handleHttpResponse(
           const header = response.headers.find((p) => p.serializedName === subName);
           if (header) {
             const value = diagnostics.pipe(
-              getSdkTypeExample(header.type, example[name][subName], relativePath)
+              getSdkTypeExample(header.type, example[name][subName], relativePath),
             );
             if (value) {
               responseExample.headers.push({
@@ -381,7 +388,7 @@ function handleHttpResponse(
             addExampleValueNoMappingDignostic(
               diagnostics,
               { [subName]: example[name][subName] },
-              relativePath
+              relativePath,
             );
           }
         }
@@ -396,8 +403,8 @@ function handleHttpResponse(
 function getSdkTypeExample(
   type: SdkType | SdkModelPropertyType,
   example: any,
-  relativePath: string
-): [SdkTypeExample | undefined, readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
   if (isSdkIntKind(type.kind) || isSdkFloatKind(type.kind)) {
@@ -406,36 +413,36 @@ function getSdkTypeExample(
     switch (type.kind) {
       case "string":
       case "bytes":
-        return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
+        return getSdkBaseTypeExample("string", type, example, relativePath);
       case "boolean":
-        return getSdkBaseTypeExample("boolean", type as SdkType, example, relativePath);
+        return getSdkBaseTypeExample("boolean", type, example, relativePath);
       case "url":
       case "plainDate":
       case "plainTime":
-        return getSdkBaseTypeExample("string", type as SdkType, example, relativePath);
+        return getSdkBaseTypeExample("string", type, example, relativePath);
       case "nullable":
         if (example === null) {
           return diagnostics.wrap({
             kind: "null",
             type,
             value: null,
-          } as SdkNullExample);
+          });
         } else {
           return getSdkTypeExample(type.type, example, relativePath);
         }
-      case "any":
+      case "unknown":
         return diagnostics.wrap({
-          kind: "any",
+          kind: "unknown",
           type,
           value: example,
-        } as SdkAnyExample);
+        });
       case "constant":
         if (example === type.value) {
           return getSdkBaseTypeExample(
             typeof type.value as "string" | "number" | "boolean",
             type,
             example,
-            relativePath
+            relativePath,
           );
         } else {
           addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
@@ -447,7 +454,7 @@ function getSdkTypeExample(
             typeof example as "string" | "number",
             type,
             example,
-            relativePath
+            relativePath,
           );
         } else {
           addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
@@ -459,7 +466,7 @@ function getSdkTypeExample(
             typeof example as "string" | "number",
             type,
             example,
-            relativePath
+            relativePath,
           );
         } else {
           addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
@@ -478,7 +485,7 @@ function getSdkTypeExample(
           kind: "union",
           type,
           value: example,
-        } as SdkUnionExample);
+        });
       case "array":
         return getSdkArrayExample(type, example, relativePath);
       case "dict":
@@ -494,15 +501,15 @@ function getSdkBaseTypeExample(
   kind: "string" | "number" | "boolean",
   type: SdkType,
   example: any,
-  relativePath: string
-): [SdkTypeExample | undefined, readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === kind) {
     return diagnostics.wrap({
       kind,
       type,
       value: example,
-    } as SdkTypeExample);
+    } as SdkExampleValue);
   } else {
     addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
   }
@@ -512,11 +519,11 @@ function getSdkBaseTypeExample(
 function getSdkArrayExample(
   type: SdkArrayType,
   example: any,
-  relativePath: string
-): [SdkArrayExample | undefined, readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkArrayExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (Array.isArray(example)) {
-    const arrayExample = [] as SdkTypeExample[];
+    const arrayExample: SdkExampleValue[] = [];
     for (const item of example) {
       const result = diagnostics.pipe(getSdkTypeExample(type.valueType, item, relativePath));
       if (result) {
@@ -527,7 +534,7 @@ function getSdkArrayExample(
       kind: "array",
       type,
       value: arrayExample,
-    } as SdkArrayExample);
+    });
   } else {
     addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
     return diagnostics.wrap(undefined);
@@ -537,17 +544,17 @@ function getSdkArrayExample(
 function getSdkDictionaryExample(
   type: SdkDictionaryType,
   example: any,
-  relativePath: string
-): [SdkDictionaryExample | undefined, readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkDictionaryExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
     if (example === null) {
       return diagnostics.wrap(undefined);
     }
-    const dictionaryExample = {} as Record<string, SdkTypeExample>;
+    const dictionaryExample: Record<string, SdkExampleValue> = {};
     for (const key of Object.keys(example)) {
       const result = diagnostics.pipe(
-        getSdkTypeExample(type.valueType, example[key], relativePath)
+        getSdkTypeExample(type.valueType, example[key], relativePath),
       );
       if (result) {
         dictionaryExample[key] = result;
@@ -557,7 +564,7 @@ function getSdkDictionaryExample(
       kind: "dict",
       type,
       value: dictionaryExample,
-    } as SdkDictionaryExample);
+    });
   } else {
     addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
     return diagnostics.wrap(undefined);
@@ -567,8 +574,8 @@ function getSdkDictionaryExample(
 function getSdkModelExample(
   type: SdkModelType,
   example: any,
-  relativePath: string
-): [SdkModelExample | undefined, readonly Diagnostic[]] {
+  relativePath: string,
+): [SdkModelExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
     if (example === null) {
@@ -583,7 +590,7 @@ function getSdkModelExample(
         return getSdkModelExample(
           type.discriminatedSubtypes![example[type.discriminatorProperty.name]],
           example,
-          relativePath
+          relativePath,
         );
       } else {
         addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
@@ -593,10 +600,10 @@ function getSdkModelExample(
 
     let additionalPropertiesType: SdkType | undefined;
     const additionalProperties: Record<string, any> = new Map();
-    const additionalPropertiesExample: Record<string, SdkTypeExample> = {};
+    const additionalPropertiesExample: Record<string, SdkExampleValue> = {};
 
     const properties: Map<string, SdkModelPropertyType> = new Map();
-    const propertiesExample: Record<string, SdkTypeExample> = {};
+    const propertiesExample: Record<string, SdkExampleValue> = {};
 
     // get all properties type and additional properties type if exist
     const modelQueue = [type];
@@ -620,7 +627,7 @@ function getSdkModelExample(
       const property = properties.get(name);
       if (property) {
         const result = diagnostics.pipe(
-          getSdkTypeExample(property.type, example[name], relativePath)
+          getSdkTypeExample(property.type, example[name], relativePath),
         );
         if (result) {
           propertiesExample[name] = result;
@@ -635,7 +642,7 @@ function getSdkModelExample(
       if (additionalPropertiesType) {
         for (const [name, value] of Object.entries(additionalProperties)) {
           const result = diagnostics.pipe(
-            getSdkTypeExample(additionalPropertiesType, value, relativePath)
+            getSdkTypeExample(additionalPropertiesType, value, relativePath),
           );
           if (result) {
             additionalPropertiesExample[name] = result;
@@ -654,7 +661,7 @@ function getSdkModelExample(
         Object.keys(additionalPropertiesExample).length > 0
           ? additionalPropertiesExample
           : undefined,
-    } as SdkModelExample);
+    });
   } else {
     addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
     return diagnostics.wrap(undefined);
@@ -664,7 +671,7 @@ function getSdkModelExample(
 function addExampleValueNoMappingDignostic(
   diagnostics: DiagnosticCollector,
   value: any,
-  relativePath: string
+  relativePath: string,
 ) {
   diagnostics.add(
     createDiagnostic({
@@ -674,6 +681,6 @@ function addExampleValueNoMappingDignostic(
         value: JSON.stringify(value),
         relativePath,
       },
-    })
+    }),
   );
 }

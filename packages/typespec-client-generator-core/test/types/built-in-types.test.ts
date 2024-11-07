@@ -1,7 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkBuiltInType } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -13,7 +12,16 @@ describe("typespec-client-generator-core: built-in types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
-
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
+  });
   it("string", async function () {
     await runner.compileWithBuiltInService(
       `
@@ -21,7 +29,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: string;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "string");
@@ -36,7 +44,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: boolean;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "boolean");
@@ -63,7 +71,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         model Test {
           prop: ${type};
         }
-      `
+      `,
       );
       const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
       strictEqual(sdkType.kind, type);
@@ -81,7 +89,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         model Test {
           prop: ${type};
         }
-      `
+      `,
       );
       const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
       strictEqual(sdkType.kind, type);
@@ -97,7 +105,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: decimal;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "decimal");
@@ -112,7 +120,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: decimal128;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "decimal128");
@@ -127,10 +135,10 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: unknown;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
-    strictEqual(sdkType.kind, "any");
+    strictEqual(sdkType.kind, "unknown");
   });
 
   it("bytes", async function () {
@@ -140,7 +148,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: bytes;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
@@ -156,7 +164,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         @encode(BytesKnownEncoding.base64)
         prop: bytes;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
@@ -172,7 +180,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         @encode(BytesKnownEncoding.base64url)
         prop: bytes;
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "bytes");
@@ -190,7 +198,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         value: Base64UrlBytes[];
       }
-    `
+    `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "array");
@@ -204,12 +212,12 @@ describe("typespec-client-generator-core: built-in types", () => {
   });
 
   it("armId from Core", async function () {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(
+    await runner.compileWithBuiltInAzureCoreService(
       `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -219,9 +227,9 @@ describe("typespec-client-generator-core: built-in types", () => {
           }
         ]>;
       }
-    `
+    `,
     );
-    const models = runnerWithCore.context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "armResourceIdentifier");
@@ -229,41 +237,39 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(type.baseType?.kind, "string");
   });
 
-  it("format", async function () {
-    const runnerWithCore = await createSdkTestRunner({
+  it("format should not alter typespec types", async function () {
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(
+    await runner.compileWithBuiltInAzureCoreService(
       `
       @usage(Usage.input | Usage.output)
       model Test {
         urlScalar: url;
 
         @format("url")
-        urlProperty: string;
+        urlFormatProperty: string;
       }
-    `
+    `,
     );
-    const models = runnerWithCore.context.sdkPackage.models;
-    for (const property of models[0].properties) {
-      strictEqual(property.kind, "property");
-      strictEqual(
-        property.type.kind,
-        property.serializedName.replace("Scalar", "").replace("Property", "")
-      );
-    }
+    const model = runner.context.sdkPackage.models[0];
+    const urlScalarProperty = model.properties.find((x) => x.name === "urlScalar");
+    const urlFormatProperty = model.properties.find((x) => x.name === "urlFormatProperty");
+    ok(urlScalarProperty);
+    ok(urlFormatProperty);
+    strictEqual(urlScalarProperty.type.kind, "url");
+    strictEqual(urlFormatProperty.type.kind, "string");
   });
 
   it("etag from core", async () => {
-    const runnerWithCore = await createSdkTestRunner({
+    runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
-      "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithCore.compileWithBuiltInAzureCoreService(`
+    await runner.compileWithBuiltInAzureCoreService(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -278,8 +284,8 @@ describe("typespec-client-generator-core: built-in types", () => {
     @doc("Gets status.")
     op getStatus is GetResourceOperationStatus<User>;
     `);
-    const userModel = runnerWithCore.context.sdkPackage.models.find(
-      (x) => x.kind === "model" && x.name === "User"
+    const userModel = runner.context.sdkPackage.models.find(
+      (x) => x.kind === "model" && x.name === "User",
     );
     ok(userModel);
     strictEqual(userModel.properties.length, 2);
@@ -287,7 +293,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     ok(etagProperty);
     strictEqual(etagProperty.type.kind, "string");
     strictEqual(etagProperty.type.name, "eTag");
-    strictEqual(etagProperty.type.encode, "string");
+    strictEqual(etagProperty.type.encode, undefined);
     strictEqual(etagProperty.type.crossLanguageDefinitionId, "Azure.Core.eTag");
     strictEqual(etagProperty.type.baseType?.kind, "string");
   });
@@ -302,7 +308,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: Derived;
       }
-      `
+      `,
     );
     const models = getAllModels(runner.context);
     strictEqual(models[0].kind, "model");
@@ -319,65 +325,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(type.baseType.baseType.baseType, undefined);
   });
 
-  it("unknown format", async function () {
-    await runner.compileWithBuiltInService(
-      `
-      @usage(Usage.input | Usage.output)
-      model Test {
-        @format("unknown")
-        unknownProp: string;
-      }
-    `
-    );
-    const models = getAllModels(runner.context);
-    strictEqual(models[0].kind, "model");
-    strictEqual(models[0].properties[0].type.kind, "string");
-  });
-
-  it("known values", async function () {
-    await runner.compileWithBuiltInService(
-      `
-      enum TestEnum{
-        one,
-        two,
-        three,
-      }
-
-      #suppress "deprecated" "for testing"
-      @knownValues(TestEnum)
-      scalar testScalar extends string;
-
-      model TestModel {
-        prop1: testScalar;
-        #suppress "deprecated" "for testing"
-        @knownValues(TestEnum)
-        prop2: string;
-      }
-
-      op func(
-        @body body: TestModel
-      ): void;
-    `
-    );
-    expectDiagnostics(runner.context.diagnostics, []);
-    const m = runner.context.sdkPackage.models.find((x) => x.name === "TestModel");
-    const e1 = runner.context.sdkPackage.enums.find((x) => x.name === "TestEnum");
-    const e2 = runner.context.sdkPackage.enums.find((x) => x.name === "testScalar");
-    ok(m && e1 && e2);
-    strictEqual(e1.kind, "enum");
-    strictEqual(e1.isUnionAsEnum, false);
-    strictEqual(e1.valueType.kind, "string");
-    strictEqual(e2.kind, "enum");
-    strictEqual(e2.isUnionAsEnum, false);
-    strictEqual(e2.valueType.kind, "string");
-    for (const property of m.properties) {
-      if (property.name === "prop1") {
-        strictEqual(property.type, e2);
-      } else if (property.name === "prop2") {
-        strictEqual(property.type, e1);
-      }
-    }
-  });
   it("with doc", async () => {
     await runner.compileWithBuiltInService(
       `
@@ -389,15 +336,13 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         prop: TestScalar;
       }
-    `
+    `,
     );
     const models = getAllModels(runner.context);
     strictEqual(models[0].kind, "model");
     const type = models[0].properties[0].type;
     strictEqual(type.kind, "string");
     strictEqual(type.name, "TestScalar");
-    strictEqual(type.description, "title"); // eslint-disable-line deprecation/deprecation
-    strictEqual(type.details, "doc"); // eslint-disable-line deprecation/deprecation
     strictEqual(type.doc, "doc");
     strictEqual(type.summary, "title");
     strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
@@ -411,7 +356,7 @@ describe("typespec-client-generator-core: built-in types", () => {
         @encode(string)
         value: safeint;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "safeint");
@@ -429,7 +374,7 @@ describe("typespec-client-generator-core: built-in types", () => {
       model Test {
         value: int32EncodedAsString;
       }
-      `
+      `,
     );
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "int32");

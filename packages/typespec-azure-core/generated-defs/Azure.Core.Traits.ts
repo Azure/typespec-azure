@@ -1,16 +1,6 @@
 import type { DecoratorContext, EnumMember, Model, ModelProperty, Type } from "@typespec/compiler";
 
 /**
- * `@trait` marks a model type as representing a 'trait' and performs basic validation
- * checks.
- *
- * @param target The model type to mark as a trait.
- * @param traitName An optional name to uniquely identify the trait.  If unspecified,
- * the model type name is used.
- */
-export type TraitDecorator = (context: DecoratorContext, target: Model, traitName?: string) => void;
-
-/**
  * `@traitLocation` sets the applicable location for a trait on its envelope property.
  *
  * @param target The trait envelope property where the context will be applied.
@@ -20,7 +10,7 @@ export type TraitDecorator = (context: DecoratorContext, target: Model, traitNam
 export type TraitLocationDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  contexts: EnumMember
+  contexts: EnumMember,
 ) => void;
 
 /**
@@ -33,8 +23,18 @@ export type TraitLocationDecorator = (
 export type TraitContextDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  contexts: Type
+  contexts: Type,
 ) => void;
+
+/**
+ * `@trait` marks a model type as representing a 'trait' and performs basic validation
+ * checks.
+ *
+ * @param target The model type to mark as a trait.
+ * @param traitName An optional name to uniquely identify the trait.  If unspecified,
+ * the model type name is used.
+ */
+export type TraitDecorator = (context: DecoratorContext, target: Model, traitName?: string) => void;
 
 /**
  * Sets the version for when the trait was added to the specification.  Can be applied
@@ -45,12 +45,12 @@ export type TraitContextDecorator = (
 export type TraitAddedDecorator = (
   context: DecoratorContext,
   target: Model | ModelProperty,
-  addedVersion: Type
+  addedVersion: Type,
 ) => void;
 
 export type AzureCoreTraitsDecorators = {
-  trait: TraitDecorator;
   traitLocation: TraitLocationDecorator;
   traitContext: TraitContextDecorator;
+  trait: TraitDecorator;
   traitAdded: TraitAddedDecorator;
 };

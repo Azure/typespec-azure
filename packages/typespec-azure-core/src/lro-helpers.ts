@@ -117,6 +117,9 @@ export interface OperationReference {
   parameterMap?: Map<string, ParameterSource>;
 
   parameters?: Map<string, PropertyMap>;
+
+  /** headers linking to the operation */
+  link?: OperationLink;
 }
 
 /**
@@ -310,26 +313,23 @@ export function getLroMetadata(program: Program, operation: Operation): LroMetad
   if (context === undefined) return undefined;
   processFinalReference(program, operation, context);
   processFinalLink(program, operation, context);
-  const nextReference: NextOperationReference | undefined = processStatusMonitorReference(
-    program,
-    operation,
-    context
-  );
+  const nextReference:
+    | NextOperationReference
+    | (NextOperationLink & { operation: Operation })
+    | undefined = processStatusMonitorReference(program, operation, context);
   if (nextReference !== undefined && nextReference.responseModel.kind === "Model") {
     context.statusMonitorStep = nextReference;
-    processFinalReference(program, nextReference.target.operation, context);
-    processFinalLink(program, nextReference.target.operation, context);
+    const linkedOperation =
+      nextReference.kind === "nextOperationLink"
+        ? nextReference.operation
+        : nextReference.target.operation;
+    processFinalReference(program, linkedOperation, context);
+    processFinalLink(program, linkedOperation, context);
     context.pollingStep = getPollingStep(program, nextReference.responseModel, context);
     return createLroMetadata(program, operation, context);
   }
 
   if (processStatusMonitorLink(program, operation, context)) {
-    return createLroMetadata(program, operation, context);
-  }
-
-  const originalStep = getPollingStep(program, operation, context);
-  if (originalStep !== undefined) {
-    context.pollingStep = originalStep;
     return createLroMetadata(program, operation, context);
   }
 
@@ -395,7 +395,7 @@ interface StatusMonitorLinkData {
 function createFinalOperationLink(
   program: Program,
   model: Model,
-  property: ModelProperty
+  property: ModelProperty,
 ): FinalOperationStep {
   let resourceType: Model | undefined;
   // if finalOperationLink is a ResourceLocation, then the responseModel is the resource type
@@ -419,7 +419,7 @@ function createFinalOperationLink(
 function createLroMetadata(
   program: Program,
   operation: Operation,
-  context: LroContext
+  context: LroContext,
 ): LroMetadata | undefined {
   const [finalState, model] = getFinalStateVia(program, operation, context);
   if (finalState === undefined || model === undefined || context.pollingStep === undefined)
@@ -463,8 +463,10 @@ function createOperationLink(program: Program, modelProperty: ModelProperty): Op
   };
 }
 
-function createOperationReference(metadata: OperationLinkMetadata): OperationReference | undefined {
-  if (!metadata.parameterMap) return undefined;
+function createOperationReferenceOrLink(
+  metadata: OperationLinkMetadata,
+): OperationReference | OperationLink | undefined {
+  if (!metadata.parameterMap && !metadata.link) return undefined;
   const map = new Map<string, ParameterSource>();
   if (metadata.parameterMap) {
     for (const [name, parameters] of metadata.parameterMap) {
@@ -485,6 +487,13 @@ function createOperationReference(metadata: OperationLinkMetadata): OperationRef
       operation: metadata.linkedOperation,
       parameterMap: map,
       parameters: metadata.parameterMap,
+    };
+  }
+  if (metadata.link) {
+    return {
+      kind: "link",
+      location: metadata.link.location,
+      property: metadata.link.property,
     };
   }
 
@@ -510,7 +519,7 @@ function createPollingStep(pollingData: StatusMonitorInfo): PollingOperationStep
 function ensureContext(
   program: Program,
   operation: Operation,
-  context: LroContext | undefined
+  context: LroContext | undefined,
 ): LroContext | undefined {
   if (context) return context;
   const [httpOperation, diagnostics] = getHttpOperation(program, operation);
@@ -531,7 +540,7 @@ function ensureContext(
 function getBodyType(program: Program, model: Model): Model | undefined {
   const bodyProps = filterModelProperties(
     model,
-    (p) => isBody(program, p) || isBodyRoot(program, p)
+    (p) => isBody(program, p) || isBodyRoot(program, p),
   );
   if (bodyProps.length === 1 && bodyProps[0].type.kind === "Model") return bodyProps[0].type;
   return undefined;
@@ -540,7 +549,7 @@ function getBodyType(program: Program, model: Model): Model | undefined {
 function getLogicalResourceOperation(
   program: Program,
   operation: Operation,
-  model: Model | undefined
+  model: Model | undefined,
 ): ResourceOperation | undefined {
   const resOp = getResourceOperation(program, operation);
   if (resOp !== undefined) return resOp;
@@ -554,9 +563,6 @@ function getLogicalResourceOperation(
     case "delete":
       resultOp = "delete";
       break;
-    case "put":
-      resultOp = "createOrReplace";
-      break;
     default:
       return undefined;
   }
@@ -567,7 +573,7 @@ function getLogicalResourceOperation(
 function getFinalStateVia(
   program: Program,
   operation: Operation,
-  context: LroContext
+  context: LroContext,
 ): [FinalStateValue, Model | IntrinsicType | undefined] {
   const operationAction = getActionDetails(program, operation);
   let model: Model | IntrinsicType | undefined =
@@ -597,11 +603,17 @@ function getFinalStateVia(
         case "nextOperationLink":
           finalState = getLroStatusFromHeaderProperty(
             program,
-            context.statusMonitorStep.target.property
+            context.statusMonitorStep.target.property,
           );
           break;
         case "nextOperationReference":
           finalState = FinalStateValue.customOperationReference;
+          if (context.statusMonitorStep.target.link?.location === "ResponseHeader") {
+            finalState = getLroStatusFromHeaderProperty(
+              program,
+              context.statusMonitorStep.target.link.property,
+            );
+          }
       }
     } else {
       finalState = getStatusFromLinkOrReference(program, operation, context.finalStep.target);
@@ -638,7 +650,7 @@ function getFinalStateVia(
       finalState = getStatusFromLinkOrReference(
         program,
         operation,
-        context.statusMonitorStep?.target
+        context.statusMonitorStep?.target,
       );
       if (context.finalStep === undefined && info.successProperty === undefined) {
         context.finalStep = { kind: "noPollingResult", responseModel: program.checker.voidType };
@@ -651,7 +663,7 @@ function getFinalStateVia(
 
 function getLroStatusFromHeaderProperty(
   program: Program,
-  property: ModelProperty | undefined
+  property: ModelProperty | undefined,
 ): FinalStateValue {
   let finalState: FinalStateValue;
   if (property === undefined || !isHeader(program, property)) return FinalStateValue.customLink;
@@ -679,7 +691,7 @@ function getLroStatusFromHeaderProperty(
 function getLroStatusProperty(program: Program, model: Model): ModelProperty | undefined {
   const properties = filterModelProperties(
     model,
-    (prop) => ignoreDiagnostics(extractLroStates(program, prop)) !== undefined
+    (prop) => ignoreDiagnostics(extractLroStates(program, prop)) !== undefined,
   );
   return properties.length > 0 ? properties[0] : undefined;
 }
@@ -687,7 +699,7 @@ function getLroStatusProperty(program: Program, model: Model): ModelProperty | u
 function getPollingStep(
   program: Program,
   modelOrOperation: Model | Operation,
-  context: LroContext
+  context: LroContext,
 ): PollingOperationStep | undefined {
   function getModel(property: ModelProperty | undefined) {
     return property?.type.kind === "Model" ? property.type : undefined;
@@ -697,10 +709,9 @@ function getPollingStep(
     context.pollingOperationLink = getOperationLink(
       program,
       context.httpOperation.operation,
-      PollingOperationKey
+      PollingOperationKey,
     );
   }
-  if (context.pollingOperationLink?.parameterMap === undefined) return undefined;
   const statusMonitorOverride = context.pollingOperationLink?.result?.statusMonitor;
   if (statusMonitorOverride !== undefined && statusMonitorOverride.monitorType !== undefined) {
     info = {
@@ -733,7 +744,7 @@ function getPollingStep(
 function getStatusFromLinkOrReference(
   program: Program,
   sourceOperation: Operation,
-  target: OperationLink | OperationReference | ModelProperty
+  target: OperationLink | OperationReference | ModelProperty,
 ): FinalStateValue {
   let finalState: FinalStateValue = FinalStateValue.originalUri;
   switch (target.kind) {
@@ -754,6 +765,8 @@ function getStatusFromLinkOrReference(
         finalState = FinalStateValue.customOperationReference;
         if (isMatchingGetOperation(program, sourceOperation, target.operation)) {
           finalState = FinalStateValue.originalUri;
+        } else if (target.link !== undefined && target.link.location === "ResponseHeader") {
+          finalState = getLroStatusFromHeaderProperty(program, target.link.property);
         }
       }
       break;
@@ -770,7 +783,7 @@ function getStatusFromLinkOrReference(
 function getStatusMonitorInfo(
   program: Program,
   modelOrLink: Model | OperationLink,
-  pollingOverride?: PollingLocationInfo
+  pollingOverride?: PollingLocationInfo,
 ): StatusMonitorInfo | undefined {
   if (pollingOverride?.kind === pollingOptionsKind.StatusMonitor) {
     return {
@@ -800,15 +813,16 @@ function getStatusMonitorInfo(
 
 function GetStatusMonitorInfoFromOperation(
   program: Program,
-  operation: HttpOperation
+  operation: HttpOperation,
 ): StatusMonitorInfo | undefined {
+  if (operation.verb === "get" || operation.verb === "head") return undefined;
   const models = filterResponseModels(
     operation,
     (model) =>
       filterModelProperties(
         model,
-        (prop) => ignoreDiagnostics(extractLroStates(program, prop)) !== undefined
-      ).length > 0
+        (prop) => ignoreDiagnostics(extractLroStates(program, prop)) !== undefined,
+      ).length > 0,
   );
   if (models === undefined || models.length < 1) return undefined;
   return getStatusMonitorInfo(program, models[0]);
@@ -816,15 +830,15 @@ function GetStatusMonitorInfoFromOperation(
 
 function getStatusMonitorLinks(
   program: Program,
-  operation: HttpOperation
+  operation: HttpOperation,
 ): StatusMonitorLinkData | undefined {
   const models: Model[] | undefined = filterResponseModels(
     operation,
     (model) =>
       filterModelProperties(
         model,
-        (prop) => isPollingLocation(program, prop) || isFinalLocation(program, prop)
-      ).length > 0
+        (prop) => isPollingLocation(program, prop) || isFinalLocation(program, prop),
+      ).length > 0,
   );
   if (models === undefined || models.length < 1) return undefined;
   return getStatusMonitorLinksFromModel(program, models[0]);
@@ -832,11 +846,11 @@ function getStatusMonitorLinks(
 
 function getStatusMonitorLinksFromModel(
   program: Program,
-  model: Model
+  model: Model,
 ): StatusMonitorLinkData | undefined {
   let pollingData: StatusMonitorPollingLocationInfo | undefined = undefined;
   let pollingLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
-    isPollingLocation(program, prop)
+    isPollingLocation(program, prop),
   );
   if (pollingLinks === undefined) return undefined;
   // favor status monitor links over stepwise polling
@@ -849,11 +863,11 @@ function getStatusMonitorLinksFromModel(
   const monitorInfo = getStatusMonitorInfo(program, pollingLink, pollingData);
   if (monitorInfo === undefined) return undefined;
   let finalLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
-    isFinalLocation(program, prop)
+    isFinalLocation(program, prop),
   );
   if ((finalLinks === undefined || finalLinks.length !== 1) && monitorInfo.monitorType) {
     finalLinks = filterModelProperties(monitorInfo.monitorType, (prop) =>
-      isFinalLocation(program, prop)
+      isFinalLocation(program, prop),
     );
   }
   const finalLink =
@@ -881,7 +895,7 @@ function getStatusMonitorLinksFromModel(
  */
 function getTargetModelInformation(
   program: Program,
-  modelOrLink: OperationLink | Model | IntrinsicType
+  modelOrLink: OperationLink | Model | IntrinsicType,
 ): [Model | IntrinsicType, ModelProperty | undefined] | undefined {
   if (modelOrLink.kind === "Intrinsic") return undefined;
   if (modelOrLink.kind === "link") {
@@ -892,7 +906,7 @@ function getTargetModelInformation(
   }
 
   const finalLinkProps = filterModelProperties(modelOrLink, (prop) =>
-    isFinalLocation(program, prop)
+    isFinalLocation(program, prop),
   );
   const resultProps = filterModelProperties(modelOrLink, (prop) => isResultProperty(program, prop));
 
@@ -915,7 +929,7 @@ function getTargetModelInformation(
 function isMatchingGetOperation(
   program: Program,
   sourceOperation: Operation,
-  targetOperation: Operation
+  targetOperation: Operation,
 ): boolean {
   const sourceHttp = getHttpMetadata(program, sourceOperation);
   const targetHttp = getHttpMetadata(program, targetOperation);
@@ -935,7 +949,7 @@ function isResultProperty(program: Program, property: ModelProperty): boolean {
 function processFinalLink(
   program: Program,
   modelOrOperation: Model | Operation,
-  context: LroContext
+  context: LroContext,
 ): void {
   // Allow @finalOperation to override link types
   const overrideModel = context.finalOperationLink?.result?.type;
@@ -944,7 +958,7 @@ function processFinalLink(
     case "Operation":
       {
         const result = getResultModelWithProperty(program, modelOrOperation, (prop) =>
-          isFinalLocation(program, prop)
+          isFinalLocation(program, prop),
         );
         if (result === undefined) return;
         const [model, property] = result;
@@ -954,13 +968,13 @@ function processFinalLink(
     case "Model":
       {
         const outProperties: ModelProperty[] = filterModelProperties(modelOrOperation, (prop) =>
-          isFinalLocation(program, prop)
+          isFinalLocation(program, prop),
         );
         if (outProperties === undefined || outProperties.length !== 1) return;
         context.finalStep = createFinalOperationLink(
           program,
           overrideModel ?? modelOrOperation,
-          outProperties[0]
+          outProperties[0],
         );
       }
       break;
@@ -971,16 +985,31 @@ function processFinalReference(program: Program, operation: Operation, context: 
   if (context.finalStep !== undefined) return;
   // looks for operation marked with @finalOperation
   const link = getOperationLink(program, operation, "final");
-  if (link === undefined || link.parameterMap === undefined || link.result?.type === undefined)
+  if (
+    link === undefined ||
+    link.result?.type === undefined ||
+    (link.link === undefined && link.parameterMap === undefined)
+  )
     return;
   context.finalOperationLink = link;
-  const reference = createOperationReference(link);
+  const reference = createOperationReferenceOrLink(link);
   if (reference === undefined) return;
-  context.finalStep = {
-    kind: "finalOperationReference",
-    responseModel: link.result?.type,
-    target: reference,
-  };
+  switch (reference.kind) {
+    case "reference":
+      context.finalStep = {
+        kind: "finalOperationReference",
+        responseModel: link.result?.type,
+        target: reference,
+      };
+      break;
+    case "link":
+      context.finalStep = {
+        kind: "finalOperationLink",
+        responseModel: link.result?.type,
+        target: reference,
+      };
+      break;
+  }
 }
 
 function createStatusMonitorPollingData(data: StatusMonitorMetadata): StatusMonitorInfo {
@@ -1001,13 +1030,13 @@ function createStatusMonitorPollingData(data: StatusMonitorMetadata): StatusMoni
 function processStatusMonitorLink(
   program: Program,
   modelOrOperation: Model | Operation,
-  context: LroContext
+  context: LroContext,
 ): boolean {
   let lroData: StatusMonitorLinkData | undefined;
 
   if (context.pollingOperationLink?.result?.statusMonitor && context.pollingOperationLink?.link) {
     const polling = createStatusMonitorPollingData(
-      context.pollingOperationLink.result.statusMonitor
+      context.pollingOperationLink.result.statusMonitor,
     );
     lroData = {
       model: context.pollingOperationLink.result.statusMonitor.monitorType,
@@ -1062,30 +1091,40 @@ function processStatusMonitorLink(
 function processStatusMonitorReference(
   program: Program,
   referencedOperation: Operation,
-  context: LroContext
-): NextOperationReference | undefined {
+  context: LroContext,
+): NextOperationReference | (NextOperationLink & { operation: Operation }) | undefined {
   const references: Map<string, OperationLinkMetadata> | undefined = getOperationLinks(
     program,
-    referencedOperation
+    referencedOperation,
   );
   if (references === undefined) return undefined;
 
   const pollingData: OperationLinkMetadata | undefined = references.get(PollingOperationKey);
   if (pollingData === undefined) return undefined;
   context.pollingOperationLink = pollingData;
-  const pollingReference = createOperationReference(pollingData);
+  const pollingReference = createOperationReferenceOrLink(pollingData);
   if (pollingReference === undefined) return undefined;
   context.statusMonitorInfo = pollingData.result?.statusMonitor;
   const finalData: OperationLinkMetadata | undefined = references.get(FinalOperationKey);
   if (context.finalStep === undefined && finalData !== undefined) {
-    const finalReference = createOperationReference(finalData);
+    const finalReference = createOperationReferenceOrLink(finalData);
     const finalModel = finalData?.result?.type;
     if (finalReference !== undefined && finalModel !== undefined) {
-      context.finalStep = {
-        kind: "finalOperationReference",
-        responseModel: finalModel,
-        target: finalReference,
-      };
+      switch (finalReference.kind) {
+        case "reference":
+          context.finalStep = {
+            kind: "finalOperationReference",
+            responseModel: finalModel,
+            target: finalReference,
+          };
+          break;
+        case "link":
+          context.finalStep = {
+            kind: "finalOperationLink",
+            responseModel: finalModel,
+            target: finalReference,
+          };
+      }
     }
   }
   if (
@@ -1102,16 +1141,26 @@ function processStatusMonitorReference(
   }
   const responseModel = pollingData.result?.type;
   if (responseModel === undefined) return undefined;
-  return {
-    kind: "nextOperationReference",
-    responseModel: responseModel,
-    target: pollingReference,
-  };
+  switch (pollingReference.kind) {
+    case "reference":
+      return {
+        kind: "nextOperationReference",
+        responseModel: responseModel,
+        target: pollingReference,
+      };
+    case "link":
+      return {
+        kind: "nextOperationLink",
+        responseModel: responseModel,
+        target: pollingReference,
+        operation: pollingData.linkedOperation,
+      };
+  }
 }
 
 function resolveOperationLocation(
   program: Program,
-  property: ModelProperty
+  property: ModelProperty,
 ): Model | IntrinsicType | undefined {
   const override = getFinalLocationValue(program, property);
   if (override) return override;

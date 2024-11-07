@@ -1,6 +1,9 @@
 packages:
   - packages/*
   - core/ # Install core workspace dependencies too. Needed for prettier plugins
+  - website/
+  - eng/feeds/
   - core/packages/*
   - "!core/packages/http-client-csharp/**"
   - "!core/packages/http-client-java/**"
+  - "!core/packages/http-client-python/**"

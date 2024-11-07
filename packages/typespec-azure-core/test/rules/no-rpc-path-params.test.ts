@@ -16,7 +16,7 @@ describe("typespec-azure-core: RPC operations", () => {
     tester = createLinterRuleTester(
       runner,
       noRpcPathParamsRule,
-      "@azure-tools/typespec-azure-core"
+      "@azure-tools/typespec-azure-core",
     );
   });
 
@@ -32,7 +32,7 @@ describe("typespec-azure-core: RPC operations", () => {
 
           @route("/two")
           op testTwo is customOp<{}>;
-        `
+        `,
         )
         .toEmitDiagnostics([
           {
@@ -56,7 +56,7 @@ describe("typespec-azure-core: RPC operations", () => {
 
           @route("/two/{bar}")
           op testTwo is customOp<{ }>;
-        `
+        `,
         )
         .toEmitDiagnostics([
           {
@@ -86,7 +86,7 @@ describe("typespec-azure-core: RPC operations", () => {
 
           model StatusError { message: string; }
           @test @pollingOperation(getStatus) @route("/lrRpcOp") op lrRpcOp is Azure.Core.LongRunningRpcOperation<{ @path foo: string }, {}, PollingStatus, StatusError>;
-        `
+        `,
         )
         .toEmitDiagnostics([
           {

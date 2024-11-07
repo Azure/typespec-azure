@@ -12,16 +12,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "format": "arm-id",
           "description": "The resource identifier for private endpoint",
-          "readOnly": true,
-          "x-ms-arm-id-details": {
-            "allowedResources": [
-              {
-                "type": "Microsoft.Network/privateEndpoints"
-              }
-            ]
-          }
+          "readOnly": true
         }
       }
     },

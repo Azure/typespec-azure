@@ -98,7 +98,7 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
       }
     } else if (target.namespace) {
       const service = getService(program, target.namespace);
-      // eslint-disable-next-line deprecation/deprecation
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       if (service?.version && currentApiVersion !== service.version) {
         reportDiagnostic(program, {
           code: "invalid-apiversion",
@@ -158,7 +158,7 @@ export function getBrowseArgQuery(program: Program, target: Type) {
 export function checkIsArmTrackedResource(
   program: Program,
   target: Model,
-  decoratorName: "browse"
+  decoratorName: "browse",
 ) {
   if (getArmResourceKind(target) !== "Tracked") {
     reportDiagnostic(program, {
@@ -174,7 +174,7 @@ export function checkIsArmTrackedResource(
 export function checkIsArmResource(
   program: Program,
   target: Model,
-  decoratorName: "about" | "marketplaceOffer" | "promotion"
+  decoratorName: "about" | "marketplaceOffer" | "promotion",
 ) {
   if (getArmResourceKind(target) !== "Tracked" && getArmResourceKind(target) !== "Proxy") {
     reportDiagnostic(program, {

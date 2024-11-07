@@ -6,7 +6,7 @@ it("part of type `bytes` produce `type: file`", async () => {
   const res = await openApiFor(
     `
     op upload(@header contentType: "multipart/form-data", profileImage: bytes): void;
-    `
+    `,
   );
   const op = res.paths["/"].post;
   deepStrictEqual(op.parameters, [
@@ -23,7 +23,7 @@ it("part of type `string` produce `type: string`", async () => {
   const res = await openApiFor(
     `
     op upload(@header contentType: "multipart/form-data", name: string): void;
-    `
+    `,
   );
   const op = res.paths["/"].post;
   deepStrictEqual(op.parameters, [
@@ -42,7 +42,7 @@ it("part of type `object` produce `type: string`", async () => {
     `
     #suppress "@azure-tools/typespec-autorest/unsupported-multipart-type" "For test"
     op upload(@header contentType: "multipart/form-data", address: {city: string, street: string}): void;
-    `
+    `,
   );
   const op = res.paths["/"].post;
   deepStrictEqual(op.parameters, [

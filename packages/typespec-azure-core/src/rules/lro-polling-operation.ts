@@ -42,7 +42,7 @@ export const longRunningOperationsRequirePollingOperation = createRule({
           if (
             (op.returnType.kind === "Union" &&
               Array.from(op.returnType.variants.values()).find((v) =>
-                hasOperationLocation(context.program, v.type)
+                hasOperationLocation(context.program, v.type),
               )) ||
             hasOperationLocation(context.program, op.returnType)
           ) {

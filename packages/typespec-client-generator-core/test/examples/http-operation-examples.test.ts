@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("simple case", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/simple.json",
-      `${__dirname}/http-operation-examples/simple.json`
+      `${__dirname}/http-operation-examples/simple.json`,
     );
     await runner.compile(`
       @service({})
@@ -33,7 +33,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].kind, "http");
     strictEqual(operation.examples[0].name, "simple description");
-    strictEqual(operation.examples[0].description, "simple description");
+    strictEqual(operation.examples[0].doc, "simple description");
     strictEqual(operation.examples[0].filePath, "simple.json");
     deepStrictEqual(operation.examples[0].rawExample, {
       operationId: "simple",
@@ -48,7 +48,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("parameters", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/parameters.json",
-      `${__dirname}/http-operation-examples/parameters.json`
+      `${__dirname}/http-operation-examples/parameters.json`,
     );
     await runner.compile(`
       @service({})
@@ -109,10 +109,42 @@ describe("typespec-client-generator-core: http operation examples", () => {
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
+  it("body with encoded name", async () => {
+    await runner.host.addRealTypeSpecFile(
+      "./examples/bodyWithEncodedName.json",
+      `${__dirname}/http-operation-examples/bodyWithEncodedName.json`,
+    );
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op encodedname(
+          @body @encodedName("application/json", "b") body: string,
+        ): void;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples[0].kind, "http");
+
+    const parameters = operation.examples[0].parameters;
+    ok(parameters);
+    strictEqual(parameters.length, 1);
+
+    strictEqual(parameters[0].value.kind, "string");
+    strictEqual(parameters[0].value.value, "body");
+    strictEqual(parameters[0].value.type.kind, "string");
+
+    expectDiagnostics(runner.context.diagnostics, []);
+  });
+
   it("body fallback", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/parameters.json",
-      `${__dirname}/http-operation-examples/bodyFallback.json`
+      `${__dirname}/http-operation-examples/bodyFallback.json`,
     );
     await runner.compile(`
       @service({})
@@ -143,7 +175,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("parameters diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/parametersDiagnostic.json",
-      `${__dirname}/http-operation-examples/parametersDiagnostic.json`
+      `${__dirname}/http-operation-examples/parametersDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -178,7 +210,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("responses", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/responses.json",
-      `${__dirname}/http-operation-examples/responses.json`
+      `${__dirname}/http-operation-examples/responses.json`,
     );
     await runner.compile(`
       @service({})
@@ -204,23 +236,32 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].kind, "http");
 
-    const okResponse = operation.examples[0].responses.get(200);
+    const okResponse = operation.examples[0].responses.find((x) => x.statusCode === 200);
     ok(okResponse);
-    deepStrictEqual(okResponse.response, operation.responses.get(200));
+    deepStrictEqual(
+      okResponse.response,
+      operation.responses.find((x) => x.statusCodes === 200),
+    );
     ok(okResponse.bodyValue);
 
     strictEqual(okResponse.bodyValue.kind, "string");
     strictEqual(okResponse.bodyValue.value, "test");
     strictEqual(okResponse.bodyValue.type.kind, "string");
 
-    const createdResponse = operation.examples[0].responses.get(201);
+    const createdResponse = operation.examples[0].responses.find((x) => x.statusCode === 201);
     ok(createdResponse);
-    deepStrictEqual(createdResponse.response, operation.responses.get(201));
+    deepStrictEqual(
+      createdResponse.response,
+      operation.responses.find((x) => x.statusCodes === 201),
+    );
 
     strictEqual(createdResponse.bodyValue, undefined);
     strictEqual(createdResponse.headers.length, 1);
 
-    deepStrictEqual(createdResponse.headers[0].header, operation.responses.get(201)?.headers[0]);
+    deepStrictEqual(
+      createdResponse.headers[0].header,
+      operation.responses.find((x) => x.statusCodes === 201)?.headers[0],
+    );
     strictEqual(createdResponse.headers[0].value.value, "test");
     strictEqual(createdResponse.headers[0].value.kind, "string");
     strictEqual(createdResponse.headers[0].value.type.kind, "string");
@@ -231,7 +272,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
   it("responses diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/responsesDiagnostic.json",
-      `${__dirname}/http-operation-examples/responsesDiagnostic.json`
+      `${__dirname}/http-operation-examples/responsesDiagnostic.json`,
     );
     await runner.compile(`
       @service({})
@@ -257,10 +298,13 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].kind, "http");
 
-    strictEqual(operation.examples[0].responses.size, 1);
-    const createdResponse = operation.examples[0].responses.get(201);
+    strictEqual(operation.examples[0].responses.length, 1);
+    const createdResponse = operation.examples[0].responses.find((x) => x.statusCode === 201);
     ok(createdResponse);
-    deepStrictEqual(createdResponse.response, operation.responses.get(201));
+    deepStrictEqual(
+      createdResponse.response,
+      operation.responses.find((x) => x.statusCodes === 201),
+    );
 
     strictEqual(createdResponse.bodyValue, undefined);
     strictEqual(createdResponse.headers.length, 0);

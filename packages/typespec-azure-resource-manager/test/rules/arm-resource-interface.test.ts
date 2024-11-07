@@ -16,7 +16,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     tester = createLinterRuleTester(
       runner,
       interfacesRule,
-      "@azure-tools/typespec-azure-resource-manager"
+      "@azure-tools/typespec-azure-resource-manager",
     );
   });
 
@@ -71,7 +71,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
          @doc("The provisioning State")
          provisioningState: ResourceState;
        }
-    `
+    `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",

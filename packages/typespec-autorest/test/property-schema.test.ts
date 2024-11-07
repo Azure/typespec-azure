@@ -29,7 +29,7 @@ describe("typespec-autorest: Property schema tests", () => {
       op myOp(): void;
 
 
-      `
+      `,
     );
 
     ok(!result.isRef);
@@ -64,7 +64,7 @@ describe("typespec-autorest: Property schema tests", () => {
 
       `,
       undefined,
-      { "use-read-only-status-schema": false }
+      { "use-read-only-status-schema": false },
     );
 
     ok(!result.isRef);
@@ -100,7 +100,7 @@ describe("typespec-autorest: Property schema tests", () => {
 
       `,
       undefined,
-      { "use-read-only-status-schema": true }
+      { "use-read-only-status-schema": true },
     );
 
     ok(!result.isRef);
@@ -136,7 +136,7 @@ describe("typespec-autorest: Property schema tests", () => {
 
       `,
       undefined,
-      { "use-read-only-status-schema": true }
+      { "use-read-only-status-schema": true },
     );
 
     ok(!result.isRef);

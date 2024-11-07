@@ -46,17 +46,15 @@ describe("typespec-azure-core: decorators", () => {
           @items
           foos: string[];
 
-          @nextLink
+          @Azure.Core.nextLink
           nextThing?: string;
         }
       `);
       const actual = getPagedResult(runner.program, Foo as Model);
       assert(actual?.itemsProperty?.name === "foos");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.itemsPath === "foos");
       deepStrictEqual(actual?.itemsSegments, ["foos"]);
       assert(actual?.nextLinkProperty?.name === "nextThing");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.nextLinkPath === "nextThing");
       deepStrictEqual(actual?.nextLinkSegments, ["nextThing"]);
     });
@@ -70,7 +68,7 @@ describe("typespec-azure-core: decorators", () => {
             things: string[];
 
             doo: {
-              @nextLink
+              @Azure.Core.nextLink
               next?: string;  
             }
           }
@@ -78,11 +76,9 @@ describe("typespec-azure-core: decorators", () => {
       `);
       const actual = getPagedResult(runner.program, Foo as Model);
       assert(actual?.itemsProperty?.name === "things");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.itemsPath === "boo.things");
       deepStrictEqual(actual?.itemsSegments, ["boo", "things"]);
       assert(actual?.nextLinkProperty?.name === "next");
-      // eslint-disable-next-line deprecation/deprecation
       assert(actual?.nextLinkPath === "boo.doo.next");
       deepStrictEqual(actual?.nextLinkSegments, ["boo", "doo", "next"]);
     });
@@ -94,7 +90,7 @@ describe("typespec-azure-core: decorators", () => {
           @items
           \`base.things\`: string[];
 
-          @nextLink
+          @Azure.Core.nextLink
           \`base.next\`?: string;  
         }
       `);
@@ -174,7 +170,7 @@ describe("typespec-azure-core: decorators", () => {
 
           @doc(".")
           nested: {
-            @nextLink
+            @Azure.Core.nextLink
             @doc(".")
             nextLink: string;
           }
@@ -191,7 +187,6 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        @list
         op foo is Azure.Core.Foundations.Operation<{}, ETagParam & MyPage>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);
@@ -214,7 +209,7 @@ describe("typespec-azure-core: decorators", () => {
             @doc(".")
             values?: string[];
 
-            @nextLink
+            @Azure.Core.nextLink
             @doc(".")
             nextLink: string;
           }
@@ -231,7 +226,6 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        @list
         op foo is Azure.Core.Foundations.Operation<{}, MyFooPageResult>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);
@@ -562,7 +556,7 @@ describe("typespec-azure-core: decorators", () => {
 
       const result = getOperationLinks(
         runner.program,
-        Foo.operations.get("createOrUpdate")!
+        Foo.operations.get("createOrUpdate")!,
       ) as Map<string, OperationLinkMetadata>;
       assert(result !== undefined);
       assert(result.get("final") !== undefined);
@@ -880,7 +874,7 @@ describe("typespec-azure-core: decorators", () => {
             B,
             C,
           }
-          `
+          `,
       );
 
       ok(isFixed(runner.program, result.FixedEnum as Enum), "Expected fixed enum");

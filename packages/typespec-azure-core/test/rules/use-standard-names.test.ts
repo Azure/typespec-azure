@@ -24,7 +24,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
 
         @pagedResult
         model FooPage {
-          @nextLink
+          @Azure.Core.nextLink
           next: string,
           @items
           value: Foo[];
@@ -52,7 +52,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
         @patch op changeFoo(@body body: Foo): FooResponse<Foo, 201>;
         
         @route("6")
-        @delete op removeFoo(): void;        `
+        @delete op removeFoo(): void;        `,
       )
       .toEmitDiagnostics([
         {
@@ -98,7 +98,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
 
       @pagedResult
       model FooPage {
-        @nextLink
+        @Azure.Core.nextLink
         next: string,
         @items
         value: Foo[];
@@ -129,7 +129,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
       @patch op createOrUpdateFoo(@body body: Foo): FooResponse<Foo, 201>;
       
       @route("7")
-      @delete op deleteFoo(): void;        `
+      @delete op deleteFoo(): void;        `,
       )
       .toBeValid();
   });
@@ -142,7 +142,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
         
         @route("1")
         @get op getString is MyOperation<string>;
-      `
+      `,
       )
       .toBeValid();
   });

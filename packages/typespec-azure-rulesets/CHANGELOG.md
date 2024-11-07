@@ -1,5 +1,38 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.48.0
+
+### Bug Fixes
+
+- [#1545](https://github.com/Azure/typespec-azure/pull/1545) Disable `@azure-tools/typespec-azure-core/standard-names` for `resource-manager` ruleset. Rule was already excluding ARM operations automatically this just configure the ruleset correctly
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
+## 0.47.0
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1555](https://github.com/Azure/typespec-azure/pull/1555) Add `no-empty-model` rule to ruleset
+
+
+## 0.46.0
+
+### Bug Fixes
+
+- [#1357](https://github.com/Azure/typespec-azure/pull/1357) Disable `use-standard-operations` azure core linter rule from `resource-manager` ruleset
+
+### Features
+
+- [#1342](https://github.com/Azure/typespec-azure/pull/1342) Replace `no-operation-id` linter rule with a more generic `no-openapi` rule guarding against any use of openapi decorators
+
+
 ## 0.45.0
 
 ### Bug Fixes

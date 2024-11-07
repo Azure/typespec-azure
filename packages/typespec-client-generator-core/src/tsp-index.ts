@@ -4,6 +4,7 @@ import {
   $client,
   $clientInitialization,
   $clientName,
+  $clientNamespace,
   $convenientAPI,
   $flattenProperty,
   $operationGroup,
@@ -27,11 +28,11 @@ export const $decorators = {
     operationGroup: $operationGroup,
     usage: $usage,
     access: $access,
-    // eslint-disable-next-line deprecation/deprecation
     flattenProperty: $flattenProperty,
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
     paramAlias: paramAliasDecorator,
+    clientNamespace: $clientNamespace,
   } as AzureClientGeneratorCoreDecorators,
 };

@@ -84,7 +84,7 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
       `
       @test("target")  union Test { UpDown, "left", "right"} 
       union UpDown { "up", "down" }
-      `
+      `,
     );
     deepStrictEqual(getMemberValues(res.members), ["left", "right"]);
     deepStrictEqual(getMemberValues(res.flattenedMembers), ["up", "down", "left", "right"]);
@@ -95,7 +95,7 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
       `
       @test("target")  union Test { UpDown, "left", "right"} 
       enum UpDown { up, down }
-      `
+      `,
     );
     deepStrictEqual(getMemberValues(res.members), ["left", "right"]);
     deepStrictEqual(getMemberValues(res.flattenedMembers), ["up", "down", "left", "right"]);
@@ -115,7 +115,7 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
       `
       @test("target")  union Test { Mod, "one"} 
       model Mod {}
-      `
+      `,
     );
     strictEqual(res, undefined);
     expectDiagnostics(diagnostics, {
@@ -128,7 +128,7 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
     const [res, diagnostics] = await testUnionAsEnum(
       `
       @test("target") union Test { Test, "one"} 
-      `
+      `,
     );
     strictEqual(res, undefined);
     expectDiagnostics(diagnostics, {

@@ -74,8 +74,8 @@ async function lintInternal(swagger) {
   ].join(" ");
   const { err, stdout, stderr } = await new Promise((res) =>
     exec(cmd, { encoding: "utf-8", maxBuffer: 1024 * 1024 * 64 }, (err, stdout, stderr) =>
-      res({ err, stdout, stderr })
-    )
+      res({ err, stdout, stderr }),
+    ),
   );
   let resultString = stderr + stdout;
   if (resultString.indexOf("{") !== -1) {

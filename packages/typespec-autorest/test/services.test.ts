@@ -15,7 +15,7 @@ it("supports emitting multiple services", async () => {
         @route("other") op other(): string;
       }
       `,
-    ["Service", "Client"]
+    ["Service", "Client"],
   );
 
   deepStrictEqual(Service.paths, {
