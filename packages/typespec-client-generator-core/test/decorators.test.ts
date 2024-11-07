@@ -3222,7 +3222,7 @@ describe("typespec-client-generator-core: decorators", () => {
             @body body: Test
           ): void;
         }
-      `
+      `;
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
