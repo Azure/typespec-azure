@@ -1,9 +1,8 @@
 import { defineLinter } from "@typespec/compiler";
-import { apiVersionRule } from "./rules/api-version-parameter.js";
 import { authRequiredRule } from "./rules/auth-required.js";
 import { badRecordTypeRule } from "./rules/bad-record-type.js";
 import { byosRule } from "./rules/byos.js";
-import { casingRule } from "./rules/casing.js";
+import { casingRule } from "./rules/casing-style.js";
 import { compositionOverInheritanceRule } from "./rules/composition-over-inheritance.js";
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
@@ -23,6 +22,7 @@ import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
+import { apiVersionRule } from "./rules/operation-missing-api-version.js";
 import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
 import { preventRestLibraryInterfaces } from "./rules/prevent-rest-library.js";

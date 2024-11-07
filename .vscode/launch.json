@@ -207,7 +207,7 @@
         "doc",
         "${workspaceFolder}/packages/typespec-azure-resource-manager",
         "--enable-experimental",
-        "--output-dir=../../docs/libraries/azure-resource-manager/reference"
+        "--output-dir=../../website/src/content/docs/docs/libraries/azure-resource-manager/reference"
       ],
       "smartStep": true,
       "sourceMaps": true,
