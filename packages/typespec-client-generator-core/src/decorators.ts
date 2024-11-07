@@ -124,20 +124,10 @@ function setScopedDecoratorData(
   const targetEntry = context.program.stateMap(key).get(target);
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
-    // override the previous value for negation scopes and keep the normal scopes unchanged
-    if (targetEntry !== undefined) {
-      const existingScopes = Object.getOwnPropertyNames(targetEntry);
-      if (!validateScopes(negationScopes, existingScopes, context)) {
-        return;
-      }
-      targetEntry[AllScopes] = value;
-      targetEntry[negationScopesKey] = negationScopes;
-    } else {
-      const newObject = Object.fromEntries([AllScopes, scopes].map((scope) => [scope, value]));
-      newObject[negationScopesKey] = negationScopes;
-      context.program.stateMap(key).set(target, newObject);
-    }
-    return;
+    // override the previous state map for negation scopes
+    const newObject = Object.fromEntries([AllScopes, scopes].map((scope) => [scope, value]));
+    newObject[negationScopesKey] = negationScopes;
+    context.program.stateMap(key).set(target, newObject);
   } else if (scopes !== undefined && scopes.length > 0) {
     // for normal scopes, add them incrementally
     // if scope specified, create or overwrite with the new value

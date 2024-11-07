@@ -3228,7 +3228,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
       ok(testModel);
     });
 
