@@ -229,6 +229,8 @@ In this example, we are going to override to return the preview api surface area
 
 <ClientTabs>
 
+<ClientTabItem lang="typespec">
+
 ```typespec
 import "@typespec/versioning";
 import "@typespec/http";
@@ -261,7 +263,6 @@ op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 ```yaml
----
 options:
   "@azure-tools/typespec-python":
     api-version: "2023-11-01-preview"
@@ -275,11 +276,13 @@ options:
     api-version: "2023-11-01-preview"
 ```
 
+</ClientTabItem>
 ```python
 import pytest
 from my.service import MyServiceClient, models
 
 preview_client = MyServiceClient(endpoint=..., credential=...)
+
 # client's api_version will be "2023-11-01-preview"
 
 stable_model = models.StableModel(stable_feature="present")
@@ -287,10 +290,12 @@ print(stable_model)
 preview_client.stable_functionality(stable_model) # call goes through
 
 preview_model = models.PreviewModel(preview_functionality="present")
+
 # the model is generated as part of the api surface
 
 preview_client.preview_functionality(preview_model) # call goes through
-```
+
+````
 
 ```csharp
 // ServiceVersion enum
@@ -311,7 +316,7 @@ Response response = client.PreviewFunctionality(previewModel);
 //call StableFunctionality
 StableModel stableModel = new StableModel("<stableFeature>");
 Response response = client.StableFunctionality(stableModel);
-```
+````
 
 ```typescript
 // there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
@@ -353,6 +358,8 @@ You can also override the signature to return the combined api surface area of a
 
 <ClientTabs>
 
+<ClientTabItem lang="typespec">
+
 ```typespec
 import "@typespec/versioning";
 import "@typespec/http";
@@ -385,7 +392,6 @@ op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 ```yaml
----
 options:
   "@azure-tools/typespec-python":
     api-version: "all"
@@ -398,6 +404,8 @@ options:
   "@azure-tools/typespec-go":
     api-version: "all"
 ```
+
+</ClientTabItem>
 
 ```python
 import pytest
