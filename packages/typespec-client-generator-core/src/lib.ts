@@ -226,8 +226,8 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Negation scopes ${"scopes"} should not be combined with normal scope.`,
-      }
-    }
+      },
+    },
   },
 });
 
