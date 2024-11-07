@@ -65,14 +65,14 @@ extends:
                   osName: windows
 
           - job: website
-              displayName: Website
-              pool:
-                name: $(LINUXPOOL)
-                image: $(LINUXVMIMAGE)
-                os: linux
+            displayName: Website
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
 
-              steps:
-                - template: /eng/pipelines/jobs/website.yml
+            steps:
+              - template: /eng/pipelines/jobs/website.yml
 
           - template: /eng/pipelines/jobs/e2e-job.yml@self
           - job: AutorestChecks
