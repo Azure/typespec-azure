@@ -1,4 +1,4 @@
 [submodule "core"]
 	path = core
-	url = https://github.com/witemple-msft/typespec.git
-	branch = witemple-msft/visibility-enum
+	url = https://github.com/microsoft/typespec
+	branch = main
