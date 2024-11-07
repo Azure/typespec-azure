@@ -222,12 +222,6 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientNamespace decorator`,
       },
     },
-    "invalid-negation-scope": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Negation scopes ${"scopes"} should not be combined with normal scope.`,
-      },
-    },
   },
 });
 

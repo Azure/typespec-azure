@@ -127,11 +127,14 @@ function setScopedDecoratorData(
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
-    const newObject = Object.fromEntries([AllScopes, scopes].map((scope) => [scope, value]));
+    const newObject: Record<string | symbol, any> =
+      scopes !== undefined && scopes.length > 0
+        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
+        : Object.fromEntries([[AllScopes, value]]);
     newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
 
-    // if a scope exists in the target entry and it overlaps with the negation scopes, it means negation scope doesn't override it
+    // if a scope exists in the target entry and it overlaps with the negation scope, it means negation scope doesn't override it
     if (targetEntry !== undefined) {
       const existingScopes = Object.getOwnPropertyNames(targetEntry);
       const intersections = existingScopes.filter((x) => negationScopes.includes(x));
@@ -171,19 +174,6 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
       negationScopes.push(s.slice(1));
     } else {
       scopes.push(s);
-    }
-  }
-
-  // throw on the combination of negation and normal scopes for the same scopes
-  if (negationScopes.length > 0 && scopes.length > 0) {
-    const intersections = negationScopes.filter((x) => scopes.includes(x));
-    if (intersections !== undefined && intersections.length > 0) {
-      reportDiagnostic(context.program, {
-        code: "invalid-negation-scope",
-        target: context.decoratorTarget,
-        format: { scopes: `'${intersections.join(", ")}'` },
-      });
-      return [undefined, undefined];
     }
   }
   return [negationScopes, scopes];

@@ -52,7 +52,7 @@ export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/
 export const clientNameKey = createStateSymbol("clientName");
 export const clientNamespaceKey = createStateSymbol("clientNamespace");
 
-export const negationScopesKey = "negationScopes";
+export const negationScopesKey = createStateSymbol("negationScopes");
 
 /**
  *
