@@ -124,10 +124,13 @@ function getSdkHttpParameters(
     parameters: [],
     bodyParam: undefined,
   };
+
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+      diagnostics.pipe(
+        getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type as any),
+      ),
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
@@ -421,15 +424,16 @@ function getSdkHttpResponseAndExceptions(
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
+    let type: SdkType | undefined;
     let contentTypes: string[] = [];
 
     for (const innerResponse of response.responses) {
+      const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
+        ? "application/json"
+        : innerResponse.body?.contentTypes[0];
       for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
         const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
-        const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
-          ? "application/json"
-          : innerResponse.body?.contentTypes[0];
         addEncodeInfo(context, header, clientType, defaultContentType);
         headers.push({
           __raw: header,
@@ -460,11 +464,17 @@ function getSdkHttpResponseAndExceptions(
           innerResponse.body.type.kind === "Model"
             ? getEffectivePayloadType(context, innerResponse.body.type)
             : innerResponse.body.type;
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+        );
+        if (innerResponse.body.property) {
+          addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+        }
       }
     }
     const sdkResponse = {
       __raw: response,
-      type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
+      type,
       headers,
       contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
       defaultContentType: contentTypes.includes("application/json")

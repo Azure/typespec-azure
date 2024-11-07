@@ -43,6 +43,7 @@ import {
 } from "@typespec/http";
 import {
   getAccessOverride,
+  getClientNamespace,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
@@ -528,6 +529,7 @@ export function getSdkUnionWithDiagnostics(
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
         name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
         isGeneratedName: !type.name,
+        clientNamespace: getClientNamespace(context, type),
         variantTypes: nonNullOptions.map((x) =>
           diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
         ),
@@ -543,6 +545,7 @@ export function getSdkUnionWithDiagnostics(
         type: retval,
         access: "public",
         usage: UsageFlags.None,
+        clientNamespace: getClientNamespace(context, type),
       };
     }
 
@@ -723,6 +726,7 @@ export function getSdkModelWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
+      clientNamespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       properties: [],
@@ -852,6 +856,7 @@ function getSdkEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
+      clientNamespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
@@ -919,6 +924,7 @@ export function getSdkUnionEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
       name,
       isGeneratedName: !type.union.name,
+      clientNamespace: getClientNamespace(context, type.union),
       doc: getDoc(context.program, union),
       summary: getSummary(context.program, union),
       valueType:
@@ -941,54 +947,6 @@ export function getSdkUnionEnumWithDiagnostics(
     sdkType.values = diagnostics.pipe(getSdkUnionEnumValues(context, type, sdkType));
   }
   return diagnostics.wrap(sdkType);
-}
-
-function getKnownValuesEnum(
-  context: TCGCContext,
-  type: Scalar | ModelProperty,
-  operation?: Operation,
-): [SdkEnumType | undefined, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const knownValues = getKnownValues(context.program, type);
-  if (!knownValues) {
-    return diagnostics.wrap(undefined);
-  }
-  if (type.kind === "ModelProperty") {
-    const sdkType = diagnostics.pipe(getSdkEnumWithDiagnostics(context, knownValues, operation));
-    return diagnostics.wrap(sdkType);
-  } else {
-    let sdkType = context.referencedTypeMap?.get(type) as SdkEnumType | undefined;
-    if (!sdkType) {
-      sdkType = {
-        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
-        name: getLibraryName(context, type),
-        isGeneratedName: false,
-        doc: getDoc(context.program, type),
-        summary: getSummary(context.program, type),
-        valueType: diagnostics.pipe(
-          getSdkEnumValueType(
-            context,
-            [...knownValues.members.values()].map((v) => v.value),
-          ),
-        ),
-        values: [],
-        isFixed: false,
-        isFlags: false,
-        usage: UsageFlags.None, // We will add usage as we loop through the operations
-        access: "public", // Dummy value until we update models map
-        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
-        apiVersions: getAvailableApiVersions(context, type, type.namespace),
-        isUnionAsEnum: false,
-      };
-      for (const member of knownValues.members.values()) {
-        sdkType.values.push(
-          diagnostics.pipe(getSdkEnumValueWithDiagnostics(context, sdkType, member)),
-        );
-      }
-    }
-    updateReferencedTypeMap(context, type, sdkType);
-    return diagnostics.wrap(sdkType);
-  }
 }
 
 export function getClientTypeWithDiagnostics(
@@ -1027,10 +985,6 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
-      retval = diagnostics.pipe(getKnownValuesEnum(context, type, operation));
-      if (retval) {
-        break;
-      }
       retval = diagnostics.pipe(getSdkDateTimeOrDurationOrBuiltInType(context, type));
       break;
     case "Enum":
@@ -1040,11 +994,8 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
-      const innerType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, type.type, operation),
-      );
-      diagnostics.pipe(addEncodeInfo(context, type, innerType));
-      retval = diagnostics.pipe(getKnownValuesEnum(context, type, operation)) ?? innerType;
+      retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      diagnostics.pipe(addEncodeInfo(context, type, retval));
       break;
     case "UnionVariant":
       const unionType = diagnostics.pipe(
@@ -1131,6 +1082,7 @@ function getSdkCredentialType(
       variantTypes: credentialTypes,
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
+      clientNamespace: getClientNamespace(context, client.service),
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
       decorators: [],
       access: "public",
