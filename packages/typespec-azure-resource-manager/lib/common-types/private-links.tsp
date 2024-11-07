@@ -39,14 +39,6 @@ model PrivateLinkResourceProperties {
 }
 
 /** A list of private link resources. */
-@removed(Versions.v6)
-@friendlyName("PrivateLinkResourceListResult")
-model PrivateLinkResourceListResultV5 {
-  /** Array of private link resources */
-  value?: PrivateLinkResource[];
-}
-
-/** A list of private link resources. */
 @added(Versions.v6)
 @pagedResult
 model PrivateLinkResourceListResult {
@@ -54,7 +46,6 @@ model PrivateLinkResourceListResult {
   value?: PrivateLinkResource[];
 
   /** URL to get the next set of operation list results (if there are any). */
-  @added(Versions.v6)
   @visibility("read")
   nextLink?: string;
 }
@@ -66,13 +57,13 @@ model PrivateEndpointConnection extends Resource {
 }
 
 /** List of private endpoint connections associated with the specified resource. */
+@added(Versions.v6)
 @pagedResult
 model PrivateEndpointConnectionListResult {
   /** Array of private endpoint connections. */
   value?: PrivateEndpointConnection[];
 
   /** URL to get the next set of operation list results (if there are any). */
-  @added(Versions.v6)
   @visibility("read")
   nextLink?: string;
 }
@@ -160,4 +151,20 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
   @TypeSpec.Rest.segment(Segment)
   @key("privateLinkResourcenName")
   name: string;
+}
+
+/** A list of private link resources. */
+@friendlyName("PrivateLinkResourceListResult")
+@removed(Versions.v6)
+model PrivateLinkResourceListResultV5 {
+  /** Array of private link resources */
+  value?: CommonTypes.PrivateLinkResource[];
+}
+
+/** List of private endpoint connections associated with the specified resource. */
+@friendlyName("PrivateEndpointConnectionListResult")
+@removed(Versions.v6)
+model PrivateEndpointConnectionListResultV5 {
+  /** Array of private endpoint connections. */
+  value?: CommonTypes.PrivateEndpointConnection[];
 }

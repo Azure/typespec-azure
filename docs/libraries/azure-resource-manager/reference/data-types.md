@@ -1681,6 +1681,20 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 | value?    | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections.                                |
 | nextLink? | `string`                                                  | URL to get the next set of operation list results (if there are any). |
 
+### `PrivateEndpointConnectionListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5}
+
+List of private endpoint connections associated with the specified resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5
+```
+
+#### Properties
+
+| Name   | Type                                                      | Description                            |
+| ------ | --------------------------------------------------------- | -------------------------------------- |
+| value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
+
 ### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
 
 The name of the private endpoint connection associated with the Azure resource.

@@ -88,9 +88,9 @@ it("can use private links with common-types references", async () => {
         createConnection is ArmResourceActionAsync<
           TestTrackedResource,
           PrivateEndpointConnection,
-          PrivateEndpointConnectionResourceListResult
+          PrivateEndpointConnectionResourceListResultV5
         >;
-        listConnections is ArmResourceActionAsync<TestTrackedResource, {}, PrivateLinkResourceListResult>;
+        listConnections is ArmResourceActionAsync<TestTrackedResource, {}, PrivateLinkResourceListResultV5>;
       }
       
       model TestTrackedProperties {
