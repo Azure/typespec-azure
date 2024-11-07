@@ -10,7 +10,7 @@ The swagger converter will not be able to accurately represent every part of eve
 
 ✅ **DO** extend the `@azure-tools/typespec-azure-rulesets/data-plane` linter rule set in your tspconfig.yaml. Example:
 
-```
+```yaml title=tspconfig.yaml
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/data-plane"
@@ -20,7 +20,7 @@ linter:
 
 ✅ **DO** use the built-in [url][url-type] for endpoint specification. Example:
 
-```
+```tsp
 @server(
   "{endpoint}/widget",
   "Contoso Widget APIs",
@@ -48,7 +48,7 @@ linter:
 
 ✅ **DO** review model definitions and add the `@resource` decorator over models that represent resources in your service and the `@key` decorator for the resource identifier property on the model. Example:
 
-```
+```tsp
 /** A widget. */
 @resource("widgets")
 model Widget {
@@ -67,7 +67,7 @@ model Widget {
 
 ✅ **DO** use `union` instead of `enum` to define Azure enums. See: [Defining enums for Azure services][no-enum]. Example:
 
-```
+```tsp
 /** The color of a widget. */
 union WidgetColor {
   string,

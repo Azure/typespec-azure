@@ -17,7 +17,7 @@ namespace Microsoft.Contoso {
 
 If you want to match the folder structure of the azure-specs repo you might have to replace the `{service-name}` interpolation with the name you changed.
 
-```diff
+```diff lang=yaml
 options:
   '@azure-tools/typespec-autorest':
      # ... other options

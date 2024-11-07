@@ -17,16 +17,16 @@ By default, any language code generator will generate both protocol methods and 
 ```typespec title=main.tsp
 namespace PetStoreNamespace;
 
-@doc("This is the input I need")
+/** This is the input I need */
 @resource("output")
 model OutputModel {
+  /** Id of this object */
   @key
-  @doc("Id of this object")
   @visibility("read")
   name: string;
 }
 
-@doc("Read my resource")
+/** Read my resource */
 op GetModel is ResourceRead<OutputModel>;
 ```
 
