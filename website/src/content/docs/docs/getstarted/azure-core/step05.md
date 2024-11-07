@@ -36,16 +36,16 @@ We'll define the standard set of CRUD (Create, Read, Update, Delete) operations 
 
 ```typespec
 interface Widgets {
-  @doc("Fetch a Widget by name.")
+  /** Fetch a Widget by name. */
   getWidget is Operations.ResourceRead<Widget>;
 
-  @doc("Creates or updates a Widget.")
+  /** Creates or updates a Widget. */
   createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
 
-  @doc("Delete a Widget.")
+  /** Delete a Widget. */
   deleteWidget is Operations.ResourceDelete<Widget>;
 
-  @doc("List Widget resources.")
+  /** List Widget resources. */
   listWidgets is Operations.ResourceList<Widget>;
 }
 ```
@@ -77,13 +77,13 @@ alias ServiceTraits = SupportsRepeatableRequests &
   SupportsConditionalRequests &
   SupportsClientRequestId;
 
+/** A custom error response type. */
 @error
-@doc("A custom error response type.")
 model ErrorResponse {
-  @doc("The error code.")
+  /** The error code. */
   code: string;
 
-  @doc("The error message.")
+  /** The error message. */
   message: string;
 }
 
@@ -102,9 +102,9 @@ alias ServiceTraits = SupportsRepeatableRequests &
   SupportsConditionalRequests &
   SupportsClientRequestId;
 
-@doc("A custom error type.")
+/** A custom error type. */
 model Error is Azure.Core.Foundations.Error {
-  @doc("The environment where the error occurred.")
+  /** The environment where the error occurred. */
   environment: string;
 }
 

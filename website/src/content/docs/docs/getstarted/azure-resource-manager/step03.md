@@ -7,7 +7,7 @@ You can create parent/child relationships between resource types by using the `@
 For example, here's how you could create a new `AddressResource` resource under the `User` defined above:
 
 ```typespec
-@doc("An address resource belonging to a user resource.")
+/** An address resource belonging to a user resource */
 @parentResource(User)
 model AddressResource is ProxyResource<AddressResourceProperties> {
   @key("addressName")
@@ -15,18 +15,18 @@ model AddressResource is ProxyResource<AddressResourceProperties> {
   name: string;
 }
 
-@doc("The properties of AddressResource")
+/** The properties of AddressResource */
 model AddressResourceProperties {
-  @doc("The street address.")
+  /** The street address */
   streetAddress: string;
 
-  @doc("The city of the address.")
+  /** The city of the address */
   city: string;
 
-  @doc("The state of the address.")
+  /** The state of the address */
   state: string;
 
-  @doc("The zip code of the address.")
+  /** The zip code of the address */
   zip: int32;
 }
 
