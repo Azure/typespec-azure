@@ -1,4 +1,6 @@
-# Quickstart: Local development with tsp-client
+---
+title:  Quickstart - Local development with tsp-client
+---
 
 Follow these steps to work on a local TypeSpec project and generate a client library from your changes:
 
