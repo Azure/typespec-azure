@@ -12,7 +12,7 @@ title: Azure TypeSpec Style Guide
 
 This document contains guidelines that complement and extend the
 [Microsoft Azure REST API Guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md) for describing an Azure API with a TypeSpec API design document.
-The goal of these guidelines is to establish the requirements for complete and consistent API designs
+The goal of these guidelines is to establish the requirements for complete and cons∑istent API designs
 that will ensure high quality in generated documentation and client libraries.
 
 ## Use the Azure.Core library

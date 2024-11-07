@@ -22,10 +22,10 @@ to always output any `ProvisioningState` schema as readOnly, using the `read-onl
 resolves the LintDiff violation. Note that if you use the scaffolding template for `ARM`, this configuration is
 enabled automatically.
 
-```yml
+```diff lang=yaml title=tspconfig.yaml
 emit:
   - "@azure-tools/typespec-autorest"
 options:
   "@azure-tools/typespec-autorest":
-    use-read-only-status-schema: true
++    use-read-only-status-schema: true
 ```
