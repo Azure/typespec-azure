@@ -8,7 +8,7 @@ title: Quickstart (local development)
 
 - Install `tsp-client`:
 
-```pwsh
+```bash
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
@@ -21,19 +21,19 @@ npm install -g @azure-tools/typespec-client-generator-cli
 2. Create/Modify the TypeSpec project.
 3. Switch to the language repository clone you want to generate a client library in. Example:
 
-```pwsh
+```bash
 cd <path to>/azure-sdk-for-python
 ```
 
 4. From the root of the repository run the following command:
 
-```pwsh
+```bash
 azure-sdk-for-python> tsp-client init -c <path to local typespec project at tspconfig.yaml level>
 ```
 
 Example:
 
-```pwsh
+```bash
 azure-sdk-for-python> tsp-client init -c ../azure-rest-api-specs/specification/contosowidgetmanager/Contoso.WidgetManager/
 ```
 
