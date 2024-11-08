@@ -2,7 +2,7 @@
 title:  Quickstart - Local development
 ---
 
-You can develop locally before pushing changes upstream to the `azure-rest-api-specs` repo. These instructions can be used when you want to generate a client library from a local TypeSpec project that has the changes you wish to use.
+`tsp-client` allows you to develop your TypeSpec project locally before pushing changes upstream. These instructions can be used when you want to generate a client library from a local TypeSpec project that has the changes you wish to use.
 
 ### Prerequisites
 
@@ -12,7 +12,7 @@ You can develop locally before pushing changes upstream to the `azure-rest-api-s
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
-- Have a local github repository with your TypeSpec project. We'll use the `azure-rest-api-specs` repository in examples.
+- Have a local Git repository with your TypeSpec project. We'll use the `azure-rest-api-specs` repository in examples.
 - Have a clone of an `azure-sdk-for-<language>` repository. We'll use `azure-sdk-for-python` in examples.
 
 ### Generate a client library from local changes
