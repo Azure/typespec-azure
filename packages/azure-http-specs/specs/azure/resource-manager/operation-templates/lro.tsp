@@ -85,6 +85,7 @@ interface Lro {
     {
       "id": "/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/lro_create/aao",
       "name": "aao",
+      "startTime": "2024-11-08T01:41:53.5508583+00:00",
       "status" : "InProgress"
     }
     ```
@@ -98,10 +99,31 @@ interface Lro {
     {
       "id": "/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/lro_create/aao",
       "name": "aao",
-      "status" : "Succeeded"
+      "status" : "Succeeded",
+      "startTime": "2024-11-08T01:41:53.5508583+00:00",
+      "endTime": "2024-11-08T01:42:41.5354192+00:00",
+      "properties": {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro",
+        "name": "top",
+        "type": "topLevel",
+        "location": "eastus",
+        "properties": {
+          "description": "valid",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": <any date>,
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": <any date>,
+          "lastModifiedByType": "User",
+        }
+      }
     }
     ```
     
+    (Optional) Last get call on resource URL
     Expected verb: GET
     Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro
     
