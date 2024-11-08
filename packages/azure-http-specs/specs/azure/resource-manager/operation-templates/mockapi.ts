@@ -12,7 +12,7 @@ const SUBSCRIPTION_ID_EXPECTED = "00000000-0000-0000-0000-000000000000";
 const RESOURCE_GROUP_EXPECTED = "test-rg";
 const validLroResource = {
   id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro`,
-  name: "top",
+  name: "lro",
   type: "Azure.ResourceManager.Resources/lroResources",
   location: "eastus",
   properties: {

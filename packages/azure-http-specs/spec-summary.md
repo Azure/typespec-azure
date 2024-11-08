@@ -865,8 +865,8 @@ Expected response body:
 ```json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro",
-  "name": "top",
-  "type": "topLevel",
+  "name": "lro",
+  "type": "Azure.ResourceManager.Resources/lroResources",
   "location": "eastus",
   "properties": {
     "description": "valid",
@@ -913,8 +913,8 @@ Expected response body:
   "endTime": "2024-11-08T01:42:41.5354192+00:00",
   "properties": {
     "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro",
-    "name": "top",
-    "type": "topLevel",
+    "name": "lro",
+    "type": "Azure.ResourceManager.Resources/lroResources",
     "location": "eastus",
     "properties": {
       "description": "valid",
@@ -942,8 +942,8 @@ Expected response body:
 ````json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro",
-  "name": "top",
-  "type": "topLevel",
+  "name": "lro",
+  "type": "Azure.ResourceManager.Resources/lroResources",
   "location": "eastus",
   "properties": {
     "description": "valid",
