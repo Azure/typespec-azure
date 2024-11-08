@@ -98,6 +98,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
       body: json({
         id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
         name: "aao",
+        startTime: "2024-11-08T01:41:53.5508583+00:00",
         status: "InProgress",
       }),
     },
@@ -145,7 +146,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
   },
 ]);
 
-Scenarios.Azure_ResourceManager_OperationTemplates_Lro_post = passOnSuccess([
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_upload = passOnSuccess([
   {
     // LRO POST initial request
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName/upload",
@@ -289,7 +290,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
       },
     },
     response: {
-      status: 200, // This is for passing e2e test. For actual status code, see "handler" definition below
+      status: 202, // This is for passing e2e test. For actual status code, see "handler" definition below
     },
     handler: (req: MockRequest) => {
       const response =
