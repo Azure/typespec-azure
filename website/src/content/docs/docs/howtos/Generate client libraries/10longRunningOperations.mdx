@@ -17,15 +17,15 @@ alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalReq
   NoRepeatableRequests &
   NoClientRequestId>;
 
+/** Details about a user. */
 @resource("users")
-@doc("Details about a user.")
 model User {
+  /** The name of user. */
   @key
   @visibility("read")
-  @doc("The name of user.")
   name: string;
 
-  @doc("The role of user")
+  /** The role of user */
   role: string;
 }
 
@@ -93,31 +93,31 @@ Long-running operation to invoke an action on a resource.
 <ClientTabs>
 
 ```typespec
+/** Details about a user. */
 @resource("users")
-@doc("Details about a user.")
 model User {
+  /** The name of user. */
   @key
   @visibility("read")
-  @doc("The name of user.")
   name: string;
 
-  @doc("The role of user")
+  /** The role of user */
   role: string;
 }
 
-@doc("The parameters for exporting a user.")
+/** The parameters for exporting a user. */
 model UserExportParams {
+  /** The format of the data. */
   @query
-  @doc("The format of the data.")
   format: string;
 }
 
-@doc("The exported user data.")
+/** The exported user data. */
 model ExportedUser {
-  @doc("The name of user.")
+  /** The name of user. */
   name: string;
 
-  @doc("The exported URI.")
+  /** The exported URI. */
   resourceUri: string;
 }
 

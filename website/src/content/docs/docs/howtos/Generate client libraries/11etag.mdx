@@ -17,12 +17,12 @@ model Response {
 
 @get
 op get(
+  /** The request should only proceed if an entity matches this string. */
   @header("If-Match")
-  @doc("The request should only proceed if an entity matches this string.")
   ifMatch?: string,
 
+  /** The request should only proceed if no entity matches this string. */
   @header("If-None-Match")
-  @doc("The request should only proceed if no entity matches this string.")
   ifNoneMatch?: string,
 ): Response;
 ```
