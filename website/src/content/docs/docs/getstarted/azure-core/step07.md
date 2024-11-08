@@ -7,17 +7,17 @@ Sometimes your resource types will need to have child resources that relate to t
 For example, here's how you could create a new `WidgetPart` resource under the `Widget` defined above:
 
 ```typespec
-@doc("A WidgetPart resource belonging to a Widget resource.")
+/** A WidgetPart resource belonging to a Widget resource. */
 @resource("parts")
 @parentResource(Widget)
 model WidgetPart {
   @key("partName")
   name: string;
 
-  @doc("The part number.")
+  /** The part number. */
   number: string;
 
-  @doc("The part name.")
+  /** The part name. */
   partName: string;
 }
 ```
@@ -36,10 +36,10 @@ alias ServiceTraits = SupportsRepeatableRequests &
 
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
-@doc("Creates a WidgetPart")
+/** Creates a WidgetPart */
 createWidgetPart is Operations.ResourceCreateWithServiceProvidedName<WidgetPart>;
 
-@doc("Get a WidgetPart")
+/** Get a WidgetPart */
 getWidgetPart is Operations.ResourceRead<WidgetPart>;
 ```
 

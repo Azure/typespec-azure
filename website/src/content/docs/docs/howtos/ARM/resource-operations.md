@@ -56,7 +56,7 @@ provisioningState: ProvisioningState;
 Get is the operation to retrieve a single resource TypeSpec provides a single operation template for GET:
 
 ```typespec
-get is ArmResourceRead<MyResource>;
+op get is ArmResourceRead<MyResource>;
 ```
 
 - **get**: The name of the operation passed on to clients.

@@ -75,10 +75,16 @@ The `Parameters` template parameter allows you to specify additional parameters 
 
 ```tsp
 // all list query params
-listBySubscription is ArmListBySubscription<Widget, Parameters = Azure.Core.StandardListQueryParameters>;
+op listBySubscription is ArmListBySubscription<
+  Widget,
+  Parameters = Azure.Core.StandardListQueryParameters
+>;
 
 // intersecting individual parameters
-listBySubscription is ArmListBySubscription<Widget, Parameters =  Azure.Core.TopQueryParameter & Azure.Core.SkipQueryParameter>;
+op listBySubscription is ArmListBySubscription<
+  Widget,
+  Parameters = Azure.Core.TopQueryParameter & Azure.Core.SkipQueryParameter
+>;
 ```
 
 ### Changing Response Types
@@ -87,7 +93,7 @@ The `Response` parameter allows you to specify non-error responses to the operat
 
 ```tsp
 // all list query params
-listBySubscription is ArmListBySubscription<Widget, Response = MyCustomCollectionType>;
+op listBySubscription is ArmListBySubscription<Widget, Response = MyCustomCollectionType>;
 ```
 
 ### Changing Error Types
@@ -96,7 +102,7 @@ The `Error` parameter allows you to change the default error type used in an ope
 
 ```tsp
 // all list query params
-listBySubscription is ArmListBySubscription<Widget, Error = MyCustomError>;
+op listBySubscription is ArmListBySubscription<Widget, Error = MyCustomError>;
 ```
 
 ### Converting Synchronous Operations to LROs
@@ -108,13 +114,13 @@ You can generally choose an asynchronous operation template that matches your op
 - `ArmCreateOrReplaceAsync` is a PUT operation that uses the 'resource' definition in the request body, and return a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains 'Location` LRO header.
 
   ```tsp
-  createOrUpdate is ArmCreateOrReplaceAsync<Resource>;
+  op createOrUpdate is ArmCreateOrReplaceAsync<Resource>;
   ```
 
 - `ArmCreateOrUpdateAsync`is a PUT operation that uses the 'resource' definition in the request body, and return a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains 'Azure-AsyncOperation` LRO header.
 
   ```tsp
-  createOrUpdate is ArmCreateOrUpdateAsync<Resource>;
+  op createOrUpdate is ArmCreateOrUpdateAsync<Resource>;
   ```
 
 #### Templates for Async PATCH Operations
@@ -122,19 +128,19 @@ You can generally choose an asynchronous operation template that matches your op
 - `ArmTagsPatchAsync` is a PATCH operation that only allows changing the resource tags (the minimum for Azure Resource Manager).
 
   ```tsp
-  update is ArmTagsPatchAsync<Resource>;
+  op update is ArmTagsPatchAsync<Resource>;
   ```
 
 - `ArmResourcePatchAsync`is a PATCH operation that uses the visibility settings to select properties for the PATCH request body(any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
 
   ```tsp
-  update is ArmResourcePatchAsync<Resource, ResourceProperties>;
+  op update is ArmResourcePatchAsync<Resource, ResourceProperties>;
   ```
 
 - `ArmCustomPatchAsync`is a PATCH operation that allows you to customize the PATCH request body.
 
   ```tsp
-  update is ArmCustomPatchAsync<Resource, PatchRequestBody>;
+  op update is ArmCustomPatchAsync<Resource, PatchRequestBody>;
   ```
 
 #### Templates for Async POST (Action) Operations
@@ -142,13 +148,13 @@ You can generally choose an asynchronous operation template that matches your op
 - `ArmResourceActionAsync` is a POST operation that allows you to specify the request and response body for a resource action operation. It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
 
   ```tsp
-  doStuff is ArmResourceActionAsync<Resource, ActionRequest, ActionResponse>;
+  op doStuff is ArmResourceActionAsync<Resource, ActionRequest, ActionResponse>;
 
   // with no request body
-  doStuffNoRequest is ArmResourceActionAsync<Resource, void, ActionResponse>;
+  op doStuffNoRequest is ArmResourceActionAsync<Resource, void, ActionResponse>;
 
   // with no response body
-  doStuffCommand is ArmResourceActionAsync<Resource, ActionRequest, void>;
+  op doStuffCommand is ArmResourceActionAsync<Resource, ActionRequest, void>;
   ```
 
 #### Templates for Async DELETE Operations
@@ -156,11 +162,11 @@ You can generally choose an asynchronous operation template that matches your op
 - `ArmResourceDeleteWithoutOKAsync` is a DELETE operation that uses no request body, will return a `202` response in the case of an Asynchronous delete operation, and a `204` response in case the resource does not exist.
 
   ```tsp
-  delete is ArmResourceDeleteWithoutOKAsync<Resource>;
+  op delete is ArmResourceDeleteWithoutOKAsync<Resource>;
   ```
 
 - `ArmResourceDeleteAsync`iis a DELETE operation that uses no request body, and return a `200` response in the case of a successful synchronous delete, a `202` response in the case of an Asynchronous delete operation, and a `204` response in case the resource does not exist.
 
   ```tsp
-  createOrUpdate is ArmResourceDeleteAsync<Resource>;
+  op createOrUpdate is ArmResourceDeleteAsync<Resource>;
   ```

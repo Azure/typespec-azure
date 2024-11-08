@@ -28,12 +28,12 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
+/** Contoso Resource Provider management API */
 @armProviderNamespace
 @service({
   title: "ContosoProviderHubClient",
   version: "2021-01-01-preview",
 })
-@doc("Contoso Resource Provider management API.")
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub;
@@ -59,33 +59,33 @@ union ProvisioningState {
   string,
 }
 
-@doc("The properties of User Resource")
+/** The properties of User Resource */
 model UserProperties {
-  @doc("The user's full name")
+  /** The user's full name */
   fullName: string;
 
-  @doc("The user's email address.")
+  /** The user's email address */
   emailAddress: string;
 
-  @doc("The status of the last operation.")
+  /** The status of the last operation */
   provisioningState?: ProvisioningState;
 }
 
-@doc("A User Resource")
+/** A User Resource */
 model User is TrackedResource<UserProperties> {
+  /** Address name */
   @key("userName")
   @segment("users")
-  @doc("Address name")
   @path
   name: string;
 }
 
-@doc("The details of a user notification.")
+/** The details of a user notification */
 model NotificationDetails {
-  @doc("The notification message.")
+  /** The notification message */
   message: string;
 
-  @doc("If true, the notification is urgent.")
+  /** If true, the notification is urgent */
   urgent: boolean;
 }
 
@@ -97,32 +97,32 @@ interface Users {
   delete is ArmResourceDeleteSync<User>;
   listByResourceGroup is ArmResourceListByParent<User>;
   listBySubscription is ArmListBySubscription<User>;
-  @doc("Send a notification to the user")
+  /** Send a notification to the user */
   @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
 
-@doc("An address resource belonging to a user resource.")
+/** An address resource belonging to a user resource */
 @parentResource(User)
 model AddressResource is ProxyResource<AddressResourceProperties> {
   ...ResourceNameParameter<AddressResource, KeyName = "addressName", SegmentName = "addresses">;
 }
 
-@doc("The properties of AddressResource")
+/** The properties of AddressResource */
 model AddressResourceProperties {
-  @doc("The street address.")
+  /** The street address */
   streetAddress: string;
 
-  @doc("The city of the address.")
+  /** The city of the address */
   city: string;
 
-  @doc("The state of the address.")
+  /** The state of the address */
   state: string;
 
-  @doc("The zip code of the address.")
+  /** The zip code of the address */
   zip: int32;
 
-  @doc("The status of the last operation.")
+  /** The status of the last operation */
   provisioningState?: ProvisioningState;
 }
 
