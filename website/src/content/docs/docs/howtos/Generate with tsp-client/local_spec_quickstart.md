@@ -38,5 +38,5 @@ azure-sdk-for-python> tsp-client init -c ../azure-rest-api-specs/specification/c
 ```
 
 :::info
-To get familiar with `tsp-client` and supported commands, see [Getting started with `tsp-client`](https://aka.ms/azsdk/tsp-client).
+To get familiar with `tsp-client` and supported commands, see [tsp-client usage](https://aka.ms/azsdk/tsp-client).
 :::
