@@ -1046,7 +1046,7 @@ Expected response body:
 
 Location first poll.
 Expected verb: GET
-Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/lro_delete/location
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/lro_post/location
 Expected status code: 202
 Expected no response body
 
