@@ -23,7 +23,7 @@ The issue is that some older specifications marked these values as read only. Th
 
 This violation is caused by a problem with the mechanism that ARM Api validation uses to determine if a [property is read-only. You can work around the issue by setting the `use-read-only-status-schema` configuration setting in `azure/tools/typespec-autorest` options to `true` in your `tspConfig.yaml` configuration file:
 
-```yml
+```yml title=tspconfig.yaml
 emit:
   - "@azure-tools/typespec-autorest"
 options:
@@ -38,27 +38,27 @@ This violation occurs when your spec uses an LRO operation template that follows
 #### PUT Operations
 
 ```tsp
-  // LRO PUT template with required headers and no 200 response
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<MyResource>;
+// LRO PUT template with required headers and no 200 response
+op createOrUpdate is ArmResourceCreateOrReplaceAsync<MyResource>;
 ```
 
 #### PATCH Operations
 
 ```tsp
-  // LRO PATCH template with required headers, response codes, and lro options
-  update is ArmResourcePatchAsync<MyResource, MyResourceProperties>;
+// LRO PATCH template with required headers, response codes, and lro options
+op update is ArmResourcePatchAsync<MyResource, MyResourceProperties>;
 ```
 
 ### POST(Action) Operations
 
 ```tsp
-  // LRO POST (Action) template with required headers, response codes, and lro options
-  doAction is ArmResourceActionAsync<MyResource, RequestModel, ResponseModel>;
+// LRO POST (Action) template with required headers, response codes, and lro options
+op doAction is ArmResourceActionAsync<MyResource, RequestModel, ResponseModel>;
 ```
 
 ### DELETE Operations
 
 ```tsp
-  // LRO delete template with required headers and no 200 response
-  delete is ArmResourceDeleteWithoutOKAsync<MyResource>;
+// LRO delete template with required headers and no 200 response
+op delete is ArmResourceDeleteWithoutOKAsync<MyResource>;
 ```

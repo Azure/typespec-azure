@@ -108,6 +108,7 @@ export const armResourceProvisioningStateRule = createRule({
           }
 
           // validate it must has a read only visibility
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
           const visibilities = getVisibility(context.program, provisioning);
           if (
             !(visibilities !== undefined && visibilities.length === 1 && visibilities[0] === "read")

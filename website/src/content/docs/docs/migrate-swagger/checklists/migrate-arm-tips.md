@@ -12,7 +12,7 @@ The swagger converter will not be able to accurately represent every part of eve
 
 ✅ **DO** extend the `@azure-tools/typespec-azure-rulesets/resource-manager` linter rule set in your tspconfig.yaml if not already there. Example:
 
-```
+```yaml title=tspconfig.yaml
 linter:
   extends:
     - "@azure-tools/typespec-azure-rulesets/resource-manager"
@@ -26,7 +26,7 @@ linter:
 
 ✅ **DO** ensure you have correct ARM common type version select with each service version. Example:
 
-```
+```tsp
   ...
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)  <---
   v2021_10_01_preview: "2021-10-01-preview",
@@ -40,7 +40,7 @@ linter:
 
 ✅ **DO** use `union` instead of `enum` to define Azure extensible enums. See: [Defining enums for Azure services][no-enum]. Example:
 
-```
+```tsp
 /** The color of a widget. */
 union WidgetColor {
   string,

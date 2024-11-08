@@ -44,6 +44,7 @@ export const resourceNameRule = createRule({
         }
 
         function checkResourceName(nameProp: ModelProperty) {
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
           const visibilities = getVisibility(context.program, nameProp);
           return (
             !http.isPathParam(context.program, nameProp) ||

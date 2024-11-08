@@ -334,7 +334,7 @@ op Azure.Core.LongRunningResourceCollectionAction(apiVersion: string): Azure.Cor
 
 ### `LongRunningResourceCreateOrReplace` {#Azure.Core.LongRunningResourceCreateOrReplace}
 
-:::warning
+:::caution
 **Deprecated**: Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
 :::
 
@@ -357,7 +357,7 @@ op Azure.Core.LongRunningResourceCreateOrReplace(apiVersion: string, resource: R
 
 ### `LongRunningResourceCreateOrUpdate` {#Azure.Core.LongRunningResourceCreateOrUpdate}
 
-:::warning
+:::caution
 **Deprecated**: Use `LongRunningResourceCreateOrUpdate` from a `ResourceOperations` interface instance.
 :::
 
@@ -380,7 +380,7 @@ op Azure.Core.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType:
 
 ### `LongRunningResourceCreateWithServiceProvidedName` {#Azure.Core.LongRunningResourceCreateWithServiceProvidedName}
 
-:::warning
+:::caution
 **Deprecated**: Use `LongRunningResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
 :::
 
@@ -484,7 +484,7 @@ op Azure.Core.ResourceCollectionAction(apiVersion: string): {} | Azure.Core.Foun
 
 ### `ResourceCreateOrReplace` {#Azure.Core.ResourceCreateOrReplace}
 
-:::warning
+:::caution
 **Deprecated**: Use `ResourceCreateOrReplace` from a `ResourceOperations` interface instance.
 :::
 
@@ -507,7 +507,7 @@ op Azure.Core.ResourceCreateOrReplace(apiVersion: string, resource: Resource): A
 
 ### `ResourceCreateOrUpdate` {#Azure.Core.ResourceCreateOrUpdate}
 
-:::warning
+:::caution
 **Deprecated**: Use `LongRunningResourceCreateOrReplace` from a `ResourceOperations` interface instance.
 :::
 
@@ -530,7 +530,7 @@ op Azure.Core.ResourceCreateOrUpdate(apiVersion: string, contentType: "applicati
 
 ### `ResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceCreateWithServiceProvidedName}
 
-:::warning
+:::caution
 **Deprecated**: Use `ResourceCreateWithServiceProvidedName` from a `ResourceOperations` interface instance.
 :::
 
@@ -610,7 +610,7 @@ op Azure.Core.ResourceRead(apiVersion: string): {} | Azure.Core.Foundations.Erro
 
 ### `ResourceUpdate` {#Azure.Core.ResourceUpdate}
 
-:::warning
+:::caution
 **Deprecated**: Use `ResourceUpdate` from a `ResourceOperations` interface instance.
 :::
 
