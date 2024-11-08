@@ -2,7 +2,7 @@
 title:  Quickstart - Local development
 ---
 
-These instructions can be used when you want to generate a client library from a local TypeSpec project that has the changes you wish to use. You can develop locally before pushing changes upstream to the `azure-rest-api-specs` repo.
+You can develop locally before pushing changes upstream to the `azure-rest-api-specs` repo. These instructions can be used when you want to generate a client library from a local TypeSpec project that has the changes you wish to use.
 
 ### Prerequisites
 
