@@ -1,5 +1,5 @@
 ---
-title:  Quickstart - Local development
+title: Quickstart (local development)
 ---
 
 `tsp-client` allows you to develop your TypeSpec project locally before pushing changes upstream. These instructions can be used when you want to generate a client library from a local TypeSpec project that has the changes you wish to use.
