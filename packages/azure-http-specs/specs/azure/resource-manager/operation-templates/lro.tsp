@@ -45,7 +45,7 @@ interface Lro {
     ```
     
     Expected status code: 201
-    Expected response header: Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/operations/create_or_replace
+    Expected response header: Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/lro_create/aao
     
     Expected response body:
     ```json
@@ -95,7 +95,6 @@ interface Lro {
     }
     ```
     
-    (The last GET call on resource URL is optional)
     Expected verb: GET
     Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro
     
@@ -166,6 +165,7 @@ interface Lro {
     Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/lro_delete/location
     
     Expected status code: 204
+    Expected no response body
     
     AAO first poll.
     Expected verb: GET
