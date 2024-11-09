@@ -14,7 +14,7 @@ export const noEmptyModel = createRule({
   create(context) {
     return {
       model: (model: Model) => {
-        if (model.properties.size === 0) {
+        if (model.properties.size === 0 && model.sourceModel?.name !== "Record") {
           context.reportDiagnostic({
             code: "no-empty-model",
             target: model,
