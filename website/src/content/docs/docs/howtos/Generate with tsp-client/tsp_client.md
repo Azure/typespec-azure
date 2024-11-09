@@ -1,5 +1,5 @@
 ---
-title: Supported commands
+title: Usage & Configuration
 ---
 
 :::info
