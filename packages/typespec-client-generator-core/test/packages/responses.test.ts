@@ -269,7 +269,7 @@ describe("typespec-client-generator-core: package", () => {
         prop: string;
       }
 
-      @protocolAPI(true)
+      @convenientAPI(false)
       op get(): Test;
       `,
     );
