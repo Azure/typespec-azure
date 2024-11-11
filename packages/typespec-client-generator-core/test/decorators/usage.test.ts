@@ -461,7 +461,10 @@ describe("typespec-client-generator-core: @usage", () => {
   });
 
   it("disableUsageAccessPropagationToBase true with override", async () => {
-    runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" }, { disableUsageAccessPropagationToBase: true });
+    runner = await createSdkTestRunner(
+      { emitterName: "@azure-tools/typespec-python" },
+      { disableUsageAccessPropagationToBase: true },
+    );
     await runner.compileWithBuiltInService(
       `
         model BaseClassThatsPruned {
@@ -486,7 +489,10 @@ describe("typespec-client-generator-core: @usage", () => {
   });
 
   it("disableUsageAccessPropagationToBase true", async () => {
-    runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" }, { disableUsageAccessPropagationToBase: true });
+    runner = await createSdkTestRunner(
+      { emitterName: "@azure-tools/typespec-python" },
+      { disableUsageAccessPropagationToBase: true },
+    );
     await runner.compileWithBuiltInService(
       `
         model BaseClassThatsPruned {
