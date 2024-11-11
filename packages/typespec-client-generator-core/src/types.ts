@@ -1553,36 +1553,35 @@ function updateTypesFromOperation(
         // will also have Json type
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.JsonMergePatch, sdkType));
       }
-    }
-    if (multipartOperation) {
-      diagnostics.pipe(
-        updateUsageOrAccess(context, UsageFlags.MultipartFormData, sdkType, {
-          propagation: false,
-        }),
-      );
-    }
-    const access = getAccessOverride(context, operation) ?? "public";
-    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-
-    // after completion of usage calculation for httpBody, check whether it has
-    // conflicting usage between multipart and regular body
-    if (sdkType.kind === "model") {
-      const isUsedInMultipart = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
-      const isUsedInOthers =
-        ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
-      if ((!multipartOperation && isUsedInMultipart) || (multipartOperation && isUsedInOthers)) {
-        // This means we have a model that is used both for formdata input and for regular body input
-        diagnostics.add(
-          createDiagnostic({
-            code: "conflicting-multipart-model-usage",
-            target: httpBody.type,
-            format: {
-              modelName: sdkType.name,
-            },
+      if (multipartOperation) {
+        diagnostics.pipe(
+          updateUsageOrAccess(context, UsageFlags.MultipartFormData, sdkType, {
+            propagation: false,
           }),
         );
       }
+      // after completion of usage calculation for httpBody, check whether it has
+      // conflicting usage between multipart and regular body
+      if (sdkType.kind === "model") {
+        const isUsedInMultipart = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
+        const isUsedInOthers =
+          ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
+        if ((!multipartOperation && isUsedInMultipart) || (multipartOperation && isUsedInOthers)) {
+          // This means we have a model that is used both for formdata input and for regular body input
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflicting-multipart-model-usage",
+              target: httpBody.type,
+              format: {
+                modelName: sdkType.name,
+              },
+            }),
+          );
+        }
+      }
     }
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
   }
 
   for (const response of httpOperation.responses) {
@@ -1595,9 +1594,10 @@ function updateTypesFromOperation(
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
           diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-        }
-        if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
-          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+
+          if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+          }
         }
         const access = getAccessOverride(context, operation) ?? "public";
         diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
