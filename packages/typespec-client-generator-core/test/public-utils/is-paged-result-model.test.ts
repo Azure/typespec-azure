@@ -1,8 +1,8 @@
-import { beforeEach, describe, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-import { isPagedResultModel } from "../../src/public-utils.js";
-import { ok } from "assert";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { ok } from "assert";
+import { beforeEach, describe, it } from "vitest";
+import { isPagedResultModel } from "../../src/public-utils.js";
+import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: public-utils", () => {
   let runner: SdkTestRunner;
@@ -35,7 +35,12 @@ describe("typespec-client-generator-core: public-utils", () => {
     `);
 
     const sdkPackage = runner.context.sdkPackage;
-    ok(isPagedResultModel(runner.context, sdkPackage.models.filter(m => m.name === "TestResult")[0]));
+    ok(
+      isPagedResultModel(
+        runner.context,
+        sdkPackage.models.filter((m) => m.name === "TestResult")[0],
+      ),
+    );
   });
 
   it("template paged model", async () => {
@@ -55,7 +60,12 @@ describe("typespec-client-generator-core: public-utils", () => {
     `);
 
     const sdkPackage = runner.context.sdkPackage;
-    ok(isPagedResultModel(runner.context, sdkPackage.models.filter(m => m.name === "TestResult")[0]));
+    ok(
+      isPagedResultModel(
+        runner.context,
+        sdkPackage.models.filter((m) => m.name === "TestResult")[0],
+      ),
+    );
   });
 
   it("another usage of template paged model", async () => {
@@ -73,7 +83,12 @@ describe("typespec-client-generator-core: public-utils", () => {
     `);
 
     const sdkPackage = runner.context.sdkPackage;
-    ok(isPagedResultModel(runner.context, sdkPackage.models.filter(m => m.name === "PagedTest")[0]));
+    ok(
+      isPagedResultModel(
+        runner.context,
+        sdkPackage.models.filter((m) => m.name === "PagedTest")[0],
+      ),
+    );
   });
 
   it("paged model use template list", async () => {
@@ -93,7 +108,11 @@ describe("typespec-client-generator-core: public-utils", () => {
     `);
 
     const sdkPackage = runner.context.sdkPackage;
-    ok(isPagedResultModel(runner.context, sdkPackage.models.filter(m => m.name === "PagedTest")[0]));
+    ok(
+      isPagedResultModel(
+        runner.context,
+        sdkPackage.models.filter((m) => m.name === "PagedTest")[0],
+      ),
+    );
   });
-
 });
