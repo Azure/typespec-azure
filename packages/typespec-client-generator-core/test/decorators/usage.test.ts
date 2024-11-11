@@ -459,4 +459,55 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(models[1].usage, UsageFlags.Output);
     strictEqual(models[1].access, "public");
   });
+
+  it("disableUsageAccessPropagationToBase true with override", async () => {
+    runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" }, { disableUsageAccessPropagationToBase: true });
+    await runner.compileWithBuiltInService(
+      `
+        model BaseClassThatsPruned {
+          id: int32;
+        }
+        model DerivedOne extends BaseClassThatsPruned {
+          name: string;
+          prop: UsedByProperty;
+        }
+        model UsedByProperty {
+          prop: string;
+        }
+        @@usage(DerivedOne, Usage.output);
+      `,
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    strictEqual(models[0].usage, UsageFlags.Output);
+    strictEqual(models[0].name, "DerivedOne");
+    strictEqual(models[1].usage, UsageFlags.Output);
+    strictEqual(models[1].name, "UsedByProperty");
+  });
+
+  it("disableUsageAccessPropagationToBase true", async () => {
+    runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" }, { disableUsageAccessPropagationToBase: true });
+    await runner.compileWithBuiltInService(
+      `
+        model BaseClassThatsPruned {
+          id: int32;
+        }
+        model DerivedOne extends BaseClassThatsPruned {
+          name: string;
+          prop: UsedByProperty;
+        }
+        model UsedByProperty {
+          prop: string;
+        }
+
+        op test(): DerivedOne;
+      `,
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[0].name, "DerivedOne");
+    strictEqual(models[1].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[1].name, "UsedByProperty");
+  });
 });

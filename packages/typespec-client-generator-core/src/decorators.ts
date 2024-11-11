@@ -615,6 +615,7 @@ export function createTCGCContext(program: Program, emitterName: string): TCGCCo
     __tspTypeToApiVersions: new Map(),
     __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
+    disableUsageAccessPropagationToBase: false,
   };
 }
 
@@ -626,6 +627,7 @@ interface VersioningStrategy {
 export interface CreateSdkContextOptions {
   readonly versioning?: VersioningStrategy;
   additionalDecorators?: string[];
+  disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
 }
 
 export async function createSdkContext<
@@ -658,6 +660,7 @@ export async function createSdkContext<
     examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
+    disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {

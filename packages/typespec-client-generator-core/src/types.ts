@@ -1234,8 +1234,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
-          )
+          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
+        )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1446,7 +1446,6 @@ function updateUsageOrAccess(
   }
 
   if (type.kind === "enum") return diagnostics.wrap(undefined);
-  if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccess(context, value, unionType, options));
@@ -1457,7 +1456,9 @@ function updateUsageOrAccess(
     diagnostics.pipe(updateUsageOrAccess(context, value, type.type, options));
     return diagnostics.wrap(undefined);
   }
-  if (type.baseModel) {
+
+  if (!options.propagation) return diagnostics.wrap(undefined);
+  if (type.baseModel && !context.disableUsageAccessPropagationToBase) {
     options.ignoreSubTypeStack.push(true);
     diagnostics.pipe(updateUsageOrAccess(context, value, type.baseModel, options));
     options.ignoreSubTypeStack.pop();
