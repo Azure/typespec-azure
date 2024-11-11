@@ -46,6 +46,7 @@ import {
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getPagedResult } from "@azure-tools/typespec-azure-core";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -680,4 +681,8 @@ export function listSubClients<TServiceOperation extends SdkServiceOperation>(
 
 export function isAzureCoreModel(t: SdkType): boolean {
   return t.__raw !== undefined && isAzureCoreTspModel(t.__raw);
+}
+
+export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
+  return t.__raw !== undefined && t.__raw.kind === "Model" && getPagedResult(context.program, t.__raw) !== undefined;
 }
