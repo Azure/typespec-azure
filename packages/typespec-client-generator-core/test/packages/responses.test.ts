@@ -261,4 +261,22 @@ describe("typespec-client-generator-core: package", () => {
     strictEqual(serviceResponse.type?.kind, "bytes");
     strictEqual(serviceResponse.type?.encode, "bytes");
   });
+
+  it("protocol response usage", async () => {
+    await runner.compileWithBuiltInService(
+      `
+      model Test {
+        prop: string;
+      }
+
+      @protocolAPI(true)
+      op get(): Test;
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.models.length, 0);
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.response.type?.kind, "model");
+    strictEqual(method.response.type.usage, 0);
+  });
 });
