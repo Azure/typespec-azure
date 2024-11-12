@@ -10,14 +10,15 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 const SUBSCRIPTION_ID_EXPECTED = "00000000-0000-0000-0000-000000000000";
 const RESOURCE_GROUP_EXPECTED = "test-rg";
-const validLroResource = {
-  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro`,
-  name: "lro",
-  type: "Azure.ResourceManager.Resources/lroResources",
+const validOrder = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/orders/order1`,
+  name: "order1",
+  type: "Azure.ResourceManager.Resources/orders",
   location: "eastus",
   properties: {
     provisioningState: "Succeeded",
-    description: "valid",
+    productId: "product1",
+    amount: 1,
   },
   systemData: {
     createdBy: "AzureSDK",
@@ -36,19 +37,20 @@ let deletePollCount = 0;
 Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnSuccess([
   {
     // LRO PUT initial request
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName",
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
     method: "put",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
-        lroResourceName: "lro",
+        orderName: "order1",
         "api-version": "2023-12-01-preview",
       },
       body: {
         location: "eastus",
         properties: {
-          description: "valid",
+          productId: "product1",
+          amount: 1,
         },
       },
     },
@@ -58,9 +60,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
         "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
       },
       body: json({
-        ...validLroResource,
+        ...validOrder,
         properties: {
-          description: "valid",
           provisioningState: "InProgress",
         },
       }),
@@ -73,9 +74,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
           "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
         },
         body: json({
-          ...validLroResource,
+          ...validOrder,
           properties: {
-            description: "valid",
             provisioningState: "InProgress",
           },
         }),
@@ -114,7 +114,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
               ...aaoResponse,
               status: "Succeeded",
               endTime: "2024-11-08T01:42:41.5354192+00:00",
-              properties: validLroResource,
+              properties: validOrder,
             }
           : { ...aaoResponse, status: "InProgress" };
       const statusCode = createOrReplacePollCount > 0 ? 200 : 202;
@@ -127,40 +127,39 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     kind: "MockApiDefinition",
   },
   {
-    // (Optional) LRO PUT get final result through initial request uri
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName",
+    // LRO PUT get final result through initial request uri
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
     method: "get",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
-        lroResourceName: "lro",
+        orderName: "order",
         "api-version": "2023-12-01-preview",
       },
     },
     response: {
       status: 200,
-      body: json(validLroResource),
+      body: json(validOrder),
     },
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_OperationTemplates_Lro_upload = passOnSuccess([
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
   {
     // LRO POST initial request
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName/upload",
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName/export",
     method: "post",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
-        lroResourceName: "lro",
+        orderName: "lro",
         "api-version": "2023-12-01-preview",
       },
       body: {
-        content: "My File Content.",
-        filename: "myfile",
+        format: "csv",
       },
     },
     response: {
@@ -199,7 +198,6 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_upload = passOnSuccess([
     handler: (req: MockRequest) => {
       let response;
       const lro_header = req.params["lro_header"];
-      const resultUrl = `https://example.org/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro/files/myfile`;
       if (lro_header === "location") {
         response =
           // first status will be 200, second and forward be 204
@@ -207,7 +205,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_upload = passOnSuccess([
             ? {
                 status: 200,
                 body: json({
-                  url: resultUrl,
+                  content: "order1,product1,1",
                 }),
               }
             : { status: 202 };
@@ -246,20 +244,14 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_upload = passOnSuccess([
 Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
   {
     // LRO DELETE initial request
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/lroResources/:lroResourceName",
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
     method: "delete",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
-        lroResourceName: "lro",
+        orderName: "order1",
         "api-version": "2023-12-01-preview",
-      },
-      body: {
-        location: "eastus",
-        properties: {
-          description: "valid",
-        },
       },
     },
     response: {

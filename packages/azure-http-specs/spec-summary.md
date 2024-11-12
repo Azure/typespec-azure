@@ -845,7 +845,7 @@ Service returns "Azure-AsyncOperation" on initial request.
 final-state-via: Azure-AsyncOperation
 
 Expected verb: PUT
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1
 Expected query parameter: api-version=2023-12-01-preview
 Expected request body:
 
@@ -853,7 +853,8 @@ Expected request body:
 {
   "location": "eastus",
   "properties": {
-    "description": "valid"
+    "productId": "product1",
+    "amount": 1
   }
 }
 ```
@@ -864,9 +865,9 @@ Expected response body:
 
 ```json
 {
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro",
-  "name": "lro",
-  "type": "Azure.ResourceManager.Resources/lroResources",
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1",
+  "name": "order1",
+  "type": "Azure.ResourceManager.Resources/orders",
   "location": "eastus",
   "properties": {
     "description": "valid",
@@ -908,45 +909,28 @@ Expected response body:
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/locations/eastus/lro_create/aao",
   "name": "aao",
-  "status" : "Succeeded",
+  "status": "Succeeded",
   "startTime": "2024-11-08T01:41:53.5508583+00:00",
-  "endTime": "2024-11-08T01:42:41.5354192+00:00",
-  "properties": {
-    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro",
-    "name": "lro",
-    "type": "Azure.ResourceManager.Resources/lroResources",
-    "location": "eastus",
-    "properties": {
-      "description": "valid",
-      "provisioningState": "Succeeded"
-    },
-    "systemData": {
-      "createdBy": "AzureSDK",
-      "createdByType": "User",
-      "createdAt": <any date>,
-      "lastModifiedBy": "AzureSDK",
-      "lastModifiedAt": <any date>,
-      "lastModifiedByType": "User",
-    }
-  }
+  "endTime": "2024-11-08T01:42:41.5354192+00:00"
 }
 ```
 
-(Optional) Last get call on resource URL
+Last get call on resource URL
 Expected verb: GET
-Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1
 
 Expected status code: 200
 Expected response body:
 
 ````json
 {
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro",
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1",
   "name": "lro",
-  "type": "Azure.ResourceManager.Resources/lroResources",
+  "type": "Azure.ResourceManager.Resources/orders",
   "location": "eastus",
   "properties": {
-    "description": "valid",
+    "productId": "product1",
+    "amount": 1,
     "provisioningState": "Succeeded"
   },
   "systemData": {
@@ -967,7 +951,7 @@ Resource DELETE operation.
 Service returns both Location header on initial request.
 
 Expected verb: DELETE
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1
 Expected query parameter: api-version=2023-12-01-preview
 Expected response status code: 202
 Expected response header: Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/lro_delete/location
@@ -985,7 +969,7 @@ Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/loca
 Expected status code: 204
 Expected no response body
 
-### Azure_ResourceManager_OperationTemplates_Lro_upload
+### Azure_ResourceManager_OperationTemplates_Lro_export
 
 - Endpoint: `post https://management.azure.com`
 
@@ -994,13 +978,12 @@ Service returns both Location and Azure-AsyncOperation header on initial request
 final-state-via: location
 
 Expected verb: POST
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro/upload
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1/export
 Expected query parameter: api-version=2023-12-01-preview
 Expected request body:
 ```json
 {
-  "content": "My File Content.",
-  "filename": "myfile"
+  "format": "csv"
 }
 ````
 
@@ -1058,7 +1041,7 @@ Expected response body:
 
 ```json
 {
-  "url": "https://example.org/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/lroResources/lro/files/myfile"
+  "content": "order1,product1,1"
 }
 ```
 
