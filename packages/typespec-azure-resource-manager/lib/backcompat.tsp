@@ -21,8 +21,10 @@ alias PrivateLinkResource = CommonTypes.PrivateLinkResource;
 alias PrivateLinkResourceProperties = CommonTypes.PrivateLinkResourceProperties;
 alias PrivateLinkResourceParameter = CommonTypes.PrivateLinkResourceParameter;
 alias PrivateEndpointConnectionResourceListResult = CommonTypes.PrivateEndpointConnectionListResult;
+#suppress "deprecated" "Need for back compatibility in common-types"
 alias PrivateEndpointConnectionResourceListResultV5 = CommonTypes.PrivateEndpointConnectionListResultV5;
 alias PrivateLinkResourceListResult = CommonTypes.PrivateLinkResourceListResult;
+#suppress "deprecated" "Need for back compatibility in common-types"
 alias PrivateLinkResourceListResultV5 = CommonTypes.PrivateLinkResourceListResultV5;
 
 // types

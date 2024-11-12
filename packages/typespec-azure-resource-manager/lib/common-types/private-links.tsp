@@ -153,7 +153,31 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
   name: string;
 }
 
-/** A list of private link resources. */
+/**
+ * Model representing the standard `PrivateLinkResourceListResult` envelope for version v3,v4 and v5, it has been deprecated for v6 and beyond.
+ *
+ * Please note that this is only intended to use on versions before v6, do not use this if you are already on CommonTypes.Version.v6 or beyond.
+ *
+ * If you are mitrating to v6 or above, use `PrivateLinkResourceListResult` directly.
+ *
+ *  @example
+ *  Version: v3,v4,v5
+ * ```typespec
+ * @armResourceOperations
+ * interface Employees {
+ *   listConnections is ArmResourceActionAsync<Employee, {}, PrivateLinkResourceListResultV5>;
+ * }
+ * ```
+ *
+ * Version: v6
+ * ```typespec
+ * @armResourceOperations
+ * interface Employees {
+ *   listConnections is ArmResourceActionAsync<Employee, {}, PrivateLinkResourceListResult>;
+ * }
+ * ```
+ */
+#deprecated "Avoid using this model. Instead, use PrivateLinkResourceListResult available in CommonTypes.Version.v6 or beyond."
 @friendlyName("PrivateLinkResourceListResult")
 @removed(Versions.v6)
 model PrivateLinkResourceListResultV5 {
@@ -161,7 +185,39 @@ model PrivateLinkResourceListResultV5 {
   value?: CommonTypes.PrivateLinkResource[];
 }
 
-/** List of private endpoint connections associated with the specified resource. */
+/**
+ * Model representing the standard `PrivateEndpointConnectionResourceListResult` envelope for version v3,v4 and v5, it has been deprecated for v6 and beyond.
+ *
+ * Please note that this is only intended to use on versions before v6, do not use this if you are already on CommonTypes.Version.v6 or beyond.
+ *
+ * If you are mitrating to v6 or above, use `PrivateEndpointConnectionResourceListResult` directly.
+ *
+ * @example
+ * Version: v3,v4,v5
+ * ```typespec
+ * @armResourceOperations
+ * interface Employees {
+ *   createConnection is ArmResourceActionAsync<
+ *     Employee,
+ *     PrivateEndpointConnection,
+ *     PrivateEndpointConnectionResourceListResultV5
+ *   >;
+ * }
+ * ```
+ *
+ * Version: v6
+ * ```typespec
+ * @armResourceOperations
+ * interface Employees {
+ *   createConnection is ArmResourceActionAsync<
+ *     Employee,
+ *     PrivateEndpointConnection,
+ *     PrivateEndpointConnectionResourceListResult
+ *   >;
+ * }
+ * ```
+ */
+#deprecated "Avoid using this model. Instead, use PrivateEndpointConnectionResourceListResult available in CommonTypes.Version.v6 or beyond."
 @friendlyName("PrivateEndpointConnectionListResult")
 @removed(Versions.v6)
 model PrivateEndpointConnectionListResultV5 {
