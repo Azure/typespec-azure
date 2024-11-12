@@ -870,7 +870,8 @@ Expected response body:
   "type": "Azure.ResourceManager.Resources/orders",
   "location": "eastus",
   "properties": {
-    "description": "valid",
+    "productId": "product1",
+    "amount": 1,
     "provisioningState": "InProgress"
   },
   "systemData": {
