@@ -1458,8 +1458,11 @@ function updateUsageOrAccess(
   }
 
   if (!options.propagation) return diagnostics.wrap(undefined);
-  if (type.baseModel && !context.disableUsageAccessPropagationToBase) {
+  if (type.baseModel) {
     options.ignoreSubTypeStack.push(true);
+    if (context.disableUsageAccessPropagationToBase) {
+      options.skipFirst = true;
+    }
     diagnostics.pipe(updateUsageOrAccess(context, value, type.baseModel, options));
     options.ignoreSubTypeStack.pop();
   }
