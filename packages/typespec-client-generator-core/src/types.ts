@@ -1234,8 +1234,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
-          )
+          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
+        )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1383,7 +1383,10 @@ function updateUsageOrAccess(
   if (options?.seenTypes === undefined) {
     options.seenTypes = new Set<SdkType>();
   }
-  if (options.seenTypes.has(type)) return diagnostics.wrap(undefined); // avoid circular references
+  if (options.seenTypes.has(type)) {
+    options.skipFirst = false;
+    return diagnostics.wrap(undefined); // avoid circular references
+  }
   if (type.kind === "array" || type.kind === "dict") {
     diagnostics.pipe(updateUsageOrAccess(context, value, type.valueType, options));
     return diagnostics.wrap(undefined);
@@ -1443,6 +1446,9 @@ function updateUsageOrAccess(
     }
   } else {
     options.skipFirst = false;
+    if (typeof value !== "number") {
+      type.__accessSet = true;
+    }
   }
 
   if (type.kind === "enum") return diagnostics.wrap(undefined);
