@@ -128,6 +128,10 @@ export async function getAllServicesAtAllVersions(
       (v) => !options.version || options.version === v.version,
     );
 
+    if (versions.length === 0) {
+      throw new Error("No matching version found.");
+    }
+    
     if (versions.length === 1 && versions[0].version === undefined) {
       let projectedProgram;
       if (versions[0].projections.length > 0) {
