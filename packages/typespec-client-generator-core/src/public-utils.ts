@@ -32,6 +32,7 @@ import {
   SdkClientType,
   SdkHttpOperationExample,
   SdkServiceOperation,
+  SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import {
@@ -39,6 +40,7 @@ import {
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
+  isAzureCoreTspModel,
   isHttpBodySpread,
   parseEmitterName,
   removeVersionsLargerThanExplicitlySpecified,
@@ -674,4 +676,8 @@ export function listSubClients<TServiceOperation extends SdkServiceOperation>(
     }
   }
   return subClients;
+}
+
+export function isAzureCoreModel(t: SdkType): boolean {
+  return t.__raw !== undefined && isAzureCoreTspModel(t.__raw);
 }

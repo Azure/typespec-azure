@@ -33,7 +33,6 @@ export default {
     "@azure-tools/typespec-azure-core/response-schema-problem": true,
     "@azure-tools/typespec-azure-core/rpc-operation-request-body": true,
     "@azure-tools/typespec-azure-core/spread-discriminated-model": true,
-    "@azure-tools/typespec-azure-core/use-standard-names": true,
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
     "@azure-tools/typespec-azure-core/require-versioned": true,
     "@azure-tools/typespec-azure-core/no-private-usage": true,
@@ -42,6 +41,9 @@ export default {
 
     // Azure core not enable - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/no-response-body": false,
+
+    // Not applicable for Arm
+    "@azure-tools/typespec-azure-core/use-standard-names": false,
 
     // Azure core not enabled - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/bad-record-type": false,

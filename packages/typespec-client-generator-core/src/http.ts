@@ -62,6 +62,7 @@ import { createDiagnostic } from "./lib.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
+  getWireName,
   isApiVersion,
 } from "./public-utils.js";
 import {
@@ -84,6 +85,7 @@ export function getSdkHttpOperation(
   const parameters = diagnostics.pipe(
     getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0]),
   );
+  filterOutUselessPathParameters(context, httpOperation, methodParameters);
   return diagnostics.wrap({
     __raw: httpOperation,
     kind: "http",
@@ -122,10 +124,13 @@ function getSdkHttpParameters(
     parameters: [],
     bodyParam: undefined,
   };
+
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+      diagnostics.pipe(
+        getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type as any),
+      ),
     )
     .filter(
       (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
@@ -180,6 +185,7 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
+        serializedName: "body",
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
@@ -361,6 +367,7 @@ export function getSdkHttpParameter(
     return diagnostics.wrap({
       ...base,
       kind: "body",
+      serializedName: param.name === "" ? "body" : getWireName(context, param),
       contentTypes: ["application/json"], // will update when we get to the operation level
       defaultContentType: "application/json", // will update when we get to the operation level
       optional: param.optional,
@@ -417,15 +424,16 @@ function getSdkHttpResponseAndExceptions(
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
+    let type: SdkType | undefined;
     let contentTypes: string[] = [];
 
     for (const innerResponse of response.responses) {
+      const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
+        ? "application/json"
+        : innerResponse.body?.contentTypes[0];
       for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
         const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
-        const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
-          ? "application/json"
-          : innerResponse.body?.contentTypes[0];
         addEncodeInfo(context, header, clientType, defaultContentType);
         headers.push({
           __raw: header,
@@ -456,11 +464,17 @@ function getSdkHttpResponseAndExceptions(
           innerResponse.body.type.kind === "Model"
             ? getEffectivePayloadType(context, innerResponse.body.type)
             : innerResponse.body.type;
+        type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+        );
+        if (innerResponse.body.property) {
+          addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+        }
       }
     }
     const sdkResponse = {
       __raw: response,
-      type: body ? diagnostics.pipe(getClientTypeWithDiagnostics(context, body)) : undefined,
+      type,
       headers,
       contentTypes: contentTypes.length > 0 ? contentTypes : undefined,
       defaultContentType: contentTypes.includes("application/json")
@@ -592,7 +606,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      methodParam.__raw.node === serviceParam.__raw.node
+      findRootSourceProperty(methodParam.__raw) === findRootSourceProperty(serviceParam.__raw)
     ) {
       return methodParam;
     }
@@ -623,6 +637,38 @@ function findMapping(
     }
   }
   return undefined;
+}
+
+function filterOutUselessPathParameters(
+  context: TCGCContext,
+  httpOperation: HttpOperation,
+  methodParameters: SdkMethodParameter[],
+) {
+  // there are some cases that method path parameter is not in operation:
+  // 1. autoroute with constant parameter
+  // 2. singleton arm resource name
+  // 3. visibility mis-match
+  // so we will remove the method parameter for consistent
+  for (let i = 0; i < methodParameters.length; i++) {
+    const param = methodParameters[i];
+    if (
+      param.__raw &&
+      isPathParam(context.program, param.__raw) &&
+      httpOperation.parameters.parameters.filter(
+        (p) => p.type === "path" && p.name === getWireName(context, param.__raw!),
+      ).length === 0
+    ) {
+      methodParameters.splice(i, 1);
+      i--;
+    }
+  }
+}
+
+function findRootSourceProperty(property: ModelProperty): ModelProperty {
+  while (property.sourceProperty) {
+    property = property.sourceProperty;
+  }
+  return property;
 }
 
 function getCollectionFormat(

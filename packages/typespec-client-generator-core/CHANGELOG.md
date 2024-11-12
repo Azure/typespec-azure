@@ -1,5 +1,36 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.48.1
+
+### Bug Fixes
+
+- [#1813](https://github.com/Azure/typespec-azure/pull/1813) fix wrong encode for body response of binary type
+- [#1786](https://github.com/Azure/typespec-azure/pull/1786) support client namespace
+
+
+## 0.48.0
+
+### Bug Fixes
+
+- [#1806](https://github.com/Azure/typespec-azure/pull/1806) remove filtering core model flag
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
+## 0.47.4
+
+### Bug Fixes
+
+- [#1763](https://github.com/Azure/typespec-azure/pull/1763) support serialized name for body parameter to avoid example mis-mapping
+- [#1761](https://github.com/Azure/typespec-azure/pull/1761) use root source property to map operation params to method
+- [#1775](https://github.com/Azure/typespec-azure/pull/1775) remove unused path parameter from method
+- [#1700](https://github.com/Azure/typespec-azure/pull/1700) We no longer filter out core models. The `filter-out-core-models` parameter to `SdkContext` is also removed
+- [#1772](https://github.com/Azure/typespec-azure/pull/1772) use array instead of set to make the types ordered by typespec definition
+- [#1762](https://github.com/Azure/typespec-azure/pull/1762) make union/nullable type to be reference type and add usage/access support for them
+
+
 ## 0.47.3
 
 ### Bug Fixes

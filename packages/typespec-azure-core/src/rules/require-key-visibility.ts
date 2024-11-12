@@ -18,6 +18,7 @@ export const requireKeyVisibility = createRule({
           model.name !== "object"
         ) {
           for (const [name, prop] of model.properties) {
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             if (isKey(context.program, prop) && !getVisibility(context.program, prop)) {
               context.reportDiagnostic({
                 target: prop,

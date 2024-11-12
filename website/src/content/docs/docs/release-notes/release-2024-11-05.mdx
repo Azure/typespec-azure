@@ -1,0 +1,52 @@
+---
+title: 0.48.0 November 2024
+---
+
+import { LinkCard, Badge } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 0.62"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2024-11-05"
+/>
+
+## Potential Breaking changes
+
+### Ambiguous `@nextLink` <Badge text="Ambiguous reference" variant="caution"/>
+
+If defining custom paging response using `Azure.Core` `@pagedResult` and `@nextLink`, the `@nextLink` decorator from `Azure.Core` can be result in an ambiguous reference. The fix is to simply use the fully qualified name.
+
+```diff lang="tsp"
+@pagedResult
+model List {
+  items?: string[];
+
+-  @nextLink
++  @Azure.Core.nextLink
+  nextLink?: string;
+}
+```
+
+## Features
+
+### @azure-tools/typespec-autorest
+
+- [#1566](https://github.com/Azure/typespec-azure/pull/1566) Emit `x-ms-pageable` whenever possible for new core paging model
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#1670](https://github.com/Azure/typespec-azure/pull/1670) Add an envelope model for a standard availability zones API contract.
+- [#1674](https://github.com/Azure/typespec-azure/pull/1674) Remove restrictions requiring Foundation.Resource in ArmResourceListByParent. This will allow using the template for non-standard resources / collection actions that return a list.
+  As part of the change, the response can now return any type. This will be specified in the response section using a new `ResourceListCustomResult<type>` model.
+
+## Bug Fixes
+
+### @azure-tools/typespec-azure-core
+
+- [#1545](https://github.com/Azure/typespec-azure/pull/1545) Add docs for linting rules and stop excluding non `Azure.` namespace
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#1759](https://github.com/Azure/typespec-azure/pull/1759) Fix the `ArmOperationStatus` model to match the Azure-AsyncOperation Resource format, where the `id` is of type `string` instead of `Core.uuid`.
+- [#1741](https://github.com/Azure/typespec-azure/pull/1741) Fix the `arm-resource-invalid-action-verb` rule. The rule should only allow `@post` and `@get` verbs, but it wasn't flagging other verbs.
+- [#1744](https://github.com/Azure/typespec-azure/pull/1744) Fix the `x-ms-identifier` rule. The `x-ms-identifier` supports indexing into inner properties, but the linter does not support that and reports a warning.
