@@ -2532,6 +2532,58 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(paramsParam.type.kind, "model");
       strictEqual(paramsParam.type.name, "Params");
     });
+
+    it("override with redefinitions", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compileWithCustomization(
+        `
+        @useDependency(Versions.v1_0_Preview_2)
+        @server("http://localhost:3000", "endpoint")
+        @service()
+        namespace My.Service;
+
+        model Params {
+          foo: string;
+          params: Params[];
+        }
+
+        @route("/template")
+        op templateOp is Azure.Core.RpcOperation<
+          Params,
+          Params
+        >;
+        `,
+        `
+        namespace My.Customizations;
+
+        @client({
+          name: "MyClient",
+          service: My.Service,
+        })
+        interface DocumentTranslationClient {
+          templateOp is My.Service.templateOp;
+        }
+
+        op templateOp(params: My.Service.Params): My.Service.Params;
+
+        @@override(My.Service.templateOp, My.Customizations.templateOp);
+        `,
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const method = sdkPackage.clients[0].methods[0];
+      strictEqual(method.parameters.length, 3);
+      ok(method.parameters.find((x) => x.name === "contentType"));
+      ok(method.parameters.find((x) => x.name === "accept"));
+
+      const paramsParam = method.parameters.find((x) => x.name === "params");
+      ok(paramsParam);
+      strictEqual(paramsParam.type.kind, "model");
+      strictEqual(paramsParam.type.name, "Params");
+    });
   });
   describe("@clientInitialization", () => {
     it("main client", async () => {
