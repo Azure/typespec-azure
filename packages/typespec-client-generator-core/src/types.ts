@@ -1608,7 +1608,7 @@ function updateTypesFromOperation(
           } else {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
           }
-          
+
           if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
           }
