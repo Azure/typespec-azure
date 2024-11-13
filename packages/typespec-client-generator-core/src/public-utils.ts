@@ -16,6 +16,7 @@ import {
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
+  isErrorModel,
   listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
@@ -696,4 +697,8 @@ export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
     t.__raw.kind === "Model" &&
     getPagedResult(context.program, t.__raw) !== undefined
   );
+}
+
+export function isSdkErrorModel(context: TCGCContext, t: SdkType): boolean {
+  return t.__raw !== undefined && isErrorModel(context.program, t.__raw);
 }

@@ -4,7 +4,7 @@ import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreTspModel } from "../../src/internal-utils.js";
-import { isAzureCoreModel } from "../../src/public-utils.js";
+import { isAzureCoreModel, isSdkErrorModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -1186,9 +1186,9 @@ describe("typespec-client-generator-core: model types", () => {
     );
     ok(
       AdditionalPropertiesModel &&
-        AdditionalPropertiesModel2 &&
-        AdditionalPropertiesModel3 &&
-        NonAdditionalPropertiesModel,
+      AdditionalPropertiesModel2 &&
+      AdditionalPropertiesModel3 &&
+      NonAdditionalPropertiesModel,
     );
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -1234,10 +1234,10 @@ describe("typespec-client-generator-core: model types", () => {
     const Test2 = models.find((x) => x.name === "Test2");
     ok(
       AdditionalPropertiesModel &&
-        AdditionalPropertiesModel2 &&
-        AdditionalPropertiesModel3 &&
-        Test &&
-        Test2,
+      AdditionalPropertiesModel2 &&
+      AdditionalPropertiesModel3 &&
+      Test &&
+      Test2,
     );
 
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
@@ -1420,16 +1420,10 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = getAllModels(runner.context);
     strictEqual(models.length, 1);
-    strictEqual(models[0].kind, "model");
-    ok(models[0].usage & UsageFlags.Error);
-
     const model = models[0];
-    const rawModel = model.__raw;
-    ok(rawModel);
-    strictEqual(rawModel.kind, "Model");
-    strictEqual(isErrorModel(runner.context.program, rawModel), true);
-    ok(model.usage & UsageFlags.Output);
-    ok(model.usage & UsageFlags.Error);
+    strictEqual(model.kind, "model");
+    ok(model.usage & UsageFlags.Exception);
+    ok(isSdkErrorModel(runner.context, model));
   });
 
   it("error model inheritance", async () => {

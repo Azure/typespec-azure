@@ -1593,7 +1593,11 @@ function updateTypesFromOperation(
             : innerResponse.body.type;
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
-          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
+          if (response.statusCodes === "*" || isErrorModel(context.program, body)) {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Exception, sdkType));
+          } else {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
+          }
 
           if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
