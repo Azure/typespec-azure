@@ -1,5 +1,4 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
@@ -1186,9 +1185,9 @@ describe("typespec-client-generator-core: model types", () => {
     );
     ok(
       AdditionalPropertiesModel &&
-      AdditionalPropertiesModel2 &&
-      AdditionalPropertiesModel3 &&
-      NonAdditionalPropertiesModel,
+        AdditionalPropertiesModel2 &&
+        AdditionalPropertiesModel3 &&
+        NonAdditionalPropertiesModel,
     );
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "string");
     strictEqual(AdditionalPropertiesModel.baseModel, undefined);
@@ -1234,10 +1233,10 @@ describe("typespec-client-generator-core: model types", () => {
     const Test2 = models.find((x) => x.name === "Test2");
     ok(
       AdditionalPropertiesModel &&
-      AdditionalPropertiesModel2 &&
-      AdditionalPropertiesModel3 &&
-      Test &&
-      Test2,
+        AdditionalPropertiesModel2 &&
+        AdditionalPropertiesModel3 &&
+        Test &&
+        Test2,
     );
 
     strictEqual(AdditionalPropertiesModel.additionalProperties?.kind, "model");
