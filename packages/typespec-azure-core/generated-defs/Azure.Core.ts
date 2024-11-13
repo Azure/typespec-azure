@@ -46,11 +46,6 @@ export type PollingLocationDecorator = (
 ) => void;
 
 /**
- * Marks a Model as a paged collection.
- */
-export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
-
-/**
  * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
  */
 export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
@@ -59,6 +54,11 @@ export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) 
  * Identifies a ModelProperty that contains the next link value. Can only be used on a Model marked with `@pagedResult`.
  */
 export type NextLinkDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
+
+/**
+ * Marks a Model as a paged collection.
+ */
+export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
 
 /**
  * Marks an Enum as being fixed since enums in Azure are
@@ -193,9 +193,9 @@ export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
-  pagedResult: PagedResultDecorator;
   items: ItemsDecorator;
   nextLink: NextLinkDecorator;
+  pagedResult: PagedResultDecorator;
   fixed: FixedDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;

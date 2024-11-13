@@ -13,6 +13,7 @@ import {
   getNamespaceName,
   getSourceModel,
   isInternalTypeSpec,
+  isSourceOperationResourceManagerInternal,
   isTemplatedInterfaceOperation,
 } from "./utils.js";
 
@@ -29,7 +30,10 @@ export const coreOperationsRule = createRule({
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (!isInternalTypeSpec(context.program, operation)) {
+        if (
+          !isInternalTypeSpec(context.program, operation) &&
+          !isSourceOperationResourceManagerInternal(operation)
+        ) {
           const verb = getOperationVerb(context.program, operation);
           if (
             !isTemplatedInterfaceOperation(operation) &&

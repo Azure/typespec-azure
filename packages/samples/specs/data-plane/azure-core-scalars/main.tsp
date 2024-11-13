@@ -3,6 +3,7 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 
+using Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using Azure.Core;
@@ -10,6 +11,7 @@ using Azure.Core.Traits;
 
 @service
 @versioned(Contoso.WidgetManager.Versions)
+@useAuth(ApiKeyAuth<ApiKeyLocation.header, "X-Key">)
 namespace Contoso.WidgetManager;
 
 @doc("The Contoso Widget Manager service version.")

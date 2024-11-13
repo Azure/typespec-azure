@@ -3,9 +3,7 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
-  getDoc,
   getNamespaceFullName,
-  getSummary,
   Interface,
   isNeverType,
   isNullType,
@@ -17,7 +15,6 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  ProjectedProgram,
   StringLiteral,
   Type,
   Union,
@@ -53,6 +50,9 @@ import { getClientTypeWithDiagnostics } from "./types.js";
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 export const clientNameKey = createStateSymbol("clientName");
+export const clientNamespaceKey = createStateSymbol("clientNamespace");
+
+export const negationScopesKey = createStateSymbol("negationScopes");
 
 /**
  *
@@ -117,7 +117,7 @@ export function updateWithApiVersionInformation(
   namespace?: Namespace | Interface,
 ): {
   isApiVersionParam: boolean;
-  clientDefaultValue?: unknown;
+  clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
   return {
@@ -206,30 +206,6 @@ export function getAvailableApiVersions(
   const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
   context.__tspTypeToApiVersions.set(type, retval);
   return retval;
-}
-
-interface DocWrapper {
-  description?: string;
-  details?: string;
-}
-
-/**
- *
- * @param context
- * @param type
- * @returns Returns the description and details of a type
- */
-export function getDocHelper(context: TCGCContext, type: Type): DocWrapper {
-  const program = context.program;
-  if (getSummary(program, type)) {
-    return {
-      description: getSummary(program, type),
-      details: getDoc(program, type),
-    };
-  }
-  return {
-    description: getDoc(program, type),
-  };
 }
 
 /**
@@ -356,7 +332,7 @@ export function intOrFloat(value: number): "int32" | "float32" {
  * @param t
  * @returns
  */
-export function isAzureCoreModel(t: Type): boolean {
+export function isAzureCoreTspModel(t: Type): boolean {
   return (
     (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&
@@ -552,15 +528,12 @@ export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMult
  * @param type
  * @returns
  */
-export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model {
+export function getHttpBodySpreadModel(type: Model): Model {
   if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
     const innerModel = type.sourceModels[0].model;
-    const projectedProgram = context.program as ProjectedProgram;
     // for case: `op test(...Model):void;`
     if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
-      return projectedProgram.projector
-        ? (projectedProgram.projector.projectedTypes.get(innerModel) as Model)
-        : innerModel;
+      return innerModel;
     }
     // for case: `op test(@header h: string, @query q: string, ...Model): void;`
     if (
@@ -569,9 +542,7 @@ export function getHttpBodySpreadModel(context: TCGCContext, type: Model): Model
       innerModel.sourceModels[0].model.name !== "" &&
       innerModel.sourceModels[0].model.properties.size === type.properties.size
     ) {
-      return projectedProgram.projector
-        ? (projectedProgram.projector.projectedTypes.get(innerModel.sourceModels[0].model) as Model)
-        : innerModel.sourceModels[0].model;
+      return innerModel.sourceModels[0].model;
     }
   }
   return type;
@@ -581,11 +552,12 @@ export function isOnClient(
   context: TCGCContext,
   type: ModelProperty,
   operation?: Operation,
+  versioning?: boolean,
 ): boolean {
   const namespace = operation ? getLocationOfOperation(operation) : type.model?.namespace;
   return (
     isSubscriptionId(context, type) ||
-    isApiVersion(context, type) ||
+    (isApiVersion(context, type) && versioning) ||
     Boolean(
       namespace &&
         context.__clientToParameters
@@ -593,4 +565,31 @@ export function isOnClient(
           ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
     )
   );
+}
+
+export function getValueTypeValue(
+  value: Value,
+): string | boolean | null | number | Array<unknown> | object | undefined {
+  switch (value.valueKind) {
+    case "ArrayValue":
+      return value.values.map((x) => getValueTypeValue(x));
+    case "BooleanValue":
+    case "StringValue":
+    case "NullValue":
+      return value.value;
+    case "NumericValue":
+      return value.value.asNumber();
+    case "EnumValue":
+      return value.value.value ?? value.value.name;
+    case "ObjectValue":
+      return Object.fromEntries(
+        [...value.properties.keys()].map((x) => [
+          x,
+          getValueTypeValue(value.properties.get(x)!.value),
+        ]),
+      );
+    case "ScalarValue":
+      // TODO: handle scalar value
+      return undefined;
+  }
 }

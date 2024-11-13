@@ -8,7 +8,16 @@ import {
   Program,
 } from "@typespec/compiler";
 import { getHttpOperation, HttpOperation } from "@typespec/http";
-import { $actionSegment, getActionSegment, getParentResource, getSegment } from "@typespec/rest";
+import {
+  $actionSegment,
+  $createsOrReplacesResource,
+  $deletesResource,
+  $readsResource,
+  $updatesResource,
+  getActionSegment,
+  getParentResource,
+  getSegment,
+} from "@typespec/rest";
 import {
   ArmResourceActionDecorator,
   ArmResourceCollectionActionDecorator,
@@ -147,6 +156,7 @@ export const $armResourceRead: ArmResourceReadDecorator = (
   target: Operation,
   resourceType: Model,
 ) => {
+  context.call($readsResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "read", "@armResourceRead");
 };
 
@@ -155,6 +165,7 @@ export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   target: Operation,
   resourceType: Model,
 ) => {
+  context.call($createsOrReplacesResource, target, resourceType);
   setResourceLifecycleOperation(
     context,
     target,
@@ -169,6 +180,7 @@ export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   target: Operation,
   resourceType: Model,
 ) => {
+  context.call($updatesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "update", "@armResourceUpdate");
 };
 
@@ -177,6 +189,7 @@ export const $armResourceDelete: ArmResourceDeleteDecorator = (
   target: Operation,
   resourceType: Model,
 ) => {
+  context.call($deletesResource, target, resourceType);
   setResourceLifecycleOperation(context, target, resourceType, "delete", "@armResourceDelete");
 };
 

@@ -960,6 +960,154 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata.finalResultPath, "result");
     });
 
+    it("Gets Lro for non-resource PUT with polling reference", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        /** The created job */
+model Job {
+  /** job id */
+  @path
+  @key
+  @visibility("read")
+  id: uuid;
+
+  /** job name */
+  name: string;
+}
+
+/** request to create a job */
+model StartJobRequest {
+  /** Name of the job */
+  name: string;
+
+  /** Job instructions */
+  instructions: string[];
+}
+
+model JobStatus is Azure.Core.Foundations.OperationStatus<Job>;
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
+@route("/jobs/{id}")
+op getJobStatus is Foundations.GetOperationStatus<
+  Rest.Resource.KeysOf<Job>,
+  Job
+>;
+
+alias JobLroResponse = {
+  @header("Operation-Location") operationLocation: url;
+  ...Azure.Core.Foundations.OperationStatus<Job>;
+};
+
+/** Start a job */
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
+@pollingOperation(getJobStatus)
+@route("/startJob/")
+@put
+op startJobAsync(
+  ...Azure.Core.Foundations.ApiVersionParameter,
+
+  /** body */
+  @body _: StartJobRequest,
+): (CreatedResponse & JobLroResponse) | (OkResponse &
+  JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
+`,
+        "startJobAsync",
+      );
+
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+      deepStrictEqual(metadata.finalStateVia, "operation-location");
+      deepStrictEqual(metadata.logicalResult.name, "Job");
+      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+      deepStrictEqual(metadata.logicalPath, "result");
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "Job");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "OperationStatus");
+      deepStrictEqual(metadata.finalResultPath, "result");
+    });
+
+    it("Gets Lro for custom PUT with polling reference", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `
+        /** The created job */
+        @resource("jobs")
+model Job {
+  /** job id */
+  @path
+  @key
+  @visibility("read")
+  name: string;
+
+  /** Job instructions */
+  instructions: string[];
+}
+
+/** request to create a job */
+model StartJobRequest {
+  /** Name of the job */
+  name: string;
+
+  /** Job instructions */
+  instructions: string[];
+}
+
+model JobStatus is Azure.Core.Foundations.OperationStatus;
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Non-resource operation"
+@route("/jobs/status/{name}")
+op getJobStatus is Foundations.GetOperationStatus<
+  Rest.Resource.KeysOf<Job>,
+  Job
+>;
+
+op read is StandardResourceOperations.ResourceRead<Job>;
+
+alias JobLroResponse = {
+  @header("Operation-Location") operationLocation: string;
+  ...Azure.Core.Foundations.OperationStatus<Job>;
+};
+
+/** Start a job */
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "test"
+@finalOperation(read)
+@pollingOperation(getJobStatus)
+@createsOrReplacesResource(Job)
+@route("/jobs/{name}")
+@put
+op createJob(
+  ...Azure.Core.Foundations.ApiVersionParameter,
+  @path name: string,
+  @bodyRoot body: Job,
+): (CreatedResponse & JobLroResponse) | (OkResponse &
+  JobLroResponse) | Azure.Core.Foundations.ErrorResponse;
+`,
+        "createJob",
+      );
+
+      ok(metadata);
+      deepStrictEqual(metadata.statusMonitorStep?.kind, "nextOperationLink");
+      deepStrictEqual(metadata.statusMonitorStep?.responseModel.name, "OperationStatus");
+
+      deepStrictEqual(metadata.pollingInfo.kind, "pollingOperationStep");
+      deepStrictEqual(metadata.pollingInfo.responseModel.name, "OperationStatus");
+      deepStrictEqual(metadata.pollingInfo.resultProperty?.name, "result");
+
+      deepStrictEqual(metadata.finalStateVia, "original-uri");
+      deepStrictEqual(metadata.logicalResult.name, "Job");
+      deepStrictEqual(metadata.envelopeResult.name, "OperationStatus");
+      deepStrictEqual(metadata.logicalPath, undefined);
+
+      deepStrictEqual((metadata.finalResult as Model)?.name, "Job");
+      deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Job");
+      deepStrictEqual(metadata.finalResultPath, undefined);
+    });
+
     it("Gets Lro for standard Async Delete", async () => {
       const [_, metadata, runner] = await compileLroOperation(
         `@test op delete is Azure.Core.LongRunningResourceDelete<TestModel, Customizations>;`,
@@ -1462,6 +1610,7 @@ describe("typespec-azure-core: operation templates", () => {
         }
         
         @route("/simpleWidgets/{id}")
+        @createsOrReplacesResource(SimpleWidget)
         @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
@@ -1509,6 +1658,7 @@ describe("typespec-azure-core: operation templates", () => {
         }
         
         @route("/simpleWidgets/{id}")
+        @createsOrUpdatesResource(SimpleWidget)
         @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
@@ -1991,8 +2141,8 @@ describe("typespec-azure-core: operation templates", () => {
 
       ok(metadata.statusMonitorStep);
       deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep.target as any).property.name, "opLink");
+      deepStrictEqual((metadata.statusMonitorStep.target as any)?.location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep.target as any)?.property.name, "opLink");
 
       ok(metadata.pollingInfo);
       deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
@@ -2026,6 +2176,7 @@ describe("typespec-azure-core: operation templates", () => {
         
         @pollingOperation(getStatus)
         @route("/simpleWidgets/{id}")
+        @createsOrReplacesResource(SimpleWidget)
         @put op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
@@ -2050,8 +2201,8 @@ describe("typespec-azure-core: operation templates", () => {
 
       ok(metadata.statusMonitorStep);
       deepStrictEqual(metadata.statusMonitorStep.target.kind, "link");
-      deepStrictEqual((metadata.statusMonitorStep.target as any).location, "ResponseHeader");
-      deepStrictEqual((metadata.statusMonitorStep.target as any).property.name, "opLink");
+      deepStrictEqual((metadata.statusMonitorStep.target as any)?.location, "ResponseHeader");
+      deepStrictEqual((metadata.statusMonitorStep.target as any)?.property.name, "opLink");
 
       ok(metadata.pollingInfo);
       deepStrictEqual(metadata.pollingInfo.responseModel.name, "PollingStatus");
@@ -2844,6 +2995,40 @@ describe("typespec-azure-core: operation templates", () => {
       deepStrictEqual(metadata, undefined);
     });
 
+    it("Gets Lro undefined for sync operation with status field", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+        model OpParams {
+          value: string;
+          ...CustomParameters;
+        };
+  
+        model OpResponse is CustomResponseProperties {
+          message: string;
+          status: "Succeeded" | "Failed" | "Canceled";
+        }
+         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
+      );
+      deepStrictEqual(metadata, undefined);
+    });
+
+    it("Gets Lro undefined for sync operation with provisioningState field", async () => {
+      const [_, metadata] = await compileLroOperation(
+        `// Reuse CustomParameters and CustomResponseProperties in the "normal" TParams and TResponse fields
+        model OpParams {
+          value: string;
+          ...CustomParameters;
+        };
+  
+        model OpResponse is CustomResponseProperties {
+          message: string;
+          provisioningState: "Succeeded" | "Failed" | "Canceled";
+        }
+         @test op update is Azure.Core.ResourceAction<TestModel, OpParams, OpResponse>;`,
+      );
+      deepStrictEqual(metadata, undefined);
+    });
+
     it("signatures with customizable responses do not accept unions for TResponse", async () => {
       const [_, diagnostics] = await getOperations(`
         model Foo {}
@@ -2895,7 +3080,7 @@ describe("typespec-azure-core: operation templates", () => {
       diagnostics.filter((x) => x.severity === "error"),
       [
         {
-          code: "unknown-identifier",
+          code: "invalid-ref",
           message: "Unknown identifier abc",
         },
         {

@@ -33,7 +33,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(operation.examples?.length, 1);
     strictEqual(operation.examples[0].kind, "http");
     strictEqual(operation.examples[0].name, "simple description");
-    strictEqual(operation.examples[0].description, "simple description");
+    strictEqual(operation.examples[0].doc, "simple description");
     strictEqual(operation.examples[0].filePath, "simple.json");
     deepStrictEqual(operation.examples[0].rawExample, {
       operationId: "simple",
@@ -105,6 +105,38 @@ describe("typespec-client-generator-core: http operation examples", () => {
     strictEqual(parameters[6].value.kind, "string");
     strictEqual(parameters[6].value.value, "renamePath");
     strictEqual(parameters[6].value.type.kind, "string");
+
+    expectDiagnostics(runner.context.diagnostics, []);
+  });
+
+  it("body with encoded name", async () => {
+    await runner.host.addRealTypeSpecFile(
+      "./examples/bodyWithEncodedName.json",
+      `${__dirname}/http-operation-examples/bodyWithEncodedName.json`,
+    );
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op encodedname(
+          @body @encodedName("application/json", "b") body: string,
+        ): void;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples[0].kind, "http");
+
+    const parameters = operation.examples[0].parameters;
+    ok(parameters);
+    strictEqual(parameters.length, 1);
+
+    strictEqual(parameters[0].value.kind, "string");
+    strictEqual(parameters[0].value.value, "body");
+    strictEqual(parameters[0].value.type.kind, "string");
 
     expectDiagnostics(runner.context.diagnostics, []);
   });

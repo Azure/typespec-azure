@@ -1,5 +1,95 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.48.1
+
+### Bug Fixes
+
+- [#1813](https://github.com/Azure/typespec-azure/pull/1813) fix wrong encode for body response of binary type
+- [#1786](https://github.com/Azure/typespec-azure/pull/1786) support client namespace
+
+
+## 0.48.0
+
+### Bug Fixes
+
+- [#1806](https://github.com/Azure/typespec-azure/pull/1806) remove filtering core model flag
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
+## 0.47.4
+
+### Bug Fixes
+
+- [#1763](https://github.com/Azure/typespec-azure/pull/1763) support serialized name for body parameter to avoid example mis-mapping
+- [#1761](https://github.com/Azure/typespec-azure/pull/1761) use root source property to map operation params to method
+- [#1775](https://github.com/Azure/typespec-azure/pull/1775) remove unused path parameter from method
+- [#1700](https://github.com/Azure/typespec-azure/pull/1700) We no longer filter out core models. The `filter-out-core-models` parameter to `SdkContext` is also removed
+- [#1772](https://github.com/Azure/typespec-azure/pull/1772) use array instead of set to make the types ordered by typespec definition
+- [#1762](https://github.com/Azure/typespec-azure/pull/1762) make union/nullable type to be reference type and add usage/access support for them
+
+
+## 0.47.3
+
+### Bug Fixes
+
+- [#1731](https://github.com/Azure/typespec-azure/pull/1731) fix wrong compare target for response body with anonymous model when finding anonymous model context
+- [#1698](https://github.com/Azure/typespec-azure/pull/1698) have paging respect renames
+
+
+## 0.47.2
+
+### Bug Fixes
+
+- [#1606](https://github.com/Azure/typespec-azure/pull/1606) overwrite original value when set multiple value for same decorator
+
+
+## 0.47.1
+
+### Bug Fixes
+
+- [#1659](https://github.com/Azure/typespec-azure/pull/1659) remove projection for source model since typespec core has already fixed the issue
+
+
+## 0.47.0
+
+### Bug Fixes
+
+- [#1511](https://github.com/Azure/typespec-azure/pull/1511) Fix logic to check conflicting usage for model of multipart body and regular body
+- [#1629](https://github.com/Azure/typespec-azure/pull/1629) do not promote api version param to client if service is not versioned
+- [#1630](https://github.com/Azure/typespec-azure/pull/1630) do not override client default value for api version param in non-versioning service
+- [#1607](https://github.com/Azure/typespec-azure/pull/1607) set service of og in using time instead of setting time
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+### Features
+
+- [#1631](https://github.com/Azure/typespec-azure/pull/1631) support value type for client default value
+- [#1515](https://github.com/Azure/typespec-azure/pull/1515) add `SdkLroServiceMetadata`
+
+### Deprecations
+
+- [#1613](https://github.com/Azure/typespec-azure/pull/1613) deprecate description in `SdkExampleBase`
+
+### Breaking Changes
+
+- [#1560](https://github.com/Azure/typespec-azure/pull/1560) Remove `.description` and `.details` from deprecated api surface
+
+
+## 0.46.2
+
+### Bug Fixes
+
+- [#1592](https://github.com/Azure/typespec-azure/pull/1592) change example mapping logic to allow operation id with/without renaming
+- [#1589](https://github.com/Azure/typespec-azure/pull/1589) In `0.46.1` we changed the type of `responses` in `SdkHttpOperation` from `Map<number | HttpRange, SdkHttpResponse>` to `SdkHttpResponse[]`, `exceptions` in `SdkHttpOperation` from `Map<number | HttpRange | "*", SdkHttpResponse>` to `SdkHttpResponse[]`,
+and added a `statusCodes` property to `SdkHttpResponse`. But the `statusCodes` is defined as `number | HttpRange | "*"`, which loses the information that the responses in `responses` property could never have a `*` as its statusCodes.
+This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number | HttpRange | "*"`, and changes the type of `statusCodes` in `SdkHttpResponse` to `number | HttpRange` to be precise.
+
+
 ## 0.46.1
 
 ### Bug Fixes

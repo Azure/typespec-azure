@@ -15,9 +15,11 @@ const outDir = resolve(dir, "openapi");
 await rm(outDir, { recursive: true, force: true });
 await emitCommonTypesSwagger("customer-managed-keys");
 await emitCommonTypesSwagger("managed-identity");
+await emitCommonTypesSwagger("managed-identity-with-delegation");
+await emitCommonTypesSwagger("mobo");
+await emitCommonTypesSwagger("network-security-perimeter");
 await emitCommonTypesSwagger("private-links");
 await emitCommonTypesSwagger("types");
-await emitCommonTypesSwagger("mobo");
 
 function log(...args: any[]) {
   // eslint-disable-next-line no-console

@@ -34,14 +34,12 @@ export interface TCGCContext {
   emitterName: string;
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  referencedTypeMap?: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
@@ -68,7 +66,6 @@ export interface SdkContext<
 export interface SdkEmitterOptions {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "filter-out-core-models"?: boolean;
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
@@ -92,19 +89,15 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
+  clientNamespace: string; // fully qualified namespace
   doc?: string;
   summary?: string;
   initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
+  /**
+   * @deprecated Use `clientNamespace` instead.
+   */
   nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
   parent?: SdkClientType<TServiceOperation>;
@@ -136,14 +129,6 @@ interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
   deprecation?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   __accessSet?: boolean;
@@ -323,12 +308,16 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   type: SdkType;
+  usage: UsageFlags;
+  access: AccessFlags;
+  clientNamespace: string; // fully qualified namespace
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -359,9 +348,12 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
+  access: AccessFlags;
+  usage: UsageFlags;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -371,6 +363,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
@@ -402,19 +395,11 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   type: SdkType;
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   apiVersions: string[];
   onClient: boolean;
-  clientDefaultValue?: any;
+  clientDefaultValue?: unknown;
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
@@ -504,6 +489,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
 
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
+  serializedName: string;
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
@@ -524,14 +510,6 @@ export interface SdkServiceResponseHeader {
   __raw: ModelProperty;
   serializedName: string;
   type: SdkType;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
 }
@@ -548,12 +526,19 @@ export interface SdkServiceResponse {
   apiVersions: string[];
 }
 
-export interface SdkHttpResponse extends SdkServiceResponse {
+interface SdkHttpResponseBase extends SdkServiceResponse {
   __raw: HttpOperationResponse;
   kind: "http";
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
+}
+
+export interface SdkHttpResponse extends SdkHttpResponseBase {
+  statusCodes: number | HttpStatusCodeRange;
+}
+
+export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
   statusCodes: number | HttpStatusCodeRange | "*";
 }
 
@@ -570,7 +555,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
   bodyParam?: SdkBodyParameter;
   responses: SdkHttpResponse[];
-  exceptions: SdkHttpResponse[];
+  exceptions: SdkHttpErrorResponse[];
   examples?: SdkHttpOperationExample[];
 }
 
@@ -587,14 +572,6 @@ interface SdkMethodBase extends DecoratedType {
   access: AccessFlags;
   parameters: SdkParameter[];
   apiVersions: string[];
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  description?: string;
-  /**
-   * @deprecated Use `doc` and `summary` instead.
-   */
-  details?: string;
   doc?: string;
   summary?: string;
   crossLanguageDefintionId: string;
@@ -719,7 +696,19 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
+  namespaces: SdkNamespace<TServiceOperation>[];
+}
+
+export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  fullName: string;
+  clients: SdkClientType<TServiceOperation>[];
+  models: SdkModelType[];
+  enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
+  namespaces: SdkNamespace<TServiceOperation>[];
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
@@ -751,7 +740,11 @@ export enum UsageFlags {
 interface SdkExampleBase {
   kind: string;
   name: string;
+  /**
+   * @deprecated Use `doc` instead.
+   */
   description: string;
+  doc: string;
   filePath: string;
   rawExample: any;
 }

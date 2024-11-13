@@ -1,0 +1,89 @@
+trigger:
+  branches: # Used to trigger for GitHub merge queues
+    include:
+      - gh-readonly-queue/*
+pr:
+  - main
+  - release/*
+
+extends:
+  template: /eng/pipelines/templates/1es-redirect.yml
+  parameters:
+    variables:
+      - template: /eng/pipelines/templates/variables/globals.yml@self
+    stages:
+      - stage: CI
+        jobs:
+          - job: Linux
+            variables:
+              TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+
+            strategy:
+              matrix:
+                "Node 18.x":
+                  nodeVersion: "18.x"
+                "Node 20.x":
+                  nodeVersion: "20.x"
+                "Node 22.x":
+                  nodeVersion: "22.x"
+
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+
+            steps:
+              - template: /eng/pipelines/jobs/build-and-test.yml@self
+                parameters:
+                  nodeVersion: $(nodeVersion)
+                  dotnetVersion: 8.0.x
+                  osName: linux
+
+          - job: Windows
+            variables:
+              TYPESPEC_VS_CI_BUILD: true # Enable official Visual Studio extension build
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+
+            strategy:
+              matrix:
+                "Node 18.x":
+                  nodeVersion: "18.x"
+                "Node 20.x":
+                  nodeVersion: "20.x"
+
+            pool:
+              name: $(WINDOWSPOOL)
+              image: $(WINDOWSVMIMAGE)
+              os: windows
+
+            steps:
+              - template: /eng/pipelines/jobs/build-and-test.yml@self
+                parameters:
+                  nodeVersion: $(nodeVersion)
+                  dotnetVersion: 8.0.x
+                  osName: windows
+
+          - job: website
+            displayName: Website
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+
+            steps:
+              - template: /eng/pipelines/jobs/website.yml
+
+          - template: /eng/pipelines/jobs/e2e-job.yml@self
+          - job: AutorestChecks
+            displayName: "Autorest Checks"
+            pool:
+              name: $(LINUXPOOL)
+              image: $(LINUXVMIMAGE)
+              os: linux
+
+            steps:
+              - template: /eng/pipelines/templates/swagger-checks.yml@self
+                parameters:
+                  nodeVersion: 20.x
+          - template: /eng/pipelines/jobs/publish-artifacts.yml@self

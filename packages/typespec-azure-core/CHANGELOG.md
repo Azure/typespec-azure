@@ -1,5 +1,27 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.48.0
+
+### Bug Fixes
+
+- [#1545](https://github.com/Azure/typespec-azure/pull/1545) Add docs for linting rules and stop excluding non `Azure.` namespace
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
+## 0.47.0
+
+### Bug Fixes
+
+- [#1416](https://github.com/Azure/typespec-azure/pull/1416) Fix #1180 Return StatusMonitor result field for non-resource PUT operations in getLroMetadata.finalResult
+
+### Bump dependencies
+
+- [#1534](https://github.com/Azure/typespec-azure/pull/1534) Bump dependencies
+
+
 ## 0.46.0
 
 ### Features

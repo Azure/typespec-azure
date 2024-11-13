@@ -1,0 +1,14 @@
+---
+import type { Language } from "./process-client";
+
+export interface Props {
+  lang: Language;
+}
+if (!Astro.props.lang) {
+  throw new Error("Missing required prop: lang");
+}
+---
+
+<client-tab-item data-language={Astro.props.lang}>
+  <slot />
+</client-tab-item>
