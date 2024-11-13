@@ -586,7 +586,7 @@ export function listOperationsInOperationGroup(
     for (const op of current.operations.values()) {
       // Skip templated operations
       if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(getOverriddenClientMethod(context, op) ?? op);
+        operations.push(op);
       }
     }
 
