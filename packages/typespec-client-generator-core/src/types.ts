@@ -1383,7 +1383,10 @@ function updateUsageOrAccess(
   if (options?.seenTypes === undefined) {
     options.seenTypes = new Set<SdkType>();
   }
-  if (options.seenTypes.has(type)) return diagnostics.wrap(undefined); // avoid circular references
+  if (options.seenTypes.has(type)) {
+    options.skipFirst = false;
+    return diagnostics.wrap(undefined); // avoid circular references
+  }
   if (type.kind === "array" || type.kind === "dict") {
     diagnostics.pipe(updateUsageOrAccess(context, value, type.valueType, options));
     return diagnostics.wrap(undefined);
@@ -1443,10 +1446,12 @@ function updateUsageOrAccess(
     }
   } else {
     options.skipFirst = false;
+    if (typeof value !== "number") {
+      type.__accessSet = true;
+    }
   }
 
   if (type.kind === "enum") return diagnostics.wrap(undefined);
-  if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccess(context, value, unionType, options));
@@ -1457,8 +1462,13 @@ function updateUsageOrAccess(
     diagnostics.pipe(updateUsageOrAccess(context, value, type.type, options));
     return diagnostics.wrap(undefined);
   }
+
+  if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.baseModel) {
     options.ignoreSubTypeStack.push(true);
+    if (context.disableUsageAccessPropagationToBase) {
+      options.skipFirst = true;
+    }
     diagnostics.pipe(updateUsageOrAccess(context, value, type.baseModel, options));
     options.ignoreSubTypeStack.pop();
   }

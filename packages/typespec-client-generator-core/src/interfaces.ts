@@ -53,6 +53,7 @@ export interface TCGCContext {
   examplesDir?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
+  disableUsageAccessPropagationToBase: boolean;
 }
 
 export interface SdkContext<
