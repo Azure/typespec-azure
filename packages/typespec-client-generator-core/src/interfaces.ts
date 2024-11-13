@@ -732,12 +732,10 @@ export enum UsageFlags {
   Spread = 1 << 6,
   // Output will also be set when Error is set.
   Error = 1 << 7,
-  // Set when type is used in conjunction with an application/json content type.
+  // Set when model is used in conjunction with an application/json content type.
   Json = 1 << 8,
-  // Set when type is used in conjunction with an application/xml content type.
+  // Set when model is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
-  // Set when type is used for exception output
-  Exception = 1 << 10,
 }
 
 interface SdkExampleBase {
