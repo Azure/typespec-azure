@@ -1,9 +1,9 @@
-import { beforeEach, describe, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-import { ok, strictEqual } from "assert";
-import { expectDiagnostics } from "@typespec/compiler/testing";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { SdkModelType, UsageFlags } from "../../src/interfaces.js";
+import { expectDiagnostics } from "@typespec/compiler/testing";
+import { ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
+import { UsageFlags } from "../../src/interfaces.js";
+import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: @override", () => {
   let runner: SdkTestRunner;
