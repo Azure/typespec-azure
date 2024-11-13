@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest",
-  "version": "0.47.0",
+  "version": "0.48.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting openapi from the TypeSpec REST protocol binding",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -46,7 +46,7 @@
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
-    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../docs/emitters/typespec-autorest/reference"
+    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/emitters/typespec-autorest/reference"
   },
   "files": [
     "lib/*.tsp",

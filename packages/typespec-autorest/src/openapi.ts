@@ -36,6 +36,7 @@ import {
   NoTarget,
   NumericLiteral,
   Operation,
+  PagingOperation,
   Program,
   Scalar,
   StringLiteral,
@@ -63,6 +64,7 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
+  getPagingOperation,
   getPattern,
   getProjectedName,
   getProperty,
@@ -78,6 +80,7 @@ import {
   isErrorModel,
   isErrorType,
   isGlobalNamespace,
+  isList,
   isNeverType,
   isNullType,
   isNumericType,
@@ -162,6 +165,7 @@ import {
   PrimitiveItems,
   Refable,
   XMSLongRunningFinalState,
+  XmsPageable,
 } from "./openapi2-document.js";
 import type { AutorestEmitterResult, LoadedExample } from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
@@ -510,22 +514,43 @@ export async function getOpenAPIForService(
     return paged;
   }
 
-  function extractPagedMetadata(program: Program, operation: HttpOperation) {
+  function resolveXmsPageable(program: Program, operation: HttpOperation): XmsPageable | undefined {
+    if (isList(program, operation.operation)) {
+      const pagedInfo = ignoreDiagnostics(getPagingOperation(program, operation.operation));
+      return pagedInfo && getXmsPageableForPagingOperation(pagedInfo);
+    } else {
+      return extractAzureCorePagedMetadata(program, operation);
+    }
+  }
+
+  function getXmsPageableForPagingOperation(paging: PagingOperation): XmsPageable | undefined {
+    if (paging.output.nextLink) {
+      const itemsName = paging.output.pageItems.property.name;
+      return {
+        nextLinkName: paging.output.nextLink.property.name,
+        itemName: itemsName === "items" ? undefined : itemsName,
+      };
+    }
+    return undefined;
+  }
+
+  function extractAzureCorePagedMetadata(program: Program, operation: HttpOperation) {
     for (const response of operation.responses) {
       const paged = extractPagedMetadataNested(program, response.type as Model);
       if (paged) {
         const nextLinkName = getLastSegment(paged.nextLinkSegments);
         const itemName = getLastSegment(paged.itemsSegments);
         if (nextLinkName) {
-          currentEndpoint["x-ms-pageable"] = {
+          return {
             nextLinkName,
             itemName: itemName !== "value" ? itemName : undefined,
           };
         }
         // Once we find paged metadata, we don't need to processes any further.
-        return;
+        return undefined;
       }
     }
+    return undefined;
   }
 
   function requiresXMsPaths(path: string, operation: Operation): boolean {
@@ -663,7 +688,10 @@ export async function getOpenAPIForService(
     }
 
     // Extract paged metadata from Azure.Core.Page
-    extractPagedMetadata(program, operation);
+    const pageable = resolveXmsPageable(program, operation);
+    if (pageable) {
+      currentEndpoint["x-ms-pageable"] = pageable;
+    }
 
     const visibility = resolveRequestVisibility(program, operation.operation, verb);
     emitEndpointParameters(parameters, visibility);
@@ -1076,6 +1104,10 @@ export async function getOpenAPIForService(
       if (httpOpParam.type === "header" && isContentTypeHeader(program, httpOpParam.param)) {
         continue;
       }
+      if (httpOpParam.type === "cookie") {
+        reportDiagnostic(program, { code: "cookies-unsupported", target: httpOpParam.param });
+        continue;
+      }
       emitParameter(httpOpParam.param, () =>
         getOpenAPI2Parameter(httpOpParam, { visibility, ignoreMetadataAnnotations: false }),
       );
@@ -1437,6 +1469,9 @@ export async function getOpenAPIForService(
         return getOpenAPI2PathParameter(param, schemaContext);
       case "header":
         return getOpenAPI2HeaderParameter(param.param, schemaContext, param.name);
+      case "cookie":
+        compilerAssert(false, "Should verify cookies before");
+        break;
       default:
         const _assertNever: never = param;
         compilerAssert(false, "Unreachable");
@@ -1951,6 +1986,7 @@ export async function getOpenAPIForService(
       if (isReadonlyProperty(program, prop)) {
         property.readOnly = true;
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         const vis = getVisibility(program, prop);
         if (vis) {
           const mutability = [];
@@ -2003,6 +2039,7 @@ export async function getOpenAPIForService(
 
   function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
     const sharedVisibilities = ["read", "create", "update", "write"];
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const visibilities = getVisibility(program, prop);
     if (visibilities) {
       for (const visibility of visibilities) {

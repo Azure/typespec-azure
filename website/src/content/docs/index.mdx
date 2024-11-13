@@ -1,0 +1,34 @@
+---
+title: Welcome to TypeSpec Azure
+description: TypeSpec Azure documentation
+template: splash
+hero:
+  tagline: API first with TypeSpec for Azure services
+  image:
+    file: ../../../public/azure.svg
+  actions:
+    - text: Docs
+      link: docs/intro/
+      icon: right-arrow
+    - text: TypeSpec language docs
+      link: https://typespec.io
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+<CardGrid stagger>
+  <Card title="Easy to Use" icon="puzzle">
+    TypeSpec was designed from the ground up to be easily installed and used to define your Azure
+    service APIs quickly.
+  </Card>
+  <Card title="Powered by standard libraries" icon="document">
+    Extend or customize your compliant Azure service APIs by reusing standard patterns and templates
+    in the Azure.Core and ARM libraries.
+  </Card>
+  <Card title="Focus on What Matters" icon="magnifier">
+    TypeSpec lets you focus on your service API design, and we'll do the chores to streamline API
+    reviews and SDK generations.
+  </Card>
+</CardGrid>

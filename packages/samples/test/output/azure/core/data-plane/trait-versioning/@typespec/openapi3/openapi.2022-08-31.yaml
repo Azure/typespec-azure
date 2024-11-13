@@ -593,6 +593,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+security:
+  - ApiKeyAuth: []
 components:
   parameters:
     Azure.Core.ClientRequestIdHeader:
@@ -826,3 +828,8 @@ components:
           type: string
           description: The ID of the widget's manufacturer.
       description: A widget.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Key
