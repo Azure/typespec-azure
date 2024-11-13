@@ -1428,7 +1428,7 @@ describe("typespec-client-generator-core: model types", () => {
     ok(rawModel);
     strictEqual(rawModel.kind, "Model");
     strictEqual(isErrorModel(runner.context.program, rawModel), true);
-    ok(model.usage & UsageFlags.Exception);
+    ok(model.usage & UsageFlags.Output);
     ok(model.usage & UsageFlags.Error);
   });
 
