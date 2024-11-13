@@ -721,7 +721,7 @@ export function getSdkModelWithDiagnostics(
 
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
-    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
+    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // eslint-disable-line @typescript-eslint/no-deprecated
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
