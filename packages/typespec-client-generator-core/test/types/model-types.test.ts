@@ -1,5 +1,4 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { isErrorModel } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
@@ -1420,16 +1419,9 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = getAllModels(runner.context);
     strictEqual(models.length, 1);
-    strictEqual(models[0].kind, "model");
-    ok(models[0].usage & UsageFlags.Error);
-
     const model = models[0];
-    const rawModel = model.__raw;
-    ok(rawModel);
-    strictEqual(rawModel.kind, "Model");
-    strictEqual(isErrorModel(runner.context.program, rawModel), true);
-    ok(model.usage & UsageFlags.Output);
-    ok(model.usage & UsageFlags.Error);
+    strictEqual(model.kind, "model");
+    ok(model.usage & UsageFlags.Exception);
   });
 
   it("error model inheritance", async () => {

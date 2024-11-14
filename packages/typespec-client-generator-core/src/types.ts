@@ -721,7 +721,7 @@ export function getSdkModelWithDiagnostics(
 
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
-    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
+    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // eslint-disable-line @typescript-eslint/no-deprecated
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -1603,7 +1603,11 @@ function updateTypesFromOperation(
             : innerResponse.body.type;
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
-          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
+          if (response.statusCodes === "*" || isErrorModel(context.program, body)) {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Exception, sdkType));
+          } else {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
+          }
 
           if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
