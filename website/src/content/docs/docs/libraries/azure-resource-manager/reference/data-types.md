@@ -1687,11 +1687,13 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 **Deprecated**: Avoid using this model. Instead, use PrivateEndpointConnectionResourceListResult available in CommonTypes.Version.v6 or beyond.
 :::
 
-Model representing the standard `PrivateEndpointConnectionResourceListResult` envelope for version v3,v4 and v5, it has been deprecated for v6 and beyond.
+List of private endpoint connections associated with the specified resource before version v6.
 
-Please note that this is only intended to use on versions before v6, do not use this if you are already on CommonTypes.Version.v6 or beyond.
+This model represents the standard `PrivateEndpointConnectionResourceListResult` envelope for versions v3, v4, and v5. It has been deprecated for v6 and beyond.
 
-If you are mitrating to v6 or above, use `PrivateEndpointConnectionResourceListResult` directly.
+Note: This is only intended for use with versions before v6. Do not use this if you are already on CommonTypes.Version.v6 or beyond.
+
+If you are migrating to v6 or above, use `PrivateEndpointConnectionResourceListResult` directly.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5
@@ -1803,11 +1805,13 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
 **Deprecated**: Avoid using this model. Instead, use PrivateLinkResourceListResult available in CommonTypes.Version.v6 or beyond.
 :::
 
-Model representing the standard `PrivateLinkResourceListResult` envelope for version v3,v4 and v5, it has been deprecated for v6 and beyond.
+A list of private link resources for versions before v6.
 
-Please note that this is only intended to use on versions before v6, do not use this if you are already on CommonTypes.Version.v6 or beyond.
+This model represents the standard `PrivateLinkResourceListResult` envelope for versions v3, v4, and v5. It has been deprecated for v6 and beyond.
 
-If you are mitrating to v6 or above, use `PrivateLinkResourceListResult` directly.
+Note: This is only intended for use with versions before v6. Do not use this if you are already on CommonTypes.Version.v6 or beyond.
+
+If you are migrating to v6 or above, use `PrivateLinkResourceListResult` directly.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5
