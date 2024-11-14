@@ -1683,7 +1683,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 
 ### `PrivateEndpointConnectionListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5}
 
-:::warning
+:::caution
 **Deprecated**: Avoid using this model. Instead, use PrivateEndpointConnectionResourceListResult available in CommonTypes.Version.v6 or beyond.
 :::
 
@@ -1801,7 +1801,7 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
 
 ### `PrivateLinkResourceListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5}
 
-:::warning
+:::caution
 **Deprecated**: Avoid using this model. Instead, use PrivateLinkResourceListResult available in CommonTypes.Version.v6 or beyond.
 :::
 
