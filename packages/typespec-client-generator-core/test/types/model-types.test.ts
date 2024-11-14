@@ -3,7 +3,7 @@ import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreTspModel } from "../../src/internal-utils.js";
-import { isAzureCoreModel, isSdkErrorModel } from "../../src/public-utils.js";
+import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -1422,7 +1422,6 @@ describe("typespec-client-generator-core: model types", () => {
     const model = models[0];
     strictEqual(model.kind, "model");
     ok(model.usage & UsageFlags.Exception);
-    ok(isSdkErrorModel(runner.context, model));
   });
 
   it("error model inheritance", async () => {

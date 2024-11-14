@@ -698,7 +698,3 @@ export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
     getPagedResult(context.program, t.__raw) !== undefined
   );
 }
-
-export function isSdkErrorModel(context: TCGCContext, t: SdkType): boolean {
-  return t.__raw !== undefined && isErrorModel(context.program, t.__raw);
-}
