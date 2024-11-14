@@ -2,6 +2,8 @@
 title: x-ms-examples example files
 ---
 
+import { FileTree } from "@astrojs/starlight/components";
+
 The `x-ms-examples` is automatically populated in the generated OpenAPI 2.0 when using the `typespec-autorest` emitter.
 The examples must be placed in the `examples-directory` (default to `{project-root}/examples`) and have the `operationdId` property.
 
@@ -15,25 +17,27 @@ Example below assume `example-directory` is `{project-root}/examples`.
 
 - Single version structure
 
-```
-main.tsp
-examples/
-  example1.json
-  example2.json
-```
+{/* prettier-ignore */}
+<FileTree>
+- main.tsp
+- examples/
+  - example1.json
+  - example2.json
+</FileTree>
 
 - Multi version structure
 
-```
-main.tsp
-examples/
-  2021-01-01/
-    example1.json
-    example2.json
-  2021-01-02/
-    example1.json
-    example2.json
-```
+{/* prettier-ignore */}
+<FileTree>
+- main.tsp
+- examples/
+  - 2021-01-01/
+    - example1.json
+    - example2.json
+  - 2021-01-02/
+    - example1.json
+    - example2.json
+</FileTree>
 
 ## Generate the examples
 

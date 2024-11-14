@@ -24,7 +24,7 @@ Traits can be applied simultaneously at both the interface and operation level, 
 For example, if you wanted to add standard list operation query parameters to the `listWidgets` operation, you could use the `ListQueryParametersTrait`:
 
 ```typespec
-@doc("List Widget resources")
+/** List Widget resources */
 op listWidgets is Operations.ResourceList<
   Widget,
   ListQueryParametersTrait<StandardListQueryParameters & SelectQueryParameter>
@@ -170,11 +170,11 @@ Here is the list of the required traits with the names of the trait models to en
 You can use the `VersionParameterTrait` to customize the API version parameter for resource operations, either at the level of interface or individual operation. To do this, use the `TraitOverride` type to override the existing `api-version` query parameter:
 
 ```typespec
-@doc("The ApiVersion path parameter.")
+/** The ApiVersion path parameter. */
 model ApiVersionPathParameter {
+  /** The API version to use for this operation. */
   @segment("api")
   @path("api-version")
-  @doc("The API version to use for this operation.")
   apiVersion: string;
 }
 
@@ -237,7 +237,7 @@ alias Operations = ResourceOperations<ServiceTraits>;
 Building on the previous example, we can add a custom header trait at a later service version using the `@traitAdded` decorator:
 
 ```typespec
-@doc("A custom trait added at a later service version.")
+/** A custom trait added at a later service version. */
 @traitAdded(Versions.v2022_11_30)
 model CustomRequestHeadersTrait
   is RequestHeadersTrait<{

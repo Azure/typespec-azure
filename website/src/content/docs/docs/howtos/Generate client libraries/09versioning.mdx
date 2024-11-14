@@ -225,11 +225,25 @@ serviceClientClient.stableFunctionality(stableModel);
 
 You can override the signature to return the api surface area for a specific api version.
 
-In this example, we are going to override to return the preview api surface area for our spec. The preview api surface area contains all of the functionality.
+In this example, you can see how this change is made in tspconfig.yaml, and we are going to override to return the preview api surface area for our spec. The preview api surface area contains all of the functionality.
 
 <ClientTabs>
 
 <ClientTabItem lang="typespec">
+
+```yaml title=tspconfig.yaml
+options:
+  "@azure-tools/typespec-python":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-csharp":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-ts":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-java":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-go":
+  api-version: "2023-11-01-preview"
+```
 
 ```typespec
 import "@typespec/versioning";
@@ -260,20 +274,6 @@ model StableModel {
 op previewFunctionality(@body previewModel: PreviewModel): void;
 
 op stableFunctionality(@body stableModel: StableModel): void;
-```
-
-```yaml
-options:
-  "@azure-tools/typespec-python":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-csharp":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-ts":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-java":
-    api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-go":
-    api-version: "2023-11-01-preview"
 ```
 
 </ClientTabItem>
@@ -354,11 +354,27 @@ serviceClientClient.previewFunctionality(previewModel);
 
 ### Override to return all
 
-You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation
+You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation.
+
+In the following examples, you can observe how this change is made in `tspconfig.yaml`.
 
 <ClientTabs>
 
 <ClientTabItem lang="typespec">
+
+```yaml title=tspconfig.yaml
+options:
+  "@azure-tools/typespec-python":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-csharp":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-ts":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-java":
+  api-version: "2023-11-01-preview"
+  "@azure-tools/typespec-go":
+  api-version: "2023-11-01-preview"
+```
 
 ```typespec
 import "@typespec/versioning";
@@ -389,20 +405,6 @@ model StableModel {
 op previewFunctionality(@body previewModel: PreviewModel): void;
 
 op stableFunctionality(@body stableModel: StableModel): void;
-```
-
-```yaml
-options:
-  "@azure-tools/typespec-python":
-    api-version: "all"
-  "@azure-tools/typespec-csharp":
-    api-version: "all"
-  "@azure-tools/typespec-ts":
-    api-version: "all"
-  "@azure-tools/typespec-java":
-    api-version: "all"
-  "@azure-tools/typespec-go":
-    api-version: "all"
 ```
 
 </ClientTabItem>

@@ -1,10 +1,10 @@
 ---
-title: Client renaming
+title: Renaming
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
-This page documents how to customize names for client generation. For an overview of the setup, please visit the setup page.
+This page documents how to customize the name of models, operations, and parameters. For an overview of the setup, please visit the setup page.
 
 :::note
 The TypeSpec compiler provides an `@encodedName` decorator that allows changing the name of the property for a given serialization format.
@@ -22,17 +22,17 @@ By default, any language code generator will assume the TYPESPEC name is the cli
 ```typespec title=main.tsp
 namespace PetStoreNamespace;
 
-@doc("This is the input I need")
+/** This is the input I need */
 @resource("input")
 model InputModel {
+  /** Id of this object */
   @key
-  @doc("Id of this object")
   @visibility("read")
   name: string;
 }
 
-@doc("Read my resource")
-op GetModel is ResourceRead<InputModel>;
+/** Read my resource */
+op get is ResourceRead<InputModel>;
 ```
 
 ```python
@@ -56,11 +56,11 @@ namespace PetStoreNamespace
   public partial class PetStoreNamespaceClient
   {
     // protocol method
-    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
-    public virtual Response GetModel(string name, RequestContext context) {}
+    public virtual async Task<Response> GetAsync(string name, RequestContext context) {}
+    public virtual Response Get(string name, RequestContext context) {}
     // convenience method
-    public virtual async Task<Response<InputModel>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
-    public virtual Response<InputModel> GetModel(string name, CancellationToken cancellationToken = default) {}
+    public virtual async Task<Response<InputModel>> GetAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<InputModel> Get(string name, CancellationToken cancellationToken = default) {}
   }
 }
 ```
@@ -81,8 +81,8 @@ public final class InputModel {
 
 package com.petstorenamespace;
 public final class PetStoreNamespaceClient {
-    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
-    public InputModel getModel(String name)
+    public Response<BinaryData> getWithResponse(String name, RequestOptions requestOptions)
+    public InputModel get(String name)
 }
 ```
 
@@ -90,9 +90,9 @@ public final class PetStoreNamespaceClient {
 
 ## Customizations
 
-### Model names
+### Renaming models and attributes
 
-Renames in the context of models can be done on the model name and the attribute name. [Renames have a target](https://microsoft.github.io/typespec/standard-library/projected-names#known-targets):
+You can rename models and attributes. [Renames have a target](https://microsoft.github.io/typespec/standard-library/projected-names#known-targets):
 
 - `client` means that all client will use that name
 - `csharp`, `javascript`, `python`, `java` means you target this specific language
@@ -137,11 +137,11 @@ namespace PetStoreNamespace
   public partial class PetStoreNamespaceClient
   {
     // protocol method
-    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
-    public virtual Response GetModel(string name, RequestContext context) {}
+    public virtual async Task<Response> GetAsync(string name, RequestContext context) {}
+    public virtual Response Get(string name, RequestContext context) {}
     // convenience method
-    public virtual async Task<Response<ParameterOptions>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
-    public virtual Response<ParameterOptions> GetModel(string name, CancellationToken cancellationToken = default) {}
+    public virtual async Task<Response<ParameterOptions>> GetAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<ParameterOptions> Get(string name, CancellationToken cancellationToken = default) {}
   }
 }
 ```
@@ -158,14 +158,16 @@ public final class InputOptions {
 
 package com.petstorenamespace;
 public final class PetStoreNamespaceClient {
-    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
-    public InputOptions getModel(String name)
+    public Response<BinaryData> getWithResponse(String name, RequestOptions requestOptions)
+    public InputOptions get(String name)
 }
 ```
 
 </ClientTabs>
 
-### Rename operations and parameters
+### Renaming operations and parameters
+
+Similarly, you can rename operations like in the example below:
 
 <ClientTabs>
 
@@ -175,8 +177,8 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@clientName(GetModel, "ReadModel"); // Use InputOptions as a base name in clients
-@@clientName(GetModel, "GetComputedModel", "python"); // Note that Python will still snake_case it
+@@clientName(Get, "Read"); // Use InputOptions as a base name in clients
+@@clientName(Get, "GetComputed", "python"); // Note that Python will still snake_case it
 ```
 
 ```python
@@ -226,6 +228,8 @@ public final class PetStoreNamespaceClient {
 ```
 
 </ClientTabs>
+
+You cannot at this moment rename parameters in the client.tsp file. You will need to add the `@clientName` decorator over the parameter directly, example:
 
 ## Implementation
 

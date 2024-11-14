@@ -37,7 +37,7 @@ Tracked resources use the `TrackedResource<TProperties/>` as their base resource
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -61,7 +61,7 @@ Tenant resources use the `ProxyResource<TProperties/>` as their base resource ty
 ```typespec
 @tenantResource
 model EmployeeResource is ProxyResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -85,7 +85,7 @@ Extension resources use the `ExtensionResource<TProperties/>` as their base reso
 
 ```typespec
 model EmployeeResource is ExtensionResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -109,7 +109,7 @@ Child resources usually use the `ProxyResource<TProperties/>` as their base reso
 ```typespec
 @parentResource(EmployeeResource)
 model JobResource is ProxyResource<JobProperties> {
-  @doc("The job name")
+  /** The job name */
   @segment("jobs")
   @key("jobName")
   @visibility("read")
@@ -134,7 +134,7 @@ Tenant resources use the `ProxyResource<TProperties/>` as their base resource ty
 ```typespec
 @subscriptionResource
 model EmployeeResource is ProxyResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -159,7 +159,7 @@ Location-based resources usually use the `ProxyResource<TProperties/>` as their 
 ```typespec
 @locationResource
 model EmployeeResource is ProxyResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -185,7 +185,7 @@ Singleton resources can use any resource base type, but most often use `ProxyRes
 @singleton
 @tenantResource
 model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
-  @doc("The default employee agreement, applying to all employees.")
+  /** The default employee agreement, applying to all employees. */
   @segment("employeeAgreements")
   @key
   @visibility("read")
@@ -219,7 +219,7 @@ Here is an example of a property bag for the `EmployeeResource` resource.
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -276,7 +276,7 @@ model Job {
 }
 
 model EmployeeProperties {
-  @doc("The current title of the employee")
+  /** The current title of the employee */
   title: string;
 
   @visibility("read", "create")
@@ -316,7 +316,7 @@ Alternately, this is also equivalent:
 
 ```typespec
 model ResourceProperties {
-  @doc("The status of the last provisioning operation performed on the resource.")
+  /** The status of the last provisioning operation performed on the resource. */
   @visibility("read")
   provisioningState?: ResourceProvisioningState;
 }
@@ -425,7 +425,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    @doc("The employee name, using 'Firstname Lastname' notation")
+    /** The employee name, using 'Firstname Lastname' notation */
     @segment("employees")
     @key("employeeName")
     @visibility("read")
@@ -440,7 +440,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
 
   ```typespec
   model EmployeeResource is TrackedResource<EmployeeProperties> {
-    @doc("The employee name, using 'Firstname Lastname' notation")
+    /** The employee name, using 'Firstname Lastname' notation */
     @segment("employees")
     @key("employeeName")
     @visibility("read")
@@ -459,7 +459,7 @@ Standard support for setting a SKU-based service level for a resource. To enable
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -478,7 +478,7 @@ Indicator that entity-tag operation concurrency support is enabled for this reso
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -497,7 +497,7 @@ Support for marketplace billing configuration for the resource. To enable `Plan`
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -516,7 +516,7 @@ Support for certain kinds of portal user experiences based on the kind of resour
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
@@ -535,7 +535,7 @@ Support for management of this resource by other resources. To add 'ManagedBy' s
 
 ```typespec
 model EmployeeResource is TrackedResource<EmployeeProperties> {
-  @doc("The employee name, using 'Firstname Lastname' notation")
+  /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
   @visibility("read")
