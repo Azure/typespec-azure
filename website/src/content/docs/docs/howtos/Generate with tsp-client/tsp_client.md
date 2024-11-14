@@ -1,5 +1,5 @@
 ---
-title: tsp-client usage
+title: Usage & Configuration
 ---
 
 :::info
