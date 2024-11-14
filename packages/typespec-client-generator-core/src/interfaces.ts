@@ -731,7 +731,7 @@ export enum UsageFlags {
   // Used in spread.
   Spread = 1 << 6,
   /**
-   * @deprecated Use `isSdkErrorModel` instead.
+   * @deprecated Use `Exception` instead.
    */
   // Output will also be set when Error is set.
   Error = 1 << 7,
@@ -739,7 +739,7 @@ export enum UsageFlags {
   Json = 1 << 8,
   // Set when type is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
-  // Set when type is used for exception output
+  // Set when type is used for exception output.
   Exception = 1 << 10,
 }
 
