@@ -682,6 +682,24 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(discriminatorProperty.serializedName, "@data.kind");
   });
 
+  it("discriminator with encodedName", async () => {
+    await runner.compileWithBuiltInService(`
+      @discriminator("odataType")
+      @usage(Usage.input | Usage.output)
+      model CharFilter {
+        @encodedName("application/json", "@odata.type")
+        odataType: string;
+        name: string;
+      }
+        `);
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const discriminatorProperty = models[0].discriminatorProperty;
+    ok(discriminatorProperty);
+    strictEqual(discriminatorProperty.kind, "property");
+    strictEqual(discriminatorProperty.serializedName, "@odata.type");
+  });
+
   it("filterOutCoreModels true", async () => {
     runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
