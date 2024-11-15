@@ -1,5 +1,5 @@
 import { createRule, Operation } from "@typespec/compiler";
-import { getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
+import { getHttpOperation, getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 /**
  * verify an operation returns 202 or 204 should not contain response body.
@@ -19,12 +19,18 @@ export const noResponseBodyRule = createRule({
   create(context) {
     return {
       operation: (op: Operation) => {
-        if (isTemplatedInterfaceOperation(op)) return;
+        const [httpOperation] = getHttpOperation(context.program, op);
+        if (isTemplatedInterfaceOperation(op) || httpOperation.verb === "head") return;
 
         const responses = getResponsesForOperation(context.program, op)[0].find(
           (v) => v.statusCodes !== 204 && v.statusCodes !== 202,
         );
+
         if (responses && !responses.responses.every((v) => v.body)) {
+          if (["delete", "post"].includes(httpOperation.verb) && responses.statusCodes === 200) {
+            return;
+          }
+
           context.reportDiagnostic({
             target: op,
           });
