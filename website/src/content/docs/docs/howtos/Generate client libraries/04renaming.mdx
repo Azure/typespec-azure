@@ -74,12 +74,12 @@ const model: InputModel = await client.path("/petStore/model/{name}").get();
 ```
 
 ```java
-package com.petstorenamespace.models;
+package petstorenamespace.models;
 public final class InputModel {
     public String getName()
 }
 
-package com.petstorenamespace;
+package petstorenamespace;
 public final class PetStoreNamespaceClient {
     public Response<BinaryData> getWithResponse(String name, RequestOptions requestOptions)
     public InputModel get(String name)
@@ -151,12 +151,12 @@ namespace PetStoreNamespace
 ```
 
 ```java
-package com.petstorenamespace.models;
+package petstorenamespace.models;
 public final class InputOptions {
     public String getName()
 }
 
-package com.petstorenamespace;
+package petstorenamespace;
 public final class PetStoreNamespaceClient {
     public Response<BinaryData> getWithResponse(String name, RequestOptions requestOptions)
     public InputOptions get(String name)
@@ -215,12 +215,12 @@ namespace PetStoreNamespace
 ```
 
 ```java
-package com.petstorenamespace.models;
+package petstorenamespace.models;
 public final class InputModel {
     public String getName()
 }
 
-package com.petstorenamespace;
+package petstorenamespace;
 public final class PetStoreNamespaceClient {
     public Response<BinaryData> readModelWithResponse(String name, RequestOptions requestOptions)
     public InputModel readModel(String name)
