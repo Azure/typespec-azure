@@ -1,7 +1,10 @@
+import "@azure-tools/typespec-autorest";
+
 import "./base.tsp";
 import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/types.tsp";
 
 using OpenAPI;
+using Autorest;
 
 namespace Azure.ResourceManager.CommonTypes;
 
@@ -31,3 +34,6 @@ interface RegisterParams {
 
 @@extension(Resource, "x-ms-azure-resource", true);
 @@extension(ResourceModelWithAllowedPropertySet, "x-ms-azure-resource", true);
+
+@useRef("./managedidentity.json#/definitions/ManagedServiceIdentity")
+model ManagedServiceIdentity {}
