@@ -129,7 +129,7 @@ export async function getAllServicesAtAllVersions(
     );
 
     if (versions.length === 0) {
-      reportDiagnostic(program, { code: "no-matching-version-found", target: NoTarget });
+      reportDiagnostic(program, { code: "no-matching-version-found", target: service.type });
     }
 
     if (versions.length === 1 && versions[0].version === undefined) {
