@@ -1611,7 +1611,7 @@ importers:
   core/packages/spec-dashboard:
     dependencies:
       '@emotion/react':
-        specifier: ^11.13.0
+        specifier: ^11.13.3
         version: 11.13.3(@types/react@18.3.11)(react@18.3.1)
       '@fluentui/react-components':
         specifier: ~9.55.0
@@ -3270,11 +3270,6 @@ packages:
 
   '@babel/parser@7.25.6':
     resolution: {integrity: sha512-trGdfBdbD0l1ZPmcJ83eNxB9rbEax4ALFTF7fN386TMYbeCQbyme5cOEXQhbGXKebwGaB/J52w1mrklMcbgy6Q==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-
-  '@babel/parser@7.25.8':
-    resolution: {integrity: sha512-HcttkxzdPucv3nNFmfOOMfFf64KgdJVqm1KaCm25dPGMLElo9nsLvXeJECQg8UzPuBGLyTSA0ZzqCtDSzKTEoQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -8613,10 +8608,6 @@ packages:
     resolution: {integrity: sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==}
     engines: {node: '>= 0.4'}
 
-  is-core-module@2.15.0:
-    resolution: {integrity: sha512-Dd+Lb2/zvk9SKy1TGCt1wFJFo/MWBPMX5x7KcvLajWTGuomczdQX61PvY5yK6SVACwpoexWo81IfFyoKY2QnTA==}
-    engines: {node: '>= 0.4'}
-
   is-core-module@2.15.1:
     resolution: {integrity: sha512-z0vtXSwucUJtANQWldhbtbt7BnL0vxiFjIdDLAatwhDYty2bad6s+rijD6Ri4YuYJubLzIJLUidCh09e1djEVQ==}
     engines: {node: '>= 0.4'}
@@ -12749,10 +12740,6 @@ snapshots:
     dependencies:
       '@babel/types': 7.26.0
 
-  '@babel/parser@7.25.8':
-    dependencies:
-      '@babel/types': 7.26.0
-
   '@babel/parser@7.26.2':
     dependencies:
       '@babel/types': 7.26.0
@@ -13354,7 +13341,7 @@ snapshots:
   '@babel/types@7.25.8':
     dependencies:
       '@babel/helper-string-parser': 7.25.7
-      '@babel/helper-validator-identifier': 7.25.7
+      '@babel/helper-validator-identifier': 7.25.9
       to-fast-properties: 2.0.0
 
   '@babel/types@7.26.0':
@@ -15821,8 +15808,8 @@ snapshots:
 
   '@readme/better-ajv-errors@1.6.0(ajv@8.17.1)':
     dependencies:
-      '@babel/code-frame': 7.25.7
-      '@babel/runtime': 7.24.8
+      '@babel/code-frame': 7.25.9
+      '@babel/runtime': 7.25.7
       '@humanwhocodes/momoa': 2.0.4
       ajv: 8.17.1
       chalk: 4.1.2
@@ -16195,7 +16182,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.2
       '@babel/preset-env': 7.25.8(@babel/core@7.25.2)
-      '@babel/types': 7.25.8
+      '@babel/types': 7.26.0
       '@storybook/core': 8.3.5
       '@storybook/csf': 0.1.11
       '@types/cross-spawn': 6.0.6
@@ -19789,10 +19776,6 @@ snapshots:
 
   is-callable@1.2.7: {}
 
-  is-core-module@2.15.0:
-    dependencies:
-      hasown: 2.0.2
-
   is-core-module@2.15.1:
     dependencies:
       hasown: 2.0.2
@@ -19991,7 +19974,7 @@ snapshots:
   jscodeshift@0.15.2(@babel/preset-env@7.25.8(@babel/core@7.25.2)):
     dependencies:
       '@babel/core': 7.25.2
-      '@babel/parser': 7.25.8
+      '@babel/parser': 7.26.2
       '@babel/plugin-transform-class-properties': 7.25.7(@babel/core@7.25.2)
       '@babel/plugin-transform-modules-commonjs': 7.25.7(@babel/core@7.25.2)
       '@babel/plugin-transform-nullish-coalescing-operator': 7.25.8(@babel/core@7.25.2)
@@ -22163,7 +22146,7 @@ snapshots:
 
   resolve@1.22.8:
     dependencies:
-      is-core-module: 2.15.0
+      is-core-module: 2.15.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
