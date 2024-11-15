@@ -75,7 +75,9 @@ model ResourceModelWithAllowedPropertySet extends TrackedResource {
    * If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. */
   eTag?: string;
 
-  identity?: Identity;
+  @typeChangedFrom(Versions.v6, Identity)
+  identity?: ManagedServiceIdentity;
+
   sku?: Sku;
   plan?: Plan;
 }
@@ -334,13 +336,16 @@ union ResourceIdentityType {
 }
 
 /** Identity for the resource. */
+@removed(Versions.v6)
 model Identity {
   /** The principal ID of resource identity. The value must be an UUID. */
+  @removed(Versions.v6)
   @typeChangedFrom(Versions.v4, string)
   @visibility("read")
   principalId?: uuid;
 
   /** The tenant ID of resource. The value must be an UUID. */
+  @removed(Versions.v6)
   @typeChangedFrom(Versions.v4, string)
   @visibility("read")
   tenantId?: uuid;
