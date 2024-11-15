@@ -353,6 +353,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Authentication "${"authType"}" is not a known authentication by the openapi3 emitter, it will be ignored.`,
       },
     },
+    "no-matching-version-found": {
+      severity: "error",
+      messages: {
+        default:
+          "The emitter did not emit any files because the specified version option does not match any versions of the service.",
+      },
+    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<AutorestEmitterOptions>,
