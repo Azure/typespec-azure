@@ -17,7 +17,7 @@ import {
 } from "@typespec/compiler";
 import { resolveInfo } from "@typespec/openapi";
 import { buildVersionProjections } from "@typespec/versioning";
-import { AutorestEmitterOptions, getTracer } from "./lib.js";
+import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
   getOpenAPIForService,
@@ -129,9 +129,9 @@ export async function getAllServicesAtAllVersions(
     );
 
     if (versions.length === 0) {
-      throw new Error("No matching version found.");
+      reportDiagnostic(program, { code: "no-matching-version-found", target: service.type });
     }
-    
+
     if (versions.length === 1 && versions[0].version === undefined) {
       let projectedProgram;
       if (versions[0].projections.length > 0) {
