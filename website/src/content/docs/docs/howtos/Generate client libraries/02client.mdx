@@ -333,7 +333,7 @@ client.pet();
 ```
 
 ```java
-package com.petstorerenamed;
+package petstorerenamed;
 
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
 client.feed();
@@ -403,7 +403,7 @@ client2.feed();
 ```
 
 ```java
-package com.petstorerenamed;
+package petstorerenamed;
 
 FoodClient foodClient = new FoodClientBuilder().buildClient();
 PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
@@ -470,7 +470,7 @@ client.opGrp2.pet();
 ```
 
 ```java
-package com.petstorerenamed;
+package petstorerenamed;
 
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
 
@@ -542,10 +542,10 @@ NOT_SUPPORTED;
 ```
 
 ```java
-import com.petstorerenamed.FoodClient;
-import com.petstorerenamed.FoodClientBuilder;
-import com.petstorerenamed.subnamespace.PetActionClient;
-import com.petstorerenamed.subnamespace.PetActionClientBuilder;
+import petstorerenamed.FoodClient;
+import petstorerenamed.FoodClientBuilder;
+import petstorerenamed.subnamespace.PetActionClient;
+import petstorerenamed.subnamespace.PetActionClientBuilder;
 
 FoodClient foodClient = new FoodClientBuilder().buildClient();
 PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
