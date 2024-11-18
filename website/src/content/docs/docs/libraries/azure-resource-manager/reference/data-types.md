@@ -1609,16 +1609,17 @@ model Azure.ResourceManager.CommonTypes.OperationStatusResult
 
 #### Properties
 
-| Name             | Type                                                                           | Description                                 |
-| ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------- |
-| id?              | `string`                                                                       | Fully qualified ID for the async operation. |
-| name?            | `string`                                                                       | Name of the async operation.                |
-| status           | `string`                                                                       | Operation status.                           |
-| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.  |
-| startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
-| endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
-| operations?      | `ResourceManager.CommonTypes.OperationStatusResult[]`                          | The operations list.                        |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | If present, details of the operation error. |
+| Name             | Type                                                                           | Description                                                                                |
+| ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| id?              | `string`                                                                       | Fully qualified ID for the async operation.                                                |
+| name?            | `string`                                                                       | Name of the async operation.                                                               |
+| status           | `string`                                                                       | Operation status.                                                                          |
+| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.                                                 |
+| startTime?       | `utcDateTime`                                                                  | The start time of the operation.                                                           |
+| endTime?         | `utcDateTime`                                                                  | The end time of the operation.                                                             |
+| operations?      | `ResourceManager.CommonTypes.OperationStatusResult[]`                          | The operations list.                                                                       |
+| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | If present, details of the operation error.                                                |
+| resourceId?      | `string`                                                                       | Fully qualified ID of the resource against which the original async operation was started. |
 
 ### `Plan` {#Azure.ResourceManager.CommonTypes.Plan}
 
