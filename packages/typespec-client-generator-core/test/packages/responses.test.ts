@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
 
-describe("typespec-client-generator-core: package", () => {
+describe("typespec-client-generator-core: responses", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
