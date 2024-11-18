@@ -70,6 +70,5 @@ model Encryption {
 
   /** All Customer-managed key encryption properties for the resource. */
   @added(Versions.v4)
-  @removed(Versions.v5)
   customerManagedKeyEncryption?: CustomerManagedKeyEncryption;
 }

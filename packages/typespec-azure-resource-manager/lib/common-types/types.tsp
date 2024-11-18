@@ -142,7 +142,6 @@ model Operation {
   isDataAction?: boolean;
 
   /** Localized display information for this particular operation. */
-  @visibility("read")
   display?: OperationDisplay;
 
   /** 
@@ -154,6 +153,7 @@ model Operation {
   /** 
     Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
      */
+  @visibility("read")
   actionType?: ActionType;
 }
 
@@ -213,6 +213,12 @@ model OperationStatusResult {
 
   /** If present, details of the operation error. */
   error?: ErrorDetail;
+
+  /** Fully qualified ID of the resource against which the original async operation was started. */
+  @visibility("read")
+  @format("arm-id")
+  @added(Versions.v5)
+  resourceId?: string;
 }
 
 /**

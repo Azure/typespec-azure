@@ -27,6 +27,10 @@
         "infrastructureEncryption": {
           "$ref": "#/definitions/InfrastructureEncryption",
           "description": "Values are enabled and disabled."
+        },
+        "customerManagedKeyEncryption": {
+          "$ref": "#/definitions/CustomerManagedKeyEncryption",
+          "description": "All Customer-managed key encryption properties for the resource."
         }
       }
     },

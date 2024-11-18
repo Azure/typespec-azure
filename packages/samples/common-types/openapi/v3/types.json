@@ -300,8 +300,7 @@
         },
         "display": {
           "$ref": "#/definitions/OperationDisplay",
-          "description": "Localized display information for this particular operation.",
-          "readOnly": true
+          "description": "Localized display information for this particular operation."
         },
         "origin": {
           "$ref": "#/definitions/Origin",
@@ -310,7 +309,8 @@
         },
         "actionType": {
           "$ref": "#/definitions/ActionType",
-          "description": "Extensible enum. Indicates the action type. \"Internal\" refers to actions that are for internal only APIs."
+          "description": "Extensible enum. Indicates the action type. \"Internal\" refers to actions that are for internal only APIs.",
+          "readOnly": true
         }
       }
     },
@@ -350,7 +350,9 @@
           "items": {
             "$ref": "#/definitions/Operation"
           },
-          "x-ms-identifiers": []
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "nextLink": {
           "type": "string",
