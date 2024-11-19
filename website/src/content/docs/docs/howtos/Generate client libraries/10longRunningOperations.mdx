@@ -2,7 +2,7 @@
 title: Long-Running Operations
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This doc details what emitters will generate for long-running operations.
 
@@ -10,23 +10,22 @@ This doc details what emitters will generate for long-running operations.
 
 Long-running operation to create or replace a resource.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
   NoRepeatableRequests &
   NoClientRequestId>;
 
+/** Details about a user. */
 @resource("users")
-@doc("Details about a user.")
 model User {
+  /** The name of user. */
   @key
   @visibility("read")
-  @doc("The name of user.")
   name: string;
 
-  @doc("The role of user")
+  /** The role of user */
   role: string;
 }
 
@@ -38,123 +37,87 @@ op getOperationStatus is ResourceOperations.GetResourceOperationStatus<User, nev
 op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User>;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 def begin_create_or_replace(
     self, name: str, resource: Union[User, JSON, IO[bytes]], **kwargs: Any
 ) -> LROPoller[User]
 ```
 
-</TabItem>
-
-<TabItem value="csharp" label="CSharp">
-
 ```csharp
 
 ```
-
-</TabItem>
-
-<TabItem value="typescript" label="Typescript">
 
 ```typescript
 
 ```
 
-</TabItem>
-
-<TabItem value="java" label="Java">
-
 ```java
 public SyncPoller<PollOperationDetails, User> beginCreateOrReplace(String name, User resource);
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Resource delete
 
 Long-running operation to delete a resource.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
 @pollingOperation(getOperationStatus)
 op delete is ResourceOperations.LongRunningResourceDelete<User>;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 def begin_delete(self, name: str, **kwargs: Any) -> LROPoller[None]
 ```
-
-</TabItem>
-
-<TabItem value="csharp" label="CSharp">
 
 ```csharp
 
 ```
 
-</TabItem>
-
-<TabItem value="typescript" label="Typescript">
-
 ```typescript
 
 ```
-
-</TabItem>
-
-<TabItem value="java" label="Java">
 
 ```java
 public SyncPoller<PollOperationDetails, Void> beginDelete(String name);
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>
 
 ## Resource action
 
 Long-running operation to invoke an action on a resource.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
 
 ```typespec
+/** Details about a user. */
 @resource("users")
-@doc("Details about a user.")
 model User {
+  /** The name of user. */
   @key
   @visibility("read")
-  @doc("The name of user.")
   name: string;
 
-  @doc("The role of user")
+  /** The role of user */
   role: string;
 }
 
-@doc("The parameters for exporting a user.")
+/** The parameters for exporting a user. */
 model UserExportParams {
+  /** The format of the data. */
   @query
-  @doc("The format of the data.")
   format: string;
 }
 
-@doc("The exported user data.")
+/** The exported user data. */
 model ExportedUser {
-  @doc("The name of user.")
+  /** The name of user. */
   name: string;
 
-  @doc("The exported URI.")
+  /** The exported URI. */
   resourceUri: string;
 }
 
@@ -166,37 +129,20 @@ op getExportOperationStatus is ResourceOperations.GetResourceOperationStatus<Use
 op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
 ```
 
-</TabItem>
-
-<TabItem value="python" label="Python">
-
 ```python
 def begin_export(self, name: str, *, format: str, **kwargs: Any) -> LROPoller[ExportedUser]
 ```
-
-</TabItem>
-
-<TabItem value="csharp" label="CSharp">
 
 ```csharp
 
 ```
 
-</TabItem>
-
-<TabItem value="typescript" label="Typescript">
-
 ```typescript
 
 ```
-
-</TabItem>
-
-<TabItem value="java" label="Java">
 
 ```java
 public SyncPoller<PollOperationDetails, ExportedUser> beginExport(String name, String format);
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabs>

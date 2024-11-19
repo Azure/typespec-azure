@@ -1,5 +1,5 @@
 ---
-title: Getting started with `tsp-client`
+title: Usage & Configuration
 ---
 
 :::info
@@ -10,13 +10,13 @@ title: Getting started with `tsp-client`
 
 ## Installation
 
-```
+```bash
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
 ## Usage
 
-```
+```bash
 tsp-client <command> [options]
 ```
 
@@ -29,17 +29,17 @@ the `-o` or `--output-dir` option.
 
 ### init
 
-Initialize the client library directory using a tspconfig.yaml. When running this command pass in a path to a local or remote tspconfig.yaml with the `-c` or `--tsp-config` flag.
+Initialize the client library directory using a tspconfig.yaml. When running this command pass in a path to a local or the URL of a remote tspconfig.yaml with the `-c` or `--tsp-config` flag. If remote, the tspconfig.yaml must include the specific commit in the path. (See example below)
 
 The `init` command generates a directory structure following the standard pattern used across Azure SDK language repositories, creates a [tsp-location.yaml](#tsp-locationyaml) file to control generation, and performs an initial generation of the client library. If you want to skip client library generation, then pass the `--skip-sync-and-generate` flag.
 
-:::warning
+:::caution
 This command should be run from the root of the repository. Example repository root: `azure-sdk-for-python/`
 :::
 
 Example:
 
-```
+```bash
 azure-sdk-for-python> tsp-client init -c https://github.com/Azure/azure-rest-api-specs/blob/431eb865a581da2cd7b9e953ae52cb146f31c2a6/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
 ```
 
@@ -49,7 +49,7 @@ The `update` command will look for a [tsp-location.yaml](#tsp-locationyaml) file
 
 Example:
 
-```
+```bash
 azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client update
 ```
 
@@ -61,7 +61,7 @@ By default the `sync` command will look for a tsp-location.yaml to get the proje
 
 Example:
 
-```
+```bash
 azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client sync
 ```
 
@@ -71,7 +71,7 @@ Generate a client library from a TypeSpec project. The `generate` command should
 
 Example:
 
-```
+```bash
 azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client generate
 ```
 
@@ -81,7 +81,7 @@ Convert an existing swagger specification to a TypeSpec project. This command sh
 
 Example:
 
-```
+```bash
 azure-rest-api-specs/specification/contosowidgetmanager> tsp-client convert --swagger-readme ./data-plane/readme.md -o ./Contoso.WidgetManager
 ```
 
@@ -91,7 +91,7 @@ Sort an existing swagger specification to be the same content order with TypeSpe
 
 ## Options
 
-```
+```bash
   --arm                     Convert ARM swagger specification to TypeSpec       [boolean]
   -c, --tsp-config          The tspconfig.yaml file to use                      [string]
   --commit                  Commit to be used for project init or update        [string]
@@ -136,7 +136,7 @@ The file has the following properties:
 
 Example:
 
-```yml
+```yml title=tsp-location.yaml
 directory: specification/contosowidgetmanager/Contoso.WidgetManager
 commit: 431eb865a581da2cd7b9e953ae52cb146f31c2a6
 repo: Azure/azure-rest-api-specs
@@ -163,9 +163,8 @@ Please note that these requirements apply on the repository where the client lib
 
 This tool creates a `TempTypeSpecFiles` directory when syncing a TypeSpec project to your local repository. This temporary folder will contain a copy of the TypeSpec project specified by the parameters set in the tsp-location.yaml file. If you pass the `--save-inputs` flag to the commandline tool, this directory will not be deleted. Repositories should add an entry in the .gitignore so that none of these files are accidentally checked in if `--save-inputs` flag is passed in.
 
-```text
-# .gitignore file
-TempTypeSpecFiles/
+```diff title=".gitignore" lang="sh"
++ TempTypeSpecFiles/
 ```
 
 ### emitter-package.json (Required)
@@ -195,6 +194,6 @@ This file replaces the package.json checked into the `azure-rest-api-spec` repos
 `emitter-package-lock.json` will be used the same as a `package-lock.json`. The tool will run a clean npm installation before generating client libraries. This file allows consistent dependency trees and allows each repository to control their dependency installation.
 The file should be checked into this location: `<root of repo>/eng/emitter-package-lock.json`
 
-:::warning
+:::caution
 The tool will run `npm ci` to install dependencies, so ensure that the `emitter-package-lock.json` and `emitter-package.json` files both exist and are in sync with each other.
 :::

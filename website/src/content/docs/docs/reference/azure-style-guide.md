@@ -92,7 +92,7 @@ use the appropriate parameter description in the Azure.Core library.
 
 ```typespec
 interface Widgets {
-  @doc("List Widget resources")
+  /** List Widget resources */
   listWidgets is ResourceList<
     Widget,
     {
@@ -135,7 +135,7 @@ The following example shows how to define a security scheme for Azure Active Dir
 @useAuth(AADToken)
 namespace Contoso.WidgetManager;
 
-@doc("The Azure Active Directory OAuth2 Flow")
+/** The Azure Active Directory OAuth2 Flow */
 model AADToken
   is OAuth2Auth<[
     {
@@ -157,7 +157,7 @@ The following example defines an apikey security scheme:
 @useAuth(AzureKey)
 namespace Contoso.WidgetManager;
 
-@doc("The secret key for your Azure Cognitive Services subscription.")
+/** The secret key for your Azure Cognitive Services subscription. */
 model AzureKey is ApiKeyAuth<ApiKeyLocation.header, "Ocp-Apim-Subscription-Key">;
 ```
 

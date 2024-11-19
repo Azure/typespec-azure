@@ -30,12 +30,12 @@ The `@azure-tools/typespec-azure-core` library defines these standard operation 
 For all of these operation templates, `TResource` is the resource model and `TCustom` allows customization of the operation parameters or response. `TCustom`, if provided, must extend the `Azure.Core.Foundations.CustomizationFields` model, which looks like:
 
 ```typespec
-@doc("The expected shape of model types passed to the TCustom parameter of operation signatures.")
+/** The expected shape of model types passed to the TCustom parameter of operation signatures. */
 model CustomizationFields {
-  @doc("An object containing custom parameters that will be included in the operation.")
+  /** An object containing custom parameters that will be included in the operation. */
   parameters?: object;
 
-  @doc("An object containing custom properties that will be included in the response.")
+  /** An object containing custom properties that will be included in the response. */
   response?: object;
 }
 ```

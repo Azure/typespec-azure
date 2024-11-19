@@ -2,7 +2,7 @@
 title: Generated Types
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents what type definitions in TypeSpec are generated as in emitted libraries
 
@@ -10,10 +10,12 @@ This page documents what type definitions in TypeSpec are generated as in emitte
 
 ### Flattening
 
-> **NOTE:** Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+:::caution
+Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+:::
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model Properties {
@@ -26,8 +28,8 @@ model Foo {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -62,8 +64,8 @@ model Foo {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattened access.
 
@@ -83,8 +85,8 @@ print(f.name)  # Flattened access is dynamically supported, but not documented
 
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 CSharp will generate the model with properties being flattened. During serialization/deserialization, the model will be serialized/deserialized as a non-flattened model.
 
@@ -152,16 +154,16 @@ public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 // Please note that this feature is not supported right now, and the model will be generated un-flattened.
 // Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 In Java, `@flattenProperty` have no effect on generated libraries.
 
@@ -174,15 +176,15 @@ public final class Properties {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Models with additional properties
 
 #### Additional properties of any type
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 Recommend usage:
 
@@ -210,8 +212,8 @@ model Animal is Record<unknown> {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -245,8 +247,8 @@ model Animal is Record<unknown> {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python models are designed to support adding any additional properties.
 
@@ -264,8 +266,8 @@ animal["friend"] = "Jerry"
 animal["age"] = 5
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public partial class Animal : IJsonModel<Animal> {
@@ -278,8 +280,8 @@ public partial class Animal : IJsonModel<Animal> {
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```ts
 // RLC input
@@ -301,8 +303,8 @@ export interface Animal extends Record<string, any> {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 @Fluent
@@ -315,13 +317,13 @@ public final class Animal implements JsonSerializable<Animal> {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 #### Additional properties of specific type
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model AnimalProperty {
@@ -336,8 +338,8 @@ model Animal {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -394,8 +396,8 @@ model Animal {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python models are designed to support adding any additional properties.
 
@@ -419,8 +421,8 @@ animal["friend"] = AnimalProperty(category="relationship", value="Jerry")
 animal["age"] = AnimalProperty(category="attribute", value=5)
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 Due to currently there is no way to know whether a Json could be correctly mapped into the specified type in `.Net`, we currently generate any non-primitive value type in additional properties property as `BinaryData`.
 
@@ -472,8 +474,8 @@ public partial class Animal : IJsonModel<Animal>
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```ts
 // RLC input
@@ -518,8 +520,8 @@ export interface Animal {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 @Fluent
@@ -533,13 +535,13 @@ public final class Animal implements JsonSerializable<Animal> {
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 #### Additional properties of union type
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model Animal {
@@ -558,8 +560,8 @@ model Animal {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -604,8 +606,8 @@ model Animal {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python models are designed to support adding any additional properties.
 
@@ -623,8 +625,8 @@ animal["friend"] = "Jerry"
 animal["age"] = 5
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public partial class Animal : IJsonModel<Animal>
@@ -638,8 +640,8 @@ public partial class Animal : IJsonModel<Animal>
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```ts
 // RLC input and output
@@ -655,8 +657,8 @@ export interface Animal extends Record<string, string | number> {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 @Fluent
@@ -669,13 +671,13 @@ public final class Animal implements JsonSerializable<Animal> {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 #### Additional properties of nullable type
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model Animal {
@@ -685,8 +687,8 @@ model Animal {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -724,8 +726,8 @@ model Animal {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python models are designed to support adding any additional properties.
 
@@ -743,8 +745,8 @@ animal["friend"] = "Jerry"
 animal["alert"] = None
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public partial class Animal : IJsonModel<Animal>
@@ -758,8 +760,8 @@ public partial class Animal : IJsonModel<Animal>
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```ts
 // RLC input and output
@@ -775,9 +777,9 @@ export interface Animal extends Record<string, string | null> {
 }
 ```
 
-</TabItem>
+</ClientTabItem>
 
-<TabItem value="java" label="Java" >
+<ClientTabItem lang="java" >
 
 ```java
 @Fluent
@@ -791,16 +793,298 @@ public final class Animal implements JsonSerializable<Animal> {
 
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
+
+### Discriminator
+
+TypeSpec uses `@discriminator` decorator to add a discriminator to a model.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+TypeSpec now has two ways to represent a discriminated set.
+
+1. Use model
+
+```typespec
+@discriminator("kind")
+model Cat {
+  kind: string;
+}
+
+model Siamese extends Cat {
+  kind: "siamese";
+}
+
+model Ragdoll extends Cat {
+  kind: "ragdoll";
+}
+```
+
+The type of the discriminator property could be an enum (extensible or fixed):
+
+```typespec
+@discriminator("kind")
+model Cat {
+  kind: CatKind;
+}
+
+union CatKind {
+  string,
+  Siamese: "siamese",
+  Ragdoll: "ragdoll",
+}
+
+model Siamese extends Cat {
+  kind: CatKind.Siamese;
+}
+
+model Ragdoll extends Cat {
+  kind: CatKind.Ragdoll;
+}
+```
+
+2. Use union
+
+```typespec
+@discriminator("kind")
+union Cat {
+  Siamese,
+  Ragdoll,
+}
+
+model Siamese {}
+
+model Ragdoll {}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
+
+TCGC currently only supports the discriminated set based on models, discriminated union is not supported yet.
+
+This is a brief structure of the models in a discriminated set in the output of TCGC.
+
+```json
+{
+  "models": [
+    {
+      "kind": "model",
+      "name": "Cat",
+      "properties": [
+        {
+          "kind": "property",
+          "name": "kind",
+          "type": {
+            "kind": "string"
+          },
+          "discriminator": true
+        }
+      ],
+      "discriminatorProperty": {
+        // the same instance of the property in the properties list here
+      },
+      "discriminatedSubtype": {
+        "siamese": {
+          "kind": "model",
+          "name": "Siamese",
+          "properties": [],
+          "discriminatorValue": "siamese"
+        },
+        "ragdoll": {
+          "kind": "model",
+          "name": "Ragdoll",
+          "properties": [],
+          "discriminatorValue": "ragdoll"
+        }
+      }
+    },
+    {
+      // the same instance of the model Siamese as we have above in `discriminatedSubtype` property
+    },
+    {
+      // the same instance of the model Ragdoll as we have above in `discriminatedSubtype` property
+    }
+  ]
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+from .. import _model_base
+from .._model_base import rest_discriminator, rest_field
+
+class Cat(_model_base.Model):
+    kind: str = rest_discriminator(name="kind")
+
+class Siamese(Cat):
+    kind: Literal["siamese"] = rest_discriminator(name="kind")
+
+class Ragdoll(Cat):
+    kind: Literal["ragdoll"] = rest_discriminator(name="kind")
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+In .Net generated code, the discriminator property will be generated as internal by default, but configurable to be public.
+
+```csharp
+public abstract partial class Cat
+{
+  protected Cat()
+  {
+  }
+
+  internal string Kind { get; set; }
+}
+
+public partial class Siamese : Cat
+{
+  public Siamese() : base()
+  {
+    Kind = "siamese";
+  }
+}
+
+public partial class Ragdoll : Cat
+{
+  public Ragdoll() : base()
+  {
+    Kind = "ragdoll";
+  }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```ts
+// RLC input models
+export interface Siamese extends CatParent {
+  kind: "siamese";
+}
+
+export interface Ragdoll extends CatParent {
+  kind: "ragdoll";
+}
+
+export type Cat = CatParent | Siamese | Ragdoll;
+
+// RLC output models
+export interface CatOutputParent {
+  kind: string;
+}
+
+export interface SiameseOutput extends CatOutputParent {
+  kind: "siamese";
+}
+
+export interface RagdollOutput extends CatOutputParent {
+  kind: "ragdoll";
+}
+
+export type CatOutput = CatOutputParent | SiameseOutput | RagdollOutput;
+
+// Modular models
+/** model interface Cat */
+export interface Cat {
+  kind: string;
+}
+
+/** Alias for CatUnion */
+export type CatUnion = Siamese | Ragdoll | Cat;
+
+/** model interface Siamese */
+export interface Siamese extends Cat {
+  kind: "siamese";
+}
+/** model interface Ragdoll */
+export interface Ragdoll extends Cat {
+  kind: "ragdoll";
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public class Cat implements JsonSerializable<Cat> {
+    public Cat();
+    public String getKind();
+}
+
+public final class Ragdoll extends Cat {
+    public Ragdoll();
+    public String getKind();
+}
+
+public final class Siamese extends Cat {
+    public Siamese();
+    public String getKind();
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="go">
+
+```go
+// CatClassification provides polymorphic access to related types.
+// Call the interface's GetCat() method to access the common type.
+// Use a type switch to determine the concrete type.  The possible types are:
+// - *Cat, *Ragdoll, *Siamese
+type CatClassification interface {
+	// GetCat returns the Cat content of the underlying type.
+	GetCat() *Cat
+}
+
+type Cat struct {
+	// REQUIRED
+	Kind *string
+}
+
+// GetCat implements the CatClassification interface for type Cat.
+func (c *Cat) GetCat() *Cat { return c }
+
+type Ragdoll struct {
+	// CONSTANT; undefinedField has constant value "ragdoll", any specified value is ignored.
+	Kind *string
+}
+
+// GetCat implements the CatClassification interface for type Ragdoll.
+func (e *Ragdoll) GetCat() *Cat {
+	return &Cat{
+		Kind:     e.Kind,
+	}
+}
+
+type Siamese struct {
+	// CONSTANT; undefinedField has constant value "siamese", any specified value is ignored.
+	Kind *string
+}
+
+// GetCat implements the CatClassification interface for type Siamese.
+func (e *Siamese) GetCat() *Cat {
+	return &Cat{
+		Kind:     e.Kind,
+	}
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
 
 ### Nullable
 
 TypeSpec uses `| null` to represent nullable types. Nullability is handled differently in languages, but emitter authors will find information
 about nullability by inspecting the type of a property.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model Foo {
@@ -824,8 +1108,8 @@ enum LR {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 A nullable type has kind `nullable` and property `valueType`. The kind of the type tells you the property is nullable, while the `valueType` tells you the underlying type you want to generate.
 
@@ -953,8 +1237,8 @@ A nullable type has kind `nullable` and property `valueType`. The kind of the ty
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python treat nullable as optional. If you actually want to send the value `null` to the service without the property being ignored, you can send in `corehttp.serialization.NULL`. Python does not restrict you from setting any property to this value.
 
@@ -980,23 +1264,23 @@ class Foo(_model_base.Model):
 
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 TODO
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 TODO
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 TODO
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ## Unions
 
@@ -1004,8 +1288,8 @@ TODO
 
 All emitters will generate their version of a closed enum.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 union LR {
@@ -1014,8 +1298,8 @@ union LR {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -1042,8 +1326,8 @@ union LR {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python never generates closed enum by design. We will always permit users to pass in additional values.
 
@@ -1056,8 +1340,8 @@ class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
   RIGHT = "right"
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public enum LR
@@ -1069,15 +1353,15 @@ public enum LR
 
 Serialization/deserialization will respect the value defined, in this case it is "left" for `LR.Left` and "right" for `LR.Right` respectively.
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export type LR = "left" | "right";
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public enum LR {
@@ -1086,15 +1370,15 @@ public enum LR {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Inline union of literals with same type
 
 This is union defined inline at point of usage.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model Widget {
@@ -1102,8 +1386,8 @@ model Widget {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -1130,8 +1414,8 @@ model Widget {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python generates this as a union of literals, not as enum. We also don't generate a closed set of literals.
 
@@ -1142,8 +1426,8 @@ model Widget:
   horizontal: Union[Literal["left"] | Literal["right"] | str]
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public partial class Widget
@@ -1157,8 +1441,8 @@ public enum WidgetHorizontal
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export interface Widget {
@@ -1166,8 +1450,8 @@ export interface Widget {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public enum WidgetHorizontal {
@@ -1176,15 +1460,15 @@ public enum WidgetHorizontal {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Union of basic type and literals of that type
 
 Each language will generate their version of an open enum.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 union Colors {
@@ -1194,8 +1478,8 @@ union Colors {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -1222,8 +1506,8 @@ union Colors {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python generates open enum again here.
 
@@ -1236,8 +1520,8 @@ class Colors(str, Enum, metaclass=CaseInsensitiveEnumMeta):
   BLUE = "blue"
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public readonly partial struct Colors : IEquatable<Colors>
@@ -1249,15 +1533,15 @@ public readonly partial struct Colors : IEquatable<Colors>
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export type Colors = string | "red" | "blue";
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public final class Colors extends ExpandableStringEnum<Colors> {
@@ -1266,15 +1550,15 @@ public final class Colors extends ExpandableStringEnum<Colors> {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Inline union of basic type and literals of that type
 
 This is union defined inline at point of usage which include the base type as an option.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model Widget {
@@ -1282,8 +1566,8 @@ model Widget {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -1310,8 +1594,8 @@ model Widget {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python generates a union of literals again.
 
@@ -1322,8 +1606,8 @@ model Widget:
   color: Union[Literal["red"] | Literal["blue"] | str]
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public partial class Widget
@@ -1339,8 +1623,8 @@ public readonly partial struct WidgetColor : IEquatable<WidgetColor>
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export interface Widget {
@@ -1348,8 +1632,8 @@ export interface Widget {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public final class WidgetColor extends ExpandableStringEnum<Colors> {
@@ -1358,13 +1642,13 @@ public final class WidgetColor extends ExpandableStringEnum<Colors> {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Union of other union/enum, basic type and literals of that type
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 import "@azure-tools/typespec-azure-resource-manager";
@@ -1376,8 +1660,8 @@ union ProvisioningState {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 For union of other union or enum. TCGC will do the flatten according to the flag.
 
 With `flatten-union-as-enum` flagged `true`:
@@ -1466,8 +1750,8 @@ With `flatten-union-as-enum` flagged `false`:
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python generates a single open enum.
 
@@ -1482,8 +1766,8 @@ class ProvisioningState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
   CANCELED = "Canceled"
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
@@ -1500,8 +1784,8 @@ public readonly partial struct ProvisioningState : IEquatable<ProvisioningState>
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export type ResourceProvisioningState = "Succeeded" | "Failed" | "Canceled";
@@ -1509,8 +1793,8 @@ export type ResourceProvisioningState = "Succeeded" | "Failed" | "Canceled";
 export type ProvisioningState = string | "InProgress" | ResourceProvisioningState;
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public final class ProvisioningState extends ExpandableStringEnum<ProvisioningState> {
@@ -1521,13 +1805,13 @@ public final class ProvisioningState extends ExpandableStringEnum<ProvisioningSt
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Union of other unions of literals with same type
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 union LR {
@@ -1546,8 +1830,8 @@ union Orientation {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 For union of other union or enum. TCGC will do the flatten according to the flag.
 
 With `flatten-union-as-enum` flagged `true`:
@@ -1643,8 +1927,8 @@ With `flatten-union-as-enum` flagged `false`:
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 ```python
 from enum import Enum
@@ -1657,8 +1941,8 @@ class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
   DOWN = "down"
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public enum Orientation
@@ -1670,8 +1954,8 @@ public enum Orientation
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export type LR = "left" | "right";
@@ -1679,8 +1963,8 @@ export type UD = "up" | "down";
 export type Orientation = LR | UD;
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public enum Orientation {
@@ -1691,13 +1975,13 @@ public enum Orientation {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Inline union of other unions of literals with same type
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 union LR {
@@ -1715,8 +1999,8 @@ model Widget {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 For union of other union or enum. TCGC will do the flatten according to the flag.
 
 With `flatten-union-as-enum` flagged `true`:
@@ -1812,8 +2096,8 @@ With `flatten-union-as-enum` flagged `false`:
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Since this is inline, Python will generate this as a single union of all possible literal values.
 
@@ -1826,8 +2110,8 @@ model Widget:
   orientation: WidgetOrientation
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public partial class Widget
@@ -1843,8 +2127,8 @@ public enum WidgetOrientation
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export interface Widget {
@@ -1855,8 +2139,8 @@ export type LR = "left" | "right";
 export type UD = "up" | "down";
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public enum WidgetOrientation {
@@ -1867,15 +2151,15 @@ public enum WidgetOrientation {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Union with multiple types
 
 These are unions where the values don't share same type.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 model Shirt {
@@ -1883,8 +2167,8 @@ model Shirt {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -1927,8 +2211,8 @@ model Shirt {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python will generate this as a union since these entries don't share the same type
 
@@ -1941,8 +2225,8 @@ model Shirt:
   sizing: ShirtSizing
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public partial class Shirt
@@ -1951,8 +2235,8 @@ public partial class Shirt
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export interface Shirt {
@@ -1960,8 +2244,8 @@ export interface Shirt {
 }
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public final class Shirt {
@@ -1969,8 +2253,8 @@ public final class Shirt {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ## Enums
 
@@ -1978,8 +2262,8 @@ public final class Shirt {
 
 Standard enums will be generated as closed enums.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 enum LR {
@@ -1988,8 +2272,8 @@ enum LR {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -2016,8 +2300,8 @@ enum LR {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python never generates closed enums by design. We will always permit users to pass in additional values.
 
@@ -2030,8 +2314,8 @@ class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
   RIGHT = "right"
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public enum LR
@@ -2041,15 +2325,15 @@ public enum LR
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export type LR = "left" | "right";
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public enum LR {
@@ -2058,13 +2342,13 @@ public enum LR {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Versioning Enums
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 @versioned(Versions)
@@ -2077,8 +2361,8 @@ enum Versions {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -2106,29 +2390,29 @@ enum Versions {
 }
 ```
 
-</TabItem>
-<TabItem value="" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 ```
 # Python does not generate the enum used for versioning
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 // CSharp does not generate the enum used for versioning
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 // JS does not generate the enum used for versioning
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public enum ServiceServiceVersion implements ServiceVersion {
@@ -2137,15 +2421,15 @@ public enum ServiceServiceVersion implements ServiceVersion {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ### Spread
 
 Spreading enums will return the resultant enum as a new single closed enum.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```typespec
 enum LR {
@@ -2164,8 +2448,8 @@ enum Orientation {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -2202,8 +2486,8 @@ enum Orientation {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 Python generates one open enum, because Python never generates an enum as fully closed.
 
@@ -2218,8 +2502,8 @@ class Orientation(str, Enum, metaclass=CaseInsensitiveEnumMeta):
   DOWN = "down"
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 public enum Orientation
@@ -2231,15 +2515,15 @@ public enum Orientation
 }
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 export type Orientation = "left" | "right" | "up" | "down";
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 public enum Orientation {
@@ -2250,8 +2534,8 @@ public enum Orientation {
 }
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ## Scalars
 
@@ -2259,8 +2543,8 @@ public enum Orientation {
 
 We will take the `@encode` decorator into account, determining how we serialize inputted scalars to send over the wire.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```tsp
 model Test {
@@ -2269,8 +2553,8 @@ model Test {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -2286,29 +2570,29 @@ model Test {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 ```python
 serialized_prop = json.dumps(prop, cls=SdkJSONEncoder, format="rfc3339")
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 TODO
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 TODO;
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 // Internal implementation
@@ -2316,13 +2600,13 @@ jsonWriter.writeStringField("prop",
     this.value == null ? null : DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(this.value));
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 When you specify an encoding type, say that you want to encode an integer as a string, that will also be represented in our generated SDKs.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```tsp
 model Test {
@@ -2331,8 +2615,8 @@ model Test {
 }
 ```
 
-</TabItem>
-<TabItem value="tcgc" label="TCGC">
+</ClientTabItem>
+<ClientTabItem lang="tcgc">
 
 ```json
 {
@@ -2348,44 +2632,44 @@ model Test {
 }
 ```
 
-</TabItem>
-<TabItem value="python" label="Python">
+</ClientTabItem>
+<ClientTabItem lang="python">
 
 ```python
 serialized_prop = json.dumps(prop, cls=SdkJSONEncoder, format="string")
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 TODO
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 TODO;
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
 
 ```java
 // Internal implementation
 jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>
 
 ## Namespace
 
 The namespace for models, enums, and unions will follow the namespace they belong to. You can use `@clientNamespace` to override it if needed.
 
-<Tabs>
-<TabItem value="typespec" label="TypeSpec" default>
+<ClientTabs>
+<ClientTabItem lang="typespec" >
 
 ```tsp
 namespace My.Service;
@@ -2400,9 +2684,9 @@ model Bar {
 }
 ```
 
-</TabItem>
+</ClientTabItem>
 
-<TabItem value="python" label="Python">
+<ClientTabItem lang="python">
 
 ```python
 from my.service import Foo
@@ -2412,26 +2696,32 @@ foo = Foo(prop="hello")
 bar = Bar(prop="world")
 ```
 
-</TabItem>
-<TabItem value="csharp" label="CSharp" >
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
 
 ```csharp
 TODO
 ```
 
-</TabItem>
-<TabItem value="typescript" label="Typescript" >
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
 
 ```typescript
 TODO;
 ```
 
-</TabItem>
-<TabItem value="java" label="Java" >
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+As `flavor=azure`, Java emitter generates the model classes under `models` package.
 
 ```java
-TODO
+import my.service.models.Foo;
+import my.service.temp.models.Bar;
+
+Foo foo = new Foo("hello");
+Bar bar = new Bar("world");
 ```
 
-</TabItem>
-</Tabs>
+</ClientTabItem>
+</ClientTabs>

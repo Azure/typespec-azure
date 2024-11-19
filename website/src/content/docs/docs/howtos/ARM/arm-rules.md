@@ -22,7 +22,7 @@ Here is an example of a linter warning:
 Diagnostics were reported during compilation:
 
 C:/typespec-samples/resource-manager/zerotrust/main.tsp:38:3 - warning @azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator: Resource POST operation must be decorated with @armResourceAction.
-> 38 |   @doc("Gets the Zero Trust URL for this resource")
+> 38 |   /** Gets the Zero Trust URL for this resource */
      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 > 39 |   @post
      | ^^^^^^^
@@ -37,7 +37,7 @@ To suppress the warning, you would use the `#suppress` directive on the type tha
 
 ```typespec
   #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-missing-decorator" "This is a sample suppression."
-  @doc("Gets the MAA URL for this resource")
+  /** Gets the MAA URL for this resource */
   @post
   getZeroTrustUrl(...ResourceInstanceParameters<ZeroTrustResource>): ZeroTrustUrl | ErrorResponse;
 ```
@@ -46,7 +46,7 @@ Of course, in this case, the best resolution would be to follow the advice in th
 
 ```typespec
   @armResourceAction(ZeroTrustResource)
-  @doc("Gets the MAA URL for this resource")
+  /** Gets the MAA URL for this resource */
   @post
   getZeroTrustUrl(...ResourceInstanceParameters<ZeroTrustResource>): ZeroTrustUrl | ErrorResponse;
 ```
