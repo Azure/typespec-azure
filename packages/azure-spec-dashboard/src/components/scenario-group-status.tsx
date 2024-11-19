@@ -6,7 +6,9 @@ export interface ScenarioGroupStatusRatioBoxProps {
   readonly ratio: number;
 }
 
-export const ScenarioGroupRatioStatusBox: FunctionComponent<ScenarioGroupStatusRatioBoxProps> = ({ ratio }) => {
+export const ScenarioGroupRatioStatusBox: FunctionComponent<ScenarioGroupStatusRatioBoxProps> = ({
+  ratio,
+}) => {
   let css = groupRatioStyles.bad;
 
   for (const [key, expectedRatio] of Object.entries(GroupRatios)) {

@@ -15,7 +15,12 @@ export type InfoEntryProps = {
   readonly valueTitle?: string;
 };
 
-export const InfoEntry: FunctionComponent<InfoEntryProps> = ({ label, caption, value, valueTitle }) => {
+export const InfoEntry: FunctionComponent<InfoEntryProps> = ({
+  label,
+  caption,
+  value,
+  valueTitle,
+}) => {
   return (
     <tr css={{ margin: "10px 0" }}>
       <td>
