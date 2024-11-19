@@ -1235,8 +1235,8 @@ function updateMultiPartInfo(
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
-          )
+          getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
+        )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
     };
@@ -1643,9 +1643,7 @@ function updateTypesFromOperation(
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
 
-      if (!context.arm) {
-        // TODO: currently skipping adding of envelopeResult due to arm error
-        // https://github.com/Azure/typespec-azure/issues/311
+      if (lroMetaData.envelopeResult !== undefined) {
         const sdkType = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, lroMetaData.envelopeResult, operation),
         );
