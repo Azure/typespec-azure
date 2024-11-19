@@ -58,7 +58,6 @@ import {
   LroFailedDecorator,
   LroStatusDecorator,
   LroSucceededDecorator,
-  NextLinkDecorator,
   NextPageOperationDecorator,
   OperationLinkDecorator,
   PagedResultDecorator,
@@ -267,10 +266,6 @@ export const $items: ItemsDecorator = (context: DecoratorContext, entity: ModelP
 export function getItems(program: Program, entity: Type): boolean | undefined {
   return program.stateMap(AzureCoreStateKeys.items).get(entity);
 }
-
-export const $nextLink: NextLinkDecorator = (context: DecoratorContext, entity: ModelProperty) => {
-  context.program.stateMap(AzureCoreStateKeys.nextLink).set(entity, true);
-};
 
 /**
  * Returns `true` if the property is marked with `@nextLink`.
