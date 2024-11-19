@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.48.2
+
+### Bug Fixes
+
+- [#1858](https://github.com/Azure/typespec-azure/pull/1858) do not replace operation with `@override` when `listOperationsInOperationGroup`
+- [#1833](https://github.com/Azure/typespec-azure/pull/1833) do not add protocol usage for protocol method's response type
+
+### Features
+
+- [#1835](https://github.com/Azure/typespec-azure/pull/1835) add `isPagedResultModel` helper function
+- [#1834](https://github.com/Azure/typespec-azure/pull/1834) add `disableUsageAccessPropagationToBase` to support language that does not generate base model
+- [#1858](https://github.com/Azure/typespec-azure/pull/1858) add `isOverride` flag to `SdkServiceMethod`.
+
+### Breaking Changes
+
+- [#1854](https://github.com/Azure/typespec-azure/pull/1854) deprecate `Error` usage and add `Exception` usage. for all models used in exception response, they will no longer have `Output` usage, but have `Exception` usage.
+
+
 ## 0.48.1
 
 ### Bug Fixes

@@ -459,4 +459,146 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(models[1].usage, UsageFlags.Output);
     strictEqual(models[1].access, "public");
   });
+
+  it("disableUsageAccessPropagationToBase true with override", async () => {
+    runner = await createSdkTestRunner(
+      { emitterName: "@azure-tools/typespec-python" },
+      { disableUsageAccessPropagationToBase: true },
+    );
+    await runner.compileWithBuiltInService(
+      `
+        model BaseClassThatsPruned {
+          id: int32;
+        }
+        model DerivedOne extends BaseClassThatsPruned {
+          name: string;
+          prop: UsedByProperty;
+        }
+        model UsedByProperty {
+          prop: string;
+        }
+        @@usage(DerivedOne, Usage.output);
+      `,
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    strictEqual(models[0].usage, UsageFlags.Output);
+    strictEqual(models[0].name, "DerivedOne");
+    strictEqual(models[1].usage, UsageFlags.Output);
+    strictEqual(models[1].name, "UsedByProperty");
+  });
+
+  it("disableUsageAccessPropagationToBase true", async () => {
+    runner = await createSdkTestRunner(
+      { emitterName: "@azure-tools/typespec-python" },
+      { disableUsageAccessPropagationToBase: true },
+    );
+    await runner.compileWithBuiltInService(
+      `
+        model BaseClassThatsPruned {
+          id: int32;
+        }
+        model DerivedOne extends BaseClassThatsPruned {
+          name: string;
+          prop: UsedByProperty;
+        }
+        model UsedByProperty {
+          prop: string;
+        }
+
+        op test(): DerivedOne;
+      `,
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[0].name, "DerivedOne");
+    strictEqual(models[1].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[1].name, "UsedByProperty");
+  });
+
+  it("disableUsageAccessPropagationToBase true property propagation", async () => {
+    runner = await createSdkTestRunner(
+      { emitterName: "@azure-tools/typespec-python" },
+      { disableUsageAccessPropagationToBase: true },
+    );
+    await runner.compileWithBuiltInService(
+      `
+        model BaseClassThatsPruned {
+          id: int32;
+          foo: UsedByBaseProperty;
+        }
+        model DerivedOne extends BaseClassThatsPruned {
+          name: string;
+          prop: UsedByProperty;
+        }
+        model UsedByProperty {
+          prop: string;
+        }
+        model UsedByBaseProperty {
+          prop: string;
+        }
+
+        op test(): DerivedOne;
+      `,
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[0].name, "DerivedOne");
+    strictEqual(models[1].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[1].name, "UsedByProperty");
+    strictEqual(models[2].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[2].name, "UsedByBaseProperty");
+  });
+
+  it("disableUsageAccessPropagationToBase true discriminator propagation", async () => {
+    runner = await createSdkTestRunner(
+      { emitterName: "@azure-tools/typespec-python" },
+      { disableUsageAccessPropagationToBase: true },
+    );
+    await runner.compileWithBuiltInService(
+      `
+        @discriminator("kind")
+        model Fish {
+          age: int32;
+        }
+
+        @discriminator("sharktype")
+        model Shark extends Fish {
+          kind: "shark";
+          origin: Origin;
+        }
+
+        model Salmon extends Fish {
+          kind: "salmon";
+        }
+
+        model SawShark extends Shark {
+          sharktype: "saw";
+        }
+
+        model Origin {
+          country: string;
+          city: string;
+          manufacture: string;
+        }
+
+        @get
+        op getModel(): Fish;
+      `,
+    );
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 5);
+    strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[0].name, "Fish");
+    strictEqual(models[1].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[1].name, "Shark");
+    strictEqual(models[2].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[2].name, "Origin");
+    strictEqual(models[3].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[3].name, "SawShark");
+    strictEqual(models[4].usage, UsageFlags.Output | UsageFlags.Json);
+    strictEqual(models[4].name, "Salmon");
+  });
 });
