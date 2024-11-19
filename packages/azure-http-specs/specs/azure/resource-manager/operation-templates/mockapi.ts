@@ -57,7 +57,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     response: {
       status: 201,
       headers: {
-        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
+        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
       },
       body: json({
         ...validOrder,
@@ -71,7 +71,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
       return {
         status: 201,
         headers: {
-          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
+          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
         },
         body: json({
           ...validOrder,
@@ -85,7 +85,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
   },
   {
     // LRO PUT poll intermediate/get final result
-    uri: "/subscriptions/:subscriptionId/locations/eastus/lro_create/aao",
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao",
     method: "get",
     request: {
       params: {
@@ -96,7 +96,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     response: {
       status: 202,
       body: json({
-        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
         name: "aao",
         startTime: "2024-11-08T01:41:53.5508583+00:00",
         status: "InProgress",
@@ -104,7 +104,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     },
     handler: (req: MockRequest) => {
       const aaoResponse = {
-        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_create/aao`,
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
         name: "aao",
         startTime: "2024-11-08T01:41:53.5508583+00:00",
       };
@@ -134,7 +134,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
-        orderName: "order",
+        orderName: "order1",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -165,8 +165,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_post/location`,
-        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_post/aao`,
+        location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_location`,
+        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
       },
     },
     handler: (req: MockRequest) => {
@@ -174,8 +174,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
       return {
         status: 202,
         headers: {
-          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_post/location`,
-          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_post/aao`,
+          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_location`,
+          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
         },
       };
     },
@@ -183,13 +183,13 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
   },
   {
     // LRO POST poll intermediate/get final result
-    uri: "/subscriptions/:subscriptionId/locations/eastus/lro_post/:lro_header",
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/:operation_name",
     method: "get",
     request: {
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         "api-version": "2023-12-01-preview",
-        lro_header: "aao", // lro_header can be "location" or "aao", depending on the header you choose to poll. "aao" here is just for passing e2e test
+        operation_name: "lro_post_aao", // operation_name can be "lro_post_location" or "lro_post_aao", depending on the header you choose to poll. "lro_post_aao" here is just for passing e2e test
       },
     },
     response: {
@@ -197,8 +197,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
     },
     handler: (req: MockRequest) => {
       let response;
-      const lro_header = req.params["lro_header"];
-      if (lro_header === "location") {
+      const operation_name = req.params["operation_name"];
+      if (operation_name === "lro_post_location") {
         response =
           // first status will be 200, second and forward be 204
           postPollCount > 0
@@ -209,9 +209,9 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
                 }),
               }
             : { status: 202 };
-      } else if (lro_header === "aao") {
+      } else if (operation_name === "lro_post_aao") {
         const aaoResponse = {
-          id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_post/aao`,
+          id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
           name: "aao",
           startTime: "2024-11-08T01:41:53.5508583+00:00",
         };
@@ -230,7 +230,11 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
           body: json(responseBody),
         };
       } else {
-        throw new ValidationError(`Unexpected lro header: ${lro_header}`, undefined, undefined);
+        throw new ValidationError(
+          `Unexpected lro poll operation: ${operation_name}`,
+          undefined,
+          undefined,
+        );
       }
 
       postPollCount += 1;
@@ -257,7 +261,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_delete/location`,
+        location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/lro_delete_location`,
       },
     },
     handler: (req: MockRequest) => {
@@ -265,7 +269,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
       return {
         status: 202,
         headers: {
-          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/locations/eastus/lro_delete/location`,
+          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/lro_delete_location`,
         },
       };
     },
@@ -273,7 +277,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
   },
   {
     // LRO DELETE poll intermediate/get final result
-    uri: "/subscriptions/:subscriptionId/locations/eastus/lro_delete/location",
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/lro_delete_location",
     method: "get",
     request: {
       params: {
