@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
 
-describe("typespec-client-generator-core: package", () => {
+describe("typespec-client-generator-core: responses", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
@@ -260,5 +260,23 @@ describe("typespec-client-generator-core: package", () => {
     deepStrictEqual(serviceResponse.contentTypes, ["image/jpeg"]);
     strictEqual(serviceResponse.type?.kind, "bytes");
     strictEqual(serviceResponse.type?.encode, "bytes");
+  });
+
+  it("protocol response usage", async () => {
+    await runner.compileWithBuiltInService(
+      `
+      model Test {
+        prop: string;
+      }
+
+      @convenientAPI(false)
+      op get(): Test;
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.models.length, 0);
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.response.type?.kind, "model");
+    strictEqual(method.response.type.usage, 0);
   });
 });
