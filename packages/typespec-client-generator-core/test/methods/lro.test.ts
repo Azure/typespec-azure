@@ -4,7 +4,7 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
-import { SdkHttpOperation, SdkLroServiceMethod } from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkLroServiceMethod, UsageFlags } from "../../src/interfaces.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: long running operation metadata", () => {
@@ -430,8 +430,12 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         method.parameters.map((m) => m.type),
         roundtripModel,
       );
+      // validate the model should be roundtrip here
+      assert.isDefined(roundtripModel.usage & UsageFlags.Input);
+      assert.isDefined(roundtripModel.usage & UsageFlags.Output);
 
-      const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
+      strictEqual(method.kind, "lro");
+      const metadata = method.lroMetadata;
       ok(metadata);
       strictEqual(metadata.finalStateVia, FinalStateValue.azureAsyncOperation);
       strictEqual(metadata.finalStep?.kind, "finalOperationLink");
@@ -480,7 +484,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         "resource",
       );
 
-      const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
+      strictEqual(method.kind, "lro");
+      const metadata = method.lroMetadata;
       ok(metadata);
       strictEqual(metadata.finalStateVia, FinalStateValue.location);
       strictEqual(metadata.finalStep?.kind, "finalOperationLink");

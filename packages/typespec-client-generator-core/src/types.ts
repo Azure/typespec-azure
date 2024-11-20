@@ -1635,25 +1635,19 @@ function updateTypesFromOperation(
   }
   const lroMetaData = getLroMetadata(program, operation);
   if (lroMetaData && generateConvenient) {
-    if (lroMetaData.finalResult !== undefined && lroMetaData.finalResult !== "void") {
-      const sdkType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, lroMetaData.finalResult, operation),
-      );
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-      const access = getAccessOverride(context, operation) ?? "public";
-      diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+    updateUsageOrAccessForLroComponent(lroMetaData.finalResult);
 
-      if (lroMetaData.envelopeResult !== undefined) {
-        const sdkType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, lroMetaData.envelopeResult, operation),
-        );
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-        const access = getAccessOverride(context, operation) ?? "public";
-        diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-      }
-    }
+    updateUsageOrAccessForLroComponent(lroMetaData.finalEnvelopeResult);
   }
   return diagnostics.wrap(undefined);
+
+  function updateUsageOrAccessForLroComponent(model: Model | "void" | undefined) {
+    if (model === undefined || model === "void") return;
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, model, operation));
+    diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+  }
 }
 
 function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
