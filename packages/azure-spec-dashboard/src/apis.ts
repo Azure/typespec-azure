@@ -96,8 +96,6 @@ export async function getCoverageSummaries(): Promise<CoverageSummary[]> {
 
 enum GeneratorMode {
   standard = "standard",
-  // TODO: Remove the following line for pure flavor
-  // You need to take both azure and standard modes for azure specific reports.
   azure = "azure",
 }
 
