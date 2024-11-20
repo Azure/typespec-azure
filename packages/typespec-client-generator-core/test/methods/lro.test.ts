@@ -417,9 +417,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           @get
           op poll(): TestClient.PollResponse;
         }`);
-      const methods = runner.context.sdkPackage.clients[0].methods;
-
-      const method = methods.find((m) => m.name === "longRunning");
+      const method = runner.context.sdkPackage.clients[0].methods.find(
+        (m) => m.name === "longRunning",
+      );
       ok(method);
       strictEqual(method.kind, "lro");
       const metadata = method.lroMetadata;
