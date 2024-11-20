@@ -383,6 +383,34 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         assert.isUndefined(metadata.finalResponse);
       });
     });
+
+    it("LRO defined in different namespace", async () => {
+      await runner.compileWithVersionedService(`
+      model PollResponse {
+        operationId: string;
+        status: Azure.Core.Foundations.OperationState;
+      }
+
+      @pollingOperation(NonService.poll)
+      @post
+      @route("/post")
+      op longRunning(): AcceptedResponse;
+
+      namespace NonService {
+      @route("/poll")
+      @get
+      op poll(): TestClient.PollResponse;
+      }`);
+      const methods = runner.context.sdkPackage.clients[0].methods;
+
+      const method = methods.find((m) => m.name === "longRunning");
+      ok(method);
+      strictEqual(method.kind, "lro");
+      const metadata = method.lroMetadata;
+      ok(metadata);
+      ok(method.lroMetadata.pollingStep.responseBody);
+      notStrictEqual(method.lroMetadata.pollingStep.responseBody.usage & UsageFlags.Output, 0); // the polling model should be output
+    });
   });
 
   describe("Arm LRO templates", () => {
