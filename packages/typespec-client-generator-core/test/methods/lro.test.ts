@@ -385,22 +385,38 @@ describe("typespec-client-generator-core: long running operation metadata", () =
     });
 
     it("LRO defined in different namespace", async () => {
-      await runner.compileWithVersionedService(`
-      model PollResponse {
-        operationId: string;
-        status: Azure.Core.Foundations.OperationState;
-      }
+      await runner.compile(`
+        @service({})
+        @versioned(Versions)
+        namespace TestClient {
+          enum Versions {
+            @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+            v1: "v1",
+            @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+            v2: "v2",
+          }
+        
+          alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
+            NoRepeatableRequests &
+            NoClientRequestId>;
 
-      @pollingOperation(NonService.poll)
-      @post
-      @route("/post")
-      op longRunning(): AcceptedResponse;
+          model PollResponse {
+            operationId: string;
+            status: Azure.Core.Foundations.OperationState;
+          }
 
-      namespace NonService {
-        @route("/poll")
-        @get
-        op poll(): TestClient.PollResponse;
-      }`);
+          @pollingOperation(NonService.poll)
+          @post
+          @route("/post")
+          op longRunning(): AcceptedResponse;
+        }
+
+        @useDependency(Azure.Core.Versions.v1_0_Preview_2, TestClient.Versions.v2)
+        namespace NonService {
+          @route("/poll")
+          @get
+          op poll(): TestClient.PollResponse;
+        }`);
       const methods = runner.context.sdkPackage.clients[0].methods;
 
       const method = methods.find((m) => m.name === "longRunning");
