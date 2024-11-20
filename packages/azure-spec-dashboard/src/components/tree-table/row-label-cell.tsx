@@ -15,13 +15,15 @@ import {
 import { ScenarioData } from "@typespec/spec-coverage-sdk";
 import { FunctionComponent, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
+import { CoverageSummary } from "../../apis.js";
 import { ManifestTreeNode, TreeTableRow } from "./types.js";
 
 export interface RowLabelCellProps {
   row: TreeTableRow;
+  coverageSummary: CoverageSummary;
 }
 const INDENT_SIZE = 14;
-export const RowLabelCell: FunctionComponent<RowLabelCellProps> = ({ row }) => {
+export const RowLabelCell: FunctionComponent<RowLabelCellProps> = ({ row, coverageSummary }) => {
   const caret = row.hasChildren ? (
     row.expanded ? (
       <ChevronDown20Filled />
@@ -60,7 +62,9 @@ export const RowLabelCell: FunctionComponent<RowLabelCellProps> = ({ row }) => {
         </div>
         <div css={{}}>
           {row.item.scenario && <ScenarioInfoButton scenario={row.item.scenario} />}
-          {row.item.scenario && <GotoSourceButton scenario={row.item.scenario} />}
+          {row.item.scenario && (
+            <GotoSourceButton scenario={row.item.scenario} coverageSummary={coverageSummary} />
+          )}
         </div>
       </div>
     </td>
@@ -93,9 +97,18 @@ const ScenarioInfoButton: FunctionComponent<ScenarioInfoButtonProps> = ({ scenar
 
 type ShowSourceButtonProps = {
   scenario: ScenarioData;
+  coverageSummary: CoverageSummary;
 };
-const GotoSourceButton: FunctionComponent<ShowSourceButtonProps> = ({ scenario }) => {
-  const baseUrl = "https://github.com/Azure/cadl-ranch/blob/main/packages/cadl-ranch-specs/http/";
+const GotoSourceButton: FunctionComponent<ShowSourceButtonProps> = ({
+  scenario,
+  coverageSummary,
+}) => {
+  if (coverageSummary.manifest.setName === "@azure-tools/azure-http-specs") {
+  }
+  const baseUrl =
+    coverageSummary.manifest.setName === "@azure-tools/azure-http-specs"
+      ? "https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs/specs/"
+      : "https://github.com/Microsoft/typespec/tree/main/packages/http-specs/specs/";
   const start = getGithubLineNumber(scenario.location.start.line);
   const end = getGithubLineNumber(scenario.location.end.line);
   const url = `${baseUrl}/${scenario.location.path}#${start}-${end}`;

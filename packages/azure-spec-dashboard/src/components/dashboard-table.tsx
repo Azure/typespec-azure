@@ -103,7 +103,7 @@ const DashboardRow: FunctionComponent<DashboardRowProps> = ({
   const scenarioData = row.item.scenario;
   return (
     <tr>
-      <RowLabelCell row={row} />
+      <RowLabelCell row={row} coverageSummary={coverageSummary} />
       {languages.map((lang) => (
         <td key={lang} css={ScenarioStatusCellStyles}>
           {scenarioData ? (
