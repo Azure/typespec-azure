@@ -480,16 +480,11 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
       // ARM LRO core types are different
-      // const pollingModel = runner.context.sdkPackage.models.find(
-      //   (m) => m.name === "ArmOperationStatusResourceProvisioningState"
-      // );
-      // ok(pollingModel);
-      // strictEqual(metadata.pollingStep.responseBody, pollingModel);
-      // TODO: TCGC bug to not include polling model https://github.com/Azure/typespec-azure/issues/1530
-      strictEqual(
-        metadata.pollingStep.responseBody?.name,
-        "ArmOperationStatusResourceProvisioningState",
+      const pollingModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "ArmOperationStatusResourceProvisioningState",
       );
+      ok(pollingModel);
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
       strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
       strictEqual(metadata.finalResponse?.result, roundtripModel);
@@ -530,16 +525,11 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
       // ARM LRO core types are different
-      // const pollingModel = runner.context.sdkPackage.models.find(
-      //   (m) => m.name === "ArmOperationStatusResourceProvisioningState"
-      // );
-      // ok(pollingModel);
-      // strictEqual(metadata.pollingStep.responseBody, pollingModel);
-      // TODO: TCGC bug to not include polling model
-      strictEqual(
-        metadata.pollingStep.responseBody?.name,
-        "ArmOperationStatusResourceProvisioningState",
+      const pollingModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "ArmOperationStatusResourceProvisioningState",
       );
+      ok(pollingModel);
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
       assert.isUndefined(metadata.finalResponse);
     });
