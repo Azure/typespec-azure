@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-remove the arm lro workaround
+usage and access now properly propagate on polling model, final envelop result of `lroMetadata`
