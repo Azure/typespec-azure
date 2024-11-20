@@ -1638,6 +1638,8 @@ function updateTypesFromOperation(
     updateUsageOrAccessForLroComponent(lroMetaData.finalResult);
 
     updateUsageOrAccessForLroComponent(lroMetaData.finalEnvelopeResult);
+
+    updateUsageOrAccessForLroComponent(lroMetaData.pollingInfo.responseModel);
   }
   return diagnostics.wrap(undefined);
 

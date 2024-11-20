@@ -2,7 +2,7 @@ import { FinalStateValue } from "@azure-tools/typespec-azure-core";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { ok, strictEqual } from "assert";
+import { notStrictEqual, ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
 import { SdkHttpOperation, SdkLroServiceMethod, UsageFlags } from "../../src/interfaces.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -70,7 +70,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           roundtripModel,
         );
 
-        const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
+        const metadata = method.lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
         assert.isUndefined(metadata.finalStep);
@@ -79,6 +79,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusError",
         );
         ok(pollingModel);
+        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
+        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
@@ -120,6 +122,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusError",
         );
         ok(pollingModel);
+        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
+        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         assert.isUndefined(metadata.finalResponse);
@@ -158,7 +162,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           "format",
         );
 
-        const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
+        const metadata = method.lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
         strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
@@ -167,6 +171,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusExportedUserError",
         );
         ok(pollingModel);
+        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
+        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         const returnModel = runner.context.sdkPackage.models.find((m) => m.name === "ExportedUser");
@@ -224,7 +230,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           inputModel,
         );
 
-        const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
+        const metadata = method.lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
         strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
@@ -233,6 +239,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusGenerationResultError",
         );
         ok(pollingModel);
+        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
+        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         const returnModel = runner.context.sdkPackage.models.find(
@@ -294,13 +302,15 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           "format",
         );
 
-        const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
+        const metadata = method.lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
         strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
         const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
         ok(pollingModel);
+        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
+        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         assert.isUndefined(metadata.finalResponse);
@@ -359,13 +369,15 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           "format",
         );
 
-        const metadata = (method as SdkLroServiceMethod<SdkHttpOperation>).lroMetadata;
+        const metadata = method.lroMetadata;
         ok(metadata);
         strictEqual(metadata.finalStateVia, FinalStateValue.location);
         strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
         const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
         ok(pollingModel);
+        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
+        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         assert.isUndefined(metadata.finalResponse);
@@ -431,8 +443,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         roundtripModel,
       );
       // validate the model should be roundtrip here
-      assert.isDefined(roundtripModel.usage & UsageFlags.Input);
-      assert.isDefined(roundtripModel.usage & UsageFlags.Output);
+      notStrictEqual(roundtripModel.usage & (UsageFlags.Input | UsageFlags.Output), 0);
 
       strictEqual(method.kind, "lro");
       const metadata = method.lroMetadata;
