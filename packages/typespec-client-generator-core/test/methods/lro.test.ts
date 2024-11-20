@@ -397,9 +397,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       op longRunning(): AcceptedResponse;
 
       namespace NonService {
-      @route("/poll")
-      @get
-      op poll(): TestClient.PollResponse;
+        @route("/poll")
+        @get
+        op poll(): TestClient.PollResponse;
       }`);
       const methods = runner.context.sdkPackage.clients[0].methods;
 
