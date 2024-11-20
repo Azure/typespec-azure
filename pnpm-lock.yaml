@@ -2393,21 +2393,39 @@ importers:
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
+      '@typespec/events':
+        specifier: workspace:~
+        version: link:../../core/packages/events
       '@typespec/http':
         specifier: workspace:~
         version: link:../../core/packages/http
+      '@typespec/json-schema':
+        specifier: workspace:~
+        version: link:../../core/packages/json-schema
       '@typespec/openapi':
         specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
         specifier: workspace:~
         version: link:../../core/packages/openapi3
+      '@typespec/protobuf':
+        specifier: workspace:~
+        version: link:../../core/packages/protobuf
       '@typespec/rest':
         specifier: workspace:~
         version: link:../../core/packages/rest
+      '@typespec/sse':
+        specifier: workspace:~
+        version: link:../../core/packages/sse
+      '@typespec/streams':
+        specifier: workspace:~
+        version: link:../../core/packages/streams
       '@typespec/versioning':
         specifier: workspace:~
         version: link:../../core/packages/versioning
+      '@typespec/xml':
+        specifier: workspace:~
+        version: link:../../core/packages/xml
       '@vitejs/plugin-react':
         specifier: ~4.3.2
         version: 4.3.2(vite@5.4.8(@types/node@22.7.5)(terser@5.34.1))
