@@ -53,6 +53,7 @@ export interface TCGCContext {
   examplesDir?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
+  disableUsageAccessPropagationToBase: boolean;
 }
 
 export interface SdkContext<
@@ -585,6 +586,7 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   exception?: SdkMethodResponse;
   generateConvenient: boolean;
   generateProtocol: boolean;
+  isOverride: boolean;
 }
 
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -729,12 +731,17 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
+  /**
+   * @deprecated Use `Exception` instead.
+   */
   // Output will also be set when Error is set.
   Error = 1 << 7,
-  // Set when model is used in conjunction with an application/json content type.
+  // Set when type is used in conjunction with an application/json content type.
   Json = 1 << 8,
-  // Set when model is used in conjunction with an application/xml content type.
+  // Set when type is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
+  // Set when type is used for exception output.
+  Exception = 1 << 10,
 }
 
 interface SdkExampleBase {

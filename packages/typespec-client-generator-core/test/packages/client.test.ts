@@ -12,7 +12,7 @@ import {
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: package", () => {
+describe("typespec-client-generator-core: client", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
