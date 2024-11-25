@@ -73,6 +73,7 @@ model ResourceModelWithAllowedPropertySet extends TrackedResource {
   /** The etag field is *not* required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.
    * Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),
    * If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. */
+  @visibility("read")
   eTag?: string;
 
   @typeChangedFrom(Versions.v6, Identity)
@@ -189,7 +190,8 @@ model OperationDisplay {
  */
 model OperationStatusResult {
   /** Fully qualified ID for the async operation. */
-  id?: string;
+  @typeChangedFrom(Versions.v5, string)
+  id?: armResourceIdentifier;
 
   /** Name of the async operation. */
   name?: string;
@@ -555,7 +557,7 @@ model ScopeParameter {
 }
 
 /**
- * The default ManagementGroupName parameter type.
+ * The default TenantIdParameter type.
  */
 @added(Versions.v4)
 model TenantIdParameter {
@@ -569,6 +571,7 @@ model TenantIdParameter {
  * The default ARM If-Match header type.
  */
 @added(Versions.v4)
+@friendlyName("If-Match")
 model IfMatchHeader {
   /** The If-Match header that makes a request conditional. */
   @header("If-Match")
@@ -576,9 +579,10 @@ model IfMatchHeader {
 }
 
 /**
- * The default ARM If-Match header type.
+ * The default ARM If-None-Match header type.
  */
 @added(Versions.v4)
+@friendlyName("If-None-Match")
 model IfNoneMatchHeader {
   /** The If-None-Match header that makes a request conditional. */
   @header("If-None-Match")

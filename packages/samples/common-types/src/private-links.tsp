@@ -12,3 +12,7 @@ model Resource {}
 
 @@OpenAPI.extension(PrivateEndpointConnection.properties, "x-ms-client-flatten", true);
 @@OpenAPI.extension(PrivateLinkResource.properties, "x-ms-client-flatten", true);
+
+interface RegisterParams {
+  v3(...PrivateEndpointConnectionName): void;
+}
