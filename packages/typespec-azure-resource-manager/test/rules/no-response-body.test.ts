@@ -90,4 +90,74 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
         message: `The body of responses with success (2xx) status codes other than 202 and 204 should not be empty.`,
       });
   });
+
+  it("valid if a 2xx response has no body for head", async () => {
+    await tester
+      .expect(
+        `
+          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+          @armProviderNamespace
+          namespace Microsoft.Foo;
+          
+          model Employee is TrackedResource<{}> {
+          @key("employeeName") @segment("employeeName") @path
+            name: string;
+           }
+           
+          @armResourceOperations
+          interface TestingOperations {
+            checkExistence is ArmResourceCheckExistence<Employee>;
+          }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("valid if a 2xx response has no body for delete", async () => {
+    await tester
+      .expect(
+        `
+          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+          @armProviderNamespace
+          namespace Microsoft.Foo;
+          
+          model Employee is TrackedResource<{}> {
+            @key("employeeName")
+            @segment("employeeName")
+            @path
+            name: string;
+          }
+          
+          @armResourceOperations
+          interface TestingOperations {
+            delete is ArmResourceDeleteSync<Employee>;
+          }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("valid if a 2xx response has no body for post", async () => {
+    await tester
+      .expect(
+        `
+          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+          @armProviderNamespace
+          namespace Microsoft.Foo;
+          
+          model Employee is TrackedResource<{}> {
+            @key("employeeName")
+            @segment("employeeName")
+            @path
+            name: string;
+          }
+          
+          @armResourceOperations
+          interface TestingOperations {
+            postEmployees is ArmProviderActionAsync<Response = Employee, Scope = SubscriptionActionScope>;
+          }
+        `,
+      )
+      .toBeValid();
+  });
 });
