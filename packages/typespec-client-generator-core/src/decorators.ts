@@ -632,9 +632,12 @@ export function listOperationsInOperationGroup(
     }
 
     for (const op of current.operations.values()) {
-      // Skip templated operations
-      if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(getOverriddenClientMethod(context, op) ?? op);
+      // Skip templated operations and omit operations
+      if (
+        !isTemplateDeclarationOrInstance(op) &&
+        !context.program.stateMap(omitOperation).get(op)
+      ) {
+        operations.push(op);
       }
     }
 
@@ -663,6 +666,7 @@ export function createTCGCContext(program: Program, emitterName: string): TCGCCo
     __tspTypeToApiVersions: new Map(),
     __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
+    disableUsageAccessPropagationToBase: false,
   };
 }
 
@@ -674,6 +678,7 @@ interface VersioningStrategy {
 export interface CreateSdkContextOptions {
   readonly versioning?: VersioningStrategy;
   additionalDecorators?: string[];
+  disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
 }
 
 export async function createSdkContext<
@@ -706,6 +711,7 @@ export async function createSdkContext<
     examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
+    disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
@@ -943,6 +949,7 @@ export function getClientNameOverride(
 }
 
 const overrideKey = createStateSymbol("override");
+const omitOperation = createStateSymbol("omitOperation");
 
 // Recursive function to collect parameter names
 function collectParams(
@@ -991,6 +998,9 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
+  // omit all override operation
+  context.program.stateMap(omitOperation).set(override, true);
+
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
     a.name.localeCompare(b.name),
