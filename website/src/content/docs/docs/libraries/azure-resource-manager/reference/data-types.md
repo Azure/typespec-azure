@@ -1274,7 +1274,7 @@ model Azure.ResourceManager.CommonTypes.IfMatchHeader
 
 ### `IfNoneMatchHeader` {#Azure.ResourceManager.CommonTypes.IfNoneMatchHeader}
 
-The default ARM If-Match header type.
+The default ARM If-None-Match header type.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.IfNoneMatchHeader
@@ -1484,20 +1484,14 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationLis
 The name for a network security perimeter configuration
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter<Segment>
+model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter
 ```
-
-#### Template Parameters
-
-| Name    | Description                                                                                                             |
-| ------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Segment | The resource type name for network security perimeter configuration (default is networkSecurityPerimeterConfigurations) |
 
 #### Properties
 
-| Name | Type     | Description                                             |
-| ---- | -------- | ------------------------------------------------------- |
-| name | `string` | The name for a network security perimeter configuration |
+| Name                                      | Type     | Description                                             |
+| ----------------------------------------- | -------- | ------------------------------------------------------- |
+| networkSecurityPerimeterConfigurationName | `string` | The name for a network security perimeter configuration |
 
 ### `NetworkSecurityPerimeterConfigurationProperties` {#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties}
 
@@ -1611,7 +1605,7 @@ model Azure.ResourceManager.CommonTypes.OperationStatusResult
 
 | Name             | Type                                                                           | Description                                                                                |
 | ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| id?              | `string`                                                                       | Fully qualified ID for the async operation.                                                |
+| id?              | `Core.armResourceIdentifier`                                                   | Fully qualified ID for the async operation.                                                |
 | name?            | `string`                                                                       | Name of the async operation.                                                               |
 | status           | `string`                                                                       | Operation status.                                                                          |
 | percentComplete? | `float64`                                                                      | Percent of the operation that is complete.                                                 |
@@ -1734,25 +1728,19 @@ interface Employees {
 | ------ | --------------------------------------------------------- | -------------------------------------- |
 | value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
 
-### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
+### `PrivateEndpointConnectionName` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionName}
 
 The name of the private endpoint connection associated with the Azure resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter<Segment>
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionName
 ```
-
-#### Template Parameters
-
-| Name    | Description                                                                                     |
-| ------- | ----------------------------------------------------------------------------------------------- |
-| Segment | The resource type name for private endpoint connections (default is privateEndpointConnections) |
 
 #### Properties
 
-| Name | Type     | Description                                                                     |
-| ---- | -------- | ------------------------------------------------------------------------------- |
-| name | `string` | The name of the private endpoint connection associated with the Azure resource. |
+| Name                          | Type     | Description                                                                     |
+| ----------------------------- | -------- | ------------------------------------------------------------------------------- |
+| privateEndpointConnectionName | `string` | The name of the private endpoint connection associated with the Azure resource. |
 
 ### `PrivateEndpointConnectionProperties` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties}
 
@@ -2089,7 +2077,7 @@ model Azure.ResourceManager.CommonTypes.SystemData
 
 ### `TenantIdParameter` {#Azure.ResourceManager.CommonTypes.TenantIdParameter}
 
-The default ManagementGroupName parameter type.
+The default TenantIdParameter type.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.TenantIdParameter
