@@ -1,3 +1,4 @@
+import { getPagedResult } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
@@ -680,4 +681,19 @@ export function listSubClients<TServiceOperation extends SdkServiceOperation>(
 
 export function isAzureCoreModel(t: SdkType): boolean {
   return t.__raw !== undefined && isAzureCoreTspModel(t.__raw);
+}
+
+/**
+ * Judge whether a type is a paged result model.
+ *
+ * @param context TCGC context
+ * @param t Any TCGC types
+ * @returns
+ */
+export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
+  return (
+    t.__raw !== undefined &&
+    t.__raw.kind === "Model" &&
+    getPagedResult(context.program, t.__raw) !== undefined
+  );
 }
