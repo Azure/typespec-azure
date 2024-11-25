@@ -1032,7 +1032,7 @@ Expected response body:
 
 Location first poll.
 Expected verb: GET
-Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/ocations/eastus/operations/lro_post_location
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_location
 Expected status code: 202
 Expected no response body
 
