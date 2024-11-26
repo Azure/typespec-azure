@@ -3,7 +3,7 @@ import { getHttpOperation, getResponsesForOperation, HttpOperationResponse } fro
 import { isTemplatedInterfaceOperation } from "./utils.js";
 /**
  * verify that 202 or 204 responses do not contain a response body.
- * verify that operations that are different for 202 and 204 should contain a response body.
+ * verify that success (2XX) responses other than 202 and 204 contain a response body.
  */
 export const noResponseBodyRule = createRule({
   name: "no-response-body",
