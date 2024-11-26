@@ -894,7 +894,7 @@ Expected response body:
 ```json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao",
-  "name": "aao",
+  "name": "lro_create_aao",
   "startTime": "2024-11-08T01:41:53.5508583+00:00",
   "status": "InProgress"
 }
@@ -909,7 +909,7 @@ Expected response body:
 ```json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao",
-  "name": "aao",
+  "name": "lro_create_aao",
   "status": "Succeeded",
   "startTime": "2024-11-08T01:41:53.5508583+00:00",
   "endTime": "2024-11-08T01:42:41.5354192+00:00"
@@ -926,7 +926,7 @@ Expected response body:
 ```json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1",
-  "name": "lro",
+  "name": "order1",
   "type": "Azure.ResourceManager.Resources/orders",
   "location": "eastus",
   "properties": {
@@ -1008,7 +1008,7 @@ Expected response body:
 ```json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao",
-  "name": "aao",
+  "name": "lro_post_aao",
   "status": "InProgress",
   "startTime": "2024-11-08T01:41:53.5508583+00:00"
 }
@@ -1023,7 +1023,7 @@ Expected response body:
 ```json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao",
-  "name": "aao",
+  "name": "lro_post_aao",
   "status": "Succeeded",
   "startTime": "2024-11-08T01:41:53.5508583+00:00",
   "endTime": "2024-11-08T01:42:41.5354192+00:00"

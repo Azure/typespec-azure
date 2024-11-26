@@ -97,7 +97,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
       status: 202,
       body: json({
         id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
-        name: "aao",
+        name: "lro_create_aao",
         startTime: "2024-11-08T01:41:53.5508583+00:00",
         status: "InProgress",
       }),
@@ -105,7 +105,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     handler: (req: MockRequest) => {
       const aaoResponse = {
         id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
-        name: "aao",
+        name: "lro_create_aao",
         startTime: "2024-11-08T01:41:53.5508583+00:00",
       };
       const response =
@@ -155,7 +155,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
       params: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
-        orderName: "lro",
+        orderName: "order1",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -212,7 +212,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
       } else if (operation_name === "lro_post_aao") {
         const aaoResponse = {
           id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
-          name: "aao",
+          name: "lro_post_aao",
           startTime: "2024-11-08T01:41:53.5508583+00:00",
         };
         // first provisioningState will be "InProgress", second and forward be "Succeeded"
