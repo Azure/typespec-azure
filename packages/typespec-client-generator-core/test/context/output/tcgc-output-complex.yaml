@@ -1,13 +1,3992 @@
-name: Contoso.WidgetManager
-rootNamespace: Contoso.WidgetManager
+name: Microsoft.ContosoProviderHub
+rootNamespace: Microsoft.ContosoProviderHub
 clients:
-  - &a2
+  - &a13
     kind: client
-    name: WidgetManagerClient
-    methods: []
-    apiVersions: &a1 []
-    nameSpace: Contoso.WidgetManager
-    clientNamespace: Contoso.WidgetManager
+    name: ContosoProviderHubClient
+    methods:
+      - kind: clientaccessor
+        parameters: []
+        name: getOperations
+        access: internal
+        response: &a96
+          kind: client
+          name: Operations
+          methods:
+            - kind: paging
+              name: list
+              access: public
+              parameters:
+                - &a4
+                  type: &a1
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: listContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions: &a2
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Azure.ResourceManager.Operations.list.accept
+                  decorators: &a3 []
+                  kind: method
+              doc: List the operations for the provider
+              operation:
+                kind: http
+                path: /providers/Microsoft.ContosoProviderHub/operations
+                uriTemplate: /providers/Microsoft.ContosoProviderHub/operations{?api-version}
+                verb: get
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Azure.ResourceManager..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - &a12
+                        doc: The API version to use for this operation.
+                        apiVersions:
+                          - 2021-10-01-preview
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                        name: apiVersion
+                        isGeneratedName: false
+                        optional: false
+                        isApiVersionParam: true
+                        clientDefaultValue: 2021-10-01-preview
+                        onClient: true
+                        crossLanguageDefinitionId: Azure.ResourceManager..anonymous.apiVersion
+                        decorators: []
+                        correspondingMethodParams: []
+                        kind: method
+                        serializedName: api-version
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - type: *a1
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: *a2
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Azure.ResourceManager.Operations.list.accept
+                    decorators: *a3
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a4
+                responses:
+                  - type: &a92
+                      kind: model
+                      decorators: []
+                      name: OperationListResult
+                      isGeneratedName: false
+                      clientNamespace: Azure.ResourceManager.CommonTypes
+                      doc: A list of REST API operations supported by an Azure Resource Provider. It contains an URL link to get the next set of results.
+                      properties:
+                        - doc: The Operation items on this page
+                          apiVersions:
+                            - 1.0-preview.1
+                            - 1.0-preview.2
+                          type:
+                            kind: array
+                            decorators: []
+                            name: ArrayOperation
+                            valueType: &a10
+                              kind: model
+                              decorators: []
+                              name: Operation
+                              isGeneratedName: false
+                              clientNamespace: Azure.ResourceManager.CommonTypes
+                              doc: Details of a REST API operation, returned from the Resource Provider Operations API
+                              properties:
+                                - doc: 'The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"'
+                                  apiVersions:
+                                    - v3
+                                    - v4
+                                    - v5
+                                    - v6
+                                  type:
+                                    kind: string
+                                    decorators: []
+                                    name: string
+                                    doc: A sequence of textual characters.
+                                    crossLanguageDefinitionId: TypeSpec.string
+                                  name: name
+                                  isGeneratedName: false
+                                  optional: true
+                                  isApiVersionParam: false
+                                  onClient: false
+                                  crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Operation.name
+                                  decorators: []
+                                  kind: property
+                                  visibility:
+                                    - 1
+                                  discriminator: false
+                                  serializedName: name
+                                  isMultipartFileInput: false
+                                  flatten: false
+                                - doc: Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
+                                  apiVersions:
+                                    - v3
+                                    - v4
+                                    - v5
+                                    - v6
+                                  type:
+                                    kind: boolean
+                                    decorators: []
+                                    name: boolean
+                                    doc: Boolean with `true` and `false` values.
+                                    crossLanguageDefinitionId: TypeSpec.boolean
+                                  name: isDataAction
+                                  isGeneratedName: false
+                                  optional: true
+                                  isApiVersionParam: false
+                                  onClient: false
+                                  crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Operation.isDataAction
+                                  decorators: []
+                                  kind: property
+                                  visibility:
+                                    - 1
+                                  discriminator: false
+                                  serializedName: isDataAction
+                                  isMultipartFileInput: false
+                                  flatten: false
+                                - doc: Localized display information for this particular operation.
+                                  apiVersions:
+                                    - v3
+                                    - v4
+                                    - v5
+                                    - v6
+                                  type: &a93
+                                    kind: model
+                                    decorators: []
+                                    name: OperationDisplay
+                                    isGeneratedName: false
+                                    clientNamespace: Azure.ResourceManager.CommonTypes
+                                    doc: Localized display information for and operation.
+                                    properties:
+                                      - doc: The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".
+                                        apiVersions:
+                                          - v3
+                                          - v4
+                                          - v5
+                                          - v6
+                                        type:
+                                          kind: string
+                                          decorators: []
+                                          name: string
+                                          doc: A sequence of textual characters.
+                                          crossLanguageDefinitionId: TypeSpec.string
+                                        name: provider
+                                        isGeneratedName: false
+                                        optional: true
+                                        isApiVersionParam: false
+                                        onClient: false
+                                        crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationDisplay.provider
+                                        decorators: []
+                                        kind: property
+                                        visibility:
+                                          - 1
+                                        discriminator: false
+                                        serializedName: provider
+                                        isMultipartFileInput: false
+                                        flatten: false
+                                      - doc: The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
+                                        apiVersions:
+                                          - v3
+                                          - v4
+                                          - v5
+                                          - v6
+                                        type:
+                                          kind: string
+                                          decorators: []
+                                          name: string
+                                          doc: A sequence of textual characters.
+                                          crossLanguageDefinitionId: TypeSpec.string
+                                        name: resource
+                                        isGeneratedName: false
+                                        optional: true
+                                        isApiVersionParam: false
+                                        onClient: false
+                                        crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationDisplay.resource
+                                        decorators: []
+                                        kind: property
+                                        visibility:
+                                          - 1
+                                        discriminator: false
+                                        serializedName: resource
+                                        isMultipartFileInput: false
+                                        flatten: false
+                                      - doc: The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine".
+                                        apiVersions:
+                                          - v3
+                                          - v4
+                                          - v5
+                                          - v6
+                                        type:
+                                          kind: string
+                                          decorators: []
+                                          name: string
+                                          doc: A sequence of textual characters.
+                                          crossLanguageDefinitionId: TypeSpec.string
+                                        name: operation
+                                        isGeneratedName: false
+                                        optional: true
+                                        isApiVersionParam: false
+                                        onClient: false
+                                        crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationDisplay.operation
+                                        decorators: []
+                                        kind: property
+                                        visibility:
+                                          - 1
+                                        discriminator: false
+                                        serializedName: operation
+                                        isMultipartFileInput: false
+                                        flatten: false
+                                      - doc: The short, localized friendly description of the operation; suitable for tool tips and detailed views.
+                                        apiVersions:
+                                          - v3
+                                          - v4
+                                          - v5
+                                          - v6
+                                        type:
+                                          kind: string
+                                          decorators: []
+                                          name: string
+                                          doc: A sequence of textual characters.
+                                          crossLanguageDefinitionId: TypeSpec.string
+                                        name: description
+                                        isGeneratedName: false
+                                        optional: true
+                                        isApiVersionParam: false
+                                        onClient: false
+                                        crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationDisplay.description
+                                        decorators: []
+                                        kind: property
+                                        visibility:
+                                          - 1
+                                        discriminator: false
+                                        serializedName: description
+                                        isMultipartFileInput: false
+                                        flatten: false
+                                    access: public
+                                    usage: 260
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationDisplay
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                  name: display
+                                  isGeneratedName: false
+                                  optional: true
+                                  isApiVersionParam: false
+                                  onClient: false
+                                  crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Operation.display
+                                  decorators: []
+                                  kind: property
+                                  visibility:
+                                    - 1
+                                  discriminator: false
+                                  serializedName: display
+                                  isMultipartFileInput: false
+                                  flatten: false
+                                - doc: The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+                                  apiVersions:
+                                    - v3
+                                    - v4
+                                    - v5
+                                    - v6
+                                  type: &a6
+                                    kind: enum
+                                    decorators: []
+                                    name: Origin
+                                    isGeneratedName: false
+                                    clientNamespace: Azure.ResourceManager.CommonTypes
+                                    doc: The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
+                                    valueType: &a5
+                                      kind: string
+                                      decorators: []
+                                      name: string
+                                      doc: A sequence of textual characters.
+                                      crossLanguageDefinitionId: TypeSpec.string
+                                    values:
+                                      - kind: enumvalue
+                                        decorators: []
+                                        name: user
+                                        doc: Indicates the operation is initiated by a user.
+                                        value: user
+                                        valueType: *a5
+                                        enumType: *a6
+                                      - kind: enumvalue
+                                        decorators: []
+                                        name: system
+                                        doc: Indicates the operation is initiated by a system.
+                                        value: system
+                                        valueType: *a5
+                                        enumType: *a6
+                                      - kind: enumvalue
+                                        decorators: []
+                                        name: user,system
+                                        doc: Indicates the operation is initiated by a user or system.
+                                        value: user,system
+                                        valueType: *a5
+                                        enumType: *a6
+                                    isFixed: false
+                                    isFlags: false
+                                    usage: 260
+                                    access: public
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Origin
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    isUnionAsEnum: true
+                                  name: origin
+                                  isGeneratedName: false
+                                  optional: true
+                                  isApiVersionParam: false
+                                  onClient: false
+                                  crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Operation.origin
+                                  decorators: []
+                                  kind: property
+                                  visibility:
+                                    - 1
+                                  discriminator: false
+                                  serializedName: origin
+                                  isMultipartFileInput: false
+                                  flatten: false
+                                - doc: Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+                                  apiVersions:
+                                    - v3
+                                    - v4
+                                    - v5
+                                    - v6
+                                  type: &a8
+                                    kind: enum
+                                    decorators: []
+                                    name: ActionType
+                                    isGeneratedName: false
+                                    clientNamespace: Azure.ResourceManager.CommonTypes
+                                    doc: Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
+                                    valueType: &a7
+                                      kind: string
+                                      decorators: []
+                                      name: string
+                                      doc: A sequence of textual characters.
+                                      crossLanguageDefinitionId: TypeSpec.string
+                                    values:
+                                      - kind: enumvalue
+                                        decorators: []
+                                        name: Internal
+                                        doc: Actions are for internal-only APIs.
+                                        value: Internal
+                                        valueType: *a7
+                                        enumType: *a8
+                                    isFixed: false
+                                    isFlags: false
+                                    usage: 260
+                                    access: public
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ActionType
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    isUnionAsEnum: true
+                                  name: actionType
+                                  isGeneratedName: false
+                                  optional: true
+                                  isApiVersionParam: false
+                                  onClient: false
+                                  crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Operation.actionType
+                                  decorators: []
+                                  kind: property
+                                  discriminator: false
+                                  serializedName: actionType
+                                  isMultipartFileInput: false
+                                  flatten: false
+                              access: public
+                              usage: 260
+                              crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Operation
+                              apiVersions:
+                                - v3
+                                - v4
+                                - v5
+                                - v6
+                            crossLanguageDefinitionId: TypeSpec.Array
+                          name: value
+                          isGeneratedName: false
+                          optional: false
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationListResult.value
+                          decorators: []
+                          kind: property
+                          discriminator: false
+                          serializedName: value
+                          isMultipartFileInput: false
+                          flatten: false
+                        - doc: The link to the next page of items
+                          apiVersions:
+                            - 1.0-preview.1
+                            - 1.0-preview.2
+                          type:
+                            kind: url
+                            decorators: []
+                            name: ResourceLocation
+                            doc: The location of an instance of Operation
+                            baseType:
+                              kind: url
+                              decorators: []
+                              name: url
+                              doc: Represent a URL string as described by https://url.spec.whatwg.org/
+                              crossLanguageDefinitionId: TypeSpec.url
+                            crossLanguageDefinitionId: TypeSpec.Rest.ResourceLocation
+                          name: nextLink
+                          isGeneratedName: false
+                          optional: true
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationListResult.nextLink
+                          decorators: []
+                          kind: property
+                          discriminator: false
+                          serializedName: nextLink
+                          isMultipartFileInput: false
+                          flatten: false
+                      access: public
+                      usage: 260
+                      crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.OperationListResult
+                      apiVersions:
+                        - v3
+                        - v4
+                        - v5
+                        - v6
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a2
+                    description: Azure operation completed successfully.
+                    kind: http
+                    statusCodes: 200
+                exceptions:
+                  - type: &a24
+                      kind: model
+                      decorators: []
+                      name: ErrorResponse
+                      isGeneratedName: false
+                      clientNamespace: Azure.ResourceManager.CommonTypes
+                      doc: Common error response for all Azure Resource Manager APIs to return error details for failed operations.
+                      properties:
+                        - doc: The error object.
+                          apiVersions:
+                            - v3
+                            - v4
+                            - v5
+                            - v6
+                          type: &a9
+                            kind: model
+                            decorators: []
+                            name: ErrorDetail
+                            isGeneratedName: false
+                            clientNamespace: Azure.ResourceManager.CommonTypes
+                            doc: The error detail.
+                            properties:
+                              - doc: The error code.
+                                apiVersions:
+                                  - v3
+                                  - v4
+                                  - v5
+                                  - v6
+                                type:
+                                  kind: string
+                                  decorators: []
+                                  name: string
+                                  doc: A sequence of textual characters.
+                                  crossLanguageDefinitionId: TypeSpec.string
+                                name: code
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorDetail.code
+                                decorators: []
+                                kind: property
+                                visibility:
+                                  - 1
+                                discriminator: false
+                                serializedName: code
+                                isMultipartFileInput: false
+                                flatten: false
+                              - doc: The error message.
+                                apiVersions:
+                                  - v3
+                                  - v4
+                                  - v5
+                                  - v6
+                                type:
+                                  kind: string
+                                  decorators: []
+                                  name: string
+                                  doc: A sequence of textual characters.
+                                  crossLanguageDefinitionId: TypeSpec.string
+                                name: message
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorDetail.message
+                                decorators: []
+                                kind: property
+                                visibility:
+                                  - 1
+                                discriminator: false
+                                serializedName: message
+                                isMultipartFileInput: false
+                                flatten: false
+                              - doc: The error target.
+                                apiVersions:
+                                  - v3
+                                  - v4
+                                  - v5
+                                  - v6
+                                type:
+                                  kind: string
+                                  decorators: []
+                                  name: string
+                                  doc: A sequence of textual characters.
+                                  crossLanguageDefinitionId: TypeSpec.string
+                                name: target
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorDetail.target
+                                decorators: []
+                                kind: property
+                                visibility:
+                                  - 1
+                                discriminator: false
+                                serializedName: target
+                                isMultipartFileInput: false
+                                flatten: false
+                              - doc: The error details.
+                                apiVersions:
+                                  - v3
+                                  - v4
+                                  - v5
+                                  - v6
+                                type:
+                                  kind: array
+                                  decorators: []
+                                  name: ArrayErrorDetail
+                                  valueType: *a9
+                                  crossLanguageDefinitionId: TypeSpec.Array
+                                name: details
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorDetail.details
+                                decorators: []
+                                kind: property
+                                visibility:
+                                  - 1
+                                discriminator: false
+                                serializedName: details
+                                isMultipartFileInput: false
+                                flatten: false
+                              - doc: The error additional info.
+                                apiVersions:
+                                  - v3
+                                  - v4
+                                  - v5
+                                  - v6
+                                type:
+                                  kind: array
+                                  decorators: []
+                                  name: ArrayErrorAdditionalInfo
+                                  valueType: &a90
+                                    kind: model
+                                    decorators: []
+                                    name: ErrorAdditionalInfo
+                                    isGeneratedName: false
+                                    clientNamespace: Azure.ResourceManager.CommonTypes
+                                    doc: The resource management error additional info.
+                                    properties:
+                                      - doc: The additional info type.
+                                        apiVersions:
+                                          - v3
+                                          - v4
+                                          - v5
+                                          - v6
+                                        type:
+                                          kind: string
+                                          decorators: []
+                                          name: string
+                                          doc: A sequence of textual characters.
+                                          crossLanguageDefinitionId: TypeSpec.string
+                                        name: type
+                                        isGeneratedName: false
+                                        optional: true
+                                        isApiVersionParam: false
+                                        onClient: false
+                                        crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo.type
+                                        decorators: []
+                                        kind: property
+                                        visibility:
+                                          - 1
+                                        discriminator: false
+                                        serializedName: type
+                                        isMultipartFileInput: false
+                                        flatten: false
+                                      - doc: The additional info.
+                                        apiVersions:
+                                          - v3
+                                          - v4
+                                          - v5
+                                          - v6
+                                        type: &a91
+                                          kind: model
+                                          decorators: []
+                                          name: ErrorAdditionalInfoInfo
+                                          isGeneratedName: true
+                                          clientNamespace: Azure.ResourceManager.CommonTypes
+                                          properties: []
+                                          access: public
+                                          usage: 1280
+                                          crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo.info.anonymous
+                                          apiVersions:
+                                            - v3
+                                            - v4
+                                            - v5
+                                            - v6
+                                        name: info
+                                        isGeneratedName: false
+                                        optional: true
+                                        isApiVersionParam: false
+                                        onClient: false
+                                        crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo.info
+                                        decorators: []
+                                        kind: property
+                                        visibility:
+                                          - 1
+                                        discriminator: false
+                                        serializedName: info
+                                        isMultipartFileInput: false
+                                        flatten: false
+                                    access: public
+                                    usage: 1280
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                  crossLanguageDefinitionId: TypeSpec.Array
+                                name: additionalInfo
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorDetail.additionalInfo
+                                decorators: []
+                                kind: property
+                                visibility:
+                                  - 1
+                                discriminator: false
+                                serializedName: additionalInfo
+                                isMultipartFileInput: false
+                                flatten: false
+                            access: public
+                            usage: 1280
+                            crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorDetail
+                            apiVersions:
+                              - v3
+                              - v4
+                              - v5
+                              - v6
+                          name: error
+                          isGeneratedName: false
+                          optional: true
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorResponse.error
+                          decorators: []
+                          kind: property
+                          discriminator: false
+                          serializedName: error
+                          isMultipartFileInput: false
+                          flatten: false
+                      access: public
+                      usage: 1408
+                      crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorResponse
+                      apiVersions:
+                        - v3
+                        - v4
+                        - v5
+                        - v6
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+                type:
+                  kind: array
+                  decorators: []
+                  name: ArrayOperation
+                  valueType: *a10
+                  crossLanguageDefinitionId: TypeSpec.Array
+                resultPath: value
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Azure.ResourceManager.Operations.list
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+              nextLinkPath: nextLink
+          apiVersions: &a11
+            - 2021-10-01-preview
+          nameSpace: Microsoft.ContosoProviderHub
+          clientNamespace: Microsoft.ContosoProviderHub
+          initialization:
+            doc: Initialization class for the client
+            kind: model
+            properties:
+              - kind: endpoint
+                type:
+                  kind: endpoint
+                  serverUrl: "{endpoint}"
+                  templateArguments:
+                    - name: endpoint
+                      isGeneratedName: true
+                      doc: Service host
+                      kind: path
+                      onClient: true
+                      urlEncode: false
+                      explode: false
+                      style: simple
+                      allowReserved: false
+                      optional: false
+                      serializedName: endpoint
+                      correspondingMethodParams: []
+                      type:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      isApiVersionParam: false
+                      apiVersions: *a11
+                      crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
+                      decorators: []
+                      clientDefaultValue: https://management.azure.com
+                  decorators: []
+                name: endpoint
+                isGeneratedName: true
+                doc: Service host
+                onClient: true
+                urlEncode: false
+                apiVersions: *a11
+                optional: false
+                isApiVersionParam: false
+                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
+                decorators: []
+              - type:
+                  kind: credential
+                  scheme: &a83
+                    id: azure_auth
+                    description: Azure Active Directory OAuth2 Flow.
+                    type: oauth2
+                    model: null
+                    flows:
+                      - type: implicit
+                        authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+                        scopes:
+                          - value: user_impersonation
+                            description: impersonate your user account
+                  decorators: []
+                kind: credential
+                name: credential
+                isGeneratedName: true
+                doc: Credential used to authenticate requests to the service.
+                apiVersions:
+                  - 2021-10-01-preview
+                onClient: true
+                optional: false
+                isApiVersionParam: false
+                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.credential
+                decorators: []
+              - *a12
+            name: OperationsOptions
+            isGeneratedName: true
+            access: internal
+            usage: 2
+            crossLanguageDefinitionId: Microsoft.OperationsOptions
+            clientNamespace: Microsoft.ContosoProviderHub
+            apiVersions: *a11
+            decorators: []
+          decorators: []
+          parent: *a13
+          crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Operations
+        apiVersions:
+          - 2021-10-01-preview
+        crossLanguageDefintionId: Microsoft.ContosoProviderHub.Operations
+        decorators: []
+      - kind: clientaccessor
+        parameters: []
+        name: getEmployees
+        access: internal
+        response: &a97
+          kind: client
+          name: Employees
+          methods:
+            - kind: basic
+              name: get
+              access: public
+              parameters:
+                - &a14
+                  doc: The name of the resource group. The name is case insensitive.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: resourceGroupName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: resourceGroupName
+                  correspondingMethodParams: []
+                - &a15
+                  doc: The name of the Employee
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: employeeName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: employeeName
+                  correspondingMethodParams: []
+                - &a19
+                  type: &a16
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: getContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions: &a17
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.get.accept
+                  decorators: &a18 []
+                  kind: method
+              doc: Get a Employee
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+                uriTemplate: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}{?api-version}
+                verb: get
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - &a26
+                        doc: The API version to use for this operation.
+                        apiVersions:
+                          - 2021-10-01-preview
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                        name: apiVersion
+                        isGeneratedName: false
+                        optional: false
+                        isApiVersionParam: true
+                        clientDefaultValue: 2021-10-01-preview
+                        onClient: true
+                        crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                        decorators: []
+                        correspondingMethodParams: []
+                        kind: method
+                        serializedName: api-version
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - &a27
+                        doc: The ID of the target subscription. The value must be an UUID.
+                        apiVersions:
+                          - 2021-10-01-preview
+                        type:
+                          kind: string
+                          decorators: []
+                          name: uuid
+                          doc: Universally Unique Identifier
+                          baseType:
+                            kind: string
+                            decorators: []
+                            name: string
+                            doc: A sequence of textual characters.
+                            crossLanguageDefinitionId: TypeSpec.string
+                          crossLanguageDefinitionId: Azure.Core.uuid
+                        name: subscriptionId
+                        isGeneratedName: false
+                        optional: false
+                        isApiVersionParam: false
+                        onClient: true
+                        crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                        decorators: []
+                        kind: method
+                        urlEncode: true
+                        explode: false
+                        style: simple
+                        allowReserved: false
+                        serializedName: subscriptionId
+                        correspondingMethodParams: []
+                  - doc: The name of the resource group. The name is case insensitive.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: resourceGroupName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: resourceGroupName
+                    correspondingMethodParams:
+                      - *a14
+                  - doc: The name of the Employee
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: employeeName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: employeeName
+                    correspondingMethodParams:
+                      - *a15
+                  - type: *a16
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: *a17
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.get.accept
+                    decorators: *a18
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a19
+                responses:
+                  - type: &a25
+                      kind: model
+                      decorators: []
+                      name: Employee
+                      isGeneratedName: false
+                      clientNamespace: Microsoft.ContosoProviderHub
+                      doc: A ContosoProviderHub resource
+                      properties:
+                        - doc: The resource-specific properties for this resource.
+                          apiVersions:
+                            - 1.0-preview.1
+                          type: &a86
+                            kind: model
+                            decorators: []
+                            name: EmployeeProperties
+                            isGeneratedName: false
+                            clientNamespace: Microsoft.ContosoProviderHub
+                            doc: Employee properties
+                            properties:
+                              - doc: Age of employee
+                                apiVersions:
+                                  - 2021-10-01-preview
+                                type:
+                                  kind: int32
+                                  decorators: []
+                                  name: int32
+                                  doc: A 32-bit integer. (`-2,147,483,648` to `2,147,483,647`)
+                                  crossLanguageDefinitionId: TypeSpec.int32
+                                name: age
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.EmployeeProperties.age
+                                decorators: []
+                                kind: property
+                                discriminator: false
+                                serializedName: age
+                                isMultipartFileInput: false
+                                flatten: false
+                              - doc: City of employee
+                                apiVersions:
+                                  - 2021-10-01-preview
+                                type:
+                                  kind: string
+                                  decorators: []
+                                  name: string
+                                  doc: A sequence of textual characters.
+                                  crossLanguageDefinitionId: TypeSpec.string
+                                name: city
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.EmployeeProperties.city
+                                decorators: []
+                                kind: property
+                                discriminator: false
+                                serializedName: city
+                                isMultipartFileInput: false
+                                flatten: false
+                              - doc: Profile of employee
+                                apiVersions:
+                                  - 2021-10-01-preview
+                                type:
+                                  kind: bytes
+                                  decorators: []
+                                  name: bytes
+                                  encode: base64url
+                                  doc: Represent a byte array
+                                  crossLanguageDefinitionId: TypeSpec.bytes
+                                name: profile
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.EmployeeProperties.profile
+                                decorators: []
+                                kind: property
+                                discriminator: false
+                                serializedName: profile
+                                isMultipartFileInput: false
+                                flatten: false
+                              - doc: The status of the last operation.
+                                apiVersions:
+                                  - 2021-10-01-preview
+                                type: &a21
+                                  kind: enum
+                                  decorators: []
+                                  name: ProvisioningState
+                                  isGeneratedName: false
+                                  clientNamespace: Microsoft.ContosoProviderHub
+                                  doc: The provisioning state of a resource.
+                                  valueType: &a20
+                                    kind: string
+                                    decorators: []
+                                    name: string
+                                    doc: A sequence of textual characters.
+                                    crossLanguageDefinitionId: TypeSpec.string
+                                  values:
+                                    - kind: enumvalue
+                                      decorators: []
+                                      name: Accepted
+                                      doc: The resource create request has been accepted
+                                      value: Accepted
+                                      valueType: *a20
+                                      enumType: *a21
+                                    - kind: enumvalue
+                                      decorators: []
+                                      name: Provisioning
+                                      doc: The resource is being provisioned
+                                      value: Provisioning
+                                      valueType: *a20
+                                      enumType: *a21
+                                    - kind: enumvalue
+                                      decorators: []
+                                      name: Updating
+                                      doc: The resource is updating
+                                      value: Updating
+                                      valueType: *a20
+                                      enumType: *a21
+                                    - kind: enumvalue
+                                      decorators: []
+                                      name: Succeeded
+                                      doc: Resource has been created.
+                                      value: Succeeded
+                                      valueType: *a20
+                                      enumType: *a21
+                                    - kind: enumvalue
+                                      decorators: []
+                                      name: Failed
+                                      doc: Resource creation failed.
+                                      value: Failed
+                                      valueType: *a20
+                                      enumType: *a21
+                                    - kind: enumvalue
+                                      decorators: []
+                                      name: Canceled
+                                      doc: Resource creation was canceled.
+                                      value: Canceled
+                                      valueType: *a20
+                                      enumType: *a21
+                                    - kind: enumvalue
+                                      decorators: []
+                                      name: Deleting
+                                      doc: The resource is being deleted
+                                      value: Deleting
+                                      valueType: *a20
+                                      enumType: *a21
+                                  isFixed: false
+                                  isFlags: false
+                                  usage: 260
+                                  access: public
+                                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.ProvisioningState
+                                  apiVersions:
+                                    - 2021-10-01-preview
+                                  isUnionAsEnum: true
+                                name: provisioningState
+                                isGeneratedName: false
+                                optional: true
+                                isApiVersionParam: false
+                                onClient: false
+                                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.EmployeeProperties.provisioningState
+                                decorators: []
+                                kind: property
+                                visibility:
+                                  - 1
+                                discriminator: false
+                                serializedName: provisioningState
+                                isMultipartFileInput: false
+                                flatten: false
+                            access: public
+                            usage: 262
+                            crossLanguageDefinitionId: Microsoft.ContosoProviderHub.EmployeeProperties
+                            apiVersions:
+                              - 2021-10-01-preview
+                          name: properties
+                          isGeneratedName: false
+                          optional: true
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employee.properties
+                          decorators: []
+                          kind: property
+                          discriminator: false
+                          serializedName: properties
+                          isMultipartFileInput: false
+                          flatten: false
+                        - doc: The name of the Employee
+                          apiVersions:
+                            - 1.0-preview.1
+                          type:
+                            kind: string
+                            decorators: []
+                            name: string
+                            doc: A sequence of textual characters.
+                            crossLanguageDefinitionId: TypeSpec.string
+                          name: name
+                          isGeneratedName: false
+                          optional: false
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employee.name
+                          decorators: []
+                          kind: path
+                          urlEncode: true
+                          explode: false
+                          style: simple
+                          allowReserved: false
+                          serializedName: name
+                          correspondingMethodParams: []
+                      access: public
+                      usage: 262
+                      crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employee
+                      apiVersions:
+                        - 2021-10-01-preview
+                      baseModel: &a87
+                        kind: model
+                        decorators: []
+                        name: TrackedResource
+                        isGeneratedName: false
+                        clientNamespace: Azure.ResourceManager.CommonTypes
+                        doc: The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'
+                        properties:
+                          - doc: Resource tags.
+                            apiVersions:
+                              - v3
+                              - v4
+                              - v5
+                              - v6
+                            type:
+                              kind: dict
+                              decorators: []
+                              keyType:
+                                kind: string
+                                decorators: []
+                                name: string
+                                doc: A sequence of textual characters.
+                                crossLanguageDefinitionId: TypeSpec.string
+                              valueType:
+                                kind: string
+                                decorators: []
+                                name: string
+                                doc: A sequence of textual characters.
+                                crossLanguageDefinitionId: TypeSpec.string
+                            name: tags
+                            isGeneratedName: false
+                            optional: true
+                            isApiVersionParam: false
+                            onClient: false
+                            crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.TrackedResource.tags
+                            decorators: []
+                            kind: property
+                            discriminator: false
+                            serializedName: tags
+                            isMultipartFileInput: false
+                            flatten: false
+                          - doc: The geo-location where the resource lives
+                            apiVersions:
+                              - v3
+                              - v4
+                              - v5
+                              - v6
+                            type:
+                              kind: string
+                              decorators: []
+                              name: string
+                              doc: A sequence of textual characters.
+                              crossLanguageDefinitionId: TypeSpec.string
+                            name: location
+                            isGeneratedName: false
+                            optional: false
+                            isApiVersionParam: false
+                            onClient: false
+                            crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.TrackedResource.location
+                            decorators: []
+                            kind: property
+                            visibility:
+                              - 1
+                              - 2
+                            discriminator: false
+                            serializedName: location
+                            isMultipartFileInput: false
+                            flatten: false
+                        access: public
+                        usage: 262
+                        crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.TrackedResource
+                        apiVersions:
+                          - v3
+                          - v4
+                          - v5
+                          - v6
+                        baseModel: &a88
+                          kind: model
+                          decorators: []
+                          name: Resource
+                          isGeneratedName: false
+                          clientNamespace: Azure.ResourceManager.CommonTypes
+                          doc: Common fields that are returned in the response for all Azure Resource Manager resources
+                          properties:
+                            - doc: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                              apiVersions:
+                                - v3
+                                - v4
+                                - v5
+                                - v6
+                              type:
+                                kind: string
+                                decorators: []
+                                name: armResourceIdentifier
+                                doc: A type definition that refers the id to an Azure Resource Manager resource.
+                                baseType:
+                                  kind: string
+                                  decorators: []
+                                  name: string
+                                  doc: A sequence of textual characters.
+                                  crossLanguageDefinitionId: TypeSpec.string
+                                crossLanguageDefinitionId: Azure.Core.armResourceIdentifier
+                              name: id
+                              isGeneratedName: false
+                              optional: true
+                              isApiVersionParam: false
+                              onClient: false
+                              crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Resource.id
+                              decorators: []
+                              kind: property
+                              visibility:
+                                - 1
+                              discriminator: false
+                              serializedName: id
+                              isMultipartFileInput: false
+                              flatten: false
+                            - doc: The name of the resource
+                              apiVersions:
+                                - v3
+                                - v4
+                                - v5
+                                - v6
+                              type:
+                                kind: string
+                                decorators: []
+                                name: string
+                                doc: A sequence of textual characters.
+                                crossLanguageDefinitionId: TypeSpec.string
+                              name: name
+                              isGeneratedName: false
+                              optional: true
+                              isApiVersionParam: false
+                              onClient: false
+                              crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Resource.name
+                              decorators: []
+                              kind: property
+                              visibility:
+                                - 1
+                              discriminator: false
+                              serializedName: name
+                              isMultipartFileInput: false
+                              flatten: false
+                            - doc: The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
+                              apiVersions:
+                                - v3
+                                - v4
+                                - v5
+                                - v6
+                              type:
+                                kind: string
+                                decorators: []
+                                name: string
+                                doc: A sequence of textual characters.
+                                crossLanguageDefinitionId: TypeSpec.string
+                              name: type
+                              isGeneratedName: false
+                              optional: true
+                              isApiVersionParam: false
+                              onClient: false
+                              crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Resource.type
+                              decorators: []
+                              kind: property
+                              visibility:
+                                - 1
+                              discriminator: false
+                              serializedName: type
+                              isMultipartFileInput: false
+                              flatten: false
+                            - doc: Azure Resource Manager metadata containing createdBy and modifiedBy information.
+                              apiVersions:
+                                - v3
+                                - v4
+                                - v5
+                                - v6
+                              type: &a89
+                                kind: model
+                                decorators: []
+                                name: SystemData
+                                isGeneratedName: false
+                                clientNamespace: Azure.ResourceManager.CommonTypes
+                                doc: Metadata pertaining to creation and last modification of the resource.
+                                properties:
+                                  - doc: The identity that created the resource.
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    type:
+                                      kind: string
+                                      decorators: []
+                                      name: string
+                                      doc: A sequence of textual characters.
+                                      crossLanguageDefinitionId: TypeSpec.string
+                                    name: createdBy
+                                    isGeneratedName: false
+                                    optional: true
+                                    isApiVersionParam: false
+                                    onClient: false
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData.createdBy
+                                    decorators: []
+                                    kind: property
+                                    discriminator: false
+                                    serializedName: createdBy
+                                    isMultipartFileInput: false
+                                    flatten: false
+                                  - doc: The type of identity that created the resource.
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    type: &a23
+                                      kind: enum
+                                      decorators: []
+                                      name: createdByType
+                                      isGeneratedName: false
+                                      clientNamespace: Azure.ResourceManager.CommonTypes
+                                      doc: The kind of entity that created the resource.
+                                      valueType: &a22
+                                        kind: string
+                                        decorators: []
+                                        name: string
+                                        doc: A sequence of textual characters.
+                                        crossLanguageDefinitionId: TypeSpec.string
+                                      values:
+                                        - kind: enumvalue
+                                          decorators: []
+                                          name: User
+                                          doc: The entity was created by a user.
+                                          value: User
+                                          valueType: *a22
+                                          enumType: *a23
+                                        - kind: enumvalue
+                                          decorators: []
+                                          name: Application
+                                          doc: The entity was created by an application.
+                                          value: Application
+                                          valueType: *a22
+                                          enumType: *a23
+                                        - kind: enumvalue
+                                          decorators: []
+                                          name: ManagedIdentity
+                                          doc: The entity was created by a managed identity.
+                                          value: ManagedIdentity
+                                          valueType: *a22
+                                          enumType: *a23
+                                        - kind: enumvalue
+                                          decorators: []
+                                          name: Key
+                                          doc: The entity was created by a key.
+                                          value: Key
+                                          valueType: *a22
+                                          enumType: *a23
+                                      isFixed: false
+                                      isFlags: false
+                                      usage: 260
+                                      access: public
+                                      crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.createdByType
+                                      apiVersions:
+                                        - v3
+                                        - v4
+                                        - v5
+                                        - v6
+                                      isUnionAsEnum: true
+                                    name: createdByType
+                                    isGeneratedName: false
+                                    optional: true
+                                    isApiVersionParam: false
+                                    onClient: false
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData.createdByType
+                                    decorators: []
+                                    kind: property
+                                    discriminator: false
+                                    serializedName: createdByType
+                                    isMultipartFileInput: false
+                                    flatten: false
+                                  - doc: The timestamp of resource creation (UTC).
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    type:
+                                      kind: utcDateTime
+                                      decorators: []
+                                      name: utcDateTime
+                                      encode: rfc3339
+                                      wireType:
+                                        kind: string
+                                        decorators: []
+                                        name: string
+                                        doc: A sequence of textual characters.
+                                        crossLanguageDefinitionId: TypeSpec.string
+                                      doc: An instant in coordinated universal time (UTC)"
+                                      crossLanguageDefinitionId: TypeSpec.utcDateTime
+                                    name: createdAt
+                                    isGeneratedName: false
+                                    optional: true
+                                    isApiVersionParam: false
+                                    onClient: false
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData.createdAt
+                                    decorators: []
+                                    kind: property
+                                    discriminator: false
+                                    serializedName: createdAt
+                                    isMultipartFileInput: false
+                                    flatten: false
+                                  - doc: The identity that last modified the resource.
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    type:
+                                      kind: string
+                                      decorators: []
+                                      name: string
+                                      doc: A sequence of textual characters.
+                                      crossLanguageDefinitionId: TypeSpec.string
+                                    name: lastModifiedBy
+                                    isGeneratedName: false
+                                    optional: true
+                                    isApiVersionParam: false
+                                    onClient: false
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData.lastModifiedBy
+                                    decorators: []
+                                    kind: property
+                                    discriminator: false
+                                    serializedName: lastModifiedBy
+                                    isMultipartFileInput: false
+                                    flatten: false
+                                  - doc: The type of identity that last modified the resource.
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    type: *a23
+                                    name: lastModifiedByType
+                                    isGeneratedName: false
+                                    optional: true
+                                    isApiVersionParam: false
+                                    onClient: false
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData.lastModifiedByType
+                                    decorators: []
+                                    kind: property
+                                    discriminator: false
+                                    serializedName: lastModifiedByType
+                                    isMultipartFileInput: false
+                                    flatten: false
+                                  - doc: The timestamp of resource last modification (UTC)
+                                    apiVersions:
+                                      - v3
+                                      - v4
+                                      - v5
+                                      - v6
+                                    type:
+                                      kind: utcDateTime
+                                      decorators: []
+                                      name: utcDateTime
+                                      encode: rfc3339
+                                      wireType:
+                                        kind: string
+                                        decorators: []
+                                        name: string
+                                        doc: A sequence of textual characters.
+                                        crossLanguageDefinitionId: TypeSpec.string
+                                      doc: An instant in coordinated universal time (UTC)"
+                                      crossLanguageDefinitionId: TypeSpec.utcDateTime
+                                    name: lastModifiedAt
+                                    isGeneratedName: false
+                                    optional: true
+                                    isApiVersionParam: false
+                                    onClient: false
+                                    crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData.lastModifiedAt
+                                    decorators: []
+                                    kind: property
+                                    discriminator: false
+                                    serializedName: lastModifiedAt
+                                    isMultipartFileInput: false
+                                    flatten: false
+                                access: public
+                                usage: 260
+                                crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData
+                                apiVersions:
+                                  - v3
+                                  - v4
+                                  - v5
+                                  - v6
+                              name: systemData
+                              isGeneratedName: false
+                              optional: true
+                              isApiVersionParam: false
+                              onClient: false
+                              crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Resource.systemData
+                              decorators: []
+                              kind: property
+                              visibility:
+                                - 1
+                              discriminator: false
+                              serializedName: systemData
+                              isMultipartFileInput: false
+                              flatten: false
+                          access: public
+                          usage: 262
+                          crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Resource
+                          apiVersions:
+                            - v3
+                            - v4
+                            - v5
+                            - v6
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a17
+                    description: Azure operation completed successfully.
+                    kind: http
+                    statusCodes: 200
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+                type: *a25
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.get
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+            - kind: lro
+              name: createOrUpdate
+              access: public
+              parameters:
+                - &a28
+                  doc: The name of the resource group. The name is case insensitive.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: resourceGroupName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: resourceGroupName
+                  correspondingMethodParams: []
+                - &a29
+                  doc: The name of the Employee
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: employeeName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: employeeName
+                  correspondingMethodParams: []
+                - &a33
+                  doc: Resource create parameters.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type: *a25
+                  name: resource
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resource
+                  decorators: []
+                  kind: method
+                  discriminator: false
+                  serializedName: resource
+                  isMultipartFileInput: false
+                  flatten: false
+                - &a30
+                  type:
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: createOrUpdateContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: contentType
+                  isGeneratedName: true
+                  apiVersions:
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.createOrUpdate.contentType
+                  decorators: []
+                  doc: Body parameter's content type. Known values are application/json
+                  kind: method
+                - &a31
+                  type:
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: createOrUpdateContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions:
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.createOrUpdate.accept
+                  decorators: []
+                  kind: method
+              doc: Create a Employee
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+                uriTemplate: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}{?api-version}
+                verb: put
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - *a26
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - *a27
+                  - doc: The name of the resource group. The name is case insensitive.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: resourceGroupName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: resourceGroupName
+                    correspondingMethodParams:
+                      - *a28
+                  - doc: The name of the Employee
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: employeeName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: employeeName
+                    correspondingMethodParams:
+                      - *a29
+                  - type:
+                      kind: constant
+                      value: application/json
+                      valueType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      name: createOrUpdateContentType
+                      isGeneratedName: true
+                      decorators: []
+                    name: contentType
+                    isGeneratedName: true
+                    apiVersions: &a32
+                      - 2021-10-01-preview
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.createOrUpdate.contentType
+                    decorators: []
+                    doc: Body parameter's content type. Known values are application/json
+                    kind: header
+                    serializedName: Content-Type
+                    correspondingMethodParams:
+                      - *a30
+                  - type:
+                      kind: constant
+                      value: application/json
+                      valueType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      name: createOrUpdateContentType
+                      isGeneratedName: true
+                      decorators: []
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: &a34
+                      - 2021-10-01-preview
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.createOrUpdate.accept
+                    decorators: []
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a31
+                bodyParam:
+                  doc: Resource create parameters.
+                  apiVersions: *a32
+                  type: *a25
+                  name: resource
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resource
+                  decorators: []
+                  kind: body
+                  serializedName: resource
+                  contentTypes:
+                    - application/json
+                  defaultContentType: application/json
+                  correspondingMethodParams:
+                    - *a33
+                responses:
+                  - type: *a25
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a34
+                    description: Resource 'Employee' update operation succeeded
+                    kind: http
+                    statusCodes: 200
+                  - type: *a25
+                    headers:
+                      - doc: A link to the status monitor
+                        serializedName: Azure-AsyncOperation
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                      - doc: The Retry-After header can indicate how long the client should wait before polling the operation status.
+                        serializedName: Retry-After
+                        type:
+                          kind: int32
+                          decorators: []
+                          name: int32
+                          doc: A 32-bit integer. (`-2,147,483,648` to `2,147,483,647`)
+                          crossLanguageDefinitionId: TypeSpec.int32
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    description: Resource 'Employee' create operation succeeded
+                    kind: http
+                    statusCodes: 201
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+                type: *a25
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.createOrUpdate
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+              lroMetadata:
+                finalStateVia: azure-async-operation
+                finalResponse:
+                  envelopeResult: *a25
+                  result: *a25
+                finalStep:
+                  kind: finalOperationLink
+                pollingStep:
+                  responseBody: &a52
+                    kind: model
+                    decorators: []
+                    name: ArmOperationStatusResourceProvisioningState
+                    isGeneratedName: false
+                    clientNamespace: Azure.ResourceManager
+                    doc: Standard Azure Resource Manager operation status response
+                    properties:
+                      - doc: The operation status
+                        apiVersions:
+                          - 1.0-preview.1
+                        type: &a36
+                          kind: enum
+                          decorators: []
+                          name: ResourceProvisioningState
+                          isGeneratedName: false
+                          clientNamespace: Azure.ResourceManager
+                          doc: The provisioning state of a resource type.
+                          valueType: &a35
+                            kind: string
+                            decorators: []
+                            name: string
+                            doc: A sequence of textual characters.
+                            crossLanguageDefinitionId: TypeSpec.string
+                          values:
+                            - kind: enumvalue
+                              decorators: []
+                              name: Succeeded
+                              doc: Resource has been created.
+                              value: Succeeded
+                              valueType: *a35
+                              enumType: *a36
+                            - kind: enumvalue
+                              decorators: []
+                              name: Failed
+                              doc: Resource creation failed.
+                              value: Failed
+                              valueType: *a35
+                              enumType: *a36
+                            - kind: enumvalue
+                              decorators: []
+                              name: Canceled
+                              doc: Resource creation was canceled.
+                              value: Canceled
+                              valueType: *a35
+                              enumType: *a36
+                          isFixed: false
+                          isFlags: false
+                          usage: 0
+                          access: public
+                          crossLanguageDefinitionId: Azure.ResourceManager.ResourceProvisioningState
+                          apiVersions:
+                            - 1.0-preview.1
+                          isUnionAsEnum: true
+                        name: status
+                        isGeneratedName: false
+                        optional: false
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus.status
+                        decorators: []
+                        kind: property
+                        discriminator: false
+                        serializedName: status
+                        isMultipartFileInput: false
+                        flatten: false
+                      - doc: The unique identifier for the operationStatus resource
+                        apiVersions:
+                          - 1.0-preview.1
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                        name: id
+                        isGeneratedName: false
+                        optional: false
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus.id
+                        decorators: []
+                        kind: path
+                        urlEncode: true
+                        explode: false
+                        style: simple
+                        allowReserved: false
+                        serializedName: id
+                        correspondingMethodParams: []
+                      - doc: The name of the  operationStatus resource
+                        apiVersions:
+                          - 1.0-preview.1
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                        name: name
+                        isGeneratedName: false
+                        optional: true
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus.name
+                        decorators: []
+                        kind: property
+                        visibility:
+                          - 1
+                        discriminator: false
+                        serializedName: name
+                        isMultipartFileInput: false
+                        flatten: false
+                      - doc: Operation start time
+                        apiVersions:
+                          - 1.0-preview.1
+                        type:
+                          kind: utcDateTime
+                          decorators: []
+                          name: utcDateTime
+                          encode: rfc3339
+                          wireType:
+                            kind: string
+                            decorators: []
+                            name: string
+                            doc: A sequence of textual characters.
+                            crossLanguageDefinitionId: TypeSpec.string
+                          doc: An instant in coordinated universal time (UTC)"
+                          crossLanguageDefinitionId: TypeSpec.utcDateTime
+                        name: startTime
+                        isGeneratedName: false
+                        optional: true
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus.startTime
+                        decorators: []
+                        kind: property
+                        visibility:
+                          - 1
+                        discriminator: false
+                        serializedName: startTime
+                        isMultipartFileInput: false
+                        flatten: false
+                      - doc: Operation complete time
+                        apiVersions:
+                          - 1.0-preview.1
+                        type:
+                          kind: utcDateTime
+                          decorators: []
+                          name: utcDateTime
+                          encode: rfc3339
+                          wireType:
+                            kind: string
+                            decorators: []
+                            name: string
+                            doc: A sequence of textual characters.
+                            crossLanguageDefinitionId: TypeSpec.string
+                          doc: An instant in coordinated universal time (UTC)"
+                          crossLanguageDefinitionId: TypeSpec.utcDateTime
+                        name: endTime
+                        isGeneratedName: false
+                        optional: true
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus.endTime
+                        decorators: []
+                        kind: property
+                        visibility:
+                          - 1
+                        discriminator: false
+                        serializedName: endTime
+                        isMultipartFileInput: false
+                        flatten: false
+                      - doc: The progress made toward completing the operation
+                        apiVersions:
+                          - 1.0-preview.1
+                        type:
+                          kind: float64
+                          decorators: []
+                          name: float64
+                          doc: A 64 bit floating point number. (`±5.0 × 10^−324` to `±1.7 × 10^308`)
+                          crossLanguageDefinitionId: TypeSpec.float64
+                        name: percentComplete
+                        isGeneratedName: false
+                        optional: true
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus.percentComplete
+                        decorators: []
+                        kind: property
+                        visibility:
+                          - 1
+                        discriminator: false
+                        serializedName: percentComplete
+                        isMultipartFileInput: false
+                        flatten: false
+                      - doc: Errors that occurred if the operation ended with Canceled or Failed status
+                        apiVersions:
+                          - 1.0-preview.1
+                        type: *a9
+                        name: error
+                        isGeneratedName: false
+                        optional: true
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus.error
+                        decorators: []
+                        kind: property
+                        visibility:
+                          - 1
+                        discriminator: false
+                        serializedName: error
+                        isMultipartFileInput: false
+                        flatten: false
+                    access: public
+                    usage: 0
+                    crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus
+                    apiVersions:
+                      - 1.0-preview.1
+            - kind: basic
+              name: update
+              access: public
+              parameters:
+                - &a37
+                  doc: The name of the resource group. The name is case insensitive.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: resourceGroupName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: resourceGroupName
+                  correspondingMethodParams: []
+                - &a38
+                  doc: The name of the Employee
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: employeeName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: employeeName
+                  correspondingMethodParams: []
+                - &a47
+                  doc: The resource properties to be updated.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type: *a25
+                  name: properties
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.properties
+                  decorators: []
+                  kind: method
+                  discriminator: false
+                  serializedName: properties
+                  isMultipartFileInput: false
+                  flatten: false
+                - &a42
+                  type: &a39
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: updateContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: contentType
+                  isGeneratedName: true
+                  apiVersions: &a40
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.update.contentType
+                  decorators: &a41 []
+                  doc: Body parameter's content type. Known values are application/json
+                  kind: method
+                - &a46
+                  type: &a43
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: updateContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions: &a44
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.update.accept
+                  decorators: &a45 []
+                  kind: method
+              doc: Update a Employee
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+                uriTemplate: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}{?api-version}
+                verb: patch
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - *a26
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - *a27
+                  - doc: The name of the resource group. The name is case insensitive.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: resourceGroupName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: resourceGroupName
+                    correspondingMethodParams:
+                      - *a37
+                  - doc: The name of the Employee
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: employeeName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: employeeName
+                    correspondingMethodParams:
+                      - *a38
+                  - type: *a39
+                    name: contentType
+                    isGeneratedName: true
+                    apiVersions: *a40
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.update.contentType
+                    decorators: *a41
+                    doc: Body parameter's content type. Known values are application/json
+                    kind: header
+                    serializedName: Content-Type
+                    correspondingMethodParams:
+                      - *a42
+                  - type: *a43
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: *a44
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.update.accept
+                    decorators: *a45
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a46
+                bodyParam:
+                  doc: The resource properties to be updated.
+                  apiVersions: *a40
+                  type: *a25
+                  name: properties
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.properties
+                  decorators: []
+                  kind: body
+                  serializedName: properties
+                  contentTypes:
+                    - application/json
+                  defaultContentType: application/json
+                  correspondingMethodParams:
+                    - *a47
+                responses:
+                  - type: *a25
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a44
+                    description: Azure operation completed successfully.
+                    kind: http
+                    statusCodes: 200
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+                type: *a25
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.update
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+            - kind: lro
+              name: delete
+              access: public
+              parameters:
+                - &a48
+                  doc: The name of the resource group. The name is case insensitive.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: resourceGroupName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: resourceGroupName
+                  correspondingMethodParams: []
+                - &a49
+                  doc: The name of the Employee
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: employeeName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: employeeName
+                  correspondingMethodParams: []
+                - &a50
+                  type:
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: deleteContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions:
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.delete.accept
+                  decorators: []
+                  kind: method
+              doc: Delete a Employee
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+                uriTemplate: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}{?api-version}
+                verb: delete
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - *a26
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - *a27
+                  - doc: The name of the resource group. The name is case insensitive.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: resourceGroupName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: resourceGroupName
+                    correspondingMethodParams:
+                      - *a48
+                  - doc: The name of the Employee
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: employeeName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: employeeName
+                    correspondingMethodParams:
+                      - *a49
+                  - type:
+                      kind: constant
+                      value: application/json
+                      valueType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      name: deleteContentType
+                      isGeneratedName: true
+                      decorators: []
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: &a51
+                      - 2021-10-01-preview
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.delete.accept
+                    decorators: []
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a50
+                responses:
+                  - headers:
+                      - doc: The Location header contains the URL where the status of the long running operation can be checked.
+                        serializedName: Location
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                      - doc: The Retry-After header can indicate how long the client should wait before polling the operation status.
+                        serializedName: Retry-After
+                        type:
+                          kind: int32
+                          decorators: []
+                          name: int32
+                          doc: A 32-bit integer. (`-2,147,483,648` to `2,147,483,647`)
+                          crossLanguageDefinitionId: TypeSpec.int32
+                    apiVersions:
+                      - 2021-10-01-preview
+                    description: Resource deletion accepted.
+                    kind: http
+                    statusCodes: 202
+                  - headers: []
+                    apiVersions:
+                      - 2021-10-01-preview
+                    description: Resource does not exist.
+                    kind: http
+                    statusCodes: 204
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a51
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.delete
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+              lroMetadata:
+                finalStateVia: location
+                finalStep:
+                  kind: finalOperationLink
+                pollingStep:
+                  responseBody: *a52
+            - kind: paging
+              name: listByResourceGroup
+              access: public
+              parameters:
+                - &a53
+                  doc: The name of the resource group. The name is case insensitive.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: resourceGroupName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: resourceGroupName
+                  correspondingMethodParams: []
+                - &a57
+                  type: &a54
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: listByResourceGroupContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions: &a55
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.listByResourceGroup.accept
+                  decorators: &a56 []
+                  kind: method
+              doc: List Employee resources by resource group
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees
+                uriTemplate: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees{?api-version}
+                verb: get
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - *a26
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - *a27
+                  - doc: The name of the resource group. The name is case insensitive.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: resourceGroupName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: resourceGroupName
+                    correspondingMethodParams:
+                      - *a53
+                  - type: *a54
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: *a55
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.listByResourceGroup.accept
+                    decorators: *a56
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a57
+                responses:
+                  - type: &a62
+                      kind: model
+                      decorators: []
+                      name: EmployeeListResult
+                      isGeneratedName: false
+                      clientNamespace: Azure.ResourceManager
+                      doc: The response of a Employee list operation.
+                      properties:
+                        - doc: The Employee items on this page
+                          apiVersions:
+                            - 1.0-preview.1
+                            - 1.0-preview.2
+                          type:
+                            kind: array
+                            decorators: []
+                            name: ArrayEmployee
+                            valueType: *a25
+                            crossLanguageDefinitionId: TypeSpec.Array
+                          name: value
+                          isGeneratedName: false
+                          optional: false
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Azure.ResourceManager.ResourceListResult.value
+                          decorators: []
+                          kind: property
+                          discriminator: false
+                          serializedName: value
+                          isMultipartFileInput: false
+                          flatten: false
+                        - doc: The link to the next page of items
+                          apiVersions:
+                            - 1.0-preview.1
+                            - 1.0-preview.2
+                          type:
+                            kind: url
+                            decorators: []
+                            name: ResourceLocation
+                            doc: The location of an instance of Employee
+                            baseType:
+                              kind: url
+                              decorators: []
+                              name: url
+                              doc: Represent a URL string as described by https://url.spec.whatwg.org/
+                              crossLanguageDefinitionId: TypeSpec.url
+                            crossLanguageDefinitionId: TypeSpec.Rest.ResourceLocation
+                          name: nextLink
+                          isGeneratedName: false
+                          optional: true
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Azure.ResourceManager.ResourceListResult.nextLink
+                          decorators: []
+                          kind: property
+                          discriminator: false
+                          serializedName: nextLink
+                          isMultipartFileInput: false
+                          flatten: false
+                      access: public
+                      usage: 260
+                      crossLanguageDefinitionId: Azure.ResourceManager.ResourceListResult
+                      apiVersions:
+                        - 1.0-preview.1
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a55
+                    description: Azure operation completed successfully.
+                    kind: http
+                    statusCodes: 200
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+                type:
+                  kind: array
+                  decorators: []
+                  name: ArrayEmployee
+                  valueType: *a25
+                  crossLanguageDefinitionId: TypeSpec.Array
+                resultPath: value
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.listByResourceGroup
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+              nextLinkPath: nextLink
+            - kind: paging
+              name: listBySubscription
+              access: public
+              parameters:
+                - &a61
+                  type: &a58
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: listBySubscriptionContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions: &a59
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.listBySubscription.accept
+                  decorators: &a60 []
+                  kind: method
+              doc: List Employee resources by subscription ID
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees
+                uriTemplate: /subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees{?api-version}
+                verb: get
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - *a26
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - *a27
+                  - type: *a58
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: *a59
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.listBySubscription.accept
+                    decorators: *a60
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a61
+                responses:
+                  - type: *a62
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a59
+                    description: Azure operation completed successfully.
+                    kind: http
+                    statusCodes: 200
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+                type:
+                  kind: array
+                  decorators: []
+                  name: ArrayEmployee
+                  valueType: *a25
+                  crossLanguageDefinitionId: TypeSpec.Array
+                resultPath: value
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.listBySubscription
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+              nextLinkPath: nextLink
+            - kind: basic
+              name: move
+              access: public
+              parameters:
+                - &a63
+                  doc: The name of the resource group. The name is case insensitive.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: resourceGroupName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: resourceGroupName
+                  correspondingMethodParams: []
+                - &a64
+                  doc: The name of the Employee
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: employeeName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: employeeName
+                  correspondingMethodParams: []
+                - &a74
+                  doc: The content of the action request
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type: &a73
+                    kind: model
+                    decorators: []
+                    name: MoveRequest
+                    isGeneratedName: false
+                    clientNamespace: Microsoft.ContosoProviderHub
+                    doc: Employee move request
+                    properties:
+                      - doc: The moving from location
+                        apiVersions:
+                          - 2021-10-01-preview
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                        name: from
+                        isGeneratedName: false
+                        optional: false
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Microsoft.ContosoProviderHub.MoveRequest.from
+                        decorators: []
+                        kind: property
+                        discriminator: false
+                        serializedName: from
+                        isMultipartFileInput: false
+                        flatten: false
+                      - doc: The moving to location
+                        apiVersions:
+                          - 2021-10-01-preview
+                        type:
+                          kind: string
+                          decorators: []
+                          name: string
+                          doc: A sequence of textual characters.
+                          crossLanguageDefinitionId: TypeSpec.string
+                        name: to
+                        isGeneratedName: false
+                        optional: false
+                        isApiVersionParam: false
+                        onClient: false
+                        crossLanguageDefinitionId: Microsoft.ContosoProviderHub.MoveRequest.to
+                        decorators: []
+                        kind: property
+                        discriminator: false
+                        serializedName: to
+                        isMultipartFileInput: false
+                        flatten: false
+                    access: public
+                    usage: 258
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.MoveRequest
+                    apiVersions:
+                      - 2021-10-01-preview
+                  name: body
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.body
+                  decorators: []
+                  kind: method
+                  discriminator: false
+                  serializedName: body
+                  isMultipartFileInput: false
+                  flatten: false
+                - &a68
+                  type: &a65
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: moveContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: contentType
+                  isGeneratedName: true
+                  apiVersions: &a66
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.move.contentType
+                  decorators: &a67 []
+                  doc: Body parameter's content type. Known values are application/json
+                  kind: method
+                - &a72
+                  type: &a69
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: moveContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions: &a70
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.move.accept
+                  decorators: &a71 []
+                  kind: method
+              doc: A sample resource action that move employee to different location
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/move
+                uriTemplate: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/move{?api-version}
+                verb: post
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - *a26
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - *a27
+                  - doc: The name of the resource group. The name is case insensitive.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: resourceGroupName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: resourceGroupName
+                    correspondingMethodParams:
+                      - *a63
+                  - doc: The name of the Employee
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: employeeName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: employeeName
+                    correspondingMethodParams:
+                      - *a64
+                  - type: *a65
+                    name: contentType
+                    isGeneratedName: true
+                    apiVersions: *a66
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.move.contentType
+                    decorators: *a67
+                    doc: Body parameter's content type. Known values are application/json
+                    kind: header
+                    serializedName: Content-Type
+                    correspondingMethodParams:
+                      - *a68
+                  - type: *a69
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: *a70
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.move.accept
+                    decorators: *a71
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a72
+                bodyParam:
+                  doc: The content of the action request
+                  apiVersions: *a66
+                  type: *a73
+                  name: body
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.body
+                  decorators: []
+                  kind: body
+                  serializedName: body
+                  contentTypes:
+                    - application/json
+                  defaultContentType: application/json
+                  correspondingMethodParams:
+                    - *a74
+                responses:
+                  - type: &a75
+                      kind: model
+                      decorators: []
+                      name: MoveResponse
+                      isGeneratedName: false
+                      clientNamespace: Microsoft.ContosoProviderHub
+                      doc: Employee move response
+                      properties:
+                        - doc: The status of the move
+                          apiVersions:
+                            - 2021-10-01-preview
+                          type:
+                            kind: string
+                            decorators: []
+                            name: string
+                            doc: A sequence of textual characters.
+                            crossLanguageDefinitionId: TypeSpec.string
+                          name: movingStatus
+                          isGeneratedName: false
+                          optional: false
+                          isApiVersionParam: false
+                          onClient: false
+                          crossLanguageDefinitionId: Microsoft.ContosoProviderHub.MoveResponse.movingStatus
+                          decorators: []
+                          kind: property
+                          discriminator: false
+                          serializedName: movingStatus
+                          isMultipartFileInput: false
+                          flatten: false
+                      access: public
+                      usage: 260
+                      crossLanguageDefinitionId: Microsoft.ContosoProviderHub.MoveResponse
+                      apiVersions:
+                        - 2021-10-01-preview
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a70
+                    description: Azure operation completed successfully.
+                    kind: http
+                    statusCodes: 200
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions:
+                      - 2021-10-01-preview
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+                type: *a75
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.move
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+            - kind: basic
+              name: checkExistence
+              access: public
+              parameters:
+                - &a76
+                  doc: The name of the resource group. The name is case insensitive.
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: resourceGroupName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: resourceGroupName
+                  correspondingMethodParams: []
+                - &a77
+                  doc: The name of the Employee
+                  apiVersions:
+                    - 2021-10-01-preview
+                  type:
+                    kind: string
+                    decorators: []
+                    name: string
+                    doc: A sequence of textual characters.
+                    crossLanguageDefinitionId: TypeSpec.string
+                  name: employeeName
+                  isGeneratedName: false
+                  optional: false
+                  isApiVersionParam: false
+                  onClient: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                  decorators: []
+                  kind: method
+                  urlEncode: true
+                  explode: false
+                  style: simple
+                  allowReserved: false
+                  serializedName: employeeName
+                  correspondingMethodParams: []
+                - &a81
+                  type: &a78
+                    kind: constant
+                    value: application/json
+                    valueType:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: checkExistenceContentType
+                    isGeneratedName: true
+                    decorators: []
+                  name: accept
+                  isGeneratedName: true
+                  apiVersions: &a79
+                    - 2021-10-01-preview
+                  isApiVersionParam: false
+                  onClient: false
+                  optional: false
+                  crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.checkExistence.accept
+                  decorators: &a80 []
+                  kind: method
+              doc: A sample HEAD operation to check resource existence
+              operation:
+                kind: http
+                path: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}
+                uriTemplate: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}{?api-version}
+                verb: head
+                parameters:
+                  - doc: The API version to use for this operation.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: apiVersion
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: true
+                    clientDefaultValue: 2021-10-01-preview
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.apiVersion
+                    decorators: []
+                    correspondingMethodParams:
+                      - *a26
+                    kind: query
+                    serializedName: api-version
+                    explode: false
+                  - doc: The ID of the target subscription. The value must be an UUID.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: uuid
+                      doc: Universally Unique Identifier
+                      baseType:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      crossLanguageDefinitionId: Azure.Core.uuid
+                    name: subscriptionId
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: true
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.subscriptionId
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: subscriptionId
+                    correspondingMethodParams:
+                      - *a27
+                  - doc: The name of the resource group. The name is case insensitive.
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: resourceGroupName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.resourceGroupName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: resourceGroupName
+                    correspondingMethodParams:
+                      - *a76
+                  - doc: The name of the Employee
+                    apiVersions:
+                      - 2021-10-01-preview
+                    type:
+                      kind: string
+                      decorators: []
+                      name: string
+                      doc: A sequence of textual characters.
+                      crossLanguageDefinitionId: TypeSpec.string
+                    name: employeeName
+                    isGeneratedName: false
+                    optional: false
+                    isApiVersionParam: false
+                    onClient: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub..anonymous.employeeName
+                    decorators: []
+                    kind: path
+                    urlEncode: true
+                    explode: false
+                    style: simple
+                    allowReserved: false
+                    serializedName: employeeName
+                    correspondingMethodParams:
+                      - *a77
+                  - type: *a78
+                    name: accept
+                    isGeneratedName: true
+                    apiVersions: *a79
+                    isApiVersionParam: false
+                    onClient: false
+                    optional: false
+                    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees.checkExistence.accept
+                    decorators: *a80
+                    kind: header
+                    serializedName: Accept
+                    correspondingMethodParams:
+                      - *a81
+                responses:
+                  - headers: []
+                    apiVersions:
+                      - 2021-10-01-preview
+                    description: The Azure resource exists
+                    kind: http
+                    statusCodes: 204
+                  - headers: []
+                    apiVersions:
+                      - 2021-10-01-preview
+                    description: The Azure resource is not found
+                    kind: http
+                    statusCodes: 404
+                exceptions:
+                  - type: *a24
+                    headers: []
+                    contentTypes:
+                      - application/json
+                    defaultContentType: application/json
+                    apiVersions: *a79
+                    kind: http
+                    statusCodes: "*"
+              response:
+                kind: method
+              apiVersions:
+                - 2021-10-01-preview
+              crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees.checkExistence
+              decorators: []
+              generateConvenient: true
+              generateProtocol: true
+              isOverride: false
+          apiVersions: &a82
+            - 2021-10-01-preview
+          nameSpace: Microsoft.ContosoProviderHub
+          clientNamespace: Microsoft.ContosoProviderHub
+          initialization:
+            doc: Initialization class for the client
+            kind: model
+            properties:
+              - kind: endpoint
+                type:
+                  kind: endpoint
+                  serverUrl: "{endpoint}"
+                  templateArguments:
+                    - name: endpoint
+                      isGeneratedName: true
+                      doc: Service host
+                      kind: path
+                      onClient: true
+                      urlEncode: false
+                      explode: false
+                      style: simple
+                      allowReserved: false
+                      optional: false
+                      serializedName: endpoint
+                      correspondingMethodParams: []
+                      type:
+                        kind: string
+                        decorators: []
+                        name: string
+                        doc: A sequence of textual characters.
+                        crossLanguageDefinitionId: TypeSpec.string
+                      isApiVersionParam: false
+                      apiVersions: *a82
+                      crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
+                      decorators: []
+                      clientDefaultValue: https://management.azure.com
+                  decorators: []
+                name: endpoint
+                isGeneratedName: true
+                doc: Service host
+                onClient: true
+                urlEncode: false
+                apiVersions: *a82
+                optional: false
+                isApiVersionParam: false
+                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
+                decorators: []
+              - type:
+                  kind: credential
+                  scheme: *a83
+                  decorators: []
+                kind: credential
+                name: credential
+                isGeneratedName: true
+                doc: Credential used to authenticate requests to the service.
+                apiVersions: &a84
+                  - 2021-10-01-preview
+                onClient: true
+                optional: false
+                isApiVersionParam: false
+                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.credential
+                decorators: []
+              - *a26
+              - *a27
+            name: EmployeesOptions
+            isGeneratedName: true
+            access: internal
+            usage: 2
+            crossLanguageDefinitionId: Microsoft.EmployeesOptions
+            clientNamespace: Microsoft.ContosoProviderHub
+            apiVersions: *a82
+            decorators: []
+          decorators: []
+          parent: *a13
+          crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employees
+        apiVersions:
+          - 2021-10-01-preview
+        crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees
+        decorators: []
+    apiVersions: &a85
+      - 2021-10-01-preview
+    nameSpace: Microsoft.ContosoProviderHub
+    clientNamespace: Microsoft.ContosoProviderHub
     initialization:
       doc: Initialization class for the client
       kind: model
@@ -36,59 +4015,156 @@ clients:
                   doc: A sequence of textual characters.
                   crossLanguageDefinitionId: TypeSpec.string
                 isApiVersionParam: false
-                apiVersions: *a1
-                crossLanguageDefinitionId: Contoso.WidgetManager.endpoint
+                apiVersions: *a84
+                crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
                 decorators: []
+                clientDefaultValue: https://management.azure.com
             decorators: []
           name: endpoint
           isGeneratedName: true
           doc: Service host
           onClient: true
           urlEncode: false
-          apiVersions: *a1
+          apiVersions: *a84
           optional: false
           isApiVersionParam: false
-          crossLanguageDefinitionId: Contoso.WidgetManager.endpoint
+          crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
           decorators: []
-      name: WidgetManagerClientOptions
+        - type:
+            kind: credential
+            scheme: *a83
+            decorators: []
+          kind: credential
+          name: credential
+          isGeneratedName: true
+          doc: Credential used to authenticate requests to the service.
+          apiVersions:
+            - 2021-10-01-preview
+          onClient: true
+          optional: false
+          isApiVersionParam: false
+          crossLanguageDefinitionId: Microsoft.ContosoProviderHub.credential
+          decorators: []
+        - *a12
+        - *a27
+      name: ContosoProviderHubClientOptions
       isGeneratedName: true
       access: public
       usage: 2
-      crossLanguageDefinitionId: Contoso.WidgetManagerClientOptions
-      clientNamespace: Contoso.WidgetManager
-      apiVersions: *a1
+      crossLanguageDefinitionId: Microsoft.ContosoProviderHubClientOptions
+      clientNamespace: Microsoft.ContosoProviderHub
+      apiVersions: *a85
       decorators: []
     decorators: []
-    crossLanguageDefinitionId: Contoso.WidgetManager
+    crossLanguageDefinitionId: Microsoft.ContosoProviderHub
 models:
-  - &a3
-    kind: model
+  - *a25
+  - *a86
+  - *a87
+  - *a88
+  - *a89
+  - *a24
+  - *a9
+  - *a90
+  - *a91
+  - *a62
+  - *a73
+  - *a75
+  - *a92
+  - *a10
+  - *a93
+enums:
+  - *a21
+  - *a23
+  - *a6
+  - *a8
+  - &a94
+    kind: enum
     decorators: []
-    name: Test
+    name: Versions
     isGeneratedName: false
-    clientNamespace: Contoso.WidgetManager
-    properties: []
+    clientNamespace: Microsoft.ContosoProviderHub
+    doc: Contoso API versions
+    valueType: &a95
+      kind: string
+      decorators: []
+      name: string
+      doc: A sequence of textual characters.
+      crossLanguageDefinitionId: TypeSpec.string
+    values:
+      - kind: enumvalue
+        decorators: []
+        name: 2021-10-01-preview
+        value: 2021-10-01-preview
+        doc: 2021-10-01-preview version
+        enumType: *a94
+        valueType: *a95
+    isFixed: true
+    isFlags: false
+    usage: 8
     access: public
-    usage: 2
-    crossLanguageDefinitionId: Contoso.WidgetManager.Test
-    apiVersions: []
-enums: []
+    crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Versions
+    apiVersions:
+      - 2021-10-01-preview
+    isUnionAsEnum: false
 unions: []
-crossLanguagePackageId: Contoso.WidgetManager
+crossLanguagePackageId: Microsoft.ContosoProviderHub
 namespaces:
-  - name: Contoso
-    fullName: Contoso
+  - name: Microsoft
+    fullName: Microsoft
     clients: []
     models: []
     enums: []
     unions: []
     namespaces:
-      - name: WidgetManager
-        fullName: Contoso.WidgetManager
+      - name: ContosoProviderHub
+        fullName: Microsoft.ContosoProviderHub
         clients:
-          - *a2
+          - *a13
+          - *a96
+          - *a97
         models:
-          - *a3
-        enums: []
+          - *a25
+          - *a86
+          - *a73
+          - *a75
+        enums:
+          - *a21
+          - *a94
         unions: []
         namespaces: []
+  - name: Azure
+    fullName: Azure
+    clients: []
+    models: []
+    enums: []
+    unions: []
+    namespaces:
+      - name: ResourceManager
+        fullName: Azure.ResourceManager
+        clients: []
+        models:
+          - *a62
+        enums: []
+        unions: []
+        namespaces:
+          - name: CommonTypes
+            fullName: Azure.ResourceManager.CommonTypes
+            clients: []
+            models:
+              - *a87
+              - *a88
+              - *a89
+              - *a24
+              - *a9
+              - *a90
+              - *a91
+              - *a92
+              - *a10
+              - *a93
+            enums:
+              - *a23
+              - *a6
+              - *a8
+            unions: []
+            namespaces: []

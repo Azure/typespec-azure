@@ -1,5 +1,8 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { resolvePath } from "@typespec/compiler";
 import { findTestPackageRoot, resolveVirtualPath } from "@typespec/compiler/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
 import { readFile } from "fs/promises";
 import { beforeEach, describe, it } from "vitest";
@@ -7,9 +10,6 @@ import { createSdkContext } from "../../src/context.js";
 import { listClients } from "../../src/decorators.js";
 import { SdkTestLibrary } from "../../src/testing/index.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 
 describe("createSdkContext", () => {
   let runner: SdkTestRunner;
@@ -90,7 +90,7 @@ describe("createSdkContext", () => {
     runner = await createSdkTestRunner({
       librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
       autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-python"
+      emitterName: "@azure-tools/typespec-python",
     });
 
     await runner.compile(
