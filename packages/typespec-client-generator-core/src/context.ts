@@ -98,13 +98,13 @@ async function exportTCGCOutput(context: SdkContext) {
       context.sdkPackage,
       (k, v) => {
         if (typeof k === "string" && k.startsWith("__")) {
-          return undefined; // remove keys starting with "__" from the output
+          return undefined; // skip keys starting with "__" from the output
         }
-        if (typeof k === "function" || typeof v === "function") {
-          return undefined; // remove functions from the output
+        if (k === "schema") {
+          return undefined; // remove credential schema
         }
-        if (typeof k === "symbol" || typeof v === "symbol") {
-          return undefined; // remove symbol from the output
+        if (k === "rawExample") {
+          return undefined; // remove raw example
         }
         return v;
       },
