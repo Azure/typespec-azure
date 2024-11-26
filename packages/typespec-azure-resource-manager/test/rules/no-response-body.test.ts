@@ -145,16 +145,9 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
           @armProviderNamespace
           namespace Microsoft.Foo;
           
-          model Employee is TrackedResource<{}> {
-            @key("employeeName")
-            @segment("employeeName")
-            @path
-            name: string;
-          }
-          
           @armResourceOperations
           interface TestingOperations {
-            postEmployees is ArmProviderActionAsync<Response = Employee, Scope = SubscriptionActionScope>;
+            postEmployees is ArmProviderActionAsync<Response = void>;
           }
         `,
       )
