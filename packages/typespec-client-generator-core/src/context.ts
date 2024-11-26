@@ -103,6 +103,9 @@ async function exportTCGCOutput(context: SdkContext) {
         if (typeof k === "function" || typeof v === "function") {
           return undefined; // remove functions from the output
         }
+        if (typeof k === "symbol" || typeof v === "symbol") {
+          return undefined; // remove symbol from the output
+        }
         return v;
       },
       { lineWidth: 0 },
