@@ -100,7 +100,7 @@ async function exportTCGCOutput(context: SdkContext) {
         if (typeof k === "string" && k.startsWith("__")) {
           return undefined; // skip keys starting with "__" from the output
         }
-        if (k === "schema") {
+        if (k === "scheme") {
           return undefined; // remove credential schema
         }
         if (k === "rawExample") {
