@@ -1313,7 +1313,6 @@ Expected request body:
 
 ```json
 {
-  "location": "eastus",
   "properties": {
     "description": "valid2"
   }

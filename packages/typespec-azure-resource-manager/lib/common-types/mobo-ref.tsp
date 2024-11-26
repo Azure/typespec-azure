@@ -9,10 +9,20 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "mobo.json"
 );
+@@armCommonDefinition(ManagedOnBehalfOfConfiguration,
+  "ManagedOnBehalfOfConfiguration",
+  Azure.ResourceManager.CommonTypes.Versions.v6,
+  "mobo.json"
+);
 
 /** This resource is created by the Resource Provider to manage some resources on behalf of the user. */
 @@armCommonDefinition(MoboBrokerResource,
   "MoboBrokerResource",
   Azure.ResourceManager.CommonTypes.Versions.v5,
+  "mobo.json"
+);
+@@armCommonDefinition(MoboBrokerResource,
+  "MoboBrokerResource",
+  Azure.ResourceManager.CommonTypes.Versions.v6,
   "mobo.json"
 );

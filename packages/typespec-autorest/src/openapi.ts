@@ -1986,6 +1986,7 @@ export async function getOpenAPIForService(
       if (isReadonlyProperty(program, prop)) {
         property.readOnly = true;
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         const vis = getVisibility(program, prop);
         if (vis) {
           const mutability = [];
@@ -2038,6 +2039,7 @@ export async function getOpenAPIForService(
 
   function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
     const sharedVisibilities = ["read", "create", "update", "write"];
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const visibilities = getVisibility(program, prop);
     if (visibilities) {
       for (const visibility of visibilities) {

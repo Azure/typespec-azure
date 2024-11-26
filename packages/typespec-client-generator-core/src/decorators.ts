@@ -65,6 +65,7 @@ import {
   clientNamespaceKey,
   getValidApiVersion,
   isAzureCoreTspModel,
+  negationScopesKey,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -88,6 +89,13 @@ function getScopedDecoratorData(
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
     if (Object.keys(retval).includes(scope)) return retval[scope];
+
+    // if the scope is negated, we should return undefined
+    // if the scope is not negated, we should return the value for AllScopes
+    const negationScopes = retval[negationScopesKey];
+    if (negationScopes !== undefined && negationScopes.includes(scope)) {
+      return undefined;
+    }
   }
   return retval[AllScopes]; // in this case it applies to all languages
 }
@@ -115,20 +123,60 @@ function setScopedDecoratorData(
     return;
   }
 
-  // if scope specified, create or overwrite with the new value
-  const splitScopes = scope.split(",").map((s) => s.trim());
   const targetEntry = context.program.stateMap(key).get(target);
-
-  // if target doesn't exist in decorator map, create a new entry
-  if (!targetEntry) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  const [negationScopes, scopes] = parseScopes(context, scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    // override the previous value for negation scopes
+    const newObject: Record<string | symbol, any> =
+      scopes !== undefined && scopes.length > 0
+        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
+        : Object.fromEntries([[AllScopes, value]]);
+    newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
-    return;
+
+    // if a scope exists in the target entry and it overlaps with the negation scope, it means negation scope doesn't override it
+    if (targetEntry !== undefined) {
+      const existingScopes = Object.getOwnPropertyNames(targetEntry);
+      const intersections = existingScopes.filter((x) => negationScopes.includes(x));
+      if (intersections !== undefined && intersections.length > 0) {
+        for (const scopeToKeep of intersections) {
+          newObject[scopeToKeep] = targetEntry[scopeToKeep];
+        }
+      }
+    }
+  } else if (scopes !== undefined && scopes.length > 0) {
+    // for normal scopes, add them incrementally
+    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
+    context.program
+      .stateMap(key)
+      .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+  }
+}
+
+function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
+  if (scope === undefined) {
+    return [undefined, undefined];
   }
 
-  // if target exists, overwrite existed value
-  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+  // handle !(scope1, scope2,...) syntax
+  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
+  }
+
+  // handle !scope1, !scope2, scope3, ... syntax
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const negationScopes: string[] = [];
+  const scopes: string[] = [];
+  for (const s of splitScopes) {
+    if (s.startsWith("!")) {
+      negationScopes.push(s.slice(1));
+    } else {
+      scopes.push(s);
+    }
+  }
+  return [negationScopes, scopes];
 }
 
 const clientKey = createStateSymbol("client");
@@ -584,9 +632,12 @@ export function listOperationsInOperationGroup(
     }
 
     for (const op of current.operations.values()) {
-      // Skip templated operations
-      if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(getOverriddenClientMethod(context, op) ?? op);
+      // Skip templated operations and omit operations
+      if (
+        !isTemplateDeclarationOrInstance(op) &&
+        !context.program.stateMap(omitOperation).get(op)
+      ) {
+        operations.push(op);
       }
     }
 
@@ -615,6 +666,7 @@ export function createTCGCContext(program: Program, emitterName: string): TCGCCo
     __tspTypeToApiVersions: new Map(),
     __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
+    disableUsageAccessPropagationToBase: false,
   };
 }
 
@@ -626,6 +678,7 @@ interface VersioningStrategy {
 export interface CreateSdkContextOptions {
   readonly versioning?: VersioningStrategy;
   additionalDecorators?: string[];
+  disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
 }
 
 export async function createSdkContext<
@@ -658,6 +711,7 @@ export async function createSdkContext<
     examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
+    disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
@@ -895,6 +949,7 @@ export function getClientNameOverride(
 }
 
 const overrideKey = createStateSymbol("override");
+const omitOperation = createStateSymbol("omitOperation");
 
 // Recursive function to collect parameter names
 function collectParams(
@@ -943,6 +998,9 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
+  // omit all override operation
+  context.program.stateMap(omitOperation).set(override, true);
+
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
     a.name.localeCompare(b.name),
