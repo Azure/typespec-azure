@@ -380,12 +380,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         );
 
         const initialResponse = method.response.type;
-        ok(initialResponse);
-        strictEqual(initialResponse.kind, "model");
-        assert.isTrue(
-          hasFlag(initialResponse.usage, UsageFlags.LroInitial),
-          "the response of a lro method should have the usage of LroInitial",
-        );
+        assert.isUndefined(initialResponse);
 
         const metadata = method.lroMetadata;
         ok(metadata);
@@ -465,12 +460,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         );
 
         const initialResponse = method.response.type;
-        ok(initialResponse);
-        strictEqual(initialResponse.kind, "model");
-        assert.isTrue(
-          hasFlag(initialResponse.usage, UsageFlags.LroInitial),
-          "the response of a lro method should have the usage of LroInitial",
-        );
+        assert.isUndefined(initialResponse);
 
         const metadata = method.lroMetadata;
         ok(metadata);
@@ -537,12 +527,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(method.kind, "lro");
 
       const initialResponse = method.response.type;
-      ok(initialResponse);
-      strictEqual(initialResponse.kind, "model");
-      assert.isTrue(
-        hasFlag(initialResponse.usage, UsageFlags.LroInitial),
-        "the response of a lro method should have the usage of LroInitial",
-      );
+      assert.isUndefined(initialResponse);
 
       const metadata = method.lroMetadata;
       ok(metadata);
