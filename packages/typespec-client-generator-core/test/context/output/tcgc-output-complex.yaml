@@ -9,7 +9,7 @@ clients:
         parameters: []
         name: getOperations
         access: internal
-        response: &a96
+        response: &a95
           kind: client
           name: Operations
           methods:
@@ -103,7 +103,7 @@ clients:
                     correspondingMethodParams:
                       - *a4
                 responses:
-                  - type: &a92
+                  - type: &a91
                       kind: model
                       decorators: []
                       name: OperationListResult
@@ -185,7 +185,7 @@ clients:
                                     - v4
                                     - v5
                                     - v6
-                                  type: &a93
+                                  type: &a92
                                     kind: model
                                     decorators: []
                                     name: OperationDisplay
@@ -637,7 +637,7 @@ clients:
                                   kind: array
                                   decorators: []
                                   name: ArrayErrorAdditionalInfo
-                                  valueType: &a90
+                                  valueType: &a89
                                     kind: model
                                     decorators: []
                                     name: ErrorAdditionalInfo
@@ -677,7 +677,7 @@ clients:
                                           - v4
                                           - v5
                                           - v6
-                                        type: &a91
+                                        type: &a90
                                           kind: model
                                           decorators: []
                                           name: ErrorAdditionalInfoInfo
@@ -831,17 +831,6 @@ clients:
                 decorators: []
               - type:
                   kind: credential
-                  scheme: &a83
-                    id: azure_auth
-                    description: Azure Active Directory OAuth2 Flow.
-                    type: oauth2
-                    model: null
-                    flows:
-                      - type: implicit
-                        authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
-                        scopes:
-                          - value: user_impersonation
-                            description: impersonate your user account
                   decorators: []
                 kind: credential
                 name: credential
@@ -874,7 +863,7 @@ clients:
         parameters: []
         name: getEmployees
         access: internal
-        response: &a97
+        response: &a96
           kind: client
           name: Employees
           methods:
@@ -1134,7 +1123,7 @@ clients:
                         - doc: The resource-specific properties for this resource.
                           apiVersions:
                             - 1.0-preview.1
-                          type: &a86
+                          type: &a85
                             kind: model
                             decorators: []
                             name: EmployeeProperties
@@ -1339,7 +1328,7 @@ clients:
                       crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employee
                       apiVersions:
                         - 2021-10-01-preview
-                      baseModel: &a87
+                      baseModel: &a86
                         kind: model
                         decorators: []
                         name: TrackedResource
@@ -1415,7 +1404,7 @@ clients:
                           - v4
                           - v5
                           - v6
-                        baseModel: &a88
+                        baseModel: &a87
                           kind: model
                           decorators: []
                           name: Resource
@@ -1513,7 +1502,7 @@ clients:
                                 - v4
                                 - v5
                                 - v6
-                              type: &a89
+                              type: &a88
                                 kind: model
                                 decorators: []
                                 name: SystemData
@@ -3953,13 +3942,12 @@ clients:
                 decorators: []
               - type:
                   kind: credential
-                  scheme: *a83
                   decorators: []
                 kind: credential
                 name: credential
                 isGeneratedName: true
                 doc: Credential used to authenticate requests to the service.
-                apiVersions: &a84
+                apiVersions: &a83
                   - 2021-10-01-preview
                 onClient: true
                 optional: false
@@ -3983,7 +3971,7 @@ clients:
           - 2021-10-01-preview
         crossLanguageDefintionId: Microsoft.ContosoProviderHub.Employees
         decorators: []
-    apiVersions: &a85
+    apiVersions: &a84
       - 2021-10-01-preview
     nameSpace: Microsoft.ContosoProviderHub
     clientNamespace: Microsoft.ContosoProviderHub
@@ -4015,7 +4003,7 @@ clients:
                   doc: A sequence of textual characters.
                   crossLanguageDefinitionId: TypeSpec.string
                 isApiVersionParam: false
-                apiVersions: *a84
+                apiVersions: *a83
                 crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
                 decorators: []
                 clientDefaultValue: https://management.azure.com
@@ -4025,14 +4013,13 @@ clients:
           doc: Service host
           onClient: true
           urlEncode: false
-          apiVersions: *a84
+          apiVersions: *a83
           optional: false
           isApiVersionParam: false
           crossLanguageDefinitionId: Microsoft.ContosoProviderHub.endpoint
           decorators: []
         - type:
             kind: credential
-            scheme: *a83
             decorators: []
           kind: credential
           name: credential
@@ -4053,39 +4040,39 @@ clients:
       usage: 2
       crossLanguageDefinitionId: Microsoft.ContosoProviderHubClientOptions
       clientNamespace: Microsoft.ContosoProviderHub
-      apiVersions: *a85
+      apiVersions: *a84
       decorators: []
     decorators: []
     crossLanguageDefinitionId: Microsoft.ContosoProviderHub
 models:
   - *a25
+  - *a85
   - *a86
   - *a87
   - *a88
-  - *a89
   - *a24
   - *a9
+  - *a89
   - *a90
-  - *a91
   - *a62
   - *a73
   - *a75
-  - *a92
+  - *a91
   - *a10
-  - *a93
+  - *a92
 enums:
   - *a21
   - *a23
   - *a6
   - *a8
-  - &a94
+  - &a93
     kind: enum
     decorators: []
     name: Versions
     isGeneratedName: false
     clientNamespace: Microsoft.ContosoProviderHub
     doc: Contoso API versions
-    valueType: &a95
+    valueType: &a94
       kind: string
       decorators: []
       name: string
@@ -4097,8 +4084,8 @@ enums:
         name: 2021-10-01-preview
         value: 2021-10-01-preview
         doc: 2021-10-01-preview version
-        enumType: *a94
-        valueType: *a95
+        enumType: *a93
+        valueType: *a94
     isFixed: true
     isFlags: false
     usage: 8
@@ -4121,16 +4108,16 @@ namespaces:
         fullName: Microsoft.ContosoProviderHub
         clients:
           - *a13
+          - *a95
           - *a96
-          - *a97
         models:
           - *a25
-          - *a86
+          - *a85
           - *a73
           - *a75
         enums:
           - *a21
-          - *a94
+          - *a93
         unions: []
         namespaces: []
   - name: Azure
@@ -4152,16 +4139,16 @@ namespaces:
             fullName: Azure.ResourceManager.CommonTypes
             clients: []
             models:
+              - *a86
               - *a87
               - *a88
-              - *a89
               - *a24
               - *a9
+              - *a89
               - *a90
               - *a91
-              - *a92
               - *a10
-              - *a93
+              - *a92
             enums:
               - *a23
               - *a6
