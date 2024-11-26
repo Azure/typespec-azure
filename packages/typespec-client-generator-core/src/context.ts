@@ -97,8 +97,11 @@ async function exportTCGCOutput(context: SdkContext) {
     content: stringify(
       context.sdkPackage,
       (k, v) => {
-        if (k.startsWith("__")) {
-          return undefined;
+        if (typeof k === 'string' && k.startsWith("__")) {
+          return undefined; // remove keys starting with "__" from the output
+        }
+        if (typeof k === 'function') {
+          return undefined; // remove functions from the output
         }
         return v;
       },
