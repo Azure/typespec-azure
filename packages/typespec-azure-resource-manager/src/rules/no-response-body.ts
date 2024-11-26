@@ -2,7 +2,7 @@ import { createRule, Operation } from "@typespec/compiler";
 import { getHttpOperation, getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 /**
- * verify an operation returns 202 or 204 should not contain response body.
+ * verify that 202 or 204 responses do not contain a response body.
  * verify that operations that are different for 202 and 204 should contain a response body.
  */
 export const noResponseBodyRule = createRule({
