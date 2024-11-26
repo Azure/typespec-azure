@@ -5,4 +5,5 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-usage and access now properly propagate on polling model, final envelop result of `lroMetadata`
+1. Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`.
+2. usage and access now properly propagate on polling model, final result and final envelop result of `lroMetadata`.
