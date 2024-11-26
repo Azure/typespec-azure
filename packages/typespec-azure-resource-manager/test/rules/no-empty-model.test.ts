@@ -55,6 +55,17 @@ it("emits diagnostic when model type:object is not defined", async () => {
     });
 });
 
+it("valid when the empty model is a record", async () => {
+  await tester
+    .expect(
+      ` 
+      ${armDef}
+      model PortalExtensionCompileFileResult is Record<unknown>;
+        `,
+    )
+    .toBeValid();
+});
+
 it("valid when a property use type:object that is defined", async () => {
   await tester
     .expect(

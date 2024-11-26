@@ -383,6 +383,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
     generateConvenient: shouldGenerateConvenient(context, operation),
     generateProtocol: shouldGenerateProtocol(context, operation),
+    isOverride: override !== undefined,
   });
 }
 

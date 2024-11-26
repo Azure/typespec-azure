@@ -2714,8 +2714,14 @@ TODO;
 </ClientTabItem>
 <ClientTabItem lang="java" >
 
+As `flavor=azure`, Java emitter generates the model classes under `models` package.
+
 ```java
-TODO
+import my.service.models.Foo;
+import my.service.temp.models.Bar;
+
+Foo foo = new Foo("hello");
+Bar bar = new Bar("world");
 ```
 
 </ClientTabItem>
