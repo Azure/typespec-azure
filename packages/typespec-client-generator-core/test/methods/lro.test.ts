@@ -5,7 +5,7 @@ import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { notStrictEqual, ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
 import { SdkHttpOperation, SdkLroServiceMethod, UsageFlags } from "../../src/interfaces.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { createSdkTestRunner, hasFlag, SdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: long running operation metadata", () => {
   let runner: SdkTestRunner;
@@ -79,8 +79,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusError",
         );
         ok(pollingModel);
-        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
-        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.LroPolling)); // polling model should have the usage of LroInitial
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Output)); // polling model should not be output
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Input)); // polling model should not be input
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
@@ -122,8 +123,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusError",
         );
         ok(pollingModel);
-        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
-        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.LroPolling)); // polling model should have the usage of LroInitial
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Output)); // polling model should not be output
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Input)); // polling model should not be input
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         assert.isUndefined(metadata.finalResponse);
@@ -171,8 +173,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusExportedUserError",
         );
         ok(pollingModel);
-        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
-        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.LroPolling)); // polling model should have the usage of LroInitial
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Output)); // polling model should not be output
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Input)); // polling model should not be input
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         const returnModel = runner.context.sdkPackage.models.find((m) => m.name === "ExportedUser");
@@ -239,8 +242,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           (m) => m.name === "OperationStatusGenerationResultError",
         );
         ok(pollingModel);
-        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
-        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.LroPolling)); // polling model should have the usage of LroInitial
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Output)); // polling model should not be output
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Input)); // polling model should not be input
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         const returnModel = runner.context.sdkPackage.models.find(
@@ -309,8 +313,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
         ok(pollingModel);
-        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
-        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.LroPolling)); // polling model should have the usage of LroInitial
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.Output)); // this polling model has output usage because there is a polling operation returning it
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Input)); // polling model should not be input
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         assert.isUndefined(metadata.finalResponse);
@@ -376,8 +381,9 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
         ok(pollingModel);
-        strictEqual(pollingModel.usage & UsageFlags.Input, 0); // polling model should not be input
-        notStrictEqual(pollingModel.usage & UsageFlags.Output, 0); // polling model should be output
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.LroPolling)); // polling model should have the usage of LroInitial
+        assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.Output)); // this polling model has output usage because there is a polling operation returning it
+        assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Input)); // polling model should not be input
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         assert.isUndefined(metadata.finalResponse);
@@ -424,8 +430,11 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(method.kind, "lro");
       const metadata = method.lroMetadata;
       ok(metadata);
-      ok(method.lroMetadata.pollingStep.responseBody);
-      notStrictEqual(method.lroMetadata.pollingStep.responseBody.usage & UsageFlags.Output, 0); // the polling model should be output
+      const pollingModel = metadata.pollingStep.responseBody;
+      ok(pollingModel);
+      assert.isTrue(hasFlag(pollingModel.usage, UsageFlags.LroPolling)); // polling model should have the usage of LroInitial
+      assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Output)); // polling model should not be output
+      assert.isFalse(hasFlag(pollingModel.usage, UsageFlags.Input)); // polling model should not be input
     });
   });
 
@@ -578,12 +587,11 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
       // ARM LRO core types are different
-      // const pollingModel = runner.context.sdkPackage.models.find(
-      //   (m) => m.name === "ArmOperationStatusResourceProvisioningState"
-      // );
-      // ok(pollingModel);
-      // strictEqual(metadata.pollingStep.responseBody, pollingModel);
-      // TODO: TCGC bug to not include polling model
+      const pollingModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "ArmOperationStatusResourceProvisioningState",
+      );
+      ok(pollingModel);
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
       strictEqual(
         metadata.pollingStep.responseBody?.name,
         "ArmOperationStatusResourceProvisioningState",
