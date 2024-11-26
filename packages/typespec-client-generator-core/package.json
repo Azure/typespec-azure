@@ -57,7 +57,8 @@
   ],
   "dependencies": {
     "change-case": "~5.4.4",
-    "pluralize": "^8.0.0"
+    "pluralize": "^8.0.0",
+    "yaml": "^2.6.1"
   },
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",

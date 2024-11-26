@@ -3,7 +3,6 @@ import {
   DecoratorContext,
   DecoratorExpressionNode,
   DecoratorFunction,
-  EmitContext,
   Enum,
   EnumMember,
   Interface,
@@ -17,7 +16,6 @@ import {
   SyntaxKind,
   Type,
   Union,
-  createDiagnosticCollector,
   getDiscriminator,
   getNamespaceFullName,
   getProjectedName,
@@ -42,20 +40,14 @@ import {
   ProtocolAPIDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { defaultDecoratorsAllowList } from "./configs.js";
-import { handleClientExamples } from "./example.js";
 import {
   AccessFlags,
   LanguageScopes,
   SdkClient,
-  SdkContext,
-  SdkEmitterOptions,
-  SdkHttpOperation,
   SdkInitializationType,
   SdkMethodParameter,
   SdkModelPropertyType,
   SdkOperationGroup,
-  SdkServiceOperation,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -66,10 +58,8 @@ import {
   getValidApiVersion,
   isAzureCoreTspModel,
   negationScopesKey,
-  parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
@@ -653,72 +643,6 @@ export function listOperationsInOperationGroup(
 
   addOperations(group.type);
   return operations;
-}
-
-export function createTCGCContext(program: Program, emitterName: string): TCGCContext {
-  const diagnostics = createDiagnosticCollector();
-  return {
-    program,
-    emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
-    diagnostics: diagnostics.diagnostics,
-    originalProgram: program,
-    __clientToParameters: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __clientToApiVersionClientDefaultValue: new Map(),
-    previewStringRegex: /-preview$/,
-    disableUsageAccessPropagationToBase: false,
-  };
-}
-
-interface VersioningStrategy {
-  readonly strategy?: "ignore";
-  readonly previewStringRegex?: RegExp; // regex to match preview versions
-}
-
-export interface CreateSdkContextOptions {
-  readonly versioning?: VersioningStrategy;
-  additionalDecorators?: string[];
-  disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
-}
-
-export async function createSdkContext<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(
-  context: EmitContext<TOptions>,
-  emitterName?: string,
-  options?: CreateSdkContextOptions,
-): Promise<SdkContext<TOptions, TServiceOperation>> {
-  const diagnostics = createDiagnosticCollector();
-  const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
-  const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
-  const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
-  const generateConvenienceMethods =
-    context.options["generate-convenience-methods"] ?? convenienceOptions;
-  const tcgcContext = createTCGCContext(
-    context.program,
-    (emitterName ?? context.program.emitters[0]?.metadata?.name)!,
-  );
-  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
-    ...tcgcContext,
-    emitContext: context,
-    sdkPackage: undefined!,
-    generateProtocolMethods: generateProtocolMethods,
-    generateConvenienceMethods: generateConvenienceMethods,
-    packageName: context.options["package-name"],
-    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
-    apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
-    examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
-    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
-    previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
-    disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
-  };
-  sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
-  for (const client of sdkContext.sdkPackage.clients) {
-    diagnostics.pipe(await handleClientExamples(sdkContext, client));
-  }
-  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
-  return sdkContext;
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
