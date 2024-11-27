@@ -1602,7 +1602,7 @@ describe("typespec-client-generator-core: model types", () => {
           nonProp: string;
       }
       @post
-      op do(@body body Test): void;
+      op do(@body body: Test): void;
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
