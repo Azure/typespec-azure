@@ -243,29 +243,29 @@ function getPropertyPathFromModel(
   model: Model,
   judge: (property: ModelProperty) => boolean,
 ): string | undefined {
-  const segments: ModelProperty[] = [];
-  const queue: ModelProperty[] = [];
+  const queue: { prop: ModelProperty; path: ModelProperty[] }[] = [];
+
   for (const prop of model.properties.values()) {
     if (judge(prop)) {
       return getLibraryName(context, prop);
     }
     if (prop.type.kind === "Model") {
-      queue.push(prop);
+      queue.push({ prop, path: [prop] });
     }
   }
+
   while (queue.length > 0) {
-    const current = queue.shift()!;
-    segments.push(current);
+    const { prop: current, path } = queue.shift()!;
     for (const prop of (current.type as Model).properties.values()) {
       if (judge(prop)) {
-        segments.push(prop);
-        return segments.map((s) => getLibraryName(context, s)).join(".");
+        return path.concat(prop).map((s) => getLibraryName(context, s)).join(".");
       }
       if (prop.type.kind === "Model") {
-        queue.push(prop);
+        queue.push({ prop, path: path.concat(prop) });
       }
     }
   }
+
   return undefined;
 }
 
