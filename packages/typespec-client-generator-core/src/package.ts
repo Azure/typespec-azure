@@ -4,10 +4,13 @@ import {
   Diagnostic,
   getDoc,
   getNamespaceFullName,
+  getPagingOperation,
   getService,
   getSummary,
   ignoreDiagnostics,
+  isList,
   Model,
+  ModelProperty,
   Operation,
   Type,
 } from "@typespec/compiler";
@@ -130,27 +133,79 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
+): [
+  SdkPagingServiceMethod<TServiceOperation> | SdkServiceMethod<TServiceOperation>,
+  readonly Diagnostic[],
+] {
   const diagnostics = createDiagnosticCollector();
-  const pagedMetadata = getPagedResult(context.program, operation)!;
+
   const basic = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
+
+  // normal paging
+  if (isList(context.program, operation)) {
+    const pagingOperation = diagnostics.pipe(getPagingOperation(context.program, operation));
+
+    if (basic.response.type?.__raw?.kind !== "Model" || !pagingOperation) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "unexpected-pageable-operation-return-type",
+          target: operation,
+          format: {
+            operationName: operation.name,
+          },
+        }),
+      );
+      // return as basic method
+      return diagnostics.wrap(basic);
+    }
+
+    basic.response.resultPath = getPropertyPathFromModel(
+      context,
+      basic.response.type?.__raw,
+      (p) => p === pagingOperation.output.pageItems.property,
+    );
+    const nextLinkPath = pagingOperation.output.nextLink
+      ? getPropertyPathFromModel(
+          context,
+          basic.response.type?.__raw,
+          (p) => p === pagingOperation.output.nextLink!.property,
+        )
+      : undefined;
+
+    // tcgc will let all paging method return a list of items
+    basic.response.type = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, pagingOperation?.output.pageItems.property.type),
+    );
+
+    return diagnostics.wrap({
+      ...basic,
+      kind: "paging",
+      nextLinkPath,
+    });
+  }
+
+  // azure core paging
+  const pagedMetadata = getPagedResult(context.program, operation)!;
   if (pagedMetadata.itemsProperty) {
+    // tcgc will let all paging method return a list of items
     basic.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
     );
+
+    basic.response.resultPath = getPropertyPathFromSegment(
+      context,
+      pagedMetadata.modelType,
+      pagedMetadata.itemsSegments,
+    );
   }
-  basic.response.resultPath = getPathFromSegment(
-    context,
-    pagedMetadata.modelType,
-    pagedMetadata.itemsSegments,
-  );
+
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: getPathFromSegment(
+    nextLinkPath: getPropertyPathFromSegment(
       context,
       pagedMetadata.modelType,
       pagedMetadata?.nextLinkSegments,
@@ -167,7 +222,42 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   });
 }
 
-function getPathFromSegment(context: TCGCContext, type: Model, segments?: string[]): string {
+function getPropertyPathFromModel(
+  context: TCGCContext,
+  model: Model,
+  judge: (property: ModelProperty) => boolean,
+): string | undefined {
+  const segments: ModelProperty[] = [];
+  const queue: ModelProperty[] = [];
+  for (const prop of model.properties.values()) {
+    if (judge(prop)) {
+      return getLibraryName(context, prop);
+    }
+    if (prop.type.kind === "Model") {
+      queue.push(prop);
+    }
+  }
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    segments.push(current);
+    for (const prop of (current.type as Model).properties.values()) {
+      if (judge(prop)) {
+        segments.push(prop);
+        return segments.map((s) => getLibraryName(context, s)).join(".");
+      }
+      if (prop.type.kind === "Model") {
+        queue.push(prop);
+      }
+    }
+  }
+  return undefined;
+}
+
+function getPropertyPathFromSegment(
+  context: TCGCContext,
+  type: Model,
+  segments?: string[],
+): string {
   if (!segments || segments.length === 0) {
     return "";
   }
@@ -393,7 +483,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getLroMetadata(context.program, operation);
-  const paging = getPagedResult(context.program, operation);
+  const paging = getPagedResult(context.program, operation) || isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
