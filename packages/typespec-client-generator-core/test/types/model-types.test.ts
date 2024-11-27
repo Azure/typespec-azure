@@ -1593,4 +1593,19 @@ describe("typespec-client-generator-core: model types", () => {
       strictEqual(p.multipartOptions, undefined);
     }
   });
+
+  it("remove property with none visibility", async function () {
+    await runner.compileWithBuiltInService(`
+      model Test{
+          prop: string;
+          @visibility("none")
+          nonProp: string;
+      }
+      @post
+      op do(@body body: Test): void;
+      `);
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    strictEqual(models[0].properties.length, 1);
+  });
 });
