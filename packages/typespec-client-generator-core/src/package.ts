@@ -258,7 +258,10 @@ function getPropertyPathFromModel(
     const { prop: current, path } = queue.shift()!;
     for (const prop of (current.type as Model).properties.values()) {
       if (judge(prop)) {
-        return path.concat(prop).map((s) => getLibraryName(context, s)).join(".");
+        return path
+          .concat(prop)
+          .map((s) => getLibraryName(context, s))
+          .join(".");
       }
       if (prop.type.kind === "Model") {
         queue.push({ prop, path: path.concat(prop) });
