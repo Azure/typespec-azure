@@ -20,6 +20,7 @@ export const ArmStateKeys = {
   armSingletonResources: azureResourceManagerCreateStateSymbol("armSingletonResources"),
   resourceBaseType: azureResourceManagerCreateStateSymbol("resourceBaseTypeKey"),
   armBuiltInResource: azureResourceManagerCreateStateSymbol("armExternalResource"),
+  armCustomResource: azureResourceManagerCreateStateSymbol("armCustomResource"),
 
   // private.decorator.ts
   azureResourceBase: azureResourceManagerCreateStateSymbol("azureResourceBase"),

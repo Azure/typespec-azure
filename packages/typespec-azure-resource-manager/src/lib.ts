@@ -36,6 +36,12 @@ export const $lib = createTypeSpecLibrary({
         default: "Resource types must include a string property called 'name'.",
       },
     },
+    "arm-custom-resource-usage-discourage": {
+      severity: "warning",
+      messages: {
+        default: "Avoid using this decorator as it does not provide validation for ARM resources.",
+      },
+    },
     "arm-resource-missing-name-key-decorator": {
       severity: "error",
       messages: {

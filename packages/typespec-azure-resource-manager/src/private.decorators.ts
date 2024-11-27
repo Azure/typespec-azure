@@ -39,6 +39,7 @@ import {
   ResourceBaseType,
   getArmResourceKind,
   getResourceBaseType,
+  isArmCustomResource,
   isArmVirtualResource,
   resolveResourceBaseType,
 } from "./resource.js";
@@ -325,6 +326,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
 
   let kind = getArmResourceKind(resourceType);
   if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
+  if (isArmCustomResource(program, resourceType)) kind = "Custom";
   if (!kind) {
     reportDiagnostic(program, {
       code: "arm-resource-invalid-base-type",

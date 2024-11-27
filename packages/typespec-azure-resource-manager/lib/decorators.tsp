@@ -183,6 +183,14 @@ extern dec armCommonTypesVersion(
 extern dec armVirtualResource(target: Model);
 
 /**
+ * This decorator is used on resources that do not satisfy the definition of a resource
+ * but need to be identified as such.
+ *
+ * @param propertiesType : Type of the resource properties.
+ */
+extern dec armCustomResource(target: Model);
+
+/**
  * This decorator sets the base type of the given resource.
  *
  * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"

@@ -25,6 +25,23 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 | ------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value like "v5". |
 
+### `@armCustomResource` {#@Azure.ResourceManager.armCustomResource}
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.armCustomResource
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+None
+
 ### `@armLibraryNamespace` {#@Azure.ResourceManager.armLibraryNamespace}
 
 `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
