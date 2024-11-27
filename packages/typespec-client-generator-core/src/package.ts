@@ -134,9 +134,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [
-  SdkPagingServiceMethod<TServiceOperation> | SdkServiceMethod<TServiceOperation>,
-  readonly Diagnostic[],
-] {
+    SdkPagingServiceMethod<TServiceOperation> | SdkServiceMethod<TServiceOperation>,
+    readonly Diagnostic[],
+  ] {
   const diagnostics = createDiagnosticCollector();
 
   const basic = diagnostics.pipe(
@@ -168,12 +168,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     );
     const nextLinkPath = pagingOperation.output.nextLink
       ? getPropertyPathFromModel(
-          context,
-          basic.response.type?.__raw,
-          (p) => p === pagingOperation.output.nextLink!.property,
-        )
+        context,
+        basic.response.type?.__raw,
+        (p) => p === pagingOperation.output.nextLink!.property,
+      )
       : undefined;
 
+    context.__pagedResultSet.add(basic.response.type);
     // tcgc will let all paging method return a list of items
     basic.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagingOperation?.output.pageItems.property.type),
@@ -188,18 +189,33 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
   // azure core paging
   const pagedMetadata = getPagedResult(context.program, operation)!;
-  if (pagedMetadata.itemsProperty) {
-    // tcgc will let all paging method return a list of items
-    basic.response.type = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
-    );
 
-    basic.response.resultPath = getPropertyPathFromSegment(
-      context,
-      pagedMetadata.modelType,
-      pagedMetadata.itemsSegments,
+  if (basic.response.type?.__raw?.kind !== "Model" || !pagedMetadata.itemsProperty) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "unexpected-pageable-operation-return-type",
+        target: operation,
+        format: {
+          operationName: operation.name,
+        },
+      }),
     );
+    // return as basic method
+    return diagnostics.wrap(basic);
   }
+
+  context.__pagedResultSet.add(basic.response.type);
+
+  // tcgc will let all paging method return a list of items
+  basic.response.type = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
+  );
+
+  basic.response.resultPath = getPropertyPathFromSegment(
+    context,
+    pagedMetadata.modelType,
+    pagedMetadata.itemsSegments,
+  );
 
   return diagnostics.wrap({
     ...basic,
@@ -212,12 +228,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     ),
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
-          getSdkServiceOperation<TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            basic.parameters,
-          ),
-        )
+        getSdkServiceOperation<TServiceOperation>(
+          context,
+          pagedMetadata.nextLinkOperation,
+          basic.parameters,
+        ),
+      )
       : undefined,
   });
 }
@@ -321,14 +337,14 @@ function getServiceMethodLroMetadata(
     finalResponse:
       rawMetadata.finalEnvelopeResult !== undefined && rawMetadata.finalEnvelopeResult !== "void"
         ? {
-            envelopeResult: diagnostics.pipe(
-              getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-            ) as SdkModelType,
-            result: diagnostics.pipe(
-              getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
-            ) as SdkModelType,
-            resultPath: rawMetadata.finalResultPath,
-          }
+          envelopeResult: diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
+          ) as SdkModelType,
+          result: diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
+          ) as SdkModelType,
+          resultPath: rawMetadata.finalResultPath,
+        }
         : undefined,
     finalStep:
       rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,

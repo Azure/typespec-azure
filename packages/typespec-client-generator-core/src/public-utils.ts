@@ -15,7 +15,6 @@ import {
   getFriendlyName,
   getNamespaceFullName,
   getProjectedName,
-  getVisibility,
   ignoreDiagnostics,
   listServices,
   resolveEncodedName,
@@ -114,11 +113,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return type;
   }
 
-  const effective = getEffectiveModelType(
-    program,
-    type,
-    (t) => !isMetadata(context.program, t) && !getVisibility(context.program, t)?.includes("none"),
-  );
+  const effective = getEffectiveModelType(program, type, (t) => !isMetadata(context.program, t));
   if (effective.name) {
     return effective;
   }
@@ -696,9 +691,5 @@ export function isAzureCoreModel(t: SdkType): boolean {
  * @returns
  */
 export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
-  return (
-    t.__raw !== undefined &&
-    t.__raw.kind === "Model" &&
-    getPagedResult(context.program, t.__raw) !== undefined
-  );
+  return context.__pagedResultSet.has(t);
 }
