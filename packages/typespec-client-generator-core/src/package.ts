@@ -133,10 +133,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-): [
-  SdkPagingServiceMethod<TServiceOperation>,
-  readonly Diagnostic[],
-] {
+): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
   const basic = diagnostics.pipe(
