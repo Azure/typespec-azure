@@ -17,14 +17,12 @@
 
 - [#1854](https://github.com/Azure/typespec-azure/pull/1854) deprecate `Error` usage and add `Exception` usage. for all models used in exception response, they will no longer have `Output` usage, but have `Exception` usage.
 
-
 ## 0.48.1
 
 ### Bug Fixes
 
 - [#1813](https://github.com/Azure/typespec-azure/pull/1813) fix wrong encode for body response of binary type
 - [#1786](https://github.com/Azure/typespec-azure/pull/1786) support client namespace
-
 
 ## 0.48.0
 
@@ -35,7 +33,6 @@
 ### Bump dependencies
 
 - [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
-
 
 ## 0.47.4
 
@@ -48,7 +45,6 @@
 - [#1772](https://github.com/Azure/typespec-azure/pull/1772) use array instead of set to make the types ordered by typespec definition
 - [#1762](https://github.com/Azure/typespec-azure/pull/1762) make union/nullable type to be reference type and add usage/access support for them
 
-
 ## 0.47.3
 
 ### Bug Fixes
@@ -56,20 +52,17 @@
 - [#1731](https://github.com/Azure/typespec-azure/pull/1731) fix wrong compare target for response body with anonymous model when finding anonymous model context
 - [#1698](https://github.com/Azure/typespec-azure/pull/1698) have paging respect renames
 
-
 ## 0.47.2
 
 ### Bug Fixes
 
 - [#1606](https://github.com/Azure/typespec-azure/pull/1606) overwrite original value when set multiple value for same decorator
 
-
 ## 0.47.1
 
 ### Bug Fixes
 
 - [#1659](https://github.com/Azure/typespec-azure/pull/1659) remove projection for source model since typespec core has already fixed the issue
-
 
 ## 0.47.0
 
@@ -97,16 +90,14 @@
 
 - [#1560](https://github.com/Azure/typespec-azure/pull/1560) Remove `.description` and `.details` from deprecated api surface
 
-
 ## 0.46.2
 
 ### Bug Fixes
 
 - [#1592](https://github.com/Azure/typespec-azure/pull/1592) change example mapping logic to allow operation id with/without renaming
 - [#1589](https://github.com/Azure/typespec-azure/pull/1589) In `0.46.1` we changed the type of `responses` in `SdkHttpOperation` from `Map<number | HttpRange, SdkHttpResponse>` to `SdkHttpResponse[]`, `exceptions` in `SdkHttpOperation` from `Map<number | HttpRange | "*", SdkHttpResponse>` to `SdkHttpResponse[]`,
-and added a `statusCodes` property to `SdkHttpResponse`. But the `statusCodes` is defined as `number | HttpRange | "*"`, which loses the information that the responses in `responses` property could never have a `*` as its statusCodes.
-This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number | HttpRange | "*"`, and changes the type of `statusCodes` in `SdkHttpResponse` to `number | HttpRange` to be precise.
-
+  and added a `statusCodes` property to `SdkHttpResponse`. But the `statusCodes` is defined as `number | HttpRange | "*"`, which loses the information that the responses in `responses` property could never have a `*` as its statusCodes.
+  This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number | HttpRange | "*"`, and changes the type of `statusCodes` in `SdkHttpResponse` to `number | HttpRange` to be precise.
 
 ## 0.46.1
 
@@ -123,8 +114,8 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
   1. The type of `responses` and `exceptions` in `SdkHttpOperation` changed from `Map<number | HttpStatusCodeRange | "*", SdkHttpResponse>` to `SdkHttpResponse[]`.
   2. The type of `responses` in `SdkHttpOperationExample` changed from `Map<number, SdkHttpResponseExampleValue>` to `SdkHttpResponseExampleValue[]`.
   3. `SdkHttpResponse` adds a new property `statusCodes` to store its corresponding status code or status code range.
-  Migration hints:
-  The type changed from map to array, and the key of the map is moved as a new property of the value type. For example, for code like this:
+     Migration hints:
+     The type changed from map to array, and the key of the map is moved as a new property of the value type. For example, for code like this:
   ```
   for (const [statusCodes, response] of operation.responses)
   ```
@@ -145,7 +136,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
   1. change `encode` in `SdkBuiltInType` to optional.
   2. no longer use the value of `kind` as `encode` when there is no encode on this type.
 - [#1541](https://github.com/Azure/typespec-azure/pull/1541) no longer export the `SdkExampleValueBase` interface. This type should have no usage in downstream consumer's code. If there is any usage, please replace it with `SdkExampleValue`.
-
 
 ## 0.46.0
 
@@ -184,13 +174,11 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#1451](https://github.com/Azure/typespec-azure/pull/1451) Have no client parameters appear on method signatures
 - [#1420](https://github.com/Azure/typespec-azure/pull/1420) clean up deprecation exports of previous version
 
-
 ## 0.45.4
 
 ### Bug Fixes
 
 - [#1392](https://github.com/Azure/typespec-azure/pull/1392) Fix multipart for client customization
-
 
 ## 0.45.3
 
@@ -204,7 +192,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 
 - [#1363](https://github.com/Azure/typespec-azure/pull/1363) URI template support
 
-
 ## 0.45.2
 
 ### Bug Fixes
@@ -213,13 +200,11 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#1350](https://github.com/Azure/typespec-azure/pull/1350) Bug fix for encode as string on ModelProperty.
 - [#1343](https://github.com/Azure/typespec-azure/pull/1343) Add generic parameter inputs to `SdkUnionType` to clearly define the union types of `endpoint` and `credential` params
 
-
 ## 0.45.1
 
 ### Bug Fixes
 
 - [#1330](https://github.com/Azure/typespec-azure/pull/1330) Fix collectionFormat for "csv"
-
 
 ## 0.45.0
 
@@ -240,14 +225,12 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#1155](https://github.com/Azure/typespec-azure/pull/1155) Make literal endpoints overridable
 - [#1148](https://github.com/Azure/typespec-azure/pull/1148) add `@override` decorator that allows authors to explicitly describe their desired client method
 
-
 ## 0.44.3
 
 ### Bug Fixes
 
 - [#1244](https://github.com/Azure/typespec-azure/pull/1244) The baseType will be undefined if the `SdkBuiltInType`, `SdkDateTimeType`, `SdkDurationType` is a std type
 - [#1251](https://github.com/Azure/typespec-azure/pull/1251) Change output for `HttpPart<T>[]`
-
 
 ## 0.44.2
 
@@ -269,7 +252,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 
 - [#1015](https://github.com/Azure/typespec-azure/pull/1015) Refactor tcgc build-in types, please refer pr's description for details and migration guides
 
-
 ## 0.44.1
 
 ### Bug Fixes
@@ -280,7 +262,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 ### Features
 
 - [#1119](https://github.com/Azure/typespec-azure/pull/1119) Report diagnostics on `@clientName` conflicts
-
 
 ## 0.44.0
 
@@ -304,7 +285,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 
 - [#1078](https://github.com/Azure/typespec-azure/pull/1078) remove `experimental_` prefix from `sdkPackage`. Now it's just called `sdkPackage`.
 
-
 ## 0.43.2
 
 ### Bug Fixes
@@ -326,7 +306,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 
 - [#886](https://github.com/Azure/typespec-azure/pull/886) always spread models and aliases with `...`
 
-
 ## 0.43.1
 
 ### Bug Fixes
@@ -343,7 +322,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#1064](https://github.com/Azure/typespec-azure/pull/1064) remove deprecated `.nameInClient` property from `SdkModelPropertyType`s
 - [#1050](https://github.com/Azure/typespec-azure/pull/1050) Fix SdkContext.arm
 - [#1066](https://github.com/Azure/typespec-azure/pull/1066) Add linter for empty `@clientName` values
-
 
 ## 0.43.0
 
@@ -367,7 +345,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#925](https://github.com/Azure/typespec-azure/pull/925) change default of `.access` on a model or enum to `"public"` instead of `undefined`
 - [#870](https://github.com/Azure/typespec-azure/pull/870) return nullable types as a new type called `SdkNullableType`
 
-
 ## 0.42.3
 
 ### Bug Fixes
@@ -376,13 +353,11 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#826](https://github.com/Azure/typespec-azure/pull/826) change from using logical result to final result
 - [#826](https://github.com/Azure/typespec-azure/pull/826) add union support for templated model naming
 
-
 ## 0.42.2
 
 ### Bug Fixes
 
 - [#818](https://github.com/Azure/typespec-azure/pull/818) Fix: Crash due to using api from next version of the compiler
-
 
 ## 0.42.1
 
@@ -395,13 +370,11 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#801](https://github.com/Azure/typespec-azure/pull/801) `getDefaultApiVersion` and service version enum hornor api version config
 - [#432](https://github.com/Azure/typespec-azure/pull/432) Add support for values
 
-
 ## 0.42.0
 
 ### Bug Fixes
 
 - [#788](https://github.com/Azure/typespec-azure/pull/788) fix wrong default version for interface from extends
-
 
 ## 0.41.9
 
@@ -411,13 +384,11 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#778](https://github.com/Azure/typespec-azure/pull/778) tie api version information to clients so we can have diff api version information per client
 - [#780](https://github.com/Azure/typespec-azure/pull/780) fix duplicated content type parameter for rpc lro
 
-
 ## 0.41.8
 
 ### Bug Fixes
 
 - [#753](https://github.com/Azure/typespec-azure/pull/753) fix usage propagation from sub types
-
 
 ## 0.41.7
 
@@ -425,13 +396,11 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 
 - [#748](https://github.com/Azure/typespec-azure/pull/748) add crossLanguageDefinitionId onto method types
 
-
 ## 0.41.6
 
 ### Bug Fixes
 
 - [#741](https://github.com/Azure/typespec-azure/pull/741) use correct default api version when projecting to a specific version
-
 
 ## 0.41.5
 
@@ -441,7 +410,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#731](https://github.com/Azure/typespec-azure/pull/731) fix `@clientName` lost after adding versioning support
 - [#726](https://github.com/Azure/typespec-azure/pull/726) fix additional property union naming problem
 
-
 ## 0.41.4
 
 ### Bug Fixes
@@ -450,7 +418,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#559](https://github.com/Azure/typespec-azure/pull/559) take lroMetadata.finalResult into consideration
 - [#700](https://github.com/Azure/typespec-azure/pull/700) support get common models for specific api version, default to latest api version which may include breaking changes
 - [#713](https://github.com/Azure/typespec-azure/pull/713) enhance versioning and add tests
-
 
 ## 0.41.3
 
@@ -463,7 +430,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 ### Bump dependencies
 
 - [#663](https://github.com/Azure/typespec-azure/pull/663) Upgrade dependencies
-
 
 ## 0.41.2
 
@@ -479,13 +445,11 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#655](https://github.com/Azure/typespec-azure/pull/655) fix wire type nullable info
 - [#630](https://github.com/Azure/typespec-azure/pull/630) use diagnostic system to raise errors and warnings
 
-
 ## 0.41.1
 
 ### Bug Fixes
 
 - [#597](https://github.com/Azure/typespec-azure/pull/597) fix api version and pageable result path issue
-
 
 ## 0.41.0
 
@@ -542,7 +506,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 - [#536](https://github.com/Azure/typespec-azure/pull/536) git status
 - [#515](https://github.com/Azure/typespec-azure/pull/515) change responses from a record to a mapping of status code, range, or default
 
-
 ## 0.40.0
 
 ### Bug Fixes
@@ -574,7 +537,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 
 - [#295](https://github.com/Azure/typespec-azure/pull/295) Split datetime type into utcDateTime and offsetDateTime to remain in sync with tsp
 
-
 ## 0.39.2
 
 ### Patch Changes
@@ -593,7 +555,6 @@ This PR adds a new type `SdkHttpErrorResponse` with the `statusCodes` of `number
 ### Patch Changes
 
 - 1f1864a: fix incorrect linter error for models not directly used in multipart operations
-
 
 ## 0.38.0
 
