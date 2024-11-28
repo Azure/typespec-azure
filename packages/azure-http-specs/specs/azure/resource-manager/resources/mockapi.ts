@@ -139,9 +139,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     method: "get",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -156,8 +156,8 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     method: "get",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -172,7 +172,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     method: "get",
     request: {
       params: {
-        "extensionName": "extension",
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -187,8 +187,8 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     method: "get",
     request: {
       params: {
-        "extensionName": "extension",
-        "topLevelResourceName": "top",
+        extensionName: "extension",
+        topLevelResourceName: "top",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -206,9 +206,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     method: "put",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -228,8 +228,8 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     method: "put",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -249,7 +249,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     method: "put",
     request: {
       params: {
-        "extensionName": "extension",
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -269,10 +269,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     method: "put",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "topLevelResourceName": "top",
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -295,9 +295,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     method: "patch",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -326,8 +326,8 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     method: "patch",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -356,7 +356,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     method: "patch",
     request: {
       params: {
-        "extensionName": "extension",
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -385,10 +385,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     method: "patch",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "topLevelResourceName": "top",
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
       body: {
@@ -420,9 +420,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     method: "delete",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -436,8 +436,8 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     method: "delete",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -451,7 +451,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     method: "delete",
     request: {
       params: {
-        "extensionName": "extension",
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -465,10 +465,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     method: "delete",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "topLevelResourceName": "top",
-        "extensionName": "extension",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
+        extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
     },
@@ -485,8 +485,8 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByParent = pas
     method: "get",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
         "api-version": "2023-12-01-preview",
       },
     },
@@ -503,7 +503,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByParent = pas
     method: "get",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         "api-version": "2023-12-01-preview",
       },
     },
@@ -536,9 +536,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByParent = pas
     method: "get",
     request: {
       params: {
-        "subscriptionId": SUBSCRIPTION_ID_EXPECTED,
-        "resourceGroup": RESOURCE_GROUP_EXPECTED,
-        "topLevelResourceName": "top",
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
         "api-version": "2023-12-01-preview",
       },
     },
