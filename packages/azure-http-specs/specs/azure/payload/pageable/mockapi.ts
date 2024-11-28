@@ -48,7 +48,7 @@ Scenarios.Azure_Payload_Pageable_list = withServiceKeys(["firstPage", "secondPag
       status: 200,
       body: json({
         value: [{ name: "user5" }, { name: "user6" }, { name: "user7" }],
-        nextLink: `/azure//payload/pageable?skipToken=name-user7&maxpagesize=3`,
+        nextLink: `/azure/payload/pageable?skipToken=name-user7&maxpagesize=3`,
       }),
     },
     handler: pageableHandler,
