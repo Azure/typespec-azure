@@ -187,6 +187,8 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     method: "get",
     request: {
       params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
         extensionName: "extension",
         topLevelResourceName: "top",
         "api-version": "2023-12-01-preview",
