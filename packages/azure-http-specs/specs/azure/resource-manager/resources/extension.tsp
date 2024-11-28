@@ -62,7 +62,7 @@ interface ExtensionsResources {
     Resource GET operation for subscription level extension resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected response body:
     ```json
     {
@@ -112,7 +112,7 @@ interface ExtensionsResources {
     Resource GET operation for resource level extension resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected response body:
     ```json
     {
@@ -383,7 +383,7 @@ interface ExtensionsResources {
     Resource Patch operation for resource level extension resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected request body:
     ```json
     {
@@ -445,7 +445,7 @@ interface ExtensionsResources {
     Resource LIST by tenant level url operation.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionResources
     Expected query parameter: api-version=2023-12-01-preview
-
+    
     Expected response body:
     ```json
     {
