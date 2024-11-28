@@ -71,9 +71,9 @@ const validResourceGroupExtensionsResource = {
   systemData: {
     createdBy: "AzureSDK",
     createdByType: "User",
-    createdAt: new Date(),
+    createdAt: "2024-10-04T00:56:07.442Z",
     lastModifiedBy: "AzureSDK",
-    lastModifiedAt: new Date(),
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
     lastModifiedByType: "User",
   },
 };
@@ -89,9 +89,9 @@ const validSubscriptionExtensionsResource = {
   systemData: {
     createdBy: "AzureSDK",
     createdByType: "User",
-    createdAt: new Date(),
+    createdAt: "2024-10-04T00:56:07.442Z",
     lastModifiedBy: "AzureSDK",
-    lastModifiedAt: new Date(),
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
     lastModifiedByType: "User",
   },
 };
@@ -107,9 +107,9 @@ const validTenantExtensionsResource = {
   systemData: {
     createdBy: "AzureSDK",
     createdByType: "User",
-    createdAt: new Date(),
+    createdAt: "2024-10-04T00:56:07.442Z",
     lastModifiedBy: "AzureSDK",
-    lastModifiedAt: new Date(),
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
     lastModifiedByType: "User",
   },
 };
@@ -125,9 +125,9 @@ const validResourceExtensionsResource = {
   systemData: {
     createdBy: "AzureSDK",
     createdByType: "User",
-    createdAt: new Date(),
+    createdAt: "2024-10-04T00:56:07.442Z",
     lastModifiedBy: "AzureSDK",
-    lastModifiedAt: new Date(),
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
     lastModifiedByType: "User",
   },
 };
