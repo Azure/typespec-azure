@@ -1,3 +1,4 @@
+import { getPagedResult } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,

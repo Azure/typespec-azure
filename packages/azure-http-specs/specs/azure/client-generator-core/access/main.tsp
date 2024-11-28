@@ -179,7 +179,7 @@ namespace RelativeModelInOperation {
     Expected response body:
     ```json
     {
-      "name": "real",
+      "name": "Madge",
       "kind": "real"
     }
     ```

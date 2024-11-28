@@ -1036,6 +1036,7 @@ export function isReadOnly(property: SdkBodyModelPropertyType) {
 }
 
 function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility[] | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   const visibility = getVisibility(context.program, type);
   if (visibility) {
     const result: Visibility[] = [];

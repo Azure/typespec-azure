@@ -20,6 +20,6 @@ For example:
 
 ```tsp
 #suppress "@azure-tools/typespec-providerhub/no-identifier-property-in-array-item" "Error items have no unique identifier."
-@doc("An array of details about specific errors that led to this reported error.")
+/** An array of details about specific errors that led to this reported error. */
 details: Error[];
 ```

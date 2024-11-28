@@ -23,7 +23,7 @@ namespace Azure.Service;
 @useAuth(AADToken)
 namespace Contoso.WidgetManager;
 
-@doc("The Azure Active Directory OAuth2 Flow")
+/** The Azure Active Directory OAuth2 Flow */
 model AADToken
   is OAuth2Auth<[
     {
@@ -41,6 +41,6 @@ model AADToken
 @useAuth(AzureKey)
 namespace Contoso.WidgetManager;
 
-@doc("The secret key for your Azure Cognitive Services subscription.")
+/** The secret key for your Azure Cognitive Services subscription. */
 model AzureKey is ApiKeyAuth<ApiKeyLocation.header, "Ocp-Apim-Subscription-Key">;
 ```
