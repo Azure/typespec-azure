@@ -877,7 +877,7 @@ it("recognizes resource with customResource identifier", async () => {
     namespace Microsoft.Person.Contoso {
       /** Person parent */
       #suppress "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage" "For test"
-      @armCustomResource
+      @customAzureResource
       model Person {
         /** The parent name */
         name: string;

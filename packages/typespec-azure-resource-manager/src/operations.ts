@@ -32,8 +32,8 @@ import { isArmLibraryNamespace } from "./namespace.js";
 import {
   getArmResourceInfo,
   getResourceBaseType,
-  isArmCustomResource,
   isArmVirtualResource,
+  isCustomAzureResource,
   ResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -238,7 +238,7 @@ export function armRenameListByOperationInternal(
   if (
     parentType &&
     !isArmVirtualResource(program, parentType) &&
-    !isArmCustomResource(program, parentType)
+    !isCustomAzureResource(program, parentType)
   ) {
     const parentResourceInfo = getArmResourceInfo(program, parentType);
     if (
@@ -282,7 +282,7 @@ export function armRenameListByOperationInternal(
 
 function getArmParentName(program: Program, resource: Model): string[] {
   const parent = getParentResource(program, resource);
-  if (parent && (isArmVirtualResource(program, parent) || isArmCustomResource(program, parent))) {
+  if (parent && (isArmVirtualResource(program, parent) || isCustomAzureResource(program, parent))) {
     const parentName = getFriendlyName(program, parent) ?? parent.name;
     if (parentName === undefined || parentName.length < 2) {
       return ["", ""];

@@ -255,7 +255,7 @@ export type ArmVirtualResourceDecorator = (context: DecoratorContext, target: Mo
  *
  * @param propertiesType : Type of the resource properties.
  */
-export type ArmCustomResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type CustomAzureResourceDecorator = (context: DecoratorContext, target: Model) => void;
 
 /**
  * This decorator sets the base type of the given resource.
@@ -288,7 +288,7 @@ export type AzureResourceManagerDecorators = {
   armResourceList: ArmResourceListDecorator;
   armResourceOperations: ArmResourceOperationsDecorator;
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
-  armCustomResource: ArmCustomResourceDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
+  customAzureResource: CustomAzureResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
 };

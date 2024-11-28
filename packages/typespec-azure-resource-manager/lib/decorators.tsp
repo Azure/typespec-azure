@@ -188,7 +188,7 @@ extern dec armVirtualResource(target: Model);
  *
  * @param propertiesType : Type of the resource properties.
  */
-extern dec armCustomResource(target: Model);
+extern dec customAzureResource(target: Model);
 
 /**
  * This decorator sets the base type of the given resource.

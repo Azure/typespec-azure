@@ -65,7 +65,6 @@ Available ruleSets:
 ### Azure.ResourceManager
 
 - [`@armCommonTypesVersion`](#@armcommontypesversion)
-- [`@armCustomResource`](#@armcustomresource)
 - [`@armLibraryNamespace`](#@armlibrarynamespace)
 - [`@armProviderNamespace`](#@armprovidernamespace)
 - [`@armProviderNameValue`](#@armprovidernamevalue)
@@ -78,6 +77,7 @@ Available ruleSets:
 - [`@armResourceRead`](#@armresourceread)
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
+- [`@customAzureResource`](#@customazureresource)
 - [`@extensionResource`](#@extensionresource)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
@@ -105,23 +105,6 @@ the version of the Azure Resource Manager common-types to use for refs in emitte
 | Name    | Type                           | Description                                                                                                                  |
 | ------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | version | `valueof string \| EnumMember` | The Azure.ResourceManager.CommonTypes.Versions for the desired common-types version or an equivalent string value like "v5". |
-
-#### `@armCustomResource`
-
-This decorator is used on resources that do not satisfy the definition of a resource
-but need to be identified as such.
-
-```typespec
-@Azure.ResourceManager.armCustomResource
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-None
 
 #### `@armLibraryNamespace`
 
@@ -338,6 +321,23 @@ Azure.ResourceManager common types.
 
 ```typespec
 @Azure.ResourceManager.armVirtualResource
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+None
+
+#### `@customAzureResource`
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.customAzureResource
 ```
 
 ##### Target

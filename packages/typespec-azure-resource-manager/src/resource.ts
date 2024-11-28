@@ -17,10 +17,10 @@ import {
 import { isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 import {
-  ArmCustomResourceDecorator,
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
+  CustomAzureResourceDecorator,
   ExtensionResourceDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
@@ -94,7 +94,7 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
   }
 };
 
-export const $armCustomResource: ArmCustomResourceDecorator = (
+export const $customAzureResource: CustomAzureResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
 ) => {
@@ -104,7 +104,7 @@ export const $armCustomResource: ArmCustomResourceDecorator = (
   if (!isLegacyTypeSpec(program, entity)) {
     reportDiagnostic(program, { code: "arm-custom-resource-usage-discourage", target: entity });
   }
-  program.stateMap(ArmStateKeys.armCustomResource).set(entity, "Custom");
+  program.stateMap(ArmStateKeys.customAzureResource).set(entity, "Custom");
   return;
 };
 
@@ -136,9 +136,9 @@ export function isArmVirtualResource(program: Program, target: Model): boolean {
  * @param target The model to check.
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
-export function isArmCustomResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.armCustomResource).has(target)) return true;
-  if (target.baseModel) return isArmCustomResource(program, target.baseModel);
+export function isCustomAzureResource(program: Program, target: Model): boolean {
+  if (program.stateMap(ArmStateKeys.customAzureResource).has(target)) return true;
+  if (target.baseModel) return isCustomAzureResource(program, target.baseModel);
   return false;
 }
 

@@ -12,10 +12,10 @@ import {
   $armResourceUpdate,
 } from "./operations.js";
 import {
-  $armCustomResource,
   $armProviderNameValue,
   $armResourceOperations,
   $armVirtualResource,
+  $customAzureResource,
   $extensionResource,
   $locationResource,
   $resourceBaseType,
@@ -49,7 +49,7 @@ export const $decorators = {
     armResourceList: $armResourceList,
     armResourceOperations: $armResourceOperations,
     armCommonTypesVersion: $armCommonTypesVersion,
-    armCustomResource: $armCustomResource,
+    customAzureResource: $customAzureResource,
     armVirtualResource: $armVirtualResource,
     resourceBaseType: $resourceBaseType,
   } satisfies AzureResourceManagerDecorators,
