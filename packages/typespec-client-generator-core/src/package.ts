@@ -134,7 +134,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [
-  SdkPagingServiceMethod<TServiceOperation> | SdkServiceMethod<TServiceOperation>,
+  SdkPagingServiceMethod<TServiceOperation>,
   readonly Diagnostic[],
 ] {
   const diagnostics = createDiagnosticCollector();
@@ -157,8 +157,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           },
         }),
       );
-      // return as basic method
-      return diagnostics.wrap(basic);
+      // return as page method with no paging info
+      return diagnostics.wrap({
+        ...basic,
+        kind: "paging",
+      });
     }
 
     basic.response.resultPath = getPropertyPathFromModel(
@@ -200,8 +203,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         },
       }),
     );
-    // return as basic method
-    return diagnostics.wrap(basic);
+    // return as page method with no paging info
+    return diagnostics.wrap({
+      ...basic,
+      kind: "paging",
+    });
   }
 
   context.__pagedResultSet.add(basic.response.type);
