@@ -1,6 +1,8 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { Model, ModelProperty } from "@typespec/compiler";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { getPropertyPathFromModel } from "../../src/package.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
 
@@ -122,5 +124,32 @@ describe("typespec-client-generator-core: paged operation", () => {
     const response = method.response;
     strictEqual(response.kind, "method");
     strictEqual(response.resultPath, "results.values");
+  });
+
+  it("getPropertyPathFromModel test for nested case", async () => {
+    const { Test, a, d } = (await runner.compileWithBuiltInService(`
+      op test(): Test;
+      @test
+      model Test {
+        a: {
+          b: {
+            @test
+            a: string;
+          };
+        };
+        b: {
+          @test
+          d: string;
+        };
+      }
+    `)) as { Test: Model; a: ModelProperty; d: ModelProperty };
+    strictEqual(
+      getPropertyPathFromModel(runner.context, Test, (x: any) => x === a),
+      "a.b.a",
+    );
+    strictEqual(
+      getPropertyPathFromModel(runner.context, Test, (x: any) => x === d),
+      "b.d",
+    );
   });
 });

@@ -241,33 +241,33 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   });
 }
 
-function getPropertyPathFromModel(
+export function getPropertyPathFromModel(
   context: TCGCContext,
   model: Model,
-  judge: (property: ModelProperty) => boolean,
+  predicate: (property: ModelProperty) => boolean,
 ): string | undefined {
-  const queue: { prop: ModelProperty; path: ModelProperty[] }[] = [];
+  const queue: { model: Model; path: ModelProperty[] }[] = [];
 
   for (const prop of model.properties.values()) {
-    if (judge(prop)) {
+    if (predicate(prop)) {
       return getLibraryName(context, prop);
     }
     if (prop.type.kind === "Model") {
-      queue.push({ prop, path: [prop] });
+      queue.push({ model: prop.type, path: [prop] });
     }
   }
 
   while (queue.length > 0) {
-    const { prop: current, path } = queue.shift()!;
-    for (const prop of (current.type as Model).properties.values()) {
-      if (judge(prop)) {
+    const { model, path } = queue.shift()!;
+    for (const prop of model.properties.values()) {
+      if (predicate(prop)) {
         return path
           .concat(prop)
           .map((s) => getLibraryName(context, s))
           .join(".");
       }
       if (prop.type.kind === "Model") {
-        queue.push({ prop, path: path.concat(prop) });
+        queue.push({ model: prop.type, path: path.concat(prop) });
       }
     }
   }
