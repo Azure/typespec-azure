@@ -17,7 +17,7 @@ function pageableHandler(req: MockRequest) {
       status: 200,
       body: json({
         value: [{ name: "user5" }, { name: "user6" }, { name: "user7" }],
-        nextLink: `${req.baseUrl}/payload/pageable?skipToken=name-user7&maxpagesize=3`,
+        nextLink: `${req.baseUrl}/azure/payload/pageable?skipToken=name-user7&maxpagesize=3`,
       }),
     } as const;
   } else if (skipToken === "name-user7") {
@@ -35,9 +35,9 @@ function pageableHandler(req: MockRequest) {
   }
 }
 
-Scenarios.Payload_Pageable_list = withServiceKeys(["firstPage", "secondPage"]).pass([
+Scenarios.Azure_Payload_Pageable_list = withServiceKeys(["firstPage", "secondPage"]).pass([
   {
-    uri: "/payload/pageable",
+    uri: "/azure/payload/pageable",
     method: "get",
     request: {
       params: {
@@ -48,14 +48,14 @@ Scenarios.Payload_Pageable_list = withServiceKeys(["firstPage", "secondPage"]).p
       status: 200,
       body: json({
         value: [{ name: "user5" }, { name: "user6" }, { name: "user7" }],
-        nextLink: `/payload/pageable?skipToken=name-user7&maxpagesize=3`,
+        nextLink: `/azure//payload/pageable?skipToken=name-user7&maxpagesize=3`,
       }),
     },
     handler: pageableHandler,
     kind: "MockApiDefinition",
   },
   {
-    uri: "/payload/pageable",
+    uri: "/azure/payload/pageable",
     method: "get",
     request: {
       params: {
