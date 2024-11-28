@@ -42,6 +42,7 @@ import {
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
+  getTypeDecorators,
   isAzureCoreTspModel,
   isHttpBodySpread,
   parseEmitterName,
@@ -211,7 +212,14 @@ export function getLibraryName(
  * @returns
  */
 export function getWireName(context: TCGCContext, type: Type & { name: string }) {
-  // 1. Check if there's an encoded name
+  const xmlNameDecorator = ignoreDiagnostics(getTypeDecorators(context, type)).filter(
+    (x) => x.name === "TypeSpec.Xml.@name",
+  );
+  // 1. Check xml name encoding
+  if (xmlNameDecorator.length > 0) {
+    return xmlNameDecorator[0].arguments["name"];
+  }
+  // 2. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
   // 2. Check if there's deprecated language projection
