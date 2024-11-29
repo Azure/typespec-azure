@@ -756,6 +756,50 @@ Expected response body:
 }
 ```
 
+### Azure_Payload_Pageable_list
+
+- Endpoint: `get /azure/payload/pageable`
+
+List users.
+
+SDK may hide the "maxpagesize" from API signature. The functionality of "maxpagesize" could be in related language Page model.
+
+Expected query parameter:
+maxpagesize=3
+
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "name": "user5"
+    },
+    {
+      "name": "user6"
+    },
+    {
+      "name": "user7"
+    }
+  ],
+  "nextLink": "{endpoint}/azure/payload/pageable?skipToken=name-user7&maxpagesize=3"
+}
+```
+
+Expected query parameter:
+skipToken=name-user7
+maxpagesize=3
+
+```json
+{
+  "value": [
+    {
+      "name": "user8"
+    }
+  ]
+}
+```
+
 ### Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSystemAssigned
 
 - Endpoint: `put https://management.azure.com`
@@ -1646,50 +1690,6 @@ client.group1.four();
 client.group2.two();
 client.group2.five();
 client.group2.six();
-```
-
-### Payload_Pageable_list
-
-- Endpoint: `get /payload/pageable`
-
-List users.
-
-SDK may hide the "maxpagesize" from API signature. The functionality of "maxpagesize" could be in related language Page model.
-
-Expected query parameter:
-maxpagesize=3
-
-Expected response body:
-
-```json
-{
-  "value": [
-    {
-      "name": "user5"
-    },
-    {
-      "name": "user6"
-    },
-    {
-      "name": "user7"
-    }
-  ],
-  "nextLink": "{endpoint}/payload/pageable?skipToken=name-user7&maxpagesize=3"
-}
-```
-
-Expected query parameter:
-skipToken=name-user7
-maxpagesize=3
-
-```json
-{
-  "value": [
-    {
-      "name": "user8"
-    }
-  ]
-}
 ```
 
 ### Resiliency_ServiceDriven_addOperation
