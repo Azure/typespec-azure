@@ -54,6 +54,7 @@ export interface TCGCContext {
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
+  __pagedResultSet: Set<SdkType>;
 }
 
 export interface SdkContext<
@@ -595,7 +596,7 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 }
 
 interface SdkPagingServiceMethodOptions {
-  __raw_paged_metadata: PagedResultMetadata;
+  __raw_paged_metadata?: PagedResultMetadata;
   nextLinkPath?: string; // off means fake paging
   nextLinkOperation?: SdkServiceOperation;
 }
