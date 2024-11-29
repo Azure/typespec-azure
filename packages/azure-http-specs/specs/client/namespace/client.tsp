@@ -1,0 +1,31 @@
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using TypeSpec.Http;
+using Spector;
+using Azure.ClientGenerator.Core;
+using Client.ClientNamespace;
+
+@route("/client/client-namespace")
+namespace ClientNameSpaceClient;
+
+@client({
+  name: "ClientNamespaceFirstClient",
+  service: Client.ClientNamespace,
+})
+@clientNamespace("client.clientnamespace", "java")
+interface ClientNamespaceFirstClient {
+  getFirst is First.getFirst;
+}
+@@clientNamespace(FirstModel, "client.clientnamespace.first", "java");
+
+@client({
+  name: "ClientNamespaceSecondClient",
+  service: Client.ClientNamespace,
+})
+@clientNamespace("client.clientnamespace.second", "java")
+namespace ClientNamespaceSecondClient {
+  op getSecond is Second.getSecond;
+}
+@@clientNamespace(Second.Model, "client.clientnamespace.second", "java");
+@@clientNamespace(Second.Model.SecondClientEnumType, "client.clientnamespace.second.sub", "java");
