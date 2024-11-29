@@ -1381,6 +1381,23 @@ Expected response body:
 }
 ```
 
+### Client_ClientNamespace
+
+- Endpoints:
+  - `get /client/client-namespace/second`
+  - `get /client/client-namespace/first`
+
+Expected client namespace for clients:
+
+- ClientNamespaceFirstClient: Client.ClientNamespace
+- ClientNamespaceSecondClient: Client.ClientNamespace.Second
+
+Expected client namespace for models:
+
+- FirstClientResult: Client.ClientNamespace.First
+- SecondClientResult: Client.ClientNamespace.Second
+- SecondClientEnumType: Client.ClientNamespace.Second.Sub
+
 ### Client_Naming_Header_request
 
 - Endpoint: `post /client/naming/header`
