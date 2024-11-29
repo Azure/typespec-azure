@@ -720,6 +720,42 @@ Expected response body:
 }
 ```
 
+### Azure_Example_Basic
+
+- Endpoint: `post /azure/example/basic/basic`
+
+Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
+
+When generate the code, one need to set the "examples-directory" option.
+
+Expected query parameter: query-param=query&api-version=2022-12-01-preview
+Expected header parameter: header-param=header
+
+Expected input body:
+
+```json
+{
+  "stringProperty": "text",
+  "modelProperty": {
+    "int32Property": 1,
+    "float32Property": 1.5,
+    "enumProperty": "EnumValue1"
+  },
+  "arrayProperty": ["item"],
+  "recordProperty": {
+    "record": "value"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "stringProperty": "text"
+}
+```
+
 ### Azure_Payload_Pageable_list
 
 - Endpoint: `get /azure/payload/pageable`
@@ -1440,42 +1476,6 @@ Expected header parameters:
 - x-ms-client-request-id=<any uuid string>
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
-
-### Client_AzureExampleClient_basicAction
-
-- Endpoint: `post /azure/example/basic/basic`
-
-Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
-
-When generate the code, one need to set the "examples-directory" option.
-
-Expected query parameter: query-param=query&api-version=2022-12-01-preview
-Expected header parameter: header-param=header
-
-Expected input body:
-
-```json
-{
-  "stringProperty": "text",
-  "modelProperty": {
-    "int32Property": 1,
-    "float32Property": 1.5,
-    "enumProperty": "EnumValue1"
-  },
-  "arrayProperty": ["item"],
-  "recordProperty": {
-    "record": "value"
-  }
-}
-```
-
-Expected response body:
-
-```json
-{
-  "stringProperty": "text"
-}
-```
 
 ### Client_Naming_Header_request
 
