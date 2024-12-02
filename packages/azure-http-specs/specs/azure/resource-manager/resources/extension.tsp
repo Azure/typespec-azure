@@ -523,7 +523,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource LIST bextension resources by resource.
+    Resource LIST extension resources by resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionResources
     Expected query parameter: api-version=2023-12-01-preview
     
