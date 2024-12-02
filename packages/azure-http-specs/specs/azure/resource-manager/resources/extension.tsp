@@ -34,7 +34,7 @@ model ExtensionsResourceProperties {
 interface ExtensionsResources {
   @scenario
   @scenarioDoc("""
-    Resource GET operation for tenant level extension resource.
+    Resource GET extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -59,7 +59,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource GET operation for subscription level extension resource.
+    Resource GET extension resource by subscription.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -84,7 +84,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource GET operation for resource group level extension resource.
+    Resource GET extension resource by resource group.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -109,7 +109,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource GET operation for resource level extension resource.
+    Resource GET extension resource by resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -138,7 +138,7 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
-    Resource PUT operation for tenant level extension resource.
+    Resource PUT extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -172,7 +172,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource PUT operation for subscription level extension resource.
+    Resource PUT extension resource by subscription.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -206,7 +206,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource PUT operation for resource group level extension resource.
+    Resource PUT extension resource by resource group.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -240,7 +240,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource PUT operation for resource level extension resource.
+    Resource PUT extension resource by resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -278,7 +278,7 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
-    Resource Patch operation for tenant level extension resource.
+    Resource Patch extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -312,7 +312,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource Patch operation for subscription level extension resource.
+    Resource Patch extension resource by subscription.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -346,7 +346,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource Patch operation for resource group level extension resource.
+    Resource Patch extension resource by resource group.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -380,7 +380,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource Patch operation for resource level extension resource.
+    Resource Patch extension resource by resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -418,22 +418,22 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
-    Resource DELETE operation for tenant level extension resource.
+    Resource DELETE extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
     
-    Resource DELETE operation for subscription level extension resource.
+    Resource DELETE extension resource by subscription.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
     
-    Resource DELETE operation for resource get level extension resource.
+    Resource DELETE extension resource by resource group.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
     
-    Resource DELETE operation for resource level extension resource.
+    Resource DELETE extension resource by resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
     Expected response status code: 204
@@ -442,7 +442,7 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
-    Resource LIST by tenant level url operation.
+    Resource LIST extension resources by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionResources
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -469,7 +469,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource LIST by subscription level url operation.
+    Resource LIST extension resources by subscription.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/extensionResources
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -496,7 +496,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource LIST by resource group level url operation.
+    Resource LIST extension resources by resource group.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/extensionResources
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -523,7 +523,7 @@ interface ExtensionsResources {
     }
     ```
     
-    Resource LIST by resource level url operation.
+    Resource LIST bextension resources by resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionResources
     Expected query parameter: api-version=2023-12-01-preview
     
