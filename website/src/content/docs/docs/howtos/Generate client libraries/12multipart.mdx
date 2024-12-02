@@ -60,7 +60,6 @@ public virtual Response Upload(MultipartRequest body, CancellationToken cancella
 ```
 
 ```typescript
-
 // RLC models (multipart part descriptors)
 
 export interface MultipartRequestIdPartDescriptor {
@@ -75,24 +74,14 @@ export interface MultipartRequestAddressPartDescriptor {
 
 export interface MultipartRequestProfileImagePartDescriptor {
   name: "profileImage";
-  body:
-    | string
-    | Uint8Array
-    | ReadableStream<Uint8Array>
-    | NodeJS.ReadableStream
-    | File;
+  body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
   filename?: string;
   contentType?: string;
 }
 
 export interface MultipartRequestPicturesPartDescriptor {
   name: "pictures";
-  body:
-    | string
-    | Uint8Array
-    | ReadableStream<Uint8Array>
-    | NodeJS.ReadableStream
-    | File;
+  body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
   filename?: string;
   contentType?: string;
 }
@@ -120,9 +109,7 @@ export interface UploadMediaTypesParam {
   contentType: "multipart/form-data";
 }
 
-export type UploadParameters = UploadMediaTypesParam &
-  UploadBodyParam &
-  RequestParameters;
+export type UploadParameters = UploadMediaTypesParam & UploadBodyParam & RequestParameters;
 
 // RLC operations
 
