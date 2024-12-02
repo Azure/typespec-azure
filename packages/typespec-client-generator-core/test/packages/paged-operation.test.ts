@@ -69,6 +69,31 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultPath, "tests");
   });
 
+  it("nullable paged result", async () => {
+    await runner.compileWithBuiltInService(`
+      @list
+      op test(): ListTestResult | NotFoundResponse;
+      model ListTestResult {
+        @pageItems
+        tests: Test[];
+        @TypeSpec.nextLink
+        next: string;
+      }
+      model Test {
+        id: string;
+      }
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "paging");
+    strictEqual(method.nextLinkPath, "next");
+
+    const response = method.response;
+    strictEqual(response.kind, "method");
+    strictEqual(response.resultPath, "tests");
+  });
+
   it("normal paged result with encoded name", async () => {
     await runner.compileWithBuiltInService(`
       @list
