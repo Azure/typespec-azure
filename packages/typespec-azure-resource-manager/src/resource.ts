@@ -98,7 +98,6 @@ export const $customAzureResource: CustomAzureResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
 ) => {
-  //TODO: investigate which rules/constrains will make this a resource and add validation
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
   if (!isLegacyTypeSpec(program, entity)) {

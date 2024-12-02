@@ -185,8 +185,6 @@ extern dec armVirtualResource(target: Model);
 /**
  * This decorator is used on resources that do not satisfy the definition of a resource
  * but need to be identified as such.
- *
- * @param propertiesType : Type of the resource properties.
  */
 extern dec customAzureResource(target: Model);
 
