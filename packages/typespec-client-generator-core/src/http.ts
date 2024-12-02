@@ -655,7 +655,9 @@ function filterOutUselessPathParameters(
       param.__raw &&
       isPathParam(context.program, param.__raw) &&
       httpOperation.parameters.parameters.filter(
-        (p) => p.type === "path" && p.name === getWireName(context, param.__raw!),
+        (p) =>
+          p.type === "path" &&
+          p.name === (getPathParamName(context.program, param.__raw!) ?? param.name),
       ).length === 0
     ) {
       methodParameters.splice(i, 1);

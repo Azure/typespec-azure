@@ -1,15 +1,19 @@
 import "@typespec/spector";
-import "@azure-tools/typespec-azure-core";
 import "@typespec/versioning";
+import "@azure-tools/typespec-azure-core";
+import "@azure-tools/typespec-client-generator-core";
 
-using TypeSpec.Versioning;
-using Azure.Core;
 using Spector;
+using TypeSpec.Versioning;
+using global.Azure.Core;
+using global.Azure.ClientGenerator.Core;
 
 @doc("Test describing pageable.")
-@scenarioService("/payload/pageable")
+@scenarioService("/azure/payload/pageable")
 @useDependency(global.Azure.Core.Versions.v1_0_Preview_2)
-namespace Payload.Pageable;
+namespace _Specs_.Azure.Payload.Pageable;
+
+@@clientNamespace(_Specs_.Azure.Payload.Pageable, "azure.payload.pageable", "java");
 
 @doc("User model")
 model User {
@@ -41,7 +45,7 @@ model User {
         "name":"user7"
       }
     ],
-    "nextLink": "{endpoint}/payload/pageable?skipToken=name-user7&maxpagesize=3"
+    "nextLink": "{endpoint}/azure/payload/pageable?skipToken=name-user7&maxpagesize=3"
   }
   ```
   
