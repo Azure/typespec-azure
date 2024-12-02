@@ -1332,6 +1332,7 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
+      getVisibility(context.program, property)?.includes("none") || // eslint-disable-line @typescript-eslint/no-deprecated
       sdkType.kind !== "model"
     ) {
       continue;

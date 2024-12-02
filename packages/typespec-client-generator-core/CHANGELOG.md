@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.48.3
+
+### Bug Fixes
+
+- [#1907](https://github.com/Azure/typespec-azure/pull/1907) use the right path parameter name when filtering method parameter
+
+### Features
+
+- [#1919](https://github.com/Azure/typespec-azure/pull/1919) support typespec common paging
+- [#1918](https://github.com/Azure/typespec-azure/pull/1918) remove none visibility property for model
+
+
 ## 0.48.2
 
 ### Bug Fixes
