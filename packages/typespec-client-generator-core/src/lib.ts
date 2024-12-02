@@ -222,6 +222,12 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientNamespace decorator`,
       },
     },
+    "unexpected-pageable-operation-return-type": {
+      severity: "error",
+      messages: {
+        default: `Operation is pageable but does not return a correct type.`,
+      },
+    },
   },
 });
 

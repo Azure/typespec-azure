@@ -2126,6 +2126,52 @@ importers:
         specifier: ~5.6.3
         version: 5.6.3
 
+  packages/azure-spec-dashboard:
+    dependencies:
+      '@emotion/react':
+        specifier: ^11.13.3
+        version: 11.13.3(@types/react@18.3.11)(react@18.3.1)
+      '@fluentui/react-components':
+        specifier: ~9.55.0
+        version: 9.55.0(@types/react-dom@18.3.0)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
+      '@fluentui/react-icons':
+        specifier: ^2.0.260
+        version: 2.0.260(react@18.3.1)
+      '@typespec/spec-coverage-sdk':
+        specifier: workspace:~
+        version: link:../../core/packages/spec-coverage-sdk
+      react:
+        specifier: ~18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ~18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-markdown:
+        specifier: ^9.0.1
+        version: 9.0.1(@types/react@18.3.11)(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ~18.3.11
+        version: 18.3.11
+      '@types/react-dom':
+        specifier: ~18.3.0
+        version: 18.3.0
+      '@vitejs/plugin-react':
+        specifier: ~4.3.2
+        version: 4.3.2(vite@5.4.10(@types/node@22.7.5)(terser@5.34.1))
+      rimraf:
+        specifier: ~6.0.1
+        version: 6.0.1
+      rollup-plugin-visualizer:
+        specifier: ~5.12.0
+        version: 5.12.0(rollup@4.24.0)
+      typescript:
+        specifier: ~5.6.3
+        version: 5.6.3
+      vite:
+        specifier: ^5.4.8
+        version: 5.4.10(@types/node@22.7.5)(terser@5.34.1)
+
   packages/e2e-tests:
     devDependencies:
       '@typespec/compiler':
@@ -2393,21 +2439,39 @@ importers:
       '@typespec/compiler':
         specifier: workspace:~
         version: link:../../core/packages/compiler
+      '@typespec/events':
+        specifier: workspace:~
+        version: link:../../core/packages/events
       '@typespec/http':
         specifier: workspace:~
         version: link:../../core/packages/http
+      '@typespec/json-schema':
+        specifier: workspace:~
+        version: link:../../core/packages/json-schema
       '@typespec/openapi':
         specifier: workspace:~
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
         specifier: workspace:~
         version: link:../../core/packages/openapi3
+      '@typespec/protobuf':
+        specifier: workspace:~
+        version: link:../../core/packages/protobuf
       '@typespec/rest':
         specifier: workspace:~
         version: link:../../core/packages/rest
+      '@typespec/sse':
+        specifier: workspace:~
+        version: link:../../core/packages/sse
+      '@typespec/streams':
+        specifier: workspace:~
+        version: link:../../core/packages/streams
       '@typespec/versioning':
         specifier: workspace:~
         version: link:../../core/packages/versioning
+      '@typespec/xml':
+        specifier: workspace:~
+        version: link:../../core/packages/xml
       '@vitejs/plugin-react':
         specifier: ~4.3.2
         version: 4.3.2(vite@5.4.8(@types/node@22.7.5)(terser@5.34.1))
