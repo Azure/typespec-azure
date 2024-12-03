@@ -15,10 +15,10 @@ model WidgetAnalytics {
   @key("analyticsId")
   id: "current";
 
-  @doc("The number of uses of the widget.")
+  /** The number of uses of the widget. */
   useCount: int64;
 
-  @doc("The number of times the widget was repaired.")
+  /** The number of times the widget was repaired. */
   repairCount: int64;
 }
 ```

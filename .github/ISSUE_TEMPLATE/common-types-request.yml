@@ -1,0 +1,49 @@
+name: ARM common-types change request
+description: Additions or changes to the ARM common-types
+title: "[arm-common-types]: "
+labels: ["arm-common-types", "lib:azure-resource-manager"]
+
+body:
+  - type: input
+    id: contact-dev
+    attributes:
+      label: Service Team Contacts (Dev)
+
+  - type: dropdown
+    id: change-type
+    attributes:
+      label: Choose which kind of change this is
+      options:
+        - Add common-types Version
+        - Add common-type
+        - Correction to Existing Type
+        - Remove common-type
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: Describe the change, Provide the desired TypeSpec or json-schema for the change as appropriate.
+
+  - type: input
+    id: doc-link
+    attributes:
+      label: Link to documentation if available
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional notes or questions
+      description: Add any other context or questions here.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Follow our [Code of Conduct](https://github.com/azure/typespec-azure/blob/main/CODE_OF_CONDUCT.md)
+          required: true
+        - label: Change is approved by Arm API Review
+          required: true
+        - label: Please update issue title and choose the change type.
+          required: true

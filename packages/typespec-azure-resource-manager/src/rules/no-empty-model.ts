@@ -1,4 +1,4 @@
-import { createRule, Model } from "@typespec/compiler";
+import { createRule, isRecordModelType, Model } from "@typespec/compiler";
 
 export const noEmptyModel = createRule({
   name: "no-empty-model",
@@ -14,7 +14,7 @@ export const noEmptyModel = createRule({
   create(context) {
     return {
       model: (model: Model) => {
-        if (model.properties.size === 0) {
+        if (model.properties.size === 0 && !isRecordModelType(context.program, model)) {
           context.reportDiagnostic({
             code: "no-empty-model",
             target: model,

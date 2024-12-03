@@ -11,15 +11,15 @@ To create a `Widget`, we need to define a `model` and annotate it with the `@res
 After the top-level `namespace` declaration, add the following lines:
 
 ```typespec
-@doc("A widget.")
+/** A widget */
 @resource("widgets")
 model Widget {
+  /** The widget name */
   @key("widgetName")
-  @doc("The widget name.")
   @visibility("read")
   name: string;
 
-  @doc("The ID of the widget's manufacturer.")
+  /** The ID of the widget's manufacturer */
   manufacturerId: string;
 }
 ```

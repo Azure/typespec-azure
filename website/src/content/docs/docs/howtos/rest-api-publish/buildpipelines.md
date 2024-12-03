@@ -23,7 +23,7 @@ In order to build TypeSpec in your build pipeline, you will need to ensure that 
 Depending on your project, you may need to add NodeJS and install NPM packages for TypeSpec.
 The following Azure Devops Pipeline tasks can be modified and added to your pipeline yaml file if you do not already utilize NodeJS in your project.
 
-```yaml
+```yaml title=".azure-pipelines.yml"
 # Install NodeJS
 - task: NodeTool@0
   inputs:
@@ -47,7 +47,7 @@ You may also need to add additional steps to compile your typespec files separat
 
 Note: This example assumes that your TypeSpec folder is at the root of your repository.
 
-```yaml
+```yaml title=".azure-pipelines.yml"
 trigger:
   - main
 pool:

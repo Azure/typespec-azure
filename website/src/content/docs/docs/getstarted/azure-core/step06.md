@@ -19,21 +19,21 @@ alias ServiceTraits = SupportsRepeatableRequests &
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 interface Widgets {
-  @doc("Get status of a Widget operation. This operation return status in status code. No response body is returned.")
+  /** Get status of a Widget operation. This operation return status in status code. No response body is returned. */
   getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget, never>;
 
-  @doc("Fetch a Widget by name.")
+  /** Fetch a Widget by name. */
   getWidget is Operations.ResourceRead<Widget>;
 
-  @doc("Create or replace a Widget asynchronously.")
+  /** Create or replace a Widget asynchronously. */
   @pollingOperation(Widgets.getWidgetOperationStatus)
   createOrUpdateWidget is Operations.LongRunningResourceCreateOrReplace<Widget>;
 
-  @doc("Delete a Widget asynchronously.")
+  /** Delete a Widget asynchronously. */
   @pollingOperation(Widgets.getWidgetOperationStatus)
   deleteWidget is Operations.LongRunningResourceDelete<Widget>;
 
-  @doc("List Widget resources.")
+  /** List Widget resources. */
   listWidgets is Operations.ResourceList<Widget>;
 }
 ```

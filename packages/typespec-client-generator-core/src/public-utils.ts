@@ -116,7 +116,7 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
   const effective = getEffectiveModelType(
     program,
     type,
-    (t) => !isMetadata(context.program, t) && !getVisibility(context.program, t)?.includes("none"),
+    (t) => !isMetadata(context.program, t) && !getVisibility(context.program, t)?.includes("none"), // eslint-disable-line @typescript-eslint/no-deprecated
   );
   if (effective.name) {
     return effective;

@@ -19,7 +19,7 @@ alias ServiceTraits = SupportsRepeatableRequests &
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 // In the Widgets interface...
-@doc("Schedule a widget for repairs.")
+/** Schedule a widget for repairs. */
 scheduleRepairs is Operations.ResourceAction<
   Widget,
   WidgetRepairRequest,
@@ -27,7 +27,7 @@ scheduleRepairs is Operations.ResourceAction<
 >;
 
 // In the WidgetParts interface...
-@doc("Reorder all parts for the widget.")
+/** Reorder all parts for the widget. */
 reorderParts is Operations.ResourceCollectionAction<
   WidgetPart,
   WidgetPartReorderRequest,
