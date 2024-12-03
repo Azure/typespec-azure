@@ -3,6 +3,7 @@ import { getAllProperties } from "./utils.js";
 
 import {
   createDiagnosticCollector,
+  createStateSymbol,
   DecoratorContext,
   Diagnostic,
   DiagnosticCollector,
@@ -151,7 +152,7 @@ function _getItems(program: Program, entity: Model): PropertyPath | undefined {
 }
 
 function _getNextLink(program: Program, entity: Model): PropertyPath | undefined {
-  return findPathToProperty(program, entity, (prop) => getNextLink(program, prop) !== undefined);
+  return findPathToProperty(program, entity, (prop) => getNextLink(program, prop));
 }
 
 /**
@@ -270,8 +271,8 @@ export function getItems(program: Program, entity: Type): boolean | undefined {
 /**
  * Returns `true` if the property is marked with `@nextLink`.
  */
-export function getNextLink(program: Program, entity: Type): boolean | undefined {
-  return program.stateMap(AzureCoreStateKeys.nextLink).get(entity);
+export function getNextLink(program: Program, entity: ModelProperty): boolean {
+  return program.stateSet(createStateSymbol("nextLink")).has(entity);
 }
 
 /**
