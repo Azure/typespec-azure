@@ -151,7 +151,7 @@ function _getItems(program: Program, entity: Model): PropertyPath | undefined {
 }
 
 function _getNextLink(program: Program, entity: Model): PropertyPath | undefined {
-  return findPathToProperty(program, entity, (prop) => getNextLink(program, prop));
+  return findPathToProperty(program, entity, (prop) => getNextLink(program, prop) === true);
 }
 
 /**
