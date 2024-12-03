@@ -43,7 +43,20 @@ def upload(
 ```
 
 ```csharp
+//model class
+public partial class MultipartRequest
+{
+  public string Id { get; }
+  public Address Address { get; }
+  public Stream ProfileImage { get; }
+  public IList<Stream> Pictures { get; }
+}
 
+//protocol method
+public virtual async Task<Response> Upload(RequestContent content, string contentType, RequestContext context = null);
+
+//convenience method
+public virtual Response Upload(MultipartRequest body, CancellationToken cancellationToken = default)
 ```
 
 ```typescript
