@@ -2,7 +2,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-Scenarios.Client_AzureExampleClient_basicAction = passOnSuccess({
+Scenarios.Azure_Example_Basic = passOnSuccess({
   uri: "/azure/example/basic/basic",
   method: "post",
   request: {

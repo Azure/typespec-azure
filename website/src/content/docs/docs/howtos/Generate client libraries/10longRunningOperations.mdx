@@ -1,0 +1,148 @@
+---
+title: Long-Running Operations
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc details what emitters will generate for long-running operations.
+
+## Resource create or replace
+
+Long-running operation to create or replace a resource.
+
+<ClientTabs>
+
+```typespec
+alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
+  NoRepeatableRequests &
+  NoClientRequestId>;
+
+/** Details about a user. */
+@resource("users")
+model User {
+  /** The name of user. */
+  @key
+  @visibility("read")
+  name: string;
+
+  /** The role of user */
+  role: string;
+}
+
+// Operation for polling the status of the LRO. SDK may exclude this operation from client.
+@sharedRoute
+op getOperationStatus is ResourceOperations.GetResourceOperationStatus<User, never>;
+
+@pollingOperation(getOperationStatus)
+op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User>;
+```
+
+```python
+def begin_create_or_replace(
+    self, name: str, resource: Union[User, JSON, IO[bytes]], **kwargs: Any
+) -> LROPoller[User]
+```
+
+```csharp
+
+```
+
+```typescript
+
+```
+
+```java
+public SyncPoller<PollOperationDetails, User> beginCreateOrReplace(String name, User resource);
+```
+
+</ClientTabs>
+
+## Resource delete
+
+Long-running operation to delete a resource.
+
+<ClientTabs>
+
+```typespec
+@pollingOperation(getOperationStatus)
+op delete is ResourceOperations.LongRunningResourceDelete<User>;
+```
+
+```python
+def begin_delete(self, name: str, **kwargs: Any) -> LROPoller[None]
+```
+
+```csharp
+
+```
+
+```typescript
+
+```
+
+```java
+public SyncPoller<PollOperationDetails, Void> beginDelete(String name);
+```
+
+</ClientTabs>
+
+## Resource action
+
+Long-running operation to invoke an action on a resource.
+
+<ClientTabs>
+
+```typespec
+/** Details about a user. */
+@resource("users")
+model User {
+  /** The name of user. */
+  @key
+  @visibility("read")
+  name: string;
+
+  /** The role of user */
+  role: string;
+}
+
+/** The parameters for exporting a user. */
+model UserExportParams {
+  /** The format of the data. */
+  @query
+  format: string;
+}
+
+/** The exported user data. */
+model ExportedUser {
+  /** The name of user. */
+  name: string;
+
+  /** The exported URI. */
+  resourceUri: string;
+}
+
+// Operation for polling the status of the LRO. SDK may exclude this operation from client.
+@sharedRoute
+op getExportOperationStatus is ResourceOperations.GetResourceOperationStatus<User, ExportedUser>;
+
+@pollingOperation(getExportOperationStatus)
+op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+```
+
+```python
+def begin_export(self, name: str, *, format: str, **kwargs: Any) -> LROPoller[ExportedUser]
+```
+
+```csharp
+
+```
+
+```typescript
+
+```
+
+```java
+public SyncPoller<PollOperationDetails, ExportedUser> beginExport(String name, String format);
+```
+
+</ClientTabs>

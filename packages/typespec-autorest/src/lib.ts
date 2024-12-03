@@ -335,6 +335,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part '${"part"}'.`,
       },
     },
+    "cookies-unsupported": {
+      severity: "warning",
+      messages: {
+        default: `Cookies are not supported in Swagger 2.0. Parameter was ignored.`,
+      },
+    },
     "invalid-format": {
       severity: "warning",
       messages: {
@@ -345,6 +351,13 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: paramMessage`Authentication "${"authType"}" is not a known authentication by the openapi3 emitter, it will be ignored.`,
+      },
+    },
+    "no-matching-version-found": {
+      severity: "error",
+      messages: {
+        default:
+          "The emitter did not emit any files because the specified version option does not match any versions of the service.",
       },
     },
   },

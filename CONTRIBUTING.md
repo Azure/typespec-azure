@@ -30,7 +30,7 @@ recommended to test a private of the change before merging.
    + "@azure-tools/typespec-autorest": "https://.../package.tgz"
    ```
 
-5. Also edit `eng/pipelines/templates/steps/npm-install.yml`, to force install
+5. Also edit `.github/actions/setup-node-npm-ci/action.yaml`, to force install
    your private build:
 
    ```diff
@@ -313,6 +313,7 @@ Area of the codebase
 | `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library            |
 | `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter              |
 | `eng`                        | #65bfff |                                                                |
+| `ide`                        | #846da1 | Issues for Azure specific ide features                         |
 
 #### issue_kinds
 

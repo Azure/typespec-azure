@@ -216,6 +216,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
       },
     },
+    "empty-client-namespace": {
+      severity: "warning",
+      messages: {
+        default: `Cannot pass an empty value to the @clientNamespace decorator`,
+      },
+    },
+    "unexpected-pageable-operation-return-type": {
+      severity: "error",
+      messages: {
+        default: `Operation is pageable but does not return a correct type.`,
+      },
+    },
   },
 });
 

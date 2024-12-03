@@ -1,7 +1,8 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { OpenAPI2Document } from "../src/openapi2-document.js";
-import { openApiFor } from "./test-host.js";
+import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: versioning", () => {
   it("if version enum is referenced only include current member and mark it with modelAsString: true", async () => {
@@ -268,5 +269,30 @@ describe("typespec-autorest: versioning", () => {
       },
       required: ["jsonProp1", "jsonProp2", "prop3"],
     });
+  });
+
+  it("emit diagnostics when version option is used an doesn't match the versions of the service", async () => {
+    const diagnostics = await diagnoseOpenApiFor(
+      `
+@versioned(Versions)
+@service
+namespace DemoService;
+
+enum Versions {
+  v1,
+  v2,
+}
+
+model A {}
+    `,
+      { version: "v3" },
+    );
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-autorest/no-matching-version-found",
+        message:
+          "The emitter did not emit any files because the specified version option does not match any versions of the service.",
+      },
+    ]);
   });
 });
