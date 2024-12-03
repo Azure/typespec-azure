@@ -1,5 +1,5 @@
 ---
-title: Client hierarchy
+title: Clients
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -552,6 +552,79 @@ PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
 
 foodClient.feed();
 petActionClient.pet();
+```
+
+</ClientTabs>
+
+
+### Adding Client Initialization Parameters
+
+By default, we only generate our clients with initialization parameters for `endpoint`, `credential`, and `apiVersion`, whenever any of these are applicable. There are cases where spec authors would like their clients to have additional input parameters. This is where the `@clientInitialization` decorator comes in.
+
+With `@clientInitialization`, you can pass in additional parameters you would like your client to have, by passing in an input model. All properties of the input model will be appended to the current default list of client initialization parameters. Additionally, these client parameters will no longer appear on service methods that previously had them as part of the method signature. The generated code will automatically pass in the inputted value from the client init to the service.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace Storage;
+
+op upload(blobName: string): void;
+op download(blobName: string): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace Customizations;
+
+model StorageClientOptions {
+  blobName: string;
+}
+
+@@clientInitialization(Storage, StorageMockClientOptions);
+```
+
+```python
+from storage import StorageClient
+
+client = StorageClient(blob_name="myBlobName", endpoint="<my-endpoint>", ...)
+
+client.upload()
+client.download()
+```
+
+```csharp
+// TODO: how do you pass in the options model
+using Storage;
+
+StorageClient client = new StorageClient();
+
+client.Upload();
+client.Download();
+```
+
+```typescript
+// TODO: how do you pass in the options model
+import { StorageClient } from "@azure/package-name";
+
+const client = new StorageClient();
+
+client.upload();
+client.download();
+```
+
+```java
+package storage;
+// TODO: how do you pass in the options model
+
+StorageClient client = new StorageClient().buildClient();
+
+client.upload()
+client.download()
 ```
 
 </ClientTabs>
