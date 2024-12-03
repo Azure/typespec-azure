@@ -270,7 +270,7 @@ export function getItems(program: Program, entity: Type): boolean | undefined {
 /**
  * Returns `true` if the property is marked with `@nextLink`.
  */
-export function getNextLink(program: Program, entity: ModelProperty): boolean {
+export function getNextLink(program: Program, entity: ModelProperty): boolean | undefined {
   return program.stateSet(Symbol.for(`TypeSpec.nextLink`)).has(entity);
 }
 
