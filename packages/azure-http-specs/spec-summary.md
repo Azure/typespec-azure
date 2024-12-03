@@ -720,6 +720,86 @@ Expected response body:
 }
 ```
 
+### Azure_Example_Basic
+
+- Endpoint: `post /azure/example/basic/basic`
+
+Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
+
+When generate the code, one need to set the "examples-directory" option.
+
+Expected query parameter: query-param=query&api-version=2022-12-01-preview
+Expected header parameter: header-param=header
+
+Expected input body:
+
+```json
+{
+  "stringProperty": "text",
+  "modelProperty": {
+    "int32Property": 1,
+    "float32Property": 1.5,
+    "enumProperty": "EnumValue1"
+  },
+  "arrayProperty": ["item"],
+  "recordProperty": {
+    "record": "value"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "stringProperty": "text"
+}
+```
+
+### Azure_Payload_Pageable_list
+
+- Endpoint: `get /azure/payload/pageable`
+
+List users.
+
+SDK may hide the "maxpagesize" from API signature. The functionality of "maxpagesize" could be in related language Page model.
+
+Expected query parameter:
+maxpagesize=3
+
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "name": "user5"
+    },
+    {
+      "name": "user6"
+    },
+    {
+      "name": "user7"
+    }
+  ],
+  "nextLink": "{endpoint}/azure/payload/pageable?skipToken=name-user7&maxpagesize=3"
+}
+```
+
+Expected query parameter:
+skipToken=name-user7
+maxpagesize=3
+
+```json
+{
+  "value": [
+    {
+      "name": "user8"
+    }
+  ]
+}
+```
+
 ### Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSystemAssigned
 
 - Endpoint: `put https://management.azure.com`
@@ -1557,42 +1637,6 @@ Expected header parameters:
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
 
-### Client_AzureExampleClient_basicAction
-
-- Endpoint: `post /azure/example/basic/basic`
-
-Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
-
-When generate the code, one need to set the "examples-directory" option.
-
-Expected query parameter: query-param=query&api-version=2022-12-01-preview
-Expected header parameter: header-param=header
-
-Expected input body:
-
-```json
-{
-  "stringProperty": "text",
-  "modelProperty": {
-    "int32Property": 1,
-    "float32Property": 1.5,
-    "enumProperty": "EnumValue1"
-  },
-  "arrayProperty": ["item"],
-  "recordProperty": {
-    "record": "value"
-  }
-}
-```
-
-Expected response body:
-
-```json
-{
-  "stringProperty": "text"
-}
-```
-
 ### Client_Naming_Header_request
 
 - Endpoint: `post /client/naming/header`
@@ -1858,50 +1902,6 @@ client.group1.four();
 client.group2.two();
 client.group2.five();
 client.group2.six();
-```
-
-### Payload_Pageable_list
-
-- Endpoint: `get /payload/pageable`
-
-List users.
-
-SDK may hide the "maxpagesize" from API signature. The functionality of "maxpagesize" could be in related language Page model.
-
-Expected query parameter:
-maxpagesize=3
-
-Expected response body:
-
-```json
-{
-  "value": [
-    {
-      "name": "user5"
-    },
-    {
-      "name": "user6"
-    },
-    {
-      "name": "user7"
-    }
-  ],
-  "nextLink": "{endpoint}/payload/pageable?skipToken=name-user7&maxpagesize=3"
-}
-```
-
-Expected query parameter:
-skipToken=name-user7
-maxpagesize=3
-
-```json
-{
-  "value": [
-    {
-      "name": "user8"
-    }
-  ]
-}
 ```
 
 ### Resiliency_ServiceDriven_addOperation
