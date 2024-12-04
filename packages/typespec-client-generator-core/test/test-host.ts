@@ -6,11 +6,12 @@ import {
   TypeSpecTestLibrary,
   createTestHost,
   createTestWrapper,
+  resolveVirtualPath,
 } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { CreateSdkContextOptions, createSdkContext } from "../src/decorators.js";
+import { CreateSdkContextOptions, createSdkContext } from "../src/context.js";
 import {
   SdkContext,
   SdkEmitterOptions,
@@ -18,6 +19,13 @@ import {
   SdkServiceOperation,
 } from "../src/interfaces.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
+
+export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
+  emitterName?: string;
+  librariesToAdd?: TypeSpecTestLibrary[];
+  autoUsings?: string[];
+  packageName?: string;
+}
 
 export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}) {
   let libraries = [SdkTestLibrary, HttpTestLibrary, RestTestLibrary, VersioningTestLibrary];
@@ -27,48 +35,6 @@ export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}
   return createTestHost({
     libraries: libraries,
   });
-}
-
-export interface SdkTestRunner extends BasicTestRunner {
-  host: TestHost;
-  context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
-  compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
-  compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
-  compileWithBuiltInAzureResourceManagerService(code: string): Promise<Record<string, Type>>;
-  compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
-  compileWithVersionedService(code: string): Promise<Record<string, Type>>;
-  compileAndDiagnoseWithCustomization(
-    mainCode: string,
-    clientCode: string,
-  ): Promise<[Record<string, Type>, readonly Diagnostic[]]>;
-}
-
-export async function createSdkContextTestHelper<
-  TOptions extends Record<string, any> = CreateSdkTestRunnerOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(
-  program: Program,
-  options: TOptions,
-  sdkContextOption?: CreateSdkContextOptions,
-): Promise<SdkContext<TOptions, TServiceOperation>> {
-  const emitContext: EmitContext<TOptions> = {
-    program: program,
-    emitterOutputDir: "dummy",
-    options: options,
-    getAssetEmitter: null as any,
-  };
-  return await createSdkContext(
-    emitContext,
-    options.emitterName ?? "@azure-tools/typespec-csharp",
-    sdkContextOption,
-  );
-}
-
-export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
-  emitterName?: string;
-  librariesToAdd?: TypeSpecTestLibrary[];
-  autoUsings?: string[];
-  packageName?: string;
 }
 
 export async function createSdkTestRunner(
@@ -91,9 +57,12 @@ export async function createSdkTestRunner(
 
   sdkTestRunner.host = host;
 
-  // compile
   const baseCompile = sdkTestRunner.compile;
-  sdkTestRunner.compile = async function compile(code, compileOptions?) {
+  const baseDiagnose = sdkTestRunner.diagnose;
+  const baseCompileAndDiagnose = sdkTestRunner.compileAndDiagnose;
+
+  // compile
+  sdkTestRunner.compile = async (code, compileOptions?) => {
     const result = await baseCompile(code, compileOptions);
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
@@ -104,8 +73,7 @@ export async function createSdkTestRunner(
   };
 
   // diagnose
-  const baseDiagnose = sdkTestRunner.diagnose;
-  sdkTestRunner.diagnose = async function diagnose(code, compileOptions?) {
+  sdkTestRunner.diagnose = async (code, compileOptions?) => {
     const result = await baseDiagnose(code, compileOptions);
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
@@ -116,8 +84,7 @@ export async function createSdkTestRunner(
   };
 
   // compile and diagnose
-  const baseCompileAndDiagnose = sdkTestRunner.compileAndDiagnose;
-  sdkTestRunner.compileAndDiagnose = async function compileAndDiagnose(code, compileOptions?) {
+  sdkTestRunner.compileAndDiagnose = async (code, compileOptions?) => {
     const result = await baseCompileAndDiagnose(code, compileOptions);
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
@@ -128,7 +95,7 @@ export async function createSdkTestRunner(
   };
 
   // compile with dummy service definition
-  sdkTestRunner.compileWithBuiltInService = async function compileWithBuiltInService(code) {
+  sdkTestRunner.compileWithBuiltInService = async (code) => {
     const result = await baseCompile(
       `@service({title: "Test Service"}) namespace TestService;
     ${code}`,
@@ -145,32 +112,30 @@ export async function createSdkTestRunner(
   };
 
   // compile with dummy service definition
-  sdkTestRunner.compileWithBuiltInAzureCoreService =
-    async function compileWithBuiltInAzureCoreService(code) {
-      const result = await baseCompile(
-        `
+  sdkTestRunner.compileWithBuiltInAzureCoreService = async (code) => {
+    const result = await baseCompile(
+      `
       @useDependency(Versions.v1_0_Preview_2)
       @server("http://localhost:3000", "endpoint")
       @service()
       namespace My.Service;
       ${code}`,
-        {
-          noEmit: true,
-        },
-      );
-      sdkTestRunner.context = await createSdkContextTestHelper(
-        sdkTestRunner.program,
-        options,
-        sdkContextOption,
-      );
-      return result;
-    };
+      {
+        noEmit: true,
+      },
+    );
+    sdkTestRunner.context = await createSdkContextTestHelper(
+      sdkTestRunner.program,
+      options,
+      sdkContextOption,
+    );
+    return result;
+  };
 
   // compile with dummy arm service definition
-  sdkTestRunner.compileWithBuiltInAzureResourceManagerService =
-    async function compileWithBuiltInAzureResourceManagerService(code) {
-      const result = await baseCompile(
-        `
+  sdkTestRunner.compileWithBuiltInAzureResourceManagerService = async (code) => {
+    const result = await baseCompile(
+      `
     @armProviderNamespace("My.Service")
     @server("http://localhost:3000", "endpoint")
     @service({title: "My.Service"})
@@ -185,40 +150,10 @@ export async function createSdkTestRunner(
       V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
     ${code}`,
-        {
-          noEmit: true,
-        },
-      );
-      sdkTestRunner.context = await createSdkContextTestHelper(
-        sdkTestRunner.program,
-        options,
-        sdkContextOption,
-      );
-      return result;
-    };
-
-  const mainAutoCode = [
-    ...host.libraries
-      .filter((x) => x !== StandardTestLibrary)
-      .map((x) => x.name)
-      .map((x) => `import "${x}";`),
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
-  ].join("\n");
-
-  const clientAutoCode = [
-    ...host.libraries
-      .filter((x) => x !== StandardTestLibrary)
-      .map((x) => x.name)
-      .map((x) => `import "${x}";`),
-    `import "./main.tsp";`,
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
-  ].join("\n");
-
-  // compile with client.tsp
-  sdkTestRunner.compileWithCustomization = async function (mainCode, clientCode) {
-    host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
-    host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
-    const result = await host.compile("./client.tsp");
+      {
+        noEmit: true,
+      },
+    );
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
@@ -228,7 +163,7 @@ export async function createSdkTestRunner(
   };
 
   // compile with versioned service
-  sdkTestRunner.compileWithVersionedService = async function (code) {
+  sdkTestRunner.compileWithVersionedService = async (code) => {
     const result = await baseCompile(
       `
       @service
@@ -260,8 +195,38 @@ export async function createSdkTestRunner(
     return result;
   };
 
+  const mainAutoCode = [
+    ...host.libraries
+      .filter((x) => x !== StandardTestLibrary)
+      .map((x) => x.name)
+      .map((x) => `import "${x}";`),
+    ...(autoUsings ?? []).map((x) => `using ${x};`),
+  ].join("\n");
+
+  const clientAutoCode = [
+    ...host.libraries
+      .filter((x) => x !== StandardTestLibrary)
+      .map((x) => x.name)
+      .map((x) => `import "${x}";`),
+    `import "./main.tsp";`,
+    ...(autoUsings ?? []).map((x) => `using ${x};`),
+  ].join("\n");
+
+  // compile with client.tsp
+  sdkTestRunner.compileWithCustomization = async (mainCode, clientCode) => {
+    host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
+    host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
+    const result = await host.compile("./client.tsp");
+    sdkTestRunner.context = await createSdkContextTestHelper(
+      sdkTestRunner.program,
+      options,
+      sdkContextOption,
+    );
+    return result;
+  };
+
   // compile and diagnose with client.tsp
-  sdkTestRunner.compileAndDiagnoseWithCustomization = async function (mainCode, clientCode) {
+  sdkTestRunner.compileAndDiagnoseWithCustomization = async (mainCode, clientCode) => {
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
     const result = await host.compileAndDiagnose("./client.tsp");
@@ -276,14 +241,39 @@ export async function createSdkTestRunner(
   return sdkTestRunner;
 }
 
-export async function createTcgcTestRunnerForEmitter(emitterName: string): Promise<SdkTestRunner> {
-  const runner = await createSdkTestRunner({ emitterName });
-  return runner;
+export interface SdkTestRunner extends BasicTestRunner {
+  host: TestHost;
+  context: SdkContext<CreateSdkTestRunnerOptions, SdkHttpOperation>;
+  compileWithBuiltInService(code: string): Promise<Record<string, Type>>;
+  compileWithBuiltInAzureCoreService(code: string): Promise<Record<string, Type>>;
+  compileWithBuiltInAzureResourceManagerService(code: string): Promise<Record<string, Type>>;
+  compileWithVersionedService(code: string): Promise<Record<string, Type>>;
+  compileWithCustomization(mainCode: string, clientCode: string): Promise<Record<string, Type>>;
+  compileAndDiagnoseWithCustomization(
+    mainCode: string,
+    clientCode: string,
+  ): Promise<[Record<string, Type>, readonly Diagnostic[]]>;
 }
 
-export function removeRawFromType<TType extends object>(type: TType): TType {
-  const { __raw, ...rest } = type as any;
-  return rest;
+export async function createSdkContextTestHelper<
+  TOptions extends Record<string, any> = CreateSdkTestRunnerOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
+  program: Program,
+  options: TOptions,
+  sdkContextOption?: CreateSdkContextOptions,
+): Promise<SdkContext<TOptions, TServiceOperation>> {
+  const emitContext: EmitContext<TOptions> = {
+    program: program,
+    emitterOutputDir: resolveVirtualPath("tsp-output"),
+    options: options,
+    getAssetEmitter: null as any,
+  };
+  return await createSdkContext(
+    emitContext,
+    options.emitterName ?? "@azure-tools/typespec-csharp",
+    sdkContextOption,
+  );
 }
 
 export function hasFlag<T extends number>(value: T, flag: T): boolean {

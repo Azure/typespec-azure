@@ -16,7 +16,8 @@ import {
   UnionVariant,
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
-import { createTCGCContext, getClientNameOverride } from "./decorators.js";
+import { createTCGCContext } from "./context.js";
+import { getClientNameOverride } from "./decorators.js";
 import { TCGCContext } from "./interfaces.js";
 import { AllScopes, clientNameKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
