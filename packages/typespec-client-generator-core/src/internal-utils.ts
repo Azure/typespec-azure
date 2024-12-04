@@ -50,6 +50,8 @@ import { getClientTypeWithDiagnostics } from "./types.js";
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 export const clientNameKey = createStateSymbol("clientName");
+export const clientNamespaceKey = createStateSymbol("clientNamespace");
+export const negationScopesKey = createStateSymbol("negationScopes");
 
 /**
  *
@@ -329,7 +331,7 @@ export function intOrFloat(value: number): "int32" | "float32" {
  * @param t
  * @returns
  */
-export function isAzureCoreModel(t: Type): boolean {
+export function isAzureCoreTspModel(t: Type): boolean {
   return (
     (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&

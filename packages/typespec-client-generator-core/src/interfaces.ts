@@ -34,14 +34,12 @@ export interface TCGCContext {
   emitterName: string;
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
-  filterOutCoreModels?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
-  modelsMap?: Map<Type, SdkModelType | SdkEnumType>;
+  referencedTypeMap?: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache?: Map<Operation, HttpOperation>;
-  unionsMap?: Map<Union, SdkUnionType>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
@@ -55,6 +53,8 @@ export interface TCGCContext {
   examplesDir?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
+  disableUsageAccessPropagationToBase: boolean;
+  __pagedResultSet: Set<SdkType>;
 }
 
 export interface SdkContext<
@@ -68,7 +68,6 @@ export interface SdkContext<
 export interface SdkEmitterOptions {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
-  "filter-out-core-models"?: boolean;
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
@@ -92,11 +91,15 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
+  clientNamespace: string; // fully qualified namespace
   doc?: string;
   summary?: string;
   initialization: SdkInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
+  /**
+   * @deprecated Use `clientNamespace` instead.
+   */
   nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
   parent?: SdkClientType<TServiceOperation>;
@@ -307,12 +310,16 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   type: SdkType;
+  usage: UsageFlags;
+  access: AccessFlags;
+  clientNamespace: string; // fully qualified namespace
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -343,9 +350,12 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
+  access: AccessFlags;
+  usage: UsageFlags;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -355,6 +365,7 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
+  clientNamespace: string; // fully qualified namespace
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
@@ -418,7 +429,8 @@ export type SdkModelPropertyType =
   | SdkQueryParameter
   | SdkPathParameter
   | SdkBodyParameter
-  | SdkHeaderParameter;
+  | SdkHeaderParameter
+  | SdkCookieParameter;
 
 export interface MultipartOptions {
   // whether this part is for file
@@ -478,8 +490,15 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
+export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
+  kind: "cookie";
+  serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
+}
+
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
+  serializedName: string;
   optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
@@ -490,7 +509,8 @@ export type SdkHttpParameter =
   | SdkQueryParameter
   | SdkPathParameter
   | SdkBodyParameter
-  | SdkHeaderParameter;
+  | SdkHeaderParameter
+  | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
@@ -542,7 +562,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   path: string;
   uriTemplate: string;
   verb: HttpVerb;
-  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   bodyParam?: SdkBodyParameter;
   responses: SdkHttpResponse[];
   exceptions: SdkHttpErrorResponse[];
@@ -575,6 +595,7 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   exception?: SdkMethodResponse;
   generateConvenient: boolean;
   generateProtocol: boolean;
+  isOverride: boolean;
 }
 
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -583,7 +604,7 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 }
 
 interface SdkPagingServiceMethodOptions {
-  __raw_paged_metadata: PagedResultMetadata;
+  __raw_paged_metadata?: PagedResultMetadata;
   nextLinkPath?: string; // off means fake paging
   nextLinkOperation?: SdkServiceOperation;
 }
@@ -686,7 +707,19 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
+  namespaces: SdkNamespace<TServiceOperation>[];
+}
+
+export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
+  name: string;
+  fullName: string;
+  clients: SdkClientType<TServiceOperation>[];
+  models: SdkModelType[];
+  enums: SdkEnumType[];
+  unions: (SdkUnionType | SdkNullableType)[];
+  namespaces: SdkNamespace<TServiceOperation>[];
 }
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
@@ -707,12 +740,23 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
+  /**
+   * @deprecated Use `Exception` instead.
+   */
   // Output will also be set when Error is set.
   Error = 1 << 7,
-  // Set when model is used in conjunction with an application/json content type.
+  // Set when type is used in conjunction with an application/json content type.
   Json = 1 << 8,
-  // Set when model is used in conjunction with an application/xml content type.
+  // Set when type is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
+  // Set when type is used for exception output.
+  Exception = 1 << 10,
+  // Set when type is used as LRO initial response.
+  LroInitial = 1 << 11,
+  // Set when type is used as LRO polling response.
+  LroPolling = 1 << 12,
+  // Set when type is used as LRO final envelop response.
+  LroFinalEnvelope = 1 << 13,
 }
 
 interface SdkExampleBase {

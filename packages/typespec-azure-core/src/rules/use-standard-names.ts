@@ -1,6 +1,4 @@
 import {
-  Interface,
-  Namespace,
   Operation,
   createRule,
   ignoreDiagnostics,
@@ -9,27 +7,6 @@ import {
 import { getHttpOperation } from "@typespec/http";
 import { isListOperation } from "@typespec/rest";
 import { getPagedResult } from "../decorators.js";
-import { isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
-
-function isArmProviderNamespace(ns: Namespace | undefined): boolean {
-  if (!ns) return false;
-  for (const dec of ns.decorators) {
-    if (dec.decorator.name === "$armProviderNamespace") {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isArmResourceOperations(inter: Interface | undefined): boolean {
-  if (!inter) return false;
-  for (const dec of inter.decorators) {
-    if (dec.decorator.name === "$armResourceOperations") {
-      return true;
-    }
-  }
-  return false;
-}
 
 export const useStandardNames = createRule({
   name: "use-standard-names",
@@ -49,11 +26,7 @@ export const useStandardNames = createRule({
   create(context) {
     return {
       operation: (op: Operation) => {
-        if (isArmProviderNamespace(op.namespace)) return;
-        if (isArmResourceOperations(op.interface)) return;
         if (isTemplateDeclarationOrInstance(op)) return;
-        if (isExcludedCoreType(context.program, op)) return;
-        if (!isAzureSubNamespace(context.program, op.namespace)) return;
         const httpOp = ignoreDiagnostics(getHttpOperation(context.program, op));
         const verb = httpOp.verb;
         const name = op.name;

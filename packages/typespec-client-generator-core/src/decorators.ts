@@ -1,4 +1,3 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   AugmentDecoratorStatementNode,
   DecoratorContext,
@@ -35,6 +34,7 @@ import {
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
+  ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
@@ -62,14 +62,16 @@ import {
 import {
   AllScopes,
   clientNameKey,
+  clientNamespaceKey,
   getValidApiVersion,
-  isAzureCoreModel,
+  isAzureCoreTspModel,
+  negationScopesKey,
   parseEmitterName,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel, getSdkUnion, getSdkUnionEnumWithDiagnostics } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -87,6 +89,13 @@ function getScopedDecoratorData(
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
     if (Object.keys(retval).includes(scope)) return retval[scope];
+
+    // if the scope is negated, we should return undefined
+    // if the scope is not negated, we should return the value for AllScopes
+    const negationScopes = retval[negationScopesKey];
+    if (negationScopes !== undefined && negationScopes.includes(scope)) {
+      return undefined;
+    }
   }
   return retval[AllScopes]; // in this case it applies to all languages
 }
@@ -114,20 +123,60 @@ function setScopedDecoratorData(
     return;
   }
 
-  // if scope specified, create or overwrite with the new value
-  const splitScopes = scope.split(",").map((s) => s.trim());
   const targetEntry = context.program.stateMap(key).get(target);
-
-  // if target doesn't exist in decorator map, create a new entry
-  if (!targetEntry) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  const [negationScopes, scopes] = parseScopes(context, scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    // override the previous value for negation scopes
+    const newObject: Record<string | symbol, any> =
+      scopes !== undefined && scopes.length > 0
+        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
+        : Object.fromEntries([[AllScopes, value]]);
+    newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
-    return;
+
+    // if a scope exists in the target entry and it overlaps with the negation scope, it means negation scope doesn't override it
+    if (targetEntry !== undefined) {
+      const existingScopes = Object.getOwnPropertyNames(targetEntry);
+      const intersections = existingScopes.filter((x) => negationScopes.includes(x));
+      if (intersections !== undefined && intersections.length > 0) {
+        for (const scopeToKeep of intersections) {
+          newObject[scopeToKeep] = targetEntry[scopeToKeep];
+        }
+      }
+    }
+  } else if (scopes !== undefined && scopes.length > 0) {
+    // for normal scopes, add them incrementally
+    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
+    context.program
+      .stateMap(key)
+      .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+  }
+}
+
+function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
+  if (scope === undefined) {
+    return [undefined, undefined];
   }
 
-  // if target exists, overwrite existed value
-  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+  // handle !(scope1, scope2,...) syntax
+  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
+  }
+
+  // handle !scope1, !scope2, scope3, ... syntax
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const negationScopes: string[] = [];
+  const scopes: string[] = [];
+  for (const s of splitScopes) {
+    if (s.startsWith("!")) {
+      negationScopes.push(s.slice(1));
+    } else {
+      scopes.push(s);
+    }
+  }
+  return [negationScopes, scopes];
 }
 
 const clientKey = createStateSymbol("client");
@@ -583,9 +632,12 @@ export function listOperationsInOperationGroup(
     }
 
     for (const op of current.operations.values()) {
-      // Skip templated operations
-      if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(getOverriddenClientMethod(context, op) ?? op);
+      // Skip templated operations and omit operations
+      if (
+        !isTemplateDeclarationOrInstance(op) &&
+        !context.program.stateMap(omitOperation).get(op)
+      ) {
+        operations.push(op);
       }
     }
 
@@ -614,6 +666,8 @@ export function createTCGCContext(program: Program, emitterName: string): TCGCCo
     __tspTypeToApiVersions: new Map(),
     __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
+    disableUsageAccessPropagationToBase: false,
+    __pagedResultSet: new Set(),
   };
 }
 
@@ -625,6 +679,7 @@ interface VersioningStrategy {
 export interface CreateSdkContextOptions {
   readonly versioning?: VersioningStrategy;
   additionalDecorators?: string[];
+  disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
 }
 
 export async function createSdkContext<
@@ -651,13 +706,13 @@ export async function createSdkContext<
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
     packageName: context.options["package-name"],
     flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
     examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
+    disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
@@ -749,12 +804,11 @@ export function getUsageOverride(
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
-  const diagnostics = createDiagnosticCollector();
   switch (entity.kind) {
     case "Union":
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(entity));
-      if (unionAsEnum) {
-        return diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum)).usage;
+      const type = getSdkUnion(context, entity);
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+        return type.usage;
       }
       return UsageFlags.None;
     case "Model":
@@ -808,7 +862,7 @@ export function getAccess(context: TCGCContext, entity: Model | Enum | Operation
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "model") {
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
         return type.access;
       }
       return "public";
@@ -896,6 +950,7 @@ export function getClientNameOverride(
 }
 
 const overrideKey = createStateSymbol("override");
+const omitOperation = createStateSymbol("omitOperation");
 
 // Recursive function to collect parameter names
 function collectParams(
@@ -912,7 +967,7 @@ function collectParams(
         while (sourceProp.sourceProperty) {
           sourceProp = sourceProp.sourceProperty;
         }
-        if (sourceProp.model && !isAzureCoreModel(sourceProp.model)) {
+        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
           params.push(value);
         } else if (!sourceProp.model) {
           params.push(value);
@@ -944,6 +999,9 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
+  // omit all override operation
+  context.program.stateMap(omitOperation).set(override, true);
+
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
     a.name.localeCompare(b.name),
@@ -1043,4 +1101,50 @@ export const paramAliasDecorator: ParamAliasDecorator = (
 
 export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
   return getScopedDecoratorData(context, paramAliasKey, original);
+}
+
+export const $clientNamespace: ClientNamespaceDecorator = (
+  context: DecoratorContext,
+  entity: Namespace | Interface | Model | Enum | Union,
+  value: string,
+  scope?: LanguageScopes,
+) => {
+  if (value.trim() === "") {
+    reportDiagnostic(context.program, {
+      code: "empty-client-namespace",
+      format: {},
+      target: entity,
+    });
+  }
+  setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
+};
+
+export function getClientNamespace(
+  context: TCGCContext,
+  entity: Namespace | Interface | Model | Enum | Union,
+): string {
+  const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
+  if (override) return override;
+  if (!entity.namespace) {
+    return "";
+  }
+  if (entity.kind === "Namespace") {
+    return getNamespaceFullNameWithOverride(context, entity);
+  }
+  return getNamespaceFullNameWithOverride(context, entity.namespace);
+}
+
+function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
+  const segments = [];
+  let current: Namespace | undefined = namespace;
+  while (current && current.name !== "") {
+    const override = getScopedDecoratorData(context, clientNamespaceKey, current);
+    if (override) {
+      segments.unshift(override);
+      break;
+    }
+    segments.unshift(current.name);
+    current = current.namespace;
+  }
+  return segments.join(".");
 }

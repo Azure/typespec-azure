@@ -1,0 +1,54 @@
+---
+title: Conditional Request Header
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc details what emitters will generate for conditional request header
+
+## `If-Match` and `If-None-Match`
+
+<ClientTabs>
+
+```typespec
+model Response {
+  name: string;
+}
+
+@get
+op get(
+  /** The request should only proceed if an entity matches this string. */
+  @header("If-Match")
+  ifMatch?: string,
+
+  /** The request should only proceed if no entity matches this string. */
+  @header("If-None-Match")
+  ifNoneMatch?: string,
+): Response;
+```
+
+```python
+from azure.core import MatchConditions
+
+def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchConditions] = None) -> Response:
+```
+
+```csharp
+
+```
+
+```typescript
+
+```
+
+```java
+import com.azure.core.http.MatchConditions;
+
+public Response get(MatchConditions matchConditions);
+```
+
+```go
+
+```
+
+</ClientTabs>

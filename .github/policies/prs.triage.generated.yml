@@ -46,3 +46,9 @@ configuration:
             then:
               - addLabel:
                   label: lib:tcgc
+          - if:
+              - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: ide

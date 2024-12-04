@@ -1,5 +1,4 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkBuiltInType } from "../../src/interfaces.js";
@@ -268,7 +267,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     runner = await createSdkTestRunner({
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
-      "filter-out-core-models": false,
       emitterName: "@azure-tools/typespec-java",
     });
     await runner.compileWithBuiltInAzureCoreService(`
@@ -327,50 +325,6 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(type.baseType.baseType.baseType, undefined);
   });
 
-  it("known values", async function () {
-    await runner.compileWithBuiltInService(
-      `
-      enum TestEnum{
-        one,
-        two,
-        three,
-      }
-
-      #suppress "deprecated" "for testing"
-      @knownValues(TestEnum)
-      scalar testScalar extends string;
-
-      model TestModel {
-        prop1: testScalar;
-        #suppress "deprecated" "for testing"
-        @knownValues(TestEnum)
-        prop2: string;
-      }
-
-      op func(
-        @body body: TestModel
-      ): void;
-    `,
-    );
-    expectDiagnostics(runner.context.diagnostics, []);
-    const m = runner.context.sdkPackage.models.find((x) => x.name === "TestModel");
-    const e1 = runner.context.sdkPackage.enums.find((x) => x.name === "TestEnum");
-    const e2 = runner.context.sdkPackage.enums.find((x) => x.name === "testScalar");
-    ok(m && e1 && e2);
-    strictEqual(e1.kind, "enum");
-    strictEqual(e1.isUnionAsEnum, false);
-    strictEqual(e1.valueType.kind, "string");
-    strictEqual(e2.kind, "enum");
-    strictEqual(e2.isUnionAsEnum, false);
-    strictEqual(e2.valueType.kind, "string");
-    for (const property of m.properties) {
-      if (property.name === "prop1") {
-        strictEqual(property.type, e2);
-      } else if (property.name === "prop2") {
-        strictEqual(property.type, e1);
-      }
-    }
-  });
   it("with doc", async () => {
     await runner.compileWithBuiltInService(
       `
