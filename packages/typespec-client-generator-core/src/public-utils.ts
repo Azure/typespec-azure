@@ -43,7 +43,6 @@ import {
   getHttpOperationResponseHeaders,
   isAzureCoreTspModel,
   isHttpBodySpread,
-  parseEmitterName,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -122,16 +121,6 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return effective;
   }
   return type;
-}
-
-/**
- *
- * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
- */
-export function getEmitterTargetName(context: TCGCContext): string {
-  return ignoreDiagnostics(
-    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name),
-  );
 }
 
 /**

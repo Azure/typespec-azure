@@ -76,6 +76,7 @@ export interface SdkEmitterOptions {
    */
   "examples-directory"?: string;
   "examples-dir"?: string;
+  "emitter-name"?: string;
 }
 
 export interface SdkClient {
@@ -429,7 +430,8 @@ export type SdkModelPropertyType =
   | SdkQueryParameter
   | SdkPathParameter
   | SdkBodyParameter
-  | SdkHeaderParameter;
+  | SdkHeaderParameter
+  | SdkCookieParameter;
 
 export interface MultipartOptions {
   // whether this part is for file
@@ -489,6 +491,12 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
+export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
+  kind: "cookie";
+  serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
+}
+
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
   serializedName: string;
@@ -502,7 +510,8 @@ export type SdkHttpParameter =
   | SdkQueryParameter
   | SdkPathParameter
   | SdkBodyParameter
-  | SdkHeaderParameter;
+  | SdkHeaderParameter
+  | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
@@ -554,7 +563,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   path: string;
   uriTemplate: string;
   verb: HttpVerb;
-  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   bodyParam?: SdkBodyParameter;
   responses: SdkHttpResponse[];
   exceptions: SdkHttpErrorResponse[];
@@ -743,6 +752,12 @@ export enum UsageFlags {
   Xml = 1 << 9,
   // Set when type is used for exception output.
   Exception = 1 << 10,
+  // Set when type is used as LRO initial response.
+  LroInitial = 1 << 11,
+  // Set when type is used as LRO polling response.
+  LroPolling = 1 << 12,
+  // Set when type is used as LRO final envelop response.
+  LroFinalEnvelope = 1 << 13,
 }
 
 interface SdkExampleBase {

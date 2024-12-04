@@ -1,0 +1,94 @@
+name: Contoso.WidgetManager
+rootNamespace: Contoso.WidgetManager
+clients:
+  - &a2
+    kind: client
+    name: WidgetManagerClient
+    methods: []
+    apiVersions: &a1 []
+    nameSpace: Contoso.WidgetManager
+    clientNamespace: Contoso.WidgetManager
+    initialization:
+      doc: Initialization class for the client
+      kind: model
+      properties:
+        - kind: endpoint
+          type:
+            kind: endpoint
+            serverUrl: "{endpoint}"
+            templateArguments:
+              - name: endpoint
+                isGeneratedName: true
+                doc: Service host
+                kind: path
+                onClient: true
+                urlEncode: false
+                explode: false
+                style: simple
+                allowReserved: false
+                optional: false
+                serializedName: endpoint
+                correspondingMethodParams: []
+                type:
+                  kind: string
+                  decorators: []
+                  name: string
+                  doc: A sequence of textual characters.
+                  crossLanguageDefinitionId: TypeSpec.string
+                isApiVersionParam: false
+                apiVersions: *a1
+                crossLanguageDefinitionId: Contoso.WidgetManager.endpoint
+                decorators: []
+            decorators: []
+          name: endpoint
+          isGeneratedName: true
+          doc: Service host
+          onClient: true
+          urlEncode: false
+          apiVersions: *a1
+          optional: false
+          isApiVersionParam: false
+          crossLanguageDefinitionId: Contoso.WidgetManager.endpoint
+          decorators: []
+      name: WidgetManagerClientOptions
+      isGeneratedName: true
+      access: public
+      usage: 2
+      crossLanguageDefinitionId: Contoso.WidgetManagerClientOptions
+      clientNamespace: Contoso.WidgetManager
+      apiVersions: *a1
+      decorators: []
+    decorators: []
+    crossLanguageDefinitionId: Contoso.WidgetManager
+models:
+  - &a3
+    kind: model
+    decorators: []
+    name: Test
+    isGeneratedName: false
+    clientNamespace: Contoso.WidgetManager
+    properties: []
+    access: public
+    usage: 2
+    crossLanguageDefinitionId: Contoso.WidgetManager.Test
+    apiVersions: []
+enums: []
+unions: []
+crossLanguagePackageId: Contoso.WidgetManager
+namespaces:
+  - name: Contoso
+    fullName: Contoso
+    clients: []
+    models: []
+    enums: []
+    unions: []
+    namespaces:
+      - name: WidgetManager
+        fullName: Contoso.WidgetManager
+        clients:
+          - *a2
+        models:
+          - *a3
+        enums: []
+        unions: []
+        namespaces: []
