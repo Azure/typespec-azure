@@ -685,7 +685,7 @@ clients:
                                           clientNamespace: Azure.ResourceManager.CommonTypes
                                           properties: []
                                           access: public
-                                          usage: 1280
+                                          usage: 5376
                                           crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo.info.anonymous
                                           apiVersions:
                                             - v3
@@ -707,7 +707,7 @@ clients:
                                         isMultipartFileInput: false
                                         flatten: false
                                     access: public
-                                    usage: 1280
+                                    usage: 5376
                                     crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo
                                     apiVersions:
                                       - v3
@@ -730,7 +730,7 @@ clients:
                                 isMultipartFileInput: false
                                 flatten: false
                             access: public
-                            usage: 1280
+                            usage: 5376
                             crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.ErrorDetail
                             apiVersions:
                               - v3
@@ -1263,7 +1263,7 @@ clients:
                                       enumType: *a21
                                   isFixed: false
                                   isFlags: false
-                                  usage: 260
+                                  usage: 10500
                                   access: public
                                   crossLanguageDefinitionId: Microsoft.ContosoProviderHub.ProvisioningState
                                   apiVersions:
@@ -1284,7 +1284,7 @@ clients:
                                 isMultipartFileInput: false
                                 flatten: false
                             access: public
-                            usage: 262
+                            usage: 10502
                             crossLanguageDefinitionId: Microsoft.ContosoProviderHub.EmployeeProperties
                             apiVersions:
                               - 2021-10-01-preview
@@ -1324,7 +1324,7 @@ clients:
                           serializedName: name
                           correspondingMethodParams: []
                       access: public
-                      usage: 262
+                      usage: 10502
                       crossLanguageDefinitionId: Microsoft.ContosoProviderHub.Employee
                       apiVersions:
                         - 2021-10-01-preview
@@ -1397,7 +1397,7 @@ clients:
                             isMultipartFileInput: false
                             flatten: false
                         access: public
-                        usage: 262
+                        usage: 10502
                         crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.TrackedResource
                         apiVersions:
                           - v3
@@ -1584,7 +1584,7 @@ clients:
                                           enumType: *a23
                                       isFixed: false
                                       isFlags: false
-                                      usage: 260
+                                      usage: 10500
                                       access: public
                                       crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.createdByType
                                       apiVersions:
@@ -1711,7 +1711,7 @@ clients:
                                     isMultipartFileInput: false
                                     flatten: false
                                 access: public
-                                usage: 260
+                                usage: 10500
                                 crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.SystemData
                                 apiVersions:
                                   - v3
@@ -1733,7 +1733,7 @@ clients:
                               isMultipartFileInput: false
                               flatten: false
                           access: public
-                          usage: 262
+                          usage: 10502
                           crossLanguageDefinitionId: Azure.ResourceManager.CommonTypes.Resource
                           apiVersions:
                             - v3
@@ -2172,7 +2172,7 @@ clients:
                               enumType: *a36
                           isFixed: false
                           isFlags: false
-                          usage: 0
+                          usage: 4096
                           access: public
                           crossLanguageDefinitionId: Azure.ResourceManager.ResourceProvisioningState
                           apiVersions:
@@ -2338,7 +2338,7 @@ clients:
                         isMultipartFileInput: false
                         flatten: false
                     access: public
-                    usage: 0
+                    usage: 4096
                     crossLanguageDefinitionId: Azure.ResourceManager.ArmOperationStatus
                     apiVersions:
                       - 1.0-preview.1
@@ -4054,6 +4054,7 @@ models:
   - *a9
   - *a89
   - *a90
+  - *a52
   - *a62
   - *a73
   - *a75
@@ -4063,6 +4064,7 @@ models:
 enums:
   - *a21
   - *a23
+  - *a36
   - *a6
   - *a8
   - &a93
@@ -4131,8 +4133,10 @@ namespaces:
         fullName: Azure.ResourceManager
         clients: []
         models:
+          - *a52
           - *a62
-        enums: []
+        enums:
+          - *a36
         unions: []
         namespaces:
           - name: CommonTypes
