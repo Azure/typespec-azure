@@ -285,3 +285,7 @@ export function removeRawFromType<TType extends object>(type: TType): TType {
   const { __raw, ...rest } = type as any;
   return rest;
 }
+
+export function hasFlag<T extends number>(value: T, flag: T): boolean {
+  return (value & flag) !== 0;
+}
