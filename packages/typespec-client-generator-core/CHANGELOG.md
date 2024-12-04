@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.48.4
+
+### Bug Fixes
+
+- [#1935](https://github.com/Azure/typespec-azure/pull/1935) fix wrong `unexpected-pageable-operation-return-type` because of nullable type
+
+
 ## 0.48.3
 
 ### Bug Fixes
