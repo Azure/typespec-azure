@@ -32,6 +32,7 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
+    __pagedResultSet: new Set(),
   };
 }
 

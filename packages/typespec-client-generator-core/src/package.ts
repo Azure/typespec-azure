@@ -4,9 +4,12 @@ import {
   Diagnostic,
   getDoc,
   getNamespaceFullName,
+  getPagingOperation,
   getService,
   getSummary,
+  isList,
   Model,
+  ModelProperty,
   Operation,
   Type,
 } from "@typespec/compiler";
@@ -129,25 +132,102 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   client: SdkClientType<TServiceOperation>,
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const pagedMetadata = getPagedResult(context.program, operation)!;
+
   const basic = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
-  if (pagedMetadata.itemsProperty) {
-    basic.response.type = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
-    );
+
+  // nullable response type means the underlaying operation has multiple responses and only one of them is not empty, which is what we want
+  let responseType = basic.response.type;
+  if (responseType?.kind === "nullable") {
+    responseType = responseType.type;
   }
-  basic.response.resultPath = getPathFromSegment(
+
+  // normal paging
+  if (isList(context.program, operation)) {
+    const pagingOperation = diagnostics.pipe(getPagingOperation(context.program, operation));
+
+    if (responseType?.__raw?.kind !== "Model" || !pagingOperation) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "unexpected-pageable-operation-return-type",
+          target: operation,
+          format: {
+            operationName: operation.name,
+          },
+        }),
+      );
+      // return as page method with no paging info
+      return diagnostics.wrap({
+        ...basic,
+        kind: "paging",
+      });
+    }
+
+    basic.response.resultPath = getPropertyPathFromModel(
+      context,
+      responseType?.__raw,
+      (p) => p === pagingOperation.output.pageItems.property,
+    );
+    const nextLinkPath = pagingOperation.output.nextLink
+      ? getPropertyPathFromModel(
+          context,
+          responseType?.__raw,
+          (p) => p === pagingOperation.output.nextLink!.property,
+        )
+      : undefined;
+
+    context.__pagedResultSet.add(responseType);
+    // tcgc will let all paging method return a list of items
+    basic.response.type = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, pagingOperation?.output.pageItems.property.type),
+    );
+
+    return diagnostics.wrap({
+      ...basic,
+      kind: "paging",
+      nextLinkPath,
+    });
+  }
+
+  // azure core paging
+  const pagedMetadata = getPagedResult(context.program, operation)!;
+
+  if (responseType?.__raw?.kind !== "Model" || !pagedMetadata.itemsProperty) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "unexpected-pageable-operation-return-type",
+        target: operation,
+        format: {
+          operationName: operation.name,
+        },
+      }),
+    );
+    // return as page method with no paging info
+    return diagnostics.wrap({
+      ...basic,
+      kind: "paging",
+    });
+  }
+
+  context.__pagedResultSet.add(responseType);
+
+  // tcgc will let all paging method return a list of items
+  basic.response.type = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
+  );
+
+  basic.response.resultPath = getPropertyPathFromSegment(
     context,
     pagedMetadata.modelType,
     pagedMetadata.itemsSegments,
   );
+
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: getPathFromSegment(
+    nextLinkPath: getPropertyPathFromSegment(
       context,
       pagedMetadata.modelType,
       pagedMetadata?.nextLinkSegments,
@@ -164,7 +244,45 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   });
 }
 
-function getPathFromSegment(context: TCGCContext, type: Model, segments?: string[]): string {
+export function getPropertyPathFromModel(
+  context: TCGCContext,
+  model: Model,
+  predicate: (property: ModelProperty) => boolean,
+): string | undefined {
+  const queue: { model: Model; path: ModelProperty[] }[] = [];
+
+  for (const prop of model.properties.values()) {
+    if (predicate(prop)) {
+      return getLibraryName(context, prop);
+    }
+    if (prop.type.kind === "Model") {
+      queue.push({ model: prop.type, path: [prop] });
+    }
+  }
+
+  while (queue.length > 0) {
+    const { model, path } = queue.shift()!;
+    for (const prop of model.properties.values()) {
+      if (predicate(prop)) {
+        return path
+          .concat(prop)
+          .map((s) => getLibraryName(context, s))
+          .join(".");
+      }
+      if (prop.type.kind === "Model") {
+        queue.push({ model: prop.type, path: path.concat(prop) });
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function getPropertyPathFromSegment(
+  context: TCGCContext,
+  type: Model,
+  segments?: string[],
+): string {
   if (!segments || segments.length === 0) {
     return "";
   }
@@ -380,7 +498,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getLroMetadata(context.program, operation);
-  const paging = getPagedResult(context.program, operation);
+  const paging = getPagedResult(context.program, operation) || isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
