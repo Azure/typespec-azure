@@ -416,3 +416,22 @@ This allows sharing Azure Resource Manager resource types across specifications
 | Name       | Type          | Description                                                              |
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+
+## Azure.ResourceManager.Legacy
+
+### `@customAzureResource` {#@Azure.ResourceManager.Legacy.customAzureResource}
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.Legacy.customAzureResource
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+None
