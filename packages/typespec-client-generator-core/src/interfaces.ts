@@ -76,6 +76,7 @@ export interface SdkEmitterOptions {
    */
   "examples-directory"?: string;
   "examples-dir"?: string;
+  "emitter-name"?: string;
 }
 
 export interface SdkClient {
@@ -751,6 +752,12 @@ export enum UsageFlags {
   Xml = 1 << 9,
   // Set when type is used for exception output.
   Exception = 1 << 10,
+  // Set when type is used as LRO initial response.
+  LroInitial = 1 << 11,
+  // Set when type is used as LRO polling response.
+  LroPolling = 1 << 12,
+  // Set when type is used as LRO final envelop response.
+  LroFinalEnvelope = 1 << 13,
 }
 
 interface SdkExampleBase {

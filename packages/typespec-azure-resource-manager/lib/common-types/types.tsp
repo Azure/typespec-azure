@@ -73,6 +73,7 @@ model ResourceModelWithAllowedPropertySet extends TrackedResource {
   /** The etag field is *not* required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.
    * Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),
    * If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. */
+  @visibility("read")
   eTag?: string;
 
   @typeChangedFrom(Versions.v6, Identity)
@@ -142,7 +143,6 @@ model Operation {
   isDataAction?: boolean;
 
   /** Localized display information for this particular operation. */
-  @visibility("read")
   display?: OperationDisplay;
 
   /** 
@@ -154,6 +154,7 @@ model Operation {
   /** 
     Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
      */
+  @visibility("read")
   actionType?: ActionType;
 }
 
@@ -189,7 +190,8 @@ model OperationDisplay {
  */
 model OperationStatusResult {
   /** Fully qualified ID for the async operation. */
-  id?: string;
+  @typeChangedFrom(Versions.v5, string)
+  id?: armResourceIdentifier;
 
   /** Name of the async operation. */
   name?: string;
@@ -213,6 +215,12 @@ model OperationStatusResult {
 
   /** If present, details of the operation error. */
   error?: ErrorDetail;
+
+  /** Fully qualified ID of the resource against which the original async operation was started. */
+  @visibility("read")
+  @format("arm-id")
+  @added(Versions.v5)
+  resourceId?: string;
 }
 
 /**
@@ -549,7 +557,7 @@ model ScopeParameter {
 }
 
 /**
- * The default ManagementGroupName parameter type.
+ * The default TenantIdParameter type.
  */
 @added(Versions.v4)
 model TenantIdParameter {
@@ -563,6 +571,7 @@ model TenantIdParameter {
  * The default ARM If-Match header type.
  */
 @added(Versions.v4)
+@friendlyName("If-Match")
 model IfMatchHeader {
   /** The If-Match header that makes a request conditional. */
   @header("If-Match")
@@ -570,9 +579,10 @@ model IfMatchHeader {
 }
 
 /**
- * The default ARM If-Match header type.
+ * The default ARM If-None-Match header type.
  */
 @added(Versions.v4)
+@friendlyName("If-None-Match")
 model IfNoneMatchHeader {
   /** The If-None-Match header that makes a request conditional. */
   @header("If-None-Match")
