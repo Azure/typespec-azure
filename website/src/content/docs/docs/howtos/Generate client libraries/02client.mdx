@@ -568,8 +568,8 @@ With `@clientInitialization`, you can pass in additional parameters you would li
 @service
 namespace Storage;
 
-op upload(blobName: string): void;
-op download(blobName: string): void;
+op upload(@path blobName: string): void;
+op download(@path blobName: string): void;
 ```
 
 ```typespec title="client.tsp"
@@ -590,7 +590,7 @@ model StorageClientOptions {
 ```python
 from storage import StorageClient
 
-client = StorageClient(blob_name="myBlobName", endpoint="<my-endpoint>", ...)
+client = StorageClient(endpoint="<my-endpoint>", blob_name="myBlobName", ...)
 
 client.upload()
 client.download()
