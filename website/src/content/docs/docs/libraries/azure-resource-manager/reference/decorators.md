@@ -250,23 +250,6 @@ Azure.ResourceManager common types.
 
 None
 
-### `@customAzureResource` {#@Azure.ResourceManager.customAzureResource}
-
-This decorator is used on resources that do not satisfy the definition of a resource
-but need to be identified as such.
-
-```typespec
-@Azure.ResourceManager.customAzureResource
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-None
-
 ### `@extensionResource` {#@Azure.ResourceManager.extensionResource}
 
 `@extensionResource` marks an Azure Resource Manager resource model as an Extension resource.
@@ -433,3 +416,22 @@ This allows sharing Azure Resource Manager resource types across specifications
 | Name       | Type          | Description                                                              |
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+
+## Azure.ResourceManager.Legacy
+
+### `@customAzureResource` {#@Azure.ResourceManager.Legacy.customAzureResource}
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.Legacy.customAzureResource
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+None
