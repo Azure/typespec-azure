@@ -415,3 +415,20 @@ Scenarios.Azure_ResourceManager_Resources_Nested_listByTopLevelTrackedResource =
   },
   kind: "MockApiDefinition",
 });
+
+Scenarios.Azure_ResourceManager_Resources_TopLevel_checkExistence = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName",
+  method: "head",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      topLevelResourceName: "top",
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 204,
+  },
+  kind: "MockApiDefinition",
+});
