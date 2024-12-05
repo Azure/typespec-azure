@@ -40,6 +40,7 @@ import {
   getArmResourceKind,
   getResourceBaseType,
   isArmVirtualResource,
+  isCustomAzureResource,
   resolveResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -325,6 +326,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
 
   let kind = getArmResourceKind(resourceType);
   if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
+  if (isCustomAzureResource(program, resourceType)) kind = "Custom";
   if (!kind) {
     reportDiagnostic(program, {
       code: "arm-resource-invalid-base-type",
