@@ -584,7 +584,7 @@ model StorageClientOptions {
   blobName: string;
 }
 
-@@clientInitialization(Storage, StorageMockClientOptions);
+@@clientInitialization(Storage, StorageClientOptions);
 ```
 
 ```python
@@ -618,9 +618,11 @@ client.download();
 
 ```java
 package storage;
-// TODO: how do you pass in the options model
 
-StorageClient client = new StorageClient().buildClient();
+StorageClient client = new StorageClient()
+    .endpoint("<my-endpoint>")
+    .blobName("myBlobName")
+    .buildClient();
 
 client.upload()
 client.download()
