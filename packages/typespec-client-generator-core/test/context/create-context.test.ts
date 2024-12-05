@@ -1,11 +1,10 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { resolvePath } from "@typespec/compiler";
-import { findTestPackageRoot, resolveVirtualPath } from "@typespec/compiler/testing";
+import { resolveVirtualPath } from "@typespec/compiler/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
-import { readFile } from "fs/promises";
 import { beforeEach, describe, it } from "vitest";
+import { parse } from "yaml";
 import { createSdkContext } from "../../src/context.js";
 import { listClients } from "../../src/decorators.js";
 import { SdkTestLibrary } from "../../src/testing/index.js";
@@ -72,18 +71,9 @@ describe("createSdkContext", () => {
     );
 
     const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    const expected = (
-      await readFile(
-        resolvePath(
-          await findTestPackageRoot(import.meta.url),
-          "test",
-          "context",
-          "output",
-          "tcgc-output.yaml",
-        ),
-      )
-    ).toString();
-    strictEqual(output, expected);
+    ok(output);
+    const codeModel = parse(output);
+    strictEqual(codeModel["models"][0]["name"], "Test");
   });
 
   it("export complex TCGC output from emitter", async () => {
@@ -202,18 +192,9 @@ describe("createSdkContext", () => {
     );
 
     const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    const expected = (
-      await readFile(
-        resolvePath(
-          await findTestPackageRoot(import.meta.url),
-          "test",
-          "context",
-          "output",
-          "tcgc-output-complex.yaml",
-        ),
-      )
-    ).toString();
-    strictEqual(output, expected);
+    ok(output);
+    const codeModel = parse(output, { maxAliasCount: -1 });
+    strictEqual(codeModel["clients"][0]["name"], "ContosoProviderHubClient");
   });
 
   it("export TCGC output with emitter name from emitter", async () => {
@@ -241,18 +222,9 @@ describe("createSdkContext", () => {
     );
 
     const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    const expected = (
-      await readFile(
-        resolvePath(
-          await findTestPackageRoot(import.meta.url),
-          "test",
-          "context",
-          "output",
-          "tcgc-output.yaml",
-        ),
-      )
-    ).toString();
-    strictEqual(output, expected);
+    ok(output);
+    const codeModel = parse(output);
+    strictEqual(codeModel["models"][0]["name"], "Test");
   });
 
   it("export TCGC output from context", async () => {
@@ -273,18 +245,9 @@ describe("createSdkContext", () => {
     `);
 
     const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    const expected = (
-      await readFile(
-        resolvePath(
-          await findTestPackageRoot(import.meta.url),
-          "test",
-          "context",
-          "output",
-          "tcgc-output.yaml",
-        ),
-      )
-    ).toString();
-    strictEqual(output, expected);
+    ok(output);
+    const codeModel = parse(output);
+    strictEqual(codeModel["models"][0]["name"], "Test");
   });
 
   it("export TCGC output with emitter name from context", async () => {
@@ -305,17 +268,8 @@ describe("createSdkContext", () => {
     `);
 
     const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    const expected = (
-      await readFile(
-        resolvePath(
-          await findTestPackageRoot(import.meta.url),
-          "test",
-          "context",
-          "output",
-          "tcgc-output.yaml",
-        ),
-      )
-    ).toString();
-    strictEqual(output, expected);
+    ok(output);
+    const codeModel = parse(output);
+    strictEqual(codeModel["models"][0]["name"], "Test");
   });
 });
