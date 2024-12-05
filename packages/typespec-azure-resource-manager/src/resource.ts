@@ -33,7 +33,6 @@ import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import { ArmResourceOperations, resolveResourceOperations } from "./operations.js";
 import { getArmResource, listArmResources } from "./private.decorators.js";
-import { isLegacyTypeSpec } from "./rules/utils.js";
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom";
@@ -100,11 +99,8 @@ export const $customAzureResource: CustomAzureResourceDecorator = (
 ) => {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
-  if (!isLegacyTypeSpec(program, entity)) {
-    reportDiagnostic(program, { code: "arm-custom-resource-usage-discourage", target: entity });
-  }
+
   program.stateMap(ArmStateKeys.customAzureResource).set(entity, "Custom");
-  return;
 };
 
 function getProperty(

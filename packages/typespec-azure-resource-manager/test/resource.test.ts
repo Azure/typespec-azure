@@ -833,8 +833,6 @@ it("emits required properties for resource with @armResourcePropertiesOptionalit
   strictEqual(resources[0].typespecType.properties.get("properties")?.optional, false);
 });
 
-it("resource with customResource identifier", async () => {});
-
 it("recognizes resource with customResource identifier", async () => {
   const { diagnostics } = await checkFor(`
     @armProviderNamespace
@@ -876,8 +874,7 @@ it("recognizes resource with customResource identifier", async () => {
     
     namespace Microsoft.Person.Contoso {
       /** Person parent */
-      #suppress "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage" "For test"
-      @customAzureResource
+      @Azure.ResourceManager.Legacy.customAzureResource
       model Person {
         /** The parent name */
         name: string;

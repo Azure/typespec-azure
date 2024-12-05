@@ -287,6 +287,9 @@ export type AzureResourceManagerDecorators = {
   armResourceOperations: ArmResourceOperationsDecorator;
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
-  customAzureResource: CustomAzureResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
+};
+
+export type AzureResourceManagerLegacyDecorators = {
+  customAzureResource: CustomAzureResourceDecorator;
 };

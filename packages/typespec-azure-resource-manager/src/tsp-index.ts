@@ -1,5 +1,8 @@
 import { definePackageFlags } from "@typespec/compiler";
-import { AzureResourceManagerDecorators } from "../generated-defs/Azure.ResourceManager.js";
+import {
+  AzureResourceManagerDecorators,
+  AzureResourceManagerLegacyDecorators,
+} from "../generated-defs/Azure.ResourceManager.js";
 import { $armCommonTypesVersion } from "./common-types.js";
 import { $armLibraryNamespace, $armProviderNamespace, $useLibraryNamespace } from "./namespace.js";
 import {
@@ -49,10 +52,12 @@ export const $decorators = {
     armResourceList: $armResourceList,
     armResourceOperations: $armResourceOperations,
     armCommonTypesVersion: $armCommonTypesVersion,
-    customAzureResource: $customAzureResource,
     armVirtualResource: $armVirtualResource,
     resourceBaseType: $resourceBaseType,
   } satisfies AzureResourceManagerDecorators,
+  "Azure.ResourceManager.Legacy": {
+    customAzureResource: $customAzureResource,
+  } satisfies AzureResourceManagerLegacyDecorators,
 };
 
 export const $flags = definePackageFlags({

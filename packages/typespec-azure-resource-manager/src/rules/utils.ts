@@ -93,14 +93,6 @@ export function isInternalTypeSpec(
   );
 }
 
-export function isLegacyTypeSpec(
-  program: Program,
-  type: Model | Operation | ModelProperty | Interface | Namespace,
-): boolean {
-  const namespace = getNamespaceName(program, type);
-  return namespace.includes(".Legacy");
-}
-
 export function isSourceOperationResourceManagerInternal(
   operation: Operation | undefined,
 ): boolean {
