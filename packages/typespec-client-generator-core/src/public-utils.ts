@@ -14,6 +14,7 @@ import {
   getFriendlyName,
   getNamespaceFullName,
   getProjectedName,
+  getVisibility,
   ignoreDiagnostics,
   listServices,
   resolveEncodedName,
@@ -32,6 +33,7 @@ import {
   SdkClientType,
   SdkHttpOperationExample,
   SdkServiceOperation,
+  SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import {
@@ -39,8 +41,8 @@ import {
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
+  isAzureCoreTspModel,
   isHttpBodySpread,
-  parseEmitterName,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -110,21 +112,15 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
     return type;
   }
 
-  const effective = getEffectiveModelType(program, type, (t) => !isMetadata(context.program, t));
+  const effective = getEffectiveModelType(
+    program,
+    type,
+    (t) => !isMetadata(context.program, t) && !getVisibility(context.program, t)?.includes("none"), // eslint-disable-line @typescript-eslint/no-deprecated
+  );
   if (effective.name) {
     return effective;
   }
   return type;
-}
-
-/**
- *
- * @deprecated This function is deprecated. Please pass in your emitter name as a parameter name to createSdkContext
- */
-export function getEmitterTargetName(context: TCGCContext): string {
-  return ignoreDiagnostics(
-    parseEmitterName(context.program, context.program.emitters[0]?.metadata?.name),
-  );
 }
 
 /**
@@ -674,4 +670,19 @@ export function listSubClients<TServiceOperation extends SdkServiceOperation>(
     }
   }
   return subClients;
+}
+
+export function isAzureCoreModel(t: SdkType): boolean {
+  return t.__raw !== undefined && isAzureCoreTspModel(t.__raw);
+}
+
+/**
+ * Judge whether a type is a paged result model.
+ *
+ * @param context TCGC context
+ * @param t Any TCGC types
+ * @returns
+ */
+export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
+  return context.__pagedResultSet.has(t);
 }

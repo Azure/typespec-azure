@@ -14,14 +14,7 @@
           "type": "string",
           "format": "arm-id",
           "description": "The resource identifier for private endpoint",
-          "readOnly": true,
-          "x-ms-arm-id-details": {
-            "allowedResources": [
-              {
-                "type": "Microsoft.Network/privateEndpoints"
-              }
-            ]
-          }
+          "readOnly": true
         }
       }
     },
@@ -43,7 +36,7 @@
     },
     "PrivateEndpointConnectionListResult": {
       "type": "object",
-      "description": "List of private endpoint connections associated with the specified resource.",
+      "description": "List of private endpoint connections associated with the specified resource before version v6.\n\nThis model represents the standard `PrivateEndpointConnectionResourceListResult` envelope for versions v3, v4, and v5. It has been deprecated for v6 and beyond.\n\nNote: This is only intended for use with versions before v6. Do not use this if you are already on CommonTypes.Version.v6 or beyond.\n\nIf you are migrating to v6 or above, use `PrivateEndpointConnectionResourceListResult` directly.",
       "properties": {
         "value": {
           "type": "array",
@@ -169,7 +162,7 @@
     },
     "PrivateLinkResourceListResult": {
       "type": "object",
-      "description": "A list of private link resources.",
+      "description": "A list of private link resources for versions before v6.\n\nThis model represents the standard `PrivateLinkResourceListResult` envelope for versions v3, v4, and v5. It has been deprecated for v6 and beyond.\n\nNote: This is only intended for use with versions before v6. Do not use this if you are already on CommonTypes.Version.v6 or beyond.\n\nIf you are migrating to v6 or above, use `PrivateLinkResourceListResult` directly.",
       "properties": {
         "value": {
           "type": "array",
@@ -224,6 +217,16 @@
           "description": "A message indicating if changes on the service provider require any updates on the consumer."
         }
       }
+    }
+  },
+  "parameters": {
+    "PrivateEndpointConnectionParameter": {
+      "name": "name",
+      "in": "path",
+      "description": "The name of the private endpoint connection associated with the Azure resource.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method"
     }
   }
 }

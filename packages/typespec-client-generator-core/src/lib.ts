@@ -1,4 +1,20 @@
-import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
+import { SdkEmitterOptions } from "./interfaces.js";
+
+const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
+  type: "object",
+  additionalProperties: true,
+  properties: {
+    "generate-protocol-methods": { type: "boolean", nullable: true },
+    "generate-convenience-methods": { type: "boolean", nullable: true },
+    "package-name": { type: "string", nullable: true },
+    "flatten-union-as-enum": { type: "boolean", nullable: true },
+    "api-version": { type: "string", nullable: true },
+    "examples-directory": { type: "string", nullable: true },
+    "examples-dir": { type: "string", nullable: true },
+    "emitter-name": { type: "string", nullable: true },
+  },
+};
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
@@ -216,6 +232,21 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
       },
     },
+    "empty-client-namespace": {
+      severity: "warning",
+      messages: {
+        default: `Cannot pass an empty value to the @clientNamespace decorator`,
+      },
+    },
+    "unexpected-pageable-operation-return-type": {
+      severity: "error",
+      messages: {
+        default: `Operation is pageable but does not return a correct type.`,
+      },
+    },
+  },
+  emitter: {
+    options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,
   },
 });
 

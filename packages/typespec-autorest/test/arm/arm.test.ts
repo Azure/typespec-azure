@@ -85,12 +85,14 @@ it("can use private links with common-types references", async () => {
       @armResourceOperations(TestTrackedResource)
       interface TrackedOperations
         extends TrackedResourceOperations<TestTrackedResource, TestTrackedProperties> {
+        #suppress "deprecated" "test"
         createConnection is ArmResourceActionAsync<
           TestTrackedResource,
           PrivateEndpointConnection,
-          PrivateEndpointConnectionResourceListResult
+          PrivateEndpointConnectionResourceListResultV5
         >;
-        listConnections is ArmResourceActionAsync<TestTrackedResource, {}, PrivateLinkResourceListResult>;
+        #suppress "deprecated" "test"
+        listConnections is ArmResourceActionAsync<TestTrackedResource, {}, PrivateLinkResourceListResultV5>;
       }
       
       model TestTrackedProperties {

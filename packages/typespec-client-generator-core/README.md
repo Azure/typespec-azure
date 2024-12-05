@@ -8,6 +8,65 @@ TypeSpec Data Plane Generation library
 npm install @azure-tools/typespec-client-generator-core
 ```
 
+## Usage
+
+1. Via the command line
+
+```bash
+tsp compile . --emit=@azure-tools/typespec-client-generator-core
+```
+
+2. Via the config
+
+```yaml
+emit:
+  - "@azure-tools/typespec-client-generator-core"
+```
+
+The config can be extended with options as follows:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-client-generator-core"
+options:
+  "@azure-tools/typespec-client-generator-core":
+    option: value
+```
+
+## Emitter options
+
+### `generate-protocol-methods`
+
+**Type:** `boolean`
+
+### `generate-convenience-methods`
+
+**Type:** `boolean`
+
+### `package-name`
+
+**Type:** `string`
+
+### `flatten-union-as-enum`
+
+**Type:** `boolean`
+
+### `api-version`
+
+**Type:** `string`
+
+### `examples-directory`
+
+**Type:** `string`
+
+### `examples-dir`
+
+**Type:** `string`
+
+### `emitter-name`
+
+**Type:** `string`
+
 ## Decorators
 
 ### Azure.ClientGenerator.Core
@@ -16,6 +75,7 @@ npm install @azure-tools/typespec-client-generator-core
 - [`@client`](#@client)
 - [`@clientInitialization`](#@clientinitialization)
 - [`@clientName`](#@clientname)
+- [`@clientNamespace`](#@clientnamespace)
 - [`@convenientAPI`](#@convenientapi)
 - [`@flattenProperty`](#@flattenproperty)
 - [`@operationGroup`](#@operationgroup)
@@ -51,10 +111,10 @@ otherwise a warning will be added to diagnostics list.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `EnumMember`     | The access info you want to set for this model or operation.                                                  |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                                                                                                           |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember`     | The access info you want to set for this model or operation.                                                                                                                                          |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -180,10 +240,10 @@ Create a ClientGenerator.Core client out of a namespace or interface
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `Model`          | Optional configuration for the service.                                                                       |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                                                                                                           |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `Model`          | Optional configuration for the service.                                                                                                                                                               |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -232,10 +292,10 @@ Client parameters you would like to add to the client. By default, we apply endp
 
 ##### Parameters
 
-| Name    | Type             | Description                                                                                                   |
-| ------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| options | `Model`          |                                                                                                               |
-| scope   | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name    | Type             | Description                                                                                                                                                                                           |
+| ------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | `Model`          |                                                                                                                                                                                                       |
+| scope   | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -271,10 +331,10 @@ Changes the name of a method, parameter, property, or model generated in the cli
 
 ##### Parameters
 
-| Name   | Type             | Description                                                                                                   |
-| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| rename | `valueof string` | The rename you want applied to the object                                                                     |
-| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name   | Type             | Description                                                                                                                                                                                           |
+| ------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object                                                                                                                                                             |
+| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -291,6 +351,41 @@ op nameInService: void;
 op nameInService: void;
 ```
 
+#### `@clientNamespace`
+
+Changes the namespace of a client, model, enum or union generated in the client SDK.
+By default, the client namespace for them will follow the TypeSpec namespace.
+
+```typespec
+@Azure.ClientGenerator.Core.clientNamespace(rename: valueof string, scope?: valueof string)
+```
+
+##### Target
+
+`Namespace | Interface | Model | Enum | Union`
+
+##### Parameters
+
+| Name   | Type             | Description                                                                                                   |
+| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object                                                                     |
+| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+
+##### Examples
+
+```typespec
+@clientNamespace("ContosoClient")
+namespace Contoso;
+```
+
+```typespec
+@clientName("ContosoJava", "java")
+@clientName("ContosoPython", "python")
+@clientName("ContosoCSharp", "csharp")
+@clientName("ContosoJavascript", "javascript")
+namespace Contoso;
+```
+
 #### `@convenientAPI`
 
 Whether you want to generate an operation as a convenient operation.
@@ -305,10 +400,10 @@ Whether you want to generate an operation as a convenient operation.
 
 ##### Parameters
 
-| Name  | Type              | Description                                                                                                   |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `valueof boolean` | Whether to generate the operation as convenience method or not.                                               |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type              | Description                                                                                                                                                                                           |
+| ----- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof boolean` | Whether to generate the operation as convenience method or not.                                                                                                                                       |
+| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -333,9 +428,9 @@ Set whether a model property should be flattened or not.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                                                                                                           |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -361,9 +456,9 @@ Create a ClientGenerator.Core operation group out of a namespace or interface
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                                                                                                           |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -387,10 +482,10 @@ Override the default client method generated by TCGC from your service definitio
 
 ##### Parameters
 
-| Name     | Type             | Description                                                                                                   |
-| -------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| override | `Operation`      | : The override method definition that specifies the exact client method you want                              |
-| scope    | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name     | Type             | Description                                                                                                                                                                                           |
+| -------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| override | `Operation`      | : The override method definition that specifies the exact client method you want                                                                                                                      |
+| scope    | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -446,10 +541,10 @@ Alias the name of a client parameter to a different name. This permits you to ha
 
 ##### Parameters
 
-| Name       | Type             | Description                                                                                                   |
-| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| paramAlias | `valueof string` |                                                                                                               |
-| scope      | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name       | Type             | Description                                                                                                                                                                                           |
+| ---------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| paramAlias | `valueof string` |                                                                                                                                                                                                       |
+| scope      | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -486,10 +581,10 @@ Whether you want to generate an operation as a protocol operation.
 
 ##### Parameters
 
-| Name  | Type              | Description                                                                                                   |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `valueof boolean` | Whether to generate the operation as protocol or not.                                                         |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type              | Description                                                                                                                                                                                           |
+| ----- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof boolean` | Whether to generate the operation as protocol or not.                                                                                                                                                 |
+| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -526,10 +621,10 @@ otherwise a warning will be added to diagnostics list.
 
 ##### Parameters
 
-| Name  | Type                  | Description                                                                                                   |
-| ----- | --------------------- | ------------------------------------------------------------------------------------------------------------- |
-| value | `EnumMember \| Union` | The usage info you want to set for this model.                                                                |
-| scope | `valueof string`      | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type                  | Description                                                                                                                                                                                           |
+| ----- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember \| Union` | The usage info you want to set for this model.                                                                                                                                                        |
+| scope | `valueof string`      | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
@@ -597,9 +692,9 @@ Whether a model needs the custom JSON converter, this is only used for backward 
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                   |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters |
+| Name  | Type             | Description                                                                                                                                                                                           |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 

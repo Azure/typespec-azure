@@ -21,14 +21,10 @@ import {
   getLibraryName,
   getPropertyNames,
   isApiVersion,
+  isAzureCoreModel,
 } from "../src/public-utils.js";
 import { getAllModels, getSdkUnion } from "../src/types.js";
-import {
-  SdkTestRunner,
-  createSdkContextTestHelper,
-  createSdkTestRunner,
-  createTcgcTestRunnerForEmitter,
-} from "./test-host.js";
+import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: public-utils", () => {
   let runner: SdkTestRunner;
@@ -401,7 +397,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   describe("getPropertyNames", () => {
     it("property language projected name", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -427,7 +423,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property language projected name augmented", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -452,7 +448,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -474,7 +470,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -493,7 +489,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property with projected client and json name", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -520,7 +516,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property with projected language and json name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -543,7 +539,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   describe("getLibraryName", () => {
     it("operation client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test @clientName("rightName") op func(@query("api-version") myApiVersion: string): void;
       `)) as { func: Operation };
@@ -556,7 +552,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation language projected name", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         @clientName("madeForCS", "csharp")
@@ -574,7 +570,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation language projected name augmented", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         op func(@query("api-version") myApiVersion: string): void;
@@ -593,7 +589,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation json projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
@@ -608,7 +604,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         op func(@query("api-version") myApiVersion: string): void;
@@ -622,7 +618,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @clientName("RightName")
@@ -639,7 +635,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model language projected name", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @clientName("CsharpModel", "csharp")
@@ -659,7 +655,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model language projected name augmented", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -680,7 +676,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model json projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
@@ -697,7 +693,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -713,7 +709,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model friendly name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
@@ -730,7 +726,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model friendly name augmented", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -748,7 +744,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("should return language specific name when both language specific name and friendly name exist", async () => {
       async function helper(expected: string, emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
@@ -770,7 +766,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("should return client name when both client name and friendly name exist", async () => {
       async function helper(expected: string, emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
@@ -789,7 +785,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("parameter client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -807,7 +803,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("parameter language projected name", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -829,7 +825,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("parameter json projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -847,7 +843,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("parameter no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -1777,7 +1773,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         emitterName: "@azure-tools/typespec-java",
       });
       await runnerWithCore.compile(lroCode);
-      const models = runnerWithCore.context.sdkPackage.models;
+      const models = runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
       strictEqual(models.length, 1);
       deepStrictEqual(models[0].name, "ExportedUser");
     });
@@ -1788,7 +1784,6 @@ describe("typespec-client-generator-core: public-utils", () => {
         emitterName: "@azure-tools/typespec-java",
       });
       await runnerWithCore.compile(lroCode);
-      runnerWithCore.context.filterOutCoreModels = false;
       const models = getAllModels(runnerWithCore.context);
       strictEqual(models.length, 8);
       // there should only be one non-core model
