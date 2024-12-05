@@ -1642,7 +1642,7 @@ function updateTypesFromOperation(
       const access = getAccessOverride(context, operation) ?? "public";
       diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
 
-      if (!context.arm) {
+      if (!context.arm && context.generateEnvelopeResult) {
         // TODO: currently skipping adding of envelopeResult due to arm error
         // https://github.com/Azure/typespec-azure/issues/311
         const sdkType = diagnostics.pipe(

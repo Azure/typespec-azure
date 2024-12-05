@@ -54,6 +54,8 @@ export interface TCGCContext {
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
+  __pagedResultSet: Set<SdkType>;
+  generateEnvelopeResult?: boolean;
 }
 
 export interface SdkContext<

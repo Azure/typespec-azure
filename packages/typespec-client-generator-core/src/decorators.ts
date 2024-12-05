@@ -628,6 +628,7 @@ export interface CreateSdkContextOptions {
   readonly versioning?: VersioningStrategy;
   additionalDecorators?: string[];
   disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
+  generateEnvelopeResult?: boolean;
 }
 
 export async function createSdkContext<
@@ -661,6 +662,7 @@ export async function createSdkContext<
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
+    generateEnvelopeResult: options?.generateEnvelopeResult ?? true,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {

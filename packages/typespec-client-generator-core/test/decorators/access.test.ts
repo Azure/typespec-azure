@@ -1,6 +1,7 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Model, ModelProperty, Operation } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -648,6 +649,168 @@ describe("typespec-client-generator-core: @access", () => {
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
     });
+  });
+
+  it("Make sure we don't get envelope model if we don't want envelope models", async () => {
+    const runnerWithCore = await createSdkTestRunner(
+      {
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      },
+      {
+        generateEnvelopeResult: false,
+      },
+    );
+    await runnerWithCore.compileWithCustomization(
+      `
+        @useDependency(Versions.v1_0_Preview_2)
+      @server("http://localhost:3000", "endpoint")
+      @service()
+      namespace DocumentIntelligence;
+        @lroStatus
+        @doc("Operation status.")
+        union DocumentIntelligenceOperationStatus {
+          string,
+
+          @doc("The operation has not started yet.")
+          notStarted: "notStarted",
+
+          @doc("The operation is in progress.")
+          running: "running",
+
+          @doc("The operation has failed.")
+          @lroFailed
+          failed: "failed",
+
+          @doc("The operation has succeeded.")
+          @lroSucceeded
+          succeeded: "succeeded",
+
+          @doc("The operation has been canceled.")
+          @lroCanceled
+          canceled: "canceled",
+
+          @doc("The operation has been skipped.")
+          @lroCanceled
+          skipped: "skipped",
+        }
+        #suppress "@azure-tools/typespec-azure-core/long-running-polling-operation-required" "This is a template"
+        op DocumentIntelligenceLongRunningOperation<
+          TParams extends TypeSpec.Reflection.Model,
+          TResponse extends TypeSpec.Reflection.Model
+        > is Foundations.Operation<
+          {
+            ...TParams,
+            @doc("Unique document model name.")
+            @path
+            @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+            @maxLength(64)
+            modelId: string;
+          },
+          AcceptedResponse &
+            Foundations.RetryAfterHeader & {
+              @pollingLocation
+              @header("Operation-Location")
+              operationLocation: ResourceLocation<TResponse>;
+            },
+          {},
+          {}
+        >;
+
+        op DocumentIntelligenceOperation<
+          TParams extends TypeSpec.Reflection.Model,
+          TResponse extends TypeSpec.Reflection.Model & Foundations.RetryAfterHeader
+        > is Foundations.Operation<
+          TParams,
+          TResponse,
+          {},
+          {}
+        >;
+
+        @doc("Document analysis result.")
+        model AnalyzeResult {
+          @doc("API version used to produce this result.")
+          apiVersion: string;
+
+          @doc("Document model ID used to produce this result.")
+          @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+          modelId: string;
+        }
+
+        @doc("Status and result of the analyze operation.")
+        model AnalyzeOperation {
+          @doc("Operation status.  notStarted, running, succeeded, or failed")
+          status: DocumentIntelligenceOperationStatus;
+
+          @doc("Date and time (UTC) when the analyze operation was submitted.")
+          createdDateTime: utcDateTime;
+
+          @doc("Date and time (UTC) when the status was last updated.")
+          lastUpdatedDateTime: utcDateTime;
+
+          @doc("Encountered error during document analysis.")
+          error?: {};
+
+          @lroResult
+          @doc("Document analysis result.")
+          analyzeResult?: AnalyzeResult;
+        }
+
+        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
+        @doc("Analyzes document with document model.")
+        @post
+        @pollingOperation(getAnalyzeResult)
+        @sharedRoute
+        @route("/documentModels/{modelId}:analyze")
+        op analyzeDocument is DocumentIntelligenceLongRunningOperation<
+          {
+            @doc("Input content type.")
+            @header
+            contentType: "application/json";
+
+            @doc("Analyze request parameters.")
+            @bodyRoot
+            @clientName("body", "python")
+            analyzeRequest?: {};
+          },
+          AnalyzeOperation
+        >;
+
+        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
+        @doc("Gets the result of document analysis.")
+        @route("/documentModels/{modelId}/analyzeResults/{resultId}")
+        @get
+        op getAnalyzeResult is DocumentIntelligenceOperation<
+          {
+            @doc("Unique document model name.")
+            @path
+            @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+            @maxLength(64)
+            modelId: string;
+
+            @doc("Analyze operation result ID.")
+            @path
+            resultId: uuid;
+          },
+          AnalyzeOperation
+        >;
+        `,
+      `
+        namespace ClientCustomizations;
+
+        @client({
+          name: "DocumentIntelligenceClient",
+          service: DocumentIntelligence,
+        })
+        interface DocumentIntelligenceClient {
+          analyzeDocument is DocumentIntelligence.analyzeDocument;
+        }
+        `,
+    );
+    const models = runnerWithCore.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    ok(!models.find((m) => m.name === "AnalyzeOperation"));
   });
 
   it("access conflict from propagation", async () => {
