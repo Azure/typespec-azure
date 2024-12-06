@@ -1,9 +1,10 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
 
-describe("typespec-client-generator-core: package", () => {
+describe("typespec-client-generator-core: responses", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
@@ -278,5 +279,24 @@ describe("typespec-client-generator-core: package", () => {
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.response.type?.kind, "model");
     strictEqual(method.response.type.usage, 0);
+  });
+
+  it("response model with property with none visibility", async function () {
+    await runner.compileWithBuiltInService(`
+      model Test{
+          prop: string;
+          @visibility("none")
+          nonProp: string;
+      }
+      op get(): Test;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const models = sdkPackage.models;
+    strictEqual(models.length, 1);
+    strictEqual(models[0].properties.length, 1);
+    strictEqual(
+      (sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>).response.type,
+      models[0],
+    );
   });
 });

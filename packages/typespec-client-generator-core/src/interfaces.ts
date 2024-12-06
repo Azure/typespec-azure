@@ -588,6 +588,7 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   exception?: SdkMethodResponse;
   generateConvenient: boolean;
   generateProtocol: boolean;
+  isOverride: boolean;
 }
 
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -596,7 +597,7 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 }
 
 interface SdkPagingServiceMethodOptions {
-  __raw_paged_metadata: PagedResultMetadata;
+  __raw_paged_metadata?: PagedResultMetadata;
   nextLinkPath?: string; // off means fake paging
   nextLinkOperation?: SdkServiceOperation;
 }

@@ -1331,6 +1331,7 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
+      getVisibility(context.program, property)?.includes("none") ||
       sdkType.kind !== "model"
     ) {
       continue;

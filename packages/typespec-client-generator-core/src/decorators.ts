@@ -584,9 +584,12 @@ export function listOperationsInOperationGroup(
     }
 
     for (const op of current.operations.values()) {
-      // Skip templated operations
-      if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(getOverriddenClientMethod(context, op) ?? op);
+      // Skip templated operations and omit operations
+      if (
+        !isTemplateDeclarationOrInstance(op) &&
+        !context.program.stateMap(omitOperation).get(op)
+      ) {
+        operations.push(op);
       }
     }
 
@@ -616,6 +619,7 @@ export function createTCGCContext(program: Program, emitterName: string): TCGCCo
     __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
+    __pagedResultSet: new Set(),
   };
 }
 
@@ -900,6 +904,7 @@ export function getClientNameOverride(
 }
 
 const overrideKey = createStateSymbol("override");
+const omitOperation = createStateSymbol("omitOperation");
 
 // Recursive function to collect parameter names
 function collectParams(
@@ -948,6 +953,9 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
+  // omit all override operation
+  context.program.stateMap(omitOperation).set(override, true);
+
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
     a.name.localeCompare(b.name),

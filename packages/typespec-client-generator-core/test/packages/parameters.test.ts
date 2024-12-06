@@ -1103,6 +1103,17 @@ describe("typespec-client-generator-core: parameters", () => {
       strictEqual(method.operation.uriTemplate, "/test");
     });
 
+    it("normal case with different wire name", async () => {
+      await runner.compileWithBuiltInService(`
+          @autoRoute
+          op test(@path("param-wire") param: string): void;
+        `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.parameters.length, 1);
+      strictEqual(method.operation.parameters.length, 1);
+    });
+
     it("singleton resource", async () => {
       const runnerWithArm = await createSdkTestRunner({
         librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
