@@ -684,6 +684,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
       ok(analyzeOperationModel);
       strictEqual(analyzeOperationModel.usage, UsageFlags.LroFinalEnvelope | UsageFlags.LroPolling);
+    });
   });
 
   describe("Arm LRO templates", () => {
