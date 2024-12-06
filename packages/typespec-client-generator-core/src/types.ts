@@ -1595,6 +1595,7 @@ function updateTypesFromOperation(
     diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
   }
 
+  const lroMetaData = getLroMetadata(program, operation);
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -1606,6 +1607,9 @@ function updateTypesFromOperation(
         if (generateConvenient) {
           if (response.statusCodes === "*" || isErrorModel(context.program, body)) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Exception, sdkType));
+          } else if (lroMetaData !== undefined) {
+            // when the operation is an lro, the response should be its initial response.
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.LroInitial, sdkType));
           } else {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
           }
@@ -1633,29 +1637,35 @@ function updateTypesFromOperation(
       }
     }
   }
-  const lroMetaData = getLroMetadata(program, operation);
-  if (lroMetaData && generateConvenient) {
-    if (lroMetaData.finalResult !== undefined && lroMetaData.finalResult !== "void") {
-      const sdkType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, lroMetaData.finalResult, operation),
-      );
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-      const access = getAccessOverride(context, operation) ?? "public";
-      diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
 
-      if (!context.arm) {
-        // TODO: currently skipping adding of envelopeResult due to arm error
-        // https://github.com/Azure/typespec-azure/issues/311
-        const sdkType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, lroMetaData.envelopeResult, operation),
-        );
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-        const access = getAccessOverride(context, operation) ?? "public";
-        diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-      }
-    }
+  if (lroMetaData && generateConvenient) {
+    // the final result will be normal output usage.
+    updateUsageOrAccessForLroComponent(lroMetaData.finalResult, UsageFlags.Output);
+
+    // the final envelope result will have LroFinalEnvelope.
+    updateUsageOrAccessForLroComponent(
+      lroMetaData.finalEnvelopeResult,
+      UsageFlags.LroFinalEnvelope,
+    );
+
+    // the polling model will have LroPolling.
+    updateUsageOrAccessForLroComponent(
+      lroMetaData.pollingInfo.responseModel,
+      UsageFlags.LroPolling,
+    );
   }
   return diagnostics.wrap(undefined);
+
+  function updateUsageOrAccessForLroComponent(
+    model: Model | "void" | undefined,
+    usage: UsageFlags,
+  ) {
+    if (model === undefined || model === "void") return;
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, model, operation));
+    diagnostics.pipe(updateUsageOrAccess(context, usage, sdkType));
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+  }
 }
 
 function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
