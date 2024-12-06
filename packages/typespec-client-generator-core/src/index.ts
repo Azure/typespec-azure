@@ -1,3 +1,4 @@
+export * from "./context.js";
 export * from "./decorators.js";
 export * from "./interfaces.js";
 export * from "./lib.js";

@@ -716,6 +716,77 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     strictEqual(nameProperty?.type.kind, "Scalar");
     strictEqual(nameProperty?.type.name, "WidgetNameType");
   });
+
+  it("emits diagnostics for non ARM resources", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso {
+       @parentResource(Microsoft.Person.Contoso.Person)
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+      
+        /** Employee properties */
+        model EmployeeProperties {
+          /** The status of the last operation. */
+          @visibility("read")
+          provisioningState?: ProvisioningState;
+        }
+      
+        /** The provisioning state of a resource. */
+        union ProvisioningState {
+          string,
+      
+          /** Resource has been created. */
+          Succeeded: "Succeeded",
+      
+          /** Resource creation failed. */
+          Failed: "Failed",
+      
+          /** Resource creation was canceled. */
+          Canceled: "Canceled",
+        }
+      
+        interface Operations extends Azure.ResourceManager.Operations {}
+      
+        @armResourceOperations
+        interface Employees {
+          listByResourceGroup is ArmResourceListByParent<Employee>;
+        }
+      }
+        
+      namespace Microsoft.Person.Contoso {
+        /** Person parent */
+        model Person {
+          /** The parent name */
+          @path
+          @visibility("read")
+          @segment("parents")
+          @key
+          name: string;
+        }
+      }
+`);
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing",
+        message: "No @armResource registration found for type Person",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/parent-type",
+        message: "Parent type Person of Employee is not registered as an ARM resource type.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing",
+        message: "No @armResource registration found for type Person",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/parent-type",
+        message: "Parent type Person of Employee is not registered as an ARM resource type.",
+      },
+    ]);
+  });
 });
 
 it("emits default optional properties for resource", async () => {
@@ -760,4 +831,55 @@ it("emits required properties for resource with @armResourcePropertiesOptionalit
   expectDiagnosticEmpty(diagnostics);
   strictEqual(resources.length, 1);
   strictEqual(resources[0].typespecType.properties.get("properties")?.optional, false);
+});
+
+it("recognizes resource with customResource identifier", async () => {
+  const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso {
+     @parentResource(Microsoft.Person.Contoso.Person)
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+    
+      /** Employee properties */
+      model EmployeeProperties {
+        /** The status of the last operation. */
+        @visibility("read")
+        provisioningState?: ProvisioningState;
+      }
+    
+      /** The provisioning state of a resource. */
+      union ProvisioningState {
+        string,
+    
+        /** Resource has been created. */
+        Succeeded: "Succeeded",
+    
+        /** Resource creation failed. */
+        Failed: "Failed",
+    
+        /** Resource creation was canceled. */
+        Canceled: "Canceled",
+      }
+    
+      interface Operations extends Azure.ResourceManager.Operations {}
+    
+      @armResourceOperations
+      interface Employees {
+        listByResourceGroup is ArmResourceListByParent<Employee>;
+      }
+    }
+    
+    namespace Microsoft.Person.Contoso {
+      /** Person parent */
+      @Azure.ResourceManager.Legacy.customAzureResource
+      model Person {
+        /** The parent name */
+        name: string;
+      }
+    }
+`);
+  expectDiagnosticEmpty(diagnostics);
 });
