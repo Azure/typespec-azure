@@ -30,7 +30,11 @@
     "test": "pnpm run-all run test",
     "update-latest-docs": "pnpm run-all run update-latest-docs",
     "watch": "tsc --build ./tsconfig.ws.json --watch",
-    "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config ./eng/config/labels.ts"
+    "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config ./eng/config/labels.ts",
+    "validate-scenarios": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-scenarios",
+    "validate-mock-apis": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-mock-apis",
+    "generate-scenarios-summary": "pnpm -r --filter=@azure-tools/azure-http-specs run generate-scenarios-summary",
+    "upload-manifest": "pnpm -r --filter=@azure-tools/azure-http-specs run upload-manifest"
   },
   "devDependencies": {
     "@chronus/chronus": "^0.13.0",
