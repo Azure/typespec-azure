@@ -53,6 +53,8 @@ export interface TCGCContext {
   examplesDir?: string;
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
+  disableUsageAccessPropagationToBase: boolean;
+  __pagedResultSet: Set<SdkType>;
 }
 
 export interface SdkContext<
@@ -74,6 +76,7 @@ export interface SdkEmitterOptions {
    */
   "examples-directory"?: string;
   "examples-dir"?: string;
+  "emitter-name"?: string;
 }
 
 export interface SdkClient {
@@ -427,7 +430,8 @@ export type SdkModelPropertyType =
   | SdkQueryParameter
   | SdkPathParameter
   | SdkBodyParameter
-  | SdkHeaderParameter;
+  | SdkHeaderParameter
+  | SdkCookieParameter;
 
 export interface MultipartOptions {
   // whether this part is for file
@@ -487,6 +491,12 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
+export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
+  kind: "cookie";
+  serializedName: string;
+  correspondingMethodParams: SdkModelPropertyType[];
+}
+
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
   serializedName: string;
@@ -500,7 +510,8 @@ export type SdkHttpParameter =
   | SdkQueryParameter
   | SdkPathParameter
   | SdkBodyParameter
-  | SdkHeaderParameter;
+  | SdkHeaderParameter
+  | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
@@ -552,7 +563,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   path: string;
   uriTemplate: string;
   verb: HttpVerb;
-  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   bodyParam?: SdkBodyParameter;
   responses: SdkHttpResponse[];
   exceptions: SdkHttpErrorResponse[];
@@ -585,6 +596,7 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   exception?: SdkMethodResponse;
   generateConvenient: boolean;
   generateProtocol: boolean;
+  isOverride: boolean;
 }
 
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -593,7 +605,7 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 }
 
 interface SdkPagingServiceMethodOptions {
-  __raw_paged_metadata: PagedResultMetadata;
+  __raw_paged_metadata?: PagedResultMetadata;
   nextLinkPath?: string; // off means fake paging
   nextLinkOperation?: SdkServiceOperation;
 }
@@ -729,12 +741,23 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
+  /**
+   * @deprecated Use `Exception` instead.
+   */
   // Output will also be set when Error is set.
   Error = 1 << 7,
-  // Set when model is used in conjunction with an application/json content type.
+  // Set when type is used in conjunction with an application/json content type.
   Json = 1 << 8,
-  // Set when model is used in conjunction with an application/xml content type.
+  // Set when type is used in conjunction with an application/xml content type.
   Xml = 1 << 9,
+  // Set when type is used for exception output.
+  Exception = 1 << 10,
+  // Set when type is used as LRO initial response.
+  LroInitial = 1 << 11,
+  // Set when type is used as LRO polling response.
+  LroPolling = 1 << 12,
+  // Set when type is used as LRO final envelop response.
+  LroFinalEnvelope = 1 << 13,
 }
 
 interface SdkExampleBase {

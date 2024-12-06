@@ -11,11 +11,7 @@ model PrivateEndpoint {
   /** The resource identifier for private endpoint */
   @visibility("read")
   @typeChangedFrom(CommonTypes.Versions.v4, string)
-  id?: Azure.Core.armResourceIdentifier<[
-    {
-      type: "Microsoft.Network/privateEndpoints";
-    }
-  ]>;
+  id?: Azure.Core.armResourceIdentifier;
 }
 
 /** A private link resource. */
@@ -131,13 +127,12 @@ union PrivateEndpointServiceConnectionStatus {
 
 /**
  * The name of the private endpoint connection associated with the Azure resource.
- * @template Segment The resource type name for private endpoint connections (default is privateEndpointConnections)
  */
-model PrivateEndpointConnectionParameter<Segment extends valueof string = "privateEndpointConnections"> {
+model PrivateEndpointConnectionParameter {
   /** The name of the private endpoint connection associated with the Azure resource. */
   @path
-  @TypeSpec.Rest.segment(Segment)
   @key("privateEndpointConnectionName")
+  @TypeSpec.Rest.segment("privateEndpointConnections")
   name: string;
 }
 

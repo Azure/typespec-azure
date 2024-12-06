@@ -4,11 +4,7 @@ import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
 import { getClientType, getSdkEnum } from "../../src/types.js";
-import {
-  SdkTestRunner,
-  createSdkTestRunner,
-  createTcgcTestRunnerForEmitter,
-} from "../test-host.js";
+import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: enum types", () => {
   let runner: SdkTestRunner;
@@ -359,7 +355,7 @@ describe("typespec-client-generator-core: enum types", () => {
       `);
 
     async function helper(emitterName: string, enumName: string, enumValueName: string) {
-      const runner = await createTcgcTestRunnerForEmitter(emitterName);
+      const runner = await createSdkTestRunner({ emitterName });
       const { Enum1 } = (await runner.compile(`
         @service({})
         namespace MyService {

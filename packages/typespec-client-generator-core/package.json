@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-client-generator-core",
-  "version": "0.48.1",
+  "version": "0.48.4",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Data Plane Generation library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -57,7 +57,8 @@
   ],
   "dependencies": {
     "change-case": "~5.4.4",
-    "pluralize": "^8.0.0"
+    "pluralize": "^8.0.0",
+    "yaml": "~2.5.1"
   },
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",

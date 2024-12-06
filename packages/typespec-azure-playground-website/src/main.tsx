@@ -48,6 +48,7 @@ await renderReactPlayground({
   emitterViewers: {
     "@typespec/openapi3": [SwaggerUIViewer],
     "@azure-tools/typespec-autorest": [SwaggerUIViewer],
+    "@azure-tools/typespec-client-generator-core": [SwaggerUIViewer],
   },
   importConfig: {
     useShim: true,

@@ -2581,7 +2581,8 @@ serialized_prop = json.dumps(prop, cls=SdkJSONEncoder, format="rfc3339")
 <ClientTabItem lang="csharp" >
 
 ```csharp
-TODO
+// Internal implementation
+utf8JsonWriter.WriteStringValue(Prop.ToString());
 ```
 
 </ClientTabItem>

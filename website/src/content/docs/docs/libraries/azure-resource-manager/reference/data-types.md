@@ -1274,7 +1274,7 @@ model Azure.ResourceManager.CommonTypes.IfMatchHeader
 
 ### `IfNoneMatchHeader` {#Azure.ResourceManager.CommonTypes.IfNoneMatchHeader}
 
-The default ARM If-Match header type.
+The default ARM If-None-Match header type.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.IfNoneMatchHeader
@@ -1484,20 +1484,14 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationLis
 The name for a network security perimeter configuration
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter<Segment>
+model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter
 ```
-
-#### Template Parameters
-
-| Name    | Description                                                                                                             |
-| ------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Segment | The resource type name for network security perimeter configuration (default is networkSecurityPerimeterConfigurations) |
 
 #### Properties
 
-| Name | Type     | Description                                             |
-| ---- | -------- | ------------------------------------------------------- |
-| name | `string` | The name for a network security perimeter configuration |
+| Name                                      | Type     | Description                                             |
+| ----------------------------------------- | -------- | ------------------------------------------------------- |
+| networkSecurityPerimeterConfigurationName | `string` | The name for a network security perimeter configuration |
 
 ### `NetworkSecurityPerimeterConfigurationProperties` {#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties}
 
@@ -1609,16 +1603,17 @@ model Azure.ResourceManager.CommonTypes.OperationStatusResult
 
 #### Properties
 
-| Name             | Type                                                                           | Description                                 |
-| ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------- |
-| id?              | `string`                                                                       | Fully qualified ID for the async operation. |
-| name?            | `string`                                                                       | Name of the async operation.                |
-| status           | `string`                                                                       | Operation status.                           |
-| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.  |
-| startTime?       | `utcDateTime`                                                                  | The start time of the operation.            |
-| endTime?         | `utcDateTime`                                                                  | The end time of the operation.              |
-| operations?      | `ResourceManager.CommonTypes.OperationStatusResult[]`                          | The operations list.                        |
-| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | If present, details of the operation error. |
+| Name             | Type                                                                           | Description                                                                                |
+| ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| id?              | `Core.armResourceIdentifier`                                                   | Fully qualified ID for the async operation.                                                |
+| name?            | `string`                                                                       | Name of the async operation.                                                               |
+| status           | `string`                                                                       | Operation status.                                                                          |
+| percentComplete? | `float64`                                                                      | Percent of the operation that is complete.                                                 |
+| startTime?       | `utcDateTime`                                                                  | The start time of the operation.                                                           |
+| endTime?         | `utcDateTime`                                                                  | The end time of the operation.                                                             |
+| operations?      | `ResourceManager.CommonTypes.OperationStatusResult[]`                          | The operations list.                                                                       |
+| error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | If present, details of the operation error.                                                |
+| resourceId?      | `string`                                                                       | Fully qualified ID of the resource against which the original async operation was started. |
 
 ### `Plan` {#Azure.ResourceManager.CommonTypes.Plan}
 
@@ -1738,14 +1733,8 @@ interface Employees {
 The name of the private endpoint connection associated with the Azure resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter<Segment>
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter
 ```
-
-#### Template Parameters
-
-| Name    | Description                                                                                     |
-| ------- | ----------------------------------------------------------------------------------------------- |
-| Segment | The resource type name for private endpoint connections (default is privateEndpointConnections) |
 
 #### Properties
 
@@ -2088,7 +2077,7 @@ model Azure.ResourceManager.CommonTypes.SystemData
 
 ### `TenantIdParameter` {#Azure.ResourceManager.CommonTypes.TenantIdParameter}
 
-The default ManagementGroupName parameter type.
+The default TenantIdParameter type.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.TenantIdParameter

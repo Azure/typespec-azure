@@ -721,7 +721,7 @@ export function getSdkModelWithDiagnostics(
 
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
-    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // initial usage we can tell just by looking at the model
+    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // eslint-disable-line @typescript-eslint/no-deprecated
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -1332,6 +1332,7 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
+      getVisibility(context.program, property)?.includes("none") || // eslint-disable-line @typescript-eslint/no-deprecated
       sdkType.kind !== "model"
     ) {
       continue;
@@ -1384,7 +1385,10 @@ function updateUsageOrAccess(
   if (options?.seenTypes === undefined) {
     options.seenTypes = new Set<SdkType>();
   }
-  if (options.seenTypes.has(type)) return diagnostics.wrap(undefined); // avoid circular references
+  if (options.seenTypes.has(type)) {
+    options.skipFirst = false;
+    return diagnostics.wrap(undefined); // avoid circular references
+  }
   if (type.kind === "array" || type.kind === "dict") {
     diagnostics.pipe(updateUsageOrAccess(context, value, type.valueType, options));
     return diagnostics.wrap(undefined);
@@ -1444,10 +1448,12 @@ function updateUsageOrAccess(
     }
   } else {
     options.skipFirst = false;
+    if (typeof value !== "number") {
+      type.__accessSet = true;
+    }
   }
 
   if (type.kind === "enum") return diagnostics.wrap(undefined);
-  if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccess(context, value, unionType, options));
@@ -1458,8 +1464,13 @@ function updateUsageOrAccess(
     diagnostics.pipe(updateUsageOrAccess(context, value, type.type, options));
     return diagnostics.wrap(undefined);
   }
+
+  if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.baseModel) {
     options.ignoreSubTypeStack.push(true);
+    if (context.disableUsageAccessPropagationToBase) {
+      options.skipFirst = true;
+    }
     diagnostics.pipe(updateUsageOrAccess(context, value, type.baseModel, options));
     options.ignoreSubTypeStack.pop();
   }
@@ -1554,38 +1565,38 @@ function updateTypesFromOperation(
         // will also have Json type
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.JsonMergePatch, sdkType));
       }
-    }
-    if (multipartOperation) {
-      diagnostics.pipe(
-        updateUsageOrAccess(context, UsageFlags.MultipartFormData, sdkType, {
-          propagation: false,
-        }),
-      );
-    }
-    const access = getAccessOverride(context, operation) ?? "public";
-    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-
-    // after completion of usage calculation for httpBody, check whether it has
-    // conflicting usage between multipart and regular body
-    if (sdkType.kind === "model") {
-      const isUsedInMultipart = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
-      const isUsedInOthers =
-        ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
-      if ((!multipartOperation && isUsedInMultipart) || (multipartOperation && isUsedInOthers)) {
-        // This means we have a model that is used both for formdata input and for regular body input
-        diagnostics.add(
-          createDiagnostic({
-            code: "conflicting-multipart-model-usage",
-            target: httpBody.type,
-            format: {
-              modelName: sdkType.name,
-            },
+      if (multipartOperation) {
+        diagnostics.pipe(
+          updateUsageOrAccess(context, UsageFlags.MultipartFormData, sdkType, {
+            propagation: false,
           }),
         );
       }
+      // after completion of usage calculation for httpBody, check whether it has
+      // conflicting usage between multipart and regular body
+      if (sdkType.kind === "model") {
+        const isUsedInMultipart = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
+        const isUsedInOthers =
+          ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
+        if ((!multipartOperation && isUsedInMultipart) || (multipartOperation && isUsedInOthers)) {
+          // This means we have a model that is used both for formdata input and for regular body input
+          diagnostics.add(
+            createDiagnostic({
+              code: "conflicting-multipart-model-usage",
+              target: httpBody.type,
+              format: {
+                modelName: sdkType.name,
+              },
+            }),
+          );
+        }
+      }
     }
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
   }
 
+  const lroMetaData = getLroMetadata(program, operation);
   for (const response of httpOperation.responses) {
     for (const innerResponse of response.responses) {
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -1595,10 +1606,18 @@ function updateTypesFromOperation(
             : innerResponse.body.type;
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
-          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-        }
-        if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
-          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+          if (response.statusCodes === "*" || isErrorModel(context.program, body)) {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Exception, sdkType));
+          } else if (lroMetaData !== undefined) {
+            // when the operation is an lro, the response should be its initial response.
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.LroInitial, sdkType));
+          } else {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
+          }
+
+          if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+          }
         }
         const access = getAccessOverride(context, operation) ?? "public";
         diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
@@ -1619,29 +1638,35 @@ function updateTypesFromOperation(
       }
     }
   }
-  const lroMetaData = getLroMetadata(program, operation);
-  if (lroMetaData && generateConvenient) {
-    if (lroMetaData.finalResult !== undefined && lroMetaData.finalResult !== "void") {
-      const sdkType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, lroMetaData.finalResult, operation),
-      );
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-      const access = getAccessOverride(context, operation) ?? "public";
-      diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
 
-      if (!context.arm) {
-        // TODO: currently skipping adding of envelopeResult due to arm error
-        // https://github.com/Azure/typespec-azure/issues/311
-        const sdkType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, lroMetaData.envelopeResult, operation),
-        );
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
-        const access = getAccessOverride(context, operation) ?? "public";
-        diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
-      }
-    }
+  if (lroMetaData && generateConvenient) {
+    // the final result will be normal output usage.
+    updateUsageOrAccessForLroComponent(lroMetaData.finalResult, UsageFlags.Output);
+
+    // the final envelope result will have LroFinalEnvelope.
+    updateUsageOrAccessForLroComponent(
+      lroMetaData.finalEnvelopeResult,
+      UsageFlags.LroFinalEnvelope,
+    );
+
+    // the polling model will have LroPolling.
+    updateUsageOrAccessForLroComponent(
+      lroMetaData.pollingInfo.responseModel,
+      UsageFlags.LroPolling,
+    );
   }
   return diagnostics.wrap(undefined);
+
+  function updateUsageOrAccessForLroComponent(
+    model: Model | "void" | undefined,
+    usage: UsageFlags,
+  ) {
+    if (model === undefined || model === "void") return;
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, model, operation));
+    diagnostics.pipe(updateUsageOrAccess(context, usage, sdkType));
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+  }
 }
 
 function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[]] {

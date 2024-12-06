@@ -43,11 +43,84 @@ def upload(
 ```
 
 ```csharp
+//model class
+public partial class MultipartRequest
+{
+  public string Id { get; }
+  public Address Address { get; }
+  public Stream ProfileImage { get; }
+  public IList<Stream> Pictures { get; }
+}
 
+//protocol method
+public virtual async Task<Response> Upload(RequestContent content, string contentType, RequestContext context = null);
+
+//convenience method
+public virtual Response Upload(MultipartRequest body, CancellationToken cancellationToken = default)
 ```
 
 ```typescript
+// RLC models (multipart part descriptors)
 
+export interface MultipartRequestIdPartDescriptor {
+  name: "id";
+  body: string;
+}
+
+export interface MultipartRequestAddressPartDescriptor {
+  name: "address";
+  body: Address;
+}
+
+export interface MultipartRequestProfileImagePartDescriptor {
+  name: "profileImage";
+  body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+  filename?: string;
+  contentType?: string;
+}
+
+export interface MultipartRequestPicturesPartDescriptor {
+  name: "pictures";
+  body: string | Uint8Array | ReadableStream<Uint8Array> | NodeJS.ReadableStream | File;
+  filename?: string;
+  contentType?: string;
+}
+
+export interface Address {
+  city: string;
+}
+
+export type MultipartRequest =
+  | FormData
+  | Array<
+      | MultipartRequestIdPartDescriptor
+      | MultipartRequestAddressPartDescriptor
+      | MultipartRequestProfileImagePartDescriptor
+      | MultipartRequestPicturesPartDescriptor
+    >;
+
+// RLC parameters
+
+export interface UploadBodyParam {
+  body: MultipartRequest;
+}
+
+export interface UploadMediaTypesParam {
+  contentType: "multipart/form-data";
+}
+
+export type UploadParameters = UploadMediaTypesParam & UploadBodyParam & RequestParameters;
+
+// RLC operations
+
+export interface Upload {
+  post(options: UploadParameters): StreamableMethod<Upload204Response>;
+}
+
+export interface Routes {
+  /** Resource for '/' has methods for the following verbs: post */
+  (path: "/"): Upload;
+}
 ```
 
 ```java
@@ -107,7 +180,9 @@ def upload(
 ```
 
 ```typescript
-
+// Not yet implemented. See issues:
+// - RLC: https://github.com/Azure/autorest.typescript/issues/2568
+// - Modular: https://github.com/Azure/autorest.typescript/issues/2422
 ```
 
 ```java
