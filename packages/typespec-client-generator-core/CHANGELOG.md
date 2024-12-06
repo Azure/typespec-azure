@@ -1,10 +1,10 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-## 0.49.0
+## 0.48.5
 
-### Features
+### Bug Fixes
 
-- [#1957](https://github.com/Azure/typespec-azure/pull/1957) 1. Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`.
+- 1. Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`.
 2. usage and access now properly propagate on polling model, final result and final envelop result of `lroMetadata`.
 
 
