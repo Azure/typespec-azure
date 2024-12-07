@@ -51,11 +51,6 @@ export type PollingLocationDecorator = (
 export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
 
 /**
- * Identifies a ModelProperty that contains the next link value. Can only be used on a Model marked with `@pagedResult`.
- */
-export type NextLinkDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
-
-/**
  * Marks a Model as a paged collection.
  */
 export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
@@ -194,7 +189,6 @@ export type AzureCoreDecorators = {
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
   items: ItemsDecorator;
-  nextLink: NextLinkDecorator;
   pagedResult: PagedResultDecorator;
   fixed: FixedDecorator;
   lroSucceeded: LroSucceededDecorator;

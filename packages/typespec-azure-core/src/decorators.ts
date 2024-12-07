@@ -58,7 +58,6 @@ import {
   LroFailedDecorator,
   LroStatusDecorator,
   LroSucceededDecorator,
-  NextLinkDecorator,
   NextPageOperationDecorator,
   OperationLinkDecorator,
   PagedResultDecorator,
@@ -152,7 +151,7 @@ function _getItems(program: Program, entity: Model): PropertyPath | undefined {
 }
 
 function _getNextLink(program: Program, entity: Model): PropertyPath | undefined {
-  return findPathToProperty(program, entity, (prop) => getNextLink(program, prop) !== undefined);
+  return findPathToProperty(program, entity, (prop) => getNextLink(program, prop) === true);
 }
 
 /**
@@ -268,15 +267,11 @@ export function getItems(program: Program, entity: Type): boolean | undefined {
   return program.stateMap(AzureCoreStateKeys.items).get(entity);
 }
 
-export const $nextLink: NextLinkDecorator = (context: DecoratorContext, entity: ModelProperty) => {
-  context.program.stateMap(AzureCoreStateKeys.nextLink).set(entity, true);
-};
-
 /**
  * Returns `true` if the property is marked with `@nextLink`.
  */
-export function getNextLink(program: Program, entity: Type): boolean | undefined {
-  return program.stateMap(AzureCoreStateKeys.nextLink).get(entity);
+export function getNextLink(program: Program, entity: ModelProperty): boolean | undefined {
+  return program.stateSet(Symbol.for(`TypeSpec.nextLink`)).has(entity);
 }
 
 /**
