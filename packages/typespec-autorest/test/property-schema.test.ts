@@ -14,7 +14,7 @@ describe("typespec-autorest: Property schema tests", () => {
 
       enum FooPrime { Succeeded, Failed, Canceled}
 
-      @pattern("[a-Z0-9]+")
+      @pattern("^[a-zA-Z0-9-]{3,24}$")
       scalar BarPrime extends string;
 
       model UsesAll {
@@ -47,7 +47,7 @@ describe("typespec-autorest: Property schema tests", () => {
 
       enum FooPrime { Succeeded, Failed, Canceled}
 
-      @pattern("[a-Z0-9]+")
+      @pattern("^[a-zA-Z0-9-]{3,24}$")
       scalar BarPrime extends string;
 
       model UsesAll {
@@ -82,7 +82,7 @@ describe("typespec-autorest: Property schema tests", () => {
 
       enum FooPrime { Succeeded, Failed, Canceled}
 
-      @pattern("[a-Z0-9]+")
+      @pattern("^[a-zA-Z0-9-]{3,24}$")
       scalar BarPrime extends string;
 
       model UsesAll {
@@ -118,7 +118,7 @@ describe("typespec-autorest: Property schema tests", () => {
 
       union FooPrime { "Succeeded", "Failed", "Canceled"}
 
-      @pattern("[a-Z0-9]+")
+      @pattern("^[a-zA-Z0-9-]{3,24}$")
       scalar BarPrime extends string;
 
       model UsesAll {
