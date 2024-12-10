@@ -546,7 +546,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         "polling model should not be input",
       );
     });
-    
+
     it("LRO final envelope result correctly marked when only used in ignored polling operation", async () => {
       const runnerWithCore = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
