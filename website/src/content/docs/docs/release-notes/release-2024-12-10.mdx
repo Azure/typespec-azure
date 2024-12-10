@@ -2,7 +2,7 @@
 title: 0.49.0 December 2024
 ---
 
-import { LinkCard, Badge } from "@astrojs/starlight/components";
+import { LinkCard } from "@astrojs/starlight/components";
 
 <LinkCard
   title="TypeSpec Core 0.63"
@@ -62,10 +62,11 @@ model WidgetPage {
 
 - [#1812](https://github.com/Azure/typespec-azure/pull/1812) add `SdkCookieParameter` type and support `@cookie` in TypeSpec http lib
 - [#1887](https://github.com/Azure/typespec-azure/pull/1887) 1. Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`.
+
 2. usage and access now properly propagate on polling model, final result and final envelope result of `lroMetadata`.
+
 - [#1783](https://github.com/Azure/typespec-azure/pull/1783) Implement scope negation for TCGC decorators
 - [#1912](https://github.com/Azure/typespec-azure/pull/1912) support emit code model
-
 
 ## Bug Fixes
 
@@ -80,4 +81,4 @@ model WidgetPage {
 ### @azure-tools/typespec-azure-resource-manager
 
 - [#1866](https://github.com/Azure/typespec-azure/pull/1866) Fix the `no-empty-model` rule to prevent it from being triggered for Records, as this is already covered by another rule.
-- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Replace usage of  `Azure.Core.nextLink`  to `TypeSpec.nextLink`.
+- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Replace usage of `Azure.Core.nextLink` to `TypeSpec.nextLink`.
