@@ -14,6 +14,11 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "managedidentitywithdelegation.json"
 );
+@@armCommonDefinition(ManagedServiceIdentityWithDelegation,
+  "ManagedServiceIdentityWithDelegation",
+  Azure.ResourceManager.CommonTypes.Versions.v6,
+  "managedidentitywithdelegation.json"
+);
 
 /** Delegated resource properties - internal use only. */
 @@armCommonDefinition(DelegatedResource,
@@ -24,5 +29,10 @@ namespace Azure.ResourceManager.CommonTypes;
 @@armCommonDefinition(DelegatedResource,
   "DelegatedResource",
   Azure.ResourceManager.CommonTypes.Versions.v5,
+  "managedidentitywithdelegation.json"
+);
+@@armCommonDefinition(DelegatedResource,
+  "DelegatedResource",
+  Azure.ResourceManager.CommonTypes.Versions.v6,
   "managedidentitywithdelegation.json"
 );

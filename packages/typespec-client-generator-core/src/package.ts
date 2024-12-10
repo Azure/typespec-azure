@@ -7,7 +7,6 @@ import {
   getPagingOperation,
   getService,
   getSummary,
-  ignoreDiagnostics,
   isList,
   Model,
   ModelProperty,
@@ -29,7 +28,7 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
-import { getCorrespondingMethodParams, getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
+import { getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
   SdkClient,
   SdkClientType,
@@ -44,7 +43,6 @@ import {
   SdkMethod,
   SdkMethodParameter,
   SdkMethodResponse,
-  SdkModelPropertyType,
   SdkModelType,
   SdkNamespace,
   SdkNullableType,
@@ -55,7 +53,6 @@ import {
   SdkPathParameter,
   SdkServiceMethod,
   SdkServiceOperation,
-  SdkServiceParameter,
   SdkType,
   SdkUnionType,
   TCGCContext,
@@ -487,16 +484,6 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     operation: serviceOperation,
     response,
     apiVersions,
-    getParameterMapping: function getParameterMapping(
-      serviceParam: SdkServiceParameter,
-    ): SdkModelPropertyType[] {
-      return ignoreDiagnostics(
-        getCorrespondingMethodParams(context, operation, methodParameters, serviceParam),
-      );
-    },
-    getResponseMapping: function getResponseMapping(): string | undefined {
-      return undefined; // currently we only return a value for paging or lro
-    },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
     generateConvenient: shouldGenerateConvenient(context, operation),

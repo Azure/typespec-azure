@@ -3,7 +3,6 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  createSdkContext,
   getAccess,
   getClient,
   getClientNameOverride,
@@ -2194,40 +2193,6 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   });
 
-  describe("createSdkContext", () => {
-    it("multiple call with versioning", async () => {
-      const tsp = `
-        @service({
-          title: "Contoso Widget Manager",
-        })
-        @versioned(Contoso.WidgetManager.Versions)
-        namespace Contoso.WidgetManager;
-        
-        enum Versions {
-          v1,
-        }
-
-        @client({name: "TestClient"})
-        @test
-        interface Test {}
-      `;
-
-      const runnerWithVersion = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-      });
-
-      await runnerWithVersion.compile(tsp);
-      let clients = listClients(runnerWithVersion.context);
-      strictEqual(clients.length, 1);
-      ok(clients[0].type);
-
-      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
-      clients = listClients(newSdkContext);
-      strictEqual(clients.length, 1);
-      ok(clients[0].type);
-    });
-  });
-
   describe("@clientInitialization", () => {
     it("main client", async () => {
       await runner.compileWithCustomization(
@@ -2720,6 +2685,288 @@ describe("typespec-client-generator-core: decorators", () => {
       strictEqual(uploadOp.parameters[0].name, "blobName");
       strictEqual(uploadOp.parameters[0].correspondingMethodParams.length, 1);
       strictEqual(uploadOp.parameters[0].correspondingMethodParams[0], blobName);
+    });
+  });
+
+  describe("scope negation", () => {
+    it("single scope negation", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
+
+    it("multiple scopes negation", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!(csharp, java)")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
+
+    it("non-negation scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!(python, java)")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("allow combination of negation scope and normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "csharp, !java")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("allow combination of negation scope and normal scope for the same scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp, csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("allow combination of negation scope and normal scope for the same multiple scopes", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp, csharp, python, !python, java")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("allow multiple separated negation scopes", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp, !java")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
+
+    it("negation scope override normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "!python, !java")
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
+    });
+
+    it("normal scope incrementally add", async () => {
+      const tsp = `
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamedAgain", "csharp")
+          @clientName("TestRenamed", "!python, !java")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `;
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(tsp);
+      const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+      const csharpTestModel = csharpSdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(csharpTestModel);
+
+      const runnerWithPython = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      await runnerWithPython.compile(tsp);
+      const pythonSdkPackage = runnerWithPython.context.sdkPackage;
+      const pythonTestModel = pythonSdkPackage.models.find((x) => x.name === "Test");
+      ok(pythonTestModel);
+    });
+
+    it("negation scope override negation scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "!python, !java")
+          @clientName("TestRenamed", "!go")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
+    });
+
+    it("negation scope override normal scope with the same scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "!csharp")
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("normal scope override negation scope with the same scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "csharp")
+          @clientName("TestRenamed", "!csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
     });
   });
 });

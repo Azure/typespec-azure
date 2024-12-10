@@ -53,19 +53,19 @@ enum Versions {
 Finally, you can express changes to your service using the `@added` and `@removed` decorators. Here's an example of adding a new property to `Widget` and removing an old one:
 
 ```typespec
-@doc("A widget.")
+/** A widget. */
 @resource("widgets")
 model Widget {
+  /** The widget name. */
   @key("widgetName")
-  @doc("The widget name.")
   @visibility("read")
   name: string;
 
-  @doc("The widget color.")
+  /** The widget color. */
   @added(Contoso.WidgetManager.Versions.v2022_11_30)
   color: string;
 
-  @doc("The ID of the widget's manufacturer.")
+  /** The ID of the widget's manufacturer. */
   @removed(Contoso.WidgetManager.Versions.v2022_11_30)
   manufacturerId: string;
 }

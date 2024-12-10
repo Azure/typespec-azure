@@ -7,18 +7,18 @@ Some resources will provide more than the standard CRUD operations and will need
 For example, to add an additional `POST` action called `/notify` to the standard operations of `User`:
 
 ```typespec
-@doc("The details of a user notification.")
+/** The details of a user notification */
 model NotificationDetails {
-  @doc("The notification message.")
+  /** The notification message */
   message: string;
 
-  @doc("If true, the notification is urgent.")
+  /** If true, the notification is urgent */
   urgent: boolean;
 }
 
 @armResourceOperations
 interface Users extends TrackedResourceOperations<User, UserProperties> {
-  @doc("Send a notification to the user")
+  /** Send a notification to the user */
   @segment("notify")
   NotifyUser is ArmResourceActionNoContentSync<User, NotificationDetails>;
 }
@@ -41,8 +41,8 @@ There are strict guidelines around ARM operations, and you may need to get speci
 In a custom operation, you define the operation parameters, responses, http verb, and so on. For example, here is an operation defining a simple custom action.
 
 ```typespec
+/** Send a notification to the user */
 @post
-@doc("Send a notification to the user")
 @segment("notify")
 op NotifyUser(
   ...ResourceInstanceParameters<User>,

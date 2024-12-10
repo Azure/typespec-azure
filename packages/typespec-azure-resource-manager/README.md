@@ -42,6 +42,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response`                                                                                                                           | [RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.                                                                                                                                                                              |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars`                                                                                                                   | Arm resource name must contain only alphanumeric characters.                                                                                                                                                                                         |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state`                                                                                                                           | Check for properly configured provisioningState property.                                                                                                                                                                                            |
+| `@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage`                                                                                                                      | Verify the usage of @customAzureResource decorator.                                                                                                                                                                                                  |
 | `@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels`                                                                                                                                     | Tracked Resources must use 3 or fewer levels of nesting.                                                                                                                                                                                             |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-operation`                                                                                                                                    | Validate ARM Resource operations.                                                                                                                                                                                                                    |
 | `@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`                                                                                                                              | Check for resources that must have a delete operation.                                                                                                                                                                                               |
@@ -51,7 +52,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation`                                                                                                                      | Tenant and Extension resources should not define a list by subscription operation.                                                                                                                                                                   |
 | [`@azure-tools/typespec-azure-resource-manager/lro-location-header`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/lro-location-header)                             | A 202 response should include a Location response header.                                                                                                                                                                                            |
 | [`@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers)                   | Array properties should describe their identifying properties with x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", [id-prop]) where "id-prop" is a list of the names of identifying properties in the item type. |
-| `@azure-tools/typespec-azure-resource-manager/no-response-body`                                                                                                                                          | The body of 202 response should be empty.                                                                                                                                                                                                            |
+| [`@azure-tools/typespec-azure-resource-manager/no-response-body`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-response-body)                                   | Check that the body is empty for 202 and 204 responses, and not empty for other success (2xx) responses.                                                                                                                                             |
 | `@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint`                                                                                                                               | Check for missing Operations interface.                                                                                                                                                                                                              |
 | `@azure-tools/typespec-azure-resource-manager/patch-envelope`                                                                                                                                            | Patch envelope properties should match the resource properties.                                                                                                                                                                                      |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-patch`                                                                                                                                        | Validate ARM PATCH operations.                                                                                                                                                                                                                       |
@@ -496,3 +497,24 @@ This allows sharing Azure Resource Manager resource types across specifications
 | Name       | Type          | Description                                                              |
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+
+### Azure.ResourceManager.Legacy
+
+- [`@customAzureResource`](#@customazureresource)
+
+#### `@customAzureResource`
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.Legacy.customAzureResource
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+None

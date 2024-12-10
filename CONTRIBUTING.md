@@ -30,7 +30,7 @@ recommended to test a private of the change before merging.
    + "@azure-tools/typespec-autorest": "https://.../package.tgz"
    ```
 
-5. Also edit `eng/pipelines/templates/steps/npm-install.yml`, to force install
+5. Also edit `.github/actions/setup-node-npm-ci/action.yaml`, to force install
    your private build:
 
    ```diff
@@ -353,6 +353,7 @@ Process labels
 | -------------- | ------- | --------------------------------------------------------------------------------- |
 | `needs-area`   | #ffffff |                                                                                   |
 | `needs-info`   | #ffffff | Mark an issue that needs reply from the author or it will be closed automatically |
+| `stale`        | #ffffff | Mark a PR that hasn't been recently updated and will be closed.                   |
 | `triaged:core` | #5319e7 |                                                                                   |
 
 #### misc

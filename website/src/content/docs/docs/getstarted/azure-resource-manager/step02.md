@@ -17,12 +17,12 @@ There are three essential components of a resource defined with TypeSpec:
 Each resource type must have a properties type which defines its custom properties. This type will be exposed as the `properties` property of the resource type.
 
 ```typespec
-@doc("The properties of User")
+/** The properties of User */
 model UserProperties {
-  @doc("The user's full name")
+  /** The user's full name */
   fullName: string;
 
-  @doc("The user's email address.")
+  /** The user's email address */
   emailAddress: string;
 }
 ```
@@ -41,7 +41,7 @@ You define a resource type, you need the following:
 Here we define a tracked resource called `User`:
 
 ```typespec
-@doc("A User Resource")
+/** A User Resource */
 model User is TrackedResource<UserProperties> {
   ...ResourceNameParameter<User>;
 }

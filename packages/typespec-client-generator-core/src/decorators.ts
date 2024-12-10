@@ -3,7 +3,6 @@ import {
   DecoratorContext,
   DecoratorExpressionNode,
   DecoratorFunction,
-  EmitContext,
   Enum,
   EnumMember,
   Interface,
@@ -17,7 +16,6 @@ import {
   SyntaxKind,
   Type,
   Union,
-  createDiagnosticCollector,
   getDiscriminator,
   getNamespaceFullName,
   getProjectedName,
@@ -42,20 +40,14 @@ import {
   ProtocolAPIDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { defaultDecoratorsAllowList } from "./configs.js";
-import { handleClientExamples } from "./example.js";
 import {
   AccessFlags,
   LanguageScopes,
   SdkClient,
-  SdkContext,
-  SdkEmitterOptions,
-  SdkHttpOperation,
   SdkInitializationType,
   SdkMethodParameter,
   SdkModelPropertyType,
   SdkOperationGroup,
-  SdkServiceOperation,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -65,10 +57,9 @@ import {
   clientNamespaceKey,
   getValidApiVersion,
   isAzureCoreTspModel,
-  parseEmitterName,
+  negationScopesKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
@@ -88,6 +79,13 @@ function getScopedDecoratorData(
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
     if (Object.keys(retval).includes(scope)) return retval[scope];
+
+    // if the scope is negated, we should return undefined
+    // if the scope is not negated, we should return the value for AllScopes
+    const negationScopes = retval[negationScopesKey];
+    if (negationScopes !== undefined && negationScopes.includes(scope)) {
+      return undefined;
+    }
   }
   return retval[AllScopes]; // in this case it applies to all languages
 }
@@ -115,20 +113,60 @@ function setScopedDecoratorData(
     return;
   }
 
-  // if scope specified, create or overwrite with the new value
-  const splitScopes = scope.split(",").map((s) => s.trim());
   const targetEntry = context.program.stateMap(key).get(target);
-
-  // if target doesn't exist in decorator map, create a new entry
-  if (!targetEntry) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  const [negationScopes, scopes] = parseScopes(context, scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    // override the previous value for negation scopes
+    const newObject: Record<string | symbol, any> =
+      scopes !== undefined && scopes.length > 0
+        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
+        : Object.fromEntries([[AllScopes, value]]);
+    newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
-    return;
+
+    // if a scope exists in the target entry and it overlaps with the negation scope, it means negation scope doesn't override it
+    if (targetEntry !== undefined) {
+      const existingScopes = Object.getOwnPropertyNames(targetEntry);
+      const intersections = existingScopes.filter((x) => negationScopes.includes(x));
+      if (intersections !== undefined && intersections.length > 0) {
+        for (const scopeToKeep of intersections) {
+          newObject[scopeToKeep] = targetEntry[scopeToKeep];
+        }
+      }
+    }
+  } else if (scopes !== undefined && scopes.length > 0) {
+    // for normal scopes, add them incrementally
+    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
+    context.program
+      .stateMap(key)
+      .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+  }
+}
+
+function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
+  if (scope === undefined) {
+    return [undefined, undefined];
   }
 
-  // if target exists, overwrite existed value
-  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+  // handle !(scope1, scope2,...) syntax
+  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
+  }
+
+  // handle !scope1, !scope2, scope3, ... syntax
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const negationScopes: string[] = [];
+  const scopes: string[] = [];
+  for (const s of splitScopes) {
+    if (s.startsWith("!")) {
+      negationScopes.push(s.slice(1));
+    } else {
+      scopes.push(s);
+    }
+  }
+  return [negationScopes, scopes];
 }
 
 const clientKey = createStateSymbol("client");
@@ -605,73 +643,6 @@ export function listOperationsInOperationGroup(
 
   addOperations(group.type);
   return operations;
-}
-
-export function createTCGCContext(program: Program, emitterName: string): TCGCContext {
-  const diagnostics = createDiagnosticCollector();
-  return {
-    program,
-    emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
-    diagnostics: diagnostics.diagnostics,
-    originalProgram: program,
-    __clientToParameters: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __clientToApiVersionClientDefaultValue: new Map(),
-    previewStringRegex: /-preview$/,
-    disableUsageAccessPropagationToBase: false,
-    __pagedResultSet: new Set(),
-  };
-}
-
-interface VersioningStrategy {
-  readonly strategy?: "ignore";
-  readonly previewStringRegex?: RegExp; // regex to match preview versions
-}
-
-export interface CreateSdkContextOptions {
-  readonly versioning?: VersioningStrategy;
-  additionalDecorators?: string[];
-  disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
-}
-
-export async function createSdkContext<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(
-  context: EmitContext<TOptions>,
-  emitterName?: string,
-  options?: CreateSdkContextOptions,
-): Promise<SdkContext<TOptions, TServiceOperation>> {
-  const diagnostics = createDiagnosticCollector();
-  const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
-  const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
-  const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
-  const generateConvenienceMethods =
-    context.options["generate-convenience-methods"] ?? convenienceOptions;
-  const tcgcContext = createTCGCContext(
-    context.program,
-    (emitterName ?? context.program.emitters[0]?.metadata?.name)!,
-  );
-  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
-    ...tcgcContext,
-    emitContext: context,
-    sdkPackage: undefined!,
-    generateProtocolMethods: generateProtocolMethods,
-    generateConvenienceMethods: generateConvenienceMethods,
-    packageName: context.options["package-name"],
-    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
-    apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
-    examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
-    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
-    previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
-    disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
-  };
-  sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
-  for (const client of sdkContext.sdkPackage.clients) {
-    diagnostics.pipe(await handleClientExamples(sdkContext, client));
-  }
-  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
-  return sdkContext;
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");

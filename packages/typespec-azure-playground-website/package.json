@@ -58,11 +58,17 @@
     "@azure-tools/typespec-client-generator-core": "workspace:~",
     "@emotion/react": "^11.13.3",
     "@typespec/compiler": "workspace:~",
+    "@typespec/events": "workspace:~",
     "@typespec/http": "workspace:~",
+    "@typespec/json-schema": "workspace:~",
     "@typespec/openapi": "workspace:~",
     "@typespec/openapi3": "workspace:~",
+    "@typespec/protobuf": "workspace:~",
     "@typespec/rest": "workspace:~",
+    "@typespec/sse": "workspace:~",
+    "@typespec/streams": "workspace:~",
     "@typespec/versioning": "workspace:~",
+    "@typespec/xml": "workspace:~",
     "@vitejs/plugin-react": "~4.3.2",
     "es-module-shims": "~1.10.0",
     "react": "~18.3.1",
@@ -71,15 +77,15 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
-    "@types/node": "~22.7.5",
+    "@types/node": "~22.7.9",
     "@types/react-dom": "~18.3.0",
     "@typespec/bundler": "workspace:~",
     "@typespec/playground": "workspace:~",
-    "@vitest/coverage-v8": "^2.1.2",
+    "@vitest/coverage-v8": "^2.1.5",
     "@vitest/ui": "^2.1.2",
     "cross-env": "~7.0.3",
     "rimraf": "~6.0.1",
     "typescript": "~5.6.3",
-    "vitest": "^2.1.2"
+    "vitest": "^2.1.5"
   }
 }
