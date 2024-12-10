@@ -50,49 +50,6 @@
 
 - [#1854](https://github.com/Azure/typespec-azure/pull/1854) deprecate `Error` usage and add `Exception` usage. for all models used in exception response, they will no longer have `Output` usage, but have `Exception` usage.
 
-## 0.48.1
-
-### Bug Fixes
-
-- [#1813](https://github.com/Azure/typespec-azure/pull/1813) fix wrong encode for body response of binary type
-- [#1786](https://github.com/Azure/typespec-azure/pull/1786) support client namespace
-
-## 0.48.4
-
-### Bug Fixes
-
-- [#1935](https://github.com/Azure/typespec-azure/pull/1935) fix wrong `unexpected-pageable-operation-return-type` because of nullable type
-
-
-## 0.48.3
-
-### Bug Fixes
-
-- [#1907](https://github.com/Azure/typespec-azure/pull/1907) use the right path parameter name when filtering method parameter
-
-### Features
-
-- [#1919](https://github.com/Azure/typespec-azure/pull/1919) support typespec common paging
-- [#1918](https://github.com/Azure/typespec-azure/pull/1918) remove none visibility property for model
-
-
-## 0.48.2
-
-### Bug Fixes
-
-- [#1858](https://github.com/Azure/typespec-azure/pull/1858) do not replace operation with `@override` when `listOperationsInOperationGroup`
-- [#1833](https://github.com/Azure/typespec-azure/pull/1833) do not add protocol usage for protocol method's response type
-
-### Features
-
-- [#1835](https://github.com/Azure/typespec-azure/pull/1835) add `isPagedResultModel` helper function
-- [#1834](https://github.com/Azure/typespec-azure/pull/1834) add `disableUsageAccessPropagationToBase` to support language that does not generate base model
-- [#1858](https://github.com/Azure/typespec-azure/pull/1858) add `isOverride` flag to `SdkServiceMethod`.
-
-### Breaking Changes
-
-- [#1854](https://github.com/Azure/typespec-azure/pull/1854) deprecate `Error` usage and add `Exception` usage. for all models used in exception response, they will no longer have `Output` usage, but have `Exception` usage.
-
 
 ## 0.48.1
 
