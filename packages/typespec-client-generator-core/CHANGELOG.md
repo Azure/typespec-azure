@@ -1,11 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
-## 0.48.5
+## 0.48.6
 
 ### Bug Fixes
 
-- 1. Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`.
-2. usage and access now properly propagate on polling model, final result and final envelop result of `lroMetadata`.
+- [#1966](https://github.com/Azure/typespec-azure/pull/1966) Allow for responses without bodies to be errors, depending on presence of `@error` decorator
+
+
+## 0.48.5
+
+### Breaking Changes
+
+- [#1957](https://github.com/Azure/typespec-azure/pull/1957) Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`. Usage and access now properly propagate on polling model, final result and final envelop result of `lroMetadata`.
 
 
 ## 0.48.4
