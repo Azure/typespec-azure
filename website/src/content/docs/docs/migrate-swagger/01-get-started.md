@@ -44,6 +44,14 @@ npm install -g @azure-tools/typespec-client-generator-cli
     tsp-client convert --swagger-readme [path to readme.md] --arm
     ```
 
+  - Convert a **control-plane** specification to fully compatible output:
+
+    By default, the converted TypeSpec project will leverage TypeSpec built-in libraries with standard patterns and templates (highly recommended), which will cause discrepancies between the generated TypeSpec and original swagger. If you really don't want this intended discrepancy, add `--fully-compatible` flag to generate a TypeSpec project that is fully compatible with the swagger.
+
+    ```shell
+    tsp-client convert --swagger-readme [path to readme.md] --arm --fully-compatible
+    ```
+
 - Review generated TypeSpec
 - Layout [the TypeSpec project folders appropriately](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
 - Leverage standard `tspconfig.yaml` ([Template projects](https://github.com/microsoft/typespec/tree/main/eng/feeds)) and make appropriate output file name changes.

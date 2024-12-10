@@ -181,22 +181,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 None
 
-### `@nextLink` {#@Azure.Core.nextLink}
-
-Identifies a ModelProperty that contains the next link value. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.nextLink
-```
-
-#### Target
-
-`ModelProperty`
-
-#### Parameters
-
-None
-
 ### `@nextPageOperation` {#@Azure.Core.nextPageOperation}
 
 Identifies that an operation is used to retrieve the next page for paged operations.
