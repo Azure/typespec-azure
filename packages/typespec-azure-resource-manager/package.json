@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-resource-manager",
-  "version": "0.48.0",
+  "version": "0.49.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Resource Manager library",
   "homepage": "https://azure.github.io/typespec-azure",
