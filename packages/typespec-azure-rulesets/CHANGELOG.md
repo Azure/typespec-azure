@@ -1,5 +1,17 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.49.0
+
+### Bug Fixes
+
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+### Features
+
+- [#1923](https://github.com/Azure/typespec-azure/pull/1923) Discourage usage of new decorator `@Azure.ResourceManager.Legacy.customAzureResource`
+- [#1740](https://github.com/Azure/typespec-azure/pull/1740) Update the `arm no-response-body` rule to behave similarly to the core rule, but with the additional requirement that the 202 response can and should also be empty
+
+
 ## 0.48.0
 
 ### Bug Fixes

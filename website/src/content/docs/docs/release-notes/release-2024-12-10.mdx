@@ -1,0 +1,84 @@
+---
+title: 0.49.0 December 2024
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 0.63"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2024-12-10"
+/>
+
+## Notable changes
+
+### Azure Resource Manager: Added Common Types Version 6
+
+Added support for version 6 of Azure common types, including changes to private links and managed identity
+
+## Breaking changes
+
+### Removed `@nextLink` decorator from Azure.core
+
+Specs should use the core decorator for `@nextLink`
+
+#### Before
+
+```TypeSpec
+model WidgetPage {
+  items: Widget[];
+
+  @Azure.Core.nextLink
+  nextLink: string;
+}
+```
+
+#### After
+
+```TypeSpec
+model WidgetPage {
+  items: Widget[];
+  //In the TypeSpec namespace
+  @nextLink
+  nextLink: string;
+}
+```
+
+## Features
+
+### @azure-tools/typespec-azure-core
+
+- [#1272](https://github.com/Azure/typespec-azure/pull/1272) Add `armResourceType` scalar, and update common-types to use the new scalar
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#1689](https://github.com/Azure/typespec-azure/pull/1689) Add common-types v6 with changes in managed identity, private links, and types.
+- [#1272](https://github.com/Azure/typespec-azure/pull/1272) Add `armResourceType` scalar, and changed some properties to be `armResourceType` instead of string
+- [#1881](https://github.com/Azure/typespec-azure/pull/1881) common-types consistency with original swagger
+- [#1923](https://github.com/Azure/typespec-azure/pull/1923) Add the `@Azure.ResourceManager.Legacy.customAzureResource` decorator to identify ARM resources that do not use the base resource types.
+- [#1740](https://github.com/Azure/typespec-azure/pull/1740) Update the `arm no-response-body` rule to behave similarly to the core rule, but with the additional requirement that the 202 response can and should also be empty
+
+### @azure-tools/typespec-client-generator-core
+
+- [#1812](https://github.com/Azure/typespec-azure/pull/1812) add `SdkCookieParameter` type and support `@cookie` in TypeSpec http lib
+- [#1887](https://github.com/Azure/typespec-azure/pull/1887) 1. Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`.
+
+2. usage and access now properly propagate on polling model, final result and final envelope result of `lroMetadata`.
+
+- [#1783](https://github.com/Azure/typespec-azure/pull/1783) Implement scope negation for TCGC decorators
+- [#1912](https://github.com/Azure/typespec-azure/pull/1912) support emit code model
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#1838](https://github.com/Azure/typespec-azure/pull/1838) Emit error `@azure-tools/typespec-autorest/no-matching-version-found` when the version option is used and does not match any versions of the service.
+
+### @azure-tools/typespec-azure-core
+
+- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Remove `Azure.Core.nextLink` as there is a nextLink instance in `TypeSpec.nextLink`, which is causing an ambiguous problem between the two.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#1866](https://github.com/Azure/typespec-azure/pull/1866) Fix the `no-empty-model` rule to prevent it from being triggered for Records, as this is already covered by another rule.
+- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Replace usage of `Azure.Core.nextLink` to `TypeSpec.nextLink`.
