@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest-canonical",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting canonical swagger",
   "homepage": "https://azure.github.io/typespec-azure",
