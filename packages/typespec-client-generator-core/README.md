@@ -78,6 +78,7 @@ options:
 - [`@clientNamespace`](#@clientnamespace)
 - [`@convenientAPI`](#@convenientapi)
 - [`@flattenProperty`](#@flattenproperty)
+- [`@isApiVersion`](#@isapiversion)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@paramAlias`](#@paramalias)
@@ -440,6 +441,39 @@ model Foo {
   prop: Bar;
 }
 model Bar {}
+```
+
+#### `@isApiVersion`
+
+Use to override default assumptions on whether a parameter is an api-version parameter or not.
+By default, we do matches with the `api-version` string in the parameter name. Since api versions are
+a client parameter, we will also elevate this parameter up onto the client
+
+```typespec
+@Azure.ClientGenerator.Core.isApiVersion(value: valueof boolean, scope?: valueof string)
+```
+
+##### Target
+
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type              | Description |
+| ----- | ----------------- | ----------- |
+| value | `valueof boolean` |             |
+| scope | `valueof string`  |             |
+
+##### Examples
+
+```typespec
+namespace Contoso;
+
+op test(
+  @isApiVersion
+  @header("x-ms-version")
+  version: string,
+): void;
 ```
 
 #### `@operationGroup`
