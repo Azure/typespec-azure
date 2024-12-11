@@ -530,4 +530,4 @@ extern dec clientNamespace(
  * ): void;
  * ```
  */
-extern dec isApiVersion(target: ModelProperty, value: valueof boolean, scope?: valueof string);
+extern dec isApiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);

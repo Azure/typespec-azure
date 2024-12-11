@@ -552,7 +552,7 @@ export type ClientNamespaceDecorator = (
 export type IsApiVersionDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  value: boolean,
+  value?: boolean,
   scope?: string,
 ) => void;
 

@@ -1032,10 +1032,10 @@ const isApiVersionKey = createStateSymbol("isApiVersion");
 export const isApiVersionDecorator: IsApiVersionDecorator = (
   context: DecoratorContext,
   param: ModelProperty,
-  value: boolean,
+  value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, isApiVersionDecorator, isApiVersionKey, param, value, scope);
+  setScopedDecoratorData(context, isApiVersionDecorator, isApiVersionKey, param, value ?? true, scope);
 };
 
 export function getIsApiVersionDecorator(
