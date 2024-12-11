@@ -13,6 +13,7 @@ import {
   $usage,
   $useSystemTextJsonConverter,
   paramAliasDecorator,
+  isApiVersionDecorator,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -33,6 +34,7 @@ export const $decorators = {
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
     paramAlias: paramAliasDecorator,
+    isApiVersion: isApiVersionDecorator,
     clientNamespace: $clientNamespace,
   } as AzureClientGeneratorCoreDecorators,
 };

@@ -533,6 +533,29 @@ export type ClientNamespaceDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Use to override default assumptions on whether a parameter is an api-version parameter or not.
+ * By default, we do matches with the `api-version` string in the parameter name. Since api versions are
+ * a client parameter, we will also elevate this parameter up onto the client
+ *
+ * @example
+ * ```typespec
+ * namespace Contoso;
+ *
+ * op test(
+ *   @isApiVersion
+ *   @header("x-ms-version")
+ *   version: string
+ * ): void;
+ * ```
+ */
+export type IsApiVersionDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value: boolean,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -547,4 +570,5 @@ export type AzureClientGeneratorCoreDecorators = {
   clientInitialization: ClientInitializationDecorator;
   paramAlias: ParamAliasDecorator;
   clientNamespace: ClientNamespaceDecorator;
+  isApiVersion: IsApiVersionDecorator;
 };
