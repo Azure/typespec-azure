@@ -823,6 +823,161 @@ describe("typespec-autorest: extension decorator", () => {
   });
 });
 
+describe("typespec-azure: identifiers decorator", () => {
+  it("uses identifiers decorator for properties", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        age: int32;
+      }
+      model PetList {
+        @identifiers(["name"])
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
+  });
+  it("identifies keys correctly as x-ms-identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        @key
+        age: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
+  });
+  it("prioritizes identifiers decorator over keys", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        @key
+        age: int32;
+      }
+      model PetList {
+        @identifiers([])
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+  });
+  it("supports multiple identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        age: int32;
+      }
+      model PetList {
+        @identifiers(["name", "age"])
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name", "age"]);
+  });
+  it("supports inner properties in identifiers decorator", async () => {
+    const oapi = await openApiFor(
+      `
+        model Pet {
+          dogs: Dog;
+        }
+        
+        model Dog {
+          bread: string;
+        }
+        
+        model PetList {
+          @identifiers(["dogs/bread"])
+          pets: Pet[]
+        }
+        @route("/Pets")
+        @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/bread"]);
+  });
+  it("supports inner properties for keys", async () => {
+    const oapi = await openApiFor(
+      `
+        model Pet {
+          dogs: Dog;
+          cats: Cat;
+        }
+         
+        model Dog {
+          @key
+          bread: string;
+        }
+        
+        model Cat
+        {
+          features: Features;
+        }
+        
+        model Features {
+            @key
+            color:string;
+            size:int32;
+        }
+        
+        model PetList {
+          pets: Pet[]
+        }
+        
+        @route("/Pets")
+        @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], [
+      "dogs/bread",
+      "cats/features/color",
+    ]);
+  });
+  it("supports multiple keys", async () => {
+    const oapi = await openApiFor(
+      `
+        model Pet {
+          @key
+          name: string;
+          @key
+          age: int32;
+        }       
+        model PetList {
+          pets: Pet[]
+        }
+        @route("/Pets")
+        @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["name", "age"]);
+  });
+});
+
 describe("typespec-autorest: multipart formData", () => {
   it("expands model into formData parameters", async () => {
     const oapi = await openApiFor(`

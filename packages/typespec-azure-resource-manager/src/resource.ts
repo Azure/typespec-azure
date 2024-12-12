@@ -1,10 +1,12 @@
 import { getAllProperties } from "@azure-tools/typespec-azure-core";
 import {
   $tag,
+  ArrayModelType,
   DecoratorContext,
   getKeyName,
   getTags,
   Interface,
+  isArrayModelType,
   isGlobalNamespace,
   isNeverType,
   isTemplateDeclaration,
@@ -22,6 +24,7 @@ import {
   ArmVirtualResourceDecorator,
   CustomAzureResourceDecorator,
   ExtensionResourceDecorator,
+  IdentifiersDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
   ResourceGroupResourceDecorator,
@@ -372,6 +375,93 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
       property.type.value = armProvider;
   }
 };
+
+export const $identifiers: IdentifiersDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty,
+  properties: string[],
+) => {
+  const { program } = context;
+  const { type } = entity;
+
+  if (
+    type.kind !== "Model" ||
+    !isArrayModelType(program, type) ||
+    type.indexer.value.kind !== "Model"
+  ) {
+    reportDiagnostic(program, {
+      code: "decorator-param-wrong-type",
+      messageId: "armIdentifiersIncorrectEntity",
+      target: entity,
+    });
+    return;
+  }
+
+  const propertiesValues = properties.values;
+  if (!Array.isArray(propertiesValues)) {
+    reportDiagnostic(program, {
+      code: "decorator-param-wrong-type",
+      messageId: "armIdentifiersProperties",
+      target: entity,
+    });
+    return;
+  }
+
+  context.program.stateMap(ArmStateKeys.armIdentifiers).set(
+    type.indexer.value,
+    propertiesValues.map((property) => property.value),
+  );
+};
+
+export function getArmIdentifiers(program: Program, entity: ArrayModelType): string[] | undefined {
+  const value = entity.indexer.value;
+
+  const getIdentifiers = program.stateMap(ArmStateKeys.armIdentifiers).get(value);
+  if (getIdentifiers !== undefined) {
+    return getIdentifiers;
+  }
+
+  const result: string[] = [];
+  if (value.kind === "Model") {
+    for (const property of value.properties.values()) {
+      const pathToKey = getPathToKey(program, property);
+      if (pathToKey !== undefined) {
+        result.push(property.name + pathToKey);
+      } else if (getKeyName(program, property)) {
+        result.push(property.name);
+      }
+    }
+  }
+
+  return result.length > 0 ? result : undefined;
+}
+
+function getPathToKey(
+  program: Program,
+  entity: ModelProperty,
+  visited = new Set<ModelProperty>(),
+): string | undefined {
+  if (entity.type.kind !== "Model") {
+    return undefined;
+  }
+  if (visited.has(entity)) {
+    return undefined;
+  }
+  visited.add(entity);
+
+  for (const property of entity.type.properties.values()) {
+    if (property.type.kind !== "Model" && getKeyName(program, property)) {
+      return "/" + property.name;
+    }
+    if (property.type.kind === "Model") {
+      const path = getPathToKey(program, property, visited);
+      if (path !== undefined) {
+        return "/" + property.name + path;
+      }
+    }
+  }
+  return undefined;
+}
 
 function getServiceNamespace(program: Program, type: Type | undefined): string | undefined {
   if (type === undefined) return undefined;

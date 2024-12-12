@@ -9,6 +9,7 @@ import {
 } from "@typespec/compiler";
 import { getExtensions } from "@typespec/openapi";
 import { isArmCommonType } from "../common-types.js";
+import { getArmIdentifiers } from "../resource.js";
 
 export const missingXmsIdentifiersRule = createRule({
   name: "missing-x-ms-identifiers",
@@ -53,16 +54,27 @@ export const missingXmsIdentifiersRule = createRule({
       }
 
       const xmsIdentifiers = getExtensions(program, property ?? array).get("x-ms-identifiers");
-      if (xmsIdentifiers === undefined) {
+      const armIdentifiers = getArmIdentifiers(program, array);
+      if (xmsIdentifiers === undefined && armIdentifiers === undefined) {
         return true;
       }
 
-      if (Array.isArray(xmsIdentifiers)) {
-        for (const propIdentifier of xmsIdentifiers) {
+      const identifiers = armIdentifiers ?? xmsIdentifiers;
+
+      if (Array.isArray(identifiers)) {
+        for (const propIdentifier of identifiers) {
           if (typeof propIdentifier === "string") {
             const props = propIdentifier.replace(/^\//, "").split("/");
             let element = elementType;
             for (const prop of props) {
+              if (element === undefined || element.kind !== "Model") {
+                context.reportDiagnostic({
+                  messageId: "missingProperty",
+                  format: { propertyName: prop, targetModelName: element?.name },
+                  target: property,
+                });
+                return false;
+              }
               const propertyValue = getProperty(element, prop);
               if (propertyValue === undefined) {
                 context.reportDiagnostic({
@@ -72,10 +84,7 @@ export const missingXmsIdentifiersRule = createRule({
                 });
               }
 
-              const propertyType = propertyValue?.type as ArrayModelType;
-              if (propertyType !== undefined && propertyType.kind === "Model") {
-                element = propertyType;
-              }
+              element = propertyValue?.type as ArrayModelType;
             }
           } else {
             context.reportDiagnostic({

@@ -79,6 +79,7 @@ Available ruleSets:
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
+- [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
 - [`@resourceGroupResource`](#@resourcegroupresource)
@@ -352,6 +353,22 @@ See more details on [different Azure Resource Manager resource type here.](https
 ##### Parameters
 
 None
+
+#### `@identifiers`
+
+```typespec
+@Azure.ResourceManager.identifiers(properties: string[])
+```
+
+##### Target
+
+`ModelProperty`
+
+##### Parameters
+
+| Name       | Type       | Description |
+| ---------- | ---------- | ----------- |
+| properties | `string[]` |             |
 
 #### `@locationResource`
 

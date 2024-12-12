@@ -272,6 +272,22 @@ See more details on [different Azure Resource Manager resource type here.](https
 
 None
 
+### `@identifiers` {#@Azure.ResourceManager.identifiers}
+
+```typespec
+@Azure.ResourceManager.identifiers(properties: string[])
+```
+
+#### Target
+
+`ModelProperty`
+
+#### Parameters
+
+| Name       | Type       | Description |
+| ---------- | ---------- | ----------- |
+| properties | `string[]` |             |
+
 ### `@locationResource` {#@Azure.ResourceManager.locationResource}
 
 `@locationResource` marks an Azure Resource Manager resource model as a location based resource.

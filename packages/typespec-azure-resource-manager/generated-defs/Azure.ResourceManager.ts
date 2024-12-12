@@ -1,9 +1,10 @@
-import type {
+import {
   DecoratorContext,
   EnumMember,
   EnumValue,
   Interface,
   Model,
+  ModelProperty,
   Namespace,
   Operation,
   Type,
@@ -266,6 +267,24 @@ export type ResourceBaseTypeDecorator = (
   baseType: Type,
 ) => void;
 
+/**
+ * This decorator is used to indicate the identifying properties of objects in the array, e.g. name
+ * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
+ *
+ * @example
+ * ```typespec
+ * model Pet {
+ *  @identifiers(["name"])
+ *  dog: Dog;
+ * }
+ * ```
+ */
+export type IdentifiersDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  properties: string[],
+) => void;
+
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
@@ -288,6 +307,7 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
+  identifiers: IdentifiersDecorator;
 };
 
 export type AzureResourceManagerLegacyDecorators = {
