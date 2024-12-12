@@ -522,7 +522,7 @@ extern dec clientNamespace(
  * @example
  * ```typespec
  * namespace Contoso;
- * 
+ *
  * op test(
  *   @isApiVersion
  *   @header("x-ms-version")

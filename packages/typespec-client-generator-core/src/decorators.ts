@@ -1035,7 +1035,14 @@ export const isApiVersionDecorator: IsApiVersionDecorator = (
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, isApiVersionDecorator, isApiVersionKey, param, value ?? true, scope);
+  setScopedDecoratorData(
+    context,
+    isApiVersionDecorator,
+    isApiVersionKey,
+    param,
+    value ?? true,
+    scope,
+  );
 };
 
 export function getIsApiVersionDecorator(
