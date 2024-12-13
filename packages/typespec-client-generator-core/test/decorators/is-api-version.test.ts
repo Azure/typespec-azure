@@ -32,7 +32,8 @@ describe("@isApiVersion", () => {
       ok(apiVersionParam);
       strictEqual(apiVersionParam.isApiVersionParam, true);
     });
-    it("overidden api version param defaults to latest api version", async () => {
+
+    it("override api version param defaults to latest api version", async () => {
       await runner.compile(`
         @service({
           title: "Contoso Widget Manager",
@@ -70,6 +71,7 @@ describe("@isApiVersion", () => {
       strictEqual(apiVersionOpParam.isApiVersionParam, true);
       strictEqual(apiVersionOpParam.correspondingMethodParams[0], apiVersionClientParam);
     });
+
     it("override parameter to not be api version", async () => {
       await runner.compile(`
         @service({})

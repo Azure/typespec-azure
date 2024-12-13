@@ -7,13 +7,13 @@ import {
   $clientNamespace,
   $convenientAPI,
   $flattenProperty,
+  $isApiVersion,
   $operationGroup,
   $override,
+  $paramAlias,
   $protocolAPI,
   $usage,
   $useSystemTextJsonConverter,
-  isApiVersionDecorator,
-  paramAliasDecorator,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -33,8 +33,8 @@ export const $decorators = {
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
-    paramAlias: paramAliasDecorator,
-    isApiVersion: isApiVersionDecorator,
+    paramAlias: $paramAlias,
+    isApiVersion: $isApiVersion,
     clientNamespace: $clientNamespace,
   } as AzureClientGeneratorCoreDecorators,
 };

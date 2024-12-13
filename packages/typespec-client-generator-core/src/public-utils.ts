@@ -25,7 +25,7 @@ import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
   getClientNameOverride,
-  getIsApiVersionDecorator,
+  getIsApiVersion,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -80,7 +80,7 @@ function isModelProperty(type: any): type is ModelProperty {
  */
 export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
   if (isModelProperty(type)) {
-    const override = getIsApiVersionDecorator(context, type);
+    const override = getIsApiVersion(context, type);
     if (override !== undefined) {
       return override;
     }

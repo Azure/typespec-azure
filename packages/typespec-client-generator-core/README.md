@@ -446,11 +446,11 @@ model Bar {}
 #### `@isApiVersion`
 
 Use to override default assumptions on whether a parameter is an api-version parameter or not.
-By default, we do matches with the `api-version` string in the parameter name. Since api versions are
-a client parameter, we will also elevate this parameter up onto the client
+By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
+a client parameter, we will also elevate this parameter up onto the client.
 
 ```typespec
-@Azure.ClientGenerator.Core.isApiVersion(value: valueof boolean, scope?: valueof string)
+@Azure.ClientGenerator.Core.isApiVersion(value?: valueof boolean, scope?: valueof string)
 ```
 
 ##### Target

@@ -535,8 +535,8 @@ export type ClientNamespaceDecorator = (
 
 /**
  * Use to override default assumptions on whether a parameter is an api-version parameter or not.
- * By default, we do matches with the `api-version` string in the parameter name. Since api versions are
- * a client parameter, we will also elevate this parameter up onto the client
+ * By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
+ * a client parameter, we will also elevate this parameter up onto the client.
  *
  * @example
  * ```typespec

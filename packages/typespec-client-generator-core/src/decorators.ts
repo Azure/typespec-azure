@@ -1014,13 +1014,13 @@ export function getClientInitialization(
 
 const paramAliasKey = createStateSymbol("paramAlias");
 
-export const paramAliasDecorator: ParamAliasDecorator = (
+export const $paramAlias: ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
   paramAlias: string,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, paramAliasDecorator, paramAliasKey, original, paramAlias, scope);
+  setScopedDecoratorData(context, $paramAlias, paramAliasKey, original, paramAlias, scope);
 };
 
 export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
@@ -1029,26 +1029,16 @@ export function getParamAlias(context: TCGCContext, original: ModelProperty): st
 
 const isApiVersionKey = createStateSymbol("isApiVersion");
 
-export const isApiVersionDecorator: IsApiVersionDecorator = (
+export const $isApiVersion: IsApiVersionDecorator = (
   context: DecoratorContext,
   param: ModelProperty,
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(
-    context,
-    isApiVersionDecorator,
-    isApiVersionKey,
-    param,
-    value ?? true,
-    scope,
-  );
+  setScopedDecoratorData(context, $isApiVersion, isApiVersionKey, param, value ?? true, scope);
 };
 
-export function getIsApiVersionDecorator(
-  context: TCGCContext,
-  param: ModelProperty,
-): boolean | undefined {
+export function getIsApiVersion(context: TCGCContext, param: ModelProperty): boolean | undefined {
   return getScopedDecoratorData(context, isApiVersionKey, param);
 }
 
