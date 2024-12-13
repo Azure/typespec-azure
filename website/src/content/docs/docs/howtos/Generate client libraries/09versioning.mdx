@@ -473,3 +473,103 @@ ServiceClient client = new ServiceClient(endpoint, options);
 ```
 
 </ClientTabs>
+
+## Overriding the Client Api Version Parameter
+
+By default, we find api version parameters in specs based off of names. There is special logic we do with api version parameters:
+
+1. These api version parameters get elevated up to the client level (if the service is versioned)
+2. We auto-add api version information to next links when paging
+3. We set the client default for these parameters to be the default api version for your service.
+
+There are cases where you have an api-versioning parameter without the explicit name `api-version`. In these cases, you can use the `@isApiVersion` decorator to override and explicitly say whether that parameter is an api version param or not.
+
+<ClientTabs>
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+import "@azure-tools/typespec-client-generator-core";
+using TypeSpec.Versioning;
+using TypeSpec.Http;
+using Azure.ClientGenerator.Core;
+@versioned(My.Service.Versions)
+@service
+namespace My.Service;
+enum Versions {
+  v2023_11_01: "2023-11-01",
+  v2024_04_01: "2024-04-01",
+}
+op get(
+  @isApiVersion
+  @header("x-ms-version")
+  version: string,
+): void;
+```
+
+```python
+from my.service import MyServiceClient
+
+client = MyServiceClient(endpoint=..., credential=...)
+print(client.version) # == "2024-04-01", since that is the default
+
+client_with_specified_api_version = MyServiceClient(endpoint=..., credential=..., version="2023-11-01")
+print(client.version) # == "2023-11-01", since we specified
+
+retval = client.get() # version is elevated onto the client
+```
+
+```csharp
+//ServiceVersion enum
+public enum ServiceVersion
+{
+    /// <summary> Service version "2023-11-01". </summary>
+    V2023_11_01 = 1,
+    /// <summary> Service version "2024-04-01". </summary>
+    v2024_04_01 = 2,
+}
+
+Uri endpoint = new Uri("<https://my-service.azure.com>");
+
+ServiceClient client = new ServiceClient(endpoint);
+//client's version will be "2024-04-01"
+ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01);
+ServiceClient clientWithSpecifiedApiVersion = new ServiceClient(endpoint, options);
+//client's version will be "2023-11-01"
+Response response = client.get(); // version parameter is elevated onto the client
+```
+
+```typescript
+// TODO
+```
+
+```java
+// ServiceVersion enum
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2023_11_01("2023-11-01");
+    V2024_04_01("2024-04-01");
+
+    public static ServiceServiceVersion getLatest() {} // V2024_04_01
+}
+
+// Client API
+ServiceClientClient client = new ServiceClientClientBuilder()
+    // other configurations
+    .buildClient();
+// client's version will be 2024-04-01
+
+ServiceClientClient clientWithSpecifiedApiVersion = new ServiceClientClientBuilder()
+    // other configurations
+    // override the api version, even if only one version is defined in the spec
+    .serviceVersion(ServiceServiceVersion.V2023_11_01)
+    .buildClient();
+// client's version will be 2023-11-01
+
+client.get(); // version parameter is elevated onto the client
+```
+
+```go
+// TODO
+```
+
+</ClientTabs>
