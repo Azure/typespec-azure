@@ -1031,11 +1031,11 @@ const isApiVersionKey = createStateSymbol("isApiVersion");
 
 export const $isApiVersion: IsApiVersionDecorator = (
   context: DecoratorContext,
-  param: ModelProperty,
+  target: ModelProperty,
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $isApiVersion, isApiVersionKey, param, value ?? true, scope);
+  setScopedDecoratorData(context, $isApiVersion, isApiVersionKey, target, value ?? true, scope);
 };
 
 export function getIsApiVersion(context: TCGCContext, param: ModelProperty): boolean | undefined {
