@@ -64,24 +64,22 @@ export function getCoverageForMode(
   key: string,
   mode: string,
 ): CoverageReport {
+  /*
+   * The generator reports is an array from of reports from Standard and Azure mode in any order.
+   * So, if the first report is from Azure mode, the second one is from Standard mode and vice versa.
+   * When the mode is standard, check if the first report is from Azure mode, if so, return the second one.
+   * Otherwise, return the first one.
+   * When the mode is azure, check if the first report is from Azure mode, if so, return the first one.
+   * Otherwise, return the second one.
+   */
+  const reports = (generatorReports["azure"] as any)[key];
+  const isFirstReportAzure =
+    reports[0]["scenariosMetadata"].packageName === "@azure-tools/azure-http-specs";
   if (mode === "standard") {
-    if (
-      (generatorReports["azure"] as any)[key][0]["scenariosMetadata"].packageName ===
-      "@azure-tools/azure-http-specs"
-    ) {
-      return (generatorReports["azure"] as any)[key][1];
-    } else {
-      return (generatorReports["azure"] as any)[key][0];
-    }
+    return isFirstReportAzure ? reports[1] : reports[0];
   } else {
-    if (
-      (generatorReports["azure"] as any)[key][0]["scenariosMetadata"].packageName ===
-      "@azure-tools/azure-http-specs"
-    ) {
-      return (generatorReports["azure"] as any)[key][0];
-    } else {
-      return (generatorReports["azure"] as any)[key][1];
-    }
+    // mode === "azure"
+    return isFirstReportAzure ? reports[0] : reports[1];
   }
 }
 
