@@ -2375,7 +2375,12 @@ export async function getOpenAPIForService(
         }),
       };
 
-      array["x-ms-identifiers"] = getArmIdentifiers(program, typespecType) ?? [];
+      const armIdentifiers = getArmIdentifiers(program, typespecType);
+      if (armIdentifiers !== undefined && armIdentifiers.length > 0) {
+        array["x-ms-identifiers"] = armIdentifiers;
+      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
+        array["x-ms-identifiers"] = [];
+      }
 
       return applyIntrinsicDecorators(typespecType, array);
     }
