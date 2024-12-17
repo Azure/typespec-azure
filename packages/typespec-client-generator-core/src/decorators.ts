@@ -29,13 +29,13 @@ import {
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
+  ApiVersionDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   FlattenPropertyDecorator,
-  ApiVersionDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
