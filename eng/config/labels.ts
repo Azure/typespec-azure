@@ -32,6 +32,10 @@ export const AreaLabels = defineLabels({
     color: "846da1",
     description: "Issues for Azure specific ide features",
   },
+  "cli/psh": {
+    color: "9EB120",
+    description: "Issues for Azure CLI/PSH features",
+  },
 });
 
 /**
