@@ -2,20 +2,20 @@ import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
-describe("@isApiVersion", () => {
+describe("@apiVersion", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
 
-  describe("@isApiVersion", () => {
+  describe("@apiVersion", () => {
     it("override parameter to be api version", async () => {
       await runner.compile(`
         @service({})
         namespace MyService;
         op get(
-            @isApiVersion
+            @apiVersion
             @header("x-ms-version")
             version: string
           ): string;
@@ -47,7 +47,7 @@ describe("@isApiVersion", () => {
           v3,
         }
         op get(
-          @isApiVersion
+          @apiVersion
           @header("x-ms-version")
           version: string
         ): string;
@@ -77,7 +77,7 @@ describe("@isApiVersion", () => {
         @service({})
         namespace MyService;
         op get(
-          @isApiVersion(false)
+          @apiVersion(false)
           @query "api-version": string
         ): string;
       `);

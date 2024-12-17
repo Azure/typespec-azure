@@ -539,7 +539,7 @@ export type ClientNamespaceDecorator = (
  * By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
  * a client parameter, we will also elevate this parameter up onto the client.
  *
- * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not.
+ * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
@@ -547,13 +547,13 @@ export type ClientNamespaceDecorator = (
  * namespace Contoso;
  *
  * op test(
- *   @isApiVersion
+ *   @apiVersion
  *   @header("x-ms-version")
  *   version: string
  * ): void;
  * ```
  */
-export type IsApiVersionDecorator = (
+export type ApiVersionDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value?: boolean,
@@ -574,5 +574,5 @@ export type AzureClientGeneratorCoreDecorators = {
   clientInitialization: ClientInitializationDecorator;
   paramAlias: ParamAliasDecorator;
   clientNamespace: ClientNamespaceDecorator;
-  isApiVersion: IsApiVersionDecorator;
+  apiVersion: ApiVersionDecorator;
 };

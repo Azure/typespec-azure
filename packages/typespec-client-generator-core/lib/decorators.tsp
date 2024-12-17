@@ -519,7 +519,7 @@ extern dec clientNamespace(
  * Use to override default assumptions on whether a parameter is an api-version parameter or not.
  * By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
  * a client parameter, we will also elevate this parameter up onto the client.
- * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not.
+ * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -528,10 +528,10 @@ extern dec clientNamespace(
  * namespace Contoso;
  *
  * op test(
- *   @isApiVersion
+ *   @apiVersion
  *   @header("x-ms-version")
  *   version: string
  * ): void;
  * ```
  */
-extern dec isApiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
+extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);

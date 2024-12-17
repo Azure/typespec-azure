@@ -147,6 +147,39 @@ op func7(@body body: Test5): void;
 op func8(@body body: Test5): void;
 ```
 
+### `@apiVersion` {#@Azure.ClientGenerator.Core.apiVersion}
+
+Use to override default assumptions on whether a parameter is an api-version parameter or not.
+By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
+a client parameter, we will also elevate this parameter up onto the client.
+
+```typespec
+@Azure.ClientGenerator.Core.apiVersion(value?: valueof boolean, scope?: valueof string)
+```
+
+#### Target
+
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type              | Description                                                                                                                                                                                            |
+| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| value | `valueof boolean` | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                             |
+| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+#### Examples
+
+```typespec
+namespace Contoso;
+
+op test(
+  @apiVersion
+  @header("x-ms-version")
+  version: string,
+): void;
+```
+
 ### `@client` {#@Azure.ClientGenerator.Core.client}
 
 Create a ClientGenerator.Core client out of a namespace or interface
@@ -363,39 +396,6 @@ model Foo {
   prop: Bar;
 }
 model Bar {}
-```
-
-### `@isApiVersion` {#@Azure.ClientGenerator.Core.isApiVersion}
-
-Use to override default assumptions on whether a parameter is an api-version parameter or not.
-By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
-a client parameter, we will also elevate this parameter up onto the client.
-
-```typespec
-@Azure.ClientGenerator.Core.isApiVersion(value?: valueof boolean, scope?: valueof string)
-```
-
-#### Target
-
-`ModelProperty`
-
-#### Parameters
-
-| Name  | Type              | Description                                                                                                                                                                                            |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `valueof boolean` | If true, we will treat this parameter as an api-version parameter. If false, we will not.                                                                                                              |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
-
-#### Examples
-
-```typespec
-namespace Contoso;
-
-op test(
-  @isApiVersion
-  @header("x-ms-version")
-  version: string,
-): void;
 ```
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}

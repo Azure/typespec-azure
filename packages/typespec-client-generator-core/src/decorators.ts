@@ -35,7 +35,7 @@ import {
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   FlattenPropertyDecorator,
-  IsApiVersionDecorator,
+  ApiVersionDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -1027,19 +1027,19 @@ export function getParamAlias(context: TCGCContext, original: ModelProperty): st
   return getScopedDecoratorData(context, paramAliasKey, original);
 }
 
-const isApiVersionKey = createStateSymbol("isApiVersion");
+const apiVersionKey = createStateSymbol("apiVersion");
 
-export const $isApiVersion: IsApiVersionDecorator = (
+export const $apiVersion: ApiVersionDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $isApiVersion, isApiVersionKey, target, value ?? true, scope);
+  setScopedDecoratorData(context, $apiVersion, apiVersionKey, target, value ?? true, scope);
 };
 
 export function getIsApiVersion(context: TCGCContext, param: ModelProperty): boolean | undefined {
-  return getScopedDecoratorData(context, isApiVersionKey, param);
+  return getScopedDecoratorData(context, apiVersionKey, param);
 }
 
 export const $clientNamespace: ClientNamespaceDecorator = (
