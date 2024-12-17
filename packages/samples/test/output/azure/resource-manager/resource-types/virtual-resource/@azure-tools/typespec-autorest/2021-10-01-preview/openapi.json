@@ -578,7 +578,10 @@
           "description": "The Employee items on this page",
           "items": {
             "$ref": "#/definitions/Employee"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "nextLink": {
           "type": "string",
