@@ -12,6 +12,7 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
+  getArmIdentifiers,
   isArmCommonType,
   isAzureResource,
   isConditionallyFlattened,
@@ -2373,9 +2374,14 @@ export async function getOpenAPIForService(
           visibility: context.visibility | Visibility.Item,
         }),
       };
-      if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
+
+      const armIdentifiers = getArmIdentifiers(program, typespecType);
+      if (armIdentifiers !== undefined && armIdentifiers.length > 0) {
+        array["x-ms-identifiers"] = armIdentifiers;
+      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];
       }
+
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;

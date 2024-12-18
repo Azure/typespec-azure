@@ -420,7 +420,10 @@
           "description": "The RoleAssignment items on this page",
           "items": {
             "$ref": "#/definitions/RoleAssignment"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "nextLink": {
           "type": "string",
