@@ -22,6 +22,7 @@ import {
   getClientNameOverride,
   getClientNamespace,
   getOverriddenClientMethod,
+  IsInScope,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -606,9 +607,11 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   const diagnostics = createDiagnosticCollector();
   const retval: SdkMethod<TServiceOperation>[] = [];
   for (const operation of listOperationsInOperationGroup(context, client)) {
-    retval.push(
-      diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
-    );
+    if (IsInScope(context, operation)) {
+      retval.push(
+        diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
+      );
+    }
   }
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group

@@ -38,6 +38,7 @@ import {
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
+  ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
@@ -58,6 +59,7 @@ import {
   getValidApiVersion,
   isAzureCoreTspModel,
   negationScopesKey,
+  scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
@@ -1070,4 +1072,18 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
     current = current.namespace;
   }
   return segments.join(".");
+}
+
+export const $scope: ScopeDecorator = (
+  context: DecoratorContext,
+  entity: Operation,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $scope, negationScopesKey, entity, undefined, scope);
+};
+
+export function IsInScope(context: TCGCContext, entity: Operation): boolean {
+  var scopes = getScopedDecoratorData(context, scopeKey, entity);
+  if (scopes === undefined) return true;
+  return scopes.includes(context.emitterName);
 }

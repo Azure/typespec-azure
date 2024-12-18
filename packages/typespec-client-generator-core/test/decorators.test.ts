@@ -2969,4 +2969,29 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(testModel);
     });
   });
+
+  describe("scope decorator", () => {
+    it("remove operation from csharp client", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          @scope("!csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+  });
 });
