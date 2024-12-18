@@ -253,7 +253,7 @@ function handleHttpOperationExamples(
   }
 
   // sort examples by file path
-  operation.examples.sort((a, b) => (a > b ? 1 : -1));
+  operation.examples.sort((a, b) => (a.filePath > b.filePath ? 1 : -1));
 
   return diagnostics.wrap(undefined);
 }
