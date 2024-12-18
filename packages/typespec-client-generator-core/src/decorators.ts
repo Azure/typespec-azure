@@ -1079,11 +1079,9 @@ export const $scope: ScopeDecorator = (
   entity: Operation,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $scope, negationScopesKey, entity, undefined, scope);
+  setScopedDecoratorData(context, $scope, scopeKey, entity, true, scope);
 };
 
 export function IsInScope(context: TCGCContext, entity: Operation): boolean {
-  const scopes = getScopedDecoratorData(context, scopeKey, entity);
-  if (scopes === undefined) return true;
-  return scopes.includes(context.emitterName);
+  return getScopedDecoratorData(context, scopeKey, entity) === true;
 }

@@ -13,6 +13,7 @@ import {
   $usage,
   $useSystemTextJsonConverter,
   paramAliasDecorator,
+  $scope,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -34,5 +35,6 @@ export const $decorators = {
     clientInitialization: $clientInitialization,
     paramAlias: paramAliasDecorator,
     clientNamespace: $clientNamespace,
+    scope: $scope,
   } as AzureClientGeneratorCoreDecorators,
 };

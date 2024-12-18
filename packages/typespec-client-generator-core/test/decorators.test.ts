@@ -2971,7 +2971,30 @@ describe("typespec-client-generator-core: decorators", () => {
   });
 
   describe("scope decorator", () => {
-    it("remove operation from csharp client", async () => {
+    it("include operation from csharp client", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          @scope("csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const sdkClient = sdkPackage.clients.find((x) => x.methods.find(m => m.name === "func"));
+      ok(sdkClient);
+    });
+
+    it("exclude operation from csharp client", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
@@ -2990,8 +3013,41 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
-      ok(testModel);
+      const sdkClient = sdkPackage.clients.find(x => x.methods.find(m => m.name === "func"));
+      ok(sdkClient === undefined);
+    });
+
+    it("define scope for operation incrementally", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const runnerWithJava = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const spec = `
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          @scope("!java")
+          @scope("!csharp")
+          @scope("csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `;
+      await runnerWithCSharp.compile(spec);
+      const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+      const csharpSdkClient = csharpSdkPackage.clients.find(x => x.methods.find(m => m.name === "func"));
+      ok(csharpSdkClient);
+
+      await runnerWithJava.compile(spec);
+      const javaSdkPackage = runnerWithJava.context.sdkPackage;
+      const javaSdkClient = javaSdkPackage.clients.find(x => x.methods.find(m => m.name === "func"));
+      ok(javaSdkClient === undefined);
     });
   });
 });
