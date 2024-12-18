@@ -1,1 +1,43 @@
-# Pending file
+trigger:
+  branches:
+    include:
+      - main
+      # For patch releases
+      - release/*
+
+pr: none
+
+extends:
+  template: /eng/pipelines/templates/1es-redirect.yml
+  parameters:
+    variables:
+      - template: /eng/pipelines/templates/variables/globals.yml@self
+    stages:
+      - stage: build
+        displayName: Build and Deploy
+
+        pool:
+          name: $(WINDOWSPOOL)
+          image: $(WINDOWSVMIMAGE)
+          os: windows
+
+        jobs:
+          - job: build
+            displayName: Build
+
+            variables:
+              TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
+
+            steps:
+              - template: /eng/pipelines/templates/install.yml
+              - template: /eng/pipelines/templates/build.yml
+
+              - task: AzureCLI@2
+                inputs:
+                  azureSubscription: "TypeSpec Storage"
+                  scriptType: "bash"
+                  scriptLocation: "inlineScript"
+                  inlineScript: |
+                    echo "Uploading files to Azure Blob Storage..."
+                    az storage blob upload-batch --account-name azurespecdashboard --source packages/azure-spec-dashboard/dist/ --destination '$web' --overwrite
+                  displayName: "Upload files to Azure Blob Storage"
