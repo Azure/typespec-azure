@@ -39,3 +39,12 @@ pipelines:
           lastModifiedDate: 2024-09-11
         binskim:
           lastModifiedDate: 2024-09-11
+  7397:
+    retail:
+      source:
+        credscan:
+          lastModifiedDate: 2024-12-18
+        psscriptanalyzer:
+          lastModifiedDate: 2024-12-18
+        armory:
+          lastModifiedDate: 2024-12-18
