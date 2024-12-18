@@ -1083,7 +1083,7 @@ export const $scope: ScopeDecorator = (
 };
 
 export function IsInScope(context: TCGCContext, entity: Operation): boolean {
-  var scopes = getScopedDecoratorData(context, scopeKey, entity);
+  const scopes = getScopedDecoratorData(context, scopeKey, entity);
   if (scopes === undefined) return true;
   return scopes.includes(context.emitterName);
 }
