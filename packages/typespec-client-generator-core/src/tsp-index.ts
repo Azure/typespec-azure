@@ -10,6 +10,7 @@ import {
   $operationGroup,
   $override,
   $protocolAPI,
+  $scope,
   $usage,
   $useSystemTextJsonConverter,
   paramAliasDecorator,
@@ -34,5 +35,6 @@ export const $decorators = {
     clientInitialization: $clientInitialization,
     paramAlias: paramAliasDecorator,
     clientNamespace: $clientNamespace,
+    scope: $scope,
   } as AzureClientGeneratorCoreDecorators,
 };
