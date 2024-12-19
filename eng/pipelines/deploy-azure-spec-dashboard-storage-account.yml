@@ -29,7 +29,13 @@ extends:
               TYPESPEC_SKIP_DOCUSAURUS_BUILD: true # Disable docusaurus build
 
             steps:
+              - checkout: self
+                submodules: true
+
               - template: /eng/pipelines/templates/install.yml
+                parameters:
+                  nodeVersion: "20.x"
+
               - template: /eng/pipelines/templates/build.yml
 
               - task: AzureCLI@2
