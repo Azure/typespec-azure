@@ -3017,7 +3017,7 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(sdkClient === undefined);
     });
 
-    it("define scope for operation incrementally", async () => {
+    it("negation scope override", async () => {
       const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
@@ -3033,7 +3033,6 @@ describe("typespec-client-generator-core: decorators", () => {
           }
           @scope("!java")
           @scope("!csharp")
-          @scope("csharp")
           op func(
             @body body: Test
           ): void;
@@ -3065,6 +3064,30 @@ describe("typespec-client-generator-core: decorators", () => {
           model Test {
             prop: string;
           }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      ok(sdkClient);
+    });
+
+    it("negation scope override normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          @scope("!csharp")
+          @scope("csharp")
           op func(
             @body body: Test
           ): void;

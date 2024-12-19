@@ -1081,16 +1081,11 @@ export const $scope: ScopeDecorator = (
 ) => {
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
-    const targetEntry = context.program.stateMap(negationScopesKey).get(entity);
-    setScopedDecoratorData(
-      context,
-      $scope,
-      negationScopesKey,
-      entity,
-      !targetEntry ? negationScopes : [...Object.values(targetEntry), ...negationScopes],
-    );
+    // for negation scope, override the previous value
+    setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
   }
   if (scopes !== undefined && scopes.length > 0) {
+    // for normal scope, add them incrementally
     const targetEntry = context.program.stateMap(scopeKey).get(entity);
     setScopedDecoratorData(
       context,
