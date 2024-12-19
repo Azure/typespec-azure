@@ -3049,5 +3049,27 @@ describe("typespec-client-generator-core: decorators", () => {
       const javaSdkClient = javaSdkPackage.clients.find(x => x.methods.find(m => m.name === "func"));
       ok(javaSdkClient === undefined);
     });
+
+    it("no scope decorator", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `); 
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const sdkClient = sdkPackage.clients.find((x) => x.methods.find(m => m.name === "func"));
+      ok(sdkClient);
+    });
   });
 });

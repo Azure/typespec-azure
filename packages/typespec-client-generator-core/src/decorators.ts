@@ -1079,9 +1079,26 @@ export const $scope: ScopeDecorator = (
   entity: Operation,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $scope, scopeKey, entity, true, scope);
+  const [negationScopes, scopes] = parseScopes(context, scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    const targetEntry = context.program.stateMap(negationScopesKey).get(entity);
+    setScopedDecoratorData(context, $scope, negationScopesKey, entity, !targetEntry ? negationScopes : [...Object.values(targetEntry), ...negationScopes]);
+  }
+  if (scopes !== undefined && scopes.length > 0) {
+    const targetEntry = context.program.stateMap(scopeKey).get(entity);
+    setScopedDecoratorData(context, $scope, scopeKey, entity, !targetEntry ? scopes : [...Object.values(targetEntry), ...scopes]);
+  }
 };
 
 export function IsInScope(context: TCGCContext, entity: Operation): boolean {
-  return getScopedDecoratorData(context, scopeKey, entity) === true;
+  const scopes = getScopedDecoratorData(context, scopeKey, entity);
+  if (scopes !== undefined && scopes.includes(context.emitterName)) {
+    return true;
+  }
+
+  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+  if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
+    return false;
+  }
+  return true;
 }
