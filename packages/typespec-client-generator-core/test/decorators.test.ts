@@ -2990,7 +2990,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const sdkClient = sdkPackage.clients.find((x) => x.methods.find(m => m.name === "func"));
+      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
       ok(sdkClient);
     });
 
@@ -3013,7 +3013,7 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const sdkClient = sdkPackage.clients.find(x => x.methods.find(m => m.name === "func"));
+      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
       ok(sdkClient === undefined);
     });
 
@@ -3041,12 +3041,16 @@ describe("typespec-client-generator-core: decorators", () => {
       `;
       await runnerWithCSharp.compile(spec);
       const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
-      const csharpSdkClient = csharpSdkPackage.clients.find(x => x.methods.find(m => m.name === "func"));
+      const csharpSdkClient = csharpSdkPackage.clients.find((x) =>
+        x.methods.find((m) => m.name === "func"),
+      );
       ok(csharpSdkClient);
 
       await runnerWithJava.compile(spec);
       const javaSdkPackage = runnerWithJava.context.sdkPackage;
-      const javaSdkClient = javaSdkPackage.clients.find(x => x.methods.find(m => m.name === "func"));
+      const javaSdkClient = javaSdkPackage.clients.find((x) =>
+        x.methods.find((m) => m.name === "func"),
+      );
       ok(javaSdkClient === undefined);
     });
 
@@ -3065,10 +3069,10 @@ describe("typespec-client-generator-core: decorators", () => {
             @body body: Test
           ): void;
         }
-      `); 
+      `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const sdkClient = sdkPackage.clients.find((x) => x.methods.find(m => m.name === "func"));
+      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
       ok(sdkClient);
     });
   });

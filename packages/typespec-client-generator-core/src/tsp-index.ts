@@ -10,10 +10,10 @@ import {
   $operationGroup,
   $override,
   $protocolAPI,
+  $scope,
   $usage,
   $useSystemTextJsonConverter,
   paramAliasDecorator,
-  $scope,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
