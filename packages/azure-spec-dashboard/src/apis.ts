@@ -99,6 +99,14 @@ export async function getCoverageSummaries(): Promise<CoverageSummary[]> {
       (generatorReports["standard"] as any)[key] = undefined;
       continue;
     }
+    if (
+      !(generatorReports["azure"] as any)[key][1] ||
+      !(generatorReports["azure"] as any)[key][0]
+    ) {
+      (generatorReports["azure"] as any)[key] = undefined;
+      (generatorReports["standard"] as any)[key] = undefined;
+      continue;
+    }
     (generatorReports["standard"] as any)[key] = {
       ...getCoverageForMode(generatorReports, key, "standard"),
       generatorMetadata: (generatorReports["azure"] as any)[key]["generatorMetadata"],
