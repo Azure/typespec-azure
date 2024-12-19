@@ -291,6 +291,9 @@ function getPropertyPathFromSegment(
   for (const segment of segments) {
     const property = current.properties.get(segment);
     if (!property) {
+      if (current.baseModel) {
+        return getPropertyPathFromSegment(context, current.baseModel, segments);
+      }
       return "";
     }
     wireSegments.push(getLibraryName(context, property));
