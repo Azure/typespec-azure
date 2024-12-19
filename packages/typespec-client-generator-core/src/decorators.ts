@@ -29,6 +29,7 @@ import {
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
+  ApiVersionDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
@@ -1013,17 +1014,32 @@ export function getClientInitialization(
 
 const paramAliasKey = createStateSymbol("paramAlias");
 
-export const paramAliasDecorator: ParamAliasDecorator = (
+export const $paramAlias: ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
   paramAlias: string,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, paramAliasDecorator, paramAliasKey, original, paramAlias, scope);
+  setScopedDecoratorData(context, $paramAlias, paramAliasKey, original, paramAlias, scope);
 };
 
 export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
   return getScopedDecoratorData(context, paramAliasKey, original);
+}
+
+const apiVersionKey = createStateSymbol("apiVersion");
+
+export const $apiVersion: ApiVersionDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value?: boolean,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $apiVersion, apiVersionKey, target, value ?? true, scope);
+};
+
+export function getIsApiVersion(context: TCGCContext, param: ModelProperty): boolean | undefined {
+  return getScopedDecoratorData(context, apiVersionKey, param);
 }
 
 export const $clientNamespace: ClientNamespaceDecorator = (
