@@ -82,6 +82,7 @@ options:
 - [`@override`](#@override)
 - [`@paramAlias`](#@paramalias)
 - [`@protocolAPI`](#@protocolapi)
+- [`@scope`](#@scope)
 - [`@usage`](#@usage)
 - [`@useSystemTextJsonConverter`](#@usesystemtextjsonconverter)
 
@@ -590,6 +591,30 @@ Whether you want to generate an operation as a protocol operation.
 
 ```typespec
 @protocolAPI(false)
+op test: void;
+```
+
+#### `@scope`
+
+To define the client scope of an operation.
+
+```typespec
+@Azure.ClientGenerator.Core.scope(scope?: valueof string)
+```
+
+##### Target
+
+`Operation`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                           |
+| ----- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+##### Examples
+
+```typespec
 op test: void;
 ```
 
