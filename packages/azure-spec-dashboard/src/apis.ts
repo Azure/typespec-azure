@@ -8,29 +8,23 @@ import {
 const storageAccountName = "typespec";
 
 export type GeneratorNames =
-  | "@typespec/http-client-python"
   | "@azure-tools/typespec-python"
   | "@azure-tools/typespec-go"
   | "@azure-tools/typespec-csharp"
-  | "@typespec/http-client-csharp"
   | "@azure-tools/typespec-ts-rlc"
   | "@azure-tools/typespec-ts-modular"
   | "@azure-tools/typespec-java"
-  | "@typespec/http-client-java"
   | "@azure-tools/typespec-cpp"
   | "@azure-tools/typespec-rust"
   | "test";
 const query = new URLSearchParams(window.location.search);
 const generatorNames: GeneratorNames[] = [
-  "@typespec/http-client-python",
   "@azure-tools/typespec-python",
   "@azure-tools/typespec-go",
   "@azure-tools/typespec-csharp",
-  "@typespec/http-client-csharp",
   "@azure-tools/typespec-ts-rlc",
   "@azure-tools/typespec-ts-modular",
   "@azure-tools/typespec-java",
-  "@typespec/http-client-java",
   "@azure-tools/typespec-cpp",
   "@azure-tools/typespec-rust",
   ...(query.has("showtest") ? (["test"] as const) : []),
@@ -102,6 +96,14 @@ export async function getCoverageSummaries(): Promise<CoverageSummary[]> {
 
   for (const key in generatorReports["azure"]) {
     if (!(generatorReports["azure"] as any)[key]) {
+      (generatorReports["standard"] as any)[key] = undefined;
+      continue;
+    }
+    if (
+      !(generatorReports["azure"] as any)[key][1] ||
+      !(generatorReports["azure"] as any)[key][0]
+    ) {
+      (generatorReports["azure"] as any)[key] = undefined;
       (generatorReports["standard"] as any)[key] = undefined;
       continue;
     }
