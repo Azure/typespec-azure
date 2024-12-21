@@ -48,6 +48,7 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "emitter:autorest": ["packages/typespec-autorest/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
   ide: [],
+  "cli/psh": [],
 };
 
 export default defineConfig({
