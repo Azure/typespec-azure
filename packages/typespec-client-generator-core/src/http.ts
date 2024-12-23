@@ -15,12 +15,14 @@ import {
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
+  getCookieParamOptions,
   getHeaderFieldName,
   getHeaderFieldOptions,
   getPathParamName,
   getQueryParamName,
   getQueryParamOptions,
   isBody,
+  isCookieParam,
   isHeader,
   isPathParam,
   isQueryParam,
@@ -30,6 +32,7 @@ import { getParamAlias } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
+  SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
   SdkHttpOperation,
@@ -104,12 +107,13 @@ export function isSdkHttpParameter(context: TCGCContext, type: ModelProperty): b
     isPathParam(program, type) ||
     isQueryParam(program, type) ||
     isHeader(program, type) ||
-    isBody(program, type)
+    isBody(program, type) ||
+    isCookieParam(program, type)
   );
 }
 
 interface SdkHttpParameters {
-  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter)[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   bodyParam?: SdkBodyParameter;
 }
 
@@ -128,14 +132,8 @@ function getSdkHttpParameters(
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
-      diagnostics.pipe(
-        getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type as any),
-      ),
-    )
-    .filter(
-      (x): x is SdkHeaderParameter | SdkQueryParameter | SdkPathParameter =>
-        x.kind === "header" || x.kind === "query" || x.kind === "path",
-    );
+      diagnostics.pipe(getSdkHttpParameter(context, x.param, httpOperation.operation, x, x.type)),
+    ) as (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   const headerParams = retval.parameters.filter(
     (x): x is SdkHeaderParameter => x.kind === "header",
   );
@@ -336,7 +334,7 @@ export function getSdkHttpParameter(
   param: ModelProperty,
   operation?: Operation,
   httpParam?: HttpOperationParameter,
-  location?: "path" | "query" | "header" | "body",
+  location?: "path" | "query" | "header" | "body" | "cookie",
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
@@ -361,6 +359,15 @@ export function getSdkHttpParameter(
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,
+    });
+  }
+  if (isCookieParam(context.program, param) || location === "cookie") {
+    return diagnostics.wrap({
+      ...base,
+      kind: "cookie",
+      serializedName: getCookieParamOptions(program, param)?.name ?? base.name,
+      correspondingMethodParams,
+      optional: param.optional,
     });
   }
   if (isBody(context.program, param) || location === "body") {
@@ -426,7 +433,6 @@ function getSdkHttpResponseAndExceptions(
     let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
-
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
         ? "application/json"
@@ -487,7 +493,12 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
     };
-    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
+
+    if (
+      response.statusCodes === "*" ||
+      isErrorModel(context.program, response.type) ||
+      (body && isErrorModel(context.program, body))
+    ) {
       exceptions.push({
         ...sdkResponse,
         kind: "http",

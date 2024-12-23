@@ -24,7 +24,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
 
         @pagedResult
         model FooPage {
-          @Azure.Core.nextLink
+          @nextLink
           next: string,
           @items
           value: Foo[];
@@ -98,7 +98,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
 
       @pagedResult
       model FooPage {
-        @Azure.Core.nextLink
+        @nextLink
         next: string,
         @items
         value: Foo[];

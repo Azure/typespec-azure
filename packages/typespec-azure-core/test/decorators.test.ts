@@ -46,7 +46,7 @@ describe("typespec-azure-core: decorators", () => {
           @items
           foos: string[];
 
-          @Azure.Core.nextLink
+          @nextLink
           nextThing?: string;
         }
       `);
@@ -68,7 +68,7 @@ describe("typespec-azure-core: decorators", () => {
             things: string[];
 
             doo: {
-              @Azure.Core.nextLink
+              @nextLink
               next?: string;  
             }
           }
@@ -90,7 +90,7 @@ describe("typespec-azure-core: decorators", () => {
           @items
           \`base.things\`: string[];
 
-          @Azure.Core.nextLink
+          @nextLink
           \`base.next\`?: string;  
         }
       `);
@@ -170,7 +170,7 @@ describe("typespec-azure-core: decorators", () => {
 
           @doc(".")
           nested: {
-            @Azure.Core.nextLink
+            @nextLink
             @doc(".")
             nextLink: string;
           }
@@ -209,7 +209,7 @@ describe("typespec-azure-core: decorators", () => {
             @doc(".")
             values?: string[];
 
-            @Azure.Core.nextLink
+            @nextLink
             @doc(".")
             nextLink: string;
           }

@@ -20,6 +20,7 @@ import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
+  CustomAzureResourceDecorator,
   ExtensionResourceDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
@@ -34,7 +35,7 @@ import { ArmResourceOperations, resolveResourceOperations } from "./operations.j
 import { getArmResource, listArmResources } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual";
+export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom";
 
 /**
  * Interface for ARM resource detail base.
@@ -92,6 +93,16 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
   }
 };
 
+export const $customAzureResource: CustomAzureResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+) => {
+  const { program } = context;
+  if (isTemplateDeclaration(entity)) return;
+
+  program.stateMap(ArmStateKeys.customAzureResource).set(entity, "Custom");
+};
+
 function getProperty(
   target: Model,
   predicate: (property: ModelProperty) => boolean,
@@ -111,6 +122,18 @@ function getProperty(
 export function isArmVirtualResource(program: Program, target: Model): boolean {
   if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target) === true) return true;
   if (target.baseModel) return isArmVirtualResource(program, target.baseModel);
+  return false;
+}
+
+/**
+ * Determine if the given model is a custom resource.
+ * @param program The program to process.
+ * @param target The model to check.
+ * @returns true if the model or any model it extends is marked as a resource, otherwise false.
+ */
+export function isCustomAzureResource(program: Program, target: Model): boolean {
+  if (program.stateMap(ArmStateKeys.customAzureResource).has(target)) return true;
+  if (target.baseModel) return isCustomAzureResource(program, target.baseModel);
   return false;
 }
 

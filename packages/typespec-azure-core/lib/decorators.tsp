@@ -18,11 +18,6 @@ namespace Azure.Core {
   extern dec items(entity: ModelProperty);
 
   /**
-   * Identifies a ModelProperty that contains the next link value. Can only be used on a Model marked with `@pagedResult`.
-   */
-  extern dec nextLink(entity: ModelProperty);
-
-  /**
    * Used for custom StatusMonitor implementation.
    * Identifies an Enum or ModelProperty as containing long-running operation
    * status.
