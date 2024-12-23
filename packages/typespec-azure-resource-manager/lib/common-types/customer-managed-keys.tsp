@@ -37,11 +37,7 @@ model KeyEncryptionKeyIdentity {
   identityType?: KeyEncryptionKeyIdentityType;
 
   /** User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity. */
-  userAssignedIdentityResourceId?: Azure.Core.armResourceIdentifier<[
-    {
-      type: "Microsoft.ManagedIdentity/userAssignedIdentities";
-    }
-  ]>;
+  userAssignedIdentityResourceId?: Azure.Core.armResourceIdentifier;
 
   /** application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540 */
   @added(Versions.v5)
@@ -70,6 +66,5 @@ model Encryption {
 
   /** All Customer-managed key encryption properties for the resource. */
   @added(Versions.v4)
-  @removed(Versions.v5)
   customerManagedKeyEncryption?: CustomerManagedKeyEncryption;
 }
