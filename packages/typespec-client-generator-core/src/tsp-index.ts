@@ -1,6 +1,7 @@
 import { AzureClientGeneratorCoreDecorators } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   $access,
+  $apiVersion,
   $client,
   $clientInitialization,
   $clientName,
@@ -9,10 +10,10 @@ import {
   $flattenProperty,
   $operationGroup,
   $override,
+  $paramAlias,
   $protocolAPI,
   $usage,
   $useSystemTextJsonConverter,
-  paramAliasDecorator,
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -32,7 +33,8 @@ export const $decorators = {
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
-    paramAlias: paramAliasDecorator,
+    paramAlias: $paramAlias,
+    apiVersion: $apiVersion,
     clientNamespace: $clientNamespace,
   } as AzureClientGeneratorCoreDecorators,
 };

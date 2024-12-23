@@ -15,7 +15,7 @@ import type {
  * Changes the name of a method, parameter, property, or model generated in the client SDK
  *
  * @param rename The rename you want applied to the object
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -42,7 +42,7 @@ export type ClientNameDecorator = (
  * Whether you want to generate an operation as a convenient operation.
  *
  * @param value Whether to generate the operation as convenience method or not.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -61,7 +61,7 @@ export type ConvenientAPIDecorator = (
  * Whether you want to generate an operation as a protocol operation.
  *
  * @param value Whether to generate the operation as protocol or not.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -80,7 +80,7 @@ export type ProtocolAPIDecorator = (
  * Create a ClientGenerator.Core client out of a namespace or interface
  *
  * @param value Optional configuration for the service.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example Basic client setting
  * ```typespec
@@ -113,7 +113,7 @@ export type ClientDecorator = (
 /**
  * Create a ClientGenerator.Core operation group out of a namespace or interface
  *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -145,7 +145,7 @@ export type OperationGroupDecorator = (
  * otherwise a warning will be added to diagnostics list.
  *
  * @param value The usage info you want to set for this model.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example Expand usage for model
  * ```typespec
@@ -217,7 +217,7 @@ export type UsageDecorator = (
  * otherwise a warning will be added to diagnostics list.
  *
  * @param value The access info you want to set for this model or operation.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example Set access
  * ```typespec
@@ -353,7 +353,7 @@ export type AccessDecorator = (
 /**
  * Set whether a model property should be flattened or not.
  *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -376,7 +376,7 @@ export type FlattenPropertyDecorator = (
  *
  * @param original : The original service definition
  * @param override : The override method definition that specifies the exact client method you want
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -427,7 +427,7 @@ export type OverrideDecorator = (
 /**
  * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
  *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -446,7 +446,7 @@ export type UseSystemTextJsonConverterDecorator = (
 /**
  * Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
  *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -477,7 +477,7 @@ export type ClientInitializationDecorator = (
 /**
  * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
  *
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
@@ -511,7 +511,8 @@ export type ParamAliasDecorator = (
  * By default, the client namespace for them will follow the TypeSpec namespace.
  *
  * @param rename The rename you want applied to the object
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
  * @clientNamespace("ContosoClient")
@@ -519,10 +520,10 @@ export type ParamAliasDecorator = (
  * ```
  * @example
  * ```typespec
- * @clientName("ContosoJava", "java")
- * @clientName("ContosoPython", "python")
- * @clientName("ContosoCSharp", "csharp")
- * @clientName("ContosoJavascript", "javascript")
+ * @clientNamespace("ContosoJava", "java")
+ * @clientNamespace("ContosoPython", "python")
+ * @clientNamespace("ContosoCSharp", "csharp")
+ * @clientNamespace("ContosoJavascript", "javascript")
  * namespace Contoso;
  * ```
  */
@@ -530,6 +531,32 @@ export type ClientNamespaceDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface | Model | Enum | Union,
   rename: string,
+  scope?: string,
+) => void;
+
+/**
+ * Use to override default assumptions on whether a parameter is an api-version parameter or not.
+ * By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
+ * a client parameter, we will also elevate this parameter up onto the client.
+ *
+ * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @example
+ * ```typespec
+ * namespace Contoso;
+ *
+ * op test(
+ *   @apiVersion
+ *   @header("x-ms-version")
+ *   version: string
+ * ): void;
+ * ```
+ */
+export type ApiVersionDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value?: boolean,
   scope?: string,
 ) => void;
 
@@ -547,4 +574,5 @@ export type AzureClientGeneratorCoreDecorators = {
   clientInitialization: ClientInitializationDecorator;
   paramAlias: ParamAliasDecorator;
   clientNamespace: ClientNamespaceDecorator;
+  apiVersion: ApiVersionDecorator;
 };
