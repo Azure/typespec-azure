@@ -30,9 +30,9 @@ const validOrder = {
   },
 };
 const validCheckNameAvailability = {
-  nameAvailable: true,
+  nameAvailable: false,
   reason: "AlreadyExists",
-  message: "",
+  message: "Hostname 'checkName' already exists. Please select a different name.",
 };
 let createOrReplacePollCount = 0;
 let postPollCount = 0;
@@ -55,10 +55,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGl
     },
     response: {
       status: 200,
-      body: json({
-        ...validCheckNameAvailability,
-        message: "This is a global name availability check message.",
-      }),
+      body: json(validCheckNameAvailability),
     },
     kind: "MockApiDefinition",
   });
@@ -81,10 +78,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLo
     },
     response: {
       status: 200,
-      body: json({
-        ...validCheckNameAvailability,
-        message: "This is a local name availability check message.",
-      }),
+      body: json(validCheckNameAvailability),
     },
     kind: "MockApiDefinition",
   });
