@@ -33,6 +33,7 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
     __pagedResultSet: new Set(),
+    __paramMapping: new Map(),
   };
 }
 

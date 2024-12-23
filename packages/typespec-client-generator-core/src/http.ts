@@ -535,7 +535,9 @@ export function getCorrespondingMethodParams(
       twoParamsEquivalent(context, x.__raw, serviceParam.__raw) ||
       (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name),
   );
-  if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
+  if (correspondingClientParams.length > 0) {
+    return diagnostics.wrap(correspondingClientParams);
+  }
 
   if (serviceParam.isApiVersionParam && serviceParam.onClient) {
     const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
@@ -552,7 +554,7 @@ export function getCorrespondingMethodParams(
       );
       return diagnostics.wrap([]);
     }
-    return diagnostics.wrap(clientParams.filter((x) => isApiVersion(context, x)));
+    return diagnostics.wrap(existingApiVersion ? [existingApiVersion] : []);
   }
   if (isSubscriptionId(context, serviceParam)) {
     const subId = clientParams.find((x) => isSubscriptionId(context, x));

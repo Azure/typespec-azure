@@ -31,8 +31,18 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  SdkBodyParameter,
   SdkClientType,
+  SdkCookieParameter,
+  SdkHeaderParameter,
+  SdkHttpOperation,
   SdkHttpOperationExample,
+  SdkMethodParameter,
+  SdkModelPropertyType,
+  SdkModelType,
+  SdkPathParameter,
+  SdkQueryParameter,
+  SdkServiceMethod,
   SdkServiceOperation,
   SdkType,
   TCGCContext,
@@ -697,4 +707,60 @@ export function isAzureCoreModel(t: SdkType): boolean {
  */
 export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
   return context.__pagedResultSet.has(t);
+}
+
+/**
+ * Find corresponding http parameter list for a client initialization or service method parameter
+ * @param method
+ * @param param
+ * @returns
+ */
+export function getHttpOperationParameter(
+  method: SdkServiceMethod<SdkHttpOperation>,
+  param: SdkMethodParameter,
+): (
+  | SdkPathParameter
+  | SdkQueryParameter
+  | SdkHeaderParameter
+  | SdkCookieParameter
+  | SdkBodyParameter
+)[] {
+  const operation = method.operation;
+  const result: (
+    | SdkPathParameter
+    | SdkQueryParameter
+    | SdkHeaderParameter
+    | SdkCookieParameter
+    | SdkBodyParameter
+  )[] = [];
+  const queue: SdkModelPropertyType[] = [param];
+  const visited: Set<SdkModelType> = new Set();
+  while (result.length === 0 && queue.length > 0) {
+    const param = queue.pop();
+    for (const p of operation.parameters) {
+      for (const cp of p.correspondingMethodParams) {
+        if (cp === param) {
+          result.push(p);
+        }
+      }
+    }
+    if (operation.bodyParam) {
+      for (const cp of operation.bodyParam.correspondingMethodParams) {
+        if (cp === param) {
+          result.push(operation.bodyParam);
+        }
+      }
+    }
+    if (result.length === 0 && param?.type.kind === "model" && !visited.has(param.type)) {
+      visited.add(param.type);
+      let current: SdkModelType | undefined = param.type;
+      while (current) {
+        for (const prop of param.type.properties) {
+          queue.push(prop);
+        }
+        current = current.baseModel;
+      }
+    }
+  }
+  return result;
 }

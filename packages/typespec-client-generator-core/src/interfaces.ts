@@ -55,6 +55,7 @@ export interface TCGCContext {
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
   __pagedResultSet: Set<SdkType>;
+  __paramMapping: Map<SdkMethodParameter, (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter | SdkBodyParameter)[]>;
 }
 
 export interface SdkContext<
