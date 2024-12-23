@@ -46,7 +46,7 @@ describe("Legacy define paging operation using Azure.Core decorators", () => {
       model CustomPageModel<T> {
         items: T[];
 
-        @Azure.Core.nextLink
+        @nextLink
         \`@odata.nextLink\`?: string;
       }
       op list(): CustomPageModel<{}>;
@@ -66,7 +66,7 @@ describe("Legacy define paging operation using Azure.Core decorators", () => {
       @Azure.Core.items
       itemList?: string[];
 
-      @Azure.Core.nextLink
+      @nextLink
       nextLink?: string;
     }
       

@@ -7,7 +7,6 @@ import {
   getPagingOperation,
   getService,
   getSummary,
-  ignoreDiagnostics,
   isList,
   Model,
   ModelProperty,
@@ -29,7 +28,7 @@ import {
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
-import { getCorrespondingMethodParams, getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
+import { getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
   SdkClient,
   SdkClientType,
@@ -44,7 +43,6 @@ import {
   SdkMethod,
   SdkMethodParameter,
   SdkMethodResponse,
-  SdkModelPropertyType,
   SdkModelType,
   SdkNamespace,
   SdkNullableType,
@@ -55,7 +53,6 @@ import {
   SdkPathParameter,
   SdkServiceMethod,
   SdkServiceOperation,
-  SdkServiceParameter,
   SdkType,
   SdkUnionType,
   TCGCContext,
@@ -140,11 +137,17 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
+  // nullable response type means the underlaying operation has multiple responses and only one of them is not empty, which is what we want
+  let responseType = basic.response.type;
+  if (responseType?.kind === "nullable") {
+    responseType = responseType.type;
+  }
+
   // normal paging
   if (isList(context.program, operation)) {
     const pagingOperation = diagnostics.pipe(getPagingOperation(context.program, operation));
 
-    if (basic.response.type?.__raw?.kind !== "Model" || !pagingOperation) {
+    if (responseType?.__raw?.kind !== "Model" || !pagingOperation) {
       diagnostics.add(
         createDiagnostic({
           code: "unexpected-pageable-operation-return-type",
@@ -163,18 +166,18 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     basic.response.resultPath = getPropertyPathFromModel(
       context,
-      basic.response.type?.__raw,
+      responseType?.__raw,
       (p) => p === pagingOperation.output.pageItems.property,
     );
     const nextLinkPath = pagingOperation.output.nextLink
       ? getPropertyPathFromModel(
           context,
-          basic.response.type?.__raw,
+          responseType?.__raw,
           (p) => p === pagingOperation.output.nextLink!.property,
         )
       : undefined;
 
-    context.__pagedResultSet.add(basic.response.type);
+    context.__pagedResultSet.add(responseType);
     // tcgc will let all paging method return a list of items
     basic.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagingOperation?.output.pageItems.property.type),
@@ -190,7 +193,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   // azure core paging
   const pagedMetadata = getPagedResult(context.program, operation)!;
 
-  if (basic.response.type?.__raw?.kind !== "Model" || !pagedMetadata.itemsProperty) {
+  if (responseType?.__raw?.kind !== "Model" || !pagedMetadata.itemsProperty) {
     diagnostics.add(
       createDiagnostic({
         code: "unexpected-pageable-operation-return-type",
@@ -207,7 +210,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     });
   }
 
-  context.__pagedResultSet.add(basic.response.type);
+  context.__pagedResultSet.add(responseType);
 
   // tcgc will let all paging method return a list of items
   basic.response.type = diagnostics.pipe(
@@ -481,16 +484,6 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     operation: serviceOperation,
     response,
     apiVersions,
-    getParameterMapping: function getParameterMapping(
-      serviceParam: SdkServiceParameter,
-    ): SdkModelPropertyType[] {
-      return ignoreDiagnostics(
-        getCorrespondingMethodParams(context, operation, methodParameters, serviceParam),
-      );
-    },
-    getResponseMapping: function getResponseMapping(): string | undefined {
-      return undefined; // currently we only return a value for paging or lro
-    },
     crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
     generateConvenient: shouldGenerateConvenient(context, operation),

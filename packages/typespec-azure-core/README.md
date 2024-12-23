@@ -82,7 +82,6 @@ Available ruleSets:
 - [`@lroResult`](#@lroresult)
 - [`@lroStatus`](#@lrostatus)
 - [`@lroSucceeded`](#@lrosucceeded)
-- [`@nextLink`](#@nextlink)
 - [`@nextPageOperation`](#@nextpageoperation)
 - [`@operationLink`](#@operationlink)
 - [`@pagedResult`](#@pagedresult)
@@ -261,22 +260,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 ##### Target
 
 `EnumMember | UnionVariant`
-
-##### Parameters
-
-None
-
-#### `@nextLink`
-
-Identifies a ModelProperty that contains the next link value. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.nextLink
-```
-
-##### Target
-
-`ModelProperty`
 
 ##### Parameters
 

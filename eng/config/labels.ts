@@ -32,6 +32,10 @@ export const AreaLabels = defineLabels({
     color: "846da1",
     description: "Issues for Azure specific ide features",
   },
+  "cli/psh": {
+    color: "9EB120",
+    description: "Issues for Azure CLI/PSH features",
+  },
 });
 
 /**
@@ -44,6 +48,7 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "emitter:autorest": ["packages/typespec-autorest/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
   ide: [],
+  "cli/psh": [],
 };
 
 export default defineConfig({

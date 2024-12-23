@@ -250,6 +250,12 @@ export type ArmCommonTypesVersionDecorator = (
 export type ArmVirtualResourceDecorator = (context: DecoratorContext, target: Model) => void;
 
 /**
+ *  This decorator is used on resources that do not satisfy the definition of a resource
+ *  but need to be identified as such.
+ */
+export type CustomAzureResourceDecorator = (context: DecoratorContext, target: Model) => void;
+
+/**
  * This decorator sets the base type of the given resource.
  *
  * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
@@ -282,4 +288,8 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
+};
+
+export type AzureResourceManagerLegacyDecorators = {
+  customAzureResource: CustomAzureResourceDecorator;
 };
