@@ -915,7 +915,7 @@ Expected response body:
   }
 }
 ```
-  
+
 ### Azure_ResourceManager_OperationTemplates_ListAvailableOperations
 
 - Endpoint: `get https://management.azure.com`
@@ -924,6 +924,7 @@ Resource GET operation.
 Expected path: /providers/Azure.ResourceManager.Models.Resources/operations
 Expected query parameter: api-version=2023-12-01-preview
 Expected response body:
+
 ```json
 {
   "value": [
