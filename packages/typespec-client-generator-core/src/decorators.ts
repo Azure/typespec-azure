@@ -38,6 +38,7 @@ import {
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
+  ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
@@ -58,6 +59,7 @@ import {
   getValidApiVersion,
   isAzureCoreTspModel,
   negationScopesKey,
+  scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
@@ -1070,4 +1072,40 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
     current = current.namespace;
   }
   return segments.join(".");
+}
+
+export const $scope: ScopeDecorator = (
+  context: DecoratorContext,
+  entity: Operation,
+  scope?: LanguageScopes,
+) => {
+  const [negationScopes, scopes] = parseScopes(context, scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    // for negation scope, override the previous value
+    setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
+  }
+  if (scopes !== undefined && scopes.length > 0) {
+    // for normal scope, add them incrementally
+    const targetEntry = context.program.stateMap(scopeKey).get(entity);
+    setScopedDecoratorData(
+      context,
+      $scope,
+      scopeKey,
+      entity,
+      !targetEntry ? scopes : [...Object.values(targetEntry), ...scopes],
+    );
+  }
+};
+
+export function IsInScope(context: TCGCContext, entity: Operation): boolean {
+  const scopes = getScopedDecoratorData(context, scopeKey, entity);
+  if (scopes !== undefined && scopes.includes(context.emitterName)) {
+    return true;
+  }
+
+  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+  if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
+    return false;
+  }
+  return true;
 }

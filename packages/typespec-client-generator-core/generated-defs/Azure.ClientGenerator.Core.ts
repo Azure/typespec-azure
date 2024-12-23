@@ -533,6 +533,18 @@ export type ClientNamespaceDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * To define the client scope of an operation.
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @example
+ * ```typespec
+ * op test: void;
+ * ```
+ */
+export type ScopeDecorator = (context: DecoratorContext, target: Operation, scope?: string) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -547,4 +559,5 @@ export type AzureClientGeneratorCoreDecorators = {
   clientInitialization: ClientInitializationDecorator;
   paramAlias: ParamAliasDecorator;
   clientNamespace: ClientNamespaceDecorator;
+  scope: ScopeDecorator;
 };
