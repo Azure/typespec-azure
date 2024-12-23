@@ -140,7 +140,7 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_update = passOnSucce
       },
     },
     headers: {
-      "Content-Type": "application/merge-patch+json",
+      "Content-Type": "application/json",
     },
   },
   response: {
