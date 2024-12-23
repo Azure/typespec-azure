@@ -79,6 +79,7 @@ interface TopLevel {
     Resource PUT operation.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
     Expected query parameter: api-version=2023-12-01-preview
+    
     Expected request body:
     ```json
     {
@@ -88,6 +89,7 @@ interface TopLevel {
       }
     }
     ```
+    
     Expected response body:
     ```json
     {
@@ -117,6 +119,7 @@ interface TopLevel {
     Resource PATCH operation.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
     Expected query parameter: api-version=2023-12-01-preview
+    
     Expected request body:
     ```json
     {
@@ -125,6 +128,7 @@ interface TopLevel {
       }
     }
     ```
+    
     Expected response body:
     ```json
     {
@@ -225,16 +229,27 @@ interface TopLevel {
 
   @scenario
   @scenarioDoc("""
-      Resource sync action.
-      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/actionSync
-      Expected query parameter: api-version=2023-12-01-preview
-      Expected request body:
-      ```json
-      {
-        "message": "Resource action at top level.",
-        "urgent": true
-      }
-      ```
+    Resource sync action.
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/actionSync
+    Expected query parameter: api-version=2023-12-01-preview
+    
+    Expected request body:
+    ```json
+    {
+      "message": "Resource action at top level.",
+      "urgent": true
+    }
+    ```
     """)
   actionSync is ArmResourceActionNoContentSync<TopLevelTrackedResource, NotificationDetails>;
+
+  @scenario
+  @scenarioDoc("""
+    Resource HEAD operation.
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
+    Expected query parameter: api-version=2023-12-01-preview
+    ```
+    Expected response status code: 204
+    """)
+  checkExistence is ArmResourceCheckExistence<TopLevelTrackedResource>;
 }
