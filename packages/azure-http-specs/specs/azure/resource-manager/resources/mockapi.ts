@@ -308,7 +308,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
         },
       },
       headers: {
-        "Content-Type": "application/merge-patch+json",
+        "Content-Type": "application/json",
       },
     },
     response: {
@@ -338,7 +338,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
         },
       },
       headers: {
-        "Content-Type": "application/merge-patch+json",
+        "Content-Type": "application/json",
       },
     },
     response: {
@@ -367,7 +367,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
         },
       },
       headers: {
-        "Content-Type": "application/merge-patch+json",
+        "Content-Type": "application/json",
       },
     },
     response: {
@@ -399,7 +399,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
         },
       },
       headers: {
-        "Content-Type": "application/merge-patch+json",
+        "Content-Type": "application/json",
       },
     },
     response: {
