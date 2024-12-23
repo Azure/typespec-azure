@@ -1256,8 +1256,8 @@ describe("typespec-client-generator-core: package", () => {
         }
       `);
       const sdkPackage = runnerWithCore.context.sdkPackage;
-      strictEqual(sdkPackage.models.length, 0);
-      strictEqual(sdkPackage.enums.length, 1);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.enums.length, 2);
     });
   });
 });

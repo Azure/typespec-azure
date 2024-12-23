@@ -1,5 +1,39 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.49.0
+
+### Bug Fixes
+
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+### Features
+
+- [#1812](https://github.com/Azure/typespec-azure/pull/1812) add `SdkCookieParameter` type and support `@cookie` in TypeSpec http lib
+- [#1783](https://github.com/Azure/typespec-azure/pull/1783) Implement scope negation for TCGC decorators
+- [#1912](https://github.com/Azure/typespec-azure/pull/1912) support emit code model
+
+
+## 0.48.6
+
+### Bug Fixes
+
+- [#1966](https://github.com/Azure/typespec-azure/pull/1966) Allow for responses without bodies to be errors, depending on presence of `@error` decorator
+
+
+## 0.48.5
+
+### Breaking Changes
+
+- [#1957](https://github.com/Azure/typespec-azure/pull/1957) Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`. Usage and access now properly propagate on polling model, final result and final envelop result of `lroMetadata`.
+
+
+## 0.48.4
+
+### Bug Fixes
+
+- [#1935](https://github.com/Azure/typespec-azure/pull/1935) fix wrong `unexpected-pageable-operation-return-type` because of nullable type
+
+
 ## 0.48.3
 
 ### Bug Fixes

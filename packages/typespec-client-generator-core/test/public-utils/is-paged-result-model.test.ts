@@ -23,7 +23,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         @items
         value: Test[];
 
-        @Azure.Core.nextLink
+        @nextLink
         nextLink?: url;
       }
 
