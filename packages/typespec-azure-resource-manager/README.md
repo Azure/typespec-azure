@@ -42,6 +42,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response`                                                                                                                           | [RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.                                                                                                                                                                              |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars`                                                                                                                   | Arm resource name must contain only alphanumeric characters.                                                                                                                                                                                         |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state`                                                                                                                           | Check for properly configured provisioningState property.                                                                                                                                                                                            |
+| `@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage`                                                                                                                      | Verify the usage of @customAzureResource decorator.                                                                                                                                                                                                  |
 | `@azure-tools/typespec-azure-resource-manager/beyond-nesting-levels`                                                                                                                                     | Tracked Resources must use 3 or fewer levels of nesting.                                                                                                                                                                                             |
 | `@azure-tools/typespec-azure-resource-manager/arm-resource-operation`                                                                                                                                    | Validate ARM Resource operations.                                                                                                                                                                                                                    |
 | `@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation`                                                                                                                              | Check for resources that must have a delete operation.                                                                                                                                                                                               |
@@ -496,3 +497,24 @@ This allows sharing Azure Resource Manager resource types across specifications
 | Name       | Type          | Description                                                              |
 | ---------- | ------------- | ------------------------------------------------------------------------ |
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
+
+### Azure.ResourceManager.Legacy
+
+- [`@customAzureResource`](#@customazureresource)
+
+#### `@customAzureResource`
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.Legacy.customAzureResource
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+None
