@@ -94,7 +94,7 @@ interface LocationResources {
     }
     ```
     """)
-  createOrUpdate is ArmResourceCreateOrUpdateAsync<LocationResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceSync<LocationResource>;
 
   @scenario
   @scenarioDoc("""
