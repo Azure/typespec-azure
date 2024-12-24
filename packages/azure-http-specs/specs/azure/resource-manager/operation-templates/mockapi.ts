@@ -29,7 +29,7 @@ const validOrder = {
     lastModifiedByType: "User",
   },
 };
-const validCheckNameAvailability = {
+const checkNameAvailabilityResponse = {
   nameAvailable: false,
   reason: "AlreadyExists",
   message: "Hostname 'checkName' already exists. Please select a different name.",
@@ -55,7 +55,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGl
     },
     response: {
       status: 200,
-      body: json(validCheckNameAvailability),
+      body: json(checkNameAvailabilityResponse),
     },
     kind: "MockApiDefinition",
   });
@@ -78,7 +78,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLo
     },
     response: {
       status: 200,
-      body: json(validCheckNameAvailability),
+      body: json(checkNameAvailabilityResponse),
     },
     kind: "MockApiDefinition",
   },
