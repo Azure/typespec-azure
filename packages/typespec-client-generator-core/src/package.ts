@@ -487,7 +487,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     operation: serviceOperation,
     response,
     apiVersions,
-    crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
     generateConvenient: shouldGenerateConvenient(context, operation),
     generateProtocol: shouldGenerateProtocol(context, operation),
@@ -636,7 +636,7 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
-      crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operationGroup.type),
       decorators: [],
     });
   }
