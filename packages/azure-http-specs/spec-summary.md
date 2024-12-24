@@ -915,7 +915,7 @@ Expected response body:
   }
 }
 ```
-  
+
 ### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal
 
 - Endpoint: `post https://management.azure.com`
@@ -945,21 +945,21 @@ Expected response body:
 ### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal
 
 - Endpoint: `post https://management.azure.com`
-  
+
 Resource POST operation.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/westus/checkNameAvailability
 Expected query parameter: api-version=2023-12-01-preview
 Expected request body:
-  
+
 ```json
 {
   "name": "checkName",
   "type": "Microsoft.Web/site"
 }
 ```
-  
+
 Expected response body:
-  
+
 ```json
 {
   "nameAvailable": false,

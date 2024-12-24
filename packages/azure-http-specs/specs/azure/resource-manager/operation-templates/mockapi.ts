@@ -61,8 +61,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGl
   });
 
 // Check Local Name Availability
-Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal = 
-  passOnSuccess({
+Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal = passOnSuccess(
+  {
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/:location/checkNameAvailability",
     method: "post",
     request: {
@@ -81,7 +81,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLo
       body: json(validCheckNameAvailability),
     },
     kind: "MockApiDefinition",
-  });
+  },
+);
 
 // lro resource
 Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnSuccess([
