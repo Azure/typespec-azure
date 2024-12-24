@@ -37,7 +37,6 @@ import {
   SdkHeaderParameter,
   SdkHttpOperation,
   SdkHttpOperationExample,
-  SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelType,
   SdkPathParameter,
@@ -710,48 +709,50 @@ export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
 }
 
 /**
- * Find corresponding http parameter list for a client initialization or service method parameter
+ * Find corresponding http parameter list for a client initialization or service method parameter or the property of that parameter.
+ *
  * @param method
  * @param param
  * @returns
  */
 export function getHttpOperationParameter(
   method: SdkServiceMethod<SdkHttpOperation>,
-  param: SdkMethodParameter,
-): (
+  param: SdkModelPropertyType,
+):
   | SdkPathParameter
   | SdkQueryParameter
   | SdkHeaderParameter
   | SdkCookieParameter
   | SdkBodyParameter
-)[] {
+  | undefined {
   const operation = method.operation;
-  const result: (
-    | SdkPathParameter
-    | SdkQueryParameter
-    | SdkHeaderParameter
-    | SdkCookieParameter
-    | SdkBodyParameter
-  )[] = [];
   const queue: SdkModelPropertyType[] = [param];
   const visited: Set<SdkModelType> = new Set();
-  while (result.length === 0 && queue.length > 0) {
+  // BFS to find the corresponding http parameter.
+  // An http parameter will be mapped to a method/client parameter, several method/client parameters (body spread case), or one property of a method property (metadata on property case).
+  // So, when we try to find which http parameter a method parameter corresponds to, we compare the `correspondingMethodParams` list directly.
+  // When we try to find which http parameter a property corresponds to, we need to consider the following cases:
+  // 1. The property itself is an http parameter.
+  // 2. The property is a model, and the properties of the model are http parameters, recursively.
+  // 3. The property is a model, and the base model of the model has http parameters, recursively.
+  // When we find one, we return directly since a method/client parameter or property could only be used in one http parameter.
+  while (queue.length > 0) {
     const param = queue.pop();
     for (const p of operation.parameters) {
       for (const cp of p.correspondingMethodParams) {
         if (cp === param) {
-          result.push(p);
+          return p;
         }
       }
     }
     if (operation.bodyParam) {
       for (const cp of operation.bodyParam.correspondingMethodParams) {
         if (cp === param) {
-          result.push(operation.bodyParam);
+          return operation.bodyParam;
         }
       }
     }
-    if (result.length === 0 && param?.type.kind === "model" && !visited.has(param.type)) {
+    if (param?.kind === "property" && param?.type.kind === "model" && !visited.has(param.type)) {
       visited.add(param.type);
       let current: SdkModelType | undefined = param.type;
       while (current) {
@@ -762,5 +763,5 @@ export function getHttpOperationParameter(
       }
     }
   }
-  return result;
+  return undefined;
 }

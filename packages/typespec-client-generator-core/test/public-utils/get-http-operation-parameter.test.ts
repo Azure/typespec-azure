@@ -29,33 +29,28 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "h") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "h");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "h");
       } else if (param.name === "q") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "query");
-        strictEqual(httpParam[0].serializedName, "q");
+        strictEqual(httpParam.kind, "query");
+        strictEqual(httpParam.serializedName, "q");
       } else if (param.name === "p") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "path");
-        strictEqual(httpParam[0].serializedName, "p");
+        strictEqual(httpParam.kind, "path");
+        strictEqual(httpParam.serializedName, "p");
       } else if (param.name === "b") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "b");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "b");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Content-Type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
       }
     }
   });
@@ -78,15 +73,13 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "key") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Content-Type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
       }
     }
   });
@@ -112,21 +105,18 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "body") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Content-Type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
       } else if (param.name === "accept") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Accept");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Accept");
       }
     }
   });
@@ -134,11 +124,12 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
   it("spread model with @bodyRoot property", async () => {
     await runner.compileWithBuiltInService(`
       model Shelf {
+        @query
         name: string;
         theme?: string;
       }
       model CreateShelfRequest {
-        @body
+        @bodyRoot
         body: Shelf;
       }
       op createShelf(...CreateShelfRequest): Shelf;
@@ -152,21 +143,30 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "body") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Content-Type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
       } else if (param.name === "accept") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Accept");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Accept");
+      }
+    }
+    strictEqual(parameters[0].type.kind, "model");
+    for (const property of parameters[0].type.properties) {
+      if (property.name === "name") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "query");
+        strictEqual(httpParam.serializedName, "name");
+      } else if (property.name === "theme") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(!httpParam);
       }
     }
   });
@@ -184,21 +184,18 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "a") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       } else if (param.name === "b") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Content-Type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
       }
     }
   });
@@ -216,21 +213,70 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "a") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "a");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "a");
       } else if (param.name === "b") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Content-Type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
+      }
+    }
+  });
+
+  it("@bodyRoot case", async () => {
+    await runner.compileWithBuiltInService(`
+      model TestRequest {
+        @header
+        h: string;
+        @query
+        q: string;
+        prop1: string;
+        prop2: string;
+      }
+      op test(@bodyRoot request: TestRequest): void;
+    `);
+    const method = getServiceMethodOfClient(runner.context.sdkPackage);
+    const parameters = method.parameters;
+
+    strictEqual(parameters.length, 2);
+
+    for (const param of parameters) {
+      if (param.name === "request") {
+        const httpParam = getHttpOperationParameter(method, param);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "request");
+      } else if (param.name === "contentType") {
+        const httpParam = getHttpOperationParameter(method, param);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
+      }
+    }
+    strictEqual(parameters[0].type.kind, "model");
+    for (const property of parameters[0].type.properties) {
+      if (property.name === "h") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "h");
+      } else if (property.name === "q") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "query");
+        strictEqual(httpParam.serializedName, "q");
+      } else if (property.name === "prop1") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(!httpParam);
+      } else if (property.name === "prop2") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(!httpParam);
       }
     }
   });
@@ -258,31 +304,26 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "name") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "path");
-        strictEqual(httpParam[0].serializedName, "name");
+        strictEqual(httpParam.kind, "path");
+        strictEqual(httpParam.serializedName, "name");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "content-type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "content-type");
       } else if (param.name === "file_data") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       } else if (param.name === "readOnly") {
         const httpParam = getHttpOperationParameter(method, param);
-        ok(httpParam);
-        strictEqual(httpParam.length, 0);
+        ok(!httpParam);
       } else if (param.name === "constant") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "body");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
       }
     }
   });
@@ -332,33 +373,28 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "petId") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "path");
-        strictEqual(httpParam[0].serializedName, "petId");
+        strictEqual(httpParam.kind, "path");
+        strictEqual(httpParam.serializedName, "petId");
       } else if (param.name === "checkupId") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "path");
-        strictEqual(httpParam[0].serializedName, "checkupId");
+        strictEqual(httpParam.kind, "path");
+        strictEqual(httpParam.serializedName, "checkupId");
       } else if (param.name === "resource") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "body");
-        strictEqual(httpParam[0].serializedName, "resource");
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "resource");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Content-Type");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
       } else if (param.name === "accept") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.length, 1);
-        strictEqual(httpParam[0].kind, "header");
-        strictEqual(httpParam[0].serializedName, "Accept");
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Accept");
       }
     }
   });
@@ -374,9 +410,9 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       method,
       client.initialization.properties[1] as SdkMethodParameter,
     );
-    strictEqual(httpParam.length, 1);
-    strictEqual(httpParam[0].kind, "query");
-    strictEqual(httpParam[0].serializedName, "apiVersion");
+    ok(httpParam);
+    strictEqual(httpParam.kind, "query");
+    strictEqual(httpParam.serializedName, "apiVersion");
   });
 
   it("client parameter", async () => {
@@ -405,16 +441,71 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       client.methods[0] as SdkServiceMethod<SdkHttpOperation>,
       client.initialization.properties[0] as SdkMethodParameter,
     );
-    strictEqual(httpParam.length, 1);
-    strictEqual(httpParam[0].kind, "path");
-    strictEqual(httpParam[0].serializedName, "blob");
+    ok(httpParam);
+    strictEqual(httpParam.kind, "path");
+    strictEqual(httpParam.serializedName, "blob");
 
     httpParam = getHttpOperationParameter(
       client.methods[1] as SdkServiceMethod<SdkHttpOperation>,
       client.initialization.properties[0] as SdkMethodParameter,
     );
-    strictEqual(httpParam.length, 1);
-    strictEqual(httpParam[0].kind, "path");
-    strictEqual(httpParam[0].serializedName, "blobName");
+    ok(httpParam);
+    strictEqual(httpParam.kind, "path");
+    strictEqual(httpParam.serializedName, "blobName");
+  });
+
+  it("@override impact", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace MyService;
+      model Params {
+        foo: string;
+        bar: string;
+      }
+
+      op func(...Params): void;
+      `,
+      `
+      namespace MyCustomizations;
+
+      op func(params: MyService.Params): void;
+
+      @@override(MyService.func, MyCustomizations.func);
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+    const parameters = method.parameters;
+
+    strictEqual(parameters.length, 2);
+
+    for (const param of parameters) {
+      if (param.name === "params") {
+        const httpParam = getHttpOperationParameter(method, param);
+        ok(!httpParam);
+      } else if (param.name === "contentType") {
+        const httpParam = getHttpOperationParameter(method, param);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "header");
+        strictEqual(httpParam.serializedName, "Content-Type");
+      }
+    }
+
+    strictEqual(parameters[0].type.kind, "model");
+    for (const property of parameters[0].type.properties) {
+      if (property.name === "foo") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
+      } else if (property.name === "bar") {
+        const httpParam = getHttpOperationParameter(method, property);
+        ok(httpParam);
+        strictEqual(httpParam.kind, "body");
+        strictEqual(httpParam.serializedName, "body");
+      }
+    }
   });
 });
