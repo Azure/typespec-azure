@@ -29,9 +29,60 @@ const validOrder = {
     lastModifiedByType: "User",
   },
 };
+const checkNameAvailabilityResponse = {
+  nameAvailable: false,
+  reason: "AlreadyExists",
+  message: "Hostname 'checkName' already exists. Please select a different name.",
+};
 let createOrReplacePollCount = 0;
 let postPollCount = 0;
 let deletePollCount = 0;
+
+// Check Global Name Availability
+Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal =
+  passOnSuccess({
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/checkNameAvailability",
+    method: "post",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        name: "checkName",
+        type: "Microsoft.Web/site",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(checkNameAvailabilityResponse),
+    },
+    kind: "MockApiDefinition",
+  });
+
+// Check Local Name Availability
+Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal = passOnSuccess(
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/:location/checkNameAvailability",
+    method: "post",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        location: "westus",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        name: "checkName",
+        type: "Microsoft.Web/site",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(checkNameAvailabilityResponse),
+    },
+    kind: "MockApiDefinition",
+  },
+);
 
 // lro resource
 Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnSuccess([
