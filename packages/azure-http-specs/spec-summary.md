@@ -921,7 +921,7 @@ Expected response body:
 - Endpoint: `get https://management.azure.com`
 
 Resource GET operation.
-Expected path: /providers/Azure.ResourceManager.Models.Resources/operations
+Expected path: /providers/Azure.ResourceManager.OperationTemplates/operations
 Expected query parameter: api-version=2023-12-01-preview
 Expected response body:
 

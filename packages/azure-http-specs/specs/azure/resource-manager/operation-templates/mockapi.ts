@@ -29,7 +29,7 @@ const validOrder = {
     lastModifiedByType: "User",
   },
 };
-const validAvailableOperations = {
+const validOperation = {
   name: "Microsoft.Compute/virtualMachines/write",
   isDataAction: false,
   display: {
@@ -57,7 +57,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_ListAvailableOperations = pas
   response: {
     status: 200,
     body: json({
-      value: [validAvailableOperations],
+      value: [validOperation],
     }),
   },
   kind: "MockApiDefinition",
