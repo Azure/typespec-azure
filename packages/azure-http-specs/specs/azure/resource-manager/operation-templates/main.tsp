@@ -5,6 +5,7 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "@azure-tools/typespec-client-generator-core";
 import "./available-operations.tsp";
+import "./checkname-availability.tsp";
 import "./lro.tsp";
 
 using TypeSpec.Http;
