@@ -965,11 +965,13 @@ Expected query parameter: api-version=2023-12-01-preview
 Expected response status code: 204
 
 ### Azure_ResourceManager_Resources_LocationResources_get
+
 - Endpoint: `get https://management.azure.com`
-Resource GET operation.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
-Expected query parameter: api-version=2023-12-01-preview
-Expected response body:
+  Resource GET operation.
+  Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
+  Expected query parameter: api-version=2023-12-01-preview
+  Expected response body:
+
 ```json
 {
   "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
@@ -988,7 +990,7 @@ Expected response body:
     "lastModifiedByType": "User",
   }
 }
-````
+```
 
 ### Azure_ResourceManager_Resources_LocationResources_listByParent
 
