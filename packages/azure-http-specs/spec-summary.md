@@ -916,58 +916,6 @@ Expected response body:
 }
 ```
 
-### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal
-
-- Endpoint: `post https://management.azure.com`
-
-  Resource POST operation.
-  Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/checkNameAvailability
-  Expected query parameter: api-version=2023-12-01-preview
-  Expected request body:
-
-  ```json
-  {
-    "name": "checkName",
-    "type": "Microsoft.Web/site"
-  }
-  ```
-
-  Expected response body:
-
-  ```json
-  {
-    "nameAvailable": false,
-    "reason": "AlreadyExists",
-    "message": "Hostname 'checkName' already exists. Please select a different name."
-  }
-  ```
-
-### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal
-
-- Endpoint: `post https://management.azure.com`
-
-Resource POST operation.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/westus/checkNameAvailability
-Expected query parameter: api-version=2023-12-01-preview
-Expected request body:
-
-```json
-{
-  "name": "checkName",
-  "type": "Microsoft.Web/site"
-}
-```
-
-Expected response body:
-
-```json
-{
-  "nameAvailable": false,
-  "reason": "AlreadyExists",
-  "message": "Hostname 'checkName' already exists. Please select a different name."
-}
-```
-
 ### Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate
 
 - Endpoint: `put https://management.azure.com`
@@ -1509,6 +1457,86 @@ Expected response body:
     "lastModifiedAt": <any date>,
     "lastModifiedByType": "User",
   }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal
+
+- Endpoint: `post https://management.azure.com`
+
+  Resource POST operation.
+  Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/checkNameAvailability
+  Expected query parameter: api-version=2023-12-01-preview
+  Expected request body:
+
+  ```json
+  {
+    "name": "checkName",
+    "type": "Microsoft.Web/site"
+  }
+  ```
+
+  Expected response body:
+
+  ```json
+  {
+    "nameAvailable": false,
+    "reason": "AlreadyExists",
+    "message": "Hostname 'checkName' already exists. Please select a different name."
+  }
+  ```
+
+### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/westus/checkNameAvailability
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "name": "checkName",
+  "type": "Microsoft.Web/site"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "nameAvailable": false,
+  "reason": "AlreadyExists",
+  "message": "Hostname 'checkName' already exists. Please select a different name."
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_ListAvailableOperations
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /providers/Azure.ResourceManager.OperationTemplates/operations
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "name": "Microsoft.Compute/virtualMachines/write",
+      "isDataAction": false,
+      "display": {
+        "provider": "Microsoft Compute",
+        "resource": "Virtual Machines",
+        "operation": "Create or Update Virtual Machine.",
+        "description": "Add or modify virtual machines."
+      },
+      "origin": "user,system",
+      "actionType": "Internal"
+    }
+  ]
 }
 ```
 
