@@ -29,6 +29,18 @@ const validOrder = {
     lastModifiedByType: "User",
   },
 };
+const validOperation = {
+  name: "Microsoft.Compute/virtualMachines/write",
+  isDataAction: false,
+  display: {
+    provider: "Microsoft Compute",
+    resource: "Virtual Machines",
+    operation: "Create or Update Virtual Machine.",
+    description: "Add or modify virtual machines.",
+  },
+  origin: "user,system",
+  actionType: "Internal",
+};
 const checkNameAvailabilityResponse = {
   nameAvailable: false,
   reason: "AlreadyExists",
@@ -37,6 +49,24 @@ const checkNameAvailabilityResponse = {
 let createOrReplacePollCount = 0;
 let postPollCount = 0;
 let deletePollCount = 0;
+
+// operation list
+Scenarios.Azure_ResourceManager_OperationTemplates_ListAvailableOperations = passOnSuccess({
+  uri: "/providers/Azure.ResourceManager.OperationTemplates/operations",
+  method: "get",
+  request: {
+    params: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json({
+      value: [validOperation],
+    }),
+  },
+  kind: "MockApiDefinition",
+});
 
 // Check Global Name Availability
 Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal =
