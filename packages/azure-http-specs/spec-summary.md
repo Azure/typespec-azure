@@ -1446,8 +1446,6 @@ Expected request body:
 Resource HEAD operation.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
 Expected query parameter: api-version=2023-12-01-preview
-
-````
 Expected response status code: 204
 
 ### Azure_ResourceManager_Resources_TopLevel_createOrReplace
