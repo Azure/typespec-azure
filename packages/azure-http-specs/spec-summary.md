@@ -1457,6 +1457,7 @@ Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroup
 Expected query parameter: api-version=2023-12-01-preview
 
 Expected request body:
+
 ```json
 {
   "location": "eastus",
@@ -1464,7 +1465,7 @@ Expected request body:
     "description": "valid"
   }
 }
-````
+```
 
 Expected response body:
 
