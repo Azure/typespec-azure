@@ -95,7 +95,11 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   clientNamespace: string; // fully qualified namespace
   doc?: string;
   summary?: string;
+  /**
+   * @deprecated Use `clientInitialization` instead.
+   */
   initialization: SdkInitializationType;
+  clientInitialization: SdkClientInitializationMethod;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   /**
@@ -376,6 +380,12 @@ export interface SdkModelType extends SdkTypeBase {
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+}
+
+export interface ClientInitializationOptions {
+  parameters?: SdkParameter[];
+  access?: AccessFlags;
+  accessorAccess?: AccessFlags;
 }
 
 export interface SdkInitializationType extends SdkModelType {
@@ -696,6 +706,10 @@ export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation
   extends SdkMethodBase {
   kind: "clientaccessor";
   response: SdkClientType<TServiceOperation>;
+}
+
+export interface SdkClientInitializationMethod extends SdkMethodBase {
+  kind: "clientinitialization";
 }
 
 export type SdkMethod<TServiceOperation extends SdkServiceOperation> =

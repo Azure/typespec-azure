@@ -3,7 +3,6 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDoc,
-  getNamespaceFullName,
   getPagingOperation,
   getService,
   getSummary,
@@ -19,7 +18,6 @@ import { camelCase } from "change-case";
 import {
   getAccess,
   getClientInitialization,
-  getClientNameOverride,
   getClientNamespace,
   getOverriddenClientMethod,
   listClients,
@@ -31,6 +29,8 @@ import {
 import { getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
   SdkClient,
+  SdkClientAccessor,
+  SdkClientInitializationMethod,
   SdkClientType,
   SdkEndpointParameter,
   SdkEndpointType,
@@ -49,7 +49,6 @@ import {
   SdkOperationGroup,
   SdkPackage,
   SdkPagingServiceMethod,
-  SdkParameter,
   SdkPathParameter,
   SdkServiceMethod,
   SdkServiceOperation,
@@ -524,43 +523,61 @@ function getClientDefaultApiVersion(
   return defaultVersion;
 }
 
-function getSdkInitializationType(
+function createSdkInitializationType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let initializationModel = getClientInitialization(context, client.type);
-  let clientParams = context.__clientToParameters.get(client.type);
-  if (!clientParams) {
-    clientParams = [];
-    context.__clientToParameters.set(client.type, clientParams);
-  }
-  const access = client.kind === "SdkClient" ? "public" : "internal";
-  if (initializationModel) {
-    for (const prop of initializationModel.properties) {
-      clientParams.push(prop);
-    }
-    initializationModel.access = access;
-  } else {
-    const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
-    const name = `${namePrefix.split(".").at(-1)}Options`;
-    initializationModel = {
-      __raw: client.service,
-      doc: "Initialization class for the client",
-      kind: "model",
-      properties: [],
-      name,
-      isGeneratedName: true,
-      access,
-      usage: UsageFlags.Input,
-      crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-      clientNamespace: getClientNamespace(context, client.type),
-      apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-      decorators: [],
-    };
-  }
+  const initializationOptions = getClientInitialization(context, client.type);
+
+  // Create an empty client initialization model.
+  const name = `${client.kind === "SdkClient" ? client.name : getLibraryName(context, client.type)}Options`;
+  const initializationModel: SdkInitializationType = {
+    __raw: client.service,
+    doc: "Initialization class for the client",
+    kind: "model",
+    properties: [],
+    name,
+    isGeneratedName: true,
+    access: initializationOptions?.access ?? (client.kind === "SdkClient" ? "public" : "internal"),
+    usage: UsageFlags.Input,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.type)}.${name}`,
+    clientNamespace: getClientNamespace(context, client.type),
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+    decorators: [],
+  };
 
   return diagnostics.wrap(initializationModel);
+}
+
+function createClientInitializationMethod(
+  context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
+): [SdkClientInitializationMethod, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const initializationOptions = getClientInitialization(context, client.type);
+  if (initializationOptions && initializationOptions.parameters) {
+    // Cache elevated parameter, then we could use it to set `onClient` property for method parameters.
+    let clientParams = context.__clientToParameters.get(client.type);
+    if (!clientParams) {
+      clientParams = [];
+      context.__clientToParameters.set(client.type, clientParams);
+    }
+    for (const param of initializationOptions.parameters) {
+      clientParams.push(param);
+    }
+  }
+  const name = `init${client.kind === "SdkClient" ? client.name : getLibraryName(context, client.type)}`;
+  return diagnostics.wrap({
+    kind: "clientinitialization",
+    parameters: initializationOptions?.parameters ? [...initializationOptions.parameters] : [],
+    name,
+    doc: "Initialization method for the client",
+    access: initializationOptions?.access ?? (client.kind === "SdkClient" ? "public" : "internal"),
+    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+    crossLanguageDefintionId: `${getCrossLanguageDefinitionId(context, client.type)}.${name}`,
+    decorators: [],
+  });
 }
 
 function getSdkMethodParameter(
@@ -612,32 +629,36 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
   }
   for (const operationGroup of listOperationGroups(context, client)) {
     // We create a client accessor for each operation group
-    const operationGroupClient = diagnostics.pipe(
-      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
+    retval.push(
+      diagnostics.pipe(createClientAccessorMethod(context, operationGroup, sdkClientType)),
     );
-    const clientInitialization = getClientInitialization(context, operationGroup.type);
-    const parameters: SdkParameter[] = [];
-    if (clientInitialization) {
-      for (const property of clientInitialization.properties) {
-        parameters.push(property);
-      }
-    } else {
-    }
-    const name = `get${operationGroup.type.name}`;
-    retval.push({
-      kind: "clientaccessor",
-      parameters,
-      name,
-      doc: getDoc(context.program, operationGroup.type),
-      summary: getSummary(context.program, operationGroup.type),
-      access: "internal",
-      response: operationGroupClient,
-      apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
-      crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
-      decorators: [],
-    });
   }
   return diagnostics.wrap(retval);
+}
+
+function createClientAccessorMethod<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  operationGroup: SdkOperationGroup,
+  parent: SdkClientType<TServiceOperation>,
+): [SdkClientAccessor<TServiceOperation>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const operationGroupClient = diagnostics.pipe(
+    createSdkClientType<TServiceOperation>(context, operationGroup, parent),
+  );
+  // If the operation group has customized initialization parameters, we will put them into the client accessor method parameter list.
+  const clientInitialization = getClientInitialization(context, operationGroup.type);
+  const name = `get${getLibraryName(context, operationGroup.type)}`;
+  return diagnostics.wrap({
+    kind: "clientaccessor",
+    parameters: clientInitialization?.parameters ?? [],
+    name,
+    doc: "Accessor method for the client",
+    access: clientInitialization?.accessorAccess ?? "public",
+    response: operationGroupClient,
+    apiVersions: context.__tspTypeToApiVersions.get(operationGroup.type)!,
+    crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
+    decorators: [],
+  });
 }
 
 function getEndpointTypeFromSingleServer<
@@ -781,24 +802,18 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const isClient = client.kind === "SdkClient";
-  let name = "";
-  if (isClient) {
-    name = client.name;
-  } else {
-    name = getClientNameOverride(context, client.type) ?? client.type.name;
-  }
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
-    name,
+    name: client.kind === "SdkClient" ? client.name : getLibraryName(context, client.type),
     doc: getDoc(context.program, client.type),
     summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
     clientNamespace: getClientNamespace(context, client.type),
-    initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
+    initialization: diagnostics.pipe(createSdkInitializationType(context, client)),
+    clientInitialization: diagnostics.pipe(createClientInitializationMethod(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
@@ -809,6 +824,9 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     getSdkMethods<TServiceOperation>(context, client, sdkClientType),
   );
   addDefaultClientParameters(context, sdkClientType);
+  // update initialization model properties
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  sdkClientType.initialization.properties = [...sdkClientType.clientInitialization.parameters];
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -817,10 +835,12 @@ function addDefaultClientParameters<
 >(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
   const diagnostics = createDiagnosticCollector();
   // there will always be an endpoint property
-  client.initialization.properties.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
+  client.clientInitialization.parameters.push(
+    diagnostics.pipe(getSdkEndpointParameter(context, client)),
+  );
   const credentialParam = getSdkCredentialParameter(context, client.__raw);
   if (credentialParam) {
-    client.initialization.properties.push(credentialParam);
+    client.clientInitialization.parameters.push(credentialParam);
   }
   let apiVersionParam = context.__clientToParameters
     .get(client.__raw.type)
@@ -836,7 +856,7 @@ function addDefaultClientParameters<
     }
   }
   if (apiVersionParam) {
-    client.initialization.properties.push(apiVersionParam);
+    client.clientInitialization.parameters.push(apiVersionParam);
   }
   let subId = context.__clientToParameters
     .get(client.__raw.type)
@@ -851,7 +871,7 @@ function addDefaultClientParameters<
     }
   }
   if (subId) {
-    client.initialization.properties.push(subId);
+    client.clientInitialization.parameters.push(subId);
   }
 }
 
