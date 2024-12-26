@@ -25,7 +25,7 @@ describe("typespec-client-generator-core: paged operation", () => {
         @items
         @clientName("values")
         tests: Test[];
-        @Azure.Core.nextLink
+        @nextLink
         @clientName("nextLink")
         next: string;
       }

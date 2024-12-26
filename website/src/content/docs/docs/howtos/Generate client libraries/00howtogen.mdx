@@ -29,7 +29,11 @@ Modify your `package.json` to include the necessary dependencies for the languag
     "@typespec/rest": "latest",
     "@typespec/http": "latest",
     "@azure-tools/typespec-azure-core": "latest",
-    "@azure-tools/typespec-python": "latest"
+    "@azure-tools/typespec-autorest": "latest",
+    "@azure-tools/typespec-python": "latest",
+    "@azure-tools/typespec-java": "latest",
+    "@azure-tools/typespec-csharp": "latest",
+    "@azure-tools/typespec-ts": "latest"
   },
   "private": true
 }
@@ -51,7 +55,13 @@ emit:
   - "@azure-tools/typespec-ts"
 options:
   "@azure-tools/typespec-python":
-    package-name: azure-service-template
+    flavor: azure
+  "@azure-tools/typespec-java":
+    flavor: azure
+  "@azure-tools/typespec-csharp":
+    flavor: azure
+  "@azure-tools/typespec-ts":
+    flavor: azure
 ```
 
 Several language repositories utilize the `tsp-client` tool to simplify generating client libraries. For more information on the tool, see [Getting started with `tsp-client`](<./../Generating with tsp-client/tsp_client.md>).
