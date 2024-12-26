@@ -194,6 +194,9 @@ describe("typespec-client-generator-core: general decorators list", () => {
           arguments: { name: "XmlId" },
         },
       ]);
+      const idProp = models[0].properties[0];
+      strictEqual(idProp.kind, "property");
+      strictEqual(idProp.serializedName, "XmlId");
     });
 
     it("@ns", async function () {
