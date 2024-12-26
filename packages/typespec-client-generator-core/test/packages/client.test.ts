@@ -678,7 +678,7 @@ describe("typespec-client-generator-core: client", () => {
 
     const clientAccessor = mainClient.methods[0];
     strictEqual(clientAccessor.kind, "clientaccessor");
-    strictEqual(clientAccessor.access, "internal");
+    strictEqual(clientAccessor.access, "public");
     strictEqual(clientAccessor.name, "getMyOperationGroup");
     strictEqual(clientAccessor.parameters.length, 0);
     strictEqual(clientAccessor.response, operationGroup);
