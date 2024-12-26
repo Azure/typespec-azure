@@ -667,10 +667,7 @@
           "description": "The PrivateEndpointConnectionResource items on this page",
           "items": {
             "$ref": "#/definitions/PrivateEndpointConnectionResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -707,10 +704,7 @@
           "description": "The PrivateLinkResource items on this page",
           "items": {
             "$ref": "#/definitions/PrivateLinkResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -775,10 +769,7 @@
           "description": "The TestTrackedResource items on this page",
           "items": {
             "$ref": "#/definitions/TestTrackedResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",

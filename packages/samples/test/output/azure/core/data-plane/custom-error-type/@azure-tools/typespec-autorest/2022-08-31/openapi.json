@@ -631,9 +631,7 @@
           "items": {
             "$ref": "#/definitions/Widget"
           },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          "x-ms-identifiers": []
         },
         "nextLink": {
           "type": "string",

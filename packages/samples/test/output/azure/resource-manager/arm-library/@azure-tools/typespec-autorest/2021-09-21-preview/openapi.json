@@ -1708,10 +1708,7 @@
           "description": "The AllPropertiesResource items on this page",
           "items": {
             "$ref": "#/definitions/AllPropertiesResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -2121,10 +2118,7 @@
           "description": "The TestExtensionResource items on this page",
           "items": {
             "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -2167,10 +2161,7 @@
           "description": "The TestTenantResource items on this page",
           "items": {
             "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -2213,10 +2204,7 @@
           "description": "The TestTrackedChild items on this page",
           "items": {
             "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedChild"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -2237,10 +2225,7 @@
           "description": "The TestTrackedResource2 items on this page",
           "items": {
             "$ref": "#/definitions/Microsoft.OperationsTest.TestTrackedResource2"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -2261,10 +2246,7 @@
           "description": "The TestTrackedResource items on this page",
           "items": {
             "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",

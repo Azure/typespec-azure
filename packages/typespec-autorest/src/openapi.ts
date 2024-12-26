@@ -1834,6 +1834,10 @@ export async function getOpenAPIForService(
     );
   }
 
+  function ifArmIdentifiersDefault(armIdentifiers: string[]) {
+    return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
+  }
+
   function getSchemaForUnionVariant(
     variant: UnionVariant,
     schemaContext: SchemaContext,
@@ -2376,7 +2380,11 @@ export async function getOpenAPIForService(
       };
 
       const armIdentifiers = getArmIdentifiers(program, typespecType);
-      if (armIdentifiers !== undefined && armIdentifiers.length > 0) {
+      if (
+        armIdentifiers !== undefined &&
+        armIdentifiers.length > 0 &&
+        !ifArmIdentifiersDefault(armIdentifiers)
+      ) {
         array["x-ms-identifiers"] = armIdentifiers;
       } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];

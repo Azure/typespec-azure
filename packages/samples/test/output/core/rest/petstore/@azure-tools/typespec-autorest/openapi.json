@@ -739,10 +739,7 @@
           "description": "The items on this page",
           "items": {
             "$ref": "#/definitions/Checkup"
-          },
-          "x-ms-identifiers": [
-            "id"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -834,10 +831,7 @@
           "description": "The items on this page",
           "items": {
             "$ref": "#/definitions/Owner"
-          },
-          "x-ms-identifiers": [
-            "id"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -919,10 +913,7 @@
           "description": "The items on this page",
           "items": {
             "$ref": "#/definitions/Pet"
-          },
-          "x-ms-identifiers": [
-            "id"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -1029,10 +1020,7 @@
           "description": "The items on this page",
           "items": {
             "$ref": "#/definitions/Toy"
-          },
-          "x-ms-identifiers": [
-            "id"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",

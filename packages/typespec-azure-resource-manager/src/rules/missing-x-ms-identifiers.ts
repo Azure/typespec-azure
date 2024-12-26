@@ -49,7 +49,7 @@ export const missingXmsIdentifiersRule = createRule({
         return false;
       }
 
-      if (getProperty(elementType, "id")) {
+      if (getProperty(elementType, "id") || getProperty(elementType, "name")) {
         return false;
       }
 

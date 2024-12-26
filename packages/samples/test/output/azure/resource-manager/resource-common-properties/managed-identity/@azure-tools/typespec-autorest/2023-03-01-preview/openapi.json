@@ -427,10 +427,7 @@
           "description": "The WidgetResource items on this page",
           "items": {
             "$ref": "#/definitions/WidgetResource"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",

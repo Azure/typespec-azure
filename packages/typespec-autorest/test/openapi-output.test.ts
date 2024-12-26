@@ -824,6 +824,25 @@ describe("typespec-autorest: extension decorator", () => {
 });
 
 describe("typespec-azure: identifiers decorator", () => {
+  it("ignores name/id keys for x-ms-identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        @key
+        name: string;
+        @key
+        id: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
+  });
   it("uses identifiers decorator for properties", async () => {
     const oapi = await openApiFor(
       `

@@ -198,6 +198,22 @@ describe("typespec-azure-core: no-enum rule", () => {
       .toBeValid();
   });
 
+  it("allow x-ms-identifiers from keys on default identifiers", async () => {
+    await tester
+      .expect(
+        `
+        model Pet {
+          pet: Dog[];
+        }
+ 
+        model Dog {
+          name: string;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
   it("allow x-ms-identifiers from identifiers decorator", async () => {
     await tester
       .expect(

@@ -268,13 +268,13 @@ export type ResourceBaseTypeDecorator = (
 ) => void;
 
 /**
- * This decorator is used to indicate the identifying properties of objects in the array, e.g. name
+ * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
  * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
  *
  * @example
  * ```typespec
  * model Pet {
- *  @identifiers(["name"])
+ *  @identifiers(["size"])
  *  dog: Dog;
  * }
  * ```

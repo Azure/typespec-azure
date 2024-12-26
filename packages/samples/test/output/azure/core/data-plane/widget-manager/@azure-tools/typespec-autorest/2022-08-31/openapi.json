@@ -2086,10 +2086,7 @@
           "description": "The Manufacturer items on this page",
           "items": {
             "$ref": "#/definitions/Manufacturer"
-          },
-          "x-ms-identifiers": [
-            "id"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",
@@ -2111,9 +2108,7 @@
           "items": {
             "$ref": "#/definitions/Widget"
           },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          "x-ms-identifiers": []
         },
         "nextLink": {
           "type": "string",
@@ -2135,9 +2130,7 @@
           "items": {
             "$ref": "#/definitions/WidgetPart"
           },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          "x-ms-identifiers": []
         },
         "nextLink": {
           "type": "string",
