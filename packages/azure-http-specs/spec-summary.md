@@ -996,7 +996,7 @@ Expected response status code: 204
 
 - Endpoint: `get https://management.azure.com`
 
-Resource LIST by resource group operation.
+Resource List operation by location.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources
 Expected query parameter: api-version=2023-12-01-preview
 
