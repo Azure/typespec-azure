@@ -462,7 +462,7 @@ export type UseSystemTextJsonConverterDecorator = (
  *   blobName: string;
  * }
  *
- * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
  * // The generated client will have `blobName` on it. We will also
  * // elevate the existing `blobName` parameter to the client level.
  * ```
@@ -470,7 +470,7 @@ export type UseSystemTextJsonConverterDecorator = (
 export type ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  options: Model,
+  options: Type,
   scope?: string,
 ) => void;
 

@@ -67,13 +67,13 @@ export const $lib = createTypeSpecLibrary({
     access: {
       severity: "error",
       messages: {
-        default: `Access decorator value must be "public" or "internal".`,
+        default: `Access value must be "public" or "internal".`,
       },
     },
     "invalid-usage": {
       severity: "error",
       messages: {
-        default: `Usage decorator value must be 2 ("input") or 4 ("output").`,
+        default: `Usage value must be 2 ("input") or 4 ("output").`,
       },
     },
     "invalid-encode": {

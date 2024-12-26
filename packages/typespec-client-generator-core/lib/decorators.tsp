@@ -449,16 +449,36 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
  *   blobName: string;
  * }
  *
- * @@clientInitialization(MyService, MyServiceClientOptions)
+ * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
  * // The generated client will have `blobName` on it. We will also
  * // elevate the existing `blobName` parameter to the client level.
  * ```
  */
 extern dec clientInitialization(
   target: Namespace | Interface,
-  options: Model,
+  options: ClientInitializationOptions,
   scope?: valueof string
 );
+
+/**
+ * Client initialization options.
+ */
+model ClientInitializationOptions {
+  /**
+   * Redefine the client initialization parameters.
+   */
+  parameters?: Model;
+
+  /**
+   * Determines the accessibility of the client initialization method.
+   */
+  access?: EnumMember;
+
+  /**
+   * Determines the accessibility of the client accessor method.
+   */
+  accessorAccess?: EnumMember;
+}
 
 /**
  * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
