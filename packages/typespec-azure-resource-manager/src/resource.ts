@@ -425,6 +425,11 @@ export const $identifiers: IdentifiersDecorator = (
   );
 };
 
+/**
+ * This function returns all arm identifiers for the given array model type
+ * This includes the identifiers specified using the @identifiers decorator
+ * and the identifiers using the @key decorator.
+ */
 export function getArmIdentifiers(program: Program, entity: ArrayModelType): string[] | undefined {
   const value = entity.indexer.value;
 
