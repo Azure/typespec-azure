@@ -380,6 +380,10 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
  * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
  * The properties that are used as identifiers for the object needs to be provided as a list of strings.
  *
+ * @param context The decorator context
+ * @param entity The model property in which the identifiers are being set.
+ * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
+ *
  * @example
  * ```typespec
  * model Pet {
@@ -429,6 +433,10 @@ export const $identifiers: IdentifiersDecorator = (
  * This function returns all arm identifiers for the given array model type
  * This includes the identifiers specified using the @identifiers decorator
  * and the identifiers using the @key decorator.
+ *
+ * @param program The program to process.
+ * @param entity The array model type to check.
+ * @returns returns list of arm identifiers for the given array model type if any or undefined.
  */
 export function getArmIdentifiers(program: Program, entity: ArrayModelType): string[] | undefined {
   const value = entity.indexer.value;

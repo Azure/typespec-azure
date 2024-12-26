@@ -851,7 +851,7 @@ describe("typespec-azure: identifiers decorator", () => {
         age: int32;
       }
       model PetList {
-        @identifiers(["name"])
+        @identifiers(["age"])
         value: Pet[]
       }
       @route("/Pets")
@@ -859,7 +859,7 @@ describe("typespec-azure: identifiers decorator", () => {
       `,
     );
     ok(oapi.paths["/Pets"].get);
-    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
   it("identifies keys correctly as x-ms-identifiers", async () => {
     const oapi = await openApiFor(
