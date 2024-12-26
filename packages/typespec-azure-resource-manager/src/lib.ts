@@ -17,7 +17,7 @@ export const $lib = createTypeSpecLibrary({
         armIdentifiersIncorrectEntity:
           "The @identifiers decorator must be applied to a property that is an array of objects",
         armIdentifiersProperties:
-          "The @identifiers decorator expects a parameter that is an array of strings or an empty array as a parameter.",
+          "The @identifiers decorator expects a parameter that is an array of strings or an empty array.",
       },
     },
     "arm-resource-circular-ancestry": {
