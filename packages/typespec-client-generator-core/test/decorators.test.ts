@@ -2969,4 +2969,139 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(testModel);
     });
   });
+
+  describe("@alternateType", () => {
+    describe.each([
+      ["utcDateTime", "string"],
+      ["utcDateTime", "int64"],
+      ["duration", "string"],
+    ])("supports replacing scalar types", (source: string, alternate: string) => {
+      it("in global", async () => {
+        await runner.compile(`
+          @service({})
+          namespace MyService {
+            scalar source extends ${source};
+          
+            model Model1 {
+              prop: source;
+            };
+
+            @route("/func1")
+            op func1(@body body: Model1): void;
+
+            @@alternateType(source, ${alternate});
+          };
+          `);
+
+        const models = getAllModels(runner.context);
+        const model1 = models[0];
+        strictEqual(model1.kind, "model");
+        const childProperty = model1.properties[0];
+        strictEqual(childProperty.type.kind, alternate);
+      });
+
+      it("of model property", async () => {
+        await runner.compile(`
+          @service({})
+          namespace MyService {
+            model Model1 {
+              prop: ${source};
+            };
+
+            @route("/func1")
+            op func1(@body body: Model1): void;
+
+            @@alternateType(Model1.prop, ${alternate});
+          };
+          `);
+
+        const models = getAllModels(runner.context);
+        const model1 = models[0];
+        strictEqual(model1.kind, "model");
+        const childProperty = model1.properties[0];
+        strictEqual(childProperty.type.kind, alternate);
+      });
+
+      it("of operation parameters", async () => {
+        await runner.compile(`
+          @service({})
+          namespace MyService {
+            @route("/func1")
+            op func1(@alternateType(${alternate}) param: ${source}): void;
+          };
+          `);
+
+        const method = runner.context.sdkPackage.clients[0].methods[0];
+        strictEqual(method.name, "func1");
+        const param = method.parameters[0];
+        strictEqual(param.type.kind, alternate);
+      });
+    });
+
+    it.each([
+      ["python", true],
+      ["python,csharp", true],
+      ["", true],
+      ["!python", false],
+      ["java", false],
+      ["java,go", false],
+    ])("supports scope", async (scope: string, shouldReplace: boolean) => {
+      await runner.compile(`
+          @service({})
+          namespace MyService {
+            @route("/func1")
+            op func1(@alternateType(string, "${scope}") param: utcDateTime): void;
+          };
+          `);
+
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.name, "func1");
+      const param = method.parameters[0];
+      strictEqual(param.type.kind, shouldReplace ? "string" : "utcDateTime");
+    });
+
+    describe.each(["null", "Array<string>", "Record<string>", "Model1", "Union1"])(
+      "doesn't support non-scalar source types",
+      (source: string) => {
+        it("of model properties", async () => {
+          const diagnostics = await runner.diagnose(`
+          @service({})
+          namespace MyService {
+            model Model1{};
+            alias Union1 = string | int32;
+
+            model Model2 {
+              @alternateType(string)
+              prop: ${source};
+            };
+
+            @route("/func1")
+            op func1(@body param: Model2): void;
+          };
+          `);
+
+          expectDiagnostics(diagnostics, {
+            code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
+          });
+        });
+
+        it("of operation parameters", async () => {
+          const diagnostics = await runner.diagnose(`
+          @service({})
+          namespace MyService {
+            model Model1{};
+            alias Union1 = string | int32;
+
+            @route("/func1")
+            op func1(@alternateType(string) param: ${source}): void;
+          };
+          `);
+
+          expectDiagnostics(diagnostics, {
+            code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
+          });
+        });
+      },
+    );
+  });
 });

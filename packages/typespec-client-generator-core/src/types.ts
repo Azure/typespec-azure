@@ -43,6 +43,7 @@ import {
 } from "@typespec/http";
 import {
   getAccessOverride,
+  getAlternateType,
   getClientNamespace,
   getOverriddenClientMethod,
   getUsageOverride,
@@ -985,7 +986,9 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
-      retval = diagnostics.pipe(getSdkDateTimeOrDurationOrBuiltInType(context, type));
+      retval = diagnostics.pipe(
+        getSdkDateTimeOrDurationOrBuiltInType(context, getAlternateType(context, type) ?? type),
+      );
       break;
     case "Enum":
       retval = diagnostics.pipe(getSdkEnumWithDiagnostics(context, type, operation));
@@ -994,7 +997,13 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
-      retval = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      retval = diagnostics.pipe(
+        getClientTypeWithDiagnostics(
+          context,
+          getAlternateType(context, type) ?? type.type,
+          operation,
+        ),
+      );
       diagnostics.pipe(addEncodeInfo(context, type, retval));
       break;
     case "UnionVariant":
@@ -1123,7 +1132,9 @@ export function getSdkModelPropertyTypeBase(
   const diagnostics = createDiagnosticCollector();
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
-  let propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+  let propertyType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, getAlternateType(context, type) ?? type.type, operation),
+  );
   diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {

@@ -244,6 +244,12 @@ export const $lib = createTypeSpecLibrary({
         default: `Operation is pageable but does not return a correct type.`,
       },
     },
+    "invalid-alternate-source-type": {
+      severity: "error",
+      messages: {
+        default: `@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
+      },
+    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,

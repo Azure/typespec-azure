@@ -147,6 +147,44 @@ op func7(@body body: Test5): void;
 op func8(@body body: Test5): void;
 ```
 
+### `@alternateType` {#@Azure.ClientGenerator.Core.alternateType}
+
+Set an alternate type for a model property, scalar, or function parameter.
+
+```typespec
+@Azure.ClientGenerator.Core.alternateType(alternate: Scalar, scope?: valueof string)
+```
+
+#### Target
+
+The source type you want to apply the alternate type to. Only scalar types are supported.
+`ModelProperty | Scalar`
+
+#### Parameters
+
+| Name      | Type             | Description                                                                                                                                                                                           |
+| --------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| alternate | `Scalar`         |                                                                                                                                                                                                       |
+| scope     | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+#### Examples
+
+```typespec
+model Foo {
+  date: utcDateTime;
+}
+@@alternateType(Foo.date, string);
+```
+
+```typespec
+scalar storageDateTime extends utcDataTime;
+@@alternateType(storageDateTime, string, "python");
+```
+
+```typespec
+op test(@param @alternateType(string) date: utcDateTime): void;
+```
+
 ### `@client` {#@Azure.ClientGenerator.Core.client}
 
 Create a ClientGenerator.Core client out of a namespace or interface
