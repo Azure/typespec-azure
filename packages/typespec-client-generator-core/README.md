@@ -229,7 +229,7 @@ op func8(@body body: Test5): void;
 
 #### `@alternateType`
 
-Set an alternate type for a model property, scalar, or function parameter.
+Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
 
 ```typespec
 @Azure.ClientGenerator.Core.alternateType(alternate: Scalar, scope?: valueof string)
@@ -244,7 +244,7 @@ The source type you want to apply the alternate type to. Only scalar types are s
 
 | Name      | Type             | Description                                                                                                                                                                                           |
 | --------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| alternate | `Scalar`         |                                                                                                                                                                                                       |
+| alternate | `Scalar`         | The alternate type you want applied to the target. Only scalar types are supported.                                                                                                                   |
 | scope     | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
