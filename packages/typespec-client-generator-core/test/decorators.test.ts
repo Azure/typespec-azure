@@ -3085,7 +3085,7 @@ describe("typespec-client-generator-core: decorators", () => {
           strictEqual(paramType.encode, alternateEncode ?? "rfc3339");
         });
 
-        it("@alternateType is declared inline", async () => {
+        it("if @alternateType is declared inline", async () => {
           await runner.compile(`
           @service({})
           namespace MyService {
@@ -3104,9 +3104,7 @@ describe("typespec-client-generator-core: decorators", () => {
             op func1(@body body: Model1): void;
 
             @route("/func2")
-            op func2(param: source): void;
-
-            @@alternateType(source, alternate);
+            op func2(@alternateType(alternate) param: source): void;
           };
           `);
 
