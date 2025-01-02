@@ -985,16 +985,14 @@ export const $alternateType: AlternateTypeDecorator = (
   alternate: Scalar,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "ModelProperty") {
-    if (source.type.kind !== "Scalar") {
-      reportDiagnostic(context.program, {
-        code: "invalid-alternate-source-type",
-        format: {
-          typeName: source.type.kind,
-        },
-        target: source,
-      });
-    }
+  if (source.kind === "ModelProperty" && source.type.kind !== "Scalar") {
+    reportDiagnostic(context.program, {
+      code: "invalid-alternate-source-type",
+      format: {
+        typeName: source.type.kind,
+      },
+      target: source,
+    });
   }
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
 };
