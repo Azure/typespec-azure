@@ -515,10 +515,10 @@ extern dec clientNamespace(
 );
 
 /**
- * Set an alternate type for a model property, scalar, or operation parameter.
+ * Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
  *
  * @param source The source type you want to apply the alternate type to. Only scalar types are supported.
- * @param alternateType The alternate type you want applied to the target. Only scalar types are supported.
+ * @param alternate The alternate type you want applied to the target. Only scalar types are supported.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example

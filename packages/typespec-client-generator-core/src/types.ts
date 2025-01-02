@@ -997,14 +997,11 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
+      const alternateType = getAlternateType(context, type);
       retval = diagnostics.pipe(
-        getClientTypeWithDiagnostics(
-          context,
-          getAlternateType(context, type) ?? type.type,
-          operation,
-        ),
+        getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
       );
-      diagnostics.pipe(addEncodeInfo(context, type, retval));
+      diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, retval));
       break;
     case "UnionVariant":
       const unionType = diagnostics.pipe(
@@ -1132,10 +1129,11 @@ export function getSdkModelPropertyTypeBase(
   const diagnostics = createDiagnosticCollector();
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
+  const alternateType = getAlternateType(context, type);
   let propertyType = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, getAlternateType(context, type) ?? type.type, operation),
+    getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
   );
-  diagnostics.pipe(addEncodeInfo(context, type, propertyType));
+  diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, propertyType));
   const knownValues = getKnownValues(context.program, type);
   if (knownValues) {
     propertyType = diagnostics.pipe(getSdkEnumWithDiagnostics(context, knownValues, operation));

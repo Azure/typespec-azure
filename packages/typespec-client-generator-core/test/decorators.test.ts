@@ -3039,6 +3039,93 @@ describe("typespec-client-generator-core: decorators", () => {
       });
     });
 
+    describe.each([
+      ["bytes", "rfc7231"],
+      ["bytes", undefined],
+      [undefined, "rfc7231"],
+      [undefined, undefined],
+    ])(
+      "always honors @encode of alternate type",
+      (sourceEncode?: string, alternateEncode?: string) => {
+        it("if @alternateType is declared in global", async () => {
+          await runner.compile(`
+          @service({})
+          namespace MyService {
+            ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
+            scalar source extends string;
+
+            ${alternateEncode ? `@encode("${alternateEncode}")` : ""}
+            scalar alternate extends utcDateTime;
+          
+            model Model1 {
+              prop: source;
+            };
+
+            @route("/func1")
+            op func1(@body body: Model1): void;
+
+            @route("/func2")
+            op func2(param: source): void;
+
+            @@alternateType(source, alternate);
+          };
+          `);
+
+          const models = getAllModels(runner.context);
+          const model1 = models[0];
+          strictEqual(model1.kind, "model");
+          const childProperty = model1.properties[0].type as SdkBuiltInType;
+          strictEqual(
+            childProperty.encode,
+            alternateEncode ?? "rfc3339" /* utcDateTime default encoding */,
+          );
+
+          const method = runner.context.sdkPackage.clients[0].methods[1];
+          const paramType = method.parameters[0].type as SdkBuiltInType;
+          strictEqual(paramType.encode, alternateEncode ?? "rfc3339");
+        });
+
+        it("@alternateType is declared inline", async () => {
+          await runner.compile(`
+          @service({})
+          namespace MyService {
+            ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
+            scalar source extends string;
+
+            ${alternateEncode ? `@encode("${alternateEncode}")` : ""}
+            scalar alternate extends utcDateTime;
+          
+            model Model1 {
+              @alternateType(alternate)
+              prop: source;
+            };
+
+            @route("/func1")
+            op func1(@body body: Model1): void;
+
+            @route("/func2")
+            op func2(param: source): void;
+
+            @@alternateType(source, alternate);
+          };
+          `);
+
+          const models = getAllModels(runner.context);
+          const model1 = models[0];
+          strictEqual(model1.kind, "model");
+          const childProperty = model1.properties[0].type as SdkBuiltInType;
+          strictEqual(
+            childProperty.encode,
+            alternateEncode ?? "rfc3339" /* utcDateTime default encoding */,
+          );
+
+          const method = runner.context.sdkPackage.clients[0].methods[1];
+          const paramType = method.parameters[0].type as SdkBuiltInType;
+          strictEqual(paramType.encode, alternateEncode ?? "rfc3339");
+        });
+      },
+    );
+
     it.each([
       ["ipV4", "string"],
       ["utc8", "utcDateTime"],
