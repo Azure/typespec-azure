@@ -433,7 +433,6 @@ function getSdkHttpResponseAndExceptions(
     let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
-
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
         ? "application/json"
@@ -494,7 +493,12 @@ function getSdkHttpResponseAndExceptions(
       ),
       description: response.description,
     };
-    if (response.statusCodes === "*" || (body && isErrorModel(context.program, body))) {
+
+    if (
+      response.statusCodes === "*" ||
+      isErrorModel(context.program, response.type) ||
+      (body && isErrorModel(context.program, body))
+    ) {
       exceptions.push({
         ...sdkResponse,
         kind: "http",

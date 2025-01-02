@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Move payload/pageable test scenario to azure folder
+Added CheckNameAvailability operations case for ARM tests.

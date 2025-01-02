@@ -1,7 +1,7 @@
 ---
-changeKind: fix
+changeKind: internal
 packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Fix test scenario for singleton patch
+Added a .gitignore file
