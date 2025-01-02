@@ -13,6 +13,7 @@ import {
   shouldGenerateProtocol,
 } from "../src/decorators.js";
 import {
+  SdkBuiltInType,
   SdkClientType,
   SdkHttpOperation,
   SdkMethodResponse,
@@ -3036,6 +3037,30 @@ describe("typespec-client-generator-core: decorators", () => {
         const param = method.parameters[0];
         strictEqual(param.type.kind, alternate);
       });
+    });
+
+    it.each([
+      ["ipV4", "string"],
+      ["utc8", "utcDateTime"],
+      ["timemillis", "int64"],
+    ])("supports custom scalar types", async (alternate: string, base: string) => {
+      await runner.compile(`
+          @service({})
+          namespace MyService {
+            scalar ${alternate} extends ${base};
+
+            @route("/func1")
+            op func1(@alternateType(${alternate}) param: utcDateTime): void;
+          };
+          `);
+
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.name, "func1");
+      const param = method.parameters[0];
+      const alternateType = param.type as SdkBuiltInType;
+      strictEqual(alternateType.kind, base);
+      strictEqual(alternateType.name, alternate);
+      strictEqual(alternateType.baseType?.kind, base);
     });
 
     it.each([
