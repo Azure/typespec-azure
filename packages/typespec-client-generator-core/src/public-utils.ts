@@ -31,8 +31,17 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  SdkBodyModelPropertyType,
+  SdkBodyParameter,
   SdkClientType,
+  SdkCookieParameter,
+  SdkHeaderParameter,
+  SdkHttpOperation,
   SdkHttpOperationExample,
+  SdkModelPropertyType,
+  SdkPathParameter,
+  SdkQueryParameter,
+  SdkServiceMethod,
   SdkServiceOperation,
   SdkType,
   TCGCContext,
@@ -697,4 +706,49 @@ export function isAzureCoreModel(t: SdkType): boolean {
  */
 export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
   return context.__pagedResultSet.has(t);
+}
+
+/**
+ * Find corresponding http parameter list for a client initialization parameter, a service method parameter or a property of a service method parameter.
+ *
+ * @param method
+ * @param param
+ * @returns
+ */
+export function getHttpOperationParameter(
+  method: SdkServiceMethod<SdkHttpOperation>,
+  param: SdkModelPropertyType,
+):
+  | SdkPathParameter
+  | SdkQueryParameter
+  | SdkHeaderParameter
+  | SdkCookieParameter
+  | SdkBodyParameter
+  | SdkBodyModelPropertyType
+  | undefined {
+  const operation = method.operation;
+  // BFS to find the corresponding http parameter.
+  // An http parameter will be mapped to a method/client parameter, several method/client parameters (body spread case), or one property of a method property (metadata on property case).
+  // So, when we try to find which http parameter a parameter or property corresponds to, we compare the `correspondingMethodParams` list directly.
+  // If a method parameter is spread case, then we need to find the cooresponding http body parameter's property.
+  for (const p of operation.parameters) {
+    for (const cp of p.correspondingMethodParams) {
+      if (cp === param) {
+        return p;
+      }
+    }
+  }
+  if (operation.bodyParam) {
+    for (const cp of operation.bodyParam.correspondingMethodParams) {
+      if (cp === param) {
+        if (operation.bodyParam.type.kind === "model" && operation.bodyParam.type !== param.type) {
+          return operation.bodyParam.type.properties.find(
+            (p) => p.kind === "property" && p.name === param.name,
+          ) as SdkBodyModelPropertyType | undefined;
+        }
+        return operation.bodyParam;
+      }
+    }
+  }
+  return undefined;
 }

@@ -523,6 +523,7 @@ export function getCorrespondingMethodParams(
 ): [SdkModelPropertyType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
+  // 1. To see if the service parameter is a client parameter.
   const operationLocation = getLocationOfOperation(operation)!;
   let clientParams = context.__clientToParameters.get(operationLocation);
   if (!clientParams) {
@@ -535,8 +536,11 @@ export function getCorrespondingMethodParams(
       twoParamsEquivalent(context, x.__raw, serviceParam.__raw) ||
       (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name),
   );
-  if (correspondingClientParams.length > 0) return diagnostics.wrap(correspondingClientParams);
+  if (correspondingClientParams.length > 0) {
+    return diagnostics.wrap(correspondingClientParams);
+  }
 
+  // 2. To see if the service parameter is api version parameter that has been elevated to client.
   if (serviceParam.isApiVersionParam && serviceParam.onClient) {
     const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
@@ -552,8 +556,10 @@ export function getCorrespondingMethodParams(
       );
       return diagnostics.wrap([]);
     }
-    return diagnostics.wrap(clientParams.filter((x) => isApiVersion(context, x)));
+    return diagnostics.wrap(existingApiVersion ? [existingApiVersion] : []);
   }
+
+  // 3. To see if the service parameter is subscription parameter that has been elevated to client (only for arm service).
   if (isSubscriptionId(context, serviceParam)) {
     const subId = clientParams.find((x) => isSubscriptionId(context, x));
     if (!subId) {
@@ -572,13 +578,13 @@ export function getCorrespondingMethodParams(
     return diagnostics.wrap(subId ? [subId] : []);
   }
 
-  // to see if the service parameter is a method parameter or a property of a method parameter
+  // 4. To see if the service parameter is a method parameter or a property of a method parameter.
   const directMapping = findMapping(methodParameters, serviceParam);
   if (directMapping) {
     return diagnostics.wrap([directMapping]);
   }
 
-  // to see if all the property of service parameter could be mapped to a method parameter or a property of a method parameter
+  // 5. To see if all the property of the service parameter could be mapped to a method parameter or a property of a method parameter.
   if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
     const retVal = [];
     for (const serviceParamProp of serviceParam.type.properties) {
@@ -592,6 +598,7 @@ export function getCorrespondingMethodParams(
     }
   }
 
+  // If mapping could not be found,  TCGC will report error since we can't generate the client code without this mapping.
   diagnostics.add(
     createDiagnostic({
       code: "no-corresponding-method-param",
@@ -605,6 +612,12 @@ export function getCorrespondingMethodParams(
   return diagnostics.wrap([]);
 }
 
+/**
+ * Try to find the mapping of a service paramete or a property of a service parameter to a method parameter or a property of a method parameter.
+ * @param methodParameters
+ * @param serviceParam
+ * @returns
+ */
 function findMapping(
   methodParameters: SdkModelPropertyType[],
   serviceParam: SdkHttpParameter | SdkModelPropertyType,
@@ -613,7 +626,7 @@ function findMapping(
   const visited: Set<SdkModelType> = new Set();
   while (queue.length > 0) {
     const methodParam = queue.shift()!;
-    // http operation parameter/body parameter/property of body parameter could either from an operation parameter directly or from a property of an operation parameter
+    // HTTP operation parameter/body parameter/property of body parameter could either from an operation parameter directly or from a property of an operation parameter.
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
@@ -621,7 +634,7 @@ function findMapping(
     ) {
       return methodParam;
     }
-    // this following two hard code mapping is for the case that TCGC help to add content type and accept header is not exist
+    // Two following two hard coded mapping is for the case that TCGC help to add content type and accept header when not exists.
     if (
       serviceParam.kind === "header" &&
       serviceParam.serializedName === "Content-Type" &&
@@ -636,6 +649,7 @@ function findMapping(
     ) {
       return methodParam;
     }
+    // BFS to find the mapping.
     if (methodParam.type.kind === "model" && !visited.has(methodParam.type)) {
       visited.add(methodParam.type);
       let current: SdkModelType | undefined = methodParam.type;
