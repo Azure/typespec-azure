@@ -73,8 +73,8 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "key") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "key");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
@@ -184,13 +184,13 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (param.name === "a") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "a");
       } else if (param.name === "b") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "b");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
@@ -218,8 +218,8 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       } else if (param.name === "b") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "b");
       } else if (param.name === "contentType") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
@@ -314,16 +314,16 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       } else if (param.name === "file_data") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "file_data");
       } else if (param.name === "readOnly") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(!httpParam);
       } else if (param.name === "constant") {
         const httpParam = getHttpOperationParameter(method, param);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "constant");
       }
     }
   });
@@ -498,13 +498,13 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
       if (property.name === "foo") {
         const httpParam = getHttpOperationParameter(method, property);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "foo");
       } else if (property.name === "bar") {
         const httpParam = getHttpOperationParameter(method, property);
         ok(httpParam);
-        strictEqual(httpParam.kind, "body");
-        strictEqual(httpParam.serializedName, "body");
+        strictEqual(httpParam.kind, "property");
+        strictEqual(httpParam.name, "bar");
       }
     }
   });
