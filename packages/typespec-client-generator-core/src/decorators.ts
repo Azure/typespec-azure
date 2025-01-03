@@ -626,6 +626,10 @@ export function listOperationsInOperationGroup(
     }
 
     for (const op of current.operations.values()) {
+      if (!IsInScope(context, op)) {
+        continue;
+      }
+
       // Skip templated operations and omit operations
       if (
         !isTemplateDeclarationOrInstance(op) &&
@@ -1141,7 +1145,7 @@ export const $scope: ScopeDecorator = (
   }
 };
 
-export function IsInScope(context: TCGCContext, entity: Operation): boolean {
+function IsInScope(context: TCGCContext, entity: Operation): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
   if (scopes !== undefined && scopes.includes(context.emitterName)) {
     return true;

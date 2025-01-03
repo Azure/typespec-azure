@@ -2978,7 +2978,6 @@ describe("typespec-client-generator-core: decorators", () => {
       await runnerWithCSharp.compile(`
         @service
         namespace MyService {
-          @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
           }
@@ -2990,8 +2989,10 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
-      ok(sdkClient);
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
     });
 
     it("exclude operation from csharp client", async () => {
@@ -3001,7 +3002,6 @@ describe("typespec-client-generator-core: decorators", () => {
       await runnerWithCSharp.compile(`
         @service
         namespace MyService {
-          @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
           }
@@ -3013,8 +3013,10 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
-      ok(sdkClient === undefined);
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      strictEqual(client, undefined);
+      strictEqual(model, undefined);
     });
 
     it("negation scope override", async () => {
@@ -3027,7 +3029,6 @@ describe("typespec-client-generator-core: decorators", () => {
       const spec = `
         @service
         namespace MyService {
-          @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
           }
@@ -3043,14 +3044,18 @@ describe("typespec-client-generator-core: decorators", () => {
       const csharpSdkClient = csharpSdkPackage.clients.find((x) =>
         x.methods.find((m) => m.name === "func"),
       );
+      const csharpSdkModel = csharpSdkPackage.models.find((x) => x.name === "Test");
       ok(csharpSdkClient);
+      ok(csharpSdkModel);
 
       await runnerWithJava.compile(spec);
       const javaSdkPackage = runnerWithJava.context.sdkPackage;
       const javaSdkClient = javaSdkPackage.clients.find((x) =>
         x.methods.find((m) => m.name === "func"),
       );
-      ok(javaSdkClient === undefined);
+      const javaSdkModel = javaSdkPackage.models.find((x) => x.name === "Test");
+      strictEqual(javaSdkClient, undefined);
+      strictEqual(javaSdkModel, undefined);
     });
 
     it("no scope decorator", async () => {
@@ -3060,7 +3065,6 @@ describe("typespec-client-generator-core: decorators", () => {
       await runnerWithCSharp.compile(`
         @service
         namespace MyService {
-          @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
           }
@@ -3071,8 +3075,10 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
-      ok(sdkClient);
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
     });
 
     it("negation scope override normal scope", async () => {
@@ -3082,7 +3088,6 @@ describe("typespec-client-generator-core: decorators", () => {
       await runnerWithCSharp.compile(`
         @service
         namespace MyService {
-          @clientName("TestRenamed", "csharp")
           model Test {
             prop: string;
           }
@@ -3095,8 +3100,10 @@ describe("typespec-client-generator-core: decorators", () => {
       `);
 
       const sdkPackage = runnerWithCSharp.context.sdkPackage;
-      const sdkClient = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
-      ok(sdkClient);
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
     });
   });
 });
