@@ -475,7 +475,7 @@ model ClientInitializationOptions {
   access?: EnumMember;
 
   /**
-   * Determines the accessibility of the client accessor method.
+   * Determines the accessibility of the client accessor method. "public" means client could be got from parent client.
    */
   accessorAccess?: EnumMember;
 }
