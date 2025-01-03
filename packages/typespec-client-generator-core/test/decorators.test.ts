@@ -2969,4 +2969,141 @@ describe("typespec-client-generator-core: decorators", () => {
       ok(testModel);
     });
   });
+
+  describe("scope decorator", () => {
+    it("include operation from csharp client", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          @scope("csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
+    });
+
+    it("exclude operation from csharp client", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          @scope("!csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      strictEqual(client, undefined);
+      strictEqual(model, undefined);
+    });
+
+    it("negation scope override", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const runnerWithJava = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const spec = `
+        @service
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          @scope("!java")
+          @scope("!csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `;
+      await runnerWithCSharp.compile(spec);
+      const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+      const csharpSdkClient = csharpSdkPackage.clients.find((x) =>
+        x.methods.find((m) => m.name === "func"),
+      );
+      const csharpSdkModel = csharpSdkPackage.models.find((x) => x.name === "Test");
+      ok(csharpSdkClient);
+      ok(csharpSdkModel);
+
+      await runnerWithJava.compile(spec);
+      const javaSdkPackage = runnerWithJava.context.sdkPackage;
+      const javaSdkClient = javaSdkPackage.clients.find((x) =>
+        x.methods.find((m) => m.name === "func"),
+      );
+      const javaSdkModel = javaSdkPackage.models.find((x) => x.name === "Test");
+      strictEqual(javaSdkClient, undefined);
+      strictEqual(javaSdkModel, undefined);
+    });
+
+    it("no scope decorator", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
+    });
+
+    it("negation scope override normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          @scope("!csharp")
+          @scope("csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
+    });
+  });
 });
