@@ -470,7 +470,7 @@ model ClientInitializationOptions {
   parameters?: Model;
 
   /**
-   * Determines the accessibility of the client initialization method.
+   * Determines the accessibility of the client initialization method. "public" means the client could be initialized separately.
    */
   access?: EnumMember;
 
