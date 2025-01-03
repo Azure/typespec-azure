@@ -678,7 +678,7 @@ describe("typespec-client-generator-core: client", () => {
 
     const clientAccessor = mainClient.methods[0];
     strictEqual(clientAccessor.kind, "clientaccessor");
-    strictEqual(clientAccessor.access, "internal");
+    strictEqual(clientAccessor.access, "public");
     strictEqual(clientAccessor.name, "getMyOperationGroup");
     strictEqual(clientAccessor.parameters.length, 0);
     strictEqual(clientAccessor.response, operationGroup);
@@ -734,14 +734,14 @@ describe("typespec-client-generator-core: client", () => {
     const fooAccessor = mainClient.methods[0];
     strictEqual(fooAccessor.kind, "clientaccessor");
     strictEqual(fooAccessor.crossLanguageDefintionId, "TestService.Foo");
-    strictEqual(fooAccessor.access, "internal");
+    strictEqual(fooAccessor.access, "public");
     strictEqual(fooAccessor.name, "getFoo");
     strictEqual(fooAccessor.parameters.length, 0);
     strictEqual(fooAccessor.response, fooClient);
 
     const barAccessor = mainClient.methods[1];
     strictEqual(barAccessor.kind, "clientaccessor");
-    strictEqual(barAccessor.access, "internal");
+    strictEqual(barAccessor.access, "public");
     strictEqual(barAccessor.name, "getBar");
     strictEqual(barAccessor.crossLanguageDefintionId, "TestService.Bar");
     strictEqual(barAccessor.parameters.length, 0);
@@ -755,7 +755,7 @@ describe("typespec-client-generator-core: client", () => {
     const fooBarAccessor = fooClient.methods[0];
     strictEqual(fooBarAccessor.kind, "clientaccessor");
     strictEqual(fooBarAccessor.crossLanguageDefintionId, "TestService.Foo.Bar");
-    strictEqual(fooBarAccessor.access, "internal");
+    strictEqual(fooBarAccessor.access, "public");
     strictEqual(fooBarAccessor.name, "getBar");
     strictEqual(fooBarAccessor.parameters.length, 0);
     strictEqual(fooBarAccessor.response, fooBarClient);

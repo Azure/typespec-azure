@@ -45,9 +45,9 @@ import {
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   AccessFlags,
+  ClientInitializationOptions,
   LanguageScopes,
   SdkClient,
-  SdkInitializationType,
   SdkMethodParameter,
   SdkModelPropertyType,
   SdkOperationGroup,
@@ -757,6 +757,11 @@ export const $access: AccessDecorator = (
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
+  validateAccessValue(context, entity, value);
+  setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
+};
+
+function validateAccessValue(context: DecoratorContext, entity: Type, value: EnumMember) {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
       code: "access",
@@ -764,8 +769,7 @@ export const $access: AccessDecorator = (
       target: entity,
     });
   }
-  setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
-};
+}
 
 export function getAccessOverride(
   context: TCGCContext,
@@ -1028,36 +1032,56 @@ const clientInitializationKey = createStateSymbol("clientInitialization");
 export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  options: Model,
+  options: Type,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(
-    context,
-    $clientInitialization,
-    clientInitializationKey,
-    target,
-    options,
-    scope,
-  );
+  if (options.kind === "Model") {
+    if (options.properties.get("access")) {
+      validateAccessValue(context, target, options.properties.get("access")!.type as EnumMember);
+    }
+    if (options.properties.get("accessorAccess")) {
+      validateAccessValue(
+        context,
+        target,
+        options.properties.get("accessorAccess")!.type as EnumMember,
+      );
+    }
+
+    setScopedDecoratorData(
+      context,
+      $clientInitialization,
+      clientInitializationKey,
+      target,
+      options,
+      scope,
+    );
+  }
 };
 
 export function getClientInitialization(
   context: TCGCContext,
   entity: Namespace | Interface,
-): SdkInitializationType | undefined {
-  const model = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (!model) return model;
-  const sdkModel = getSdkModel(context, model);
-  const initializationProps = sdkModel.properties.map(
-    (property: SdkModelPropertyType): SdkMethodParameter => {
-      property.onClient = true;
-      property.kind = "method";
-      return property as SdkMethodParameter;
-    },
-  );
+): ClientInitializationOptions | undefined {
+  const options = getScopedDecoratorData(context, clientInitializationKey, entity);
+  if (options === undefined) return undefined;
+
+  const model = options.properties.get("parameters")
+    ? getSdkModel(context, options.properties.get("parameters").type)
+    : undefined;
   return {
-    ...sdkModel,
-    properties: initializationProps,
+    parameters: model
+      ? model.properties.map((property: SdkModelPropertyType): SdkMethodParameter => {
+          property.onClient = true;
+          property.kind = "method";
+          return property as SdkMethodParameter;
+        })
+      : undefined,
+    access: options.properties.get("access")
+      ? options.properties.get("access").type.value
+      : undefined,
+    accessorAccess: options.properties.get("accessorAccess")
+      ? options.properties.get("accessorAccess").type.value
+      : undefined,
   };
 }
 
