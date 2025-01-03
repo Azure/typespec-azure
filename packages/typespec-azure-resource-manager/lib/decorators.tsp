@@ -191,3 +191,5 @@ extern dec resourceBaseType(
   target: Model,
   baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension"
 );
+
+extern dec identifiers(entity: ModelProperty, properties: string[]);
