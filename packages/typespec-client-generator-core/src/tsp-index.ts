@@ -1,6 +1,7 @@
 import { AzureClientGeneratorCoreDecorators } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   $access,
+  $alternateType,
   $client,
   $clientInitialization,
   $clientName,
@@ -10,6 +11,7 @@ import {
   $operationGroup,
   $override,
   $protocolAPI,
+  $scope,
   $usage,
   $useSystemTextJsonConverter,
   paramAliasDecorator,
@@ -34,5 +36,7 @@ export const $decorators = {
     clientInitialization: $clientInitialization,
     paramAlias: paramAliasDecorator,
     clientNamespace: $clientNamespace,
+    alternateType: $alternateType,
+    scope: $scope,
   } as AzureClientGeneratorCoreDecorators,
 };
