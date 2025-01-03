@@ -539,3 +539,16 @@ extern dec clientNamespace(
  * ```
  */
 extern dec alternateType(source: ModelProperty | Scalar, alternate: Scalar, scope?: valueof string);
+
+/**
+ * To define the client scope of an operation.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ *
+ * @example
+ * ```typespec
+ * @scope("!csharp")
+ * op test: void;
+ * ```
+ */
+extern dec scope(target: Operation, scope?: valueof string);
