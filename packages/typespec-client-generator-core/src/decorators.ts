@@ -13,6 +13,7 @@ import {
   Operation,
   Program,
   RekeyableMap,
+  Scalar,
   SyntaxKind,
   Type,
   Union,
@@ -29,6 +30,7 @@ import {
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
+  AlternateTypeDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
@@ -967,6 +969,48 @@ export function getOverriddenClientMethod(
   entity: Operation,
 ): Operation | undefined {
   return getScopedDecoratorData(context, overrideKey, entity);
+}
+
+const alternateTypeKey = createStateSymbol("alternateType");
+
+/**
+ * Replace a source type with an alternate type in a specific scope.
+ *
+ * @param context the decorator context
+ * @param source source type to be replaced
+ * @param alternate target type to replace the source type
+ * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
+ */
+export const $alternateType: AlternateTypeDecorator = (
+  context: DecoratorContext,
+  source: ModelProperty | Scalar,
+  alternate: Scalar,
+  scope?: LanguageScopes,
+) => {
+  if (source.kind === "ModelProperty" && source.type.kind !== "Scalar") {
+    reportDiagnostic(context.program, {
+      code: "invalid-alternate-source-type",
+      format: {
+        typeName: source.type.kind,
+      },
+      target: source,
+    });
+  }
+  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
+};
+
+/**
+ * Get the alternate type for a source type in a specific scope.
+ *
+ * @param context the Sdk Context
+ * @param source source type to be replaced
+ * @returns alternate type to replace the source type, or undefined if no alternate type is found
+ */
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar,
+): Scalar | undefined {
+  return getScopedDecoratorData(context, alternateTypeKey, source);
 }
 
 export const $useSystemTextJsonConverter: DecoratorFunction = (
