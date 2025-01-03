@@ -682,7 +682,10 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(clientAccessor.name, "getMyOperationGroup");
     strictEqual(clientAccessor.parameters.length, 0);
     strictEqual(clientAccessor.response, operationGroup);
-    strictEqual(clientAccessor.crossLanguageDefinitionId, "TestService.MyOperationGroup");
+    strictEqual(
+      clientAccessor.crossLanguageDefinitionId,
+      "TestService.MyOperationGroup.getMyOperationGroup",
+    );
 
     strictEqual(operationGroup.initialization.properties.length, 1);
     strictEqual(operationGroup.initialization.access, "internal");
@@ -733,7 +736,7 @@ describe("typespec-client-generator-core: client", () => {
 
     const fooAccessor = mainClient.methods[0];
     strictEqual(fooAccessor.kind, "clientaccessor");
-    strictEqual(fooAccessor.crossLanguageDefinitionId, "TestService.Foo");
+    strictEqual(fooAccessor.crossLanguageDefinitionId, "TestService.Foo.getFoo");
     strictEqual(fooAccessor.access, "internal");
     strictEqual(fooAccessor.name, "getFoo");
     strictEqual(fooAccessor.parameters.length, 0);
@@ -743,7 +746,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(barAccessor.kind, "clientaccessor");
     strictEqual(barAccessor.access, "internal");
     strictEqual(barAccessor.name, "getBar");
-    strictEqual(barAccessor.crossLanguageDefinitionId, "TestService.Bar");
+    strictEqual(barAccessor.crossLanguageDefinitionId, "TestService.Bar.getBar");
     strictEqual(barAccessor.parameters.length, 0);
     strictEqual(barAccessor.response, barClient);
 
@@ -754,7 +757,7 @@ describe("typespec-client-generator-core: client", () => {
 
     const fooBarAccessor = fooClient.methods[0];
     strictEqual(fooBarAccessor.kind, "clientaccessor");
-    strictEqual(fooBarAccessor.crossLanguageDefinitionId, "TestService.Foo.Bar");
+    strictEqual(fooBarAccessor.crossLanguageDefinitionId, "TestService.Foo.Bar.getBar");
     strictEqual(fooBarAccessor.access, "internal");
     strictEqual(fooBarAccessor.name, "getBar");
     strictEqual(fooBarAccessor.parameters.length, 0);

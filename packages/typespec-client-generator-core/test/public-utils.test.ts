@@ -1393,7 +1393,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.kind, "enum");
         strictEqual(unionEnum.name, "AStatus");
         ok(unionEnum.isGeneratedName);
-        strictEqual(unionEnum.crossLanguageDefinitionId, "A.status.anonymous");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.status.anonymous");
         strictEqual(models[0].kind, "model");
         const statusProp = models[0].properties[0];
         strictEqual(statusProp.kind, "property");
@@ -1465,7 +1465,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const unionEnum = test1.properties[0].type;
         strictEqual(unionEnum.name, "AChoiceStatus");
         ok(unionEnum.isGeneratedName);
-        strictEqual(unionEnum.crossLanguageDefinitionId, "A.choice.status.anonymous");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.choice.status.anonymous");
       });
     });
 
@@ -1552,7 +1552,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.name, "AStatus");
         ok(unionEnum.isGeneratedName);
         // not a defined type in tsp, so no crossLanguageDefinitionId
-        strictEqual(unionEnum.crossLanguageDefinitionId, "A.status.anonymous");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.status.anonymous");
       });
     });
 
@@ -1611,7 +1611,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "test.ResponseRepeatabilityResult.anonymous",
+          "MyService.test.ResponseRepeatabilityResult.anonymous",
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1639,7 +1639,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "test.RequestRepeatabilityResult.anonymous",
+          "MyService.test.RequestRepeatabilityResult.anonymous",
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1673,7 +1673,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.isGeneratedName, true);
         strictEqual(
           stringType.crossLanguageDefinitionId,
-          "test.RequestRepeatabilityResult.anonymous",
+          "MyService.test.RequestRepeatabilityResult.anonymous",
         );
       });
 

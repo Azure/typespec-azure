@@ -1084,7 +1084,7 @@ function getSdkCredentialType(
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
       clientNamespace: getClientNamespace(context, client.service),
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.service),
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.CredentialUnion`,
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
@@ -1099,11 +1099,10 @@ export function getSdkCredentialParameter(
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
-  const name = "credential";
   return {
     type: getSdkCredentialType(context, client, auth),
     kind: "credential",
-    name,
+    name: "credential",
     isGeneratedName: true,
     doc: "Credential used to authenticate requests to the service.",
     apiVersions: getAvailableApiVersions(context, client.service, client.type),
