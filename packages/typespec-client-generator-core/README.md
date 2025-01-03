@@ -654,6 +654,7 @@ To define the client scope of an operation.
 ##### Examples
 
 ```typespec
+@scope("!csharp")
 op test: void;
 ```
 

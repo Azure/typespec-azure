@@ -572,6 +572,7 @@ export type AlternateTypeDecorator = (
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
+ * @scope("!csharp")
  * op test: void;
  * ```
  */

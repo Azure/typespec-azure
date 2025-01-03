@@ -547,6 +547,7 @@ extern dec alternateType(source: ModelProperty | Scalar, alternate: Scalar, scop
  *
  * @example
  * ```typespec
+ * @scope("!csharp")
  * op test: void;
  * ```
  */
