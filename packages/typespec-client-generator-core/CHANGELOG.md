@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.49.1
+
+### Bug Fixes
+
+- [#2000](https://github.com/Azure/typespec-azure/pull/2000) ensure operation examples to be ordered
+- [#2004](https://github.com/Azure/typespec-azure/pull/2004) get correct pageable info for azure pageable operation with inheritance return model
+- [#2034](https://github.com/Azure/typespec-azure/pull/2034) refine cross language definition id logic
+
+### Features
+
+- [#2010](https://github.com/Azure/typespec-azure/pull/2010) add `getHttpOperationParameter` helper function
+- [#1978](https://github.com/Azure/typespec-azure/pull/1978) Add `@isApiVersion` decorator to override whether a parameter is an api version or not
+
+### Breaking Changes
+
+- [#2007](https://github.com/Azure/typespec-azure/pull/2007) fix typo of `crossLanguageDefinitionId` of method.
+
+
 ## 0.49.0
 
 ### Bug Fixes
