@@ -21,6 +21,7 @@ namespace Property {
     @clientName("JavaName", "java")
     @clientName("TSName", "javascript")
     @clientName("python_name", "python")
+    @clientName("rustName", "rust")
     defaultName: boolean;
   }
 
@@ -150,6 +151,7 @@ namespace Model {
   @clientName("JavaModel", "java")
   @clientName("TSModel", "javascript")
   @clientName("PythonModel", "python")
+  @clientName("rustName", "rust")
   model ModelWithLanguageClientName {
     @doc("Pass in true")
     defaultName: boolean;
