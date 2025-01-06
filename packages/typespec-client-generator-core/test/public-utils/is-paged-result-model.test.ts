@@ -4,7 +4,7 @@ import { beforeEach, describe, it } from "vitest";
 import { isPagedResultModel } from "../../src/public-utils.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: public-utils", () => {
+describe("typespec-client-generator-core: public-utils isPagedResultModel", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
