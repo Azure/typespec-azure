@@ -1,4 +1,5 @@
 import {
+  CoverageReport,
   ResolvedCoverageReport,
   ScenarioManifest,
   SpecCoverageClient,
@@ -7,29 +8,23 @@ import {
 const storageAccountName = "typespec";
 
 export type GeneratorNames =
-  | "@typespec/http-client-python"
   | "@azure-tools/typespec-python"
   | "@azure-tools/typespec-go"
   | "@azure-tools/typespec-csharp"
-  | "@typespec/http-client-csharp"
   | "@azure-tools/typespec-ts-rlc"
   | "@azure-tools/typespec-ts-modular"
   | "@azure-tools/typespec-java"
-  | "@typespec/http-client-java"
   | "@azure-tools/typespec-cpp"
   | "@azure-tools/typespec-rust"
   | "test";
 const query = new URLSearchParams(window.location.search);
 const generatorNames: GeneratorNames[] = [
-  "@typespec/http-client-python",
   "@azure-tools/typespec-python",
   "@azure-tools/typespec-go",
   "@azure-tools/typespec-csharp",
-  "@typespec/http-client-csharp",
   "@azure-tools/typespec-ts-rlc",
   "@azure-tools/typespec-ts-modular",
   "@azure-tools/typespec-java",
-  "@typespec/http-client-java",
   "@azure-tools/typespec-cpp",
   "@azure-tools/typespec-rust",
   ...(query.has("showtest") ? (["test"] as const) : []),
@@ -58,6 +53,30 @@ export function getManifestClient() {
   return manifestClient;
 }
 
+export function getCoverageForMode(
+  generatorReports: { [mode: string]: Record<GeneratorNames, ResolvedCoverageReport | undefined> },
+  key: string,
+  mode: string,
+): CoverageReport {
+  /*
+   * The generator reports is an array from of reports from Standard and Azure mode in any order.
+   * So, if the first report is from Azure mode, the second one is from Standard mode and vice versa.
+   * When the mode is standard, check if the first report is from Azure mode, if so, return the second one.
+   * Otherwise, return the first one.
+   * When the mode is azure, check if the first report is from Azure mode, if so, return the first one.
+   * Otherwise, return the second one.
+   */
+  const reports = (generatorReports["azure"] as any)[key];
+  const isFirstReportAzure =
+    reports[0]["scenariosMetadata"].packageName === "@azure-tools/azure-http-specs";
+  if (mode === "standard") {
+    return isFirstReportAzure ? reports[1] : reports[0];
+  } else {
+    // mode === "azure"
+    return isFirstReportAzure ? reports[0] : reports[1];
+  }
+}
+
 export async function getCoverageSummaries(): Promise<CoverageSummary[]> {
   const coverageClient = getCoverageClient();
   const manifestClient = getManifestClient();
@@ -69,19 +88,31 @@ export async function getCoverageSummaries(): Promise<CoverageSummary[]> {
   const manifestStandard = manifests.filter(
     (manifest: ScenarioManifest) => manifest.setName !== "@azure-tools/azure-http-specs",
   )[0];
-  for (const key in generatorReports["standard"]) {
-    (generatorReports["standard"] as any)[key] = {
-      ...(generatorReports["standard"] as any)[key][0],
-      generatorMetadata: (generatorReports["standard"] as any)[key]["generatorMetadata"],
-    };
-  }
-
   const manifestAzure = manifests.filter(
     (manifest: ScenarioManifest) => manifest.setName === "@azure-tools/azure-http-specs",
   )[0];
+
+  (generatorReports["standard"] as any) = {};
+
   for (const key in generatorReports["azure"]) {
+    if (!(generatorReports["azure"] as any)[key]) {
+      (generatorReports["standard"] as any)[key] = undefined;
+      continue;
+    }
+    if (
+      !(generatorReports["azure"] as any)[key][1] ||
+      !(generatorReports["azure"] as any)[key][0]
+    ) {
+      (generatorReports["azure"] as any)[key] = undefined;
+      (generatorReports["standard"] as any)[key] = undefined;
+      continue;
+    }
+    (generatorReports["standard"] as any)[key] = {
+      ...getCoverageForMode(generatorReports, key, "standard"),
+      generatorMetadata: (generatorReports["azure"] as any)[key]["generatorMetadata"],
+    };
     (generatorReports["azure"] as any)[key] = {
-      ...(generatorReports["azure"] as any)[key][0],
+      ...getCoverageForMode(generatorReports, key, "azure"),
       generatorMetadata: (generatorReports["azure"] as any)[key]["generatorMetadata"],
     };
   }
@@ -99,7 +130,6 @@ export async function getCoverageSummaries(): Promise<CoverageSummary[]> {
 }
 
 enum GeneratorMode {
-  standard = "standard",
   azure = "azure",
 }
 

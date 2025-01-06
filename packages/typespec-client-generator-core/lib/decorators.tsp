@@ -516,6 +516,45 @@ extern dec clientNamespace(
 );
 
 /**
+ * Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ *
+ * @param source The source type you want to apply the alternate type to. Only scalar types are supported.
+ * @param alternate The alternate type you want applied to the target. Only scalar types are supported.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @example
+ * ```typespec
+ * model Foo {
+ *    date: utcDateTime;
+ * }
+ * @@alternateType(Foo.date, string);
+ * ```
+ * @example
+ * ```typespec
+ * scalar storageDateTime extends utcDataTime;
+ * @@alternateType(storageDateTime, string, "python");
+ * ```
+ * @example
+ * ```typespec
+ * op test(@param @alternateType(string) date: utcDateTime): void;
+ * ```
+ */
+extern dec alternateType(source: ModelProperty | Scalar, alternate: Scalar, scope?: valueof string);
+
+/**
+ * To define the client scope of an operation.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ *
+ * @example
+ * ```typespec
+ * @scope("!csharp")
+ * op test: void;
+ * ```
+ */
+extern dec scope(target: Operation, scope?: valueof string);
+
+/**
  * Use to override default assumptions on whether a parameter is an api-version parameter or not.
  * By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
  * a client parameter, we will also elevate this parameter up onto the client.
