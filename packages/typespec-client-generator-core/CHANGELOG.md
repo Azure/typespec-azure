@@ -11,7 +11,7 @@
 ### Features
 
 - [#2010](https://github.com/Azure/typespec-azure/pull/2010) add `getHttpOperationParameter` helper function
-- [#1978](https://github.com/Azure/typespec-azure/pull/1978) Add `@isApiVersion` decorator to override whether a parameter is an api version or not
+- [#1978](https://github.com/Azure/typespec-azure/pull/1978) Add `@apiVersion` decorator to override whether a parameter is an api version or not
 
 ### Breaking Changes
 
