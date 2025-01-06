@@ -14,11 +14,11 @@ model Azure.ClientGenerator.Core.ClientInitializationOptions
 
 #### Properties
 
-| Name            | Type         | Description                                                       |
-| --------------- | ------------ | ----------------------------------------------------------------- |
-| parameters?     | `Model`      | Redefine the client initialization parameters.                    |
-| access?         | `EnumMember` | Determines the accessibility of the client initialization method. |
-| accessorAccess? | `EnumMember` | Determines the accessibility of the client accessor method.       |
+| Name            | Type         | Description                                                                                                                         |
+| --------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| parameters?     | `Model`      | Redefine the client initialization parameters.                                                                                      |
+| access?         | `EnumMember` | Determines the accessibility of the client initialization method. `Access.public` means the client could be initialized separately. |
+| accessorAccess? | `EnumMember` | Determines the accessibility of the client accessor method. `Access.public` means client could be got from parent client.           |
 
 ### `Access` {#Azure.ClientGenerator.Core.Access}
 

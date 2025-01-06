@@ -470,12 +470,12 @@ model ClientInitializationOptions {
   parameters?: Model;
 
   /**
-   * Determines the accessibility of the client initialization method.
+   * Determines the accessibility of the client initialization method. `Access.public` means the client could be initialized separately.
    */
   access?: EnumMember;
 
   /**
-   * Determines the accessibility of the client accessor method.
+   * Determines the accessibility of the client accessor method. `Access.public` means client could be got from parent client.
    */
   accessorAccess?: EnumMember;
 }
