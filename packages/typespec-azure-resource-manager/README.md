@@ -356,6 +356,9 @@ None
 
 #### `@identifiers`
 
+This decorator is used to indicate the identifying properties of objects in the array, e.g. size
+The properties that are used as identifiers for the object needs to be provided as a list of strings.
+
 ```typespec
 @Azure.ResourceManager.identifiers(properties: string[])
 ```
@@ -366,9 +369,18 @@ None
 
 ##### Parameters
 
-| Name       | Type       | Description |
-| ---------- | ---------- | ----------- |
-| properties | `string[]` |             |
+| Name       | Type       | Description                                                                                                         |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| properties | `string[]` | The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings. |
+
+##### Examples
+
+```typespec
+model Pet {
+  @identifiers(["size"])
+  dog: Dog;
+}
+```
 
 #### `@locationResource`
 

@@ -376,22 +376,6 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
   }
 };
 
-/**
- * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
- * The properties that are used as identifiers for the object needs to be provided as a list of strings.
- *
- * @param context The decorator context
- * @param entity The model property in which the identifiers are being set.
- * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
- *
- * @example
- * ```typespec
- * model Pet {
- *  @identifiers(["size"])
- *  dog: Dog;
- * }
- * ```
- */
 export const $identifiers: IdentifiersDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,

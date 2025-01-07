@@ -267,18 +267,6 @@ export type ResourceBaseTypeDecorator = (
   baseType: Type,
 ) => void;
 
-/**
- * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
- * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
- *
- * @example
- * ```typespec
- * model Pet {
- *  @identifiers(["size"])
- *  dog: Dog;
- * }
- * ```
- */
 export type IdentifiersDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
