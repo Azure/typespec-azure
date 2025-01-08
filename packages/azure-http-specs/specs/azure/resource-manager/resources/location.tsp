@@ -170,5 +170,5 @@ interface LocationResources {
     }
     ```
     """)
-  listByParent is ArmResourceListByParent<LocationResource>;
+  listByLocation is ArmResourceListByParent<LocationResource>;
 }

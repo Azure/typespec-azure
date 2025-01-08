@@ -170,7 +170,7 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_delete = passOnSucce
   kind: "MockApiDefinition",
 });
 
-Scenarios.Azure_ResourceManager_Resources_LocationResources_listByParent = passOnSuccess({
+Scenarios.Azure_ResourceManager_Resources_LocationResources_listByLocation = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources",
   method: "get",
   request: {
