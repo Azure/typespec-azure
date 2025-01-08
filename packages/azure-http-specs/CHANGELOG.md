@@ -1,5 +1,17 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.5
+
+### Bug Fixes
+
+- [#2039](https://github.com/Azure/typespec-azure/pull/2039) Add Rust to client naming scenarios
+
+### Features
+
+- [#1934](https://github.com/Azure/typespec-azure/pull/1934) Added CheckNameAvailability operations case for ARM tests.
+- [#1933](https://github.com/Azure/typespec-azure/pull/1933) Added listing available operations case for ARM tests.
+
+
 ## 0.1.0-alpha.4
 
 ### Bug Fixes
