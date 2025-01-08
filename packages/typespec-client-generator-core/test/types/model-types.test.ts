@@ -49,6 +49,10 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 1);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InnerModel"].sort());
+
+    strictEqual(models[0].serializationOptions.json?.name, "InnerModel");
+    strictEqual(models[0].properties[0].kind, "property");
+    strictEqual(models[0].properties[0].serializationOptions.json?.name, "prop");
   });
 
   it("models in Array", async () => {
@@ -66,6 +70,10 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 1);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InnerModel"].sort());
+
+    strictEqual(models[0].serializationOptions.json?.name, "InnerModel");
+    strictEqual(models[0].properties[0].kind, "property");
+    strictEqual(models[0].properties[0].serializationOptions.json?.name, "prop");
   });
 
   it("embedded models", async () => {
@@ -87,6 +95,10 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 2);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InputModel", "InnerModel"].sort());
+
+    strictEqual(models[1].serializationOptions.json?.name, "InnerModel");
+    strictEqual(models[1].properties[0].kind, "property");
+    strictEqual(models[1].properties[0].serializationOptions.json?.name, "prop");
   });
 
   it("base model", async () => {
@@ -108,6 +120,10 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 2);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InputModel", "BaseModel"].sort());
+
+    strictEqual(models[1].serializationOptions.json?.name, "BaseModel");
+    strictEqual(models[1].properties[0].kind, "property");
+    strictEqual(models[1].properties[0].serializationOptions.json?.name, "prop");
   });
 
   it("derived model", async () => {
@@ -126,15 +142,20 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 2);
     const modelNames = models.map((model) => model.name).sort();
     deepStrictEqual(modelNames, ["InputModel", "DerivedModel"].sort());
+
+    strictEqual(models[0].serializationOptions.json?.name, "DerivedModel");
+    strictEqual(models[0].properties[0].kind, "property");
+    strictEqual(models[0].properties[0].serializationOptions.json?.name, "prop2");
   });
 
   it("recursive model", async () => {
     await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
       model RecursiveModel {
         prop: RecursiveModel
       }
-      `);
+        
+      op test(@body input: RecursiveModel): RecursiveModel;
+    `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const recursiveModel = models[0];
@@ -147,6 +168,10 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(prop.name, "prop");
     strictEqual(prop.type.kind, "model");
     strictEqual(prop.type.name, "RecursiveModel");
+
+    strictEqual(models[0].serializationOptions.json?.name, "RecursiveModel");
+    strictEqual(models[0].properties[0].kind, "property");
+    strictEqual(models[0].properties[0].serializationOptions.json?.name, "prop");
   });
 
   it("discriminator model", async () => {

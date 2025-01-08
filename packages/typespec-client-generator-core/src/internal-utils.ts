@@ -15,6 +15,8 @@ import {
   NumericLiteral,
   Operation,
   Program,
+  resolveEncodedName,
+  Scalar,
   StringLiteral,
   Type,
   Union,
@@ -489,14 +491,14 @@ export function filterApiVersionsInEnum(
   }
 }
 
+const jsonRegex = new RegExp(/^(application|text)\/(.+\+)?json$/);
 export function isJsonContentType(contentType: string): boolean {
-  const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
-  return regex.test(contentType);
+  return jsonRegex.test(contentType);
 }
 
+const xmlRegex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
 export function isXmlContentType(contentType: string): boolean {
-  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
-  return regex.test(contentType);
+  return xmlRegex.test(contentType);
 }
 
 export function twoParamsEquivalent(
