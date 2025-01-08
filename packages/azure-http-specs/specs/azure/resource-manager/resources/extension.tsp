@@ -28,7 +28,7 @@ model ExtensionsResourceProperties {
 }
 
 /** The interface of extensions resources,
- * it contains 4 kinds of URLs (resource, resource group, subscription and tenant)
+ * it contains 4 kinds of scopes (resource, resource group, subscription and tenant)
  */
 @armResourceOperations
 interface ExtensionsResources {
