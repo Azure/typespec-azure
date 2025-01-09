@@ -916,153 +916,6 @@ Expected response body:
 }
 ```
 
-### Azure_ResourceManager_Resources_LocationResources_createOrUpdate
-
-- Endpoint: `put https://management.azure.com`
-
-Resource PUT operation.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
-Expected query parameter: api-version=2022-12-01-preview
-Expected request body:
-
-```json
-{
-  "properties": {
-    "description": "valid"
-  }
-}
-```
-
-Expected response body:
-
-```json
-{
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
-  "name": "resource",
-  "type": "Azure.ResourceManager.Resources/locationResources",
-  "properties": {
-    "description": "valid",
-    "provisioningState": "Succeeded",
-  },
-  "systemData": {
-    "createdBy": "AzureSDK",
-    "createdByType": "User",
-    "createdAt": <any date>,
-    "lastModifiedBy": "AzureSDK",
-    "lastModifiedAt": <any date>,
-    "lastModifiedByType": "User",
-  }
-}
-```
-
-### Azure_ResourceManager_Resources_LocationResources_delete
-
-- Endpoint: `delete https://management.azure.com`
-
-Resource DELETE operation.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
-Expected query parameter: api-version=2023-12-01-preview
-Expected response status code: 204
-
-### Azure_ResourceManager_Resources_LocationResources_get
-
-- Endpoint: `get https://management.azure.com`
-  Resource GET operation.
-  Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
-  Expected query parameter: api-version=2023-12-01-preview
-  Expected response body:
-
-```json
-{
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
-  "name": "resource",
-  "type": "Azure.ResourceManager.Resources/locationResources",
-  "properties":{
-    "description": "valid",
-    "provisioningState": "Succeeded"
-  },
-  "systemData": {
-    "createdBy": "AzureSDK",
-    "createdByType": "User",
-    "createdAt": <any date>,
-    "lastModifiedBy": "AzureSDK",
-    "lastModifiedAt": <any date>,
-    "lastModifiedByType": "User",
-  }
-}
-```
-
-### Azure_ResourceManager_Resources_LocationResources_listByParent
-
-- Endpoint: `get https://management.azure.com`
-
-Resource List operation by location.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources
-Expected query parameter: api-version=2023-12-01-preview
-
-Expected response body:
-
-```json
-{
-  "value": [{
-    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
-    "name": "resource",
-    "type": "Azure.ResourceManager.Resources/locationResources",
-    "properties":{
-      "description": "valid",
-      "provisioningState": "Succeeded"
-    },
-    "systemData": {
-      "createdBy": "AzureSDK",
-      "createdByType": "User",
-      "createdAt": <any date>,
-      "lastModifiedBy": "AzureSDK",
-      "lastModifiedAt": <any date>,
-      "lastModifiedByType": "User",
-    }
-  }]
-}
-```
-
-### Azure_ResourceManager_Resources_LocationResources_update
-
-- Endpoint: `patch https://management.azure.com`
-
-Resource PATCH operation.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
-Expected query parameter: api-version=2023-12-01-preview
-Expected request body:
-
-```json
-{
-  "properties": {
-    "description": "valid2"
-  }
-}
-```
-
-Expected response body:
-
-```json
-{
-  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
-  "name": "resource",
-  "type": "Azure.ResourceManager.Resources/locationResources",
-  "properties":{
-    "description": "valid2",
-    "provisioningState": "Succeeded"
-  },
-  "systemData": {
-    "createdBy": "AzureSDK",
-    "createdByType": "User",
-    "createdAt": <any date>,
-    "lastModifiedBy": "AzureSDK",
-    "lastModifiedAt": <any date>,
-    "lastModifiedByType": "User",
-  }
-}
-```
-
 ### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal
 
 - Endpoint: `post https://management.azure.com`
@@ -1093,55 +946,55 @@ Expected response body:
 
 - Endpoint: `post https://management.azure.com`
 
-Resource POST operation.
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/westus/checkNameAvailability
-Expected query parameter: api-version=2023-12-01-preview
-Expected request body:
+  Resource POST operation.
+  Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/westus/checkNameAvailability
+  Expected query parameter: api-version=2023-12-01-preview
+  Expected request body:
 
-```json
-{
-  "name": "checkName",
-  "type": "Microsoft.Web/site"
-}
-```
+  ```json
+  {
+    "name": "checkName",
+    "type": "Microsoft.Web/site"
+  }
+  ```
 
-Expected response body:
+  Expected response body:
 
-```json
-{
-  "nameAvailable": false,
-  "reason": "AlreadyExists",
-  "message": "Hostname 'checkName' already exists. Please select a different name."
-}
-```
+  ```json
+  {
+    "nameAvailable": false,
+    "reason": "AlreadyExists",
+    "message": "Hostname 'checkName' already exists. Please select a different name."
+  }
+  ```
 
 ### Azure_ResourceManager_OperationTemplates_ListAvailableOperations
 
 - Endpoint: `get https://management.azure.com`
 
-Resource GET operation.
-Expected path: /providers/Azure.ResourceManager.OperationTemplates/operations
-Expected query parameter: api-version=2023-12-01-preview
-Expected response body:
+  Resource GET operation.
+  Expected path: /providers/Azure.ResourceManager.OperationTemplates/operations
+  Expected query parameter: api-version=2023-12-01-preview
+  Expected response body:
 
-```json
-{
-  "value": [
-    {
-      "name": "Microsoft.Compute/virtualMachines/write",
-      "isDataAction": false,
-      "display": {
-        "provider": "Microsoft Compute",
-        "resource": "Virtual Machines",
-        "operation": "Create or Update Virtual Machine.",
-        "description": "Add or modify virtual machines."
-      },
-      "origin": "user,system",
-      "actionType": "Internal"
-    }
-  ]
-}
-```
+  ```json
+  {
+    "value": [
+      {
+        "name": "Microsoft.Compute/virtualMachines/write",
+        "isDataAction": false,
+        "display": {
+          "provider": "Microsoft Compute",
+          "resource": "Virtual Machines",
+          "operation": "Create or Update Virtual Machine.",
+          "description": "Add or modify virtual machines."
+        },
+        "origin": "user,system",
+        "actionType": "Internal"
+      }
+    ]
+  }
+  ```
 
 ### Azure_ResourceManager_OperationTemplates_Lro_createOrReplace
 
@@ -1352,6 +1205,155 @@ Expected response body:
 ```json
 {
   "content": "order1,product1,1"
+}
+```
+
+### Azure_ResourceManager_Resources_LocationResources_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
+Expected query parameter: api-version=2022-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
+  "name": "resource",
+  "type": "Azure.ResourceManager.Resources/locationResources",
+  "properties": {
+    "description": "valid",
+    "provisioningState": "Succeeded",
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User",
+  }
+}
+```
+
+### Azure_ResourceManager_Resources_LocationResources_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_Resources_LocationResources_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
+  "name": "resource",
+  "type": "Azure.ResourceManager.Resources/locationResources",
+  "properties":{
+    "description": "valid",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User",
+  }
+}
+```
+
+### Azure_ResourceManager_Resources_LocationResources_listByLocation
+
+- Endpoint: `get https://management.azure.com`
+
+Resource List operation by location.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "value": [{
+    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
+    "name": "resource",
+    "type": "Azure.ResourceManager.Resources/locationResources",
+    "properties":{
+      "description": "valid",
+      "provisioningState": "Succeeded"
+    },
+    "systemData": {
+      "createdBy": "AzureSDK",
+      "createdByType": "User",
+      "createdAt": <any date>,
+      "lastModifiedBy": "AzureSDK",
+      "lastModifiedAt": <any date>,
+      "lastModifiedByType": "User",
+    }
+  }]
+}
+```
+
+### Azure_ResourceManager_Resources_LocationResources_update
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "valid2"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.Resources/locations/eastus/locationResources/resource",
+  "name": "resource",
+  "type": "Azure.ResourceManager.Resources/locationResources",
+  "properties":{
+    "description": "valid2",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User",
+  }
 }
 ```
 
