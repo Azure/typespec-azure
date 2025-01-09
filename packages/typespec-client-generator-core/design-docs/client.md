@@ -33,7 +33,7 @@ client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
 sub_client = TestSubClient(endpoint="endpoint", credential=AzureKeyCredential("key"), sub_name="sub")
 result = sub_client.do_something()
 ```
-4. Combine 3 and 4. The sub client could either be get from parent client or be initialized separately.
+4. Combine 2 and 3. The sub client could either be get from parent client or be initialized separately.
 
 **Questions: do we have such scenario? YES.**
 > Confirmed YES. (DPG office hour in 12/12/2024)
