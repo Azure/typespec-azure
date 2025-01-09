@@ -25,13 +25,23 @@ import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
   getClientNameOverride,
+  getIsApiVersion,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  SdkBodyModelPropertyType,
+  SdkBodyParameter,
   SdkClientType,
+  SdkCookieParameter,
+  SdkHeaderParameter,
+  SdkHttpOperation,
   SdkHttpOperationExample,
+  SdkModelPropertyType,
+  SdkPathParameter,
+  SdkQueryParameter,
+  SdkServiceMethod,
   SdkServiceOperation,
   SdkType,
   TCGCContext,
@@ -66,6 +76,11 @@ export function getDefaultApiVersion(
     return undefined;
   }
 }
+
+function isModelProperty(type: any): type is ModelProperty {
+  return type && typeof type === "object" && "kind" in type && type.kind === "ModelProperty";
+}
+
 /**
  * Return whether a parameter is the Api Version parameter of a client
  * @param program
@@ -73,6 +88,12 @@ export function getDefaultApiVersion(
  * @returns
  */
 export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
+  if (isModelProperty(type)) {
+    const override = getIsApiVersion(context, type);
+    if (override !== undefined) {
+      return override;
+    }
+  }
   return (
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
@@ -218,20 +239,27 @@ export function getCrossLanguageDefinitionId(
   appendNamespace: boolean = true,
 ): string {
   let retval = type.name || "anonymous";
-  const namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
+  let namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
   switch (type.kind) {
+    // Enum and Scalar will always have a name
     case "Union":
     case "Model":
-      // Enum and Scalar will always have a name
       if (type.name) {
         break;
       }
       const contextPath = operation
         ? getContextPath(context, operation, type)
         : findContextPath(context, type);
+      const namingPart = contextPath.slice(findLastNonAnonymousNode(contextPath));
+      if (
+        namingPart[0]?.type?.kind === "Model" ||
+        namingPart[0]?.type?.kind === "Union" ||
+        namingPart[0]?.type?.kind === "Operation"
+      ) {
+        namespace = namingPart[0]?.type?.namespace;
+      }
       retval =
-        contextPath
-          .slice(findLastNonAnonymousModelNode(contextPath))
+        namingPart
           .map((x) =>
             x.type?.kind === "Model" || x.type?.kind === "Union"
               ? x.type.name || x.name
@@ -243,7 +271,12 @@ export function getCrossLanguageDefinitionId(
       break;
     case "ModelProperty":
       if (type.model) {
-        retval = `${getCrossLanguageDefinitionId(context, type.model, undefined, false)}.${retval}`;
+        // operation parameter case
+        if (type.model === operation?.parameters) {
+          retval = `${getCrossLanguageDefinitionId(context, operation, undefined, false)}.${retval}`;
+        } else {
+          retval = `${getCrossLanguageDefinitionId(context, type.model, operation, false)}.${retval}`;
+        }
       }
       break;
     case "Operation":
@@ -352,7 +385,7 @@ function findContextPath(
 
 interface ContextNode {
   name: string;
-  type?: Model | Union | TspLiteralType;
+  type: Model | Union | TspLiteralType | Operation;
 }
 
 /**
@@ -376,7 +409,7 @@ function getContextPath(
 
     if (httpOperation.parameters.body) {
       visited.clear();
-      result = [{ name: root.name }];
+      result = [{ name: root.name, type: root }];
       let bodyType: Type;
       if (isHttpBodySpread(httpOperation.parameters.body)) {
         bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
@@ -390,7 +423,7 @@ function getContextPath(
 
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
       visited.clear();
-      result = [{ name: root.name }];
+      result = [{ name: root.name, type: root }];
       if (
         dfsModelProperties(typeToFind, parameter.param.type, `Request${pascalCase(parameter.name)}`)
       ) {
@@ -402,7 +435,7 @@ function getContextPath(
       for (const innerResponse of response.responses) {
         if (innerResponse.body?.type) {
           visited.clear();
-          result = [{ name: root.name }];
+          result = [{ name: root.name, type: root }];
           if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response", true)) {
             return result;
           }
@@ -412,7 +445,7 @@ function getContextPath(
         if (headers) {
           for (const header of Object.values(headers)) {
             visited.clear();
-            result = [{ name: root.name }];
+            result = [{ name: root.name, type: root }];
             if (dfsModelProperties(typeToFind, header.type, `Response${pascalCase(header.name)}`)) {
               return result;
             }
@@ -554,15 +587,15 @@ function getContextPath(
   }
 }
 
-function findLastNonAnonymousModelNode(contextPath: ContextNode[]): number {
+function findLastNonAnonymousNode(contextPath: ContextNode[]): number {
   let lastNonAnonymousModelNodeIndex = contextPath.length - 1;
   while (lastNonAnonymousModelNodeIndex >= 0) {
     const currType = contextPath[lastNonAnonymousModelNodeIndex].type;
     if (
-      !contextPath[lastNonAnonymousModelNodeIndex].type ||
-      (currType?.kind === "Model" && currType.name)
+      (currType.kind === "Model" || currType.kind === "Union" || currType.kind === "Operation") &&
+      currType.name
     ) {
-      // it's nonanonymous model node (if no type defined, it's the operation node)
+      // it's non anonymous node
       break;
     } else {
       --lastNonAnonymousModelNodeIndex;
@@ -589,11 +622,11 @@ function buildNameFromContextPaths(
     return "";
   }
 
-  // 1. find the last nonanonymous model node
-  const lastNonAnonymousModelNodeIndex = findLastNonAnonymousModelNode(contextPath);
+  // 1. find the last non-anonymous model node
+  const lastNonAnonymousNodeIndex = findLastNonAnonymousNode(contextPath);
   // 2. build name
   let createName: string = "";
-  for (let j = lastNonAnonymousModelNodeIndex; j < contextPath.length; j++) {
+  for (let j = lastNonAnonymousNodeIndex; j < contextPath.length; j++) {
     const currContextPathType = contextPath[j]?.type;
     if (
       currContextPathType?.kind === "String" ||
@@ -602,11 +635,11 @@ function buildNameFromContextPaths(
     ) {
       // constant type
       createName = `${createName}${pascalCase(contextPath[j].name)}`;
-    } else if (!currContextPathType?.name) {
-      // is anonymous model node
+    } else if (!currContextPathType?.name || currContextPathType.kind === "Operation") {
+      // is anonymous node or operation node
       createName = `${createName}${pascalCase(contextPath[j].name)}`;
     } else {
-      // is non-anonymous model, use type name
+      // is non-anonymous node, use type name
       createName = `${createName}${currContextPathType!.name!}`;
     }
   }
@@ -685,4 +718,49 @@ export function isAzureCoreModel(t: SdkType): boolean {
  */
 export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
   return context.__pagedResultSet.has(t);
+}
+
+/**
+ * Find corresponding http parameter list for a client initialization parameter, a service method parameter or a property of a service method parameter.
+ *
+ * @param method
+ * @param param
+ * @returns
+ */
+export function getHttpOperationParameter(
+  method: SdkServiceMethod<SdkHttpOperation>,
+  param: SdkModelPropertyType,
+):
+  | SdkPathParameter
+  | SdkQueryParameter
+  | SdkHeaderParameter
+  | SdkCookieParameter
+  | SdkBodyParameter
+  | SdkBodyModelPropertyType
+  | undefined {
+  const operation = method.operation;
+  // BFS to find the corresponding http parameter.
+  // An http parameter will be mapped to a method/client parameter, several method/client parameters (body spread case), or one property of a method property (metadata on property case).
+  // So, when we try to find which http parameter a parameter or property corresponds to, we compare the `correspondingMethodParams` list directly.
+  // If a method parameter is spread case, then we need to find the cooresponding http body parameter's property.
+  for (const p of operation.parameters) {
+    for (const cp of p.correspondingMethodParams) {
+      if (cp === param) {
+        return p;
+      }
+    }
+  }
+  if (operation.bodyParam) {
+    for (const cp of operation.bodyParam.correspondingMethodParams) {
+      if (cp === param) {
+        if (operation.bodyParam.type.kind === "model" && operation.bodyParam.type !== param.type) {
+          return operation.bodyParam.type.properties.find(
+            (p) => p.kind === "property" && p.name === param.name,
+          ) as SdkBodyModelPropertyType | undefined;
+        }
+        return operation.bodyParam;
+      }
+    }
+  }
+  return undefined;
 }

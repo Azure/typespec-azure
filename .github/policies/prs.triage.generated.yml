@@ -52,3 +52,9 @@ configuration:
             then:
               - addLabel:
                   label: ide
+          - if:
+              - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: cli/psh

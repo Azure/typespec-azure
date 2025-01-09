@@ -652,7 +652,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(getStatus.name, "getWidgetOperationStatus");
       strictEqual(getStatus.kind, "basic");
       strictEqual(
-        getStatus.crossLanguageDefintionId,
+        getStatus.crossLanguageDefinitionId,
         "Contoso.WidgetManager.Widgets.getWidgetOperationStatus",
       );
       strictEqual(getStatus.parameters.length, 3);
@@ -729,7 +729,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(createOrUpdate.kind, "lro");
       strictEqual(createOrUpdate.parameters.length, 11);
       strictEqual(
-        createOrUpdate.crossLanguageDefintionId,
+        createOrUpdate.crossLanguageDefinitionId,
         "Contoso.WidgetManager.Widgets.createOrUpdateWidget",
       );
       deepStrictEqual(createOrUpdate.parameters.map((x) => x.name).sort(), [
@@ -878,7 +878,7 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(listManufacturers.name, "listManufacturers");
       strictEqual(
-        listManufacturers.crossLanguageDefintionId,
+        listManufacturers.crossLanguageDefinitionId,
         "Contoso.WidgetManager.Widgets.listManufacturers",
       );
       strictEqual(listManufacturers.kind, "paging");

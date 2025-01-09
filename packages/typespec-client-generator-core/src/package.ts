@@ -11,11 +11,9 @@ import {
   Model,
   ModelProperty,
   Operation,
-  Type,
 } from "@typespec/compiler";
 import { getServers, HttpServer } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
-import { camelCase } from "change-case";
 import {
   getAccess,
   getClientInitialization,
@@ -291,6 +289,9 @@ function getPropertyPathFromSegment(
   for (const segment of segments) {
     const property = current.properties.get(segment);
     if (!property) {
+      if (current.baseModel) {
+        return getPropertyPathFromSegment(context, current.baseModel, segments);
+      }
       return "";
     }
     wireSegments.push(getLibraryName(context, property));
@@ -387,7 +388,7 @@ function getSdkMethodResponse(
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
       clientNamespace: client.clientNamespace,
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
       decorators: [],
     };
   } else if (responseTypes.size === 1) {
@@ -484,7 +485,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     operation: serviceOperation,
     response,
     apiVersions,
-    crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operation),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, operation)),
     generateConvenient: shouldGenerateConvenient(context, operation),
     generateProtocol: shouldGenerateProtocol(context, operation),
@@ -565,33 +566,10 @@ function getSdkInitializationType(
 
 function getSdkMethodParameter(
   context: TCGCContext,
-  type: Type,
+  type: ModelProperty,
   operation: Operation,
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (type.kind !== "ModelProperty") {
-    const libraryName = getLibraryName(context, type);
-    const name = camelCase(libraryName ?? "body");
-    // call before creating property type, so we can pass apiVersions of param onto its type
-    const apiVersions = getAvailableApiVersions(context, type, operation);
-    const propertyType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type, operation));
-    return diagnostics.wrap({
-      kind: "method",
-      doc: getDoc(context.program, type),
-      summary: getSummary(context.program, type),
-      apiVersions,
-      type: propertyType,
-      name,
-      isGeneratedName: Boolean(libraryName),
-      optional: false,
-      discriminator: false,
-      serializedName: name,
-      isApiVersionParam: false,
-      onClient: false,
-      crossLanguageDefinitionId: "anonymous",
-      decorators: diagnostics.pipe(getTypeDecorators(context, type)),
-    });
-  }
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
     kind: "method",
@@ -633,7 +611,7 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
       access: "internal",
       response: operationGroupClient,
       apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
-      crossLanguageDefintionId: getCrossLanguageDefinitionId(context, operationGroup.type),
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operationGroup.type)}.${name}`,
       decorators: [],
     });
   }
@@ -693,6 +671,7 @@ function getEndpointTypeFromSingleServer<
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
       sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);
+      sdkParam.crossLanguageDefinitionId = `${getCrossLanguageDefinitionId(context, client.__raw.service)}.${param.name}`;
     } else {
       diagnostics.add(
         createDiagnostic({
@@ -752,7 +731,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       variantTypes: types,
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, rawClient.service),
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
       clientNamespace: getClientNamespace(context, rawClient.service),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;

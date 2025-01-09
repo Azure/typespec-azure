@@ -31,7 +31,7 @@ describe("typespec-client-generator-core: parameters", () => {
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "myOp");
     strictEqual(method.kind, "basic");
-    strictEqual(method.crossLanguageDefintionId, "My.Service.myOp");
+    strictEqual(method.crossLanguageDefinitionId, "My.Service.myOp");
     strictEqual(method.parameters.length, 1);
 
     const methodParam = method.parameters[0];
@@ -102,7 +102,7 @@ describe("typespec-client-generator-core: parameters", () => {
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "pathInModel");
     strictEqual(method.kind, "basic");
-    strictEqual(method.crossLanguageDefintionId, "TestService.pathInModel");
+    strictEqual(method.crossLanguageDefinitionId, "TestService.pathInModel");
     strictEqual(method.parameters.length, 1);
     const pathMethod = method.parameters[0];
     strictEqual(pathMethod.kind, "method");
@@ -139,7 +139,7 @@ describe("typespec-client-generator-core: parameters", () => {
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "myOp");
     strictEqual(method.kind, "basic");
-    strictEqual(method.crossLanguageDefintionId, "My.Service.myOp");
+    strictEqual(method.crossLanguageDefinitionId, "My.Service.myOp");
     strictEqual(method.parameters.length, 1);
 
     const methodParam = method.parameters[0];

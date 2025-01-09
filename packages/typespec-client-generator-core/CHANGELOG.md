@@ -1,5 +1,50 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.49.1
+
+### Bug Fixes
+
+- [#2000](https://github.com/Azure/typespec-azure/pull/2000) ensure operation examples to be ordered
+- [#2004](https://github.com/Azure/typespec-azure/pull/2004) get correct pageable info for azure pageable operation with inheritance return model
+- [#2034](https://github.com/Azure/typespec-azure/pull/2034) refine cross language definition id logic
+
+### Features
+
+- [#2010](https://github.com/Azure/typespec-azure/pull/2010) add `getHttpOperationParameter` helper function
+- [#1978](https://github.com/Azure/typespec-azure/pull/1978) Add `@apiVersion` decorator to override whether a parameter is an api version or not
+
+### Breaking Changes
+
+- [#2007](https://github.com/Azure/typespec-azure/pull/2007) fix typo of `crossLanguageDefinitionId` of method.
+
+
+## 0.49.0
+
+### Bug Fixes
+
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+### Features
+
+- [#1812](https://github.com/Azure/typespec-azure/pull/1812) add `SdkCookieParameter` type and support `@cookie` in TypeSpec http lib
+- [#1783](https://github.com/Azure/typespec-azure/pull/1783) Implement scope negation for TCGC decorators
+- [#1912](https://github.com/Azure/typespec-azure/pull/1912) support emit code model
+
+
+## 0.48.6
+
+### Bug Fixes
+
+- [#1966](https://github.com/Azure/typespec-azure/pull/1966) Allow for responses without bodies to be errors, depending on presence of `@error` decorator
+
+
+## 0.48.5
+
+### Breaking Changes
+
+- [#1957](https://github.com/Azure/typespec-azure/pull/1957) Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`. Usage and access now properly propagate on polling model, final result and final envelop result of `lroMetadata`.
+
+
 ## 0.48.4
 
 ### Bug Fixes

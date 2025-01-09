@@ -546,6 +546,146 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         "polling model should not be input",
       );
     });
+
+    it("LRO final envelope result correctly marked when only used in ignored polling operation", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compileWithCustomization(
+        `
+        @useDependency(Versions.v1_0_Preview_2)
+        @server("http://localhost:3000", "endpoint")
+        @service()
+        namespace DocumentIntelligence;
+          @lroStatus
+          @doc("Operation status.")
+          union DocumentIntelligenceOperationStatus {
+            string,
+            @doc("The operation has not started yet.")
+            notStarted: "notStarted",
+            @doc("The operation is in progress.")
+            running: "running",
+            @doc("The operation has failed.")
+            @lroFailed
+            failed: "failed",
+            @doc("The operation has succeeded.")
+            @lroSucceeded
+            succeeded: "succeeded",
+            @doc("The operation has been canceled.")
+            @lroCanceled
+            canceled: "canceled",
+            @doc("The operation has been skipped.")
+            @lroCanceled
+            skipped: "skipped",
+          }
+          #suppress "@azure-tools/typespec-azure-core/long-running-polling-operation-required" "This is a template"
+          op DocumentIntelligenceLongRunningOperation<
+            TParams extends TypeSpec.Reflection.Model,
+            TResponse extends TypeSpec.Reflection.Model
+          > is Foundations.Operation<
+            {
+              ...TParams,
+              @doc("Unique document model name.")
+              @path
+              @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+              @maxLength(64)
+              modelId: string;
+            },
+            AcceptedResponse &
+              Foundations.RetryAfterHeader & {
+                @pollingLocation
+                @header("Operation-Location")
+                operationLocation: ResourceLocation<TResponse>;
+              },
+            {},
+            {}
+          >;
+          op DocumentIntelligenceOperation<
+            TParams extends TypeSpec.Reflection.Model,
+            TResponse extends TypeSpec.Reflection.Model & Foundations.RetryAfterHeader
+          > is Foundations.Operation<
+            TParams,
+            TResponse,
+            {},
+            {}
+          >;
+          @doc("Document analysis result.")
+          model AnalyzeResult {
+            @doc("API version used to produce this result.")
+            apiVersion: string;
+            @doc("Document model ID used to produce this result.")
+            @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+            modelId: string;
+          }
+          @doc("Status and result of the analyze operation.")
+          model AnalyzeOperation {
+            @doc("Operation status.  notStarted, running, succeeded, or failed")
+            status: DocumentIntelligenceOperationStatus;
+            @doc("Date and time (UTC) when the analyze operation was submitted.")
+            createdDateTime: utcDateTime;
+            @doc("Date and time (UTC) when the status was last updated.")
+            lastUpdatedDateTime: utcDateTime;
+            @doc("Encountered error during document analysis.")
+            error?: {};
+            @lroResult
+            @doc("Document analysis result.")
+            analyzeResult?: AnalyzeResult;
+          }
+          #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
+          @doc("Analyzes document with document model.")
+          @post
+          @pollingOperation(getAnalyzeResult)
+          @sharedRoute
+          @route("/documentModels/{modelId}:analyze")
+          op analyzeDocument is DocumentIntelligenceLongRunningOperation<
+            {
+              @doc("Input content type.")
+              @header
+              contentType: "application/json";
+              @doc("Analyze request parameters.")
+              @bodyRoot
+              @clientName("body", "python")
+              analyzeRequest?: {};
+            },
+            AnalyzeOperation
+          >;
+          #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
+          @doc("Gets the result of document analysis.")
+          @route("/documentModels/{modelId}/analyzeResults/{resultId}")
+          @get
+          op getAnalyzeResult is DocumentIntelligenceOperation<
+            {
+              @doc("Unique document model name.")
+              @path
+              @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+              @maxLength(64)
+              modelId: string;
+              @doc("Analyze operation result ID.")
+              @path
+              resultId: uuid;
+            },
+            AnalyzeOperation
+          >;
+          `,
+        `
+          namespace ClientCustomizations;
+          @client({
+            name: "DocumentIntelligenceClient",
+            service: DocumentIntelligence,
+          })
+          interface DocumentIntelligenceClient {
+            analyzeDocument is DocumentIntelligence.analyzeDocument;
+          }
+          `,
+      );
+      const models = runnerWithCore.context.sdkPackage.models;
+      strictEqual(models.length, 4);
+      const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
+      ok(analyzeOperationModel);
+      strictEqual(analyzeOperationModel.usage, UsageFlags.LroFinalEnvelope | UsageFlags.LroPolling);
+    });
   });
 
   describe("Arm LRO templates", () => {

@@ -1,7 +1,7 @@
 ---
-changeKind: internal
+changeKind: feature
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-refine tcgc tests
+add `@alternateType` decorator
