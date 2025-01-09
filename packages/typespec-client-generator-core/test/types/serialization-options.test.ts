@@ -1,7 +1,6 @@
 import { XmlTestLibrary } from "@typespec/xml/testing";
-import { deepStrictEqual, strictEqual } from "assert";
+import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkEnumValueType } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: serialization options", () => {
@@ -68,17 +67,16 @@ describe("typespec-client-generator-core: serialization options", () => {
         @attribute id: string;
       }
 
-      op test(): Blob;
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Blob};
     `);
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].properties[0].decorators, [
-      {
-        name: "TypeSpec.Xml.@attribute",
-        arguments: {},
-      },
-    ]);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "Blob");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "id");
+    strictEqual(model.properties[0].serializationOptions.xml?.attribute, true);
   });
 
   it("@name", async function () {
@@ -94,23 +92,15 @@ describe("typespec-client-generator-core: serialization options", () => {
         content: string;
       }
 
-      op test(): Book;
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Book};
     `);
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].decorators, [
-      {
-        name: "TypeSpec.Xml.@name",
-        arguments: { name: "XmlBook" },
-      },
-    ]);
-    deepStrictEqual(models[0].properties[0].decorators, [
-      {
-        name: "TypeSpec.Xml.@name",
-        arguments: { name: "XmlId" },
-      },
-    ]);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlBook");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "XmlId");
   });
 
   it("@ns", async function () {
@@ -129,38 +119,26 @@ describe("typespec-client-generator-core: serialization options", () => {
         bar2: string;
       }
 
-      op test(): Foo;
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
     `);
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].decorators, [
-      {
-        name: "TypeSpec.Xml.@ns",
-        arguments: {
-          ns: "https://example.com/ns1",
-          prefix: "ns1",
-        },
-      },
-    ]);
-    deepStrictEqual(models[0].properties[0].decorators, [
-      {
-        name: "TypeSpec.Xml.@ns",
-        arguments: {
-          ns: "https://example.com/ns1",
-          prefix: "ns1",
-        },
-      },
-    ]);
-    deepStrictEqual(models[0].properties[1].decorators, [
-      {
-        name: "TypeSpec.Xml.@ns",
-        arguments: {
-          ns: "https://example.com/ns2",
-          prefix: "ns2",
-        },
-      },
-    ]);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.ns?.namespace, "https://example.com/ns1");
+    strictEqual(model.serializationOptions.xml?.ns?.prefix, "ns1");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(
+      model.properties[0].serializationOptions.xml?.ns?.namespace,
+      "https://example.com/ns1",
+    );
+    strictEqual(model.properties[0].serializationOptions.xml?.ns?.prefix, "ns1");
+    strictEqual(model.properties[1].kind, "property");
+    strictEqual(
+      model.properties[1].serializationOptions.xml?.ns?.namespace,
+      "https://example.com/ns2",
+    );
+    strictEqual(model.properties[1].serializationOptions.xml?.ns?.prefix, "ns2");
   });
 
   it("@nsDeclarations", async function () {
@@ -185,22 +163,23 @@ describe("typespec-client-generator-core: serialization options", () => {
         bar2: string;
       }
 
-      op test(): Foo;
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
     `);
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    strictEqual(models[0].decorators[0].name, "TypeSpec.Xml.@ns");
-    const modelArg = models[0].decorators[0].arguments["ns"] as SdkEnumValueType;
-    strictEqual(modelArg.value, "https://example.com/ns1");
-
-    strictEqual(models[0].properties[0].decorators[0].name, "TypeSpec.Xml.@ns");
-    let propArg = models[0].properties[0].decorators[0].arguments["ns"] as SdkEnumValueType;
-    strictEqual(propArg.value, "https://example.com/ns1");
-
-    strictEqual(models[0].properties[1].decorators[0].name, "TypeSpec.Xml.@ns");
-    propArg = models[0].properties[1].decorators[0].arguments["ns"] as SdkEnumValueType;
-    strictEqual(propArg.value, "https://example.com/ns2");
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.ns?.namespace, "https://example.com/ns1");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(
+      model.properties[0].serializationOptions.xml?.ns?.namespace,
+      "https://example.com/ns1",
+    );
+    strictEqual(model.properties[1].kind, "property");
+    strictEqual(
+      model.properties[1].serializationOptions.xml?.ns?.namespace,
+      "https://example.com/ns2",
+    );
   });
 
   it("@unwrapped", async function () {
@@ -214,16 +193,353 @@ describe("typespec-client-generator-core: serialization options", () => {
         @unwrapped tags: string[];
       }
 
-      op test(): Pet;
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
     `);
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].properties[0].decorators, [
-      {
-        name: "TypeSpec.Xml.@unwrapped",
-        arguments: {},
-      },
-    ]);
+    const model = models[0];
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+  });
+
+  it("array of primitive types unwrapped", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @Xml.unwrapped
+        tags: string[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "tags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "tags");
+  });
+
+  it("array of primitive types unwrapped with rename", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @Xml.unwrapped
+        @encodedName("application/xml", "ItemsTags")
+        tags: string[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "ItemsTags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "ItemsTags");
+  });
+
+  it("array of primitive types wrapped", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        tags: string[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "tags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, false);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "string");
+  });
+
+  it("array of primitive types wrapped with rename", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @encodedName("application/xml", "ItemsTags")
+        tags: string[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "ItemsTags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, false);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "string");
+  });
+
+  it("array of scalar types unwrapped", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      scalar tag extends string;
+
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @Xml.unwrapped
+        tags: tag[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "tags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "tags");
+  });
+
+  it("array of scalar types unwrapped with rename", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      scalar tag extends string;
+
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @Xml.unwrapped
+        @encodedName("application/xml", "ItemsTags")
+        tags: tag[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "ItemsTags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "ItemsTags");
+  });
+
+  it("array of scalar types wrapped", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      scalar tag extends string;
+
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        tags: tag[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "tags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, false);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "tag");
+  });
+
+  it("array of scalar types wrapped with rename", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "ItemsName")
+      scalar tag extends string;
+
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @encodedName("application/xml", "ItemsTags")
+        tags: tag[];
+      }
+
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "ItemsTags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, false);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "ItemsName");
+  });
+
+  it("array of complex type unwrapped", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @Xml.unwrapped
+        tags: Tag[];
+      }
+
+      @encodedName("application/xml", "XmlTag")
+      model Tag {
+        name: string;
+      }
+        
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "tags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "tags");
+  });
+
+  it("array of complex type unwrapped with rename", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @Xml.unwrapped
+        @encodedName("application/xml", "ItemsTag")
+        tags: Tag[];
+      }
+
+      @encodedName("application/xml", "XmlTag")
+      model Tag {
+        name: string;
+      }
+        
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "ItemsTag");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "ItemsTag");
+  });
+
+  it("array of complex type wrapped", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        tags: Tag[];
+      }
+
+      model Tag {
+        name: string;
+      }
+        
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "tags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, false);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "Tag");
+  });
+
+  it("array of complex type wrapped with rename", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlPet")
+      model Pet {
+        @encodedName("application/xml", "ItemsTags")
+        tags: Tag[];
+      }
+
+      @encodedName("application/xml", "XmlTag")
+      model Tag {
+        name: string;
+      }
+        
+      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlPet");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "ItemsTags");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, false);
+    strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "XmlTag");
   });
 });

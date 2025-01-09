@@ -412,6 +412,7 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
 export interface SerializationOptions {
   json?: JsonSerializationOptions;
   xml?: XmlSerializationOptions;
+  multipart?: MultipartOptions;
 }
 
 /**
@@ -469,6 +470,7 @@ export type SdkModelPropertyType =
   | SdkCookieParameter;
 
 export interface MultipartOptions {
+  name: string;
   // whether this part is for file
   isFilePart: boolean;
   // whether this part is multi in request payload
@@ -489,10 +491,13 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
    */
   serializedName: string;
   serializationOptions: SerializationOptions;
-  /*
-    @deprecated This property is deprecated. Use `multipartOptions?.isFilePart` instead.
-  */
+  /**
+   * @deprecated This property is deprecated. Use `multipartOptions?.isFilePart` instead.
+   */
   isMultipartFileInput: boolean;
+  /**
+   * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
+   */
   multipartOptions?: MultipartOptions;
   visibility?: Visibility[];
   flatten: boolean;

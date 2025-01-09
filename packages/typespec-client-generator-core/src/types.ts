@@ -1240,7 +1240,7 @@ function updateMultiPartInfo(
   const diagnostics = createDiagnosticCollector();
   if (httpOperationPart) {
     // body decorated with @multipartBody
-    base.multipartOptions = {
+    base.serializationOptions.multipart = {
       isFilePart: isFilePart(context, base.type),
       isMulti: httpOperationPart.multi,
       filename: httpOperationPart.filename
@@ -1252,11 +1252,13 @@ function updateMultiPartInfo(
           )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
+      name: base.name,
     };
     // after https://github.com/microsoft/typespec/issues/3779 fixed, could use httpOperationPart.name directly
     const httpPart = getHttpPart(context.program, type.type);
     if (httpPart?.options?.name) {
       base.serializedName = httpPart?.options?.name;
+      base.serializationOptions.multipart.name = httpPart?.options?.name;
     }
   } else {
     // common body
@@ -1277,15 +1279,16 @@ function updateMultiPartInfo(
           }),
         );
       }
-      base.multipartOptions = {
+      base.serializationOptions.multipart = {
         isFilePart: isBytesInput,
         isMulti: base.type.kind === "array",
         defaultContentTypes: [],
+        name: base.name,
       };
     }
   }
-  if (base.multipartOptions !== undefined) {
-    base.isMultipartFileInput = base.multipartOptions.isFilePart;
+  if (base.serializationOptions.multipart !== undefined) {
+    base.isMultipartFileInput = base.serializationOptions.multipart.isFilePart;
   }
 
   return diagnostics.wrap(undefined);
@@ -1329,6 +1332,7 @@ export function getSdkModelPropertyType(
       if (type.model === httpBodyType) {
         // only try to add multipartOptions for property of body
         diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+        result.multipartOptions = result.serializationOptions.multipart;
       }
     }
   }
@@ -1420,7 +1424,7 @@ function updateUsageOrAccess(
   ) {
     return diagnostics.wrap(undefined);
   }
-    
+
   options.seenTypes.add(type);
 
   if (!options.skipFirst) {
@@ -1957,55 +1961,52 @@ function setSerializationOptions(
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes ?? []) {
-    if (
-      isJsonContentType(contentType) &&
-      !type.serializationOptions.json &&
-      (type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty")
-    ) {
+    if (isJsonContentType(contentType) && !type.serializationOptions.json) {
       type.serializationOptions.json = {
-        name: resolveEncodedName(context.program, type.__raw, "application/json"),
+        name:
+          type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
+            ? resolveEncodedName(context.program, type.__raw, "application/json")
+            : type.name,
       };
     }
 
-    if (
-      isXmlContentType(contentType) &&
-      !type.serializationOptions.xml &&
-      (type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty")
-    ) {
+    if (isXmlContentType(contentType) && !type.serializationOptions.xml) {
       type.serializationOptions.xml = {
-        name: resolveEncodedName(context.program, type.__raw, "application/xml"),
-        attribute: type.__raw.kind === "ModelProperty" && isAttribute(context.program, type.__raw),
-        ns: getNs(context.program, type.__raw),
-        unwrapped: type.__raw.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
+        name:
+          type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
+            ? resolveEncodedName(context.program, type.__raw, "application/xml")
+            : type.name,
+        attribute: type.__raw?.kind === "ModelProperty" && isAttribute(context.program, type.__raw),
+        ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
+        unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
       };
 
       // set extra serialization info for array property
       if (
-        type.__raw.kind === "ModelProperty" &&
+        type.__raw?.kind === "ModelProperty" &&
         type.__raw.type.kind === "Model" &&
         isArrayModelType(context.program, type.__raw.type)
       ) {
-        // for scalar type, set itemsName to the type name
-        if (type.__raw.type.indexer.value.kind === "Scalar") {
-          type.serializationOptions.xml.itemsName = resolveEncodedName(
-            context.program,
-            type.__raw.type.indexer.value,
-            "application/xml",
-          );
-          type.serializationOptions.xml.itemsNs = getNs(
-            context.program,
-            type.__raw.type.indexer.value,
-          );
-        } else if (type.__raw.type.indexer.value.kind !== "Model") {
-          // for basic type
-          if (!type.serializationOptions.xml.unwrapped) {
-            // if wrapped, set itemsName to the type name
-            type.serializationOptions.xml.itemsName =
-              type.__raw.type.indexer.value.kind.toLowerCase();
+        if (!type.serializationOptions.xml.unwrapped) {
+          // if wrapped, set itemsName and itemsNS according to the array item type
+          const itemType = type.__raw.type.indexer.value;
+          if ("name" in itemType) {
+            // if the type has name then get the name
+            type.serializationOptions.xml.itemsName = resolveEncodedName(
+              context.program,
+              itemType as Type & { name: string },
+              "application/xml",
+            );
+            type.serializationOptions.xml.itemsNs = getNs(context.program, itemType);
           } else {
-            // if unwrapped, set itemName to property name
+            // otherwise use the property name
             type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
+            type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
           }
+        } else {
+          // if unwrapped, always set itemName to property name
+          type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
+          type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
         }
       }
     }

@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
+import { UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreTspModel } from "../../src/internal-utils.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
@@ -13,6 +13,7 @@ describe("typespec-client-generator-core: model types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
+
   it("basic", async () => {
     await runner.compile(`
         @service({})
@@ -162,16 +163,14 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(recursiveModel.name, "RecursiveModel");
     strictEqual(recursiveModel.kind, "model");
     strictEqual(recursiveModel.crossLanguageDefinitionId, "TestService.RecursiveModel");
+    strictEqual(recursiveModel.serializationOptions.json?.name, "RecursiveModel");
     strictEqual(recursiveModel.properties.length, 1);
     const prop = recursiveModel.properties[0];
     strictEqual(prop.kind, "property");
     strictEqual(prop.name, "prop");
     strictEqual(prop.type.kind, "model");
     strictEqual(prop.type.name, "RecursiveModel");
-
-    strictEqual(models[0].serializationOptions.json?.name, "RecursiveModel");
-    strictEqual(models[0].properties[0].kind, "property");
-    strictEqual(models[0].properties[0].serializationOptions.json?.name, "prop");
+    strictEqual(prop.serializationOptions.json?.name, "prop");
   });
 
   it("discriminator model", async () => {
@@ -208,6 +207,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 5);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
+    strictEqual(fish.serializationOptions.json?.name, "Fish");
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
@@ -216,9 +216,12 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
     strictEqual(kindProperty.__raw, undefined);
+    strictEqual(kindProperty.serializationOptions.json?.name, "kind");
     strictEqual(fish.discriminatorProperty, kindProperty);
+
     const shark = models.find((x) => x.name === "Shark");
     ok(shark);
+    strictEqual(shark.serializationOptions.json?.name, "Shark");
     strictEqual(shark.properties.length, 2);
     const sharktypeProperty = shark.properties[0];
     ok(sharktypeProperty);
@@ -227,6 +230,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(sharktypeProperty.kind, "property");
     strictEqual(sharktypeProperty.discriminator, true);
     strictEqual(sharktypeProperty.type.kind, "string");
+    strictEqual(sharktypeProperty.serializationOptions.json?.name, "sharktype");
     strictEqual(shark.discriminatorProperty, sharktypeProperty);
   });
 
@@ -251,6 +255,8 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 2);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
+    strictEqual(fish.serializationOptions.json?.name, "Fish");
+
     const kindProperty = fish.properties[0];
     ok(kindProperty);
     strictEqual(kindProperty.name, "kind");
@@ -259,14 +265,21 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(kindProperty.discriminator, true);
     strictEqual(kindProperty.type.kind, "string");
     strictEqual(kindProperty.__raw, undefined);
+    strictEqual(kindProperty.serializationOptions.json?.name, "kind");
     strictEqual(fish.discriminatorProperty, kindProperty);
 
     const salmon = models.find((x) => x.name === "Salmon");
     ok(salmon);
+    strictEqual(salmon.serializationOptions.json?.name, "Salmon");
+
     strictEqual(salmon.properties.length, 4);
+    strictEqual(salmon.properties[0].kind, "property");
     strictEqual(salmon.properties[0].name, "kind");
-    strictEqual((salmon.properties[0] as SdkBodyModelPropertyType).discriminator, true);
+    strictEqual(salmon.properties[0].discriminator, true);
+    strictEqual(salmon.properties[0].serializationOptions.json?.name, "kind");
     strictEqual(salmon.discriminatorValue, "salmon");
+    strictEqual(salmon.properties[1].kind, "property");
+    strictEqual(salmon.properties[1].serializationOptions.json?.name, "friends");
   });
 
   it("single discriminated model", async () => {
@@ -321,6 +334,7 @@ describe("typespec-client-generator-core: model types", () => {
 
     const golden = models.find((x) => x.name === "Golden");
     ok(golden);
+    strictEqual(golden.serializationOptions.json?.name, "Golden");
 
     const kind = golden.properties.find(
       (x) => x.kind === "property" && x.serializedName === "kind",
@@ -328,9 +342,12 @@ describe("typespec-client-generator-core: model types", () => {
     ok(kind);
     strictEqual(kind.type.kind, "enumvalue");
     strictEqual(kind.type.value, "golden");
+    strictEqual(kind.kind, "property");
+    strictEqual(kind.serializationOptions.json?.name, "kind");
 
     const dog = models.find((x) => x.name === "Dog");
     ok(dog);
+    strictEqual(dog.serializationOptions.json?.name, "Dog");
     strictEqual(runner.context.sdkPackage.enums.length, 1);
     const dogKind = runner.context.sdkPackage.enums[0];
 
@@ -340,6 +357,7 @@ describe("typespec-client-generator-core: model types", () => {
     ok(dogKindProperty);
     strictEqual(dogKindProperty.kind, "property");
     strictEqual(dogKindProperty.type, dogKind);
+    strictEqual(dogKindProperty.serializationOptions.json?.name, "kind");
     strictEqual(dog.discriminatorProperty, dogKindProperty);
   });
 
@@ -502,6 +520,7 @@ describe("typespec-client-generator-core: model types", () => {
 
     const golden = models.find((x) => x.name === "Golden");
     ok(golden);
+    strictEqual(golden.serializationOptions.json?.name, "Golden");
 
     const kind = golden.properties.find(
       (x) => x.kind === "property" && x.serializedName === "kind",
@@ -509,9 +528,12 @@ describe("typespec-client-generator-core: model types", () => {
     ok(kind);
     strictEqual(kind.type.kind, "enumvalue");
     strictEqual(kind.type.value, "golden");
+    strictEqual(kind.kind, "property");
+    strictEqual(kind.serializationOptions.json?.name, "kind");
 
     const dog = models.find((x) => x.name === "Dog");
     ok(dog);
+    strictEqual(dog.serializationOptions.json?.name, "Dog");
     strictEqual(runner.context.sdkPackage.enums.length, 1);
     const dogKind = runner.context.sdkPackage.enums[0];
 
@@ -519,6 +541,8 @@ describe("typespec-client-generator-core: model types", () => {
     ok(dogKindProperty);
     strictEqual(dogKindProperty.type, dogKind);
     strictEqual(dogKindProperty.doc, "Discriminator property for Dog.");
+    strictEqual(dogKindProperty.kind, "property");
+    strictEqual(dogKindProperty.serializationOptions.json?.name, "kind");
   });
 
   it("discriminator", async () => {
@@ -697,6 +721,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 2);
     const fish = models.find((x) => x.name === "Fish");
     ok(fish);
+    strictEqual(fish.serializationOptions.json?.name, "Fish");
     strictEqual(fish.properties.length, 2);
     const discriminatorProperty = fish.properties.find((x) => x.name === "type");
     ok(discriminatorProperty);
@@ -704,24 +729,28 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(discriminatorProperty.discriminator, true);
     strictEqual(discriminatorProperty.type.kind, "string");
     strictEqual(discriminatorProperty.serializedName, "@data.kind");
+    strictEqual(discriminatorProperty.serializationOptions.json?.name, "@data.kind");
   });
 
   it("discriminator with encodedName", async () => {
     await runner.compileWithBuiltInService(`
       @discriminator("odataType")
-      @usage(Usage.input | Usage.output)
       model CharFilter {
         @encodedName("application/json", "@odata.type")
         odataType: string;
         name: string;
       }
-        `);
+
+      @get
+      op getModel(): CharFilter;
+    `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     const discriminatorProperty = models[0].discriminatorProperty;
     ok(discriminatorProperty);
     strictEqual(discriminatorProperty.kind, "property");
     strictEqual(discriminatorProperty.serializedName, "@odata.type");
+    strictEqual(discriminatorProperty.serializationOptions.json?.name, "@odata.type");
   });
 
   it("filterOutCoreModels true", async () => {
@@ -888,6 +917,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(myError.properties.length, 1);
     strictEqual(myError.properties[0].type, azureError);
   });
+
   it("no models filter core", async () => {
     await runner.compile(`
         @service({})
@@ -896,6 +926,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 0);
   });
+
   it("no models don't filter core", async () => {
     await runner.compile(`
         @service({})
@@ -904,6 +935,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 0);
   });
+
   it("input usage", async () => {
     await runner.compileWithBuiltInService(`
         model InputModel {
@@ -1103,6 +1135,7 @@ describe("typespec-client-generator-core: model types", () => {
     propreties.sort();
     deepStrictEqual(propreties, ["innerProp1", "innerProp2", "prop1", "prop2"]);
   });
+
   it("model access transitive closure", async () => {
     await runner.compileWithBuiltInService(`
         model Test {
@@ -1198,6 +1231,7 @@ describe("typespec-client-generator-core: model types", () => {
     ok(Test6);
     strictEqual(Test6.access, "public");
   });
+
   it("additionalProperties of same type", async () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -1386,6 +1420,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(catalog.properties.length, 2);
     strictEqual(deployment.properties.length, 2);
   });
+
   it("model with deprecated annotation", async () => {
     await runner.compileAndDiagnose(`
         @service({})
@@ -1451,6 +1486,7 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
   });
+
   it("error model", async () => {
     await runner.compileWithBuiltInService(`
         @error

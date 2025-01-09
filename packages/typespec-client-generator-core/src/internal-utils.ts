@@ -15,8 +15,6 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  resolveEncodedName,
-  Scalar,
   StringLiteral,
   Type,
   Union,
