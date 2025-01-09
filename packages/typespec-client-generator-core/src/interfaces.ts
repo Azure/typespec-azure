@@ -585,7 +585,7 @@ interface SdkMethodBase extends DecoratedType {
   apiVersions: string[];
   doc?: string;
   summary?: string;
-  crossLanguageDefintionId: string;
+  crossLanguageDefinitionId: string;
 }
 
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>

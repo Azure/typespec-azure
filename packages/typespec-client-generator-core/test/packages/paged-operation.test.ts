@@ -177,4 +177,35 @@ describe("typespec-client-generator-core: paged operation", () => {
       "b.d",
     );
   });
+
+  it("azure page result with inheritance", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(): ExtendedListTestResult;
+      @pagedResult
+      model ListTestResult {
+        @items
+        values: Test[];
+
+        @nextLink
+        nextLink: string;
+      }
+
+      model ExtendedListTestResult extends ListTestResult {
+        message: string;
+      }
+      
+      model Test {
+        id: string;
+      }
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "paging");
+    strictEqual(method.nextLinkPath, "nextLink");
+
+    const response = method.response;
+    strictEqual(response.kind, "method");
+    strictEqual(response.resultPath, "values");
+  });
 });
