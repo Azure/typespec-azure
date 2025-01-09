@@ -487,7 +487,7 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
   /**
-   * @deprecated This property is deprecated. Use `serializationOptions.json` instead.
+   * @deprecated This property is deprecated. Use `serializationOptions.xxx.name` instead.
    */
   serializedName: string;
   serializationOptions: SerializationOptions;
