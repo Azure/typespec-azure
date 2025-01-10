@@ -13,7 +13,9 @@ client.do_something()
 
 2. Client with sub client and sub client could be initialized by parent client
 
-- Sub client does not have additional parameter than parent client
+- Sub client has same initialization parameters with parent client
+
+ARM services always follow this pattern.
 
 ```python
 client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
@@ -23,7 +25,7 @@ sub_client = client.sub_client()
 sub_client.do_something()
 ```
 
-- Sub client has additional parameter than parent client
+- Sub client has additional initialization parameter than parent client
 
 ```python
 client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
@@ -35,7 +37,7 @@ sub_client.do_something()
 
 3. Client with sub client and sub client could be initialized individually
 
-- Sub client does not have additional parameter than parent client
+- Sub client has same initialization parameters with parent client
 
 ```python
 client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
@@ -45,7 +47,7 @@ sub_client = TestSubClient(endpoint="endpoint", credential=AzureKeyCredential("k
 sub_client.do_something()
 ```
 
-- Sub client has additional parameter than parent client
+- Sub client has additional initialization parameter than parent client
 
 ```python
 client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
@@ -57,7 +59,9 @@ sub_client.do_something()
 
 4. Client with sub client and sub client could be initialized both by parent and individually
 
-- Sub client does not have additional parameter than parent client
+Storage, container registry, etc., could fit this scenario.
+
+- Sub client has same initialization parameters with parent client
 
 ```python
 client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
@@ -70,7 +74,7 @@ sub_client = TestSubClient(endpoint="endpoint", credential=AzureKeyCredential("k
 sub_client.do_something()
 ```
 
-- Sub client has additional parameter than parent client
+- Sub client has additional initialization parameter than parent client
 
 ```python
 client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
@@ -83,11 +87,11 @@ sub_client = TestSubClient(endpoint="endpoint", credential=AzureKeyCredential("k
 sub_client.do_something()
 ```
 
-## TCGC types and decorators for client
+## TCGC types and decorators for client concept
 
 ### Client structure
 
-The entrance of TCGC is `SdkPackage` which represents a complete client package and includes clients, models, etc. The clients depend on the combination usage of namespace, interface, `@service`, `@client`.
+The entrance of TCGC is `SdkPackage` which represents a complete package and includes clients, models, etc. The clients depend on the combination usage of namespace, interface, `@service`, `@client`.
 
 If there is no explicitly defined `@client`, then every namespaces with `@service` will be a client. The nested namespaces and interfaces under that namespace will be a sub client with hierarchy.
 
@@ -125,7 +129,7 @@ namespace ToyStore {
 }
 ```
 
-The above tsp gets the two root clients: `PetStoreClient` and `ToyStoreClient` (naming logic is ensuring suffix with `Client`). The former has two child clients: `Dogs` and `Cats`. The later has two child clients: `Dolls` and `Cars`.
+The above tsp gets two root clients: `PetStoreClient` and `ToyStoreClient` (naming logic is ensuring suffix with `Client`). The former has two child clients: `Dogs` and `Cats`. The later has two child clients: `Dolls` and `Cars`.
 
 If there is any `@client` definition, then each top level `@client` will be a client and each nested `@client` will be a sub client with hierarchy.
 
@@ -194,11 +198,11 @@ TCGC always puts the following things in initialization parameters:
 3. API version parameter: if the service is versioned, then the API version parameter on method will be elevated to client.
 4. Subscription ID parameter: if the service is an ARM service, then the subscription ID parameter on method will be elevated to client.
 
-The `SdkInitializationType` has `initializedBy` properties.
+The `SdkInitializationType` has `initializedBy` property.
 The value could be `InitializedBy.parent (1)` (the client could be initialized by parent client),
-`InitializedBy.Individually (2)` (the client could be initialized individually) or `InitializedBy.parent | InitializedBy.Individually (3)` (both).
+`InitializedBy.individually (2)` (the client could be initialized individually) or `InitializedBy.parent | InitializedBy.individually (3)` (both).
 
-Default value of `initializedBy` for client is `InitializedBy.Individually`, while `InitializedBy.parent` for sub client.
+Default value of `initializedBy` for client is `InitializedBy.individually`, while `InitializedBy.parent` for sub client.
 
 For above example 1, you will get TCGC types like this:
 
@@ -386,7 +390,7 @@ clients:
 
 ### Customization for client initialization
 
-TCGC has `@clientInitialization` to do the customization for the client initialization parameters.
+TCGC has `@clientInitialization` to do the customization for the client initialization parameters and initialization way.
 Users could elevate any method's parameter to the clients, as well as change the way of how to initialize the client.
 
 Example 3:
@@ -409,7 +413,7 @@ namespace MyCustomizations {
   @@clientInitialization(MyService.InnerGroup,
     {
       parameters: InnerGroupClientOptions,
-      initializedBy: InitializedBy.parent | InitializedBy.Individually,
+      initializedBy: InitializedBy.parent | InitializedBy.individually,
     }
   );
 }
@@ -475,7 +479,7 @@ namespace SingleClient {
 
 2. Client with sub client and sub client could be initialized by parent client
 
-- Sub client does not have additional parameter than parent client
+- Sub client has same initialization parameters with parent client
 
 ```typespec
 @service({
@@ -490,7 +494,7 @@ namespace TestClient {
 }
 ```
 
-- Sub client has additional parameter than parent client
+- Sub client has additional initialization parameter than parent client
 
 ```typespec
 @service({
@@ -517,7 +521,7 @@ model SubClientOptions {
 
 3. Client with sub client and sub client could be initialized individually
 
-- Sub client does not have additional parameter than parent client
+- Sub client has same initialization parameters with parent client
 
 ```typespec
 @service({
@@ -538,7 +542,7 @@ namespace TestClient {
 );
 ```
 
-- Sub client has additional parameter than parent client
+- Sub client has additional initialization parameter than parent client
 
 ```typespec
 @service({
@@ -566,7 +570,7 @@ model SubClientOptions {
 
 4. Client with sub client and sub client could be initialized both by parent and individually
 
-- Sub client does not have additional parameter than parent client
+- Sub client has same initialization parameters with parent client
 
 ```typespec
 @service({
@@ -587,7 +591,7 @@ namespace TestClient {
 );
 ```
 
-- Sub client has additional parameter than parent client
+- Sub client has additional initialization parameter than parent client
 
 ```typespec
 @service({
