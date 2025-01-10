@@ -883,3 +883,76 @@ it("recognizes resource with customResource identifier", async () => {
 `);
   expectDiagnosticEmpty(diagnostics);
 });
+
+describe("typespec-azure-resource-manager: identifiers decorator", () => {
+  it("allows multiple model properties in identifiers decorator", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model Dog {
+      name: string;
+      age: int32;
+    }
+    
+    model Pets
+    {
+      @identifiers(["name", "age"])
+      dogs: Dog[];
+    }
+`);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("allows inner model properties in identifiers decorator", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model Dog {
+      breed: Breed;
+    }
+    
+    model Breed {
+      type: string;
+    }
+    
+    model Pets
+    {
+      @identifiers(["breed/type"])
+      dogs: Dog[];
+    }
+`);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("emits diagnostic when identifiers is not of a model property object array", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model Dog {
+      name: string;
+    }
+    
+    model Pets
+    {
+      @identifiers(["age"])
+      dogs: Dog;
+    }
+`);
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/decorator-param-wrong-type",
+        message:
+          "The @identifiers decorator must be applied to a property that is an array of objects",
+      },
+    ]);
+  });
+});

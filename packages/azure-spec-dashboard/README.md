@@ -1,4 +1,4 @@
-# Azure Spec Dashboard
+# Azure Spector Dashboard
 
 ## Dev
 

@@ -682,14 +682,17 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(clientAccessor.name, "getMyOperationGroup");
     strictEqual(clientAccessor.parameters.length, 0);
     strictEqual(clientAccessor.response, operationGroup);
-    strictEqual(clientAccessor.crossLanguageDefintionId, "TestService.MyOperationGroup");
+    strictEqual(
+      clientAccessor.crossLanguageDefinitionId,
+      "TestService.MyOperationGroup.getMyOperationGroup",
+    );
 
     strictEqual(operationGroup.initialization.properties.length, 1);
     strictEqual(operationGroup.initialization.access, "internal");
     strictEqual(operationGroup.methods.length, 1);
     strictEqual(operationGroup.methods[0].name, "func");
     strictEqual(
-      operationGroup.methods[0].crossLanguageDefintionId,
+      operationGroup.methods[0].crossLanguageDefinitionId,
       "TestService.MyOperationGroup.func",
     );
     strictEqual(operationGroup.crossLanguageDefinitionId, "TestService.MyOperationGroup");
@@ -733,7 +736,7 @@ describe("typespec-client-generator-core: client", () => {
 
     const fooAccessor = mainClient.methods[0];
     strictEqual(fooAccessor.kind, "clientaccessor");
-    strictEqual(fooAccessor.crossLanguageDefintionId, "TestService.Foo");
+    strictEqual(fooAccessor.crossLanguageDefinitionId, "TestService.Foo.getFoo");
     strictEqual(fooAccessor.access, "internal");
     strictEqual(fooAccessor.name, "getFoo");
     strictEqual(fooAccessor.parameters.length, 0);
@@ -743,7 +746,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(barAccessor.kind, "clientaccessor");
     strictEqual(barAccessor.access, "internal");
     strictEqual(barAccessor.name, "getBar");
-    strictEqual(barAccessor.crossLanguageDefintionId, "TestService.Bar");
+    strictEqual(barAccessor.crossLanguageDefinitionId, "TestService.Bar.getBar");
     strictEqual(barAccessor.parameters.length, 0);
     strictEqual(barAccessor.response, barClient);
 
@@ -754,7 +757,7 @@ describe("typespec-client-generator-core: client", () => {
 
     const fooBarAccessor = fooClient.methods[0];
     strictEqual(fooBarAccessor.kind, "clientaccessor");
-    strictEqual(fooBarAccessor.crossLanguageDefintionId, "TestService.Foo.Bar");
+    strictEqual(fooBarAccessor.crossLanguageDefinitionId, "TestService.Foo.Bar.getBar");
     strictEqual(fooBarAccessor.access, "internal");
     strictEqual(fooBarAccessor.name, "getBar");
     strictEqual(fooBarAccessor.parameters.length, 0);
@@ -766,7 +769,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(fooBarClient.methods.length, 1);
     strictEqual(fooBarClient.methods[0].kind, "basic");
     strictEqual(fooBarClient.methods[0].name, "one");
-    strictEqual(fooBarClient.methods[0].crossLanguageDefintionId, "TestService.Foo.Bar.one");
+    strictEqual(fooBarClient.methods[0].crossLanguageDefinitionId, "TestService.Foo.Bar.one");
 
     strictEqual(barClient.initialization.properties.length, 1);
     strictEqual(barClient.initialization.access, "internal");
@@ -774,7 +777,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(barClient.methods.length, 1);
     strictEqual(barClient.methods[0].kind, "basic");
     strictEqual(barClient.methods[0].name, "two");
-    strictEqual(barClient.methods[0].crossLanguageDefintionId, "TestService.Bar.two");
+    strictEqual(barClient.methods[0].crossLanguageDefinitionId, "TestService.Bar.two");
   });
 
   function getServiceNoDefaultApiVersion(op: string) {
@@ -895,7 +898,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(withoutApiVersion.parameters.length, 0);
     strictEqual(withoutApiVersion.operation.parameters.length, 0);
     strictEqual(
-      withoutApiVersion.crossLanguageDefintionId,
+      withoutApiVersion.crossLanguageDefinitionId,
       "Server.Versions.Versioned.withoutApiVersion",
     );
   });
@@ -934,7 +937,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(withApiVersion.name, "withQueryApiVersion");
     strictEqual(withApiVersion.kind, "basic");
     strictEqual(
-      withApiVersion.crossLanguageDefintionId,
+      withApiVersion.crossLanguageDefinitionId,
       "Server.Versions.Versioned.withQueryApiVersion",
     );
     strictEqual(withApiVersion.parameters.length, 0);
@@ -988,7 +991,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(withApiVersion.name, "withPathApiVersion");
     strictEqual(withApiVersion.kind, "basic");
     strictEqual(
-      withApiVersion.crossLanguageDefintionId,
+      withApiVersion.crossLanguageDefinitionId,
       "Server.Versions.Versioned.withPathApiVersion",
     );
     strictEqual(withApiVersion.parameters.length, 0);
