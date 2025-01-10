@@ -376,6 +376,7 @@ export interface SdkModelType extends SdkTypeBase {
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  serializationOptions: SerializationOptions;
 }
 
 export interface SdkInitializationType extends SdkModelType {
@@ -408,11 +409,46 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   crossLanguageDefinitionId: string;
 }
 
+export interface SerializationOptions {
+  json?: JsonSerializationOptions;
+  xml?: XmlSerializationOptions;
+  multipart?: MultipartOptions;
+}
+
+/**
+ * For Json serialization.
+ * The name will come from explicit setting of `@encodedName("application/json", "NAME")`.
+ */
+export interface JsonSerializationOptions {
+  name: string;
+}
+
+/**
+ * For Xml serialization.
+ * The `name`/`itemsName` will come from explicit setting of `@encodedName("application/xml", "NAME")` or `@xml.Name("NAME")`.
+ * Other properties come from `@xml.attribute`, `@xml.ns`, `@xml.unwrapped`.
+ * The `itemsName` and `itemsNs` are used for array items.
+ */
+export interface XmlSerializationOptions {
+  name: string;
+  attribute?: boolean;
+  ns?: {
+    namespace: string;
+    prefix: string;
+  };
+  unwrapped?: boolean;
+
+  itemsName?: string;
+  itemsNs?: {
+    namespace: string;
+    prefix: string;
+  };
+}
+
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   kind: "endpoint";
   urlEncode: boolean;
   onClient: true;
-  serializedName?: string;
   type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
 }
 
@@ -434,6 +470,7 @@ export type SdkModelPropertyType =
   | SdkCookieParameter;
 
 export interface MultipartOptions {
+  name: string;
   // whether this part is for file
   isFilePart: boolean;
   // whether this part is multi in request payload
@@ -449,11 +486,18 @@ export interface MultipartOptions {
 export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
+  /**
+   * @deprecated This property is deprecated. Use `serializationOptions.xxx.name` instead.
+   */
   serializedName: string;
-  /*
-    @deprecated This property is deprecated. Use `.multipartOptions?.isFilePart` instead.
-  */
+  serializationOptions: SerializationOptions;
+  /**
+   * @deprecated This property is deprecated. Use `multipartOptions?.isFilePart` instead.
+   */
   isMultipartFileInput: boolean;
+  /**
+   * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
+   */
   multipartOptions?: MultipartOptions;
   visibility?: Visibility[];
   flatten: boolean;

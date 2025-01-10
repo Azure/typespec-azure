@@ -614,8 +614,11 @@ function getSdkModelExample(
       const model = modelQueue.pop()!;
       for (let property of model.properties) {
         property = property as SdkBodyModelPropertyType;
-        if (!properties.has(property.serializedName)) {
-          properties.set(property.serializedName, property);
+        if (
+          property.serializationOptions.json?.name &&
+          !properties.has(property.serializationOptions.json?.name)
+        ) {
+          properties.set(property.serializationOptions.json?.name, property);
         }
       }
       if (model.additionalProperties && additionalPropertiesType === undefined) {
