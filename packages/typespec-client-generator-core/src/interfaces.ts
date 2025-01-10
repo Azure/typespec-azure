@@ -430,7 +430,7 @@ export interface JsonSerializationOptions {
  * The `itemsName` and `itemsNs` are used for array items.
  */
 export interface XmlSerializationOptions {
-  name?: string;
+  name: string;
   attribute?: boolean;
   ns?: {
     namespace: string;
