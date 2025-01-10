@@ -542,4 +542,48 @@ describe("typespec-client-generator-core: serialization options", () => {
     strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, false);
     strictEqual(model.properties[0].serializationOptions.xml?.itemsName, "XmlTag");
   });
+
+  it("orphan model with xml serialization", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      @encodedName("application/xml", "XmlTag")
+      model Tag {
+        @Xml.name("XmlName")
+        name: string;
+      }
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlTag");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "XmlName");
+  });
+
+  it("orphan model with json serialization", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      model Tag {
+        @encodedName("application/json", "rename")
+        name: string;
+      }
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.json?.name, "rename");
+  });
 });

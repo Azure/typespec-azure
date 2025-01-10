@@ -1170,9 +1170,11 @@ describe("typespec-client-generator-core: model types", () => {
         op operation(@body input: Salmon): Salmon;
       `);
     const models = runner.context.sdkPackage.models;
-    strictEqual(models.length, 5);
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
-
+    strictEqual(models.length, 6);
+    for (const model of models) {
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    }
+    
     const fish = models.find((x) => x.name === "Fish");
     strictEqual(fish?.serializationOptions.json?.name, "Fish");
     strictEqual(fish?.properties[0].kind, "property");
@@ -1181,6 +1183,13 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(fish?.properties[1].serializationOptions.json?.name, "age");
     strictEqual(fish?.properties[2].kind, "property");
     strictEqual(fish?.properties[2].serializationOptions.json?.name, "food");
+
+    const shark = models.find((x) => x.name === "Shark");
+    strictEqual(shark?.serializationOptions.json?.name, "Shark");
+    strictEqual(shark?.properties[0].kind, "property");
+    strictEqual(shark?.properties[0].serializationOptions.json?.name, "sharktype");
+    strictEqual(shark?.properties[1].kind, "property");
+    strictEqual(shark?.properties[1].serializationOptions.json?.name, "kind");
 
     const food = models.find((x) => x.name === "Food");
     strictEqual(food?.serializationOptions.json?.name, "Food");
