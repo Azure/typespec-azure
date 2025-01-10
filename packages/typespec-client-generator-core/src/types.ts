@@ -1257,7 +1257,7 @@ function updateMultiPartInfo(
     // after https://github.com/microsoft/typespec/issues/3779 fixed, could use httpOperationPart.name directly
     const httpPart = getHttpPart(context.program, type.type);
     if (httpPart?.options?.name) {
-      base.serializedName = httpPart?.options?.name;
+      base.serializedName = httpPart?.options?.name; // eslint-disable-line @typescript-eslint/no-deprecated
       base.serializationOptions.multipart.name = httpPart?.options?.name;
     }
   } else {
@@ -1288,7 +1288,7 @@ function updateMultiPartInfo(
     }
   }
   if (base.serializationOptions.multipart !== undefined) {
-    base.isMultipartFileInput = base.serializationOptions.multipart.isFilePart;
+    base.isMultipartFileInput = base.serializationOptions.multipart.isFilePart; // eslint-disable-line @typescript-eslint/no-deprecated
   }
 
   return diagnostics.wrap(undefined);
@@ -1332,7 +1332,7 @@ export function getSdkModelPropertyType(
       if (type.model === httpBodyType) {
         // only try to add multipartOptions for property of body
         diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
-        result.multipartOptions = result.serializationOptions.multipart;
+        result.multipartOptions = result.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
       }
     }
   }
