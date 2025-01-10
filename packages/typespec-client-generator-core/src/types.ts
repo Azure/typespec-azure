@@ -1694,6 +1694,8 @@ function updateTypesFromOperation(
     diagnostics.pipe(updateUsageOrAccess(context, usage, sdkType));
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+    // add serialization options to model type, and always set to application/json for lro
+    updateSerializationOptions(context, sdkType, ["application/json"]);
   }
 }
 
