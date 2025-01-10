@@ -1040,8 +1040,9 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 4);
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
-    ok(!(models[0].usage & UsageFlags.Error));
+    for (const model of models) {
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    }
 
     const shark = models.find((x) => x.name === "Shark");
     strictEqual(shark?.serializationOptions.json?.name, "Shark");
@@ -1087,9 +1088,6 @@ describe("typespec-client-generator-core: model types", () => {
 
         model Salmon extends Fish {
           kind: "salmon";
-          friends?: Fish[];
-          hate?: Record<Fish>;
-          partner?: Fish;
         }
 
         model SawShark extends Shark {
@@ -1103,7 +1101,9 @@ describe("typespec-client-generator-core: model types", () => {
       `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
-    strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    for (const model of models) {
+      strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    }
 
     const fish = models.find((x) => x.name === "Fish");
     strictEqual(fish?.serializationOptions.json?.name, "Fish");
@@ -1174,7 +1174,7 @@ describe("typespec-client-generator-core: model types", () => {
     for (const model of models) {
       strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
     }
-    
+
     const fish = models.find((x) => x.name === "Fish");
     strictEqual(fish?.serializationOptions.json?.name, "Fish");
     strictEqual(fish?.properties[0].kind, "property");
