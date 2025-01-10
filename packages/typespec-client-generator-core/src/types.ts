@@ -1920,7 +1920,9 @@ function updateSerializationOptions(
     return;
   }
 
-  setSerializationOptions(context, type, contentTypes);
+  const hasUpdate = setSerializationOptions(context, type, contentTypes);
+  // only when model has serialization options update, we need to do propagation
+  if (!hasUpdate) return;
   for (const property of type.properties) {
     if (property.kind === "property") {
       setSerializationOptions(context, property, contentTypes);
@@ -1959,9 +1961,11 @@ function setSerializationOptions(
   context: TCGCContext,
   type: SdkModelType | SdkBodyModelPropertyType,
   contentTypes: string[],
-) {
+): boolean {
+  let hasUpdate = false;
   for (const contentType of contentTypes ?? []) {
     if (isJsonContentType(contentType) && !type.serializationOptions.json) {
+      hasUpdate = true;
       type.serializationOptions.json = {
         name:
           type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
@@ -1971,6 +1975,7 @@ function setSerializationOptions(
     }
 
     if (isXmlContentType(contentType) && !type.serializationOptions.xml) {
+      hasUpdate = true;
       type.serializationOptions.xml = {
         name:
           type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
@@ -2011,4 +2016,5 @@ function setSerializationOptions(
       }
     }
   }
+  return hasUpdate;
 }
