@@ -30,6 +30,9 @@ importers:
       '@types/node':
         specifier: ~22.7.9
         version: 22.7.9
+      '@vitest/coverage-v8':
+        specifier: ^2.1.5
+        version: 2.1.8(vitest@2.1.8(@types/node@22.7.9)(happy-dom@15.11.0)(jsdom@25.0.1)(terser@5.34.1))
       c8:
         specifier: ^10.1.2
         version: 10.1.2
@@ -4454,10 +4457,6 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
-
-  '@eslint-community/regexpp@4.11.1':
-    resolution: {integrity: sha512-m4DVN9ZqskZoLU5GlWZadwDnYo3vAEydiUayB9widCl9ffWx2IvPnp6n3on5rJmziJSw9Bv+Z3ChDVdMwXCY8Q==}
-    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
   '@eslint-community/regexpp@4.12.1':
     resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
@@ -14050,8 +14049,6 @@ snapshots:
       eslint: 9.16.0(jiti@2.3.3)
       eslint-visitor-keys: 3.4.3
 
-  '@eslint-community/regexpp@4.11.1': {}
-
   '@eslint-community/regexpp@4.12.1': {}
 
   '@eslint/config-array@0.19.1':
@@ -15416,8 +15413,8 @@ snapshots:
 
   '@microsoft/api-extractor-model@7.29.6(@types/node@22.7.9)':
     dependencies:
-      '@microsoft/tsdoc': 0.15.0
-      '@microsoft/tsdoc-config': 0.17.0
+      '@microsoft/tsdoc': 0.15.1
+      '@microsoft/tsdoc-config': 0.17.1
       '@rushstack/node-core-library': 5.7.0(@types/node@22.7.9)
     transitivePeerDependencies:
       - '@types/node'
@@ -16376,7 +16373,7 @@ snapshots:
       '@storybook/core': 8.3.5
       '@storybook/csf': 0.1.11
       '@types/cross-spawn': 6.0.6
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.6
       globby: 14.0.2
       jscodeshift: 0.15.2(@babel/preset-env@7.25.8(@babel/core@7.25.2))
       lodash: 4.17.21
@@ -16818,7 +16815,7 @@ snapshots:
 
   '@typescript-eslint/eslint-plugin@8.17.0(@typescript-eslint/parser@8.17.0(eslint@9.16.0(jiti@2.3.3))(typescript@5.6.3))(eslint@9.16.0(jiti@2.3.3))(typescript@5.6.3)':
     dependencies:
-      '@eslint-community/regexpp': 4.11.1
+      '@eslint-community/regexpp': 4.12.1
       '@typescript-eslint/parser': 8.17.0(eslint@9.16.0(jiti@2.3.3))(typescript@5.6.3)
       '@typescript-eslint/scope-manager': 8.17.0
       '@typescript-eslint/type-utils': 8.17.0(eslint@9.16.0(jiti@2.3.3))(typescript@5.6.3)
@@ -19124,7 +19121,7 @@ snapshots:
 
   execa@5.1.1:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.6
       get-stream: 6.0.1
       human-signals: 2.1.0
       is-stream: 2.0.1
@@ -19136,7 +19133,7 @@ snapshots:
 
   execa@8.0.1:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.6
       get-stream: 8.0.1
       human-signals: 5.0.0
       is-stream: 3.0.0

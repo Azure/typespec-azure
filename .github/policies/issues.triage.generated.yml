@@ -29,6 +29,8 @@ configuration:
                     label: eng
                 - hasLabel:
                     label: ide
+                - hasLabel:
+                    label: cli/psh
         then:
           - addLabel:
               label: needs-area
@@ -51,6 +53,8 @@ configuration:
                   label: eng
               - labelAdded:
                   label: ide
+              - labelAdded:
+                  label: cli/psh
         then:
           - removeLabel:
               label: needs-area
@@ -74,6 +78,8 @@ configuration:
                   label: eng
               - labelRemoved:
                   label: ide
+              - labelRemoved:
+                  label: cli/psh
           - not:
               or:
                 - hasLabel:
@@ -88,6 +94,8 @@ configuration:
                     label: eng
                 - hasLabel:
                     label: ide
+                - hasLabel:
+                    label: cli/psh
         then:
           - addLabel:
               label: needs-area
