@@ -11,6 +11,7 @@ export type GeneratorNames =
   | "@azure-tools/typespec-python"
   | "@azure-tools/typespec-go"
   | "@azure-tools/typespec-csharp"
+  | "@azure-typespec/http-client-csharp"
   | "@azure-tools/typespec-ts-rlc"
   | "@azure-tools/typespec-ts-modular"
   | "@azure-tools/typespec-java"
@@ -22,6 +23,7 @@ const generatorNames: GeneratorNames[] = [
   "@azure-tools/typespec-python",
   "@azure-tools/typespec-go",
   "@azure-tools/typespec-csharp",
+  "@azure-typespec/http-client-csharp",
   "@azure-tools/typespec-ts-rlc",
   "@azure-tools/typespec-ts-modular",
   "@azure-tools/typespec-java",
