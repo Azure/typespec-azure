@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { UsageFlags } from "../../src/interfaces.js";
+import { SdkModelType, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreTspModel } from "../../src/internal-utils.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
@@ -1010,7 +1010,7 @@ describe("typespec-client-generator-core: model types", () => {
     );
   });
 
-  it("usage propagation", async () => {
+  it("propagation", async () => {
     await runner.compileWithBuiltInService(`
         @discriminator("kind")
         model Fish {
@@ -1042,9 +1042,38 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models.length, 4);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
     ok(!(models[0].usage & UsageFlags.Error));
+
+    const shark = models.find((x) => x.name === "Shark");
+    strictEqual(shark?.serializationOptions.json?.name, "Shark");
+    strictEqual(shark?.properties[0].kind, "property");
+    strictEqual(shark?.properties[0].serializationOptions.json?.name, "sharktype");
+    strictEqual(shark?.properties[1].kind, "property");
+    strictEqual(shark?.properties[1].serializationOptions.json?.name, "kind");
+
+    const fish = models.find((x) => x.name === "Fish");
+    strictEqual(fish?.serializationOptions.json?.name, "Fish");
+    strictEqual(fish?.properties[0].kind, "property");
+    strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
+
+    const salmon = Array.from(runner.context.referencedTypeMap?.values() ?? []).find(
+      (x) => x.kind === "model" && x.name === "Salmon",
+    ) as SdkModelType;
+    strictEqual(salmon?.serializationOptions.json, undefined);
+    strictEqual(salmon?.properties[0].kind, "property");
+    strictEqual(salmon?.properties[0].serializationOptions.json, undefined);
+
+    const sawShark = models.find((x) => x.name === "SawShark");
+    strictEqual(sawShark?.serializationOptions.json?.name, "SawShark");
+    strictEqual(sawShark?.properties[0].kind, "property");
+    strictEqual(sawShark?.properties[0].serializationOptions.json?.name, "sharktype");
+
+    const goblinShark = models.find((x) => x.name === "GoblinShark");
+    strictEqual(goblinShark?.serializationOptions.json?.name, "GoblinShark");
+    strictEqual(goblinShark?.properties[0].kind, "property");
+    strictEqual(goblinShark?.properties[0].serializationOptions.json?.name, "sharktype");
   });
 
-  it("usage propagation from subtype", async () => {
+  it("propagation from subtype", async () => {
     await runner.compileWithBuiltInService(`
         @discriminator("kind")
         model Fish {
@@ -1075,9 +1104,40 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+
+    const fish = models.find((x) => x.name === "Fish");
+    strictEqual(fish?.serializationOptions.json?.name, "Fish");
+    strictEqual(fish?.properties[0].kind, "property");
+    strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
+
+    const salmon = models.find((x) => x.name === "Salmon");
+    strictEqual(salmon?.serializationOptions.json?.name, "Salmon");
+    strictEqual(fish?.properties[0].kind, "property");
+    strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
+
+    const types = Array.from(runner.context.referencedTypeMap?.values() ?? []);
+
+    const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
+    strictEqual(shark?.serializationOptions.json, undefined);
+    strictEqual(shark?.properties[0].kind, "property");
+    strictEqual(shark?.properties[0].serializationOptions.json, undefined);
+    strictEqual(shark?.properties[1].kind, "property");
+    strictEqual(shark?.properties[1].serializationOptions.json, undefined);
+
+    const sawShark = types.find((x) => x.kind === "model" && x.name === "SawShark") as SdkModelType;
+    strictEqual(sawShark?.serializationOptions.json, undefined);
+    strictEqual(sawShark?.properties[0].kind, "property");
+    strictEqual(sawShark?.properties[0].serializationOptions.json, undefined);
+
+    const goblinShark = types.find(
+      (x) => x.kind === "model" && x.name === "GoblinShark",
+    ) as SdkModelType;
+    strictEqual(goblinShark?.serializationOptions.json, undefined);
+    strictEqual(goblinShark?.properties[0].kind, "property");
+    strictEqual(goblinShark?.properties[0].serializationOptions.json, undefined);
   });
 
-  it("usage propagation from subtype of type with another discriminated property", async () => {
+  it("propagation from subtype of type with another discriminated property", async () => {
     await runner.compileWithBuiltInService(`
         @discriminator("kind")
         model Fish {
@@ -1112,6 +1172,37 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 5);
     strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+
+    const fish = models.find((x) => x.name === "Fish");
+    strictEqual(fish?.serializationOptions.json?.name, "Fish");
+    strictEqual(fish?.properties[0].kind, "property");
+    strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
+    strictEqual(fish?.properties[1].kind, "property");
+    strictEqual(fish?.properties[1].serializationOptions.json?.name, "age");
+    strictEqual(fish?.properties[2].kind, "property");
+    strictEqual(fish?.properties[2].serializationOptions.json?.name, "food");
+
+    const food = models.find((x) => x.name === "Food");
+    strictEqual(food?.serializationOptions.json?.name, "Food");
+    strictEqual(food?.properties[0].kind, "property");
+    strictEqual(food?.properties[0].serializationOptions.json?.name, "kind");
+
+    const salmon = models.find((x) => x.name === "Salmon");
+    strictEqual(salmon?.serializationOptions.json?.name, "Salmon");
+    strictEqual(salmon?.properties[0].kind, "property");
+    strictEqual(salmon?.properties[0].serializationOptions.json?.name, "kind");
+    strictEqual(salmon?.properties[1].kind, "property");
+    strictEqual(salmon?.properties[1].serializationOptions.json?.name, "friends");
+
+    const fruit = models.find((x) => x.name === "Fruit");
+    strictEqual(fruit?.serializationOptions.json?.name, "Fruit");
+    strictEqual(fruit?.properties[0].kind, "property");
+    strictEqual(fruit?.properties[0].serializationOptions.json?.name, "kind");
+
+    const meet = models.find((x) => x.name === "Meet");
+    strictEqual(meet?.serializationOptions.json?.name, "Meet");
+    strictEqual(meet?.properties[0].kind, "property");
+    strictEqual(meet?.properties[0].serializationOptions.json?.name, "kind");
   });
 
   it("unnamed model", async () => {

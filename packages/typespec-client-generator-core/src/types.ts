@@ -1380,7 +1380,7 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
   context.referencedTypeMap.set(type, sdkType);
 }
 
-interface ModelUsageOptions {
+interface PropagationOptions {
   seenTypes?: Set<SdkType>;
   propagation?: boolean;
   skipFirst?: boolean;
@@ -1393,13 +1393,13 @@ function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
   type?: SdkType,
-  options?: ModelUsageOptions,
+  options?: PropagationOptions,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   options = options ?? {};
+  options.seenTypes = options.seenTypes ?? new Set<SdkType>();
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
-  options.seenTypes = options.seenTypes ?? new Set<SdkType>();
 
   if (!type) return diagnostics.wrap(undefined);
   if (options.seenTypes.has(type)) {
@@ -1890,33 +1890,34 @@ function updateSerializationOptions(
   context: TCGCContext,
   type: SdkType,
   contentTypes: string[],
-  seenTypes?: Set<SdkType>,
-  ignoreSubTypeStack?: boolean[],
+  options?: PropagationOptions,
 ) {
-  seenTypes = seenTypes ?? new Set<SdkType>();
-  ignoreSubTypeStack = ignoreSubTypeStack ?? [];
+  options = options ?? {};
+  options.seenTypes = options.seenTypes ?? new Set<SdkType>();
+  options.propagation = options?.propagation ?? true;
+  options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
 
-  if (seenTypes.has(type)) {
+  if (options.seenTypes.has(type)) {
     return; // avoid circular references
   }
 
   if (type.kind === "array" || type.kind === "dict") {
-    updateSerializationOptions(context, type.valueType, contentTypes, seenTypes);
+    updateSerializationOptions(context, type.valueType, contentTypes, options);
     return;
   }
 
   if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable") return;
 
-  seenTypes.add(type);
+  options.seenTypes.add(type);
 
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
-      updateSerializationOptions(context, unionType, contentTypes, seenTypes);
+      updateSerializationOptions(context, unionType, contentTypes, options);
     }
     return;
   }
   if (type.kind === "nullable") {
-    updateSerializationOptions(context, type.type, contentTypes, seenTypes);
+    updateSerializationOptions(context, type.type, contentTypes, options);
     return;
   }
 
@@ -1930,29 +1931,29 @@ function updateSerializationOptions(
   }
 
   if (type.baseModel) {
-    ignoreSubTypeStack.push(true);
-    updateSerializationOptions(context, type.baseModel, contentTypes, seenTypes);
-    ignoreSubTypeStack.pop();
+    options.ignoreSubTypeStack.push(true);
+    updateSerializationOptions(context, type.baseModel, contentTypes, options);
+    options.ignoreSubTypeStack.pop();
   }
   if (
     type.discriminatedSubtypes &&
-    (ignoreSubTypeStack.length === 0 || !ignoreSubTypeStack.at(-1))
+    (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1))
   ) {
     for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
-      ignoreSubTypeStack.push(false);
-      updateSerializationOptions(context, discriminatedSubtype, contentTypes, seenTypes);
-      ignoreSubTypeStack.pop();
+      options.ignoreSubTypeStack.push(false);
+      updateSerializationOptions(context, discriminatedSubtype, contentTypes, options);
+      options.ignoreSubTypeStack.pop();
     }
   }
   if (type.additionalProperties) {
-    ignoreSubTypeStack.push(false);
-    updateSerializationOptions(context, type.additionalProperties, contentTypes, seenTypes);
-    ignoreSubTypeStack.pop();
+    options.ignoreSubTypeStack.push(false);
+    updateSerializationOptions(context, type.additionalProperties, contentTypes, options);
+    options.ignoreSubTypeStack.pop();
   }
   for (const property of type.properties) {
-    ignoreSubTypeStack.push(false);
-    updateSerializationOptions(context, property.type, contentTypes, seenTypes);
-    ignoreSubTypeStack.pop();
+    options.ignoreSubTypeStack.push(false);
+    updateSerializationOptions(context, property.type, contentTypes, options);
+    options.ignoreSubTypeStack.pop();
   }
   return;
 }
