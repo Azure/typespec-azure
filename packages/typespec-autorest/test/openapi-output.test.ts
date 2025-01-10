@@ -924,11 +924,11 @@ describe("typespec-azure: identifiers decorator", () => {
         }
         
         model Dog {
-          bread: string;
+          breed: string;
         }
         
         model PetList {
-          @identifiers(["dogs/bread"])
+          @identifiers(["dogs/breed"])
           pets: Pet[]
         }
         @route("/Pets")
@@ -936,7 +936,7 @@ describe("typespec-azure: identifiers decorator", () => {
       `,
     );
     ok(oapi.paths["/Pets"].get);
-    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/bread"]);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/breed"]);
   });
   it("supports inner properties for keys", async () => {
     const oapi = await openApiFor(
@@ -948,7 +948,7 @@ describe("typespec-azure: identifiers decorator", () => {
          
         model Dog {
           @key
-          bread: string;
+          breed: string;
         }
         
         model Cat
@@ -972,7 +972,7 @@ describe("typespec-azure: identifiers decorator", () => {
     );
     ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], [
-      "dogs/bread",
+      "dogs/breed",
       "cats/features/color",
     ]);
   });
