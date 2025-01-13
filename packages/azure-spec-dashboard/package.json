@@ -2,7 +2,7 @@
   "name": "@azure-tools/azure-spec-dashboard",
   "private": true,
   "version": "0.1.0-alpha.0",
-  "description": "Azure Spec Dashboard website",
+  "description": "Azure Spector Dashboard website",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
