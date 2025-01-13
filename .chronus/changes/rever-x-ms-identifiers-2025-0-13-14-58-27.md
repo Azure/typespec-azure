@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-"Reverting change created by poull reuqest #1983"
+"Reverting change created by pull request #1983"
