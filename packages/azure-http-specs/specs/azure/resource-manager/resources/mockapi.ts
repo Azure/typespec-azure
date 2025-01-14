@@ -4,6 +4,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 const SUBSCRIPTION_ID_EXPECTED = "00000000-0000-0000-0000-000000000000";
 const RESOURCE_GROUP_EXPECTED = "test-rg";
+const LOCATION_EXPECTED = "eastus";
 const validTopLevelResource = {
   id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`,
   name: "top",
@@ -49,6 +50,24 @@ const validSingletonResource = {
   properties: {
     provisioningState: "Succeeded",
     description: "valid",
+  },
+  systemData: {
+    createdBy: "AzureSDK",
+    createdByType: "User",
+    createdAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedBy: "AzureSDK",
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedByType: "User",
+  },
+};
+
+const validLocationResource = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.Resources/locations/${LOCATION_EXPECTED}/locationResources/resource`,
+  name: "resource",
+  type: "Azure.ResourceManager.Resources/locationResources",
+  properties: {
+    description: "valid",
+    provisioningState: "Succeeded",
   },
   systemData: {
     createdBy: "AzureSDK",
@@ -553,6 +572,116 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByParent = pas
     kind: "MockApiDefinition",
   },
 ]);
+
+// location resource
+Scenarios.Azure_ResourceManager_Resources_LocationResources_get = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
+  method: "get",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      location: LOCATION_EXPECTED,
+      locationResourceName: "resource",
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json(validLocationResource),
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_ResourceManager_Resources_LocationResources_createOrUpdate = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
+  method: "put",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      location: LOCATION_EXPECTED,
+      locationResourceName: "resource",
+      "api-version": "2023-12-01-preview",
+    },
+    body: {
+      properties: {
+        description: "valid",
+      },
+    },
+  },
+  response: {
+    status: 200,
+    body: json(validLocationResource),
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_ResourceManager_Resources_LocationResources_update = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
+  method: "patch",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      location: LOCATION_EXPECTED,
+      locationResourceName: "resource",
+      "api-version": "2023-12-01-preview",
+    },
+    body: {
+      properties: {
+        description: "valid2",
+      },
+    },
+    headers: {
+      "Content-Type": "application/json",
+    },
+  },
+  response: {
+    status: 200,
+    body: json({
+      ...validLocationResource,
+      properties: {
+        provisioningState: "Succeeded",
+        description: "valid2",
+      },
+    }),
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_ResourceManager_Resources_LocationResources_delete = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
+  method: "delete",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      location: LOCATION_EXPECTED,
+      locationResourceName: "resource",
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 204,
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_ResourceManager_Resources_LocationResources_listByLocation = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources",
+  method: "get",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      location: LOCATION_EXPECTED,
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json({
+      value: [validLocationResource],
+    }),
+  },
+  kind: "MockApiDefinition",
+});
 
 // singleton tracked resource
 Scenarios.Azure_ResourceManager_Resources_Singleton_getByResourceGroup = passOnSuccess({

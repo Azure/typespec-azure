@@ -253,4 +253,25 @@ describe("typespec-client-generator-core: load examples", () => {
     ok(operation);
     strictEqual(operation.examples?.length, 1);
   });
+
+  it("ensure ordering for multiple examples", async () => {
+    await runner.host.addRealTypeSpecFile("./examples/a_b_c.json", `${__dirname}/load/a_b_c.json`);
+    await runner.host.addRealTypeSpecFile("./examples/a_b.json", `${__dirname}/load/a_b.json`);
+    await runner.host.addRealTypeSpecFile("./examples/a.json", `${__dirname}/load/a.json`);
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        op get(): string;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 3);
+    strictEqual(operation.examples![0].filePath, "a.json");
+    strictEqual(operation.examples![1].filePath, "a_b.json");
+    strictEqual(operation.examples![2].filePath, "a_b_c.json");
+  });
 });
