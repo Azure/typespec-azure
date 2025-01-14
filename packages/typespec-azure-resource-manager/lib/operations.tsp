@@ -707,14 +707,15 @@ op checkLocalNameAvailability<
 @action
 @armResourceCollectionAction
 op ArmProviderActionSync<
-  Request extends {} | void = void,
+  Request extends {},
   Response extends {} | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
-  ...ProviderNamespace<Scope>,
+  ...Scope,
+  ...ProviderNamespace<Request>,
   ...Parameters,
 
   /** The request body */
@@ -734,7 +735,7 @@ op ArmProviderActionSync<
 @action
 @armResourceCollectionAction
 op ArmProviderActionAsync<
-  Request extends {} | void = void,
+  Request extends {},
   Response extends {} | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
@@ -747,7 +748,8 @@ op ArmProviderActionAsync<
   Error extends {} = ErrorResponse
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
-  ...ProviderNamespace<Scope>,
+  ...Scope,
+  ...ProviderNamespace<Request>,
   ...Parameters,
 
   /** The request body */

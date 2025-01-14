@@ -252,20 +252,20 @@ describe("typespec-azure-resource-manager: generates provider paths correctly", 
         @armResourceRead(VmSize)
         @test
         @autoRoute
-        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+        getVmsSizes is ArmProviderActionSync<{}, VmSize, SubscriptionActionScope>;
         
         @get
         @armResourceRead(VmSize)
         @test
         @autoRoute
-        getVmsSizesAtLocation is ArmProviderActionSync<void, VmSize, SubscriptionActionScope, Parameters= LocationParameter>;
+        getVmsSizesAtLocation is ArmProviderActionSync<{}, VmSize, SubscriptionActionScope, Parameters= LocationParameter>;
         
         @get
         @armResourceRead(VmSize)
         @test
         @autoRoute
         @action("logAnalytics/apiAccess/getThrottledRequests")
-        getThrottledRequests is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+        getThrottledRequests is ArmProviderActionSync<{}, VmSize, SubscriptionActionScope>;
       }
       `,
     );
@@ -283,6 +283,53 @@ describe("typespec-azure-resource-manager: generates provider paths correctly", 
     strictEqual(
       getHttpOperation(runner.program, results.getThrottledRequests as Operation)[0].path,
       "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/logAnalytics/apiAccess/getThrottledRequests",
+    );
+  });
+
+  it("Generates provider paths correctly when not extending from Azure.ResourceManager.Operations", async () => {
+    const [results, _] = await runner.compileAndDiagnose(
+      `
+    @armProviderNamespace
+    @service({title: "Microsoft.Foo"})
+    @versioned(Versions)
+    namespace Microsoft.Contoso;
+    enum Versions {
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        "2021-10-01-preview",
+      }
+
+      @doc("The VM Size")
+      model VmSize {
+        @doc("number of cpus ")
+        cpus: int32;
+      }
+
+      @armResourceOperations
+      interface ProviderOperations {
+        @get
+        @armResourceRead(VmSize)
+        @test
+        @autoRoute
+        getVmsSizes is ArmProviderActionAsync<{}, VmSize, SubscriptionActionScope>;
+        
+        @get
+        @armResourceRead(VmSize)
+        @test
+        @autoRoute
+        getVmsSizesAtLocation is ArmProviderActionSync<{}, VmSize, SubscriptionActionScope, Parameters= LocationParameter>;
+      }
+      `,
+    );
+
+    strictEqual(
+      getHttpOperation(runner.program, results.getVmsSizes as Operation)[0].path,
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/getVmsSizes",
+    );
+
+    strictEqual(
+      getHttpOperation(runner.program, results.getVmsSizesAtLocation as Operation)[0].path,
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/locations/{location}/getVmsSizesAtLocation",
     );
   });
 });
