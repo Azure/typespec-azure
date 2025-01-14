@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Contoso Widget Manager
-  version: 2022-08-31
+  version: '2022-08-31'
 tags: []
 paths:
   /widgets:
@@ -482,7 +482,7 @@ components:
     Versions:
       type: string
       enum:
-        - 2022-08-31
+        - '2022-08-31'
       description: The Contoso Widget Manager service version.
     Widget:
       type: object
