@@ -1,10 +1,9 @@
-import {
+import type {
   DecoratorContext,
   EnumMember,
   EnumValue,
   Interface,
   Model,
-  ModelProperty,
   Namespace,
   Operation,
   Type,
@@ -267,12 +266,6 @@ export type ResourceBaseTypeDecorator = (
   baseType: Type,
 ) => void;
 
-export type IdentifiersDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-  properties: string[],
-) => void;
-
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
@@ -295,7 +288,6 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
-  identifiers: IdentifiersDecorator;
 };
 
 export type AzureResourceManagerLegacyDecorators = {
