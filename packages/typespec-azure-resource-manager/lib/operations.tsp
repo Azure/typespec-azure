@@ -707,7 +707,7 @@ op checkLocalNameAvailability<
 @action
 @armResourceCollectionAction
 op ArmProviderActionSync<
-  Request extends {},
+  Request extends {} = {},
   Response extends {} | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
@@ -735,7 +735,7 @@ op ArmProviderActionSync<
 @action
 @armResourceCollectionAction
 op ArmProviderActionAsync<
-  Request extends {},
+  Request extends {} = {},
   Response extends {} | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},

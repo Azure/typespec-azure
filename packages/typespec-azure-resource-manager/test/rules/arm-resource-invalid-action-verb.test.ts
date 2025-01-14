@@ -114,7 +114,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       interface ProviderOperations {
         @get
         @armResourceList(VmSize)
-        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+        getVmsSizes is ArmProviderActionSync<{}, VmSize, SubscriptionActionScope>;
       }
     `,
       )
@@ -147,7 +147,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       interface ProviderOperations {
         @post
         @armResourceList(VmSize)
-        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+        getVmsSizes is ArmProviderActionSync<{}, VmSize, SubscriptionActionScope>;
       }
     `,
       )
@@ -368,7 +368,7 @@ describe("typespec-azure-resource-manager: generates tenant paths correctly", ()
         @test
         @autoRoute
         @armResourceRead(CoresSize)
-        getCores is ArmProviderActionSync<void, CoresSize, TenantActionScope>;
+        getCores is ArmProviderActionSync<{}, CoresSize, TenantActionScope>;
       }
       `,
     );
