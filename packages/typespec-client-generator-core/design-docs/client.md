@@ -220,7 +220,7 @@ clients:
           onClient: true
       name: PetStoreClientOptions
       isGeneratedName: true
-      initializedBy: 2
+      initializedBy: individually
     subClients:
       - kind: client
         name: Cats
@@ -235,7 +235,7 @@ clients:
               onClient: true
           name: CatsOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
       - kind: client
         name: Dogs
         parent: *a1
@@ -249,7 +249,7 @@ clients:
               onClient: true
           name: DogsOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
   - &a2
     kind: client
     name: ToyStoreClient
@@ -262,7 +262,7 @@ clients:
           onClient: true
       name: ToyStoreClientOptions
       isGeneratedName: true
-      initializedBy: 2
+      initializedBy: individually
     subClients:
       - kind: client
         name: Cars
@@ -278,7 +278,7 @@ clients:
               onClient: true
           name: CarsOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
       - kind: client
         name: Dolls
         parent: *a2
@@ -293,7 +293,7 @@ clients:
               onClient: true
           name: DollsOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
 ```
 
 For above example 2, you will get TCGC types like this:
@@ -312,7 +312,7 @@ clients:
           onClient: true
       name: DogsClientOptions
       isGeneratedName: true
-      initializedBy: 2
+      initializedBy: individually
     subClients:
       - kind: client
         name: Feed
@@ -327,7 +327,7 @@ clients:
               onClient: true
           name: FeedOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
       - kind: client
         name: Pet
         parent: *a1
@@ -341,7 +341,7 @@ clients:
               onClient: true
           name: PetOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
   - &a2
     kind: client
     name: CatsClient
@@ -354,7 +354,7 @@ clients:
           onClient: true
       name: CatsClientOptions
       isGeneratedName: true
-      initializedBy: 2
+      initializedBy: individually
     subClients:
       - kind: client
         name: Feed
@@ -370,7 +370,7 @@ clients:
               onClient: true
           name: FeedOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
       - kind: client
         name: Pet
         parent: *a2
@@ -385,7 +385,7 @@ clients:
               onClient: true
           name: PetOptions
           isGeneratedName: true
-          initializedBy: 1
+          initializedBy: parent
 ```
 
 ### Customization for client initialization
@@ -451,7 +451,7 @@ clients:
               name: endpoint
               isGeneratedName: true
               onClient: true
-          initializedBy: 3
+          initializedBy: parent | individually
         parent: *a3
     initialization:
       kind: model
@@ -461,7 +461,7 @@ clients:
           isGeneratedName: true
           onClient: true
       name: MyServiceClientOptions
-      initializedBy: 2
+      initializedBy: individually
 ```
 
 ## Usage for all scenarios
