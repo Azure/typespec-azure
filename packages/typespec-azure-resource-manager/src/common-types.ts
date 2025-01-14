@@ -21,6 +21,7 @@ import {
   getCommonTypeRecords,
 } from "./commontypes.private.decorators.js";
 import { createDiagnostic } from "./lib.js";
+import { CommonTypeDefinitionRecord } from "./operations.js";
 import { ArmStateKeys } from "./state.js";
 
 export interface ArmCommonTypeVersions {
@@ -246,4 +247,27 @@ function resolveCommonTypesVersion(
     selectedVersion,
     allVersions: allVersions ?? [],
   };
+}
+
+export function getCommonTypeDefinitionOpenAPIRef(
+  program: Program,
+  entity: Model | ModelProperty | Enum | Union,
+): string | undefined {
+  const record = getCommonTypeDefinitionRecords(program, entity);
+  return record ? `${record.path}#/${record.kind}/${record.name}` : undefined;
+}
+
+function getCommonTypeDefinitionRecords(
+  program: Program,
+  entity: Model | ModelProperty | Enum | Union,
+): CommonTypeDefinitionRecord {
+  return program.stateMap(ArmStateKeys.commonTypesDefinitions).get(entity) ?? {};
+}
+
+export function isCommonTypeDefinition(entity: Type): boolean {
+  const commonDecorators = ["$commonTypeDefinition"];
+  return (
+    isTypeSpecValueTypeOf(entity, ["Model", "ModelProperty", "Enum", "Union"]) &&
+    entity.decorators.some((d) => commonDecorators.includes(d.decorator.name))
+  );
 }

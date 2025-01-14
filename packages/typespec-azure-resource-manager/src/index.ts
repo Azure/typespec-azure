@@ -5,7 +5,9 @@ export {
   getArmCommonTypeOpenAPIRef,
   getArmCommonTypesVersion,
   getArmCommonTypesVersions,
+  getCommonTypeDefinitionOpenAPIRef,
   isArmCommonType,
+  isCommonTypeDefinition,
   type ArmCommonTypeVersions,
   type ArmCommonTypesResolutionOptions,
 } from "./common-types.js";

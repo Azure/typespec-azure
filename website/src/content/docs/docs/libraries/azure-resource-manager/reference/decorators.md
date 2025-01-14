@@ -250,6 +250,25 @@ Azure.ResourceManager common types.
 
 None
 
+### `@commonTypeDefinition` {#@Azure.ResourceManager.commonTypeDefinition}
+
+This decorator creates a reference to a common type definition, which can be used in other services
+
+```typespec
+@Azure.ResourceManager.commonTypeDefinition(relativePath: string)
+```
+
+#### Target
+
+The entity to create a common type definition for
+`Model`
+
+#### Parameters
+
+| Name         | Type     | Description                                     |
+| ------------ | -------- | ----------------------------------------------- |
+| relativePath | `string` | The relative path to the common type definition |
+
 ### `@extensionResource` {#@Azure.ResourceManager.extensionResource}
 
 `@extensionResource` marks an Azure Resource Manager resource model as an Extension resource.

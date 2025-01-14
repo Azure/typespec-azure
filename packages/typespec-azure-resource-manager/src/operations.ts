@@ -1,11 +1,14 @@
 import {
   $doc,
   DecoratorContext,
+  Enum,
   getFriendlyName,
   ignoreDiagnostics,
   Model,
+  ModelProperty,
   Operation,
   Program,
+  Union,
 } from "@typespec/compiler";
 import { getHttpOperation, HttpOperation } from "@typespec/http";
 import {
@@ -26,6 +29,7 @@ import {
   ArmResourceListDecorator,
   ArmResourceReadDecorator,
   ArmResourceUpdateDecorator,
+  CommonTypeDefinitionDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
@@ -354,4 +358,33 @@ export const $armResourceCollectionAction: ArmResourceCollectionActionDecorator 
 
 export function isArmCollectionAction(program: Program, target: Operation): boolean {
   return program.stateMap(ArmStateKeys.armResourceCollectionAction).get(target) === true;
+}
+
+export const $commonTypeDefinition: CommonTypeDefinitionDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  relativePath: { value: string },
+) => {
+  if (relativePath?.value) {
+    storeCommonTypeDefinition(context, entity, relativePath.value);
+  }
+};
+
+function storeCommonTypeDefinition(
+  context: DecoratorContext,
+  entity: Model | ModelProperty | Enum | Union,
+  relativePath: string,
+) {
+  const record: CommonTypeDefinitionRecord = {
+    name: entity.name!,
+    kind: "definitions",
+    path: relativePath,
+  };
+  context.program.stateMap(ArmStateKeys.commonTypesDefinitions).set(entity, record);
+}
+
+export interface CommonTypeDefinitionRecord {
+  name: string;
+  kind: string;
+  path: string;
 }

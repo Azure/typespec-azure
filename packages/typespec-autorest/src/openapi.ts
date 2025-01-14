@@ -12,8 +12,10 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
+  getCommonTypeDefinitionOpenAPIRef,
   isArmCommonType,
   isAzureResource,
+  isCommonTypeDefinition,
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
@@ -947,6 +949,21 @@ export async function getOpenAPIForService(
         version: context.version,
         service: context.service,
       });
+      if (ref) {
+        return {
+          $ref: expandRef(ref),
+        };
+      }
+    }
+
+    if (
+      isCommonTypeDefinition(type) &&
+      (type.kind === "Model" ||
+        type.kind === "ModelProperty" ||
+        type.kind === "Enum" ||
+        type.kind === "Union")
+    ) {
+      const ref = getCommonTypeDefinitionOpenAPIRef(program, type);
       if (ref) {
         return {
           $ref: expandRef(ref),

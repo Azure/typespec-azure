@@ -191,3 +191,10 @@ extern dec resourceBaseType(
   target: Model,
   baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension"
 );
+
+/**
+ * This decorator creates a reference to a common type definition, which can be used in other services
+ * @param entity The entity to create a common type definition for
+ * @param relativePath The relative path to the common type definition
+ */
+extern dec commonTypeDefinition(entity: Model, relativePath: string);

@@ -78,6 +78,7 @@ Available ruleSets:
 - [`@armResourceRead`](#@armresourceread)
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
+- [`@commonTypeDefinition`](#@commontypedefinition)
 - [`@extensionResource`](#@extensionresource)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
@@ -330,6 +331,25 @@ Azure.ResourceManager common types.
 ##### Parameters
 
 None
+
+#### `@commonTypeDefinition`
+
+This decorator creates a reference to a common type definition, which can be used in other services
+
+```typespec
+@Azure.ResourceManager.commonTypeDefinition(relativePath: string)
+```
+
+##### Target
+
+The entity to create a common type definition for
+`Model`
+
+##### Parameters
+
+| Name         | Type     | Description                                     |
+| ------------ | -------- | ----------------------------------------------- |
+| relativePath | `string` | The relative path to the common type definition |
 
 #### `@extensionResource`
 

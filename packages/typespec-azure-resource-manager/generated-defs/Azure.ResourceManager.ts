@@ -140,6 +140,15 @@ export type ResourceGroupResourceDecorator = (context: DecoratorContext, target:
 export type ExtensionResourceDecorator = (context: DecoratorContext, target: Model) => void;
 
 /**
+ * `@commonTypeDefinition` creates a reference to a definition so it can be used as a common definition across multiple projects.
+ */
+export type CommonTypeDefinitionDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  relativePath: { value: string },
+) => void;
+
+/**
  *
  *
  *
@@ -288,6 +297,7 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
+  commonTypeDefinition: CommonTypeDefinitionDecorator;
 };
 
 export type AzureResourceManagerLegacyDecorators = {

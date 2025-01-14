@@ -13,6 +13,7 @@ import {
   $armResourceList,
   $armResourceRead,
   $armResourceUpdate,
+  $commonTypeDefinition,
 } from "./operations.js";
 import {
   $armProviderNameValue,
@@ -54,6 +55,7 @@ export const $decorators = {
     armCommonTypesVersion: $armCommonTypesVersion,
     armVirtualResource: $armVirtualResource,
     resourceBaseType: $resourceBaseType,
+    commonTypeDefinition: $commonTypeDefinition,
   } satisfies AzureResourceManagerDecorators,
   "Azure.ResourceManager.Legacy": {
     customAzureResource: $customAzureResource,
