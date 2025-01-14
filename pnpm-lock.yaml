@@ -704,12 +704,21 @@ importers:
       '@typespec/http':
         specifier: workspace:~
         version: link:../http
+      '@vitest/coverage-v8':
+        specifier: ^2.1.5
+        version: 2.1.8(vitest@2.1.8(@types/node@22.7.9)(happy-dom@15.11.0)(jsdom@25.0.1)(terser@5.34.1))
+      '@vitest/ui':
+        specifier: ^2.1.2
+        version: 2.1.2(vitest@2.1.8)
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
       typescript:
         specifier: ~5.6.3
         version: 5.6.3
+      vitest:
+        specifier: ^2.1.5
+        version: 2.1.8(@types/node@22.7.9)(@vitest/ui@2.1.2)(happy-dom@15.11.0)(jsdom@25.0.1)(terser@5.34.1)
 
   core/packages/http-specs:
     dependencies:
@@ -973,6 +982,9 @@ importers:
       '@typespec/http':
         specifier: workspace:~
         version: link:../http
+      '@typespec/json-schema':
+        specifier: workspace:~
+        version: link:../json-schema
       '@typespec/library-linter':
         specifier: workspace:~
         version: link:../library-linter
@@ -2004,6 +2016,9 @@ importers:
       vscode-languageclient:
         specifier: ~9.0.1
         version: 9.0.1
+      yaml:
+        specifier: ~2.5.1
+        version: 2.5.1
 
   core/packages/versioning:
     devDependencies:
