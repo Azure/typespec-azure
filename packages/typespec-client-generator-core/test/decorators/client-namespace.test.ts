@@ -45,6 +45,19 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       strictEqual(anonymousModel.clientNamespace, "TestService");
     });
 
+    it("namespace on alias", async () => {
+      await runner.compileWithBuiltInService(
+        `
+      alias Test = {
+        prop: string;
+      };
+
+      op test(): Test;
+      `,
+      );
+      strictEqual(runner.context.sdkPackage.models[0].clientNamespace, "TestService");
+    });
+
     it("namespace on enum", async () => {
       await runner.compileWithBuiltInService(
         `
