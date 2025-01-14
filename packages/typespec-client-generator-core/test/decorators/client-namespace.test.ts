@@ -1,4 +1,4 @@
-import { strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkClientType, SdkServiceOperation } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -22,6 +22,27 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       `,
       );
       strictEqual(runner.context.sdkPackage.models[0].clientNamespace, "TestService");
+    });
+
+    it("namespace on anonymous model", async () => {
+      await runner.compileWithBuiltInService(`
+        model Test {
+          prop: {
+            p1: string;
+            p2: int32;
+          }
+        }
+        
+        op test(): Test;
+        `);
+
+      const models = runner.context.sdkPackage.models;
+      const testModel = models.find((m) => m.name === "Test");
+      ok(testModel);
+      const anonymousModel = testModel?.properties[0].type;
+      ok(anonymousModel);
+      strictEqual(anonymousModel.kind, "model");
+      strictEqual(anonymousModel.clientNamespace, "TestService");
     });
 
     it("namespace on enum", async () => {
