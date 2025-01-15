@@ -79,7 +79,6 @@ Available ruleSets:
 - [`@armResourceUpdate`](#@armresourceupdate)
 - [`@armVirtualResource`](#@armvirtualresource)
 - [`@extensionResource`](#@extensionresource)
-- [`@identifiers`](#@identifiers)
 - [`@locationResource`](#@locationresource)
 - [`@resourceBaseType`](#@resourcebasetype)
 - [`@resourceGroupResource`](#@resourcegroupresource)
@@ -353,34 +352,6 @@ See more details on [different Azure Resource Manager resource type here.](https
 ##### Parameters
 
 None
-
-#### `@identifiers`
-
-This decorator is used to indicate the identifying properties of objects in the array, e.g. size
-The properties that are used as identifiers for the object needs to be provided as a list of strings.
-
-```typespec
-@Azure.ResourceManager.identifiers(properties: string[])
-```
-
-##### Target
-
-`ModelProperty`
-
-##### Parameters
-
-| Name       | Type       | Description                                                                                                         |
-| ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------- |
-| properties | `string[]` | The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings. |
-
-##### Examples
-
-```typespec
-model Pet {
-  @identifiers(["size"])
-  dog: Dog;
-}
-```
 
 #### `@locationResource`
 
