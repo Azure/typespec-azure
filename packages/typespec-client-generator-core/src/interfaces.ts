@@ -409,6 +409,11 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   crossLanguageDefinitionId: string;
 }
 
+/**
+ * Options to show how to serialize a type.
+ * A type that is used in multiple operations with different wire format could have multiple options set. For example, a type could be serialized as JSON in one operation and as XML in another operation.
+ * A type that has no special serialization logic will have no options set. For example, a type that is used in a HTTP query parameter will have no serialization options set.
+ */
 export interface SerializationOptions {
   json?: JsonSerializationOptions;
   xml?: XmlSerializationOptions;
@@ -417,7 +422,7 @@ export interface SerializationOptions {
 
 /**
  * For Json serialization.
- * The name will come from explicit setting of `@encodedName("application/json", "NAME")`.
+ * The name will come from explicit setting of `@encodedName("application/json", "NAME")` or original model/property name.
  */
 export interface JsonSerializationOptions {
   name: string;
@@ -425,9 +430,10 @@ export interface JsonSerializationOptions {
 
 /**
  * For Xml serialization.
- * The `name`/`itemsName` will come from explicit setting of `@encodedName("application/xml", "NAME")` or `@xml.Name("NAME")`.
+ * The `name`/`itemsName` will come from explicit setting of `@encodedName("application/xml", "NAME")` or `@xml.Name("NAME")` or original model/property name.
  * Other properties come from `@xml.attribute`, `@xml.ns`, `@xml.unwrapped`.
  * The `itemsName` and `itemsNs` are used for array items.
+ * If `unwrapped` is `true`, `itensName` should always be same as the `name`. If `unwrapped` is `false`, `itemsName` could have different name.
  */
 export interface XmlSerializationOptions {
   name: string;
