@@ -4,7 +4,7 @@ title: Clients
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
-This page documents the default client hierarchy behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
+This page documents the client behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
 
 JS RLC is not in the business of customization. it will ignore client.tsp and the follow scenarios will not have impact on the JS RLC user experiences. In this context, TypeScript part means JS Modular Emitter.
 
@@ -12,9 +12,9 @@ JS RLC is not in the business of customization. it will ignore client.tsp and th
 
 By default, each namespace with `@service` decorator will be generated as a root client. The name for that client will be the namespace name concatenating `Client` as suffix.
 
-Other nested namespacess and interfaces of each root client will be generated as operation groups with hierarchy.
+Other sub namespaces and interfaces of each root client will be generated as operation groups with hierarchy.
 
-The root client's namespace will follow the namespace decorated with `@service`. If an operation group comes from a nested namespace, it will follow that namespace. If it comes from a nested interface, it will follow the namespace to which the interface belongs.
+The root client's SDK namespace will follow the namespace decorated with `@service`. If an operation group comes from a sub namespace, its SDK namespace will follow that namespace. If it comes from a interface, its SDK namespace will follow the namespace which the interface belongs to.
 
 Different language's code generator will have different way to organize clients and operation groups. Please refer the following examples.
 
@@ -63,6 +63,63 @@ client.pet();
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
 client.feed();
 client.pet();
+```
+
+</ClientTabs>
+
+### Clients from sub namespaces
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+namespace PetStore;
+
+@service({
+  title: "Dog Store",
+})
+namespace Dogs {
+  @route("/feed")
+  op feed(): void;
+
+  @route("/op2")
+  op pet(): void;
+}
+
+@service({
+  title: "Cat Store",
+})
+namespace Cats {
+  @route("/feed")
+  op feed(): void;
+
+  @route("/op2")
+  op pet(): void;
+}
+```
+
+```python
+from pet_store.dogs import DogsClient
+from pet_store.cats import CatsClient
+
+dogs_client = Dogs()
+dogs_client.feed()
+dogs_client.pet()
+
+cats_client = Cats()
+cats_client.feed()
+cats_client.pet()
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
 ```
 
 </ClientTabs>
@@ -242,7 +299,7 @@ Customization SHOULD always be done in a file called `client.tsp` along with the
 
 You can use `@client` and `@operationGroup` to reconstruct the client hierarchy. However, if any customizations are made, the client hierarchy will only be inferred from those customizations. The logic defined in the default behaviors will no longer take effect.
 
-If any customizations are made, the client's namespace will follow the namespace decorated with `@client` or the namespace to which the interface decorated with `@client` belongs. The operation group's namespace follows the same logic for `@operationGroup`. You can use `@clientNamespace` to override it if needed.
+If any customizations are made, the client's SDK namespace will follow the namespace decorated with `@client` or the namespace which the interface decorated with `@client` belongs to. The operation group's SDK namespace follows the same logic for `@operationGroup`. You can use `@clientNamespace` to override it if needed.
 
 For this section, we will assume that you have service called `PetStore` in the namespace `PetStore`, defining the two operations `feed` and `pet`.
 
@@ -479,6 +536,60 @@ opGrp1Client.feed();
 
 OpGrp2Client opGrp2Client = builder.buildOpGrp2Client();
 opGrp2Client.pet();
+```
+
+</ClientTabs>
+
+### Splitting the operations into sub namespaces
+
+<ClientTabs>
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace NewPetStore;
+
+@client({
+  name: "FoodClient",
+  service: PetStore,
+})
+namespace Food {
+  feed is PetStore.feed;
+}
+
+@client({
+  name: "PetActionClient",
+  service: PetStore,
+})
+namespace PetAction {
+  pet is PetStore.pet;
+}
+```
+
+```python
+from new_pet_store.food import FoodClient
+from new_pet_store.pet_action import PetActionClient
+
+client1 = FoodClient()
+client2 = PetActionClient()
+
+client1.feed()
+client2.pet()
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+NOT_SUPPORTED;
+```
+
+```java
+// TODO
 ```
 
 </ClientTabs>
