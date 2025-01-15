@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.50.0
+
+### Features
+
+- [#1998](https://github.com/Azure/typespec-azure/pull/1998) Add `@scope` decorator to define the language scope for operation
+- [#2029](https://github.com/Azure/typespec-azure/pull/2029) add `@alternateType` decorator
+
+
 ## 0.49.1
 
 ### Bug Fixes
