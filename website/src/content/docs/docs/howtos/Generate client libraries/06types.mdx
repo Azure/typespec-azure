@@ -53,7 +53,9 @@ foo = Foo(prop="hello")
 As `flavor=azure`, Java emitter generates the model classes under `models` package.
 
 ```java
-// TODO
+import myservice.models.Foo;
+
+Foo foo = new Foo("hello");
 ```
 
 </ClientTabItem>
@@ -104,7 +106,9 @@ foo = Foo(prop="hello")
 As `flavor=azure`, Java emitter generates the model classes under `models` package.
 
 ```java
-// TODO
+import myservice.container.models.Foo;
+
+Foo foo = new Foo("hello");
 ```
 
 </ClientTabItem>

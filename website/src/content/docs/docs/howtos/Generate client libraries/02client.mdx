@@ -119,7 +119,18 @@ cats_client.pet()
 ```
 
 ```java
-// TODO
+import petstore.cats.CatsClient;
+import petstore.cats.CatsClientBuilder;
+import petstore.dogs.DogsClient;
+import petstore.dogs.DogsClientBuilder;
+
+DogsClient dogsClient = new DogsClientBuilder().buildClient();
+dogsClient.feed();
+dogsClient.pet();
+
+CatsClient catsClient = new CatsClientBuilder().buildClient();
+catsClient.feed();
+catsClient.pet();
 ```
 
 </ClientTabs>
@@ -557,7 +568,7 @@ namespace NewPetStore;
   service: PetStore,
 })
 namespace Food {
-  feed is PetStore.feed;
+  op feed is PetStore.feed;
 }
 
 @client({
@@ -565,7 +576,7 @@ namespace Food {
   service: PetStore,
 })
 namespace PetAction {
-  pet is PetStore.pet;
+  op pet is PetStore.pet;
 }
 ```
 
@@ -589,7 +600,16 @@ NOT_SUPPORTED;
 ```
 
 ```java
-// TODO
+import newpetstore.food.FoodClient;
+import newpetstore.food.FoodClientBuilder;
+import newpetstore.petaction.PetActionClient;
+import newpetstore.petaction.PetActionClientBuilder;
+
+FoodClient foodClient = new FoodClientBuilder().buildClient();
+foodClient.feed();
+
+PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
+petActionClient.pet();
 ```
 
 </ClientTabs>
