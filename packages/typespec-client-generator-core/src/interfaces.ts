@@ -433,7 +433,7 @@ export interface JsonSerializationOptions {
  * The `name`/`itemsName` will come from explicit setting of `@encodedName("application/xml", "NAME")` or `@xml.Name("NAME")` or original model/property name.
  * Other properties come from `@xml.attribute`, `@xml.ns`, `@xml.unwrapped`.
  * The `itemsName` and `itemsNs` are used for array items.
- * If `unwrapped` is `true`, `itensName` should always be same as the `name`. If `unwrapped` is `false`, `itemsName` could have different name.
+ * If `unwrapped` is `true`, `itemsName` should always be same as the `name`. If `unwrapped` is `false`, `itemsName` could have different name.
  */
 export interface XmlSerializationOptions {
   name: string;
