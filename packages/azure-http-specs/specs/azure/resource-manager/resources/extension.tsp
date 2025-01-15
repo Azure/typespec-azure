@@ -34,6 +34,7 @@ model ExtensionsResourceProperties {
 interface ExtensionsResources {
   @scenario
   @scenarioDoc("""
+    This test is passed by calling the API 4 times, by providing different parameters.
     Resource GET extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
@@ -138,6 +139,7 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
+    This test is passed by calling the API 4 times, by providing different parameters.
     Resource PUT extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
@@ -278,6 +280,7 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
+    This test is passed by calling the API 4 times, by providing different parameters.
     Resource Patch extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
@@ -418,6 +421,7 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
+    This test is passed by calling the API 4 times, by providing different parameters.
     Resource DELETE extension resource by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
     Expected query parameter: api-version=2023-12-01-preview
@@ -442,6 +446,7 @@ interface ExtensionsResources {
 
   @scenario
   @scenarioDoc("""
+    This test is passed by calling the API 4 times, by providing different parameters.
     Resource LIST extension resources by tenant.
     Expected path: /providers/Azure.ResourceManager.Resources/extensionResources
     Expected query parameter: api-version=2023-12-01-preview
