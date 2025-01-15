@@ -7,6 +7,7 @@ import "@azure-tools/typespec-client-generator-core";
 import "./toplevel.tsp";
 import "./nested.tsp";
 import "./singleton.tsp";
+import "./extension.tsp";
 import "./location.tsp";
 
 using TypeSpec.Http;

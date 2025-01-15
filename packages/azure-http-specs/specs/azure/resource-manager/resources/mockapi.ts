@@ -79,6 +79,500 @@ const validLocationResource = {
   },
 };
 
+const validResourceGroupExtensionsResource = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
+  name: "extension",
+  type: "Azure.ResourceManager.Resources/extensionsResources",
+  properties: {
+    description: "valid",
+    provisioningState: "Succeeded",
+  },
+  systemData: {
+    createdBy: "AzureSDK",
+    createdByType: "User",
+    createdAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedBy: "AzureSDK",
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedByType: "User",
+  },
+};
+
+const validSubscriptionExtensionsResource = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
+  name: "extension",
+  type: "Azure.ResourceManager.Resources/extensionsResources",
+  properties: {
+    description: "valid",
+    provisioningState: "Succeeded",
+  },
+  systemData: {
+    createdBy: "AzureSDK",
+    createdByType: "User",
+    createdAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedBy: "AzureSDK",
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedByType: "User",
+  },
+};
+
+const validTenantExtensionsResource = {
+  id: `/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
+  name: "extension",
+  type: "Azure.ResourceManager.Resources/extensionsResources",
+  properties: {
+    description: "valid",
+    provisioningState: "Succeeded",
+  },
+  systemData: {
+    createdBy: "AzureSDK",
+    createdByType: "User",
+    createdAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedBy: "AzureSDK",
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedByType: "User",
+  },
+};
+
+const validResourceExtensionsResource = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
+  name: "extension",
+  type: "Azure.ResourceManager.Resources/extensionsResources",
+  properties: {
+    description: "valid",
+    provisioningState: "Succeeded",
+  },
+  systemData: {
+    createdBy: "AzureSDK",
+    createdByType: "User",
+    createdAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedBy: "AzureSDK",
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedByType: "User",
+  },
+};
+
+// extension tracked resource
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSuccess([
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "get",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validResourceGroupExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "get",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validSubscriptionExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "get",
+    request: {
+      params: {
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validTenantExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "get",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
+        topLevelResourceName: "top",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validResourceExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = passOnSuccess([
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "put",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid",
+        },
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validResourceGroupExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "put",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid",
+        },
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validSubscriptionExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "put",
+    request: {
+      params: {
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid",
+        },
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validTenantExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "put",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid",
+        },
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validResourceExtensionsResource),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuccess([
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "patch",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid2",
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        ...validResourceGroupExtensionsResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "patch",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid2",
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        ...validSubscriptionExtensionsResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "patch",
+    request: {
+      params: {
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid2",
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        ...validTenantExtensionsResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "patch",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        properties: {
+          description: "valid2",
+        },
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        ...validResourceExtensionsResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuccess([
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "delete",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "delete",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "delete",
+    request: {
+      params: {
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    method: "delete",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
+        extensionName: "extension",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = passOnSuccess([
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources",
+    method: "get",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [validResourceGroupExtensionsResource],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources",
+    method: "get",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [validSubscriptionExtensionsResource],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/providers/Azure.ResourceManager.Resources/extensionsResources",
+    method: "get",
+    request: {
+      params: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [validTenantExtensionsResource],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources",
+    method: "get",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        topLevelResourceName: "top",
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [validResourceExtensionsResource],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
 // location resource
 Scenarios.Azure_ResourceManager_Resources_LocationResources_get = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
