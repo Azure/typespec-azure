@@ -500,7 +500,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByParent = passOnSuccess([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = passOnSuccess([
   {
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources",
     method: "get",

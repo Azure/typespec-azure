@@ -555,5 +555,5 @@ interface ExtensionsResources {
     }
     ```
     """)
-  listByParent is ArmResourceListByParent<ExtensionsResource>;
+  listByScope is ArmResourceListByParent<ExtensionsResource>;
 }

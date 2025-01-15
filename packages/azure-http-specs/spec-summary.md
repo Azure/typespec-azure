@@ -920,6 +920,7 @@ Expected response body:
 
 - Endpoint: `put https://management.azure.com`
 
+This test is passed by calling the API 4 times, by providing different parameters.
 Resource PUT extension resource by tenant.
 Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
 Expected query parameter: api-version=2023-12-01-preview
@@ -1068,6 +1069,7 @@ Expected response body:
 
 - Endpoint: `delete https://management.azure.com`
 
+This test is passed by calling the API 4 times, by providing different parameters.
 Resource DELETE extension resource by tenant.
 Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
 Expected query parameter: api-version=2023-12-01-preview
@@ -1092,6 +1094,7 @@ Expected response status code: 204
 
 - Endpoint: `get https://management.azure.com`
 
+This test is passed by calling the API 4 times, by providing different parameters.
 Resource GET extension resource by tenant.
 Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
 Expected query parameter: api-version=2023-12-01-preview
@@ -1196,10 +1199,11 @@ Expected response body:
 }
 ```
 
-### Azure_ResourceManager_Resources_ExtensionsResources_listByParent
+### Azure_ResourceManager_Resources_ExtensionsResources_listByScope
 
 - Endpoint: `get https://management.azure.com`
 
+This test is passed by calling the API 4 times, by providing different parameters.
 Resource LIST extension resources by tenant.
 Expected path: /providers/Azure.ResourceManager.Resources/extensionResources
 Expected query parameter: api-version=2023-12-01-preview
@@ -1316,6 +1320,7 @@ Expected response body:
 
 - Endpoint: `patch https://management.azure.com`
 
+This test is passed by calling the API 4 times, by providing different parameters.
 Resource Patch extension resource by tenant.
 Expected path: /providers/Azure.ResourceManager.Resources/extensionsResources/extension
 Expected query parameter: api-version=2023-12-01-preview
