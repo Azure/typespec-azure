@@ -39,6 +39,37 @@ describe("typespec-autorest: metadata", () => {
     });
   });
 
+  it("will correctly consolidate schemas when @parameterVisibility is used with no arguments", async () => {
+    const res = await openApiFor(`
+      model M {
+        example: string;
+        @visibility(Lifecycle.Read)
+        createdAt?: utcDateTime;
+      }
+
+      @route("/")
+      @parameterVisibility
+      @patch op createOrUpdate(@bodyRoot m: M): M;
+      `);
+
+    const request = res.paths["/"].patch.parameters[0].schema;
+    const response = res.paths["/"].patch.responses["200"].schema;
+
+    deepStrictEqual(request, { $ref: "#/definitions/M" });
+    deepStrictEqual(response, { $ref: "#/definitions/M" });
+
+    deepStrictEqual(res.definitions, {
+      M: {
+        type: "object",
+        properties: {
+          example: { type: "string" },
+          createdAt: { type: "string", format: "date-time", readOnly: true },
+        },
+        required: ["example"],
+      },
+    });
+  });
+
   it("will expose create visibility properties on PUT model", async () => {
     const res = await openApiFor(`
       model M {
