@@ -10,6 +10,6 @@ extern dec customAzureResource(target: Model);
 
 /**
  * Specify an external reference that should be used when emitting this type.
- *  @param jsonRef - External reference(e.g. "../../common.json#/definitions/Foo")
+ * @param jsonRef - External reference(e.g. "../../common.json#/definitions/Foo")
  */
 extern dec commonTypesRef(entity: Model | ModelProperty, jsonRef: valueof string);
