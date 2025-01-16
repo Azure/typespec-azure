@@ -29,9 +29,90 @@ const validOrder = {
     lastModifiedByType: "User",
   },
 };
+const validOperation = {
+  name: "Microsoft.Compute/virtualMachines/write",
+  isDataAction: false,
+  display: {
+    provider: "Microsoft Compute",
+    resource: "Virtual Machines",
+    operation: "Create or Update Virtual Machine.",
+    description: "Add or modify virtual machines.",
+  },
+  origin: "user,system",
+  actionType: "Internal",
+};
+const checkNameAvailabilityResponse = {
+  nameAvailable: false,
+  reason: "AlreadyExists",
+  message: "Hostname 'checkName' already exists. Please select a different name.",
+};
 let createOrReplacePollCount = 0;
 let postPollCount = 0;
 let deletePollCount = 0;
+
+// operation list
+Scenarios.Azure_ResourceManager_OperationTemplates_ListAvailableOperations = passOnSuccess({
+  uri: "/providers/Azure.ResourceManager.OperationTemplates/operations",
+  method: "get",
+  request: {
+    params: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json({
+      value: [validOperation],
+    }),
+  },
+  kind: "MockApiDefinition",
+});
+
+// Check Global Name Availability
+Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal =
+  passOnSuccess({
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/checkNameAvailability",
+    method: "post",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        name: "checkName",
+        type: "Microsoft.Web/site",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(checkNameAvailabilityResponse),
+    },
+    kind: "MockApiDefinition",
+  });
+
+// Check Local Name Availability
+Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal = passOnSuccess(
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/:location/checkNameAvailability",
+    method: "post",
+    request: {
+      params: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        location: "westus",
+        "api-version": "2023-12-01-preview",
+      },
+      body: {
+        name: "checkName",
+        type: "Microsoft.Web/site",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(checkNameAvailabilityResponse),
+    },
+    kind: "MockApiDefinition",
+  },
+);
 
 // lro resource
 Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnSuccess([
