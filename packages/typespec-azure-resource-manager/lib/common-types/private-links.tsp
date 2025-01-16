@@ -128,12 +128,12 @@ union PrivateEndpointServiceConnectionStatus {
 /**
  * The name of the private endpoint connection associated with the Azure resource.
  */
-model PrivateEndpointConnectionParameter {
+model PrivateEndpointConnectionName {
   /** The name of the private endpoint connection associated with the Azure resource. */
   @path
   @key("privateEndpointConnectionName")
   @TypeSpec.Rest.segment("privateEndpointConnections")
-  name: string;
+  privateEndpointConnectionName: string;
 }
 
 /**
