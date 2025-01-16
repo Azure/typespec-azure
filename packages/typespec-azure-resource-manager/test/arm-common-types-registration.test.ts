@@ -1,8 +1,9 @@
 import type { Diagnostic, Model, ModelProperty, Namespace } from "@typespec/compiler";
 import { getService } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import { findArmCommonTypeRecord } from "../src/common-types.js";
+import { findArmCommonTypeRecord, getCommonTypesRef } from "../src/common-types.js";
 import type { ArmCommonTypeRecord } from "../src/commontypes.private.decorators.js";
 import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
@@ -203,5 +204,18 @@ describe("common parameters", () => {
         version,
       });
     });
+  });
+});
+
+describe("common types ref", () => {
+  it("set external reference", async () => {
+    const runner = await createAzureResourceManagerTestRunner();
+    const [{ Foo }, diagnostics] = await runner.compileAndDiagnose(`
+        @test @Azure.ResourceManager.Legacy.commonTypesRef("../common.json#/definitions/Foo")
+        model Foo {}
+      `);
+
+    expectDiagnosticEmpty(diagnostics);
+    strictEqual(getCommonTypesRef(runner.program, Foo), "../common.json#/definitions/Foo");
   });
 });
