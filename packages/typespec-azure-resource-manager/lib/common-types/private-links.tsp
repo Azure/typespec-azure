@@ -133,7 +133,7 @@ model PrivateEndpointConnectionName {
   @path
   @key("privateEndpointConnectionName")
   @TypeSpec.Rest.segment("privateEndpointConnections")
-  privateEndpointConnectionName: string;
+  name: string;
 }
 
 /**
