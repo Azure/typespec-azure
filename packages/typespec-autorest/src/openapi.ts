@@ -12,7 +12,6 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
-  getArmIdentifiers,
   isArmCommonType,
   isAzureResource,
   isConditionallyFlattened,
@@ -1834,10 +1833,6 @@ export async function getOpenAPIForService(
     );
   }
 
-  function ifArmIdentifiersDefault(armIdentifiers: string[]) {
-    return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
-  }
-
   function getSchemaForUnionVariant(
     variant: UnionVariant,
     schemaContext: SchemaContext,
@@ -2378,18 +2373,9 @@ export async function getOpenAPIForService(
           visibility: context.visibility | Visibility.Item,
         }),
       };
-
-      const armIdentifiers = getArmIdentifiers(program, typespecType);
-      if (
-        armIdentifiers !== undefined &&
-        armIdentifiers.length > 0 &&
-        !ifArmIdentifiersDefault(armIdentifiers)
-      ) {
-        array["x-ms-identifiers"] = armIdentifiers;
-      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
+      if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];
       }
-
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;

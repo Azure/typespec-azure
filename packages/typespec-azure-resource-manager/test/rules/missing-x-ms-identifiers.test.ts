@@ -177,60 +177,6 @@ describe("typespec-azure-core: no-enum rule", () => {
       .toBeValid();
   });
 
-  it("allow x-ms-identifiers from keys", async () => {
-    await tester
-      .expect(
-        `
-        model Pet {
-          pet: Dog[];
-        }
- 
-        model Dog {
-          food: Food;
-        }
-        
-        model Food {
-          @key
-          brand: string;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("allow x-ms-identifiers from keys on default identifiers", async () => {
-    await tester
-      .expect(
-        `
-        model Pet {
-          pet: Dog[];
-        }
- 
-        model Dog {
-          name: string;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("allow x-ms-identifiers from identifiers decorator", async () => {
-    await tester
-      .expect(
-        `
-        model Pet {
-          @identifiers(["name"])
-          pet: Dog[];
-        }
- 
-        model Dog {
-          name: string;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-
   it("emit diagnostic if a section is not found", async () => {
     await tester
       .expect(
@@ -242,13 +188,12 @@ describe("typespec-azure-core: no-enum rule", () => {
  
         model Dog {
           food: string;
-          brand: string;
         }
         `,
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Property "brand" is not found in "string". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
+        message: `Property "brand" is not found in "Dog". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
       });
   });
 });
