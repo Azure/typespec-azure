@@ -410,9 +410,10 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
 }
 
 /**
- * Options to show how to serialize a type.
- * A type that is used in multiple operations with different wire format could have multiple options set. For example, a type could be serialized as JSON in one operation and as XML in another operation.
- * A type that has no special serialization logic will have no options set. For example, a type that is used in a HTTP query parameter will have no serialization options set.
+ * Options to show how to serialize a model/property.
+ * A model/property that is used in multiple operations with different wire format could have multiple options set. For example, a model could be serialized as JSON in one operation and as XML in another operation.
+ * A model/property that has no special serialization logic will have no options set. For example, a property that is used in a HTTP query parameter will have no serialization options set.
+ * A model/property that is used as binary payloads will also have no options set. For example, a property that is used as a HTTP request body with `"image/png` content type.
  */
 export interface SerializationOptions {
   json?: JsonSerializationOptions;
