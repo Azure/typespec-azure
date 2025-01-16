@@ -222,23 +222,23 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 
-/** PrivateEndpointConnectionParameter */
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+/** PrivateEndpointConnectionName */
+@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionName.privateEndpointConnectionName,
   "PrivateEndpointConnectionName",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v3, isDefault: true },
   "privatelinks.json"
 );
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionName.privateEndpointConnectionName,
   "PrivateEndpointConnectionName",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionName.privateEndpointConnectionName,
   "PrivateEndpointConnectionName",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
 );
-@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionParameter.name,
+@@CommonTypes.Private.armCommonParameter(PrivateEndpointConnectionName.privateEndpointConnectionName,
   "PrivateEndpointConnectionName",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "privatelinks.json"
