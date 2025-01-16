@@ -7,21 +7,21 @@ options:
     azure-resource-provider-folder: "resource-manager"
     output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-csharp":
-    package-dir: {package-name}
+    package-dir: "{package-name}"
     clear-output-folder: true
     model-namespace: false
     namespace: "{package-dir}"
   "@azure-tools/typespec-python":
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
-    package-name: "{package-dir}"
+    package-dir: "{package-dir}"
+    package-name: "{package-name}"
     generate-test: true
     generate-sample: true
   "@azure-tools/typespec-java":
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
-    namespace: com.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}
+    package-dir: "{package-dir}"
+    namespace: "{namespace}"
     service-name: "{service-name}"
   "@azure-tools/typespec-ts":
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
+    package-dir: "arm-{name}"
     azureSdkForJs: true
     isModularLibrary: true
     generateMetadata: true
@@ -29,7 +29,7 @@ options:
     experimentalExtensibleEnums: true
     enableOperationGroup: true
     packageDetails:
-      name: "@azure/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
+      name: "@azure/{package-dir}"
   "@azure-tools/typespec-go":
     service-dir: "sdk/resourcemanager/{{normalizePackageName}}"
     package-dir: "arm{{normalizePackageName}}"
