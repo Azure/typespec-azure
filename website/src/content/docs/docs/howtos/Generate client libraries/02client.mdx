@@ -67,75 +67,9 @@ client.pet();
 
 </ClientTabs>
 
-### Clients from sub namespaces
-
-<ClientTabs>
-
-```typespec title="main.tsp"
-namespace PetStore;
-
-@service({
-  title: "Dog Store",
-})
-namespace Dogs {
-  @route("/feed")
-  op feed(): void;
-
-  @route("/op2")
-  op pet(): void;
-}
-
-@service({
-  title: "Cat Store",
-})
-namespace Cats {
-  @route("/feed")
-  op feed(): void;
-
-  @route("/op2")
-  op pet(): void;
-}
-```
-
-```python
-from pet_store.dogs import DogsClient
-from pet_store.cats import CatsClient
-
-dogs_client = Dogs()
-dogs_client.feed()
-dogs_client.pet()
-
-cats_client = Cats()
-cats_client.feed()
-cats_client.pet()
-```
-
-```csharp
-// TODO
-```
-
-```typescript
-// TODO
-```
-
-```java
-import petstore.cats.CatsClient;
-import petstore.cats.CatsClientBuilder;
-import petstore.dogs.DogsClient;
-import petstore.dogs.DogsClientBuilder;
-
-DogsClient dogsClient = new DogsClientBuilder().buildClient();
-dogsClient.feed();
-dogsClient.pet();
-
-CatsClient catsClient = new CatsClientBuilder().buildClient();
-catsClient.feed();
-catsClient.pet();
-```
-
-</ClientTabs>
-
 ### Client with one-layer child operation groups
+
+`PetStore` has two operation groups. Operation group `Dogs` is from a sub namespace, and `Cats` is from an interface.
 
 <ClientTabs>
 
@@ -204,6 +138,8 @@ catsClient.pet();
 </ClientTabs>
 
 ### Client with multi-layer child operation group
+
+`PetStore` has three operation groups. Operation group `Billings` is from an interface, `Pets` is from a sub namespace, and `Actions` is from an interface. `Pets` has one nested operation group `Actions` from an interface.
 
 <ClientTabs>
 

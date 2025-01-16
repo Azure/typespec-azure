@@ -16,7 +16,7 @@ The namespace for models, enums, and unions will follow the namespace they belon
 <ClientTabItem lang="typespec" >
 
 ```tsp
-namespace MyService;
+namespace Service;
 
 model Foo {
   prop: string;
@@ -28,7 +28,7 @@ model Foo {
 <ClientTabItem lang="python">
 
 ```python
-from my_service.models import Foo
+from service.models import Foo
 
 foo = Foo(prop="hello")
 ```
@@ -53,7 +53,7 @@ foo = Foo(prop="hello")
 As `flavor=azure`, Java emitter generates the model classes under `models` package.
 
 ```java
-import myservice.models.Foo;
+import service.models.Foo;
 
 Foo foo = new Foo("hello");
 ```
@@ -67,7 +67,7 @@ Foo foo = new Foo("hello");
 <ClientTabItem lang="typespec" >
 
 ```tsp
-namespace MyService;
+namespace Service;
 
 namespace Container {
   model Foo {
@@ -81,7 +81,7 @@ namespace Container {
 <ClientTabItem lang="python">
 
 ```python
-from my_service.container.models import Foo
+from service.container.models import Foo
 
 foo = Foo(prop="hello")
 ```
@@ -106,7 +106,7 @@ foo = Foo(prop="hello")
 As `flavor=azure`, Java emitter generates the model classes under `models` package.
 
 ```java
-import myservice.container.models.Foo;
+import service.container.models.Foo;
 
 Foo foo = new Foo("hello");
 ```
@@ -120,7 +120,7 @@ Foo foo = new Foo("hello");
 <ClientTabItem lang="typespec" >
 
 ```tsp
-namespace MyService;
+namespace Service;
 
 @clientNamespace("Service.Container")
 model Foo {
@@ -2513,7 +2513,7 @@ public enum LR {
 ```typespec
 @versioned(Versions)
 @service
-namespace My.Service;
+namespace Service;
 
 enum Versions {
   v1,
