@@ -529,24 +529,37 @@ function createSdkInitializationType(
   client: SdkClient | SdkOperationGroup,
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const initializationOptions = getClientInitialization(context, client.type);
-
-  // Create an empty client initialization model.
-  const name = `${client.kind === "SdkClient" ? client.name : getLibraryName(context, client.type)}Options`;
-  const initializationModel: SdkInitializationType = {
-    __raw: client.service,
-    doc: "Initialization class for the client",
-    kind: "model",
-    properties: [],
-    name,
-    isGeneratedName: true,
-    access: initializationOptions?.access ?? (client.kind === "SdkClient" ? "public" : "internal"),
-    usage: UsageFlags.Input,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.type)}.${name}`,
-    clientNamespace: getClientNamespace(context, client.type),
-    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-    decorators: [],
-  };
+  let initializationModel = getClientInitialization(context, client.type);
+  let clientParams = context.__clientToParameters.get(client.type);
+  if (!clientParams) {
+    clientParams = [];
+    context.__clientToParameters.set(client.type, clientParams);
+  }
+  const access = client.kind === "SdkClient" ? "public" : "internal";
+  if (initializationModel) {
+    for (const prop of initializationModel.properties) {
+      clientParams.push(prop);
+    }
+    initializationModel.access = access;
+  } else {
+    const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
+    const name = `${namePrefix.split(".").at(-1)}Options`;
+    initializationModel = {
+      __raw: client.service,
+      doc: "Initialization class for the client",
+      kind: "model",
+      properties: [],
+      name,
+      isGeneratedName: true,
+      access,
+      usage: UsageFlags.Input,
+      crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
+      clientNamespace: getClientNamespace(context, client.type),
+      apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+      decorators: [],
+      serializationOptions: {},
+    };
+  }
 
   return diagnostics.wrap(initializationModel);
 }

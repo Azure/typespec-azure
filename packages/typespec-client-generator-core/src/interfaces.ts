@@ -380,6 +380,7 @@ export interface SdkModelType extends SdkTypeBase {
   baseModel?: SdkModelType;
   crossLanguageDefinitionId: string;
   apiVersions: string[];
+  serializationOptions: SerializationOptions;
 }
 
 export interface ClientInitializationOptions {
@@ -418,11 +419,53 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   crossLanguageDefinitionId: string;
 }
 
+/**
+ * Options to show how to serialize a model/property.
+ * A model/property that is used in multiple operations with different wire format could have multiple options set. For example, a model could be serialized as JSON in one operation and as XML in another operation.
+ * A model/property that has no special serialization logic will have no options set. For example, a property that is used in a HTTP query parameter will have no serialization options set.
+ * A model/property that is used as binary payloads will also have no options set. For example, a property that is used as a HTTP request body with `"image/png` content type.
+ */
+export interface SerializationOptions {
+  json?: JsonSerializationOptions;
+  xml?: XmlSerializationOptions;
+  multipart?: MultipartOptions;
+}
+
+/**
+ * For Json serialization.
+ * The name will come from explicit setting of `@encodedName("application/json", "NAME")` or original model/property name.
+ */
+export interface JsonSerializationOptions {
+  name: string;
+}
+
+/**
+ * For Xml serialization.
+ * The `name`/`itemsName` will come from explicit setting of `@encodedName("application/xml", "NAME")` or `@xml.Name("NAME")` or original model/property name.
+ * Other properties come from `@xml.attribute`, `@xml.ns`, `@xml.unwrapped`.
+ * The `itemsName` and `itemsNs` are used for array items.
+ * If `unwrapped` is `true`, `itemsName` should always be same as the `name`. If `unwrapped` is `false`, `itemsName` could have different name.
+ */
+export interface XmlSerializationOptions {
+  name: string;
+  attribute?: boolean;
+  ns?: {
+    namespace: string;
+    prefix: string;
+  };
+  unwrapped?: boolean;
+
+  itemsName?: string;
+  itemsNs?: {
+    namespace: string;
+    prefix: string;
+  };
+}
+
 export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   kind: "endpoint";
   urlEncode: boolean;
   onClient: true;
-  serializedName?: string;
   type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
 }
 
@@ -444,6 +487,7 @@ export type SdkModelPropertyType =
   | SdkCookieParameter;
 
 export interface MultipartOptions {
+  name: string;
   // whether this part is for file
   isFilePart: boolean;
   // whether this part is multi in request payload
@@ -459,11 +503,18 @@ export interface MultipartOptions {
 export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
+  /**
+   * @deprecated This property is deprecated. Use `serializationOptions.xxx.name` instead.
+   */
   serializedName: string;
-  /*
-    @deprecated This property is deprecated. Use `.multipartOptions?.isFilePart` instead.
-  */
+  serializationOptions: SerializationOptions;
+  /**
+   * @deprecated This property is deprecated. Use `multipartOptions?.isFilePart` instead.
+   */
   isMultipartFileInput: boolean;
+  /**
+   * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
+   */
   multipartOptions?: MultipartOptions;
   visibility?: Visibility[];
   flatten: boolean;
