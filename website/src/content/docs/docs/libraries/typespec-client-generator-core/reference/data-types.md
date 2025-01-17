@@ -6,7 +6,7 @@ title: "Data types"
 
 ### `ClientInitializationOptions` {#Azure.ClientGenerator.Core.ClientInitializationOptions}
 
-Client initialization options.
+Client initialization customization options.
 
 ```typespec
 model Azure.ClientGenerator.Core.ClientInitializationOptions
@@ -14,11 +14,10 @@ model Azure.ClientGenerator.Core.ClientInitializationOptions
 
 #### Properties
 
-| Name            | Type         | Description                                                                                                                         |
-| --------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| parameters?     | `Model`      | Redefine the client initialization parameters.                                                                                      |
-| access?         | `EnumMember` | Determines the accessibility of the client initialization method. `Access.public` means the client could be initialized separately. |
-| accessorAccess? | `EnumMember` | Determines the accessibility of the client accessor method. `Access.public` means client could be got from parent client.           |
+| Name           | Type                  | Description                                                                                                                                                                                                                                                                                     |
+| -------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| parameters?    | `Model`               | Redefine the client initialization parameters you would like to add to the client.<br />By default, we apply endpoint, credential, and api-version parameters. If you specify parameters model, we will append the properties of the model to the parameters list of the client initialization. |
+| initializedBy? | `EnumMember \| Union` | Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually \| InitializedBy.parent`.                                                                     |
 
 ### `Access` {#Azure.ClientGenerator.Core.Access}
 
@@ -32,6 +31,19 @@ enum Azure.ClientGenerator.Core.Access
 | -------- | ------------ | -------------- |
 | public   | `"public"`   | Open to user   |
 | internal | `"internal"` | Hide from user |
+
+### `InitializedBy` {#Azure.ClientGenerator.Core.InitializedBy}
+
+InitializedBy value.
+
+```typespec
+enum Azure.ClientGenerator.Core.InitializedBy
+```
+
+| Name         | Value | Description                                       |
+| ------------ | ----- | ------------------------------------------------- |
+| individually | `1`   | The client could be initialized individually.     |
+| parent       | `2`   | The client could be initialized by parent client. |
 
 ### `Usage` {#Azure.ClientGenerator.Core.Usage}
 

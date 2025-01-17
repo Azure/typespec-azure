@@ -354,7 +354,7 @@ interface MyInterface {}
 
 #### `@clientInitialization`
 
-Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+Customize the client initialization way.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientInitialization(options: Azure.ClientGenerator.Core.ClientInitializationOptions, scope?: valueof string)
@@ -387,8 +387,8 @@ model MyServiceClientOptions {
 }
 
 @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
-// The generated client will have `blobName` on it. We will also
-// elevate the existing `blobName` parameter to the client level.
+// The generated client will have `blobName` on its initialization method. We will also
+// elevate the existing `blobName` parameter from method level to client level.
 ```
 
 #### `@clientName`
