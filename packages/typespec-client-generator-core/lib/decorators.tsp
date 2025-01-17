@@ -431,7 +431,22 @@ extern dec override(original: Operation, override: Operation, scope?: valueof st
 extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
 
 /**
- * Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+ * InitializedBy value.
+ */
+enum InitializedBy {
+  /**
+   * The client could be initialized individually.
+   */
+  individually: 1,
+
+  /**
+   * The client could be initialized by parent client.
+   */
+  parent: 2,
+}
+
+/**
+ * Customize the client initialization way.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -450,8 +465,8 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
  * }
  *
  * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
- * // The generated client will have `blobName` on it. We will also
- * // elevate the existing `blobName` parameter to the client level.
+ * // The generated client will have `blobName` on its initialization method. We will also
+ * // elevate the existing `blobName` parameter from method level to client level.
  * ```
  */
 extern dec clientInitialization(
@@ -461,23 +476,19 @@ extern dec clientInitialization(
 );
 
 /**
- * Client initialization options.
+ * Client initialization customization options.
  */
 model ClientInitializationOptions {
   /**
-   * Redefine the client initialization parameters.
+   * Redefine the client initialization parameters you would like to add to the client.
+   * By default, we apply endpoint, credential, and api-version parameters. If you specify parameters model, we will append the properties of the model to the parameters list of the client initialization.
    */
   parameters?: Model;
 
   /**
-   * Determines the accessibility of the client initialization method. `Access.public` means the client could be initialized separately.
+   * Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent`.
    */
-  access?: EnumMember;
-
-  /**
-   * Determines the accessibility of the client accessor method. `Access.public` means client could be got from parent client.
-   */
-  accessorAccess?: EnumMember;
+  initializedBy?: EnumMember | Union;
 }
 
 /**

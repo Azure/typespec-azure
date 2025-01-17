@@ -1,5 +1,7 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
+import { InitializedByFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: @clientInitialization", () => {
@@ -9,7 +11,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
   });
 
-  it("main client", async () => {
+  it("change client initialization", async () => {
     await runner.compileWithCustomization(
       `
       @service
@@ -29,17 +31,73 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     );
     const sdkPackage = runner.context.sdkPackage;
     const client = sdkPackage.clients[0];
-    strictEqual(client.clientInitialization.access, "public");
-    strictEqual(client.clientInitialization.parameters.length, 2);
+    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.init.parameters.length, 2);
     strictEqual(client.initialization.access, "public");
     strictEqual(client.initialization.properties.length, 2);
-    const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+    const endpoint = client.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpoint);
     strictEqual(
       endpoint,
       client.initialization.properties.find((x) => x.kind === "endpoint"),
     );
-    const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+    const blobName = client.init.parameters.find((x) => x.name === "blobName");
+    ok(blobName);
+    strictEqual(
+      blobName,
+      client.initialization.properties.find((x) => x.name === "blobName"),
+    );
+    strictEqual(blobName.clientDefaultValue, undefined);
+    strictEqual(blobName.onClient, true);
+    strictEqual(blobName.optional, false);
+
+    const methods = client.methods;
+    strictEqual(methods.length, 1);
+    const download = methods[0];
+    strictEqual(download.name, "download");
+    strictEqual(download.kind, "basic");
+    strictEqual(download.parameters.length, 0);
+
+    const downloadOp = download.operation;
+    strictEqual(downloadOp.parameters.length, 1);
+    const blobNameOpParam = downloadOp.parameters[0];
+    strictEqual(blobNameOpParam.name, "blobName");
+    strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
+    strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
+    strictEqual(blobNameOpParam.onClient, true);
+  });
+
+  it("backward compatibility", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace MyService;
+
+      op download(@path blobName: string): void;
+      `,
+      `
+      namespace MyCustomizations;
+
+      model MyClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.init.parameters.length, 2);
+    strictEqual(client.initialization.access, "public");
+    strictEqual(client.initialization.properties.length, 2);
+    const endpoint = client.init.parameters.find((x) => x.kind === "endpoint");
+    ok(endpoint);
+    strictEqual(
+      endpoint,
+      client.initialization.properties.find((x) => x.kind === "endpoint"),
+    );
+    const blobName = client.init.parameters.find((x) => x.name === "blobName");
     ok(blobName);
     strictEqual(
       blobName,
@@ -93,10 +151,10 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     const sdkPackage = runner.context.sdkPackage;
     const clientAccessor = sdkPackage.clients[0].methods[0];
     strictEqual(clientAccessor.kind, "clientaccessor");
-    strictEqual(clientAccessor.access, "public");
+    strictEqual(clientAccessor.access, "internal");
 
     const bumpParameterClient = clientAccessor.response;
-    strictEqual(bumpParameterClient.clientInitialization.access, "internal");
+    strictEqual(bumpParameterClient.init.initializedBy, InitializedByFlags.Parent);
     strictEqual(bumpParameterClient.initialization.access, "internal");
 
     const methods = bumpParameterClient.methods;
@@ -144,17 +202,17 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     strictEqual(clients.length, 1);
     const client = clients[0];
     strictEqual(client.name, "StorageClient");
-    strictEqual(client.clientInitialization.access, "public");
+    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
     strictEqual(client.initialization.access, "public");
-    strictEqual(client.clientInitialization.parameters.length, 2);
+    strictEqual(client.init.parameters.length, 2);
     strictEqual(client.initialization.properties.length, 2);
-    const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+    const endpoint = client.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpoint);
     strictEqual(
       endpoint,
       client.initialization.properties.find((x) => x.kind === "endpoint"),
     );
-    const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+    const blobName = client.init.parameters.find((x) => x.name === "blobName");
     ok(blobName);
     strictEqual(
       blobName,
@@ -185,9 +243,9 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
 
     strictEqual(blobClient.kind, "client");
     strictEqual(blobClient.name, "BlobClient");
+    strictEqual(blobClient.init.initializedBy, InitializedByFlags.Parent);
     strictEqual(blobClient.initialization.access, "internal");
-    strictEqual(blobClient.initialization.access, "internal");
-    strictEqual(blobClient.clientInitialization.parameters.length, 2);
+    strictEqual(blobClient.init.parameters.length, 2);
     strictEqual(blobClient.initialization.properties.length, 2);
 
     const blobClientEndpoint = blobClient.initialization.properties.find(
@@ -198,9 +256,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
       blobClientEndpoint,
       blobClient.initialization.properties.find((x) => x.kind === "endpoint"),
     );
-    const blobClientBlobName = blobClient.clientInitialization.parameters.find(
-      (x) => x.name === "blobName",
-    );
+    const blobClientBlobName = blobClient.init.parameters.find((x) => x.name === "blobName");
     ok(blobClientBlobName);
     strictEqual(
       blobClientBlobName,
@@ -245,18 +301,18 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     );
     const sdkPackage = runner.context.sdkPackage;
     const client = sdkPackage.clients[0];
-    strictEqual(client.clientInitialization.access, "public");
-    strictEqual(client.clientInitialization.parameters.length, 2);
+    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.init.parameters.length, 2);
     strictEqual(client.initialization.access, "public");
     strictEqual(client.initialization.properties.length, 2);
 
-    const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+    const endpoint = client.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpoint);
     strictEqual(
       endpoint,
       client.initialization.properties.find((x) => x.kind === "endpoint"),
     );
-    const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+    const blobName = client.init.parameters.find((x) => x.name === "blobName");
     ok(blobName);
     strictEqual(
       blobName,
@@ -314,18 +370,18 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     );
     const sdkPackage = runner.context.sdkPackage;
     const client = sdkPackage.clients[0];
-    strictEqual(client.clientInitialization.access, "public");
-    strictEqual(client.clientInitialization.parameters.length, 3);
+    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.init.parameters.length, 3);
     strictEqual(client.initialization.access, "public");
     strictEqual(client.initialization.properties.length, 3);
 
-    const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+    const endpoint = client.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpoint);
     strictEqual(
       endpoint,
       client.initialization.properties.find((x) => x.kind === "endpoint"),
     );
-    const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+    const blobName = client.init.parameters.find((x) => x.name === "blobName");
     ok(blobName);
     strictEqual(
       blobName,
@@ -335,9 +391,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     strictEqual(blobName.onClient, true);
     strictEqual(blobName.optional, false);
 
-    const containerName = client.clientInitialization.parameters.find(
-      (x) => x.name === "containerName",
-    );
+    const containerName = client.init.parameters.find((x) => x.name === "containerName");
     ok(containerName);
     strictEqual(
       containerName,
@@ -390,18 +444,18 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     strictEqual(sdkPackage.clients.length, 1);
 
     const client = sdkPackage.clients[0];
-    strictEqual(client.clientInitialization.access, "public");
+    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
     strictEqual(client.initialization.access, "public");
-    strictEqual(client.clientInitialization.parameters.length, 3);
+    strictEqual(client.init.parameters.length, 3);
     strictEqual(client.initialization.properties.length, 3);
 
-    const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+    const endpoint = client.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpoint);
     strictEqual(
       endpoint,
       client.initialization.properties.find((x) => x.kind === "endpoint"),
     );
-    const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+    const blobName = client.init.parameters.find((x) => x.name === "blobName");
     ok(blobName);
     strictEqual(
       blobName,
@@ -410,9 +464,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     strictEqual(blobName.clientDefaultValue, undefined);
     strictEqual(blobName.onClient, true);
 
-    const containerName = client.clientInitialization.parameters.find(
-      (x) => x.name === "containerName",
-    );
+    const containerName = client.init.parameters.find((x) => x.name === "containerName");
     ok(containerName);
     strictEqual(
       containerName,
@@ -428,14 +480,14 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     const og = clientAccessor.response;
     strictEqual(og.kind, "client");
 
-    strictEqual(og.clientInitialization.access, "internal");
-    strictEqual(og.clientInitialization.parameters.length, 3);
+    strictEqual(og.init.initializedBy, InitializedByFlags.Parent);
+    strictEqual(og.init.parameters.length, 3);
     strictEqual(og.initialization.access, "internal");
     strictEqual(og.initialization.properties.length, 3);
 
-    ok(og.clientInitialization.parameters.find((x) => x.kind === "endpoint"));
-    ok(og.clientInitialization.parameters.find((x) => x === blobName));
-    ok(og.clientInitialization.parameters.find((x) => x === containerName));
+    ok(og.init.parameters.find((x) => x.kind === "endpoint"));
+    ok(og.init.parameters.find((x) => x === blobName));
+    ok(og.init.parameters.find((x) => x === containerName));
     ok(og.initialization.properties.find((x) => x.kind === "endpoint"));
     ok(og.initialization.properties.find((x) => x === blobName));
     ok(og.initialization.properties.find((x) => x === containerName));
@@ -493,23 +545,19 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
 
     const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
     ok(containerClient);
-    strictEqual(containerClient.clientInitialization.access, "public");
+    strictEqual(containerClient.init.initializedBy, InitializedByFlags.Individually);
     strictEqual(containerClient.initialization.access, "public");
-    strictEqual(containerClient.clientInitialization.parameters.length, 2);
+    strictEqual(containerClient.init.parameters.length, 2);
     strictEqual(containerClient.initialization.properties.length, 2);
 
-    const endpoint = containerClient.clientInitialization.parameters.find(
-      (x) => x.kind === "endpoint",
-    );
+    const endpoint = containerClient.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpoint);
     strictEqual(
       endpoint,
       containerClient.initialization.properties.find((x) => x.kind === "endpoint"),
     );
 
-    const containerName = containerClient.clientInitialization.parameters.find(
-      (x) => x.name === "containerName",
-    );
+    const containerName = containerClient.init.parameters.find((x) => x.name === "containerName");
     ok(containerName);
     strictEqual(
       containerName,
@@ -526,21 +574,19 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
 
     const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
     ok(blobClient);
-    strictEqual(blobClient.clientInitialization.access, "public");
+    strictEqual(blobClient.init.initializedBy, InitializedByFlags.Individually);
     strictEqual(blobClient.initialization.access, "public");
-    strictEqual(blobClient.clientInitialization.parameters.length, 3);
+    strictEqual(blobClient.init.parameters.length, 3);
     strictEqual(blobClient.initialization.properties.length, 3);
 
-    const endpointOnBlobClient = blobClient.clientInitialization.parameters.find(
-      (x) => x.kind === "endpoint",
-    );
+    const endpointOnBlobClient = blobClient.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpointOnBlobClient);
     strictEqual(
       endpointOnBlobClient,
       blobClient.initialization.properties.find((x) => x.kind === "endpoint"),
     );
 
-    const containerNameOnBlobClient = blobClient.clientInitialization.parameters.find(
+    const containerNameOnBlobClient = blobClient.init.parameters.find(
       (x) => x.name === "containerName",
     );
     ok(containerNameOnBlobClient);
@@ -549,7 +595,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
       blobClient.initialization.properties.find((x) => x.name === "containerName"),
     );
 
-    const blobName = blobClient.clientInitialization.parameters.find((x) => x.name === "blobName");
+    const blobName = blobClient.init.parameters.find((x) => x.name === "blobName");
     ok(blobName);
     strictEqual(
       blobName,
@@ -591,19 +637,19 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     );
     const sdkPackage = runner.context.sdkPackage;
     const client = sdkPackage.clients[0];
-    strictEqual(client.clientInitialization.access, "public");
+    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
     strictEqual(client.initialization.access, "public");
-    strictEqual(client.clientInitialization.parameters.length, 2);
+    strictEqual(client.init.parameters.length, 2);
     strictEqual(client.initialization.properties.length, 2);
 
-    const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+    const endpoint = client.init.parameters.find((x) => x.kind === "endpoint");
     ok(endpoint);
     strictEqual(
       endpoint,
       client.initialization.properties.find((x) => x.kind === "endpoint"),
     );
 
-    const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+    const blobName = client.init.parameters.find((x) => x.name === "blobName");
     ok(blobName);
     strictEqual(
       blobName,
@@ -639,31 +685,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     strictEqual(uploadOp.parameters[0].correspondingMethodParams[0], blobName);
   });
 
-  it("internal client initialization", async () => {
-    await runner.compileWithCustomization(
-      `
-      @service
-      namespace MyService;
-
-      op download(@path blobName: string): void;
-      `,
-      `
-      namespace MyCustomizations;
-
-      model MyClientInitialization {
-        blobName: string;
-      }
-
-      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization, access: Access.internal});
-      `,
-    );
-    const sdkPackage = runner.context.sdkPackage;
-    const client = sdkPackage.clients[0];
-    strictEqual(client.clientInitialization.access, "internal");
-    strictEqual(client.initialization.access, "internal");
-  });
-
-  it("public sub client initialization and internal client accessor", async () => {
+  it("sub client initialized individually", async () => {
     await runner.compileWithBuiltInService(
       `
       model clientInitModel
@@ -672,7 +694,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
       }
 
       @route("/bump")
-      @clientInitialization({parameters: clientInitModel, access: Access.public, accessorAccess: Access.internal})
+      @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually})
       interface bumpParameter {
           @route("/op1")
           @doc("bump parameter")
@@ -694,7 +716,38 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     strictEqual(clientAccessor.access, "internal");
 
     const bumpParameterClient = clientAccessor.response;
-    strictEqual(bumpParameterClient.clientInitialization.access, "public");
-    strictEqual(bumpParameterClient.initialization.access, "public");
+    strictEqual(bumpParameterClient.init.initializedBy, InitializedByFlags.Individually);
+    strictEqual(bumpParameterClient.initialization.access, "internal");
+  });
+
+  it("wrong initializedBy value type", async () => {
+    const diagnostics = await runner.diagnose(`
+      @clientInitialization({initializedBy: 4})
+      namespace Test {
+      }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "invalid-argument",
+    });
+  });
+
+  it("wrong initializedBy value", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace MyService;
+
+      op download(@path blobName: string): void;
+      `,
+      `
+      namespace MyCustomizations;
+
+      @@clientInitialization(MyService, {initializedBy: InitializedBy.parent});
+      `,
+    );
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
+    });
   });
 });

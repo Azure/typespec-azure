@@ -1,7 +1,7 @@
 ---
-changeKind: breaking
+changeKind: feature
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-`getClientInitialization` now return `ClientInitializationOptions` types. It includes the info of the client initialization parameter list, the client initialization access value and the client accessor access value.
+Add new `children` property to `SdkClientType` to include all the sub client belong to that client.

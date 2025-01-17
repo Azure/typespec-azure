@@ -623,6 +623,7 @@ model SubClientOptions {
 
 - Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type to accept `initializedBy` setting.
 - Add `clientInitialization` property to `SdkInitializationType`.
+- Add check for `initializedBy`, root clients could only have `individually` value.
 
 2. Deprecate client accessor method. Add `subClients` property to `SdkClientType` and put all sub clients in this list.
 

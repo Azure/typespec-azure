@@ -1,7 +1,7 @@
 ---
-changeKind: breaking
+changeKind: feature
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type. The options now could set the client initialization method's access and client accessor's access. This is a behavior breaking change for this decorator. All specs that use this decorator should change from `@clientInitialization(CustomizedOption)` to `@clientInitialization({parameters: CustomizedOption})`.
+Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type. The options now could set how to initialize the client. Though the implementation could support backward compatibility, it's better to have all specs that use this decorator change from `@clientInitialization(CustomizedOption)` to `@clientInitialization({parameters: CustomizedOption})`. A new helper `getClientInitializationOptions` is added for getting the new `ClientInitializationOptions` info from the `@clientInitialization` decorator.

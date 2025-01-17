@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add `clientInitialization` property to `SdkClientType`. It indicate the initialization method's signature, including the parameter list and access, etc.
+Add `init` property to `SdkClientType`. Its type is `SdkClientInitializationType` which includes the initialization parameters and how to initialize the client.

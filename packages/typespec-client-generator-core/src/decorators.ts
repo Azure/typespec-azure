@@ -49,6 +49,7 @@ import {
   ClientInitializationOptions,
   LanguageScopes,
   SdkClient,
+  SdkInitializationType,
   SdkMethodParameter,
   SdkModelPropertyType,
   SdkOperationGroup,
@@ -758,19 +759,16 @@ export const $access: AccessDecorator = (
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
-  validateAccessValue(context, entity, value);
-  setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
-};
-
-function validateAccessValue(context: DecoratorContext, entity: Type, value: EnumMember) {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
       code: "access",
       format: {},
       target: entity,
     });
+    return;
   }
-}
+  setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
+};
 
 export function getAccessOverride(
   context: TCGCContext,
@@ -826,6 +824,7 @@ export const $flattenProperty: FlattenPropertyDecorator = (
       format: {},
       target: target,
     });
+    return;
   }
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line @typescript-eslint/no-deprecated
 };
@@ -873,6 +872,7 @@ export const $clientName: ClientNameDecorator = (
       format: {},
       target: entity,
     });
+    return;
   }
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 };
@@ -961,6 +961,7 @@ export const $override = (
         overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
       },
     });
+    return;
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
@@ -1004,6 +1005,7 @@ export const $alternateType: AlternateTypeDecorator = (
       },
       target: source,
     });
+    return;
   }
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
 };
@@ -1037,15 +1039,36 @@ export const $clientInitialization: ClientInitializationDecorator = (
   scope?: LanguageScopes,
 ) => {
   if (options.kind === "Model") {
-    if (options.properties.get("access")) {
-      validateAccessValue(context, target, options.properties.get("access")!.type as EnumMember);
-    }
-    if (options.properties.get("accessorAccess")) {
-      validateAccessValue(
-        context,
-        target,
-        options.properties.get("accessorAccess")!.type as EnumMember,
-      );
+    if (options.properties.get("initializedBy")) {
+      const value = options.properties.get("initializedBy")!.type;
+
+      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+
+      if (value.kind === "EnumMember") {
+        if (typeof value.value !== "number" || !isValidValue(value.value)) {
+          reportDiagnostic(context.program, {
+            code: "invalid-initialized-by",
+            format: {},
+            target: target,
+          });
+          return;
+        }
+      } else if (value.kind === "Union") {
+        for (const variant of value.variants.values()) {
+          if (
+            variant.type.kind !== "EnumMember" ||
+            typeof variant.type.value !== "number" ||
+            !isValidValue(variant.type.value)
+          ) {
+            reportDiagnostic(context.program, {
+              code: "invalid-initialized-by",
+              format: {},
+              target: target,
+            });
+            return;
+          }
+        }
+      }
     }
 
     setScopedDecoratorData(
@@ -1059,30 +1082,77 @@ export const $clientInitialization: ClientInitializationDecorator = (
   }
 };
 
+/**
+ * Get `SdkInitializationType` for namespace or interface. The info is from `@clientInitialization` decorator.
+ *
+ * @param context
+ * @param entity namespace or interface which represents a client
+ * @returns
+ * @deprecated This function is deprecated. Use `getClientInitializationOptions` instead.
+ */
 export function getClientInitialization(
+  context: TCGCContext,
+  entity: Namespace | Interface,
+): SdkInitializationType | undefined {
+  let options = getScopedDecoratorData(context, clientInitializationKey, entity);
+  if (options === undefined) return undefined;
+  // backward compatibility
+  if (options.properties.get("initializedBy")) return undefined;
+  if (options.properties.get("parameters")) options = options.properties.get("parameters").type;
+  const sdkModel = getSdkModel(context, options);
+  const initializationProps = sdkModel.properties.map(
+    (property: SdkModelPropertyType): SdkMethodParameter => {
+      property.onClient = true;
+      property.kind = "method";
+      return property as SdkMethodParameter;
+    },
+  );
+  return {
+    ...sdkModel,
+    properties: initializationProps,
+  };
+}
+
+/**
+ * Get client initialization options for namespace or interface. The info is from `@clientInitialization` decorator.
+ *
+ * @param context
+ * @param entity namespace or interface which represents a client
+ * @returns
+ */
+export function getClientInitializationOptions(
   context: TCGCContext,
   entity: Namespace | Interface,
 ): ClientInitializationOptions | undefined {
   const options = getScopedDecoratorData(context, clientInitializationKey, entity);
   if (options === undefined) return undefined;
 
-  const model = options.properties.get("parameters")
-    ? getSdkModel(context, options.properties.get("parameters").type)
-    : undefined;
+  // backward compatibility
+  if (
+    options.properties.get("initializedBy") === undefined &&
+    options.properties.get("parameters") === undefined
+  ) {
+    return {
+      parameters: options,
+    };
+  }
+
+  let initializedBy = undefined;
+
+  if (options.properties.get("initializedBy")) {
+    if (options.properties.get("initializedBy").type.kind === "EnumMember") {
+      initializedBy = options.properties.get("initializedBy").type.value;
+    } else if (options.properties.get("initializedBy").type.kind === "Union") {
+      initializedBy = 0;
+      for (const variant of options.properties.get("initializedBy").type.variants.values()) {
+        initializedBy |= variant.type.value;
+      }
+    }
+  }
+
   return {
-    parameters: model
-      ? model.properties.map((property: SdkModelPropertyType): SdkMethodParameter => {
-          property.onClient = true;
-          property.kind = "method";
-          return property as SdkMethodParameter;
-        })
-      : undefined,
-    access: options.properties.get("access")
-      ? options.properties.get("access").type.value
-      : undefined,
-    accessorAccess: options.properties.get("accessorAccess")
-      ? options.properties.get("accessorAccess").type.value
-      : undefined,
+    parameters: options.properties.get("parameters")?.type,
+    initializedBy: initializedBy,
   };
 }
 
@@ -1128,6 +1198,7 @@ export const $clientNamespace: ClientNamespaceDecorator = (
       format: {},
       target: entity,
     });
+    return;
   }
   setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
 };

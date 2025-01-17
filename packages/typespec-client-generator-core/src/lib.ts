@@ -250,6 +250,12 @@ export const $lib = createTypeSpecLibrary({
         default: `@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
       },
     },
+    "invalid-initialized-by": {
+      severity: "error",
+      messages: {
+        default: `Invalid 'initializedBy' value.`,
+      },
+    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,
