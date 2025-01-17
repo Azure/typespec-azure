@@ -27,10 +27,7 @@ namespace Azure.ResourceManager.Legacy {
     @autoRoute
     @doc("Create a {name}", Resource)
     @armResourceCreateOrUpdate(Resource)
-    @Azure.Core.Foundations.Private.defaultFinalStateVia(#[
-      "location",
-      "azure-async-operation"
-    ])
+    @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
     @put
     CreateOrUpdateAsync<
       Resource extends Azure.ResourceManager.CommonTypes.Resource,
@@ -145,11 +142,7 @@ namespace Azure.ResourceManager.Legacy {
         Azure.Core.Foundations.RetryAfterHeader,
       Parameters extends {} = {},
       Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse
-    >(
-      ...ParentParameters,
-      ...ResourceTypeParameter,
-      ...Parameters,
-    ): Response | ErrorType;
+    >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
 
     /**
      * @dev Delete a resource synchronously
@@ -167,11 +160,7 @@ namespace Azure.ResourceManager.Legacy {
       Resource extends Azure.ResourceManager.CommonTypes.Resource,
       Parameters extends {} = {},
       Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse
-    >(
-      ...ParentParameters,
-      ...ResourceTypeParameter,
-      ...Parameters,
-    ): Response | ErrorType;
+    >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
 
     /**
      * @dev Get a resource
@@ -188,11 +177,7 @@ namespace Azure.ResourceManager.Legacy {
       Resource extends Azure.ResourceManager.CommonTypes.Resource,
       Parameters extends {} = {},
       Response extends {} = ArmResponse<Resource>
-    >(
-      ...ParentParameters,
-      ...ResourceTypeParameter,
-      ...Parameters,
-    ): Response | ErrorType;
+    >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
 
     /**
      * @dev List a resource
