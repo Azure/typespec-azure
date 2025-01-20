@@ -72,7 +72,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       strictEqual(runner.context.sdkPackage.enums[0].clientNamespace, "TestService");
     });
 
-    it("namespace on response in a template", async () => {
+    it("namespace on anonymous response in a template", async () => {
       runner = await createSdkTestRunner({
         librariesToAdd: [AzureCoreTestLibrary],
         autoUsings: ["Azure.Core", "Azure.Core.Traits"],
@@ -100,6 +100,37 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       strictEqual(responseType.kind, "model");
       // TODO -- this is currently empty which might be an issue, tracking in @typespec/http library issue https://github.com/microsoft/typespec/issues/5664
       strictEqual(responseType.clientNamespace, "");
+    });
+
+    it("namespace on concrete response in a template", async () => {
+      runner = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runner.compileWithBuiltInAzureCoreService(`
+          alias ServiceTraits = SupportsRepeatableRequests &
+          SupportsConditionalRequests &
+          SupportsClientRequestId;
+
+          model ServiceStatus {
+            statusString: string;
+          }
+          
+          @route("service-status")
+          op getServiceStatus is RpcOperation<
+            {},
+            ServiceStatus,
+            ServiceTraits
+          >;
+        `);
+
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.kind, "basic");
+      const responseType = method.response.type;
+      ok(responseType);
+      strictEqual(responseType.kind, "model");
+      strictEqual(responseType.clientNamespace, "My.Service");
     });
 
     it("namespace on union", async () => {
