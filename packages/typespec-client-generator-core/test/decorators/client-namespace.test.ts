@@ -1,3 +1,4 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkClientType, SdkServiceOperation } from "../../src/interfaces.js";
@@ -69,6 +70,35 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       `,
       );
       strictEqual(runner.context.sdkPackage.enums[0].clientNamespace, "TestService");
+    });
+
+    it("namespace on response in a template", async () => {
+      runner = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runner.compileWithBuiltInAzureCoreService(`
+          alias ServiceTraits = SupportsRepeatableRequests &
+          SupportsConditionalRequests &
+          SupportsClientRequestId;
+          
+          @route("service-status")
+          op getServiceStatus is RpcOperation<
+            {},
+            {
+              statusString: string;
+            },
+            ServiceTraits
+          >;
+        `);
+
+      const method = runner.context.sdkPackage.clients[0].methods[0];
+      strictEqual(method.kind, "basic");
+      const responseType = method.response.type;
+      ok(responseType);
+      strictEqual(responseType.kind, "model");
+      strictEqual(responseType.clientNamespace, "My.Service");
     });
 
     it("namespace on union", async () => {
