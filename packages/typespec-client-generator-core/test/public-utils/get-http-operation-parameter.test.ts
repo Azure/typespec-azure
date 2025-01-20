@@ -439,7 +439,7 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
     const client = sdkPackage.clients[0];
     let httpParam = getHttpOperationParameter(
       client.methods[0] as SdkServiceMethod<SdkHttpOperation>,
-      client.initialization.properties[0] as SdkMethodParameter,
+      client.initialization.properties[1] as SdkMethodParameter,
     );
     ok(httpParam);
     strictEqual(httpParam.kind, "path");
@@ -447,7 +447,7 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
 
     httpParam = getHttpOperationParameter(
       client.methods[1] as SdkServiceMethod<SdkHttpOperation>,
-      client.initialization.properties[0] as SdkMethodParameter,
+      client.initialization.properties[1] as SdkMethodParameter,
     );
     ok(httpParam);
     strictEqual(httpParam.kind, "path");

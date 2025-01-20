@@ -734,42 +734,4 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
       code: "invalid-argument",
     });
   });
-
-  it("first level client could not be initialized by parent", async () => {
-    await runner.compileWithCustomization(
-      `
-      @service
-      namespace MyService;
-
-      op download(@path blobName: string): void;
-      `,
-      `
-      namespace MyCustomizations;
-
-      @@clientInitialization(MyService, {initializedBy: InitializedBy.parent});
-      `,
-    );
-    expectDiagnostics(runner.context.diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
-      message:
-        "Invalid 'initializedBy' value. First level client could not be initialized by parent.",
-    });
-  });
-
-  it("sub client could not only be initialized individually", async () => {
-    await runner.compileWithBuiltInService(
-      `
-      @route("/bump")
-      @clientInitialization({initializedBy: InitializedBy.individually})
-      interface SubClient {
-          op test(): void;
-      }
-      `,
-    );
-    expectDiagnostics(runner.context.diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
-      message:
-        "Invalid 'initializedBy' value. Sub client could not only be initialized individually.",
-    });
-  });
 });

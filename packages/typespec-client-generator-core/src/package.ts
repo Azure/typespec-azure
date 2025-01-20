@@ -873,11 +873,12 @@ function addDefaultClientParameters<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
   const diagnostics = createDiagnosticCollector();
+  const defaultClientParamters = [];
   // there will always be an endpoint property
-  client.init.parameters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
+  defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
   const credentialParam = getSdkCredentialParameter(context, client.__raw);
   if (credentialParam) {
-    client.init.parameters.push(credentialParam);
+    defaultClientParamters.push(credentialParam);
   }
   let apiVersionParam = context.__clientToParameters
     .get(client.__raw.type)
@@ -893,7 +894,7 @@ function addDefaultClientParameters<
     }
   }
   if (apiVersionParam) {
-    client.init.parameters.push(apiVersionParam);
+    defaultClientParamters.push(apiVersionParam);
   }
   let subId = context.__clientToParameters
     .get(client.__raw.type)
@@ -908,8 +909,9 @@ function addDefaultClientParameters<
     }
   }
   if (subId) {
-    client.init.parameters.push(subId);
+    defaultClientParamters.push(subId);
   }
+  client.init.parameters = [...defaultClientParamters, ...client.init.parameters];
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {
