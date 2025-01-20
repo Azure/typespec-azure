@@ -247,13 +247,13 @@ export const $lib = createTypeSpecLibrary({
     "invalid-alternate-source-type": {
       severity: "error",
       messages: {
-        default: `@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
+        default: paramMessage`@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
       },
     },
     "invalid-initialized-by": {
       severity: "error",
       messages: {
-        default: `Invalid 'initializedBy' value.`,
+        default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
     },
   },

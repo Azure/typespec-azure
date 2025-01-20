@@ -1048,7 +1048,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
           reportDiagnostic(context.program, {
             code: "invalid-initialized-by",
-            format: {},
+            format: { message: "Please use `InitializedBy` enum to set the value." },
             target: target,
           });
           return;
@@ -1062,7 +1062,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
           ) {
             reportDiagnostic(context.program, {
               code: "invalid-initialized-by",
-              format: {},
+              format: { message: "Please use `InitializedBy` enum to set the value." },
               target: target,
             });
             return;

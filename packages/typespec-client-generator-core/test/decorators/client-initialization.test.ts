@@ -694,7 +694,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
       }
 
       @route("/bump")
-      @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually})
+      @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually | InitializedBy.parent})
       interface bumpParameter {
           @route("/op1")
           @doc("bump parameter")
@@ -716,7 +716,10 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     strictEqual(clientAccessor.access, "internal");
 
     const bumpParameterClient = clientAccessor.response;
-    strictEqual(bumpParameterClient.init.initializedBy, InitializedByFlags.Individually);
+    strictEqual(
+      bumpParameterClient.init.initializedBy,
+      InitializedByFlags.Individually | InitializedByFlags.Parent,
+    );
     strictEqual(bumpParameterClient.initialization.access, "internal");
   });
 
@@ -732,7 +735,7 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     });
   });
 
-  it("wrong initializedBy value", async () => {
+  it("first level client could not be initialized by parent", async () => {
     await runner.compileWithCustomization(
       `
       @service
@@ -748,6 +751,25 @@ describe("typespec-client-generator-core: @clientInitialization", () => {
     );
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
+      message:
+        "Invalid 'initializedBy' value. First level client could not be initialized by parent.",
+    });
+  });
+
+  it("sub client could not only be initialized individually", async () => {
+    await runner.compileWithBuiltInService(
+      `
+      @route("/bump")
+      @clientInitialization({initializedBy: InitializedBy.individually})
+      interface SubClient {
+          op test(): void;
+      }
+      `,
+    );
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
+      message:
+        "Invalid 'initializedBy' value. Sub client could not only be initialized individually.",
     });
   });
 });

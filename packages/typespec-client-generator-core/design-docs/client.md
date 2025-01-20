@@ -35,29 +35,7 @@ sub_client = client.sub_client(sub_name="sub")
 sub_client.do_something()
 ```
 
-3. Client with sub client and sub client could be initialized individually
-
-- Sub client has same initialization parameters with parent client
-
-```python
-client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
-client.do_something()
-
-sub_client = TestSubClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
-sub_client.do_something()
-```
-
-- Sub client has additional initialization parameter than parent client
-
-```python
-client = TestClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
-client.do_something()
-
-sub_client = TestSubClient(endpoint="endpoint", credential=AzureKeyCredential("key"), sub_name="sub")
-sub_client.do_something()
-```
-
-4. Client with sub client and sub client could be initialized both by parent and individually
+3. Client with sub client and sub client could be initialized both by parent and individually
 
 Storage, container registry, etc., could fit this scenario.
 
@@ -519,56 +497,7 @@ model SubClientOptions {
 );
 ```
 
-3. Client with sub client and sub client could be initialized individually
-
-- Sub client has same initialization parameters with parent client
-
-```typespec
-@service({
-  title: "Scenario3",
-})
-namespace TestClient {
-  op do_something(): void;
-
-  interface SubClient {
-    do_something(): void;
-  }
-}
-
-@@clientInitialization(TestClient.SubClient,
-  {
-    intializedBy: InitializedBy.individually,
-  }
-);
-```
-
-- Sub client has additional initialization parameter than parent client
-
-```typespec
-@service({
-  title: "Scenario3",
-})
-namespace TestClient {
-  op do_something(): void;
-
-  interface SubClient {
-    do_something(subName: string): void;
-  }
-}
-
-model SubClientOptions {
-  subName: string;
-}
-
-@@clientInitialization(TestClient.SubClient,
-  {
-    parameters: SubClientOptions,
-    intializedBy: InitializedBy.individually,
-  }
-);
-```
-
-4. Client with sub client and sub client could be initialized both by parent and individually
+3. Client with sub client and sub client could be initialized both by parent and individually
 
 - Sub client has same initialization parameters with parent client
 

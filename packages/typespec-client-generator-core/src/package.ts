@@ -608,13 +608,23 @@ function createSdkClientInitializationType(
         createDiagnostic({
           code: "invalid-initialized-by",
           target: client.type,
-          format: {
-            initializedBy: initializationOptions.initializedBy,
-          },
+          format: { message: "First level client could not be initialized by parent." },
         }),
       );
+    } else if (
+      client.kind === "SdkOperationGroup" &&
+      initializationOptions.initializedBy === InitializedByFlags.Individually
+    ) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "invalid-initialized-by",
+          target: client.type,
+          format: { message: "Sub client could not only be initialized individually." },
+        }),
+      );
+    } else {
+      result.initializedBy = initializationOptions.initializedBy;
     }
-    result.initializedBy = initializationOptions.initializedBy;
   }
   if (initializationOptions?.parameters) {
     // Cache elevated parameter, then we could use it to set `onClient` property for method parameters.
