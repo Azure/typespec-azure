@@ -529,6 +529,11 @@ export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
   resultPath?: string; // if exists, tells you how to get from the service response to the method response.
+  /**
+   * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
+   * Temporarily this is not enabled for paging now.
+   */
+  resultProperties?: SdkModelPropertyType[];
 }
 
 export interface SdkServiceResponse {

@@ -315,7 +315,10 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
 
   basicServiceMethod.response.type = metadata.finalResponse?.result;
 
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   basicServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
+
+  basicServiceMethod.response.resultProperties = metadata.finalResponse?.resultProperties;
 
   return diagnostics.wrap({
     ...basicServiceMethod,
