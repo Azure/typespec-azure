@@ -27,8 +27,10 @@ import {
   getSummary,
   getVisibility,
   ignoreDiagnostics,
+  isArrayModelType,
   isErrorModel,
   isNeverType,
+  resolveEncodedName,
 } from "@typespec/compiler";
 import {
   Authentication,
@@ -114,6 +116,7 @@ import {
 } from "./public-utils.js";
 
 import { getVersions } from "@typespec/versioning";
+import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 
 export function getTypeSpecBuiltInType(
@@ -543,6 +546,8 @@ export function getSdkUnionWithDiagnostics(
     if (nullOption !== undefined) {
       retval = {
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+        isGeneratedName: !type.name,
         type: retval,
         access: "public",
         usage: UsageFlags.None,
@@ -672,8 +677,9 @@ function addDiscriminatorToModelType(
       optional: false,
       discriminator: true,
       serializedName: discriminatorProperty
-        ? discriminatorProperty.serializedName
+        ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
         : discriminator.propertyName,
+      serializationOptions: {},
       type: discriminatorType!,
       name,
       isGeneratedName: false,
@@ -736,6 +742,7 @@ export function getSdkModelWithDiagnostics(
       usage,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
+      serializationOptions: {},
     };
     updateReferencedTypeMap(context, type, sdkType);
 
@@ -1235,7 +1242,7 @@ function updateMultiPartInfo(
   const diagnostics = createDiagnosticCollector();
   if (httpOperationPart) {
     // body decorated with @multipartBody
-    base.multipartOptions = {
+    base.serializationOptions.multipart = {
       isFilePart: isFilePart(context, base.type),
       isMulti: httpOperationPart.multi,
       filename: httpOperationPart.filename
@@ -1247,11 +1254,13 @@ function updateMultiPartInfo(
           )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
+      name: base.name,
     };
     // after https://github.com/microsoft/typespec/issues/3779 fixed, could use httpOperationPart.name directly
     const httpPart = getHttpPart(context.program, type.type);
     if (httpPart?.options?.name) {
-      base.serializedName = httpPart?.options?.name;
+      base.serializedName = httpPart?.options?.name; // eslint-disable-line @typescript-eslint/no-deprecated
+      base.serializationOptions.multipart.name = httpPart?.options?.name;
     }
   } else {
     // common body
@@ -1272,15 +1281,16 @@ function updateMultiPartInfo(
           }),
         );
       }
-      base.multipartOptions = {
+      base.serializationOptions.multipart = {
         isFilePart: isBytesInput,
         isMulti: base.type.kind === "array",
         defaultContentTypes: [],
+        name: base.name,
       };
     }
   }
-  if (base.multipartOptions !== undefined) {
-    base.isMultipartFileInput = base.multipartOptions.isFilePart;
+  if (base.serializationOptions.multipart !== undefined) {
+    base.isMultipartFileInput = base.serializationOptions.multipart.isFilePart; // eslint-disable-line @typescript-eslint/no-deprecated
   }
 
   return diagnostics.wrap(undefined);
@@ -1312,6 +1322,7 @@ export function getSdkModelPropertyType(
     serializedName: getPropertyNames(context, type)[1],
     isMultipartFileInput: false,
     flatten: shouldFlattenProperty(context, type),
+    serializationOptions: {},
   };
   if (operation && type.model) {
     const httpOperation = getHttpOperationWithCache(context, operation);
@@ -1323,6 +1334,7 @@ export function getSdkModelPropertyType(
       if (type.model === httpBodyType) {
         // only try to add multipartOptions for property of body
         diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
+        result.multipartOptions = result.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
       }
     }
   }
@@ -1370,7 +1382,7 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
   context.referencedTypeMap.set(type, sdkType);
 }
 
-interface ModelUsageOptions {
+interface PropagationOptions {
   seenTypes?: Set<SdkType>;
   propagation?: boolean;
   skipFirst?: boolean;
@@ -1383,20 +1395,20 @@ function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
   type?: SdkType,
-  options?: ModelUsageOptions,
+  options?: PropagationOptions,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   options = options ?? {};
+  options.seenTypes = options.seenTypes ?? new Set<SdkType>();
   options.propagation = options?.propagation ?? true;
   options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
+
   if (!type) return diagnostics.wrap(undefined);
-  if (options?.seenTypes === undefined) {
-    options.seenTypes = new Set<SdkType>();
-  }
   if (options.seenTypes.has(type)) {
     options.skipFirst = false;
     return diagnostics.wrap(undefined); // avoid circular references
   }
+
   if (type.kind === "array" || type.kind === "dict") {
     diagnostics.pipe(updateUsageOrAccess(context, value, type.valueType, options));
     return diagnostics.wrap(undefined);
@@ -1405,14 +1417,19 @@ function updateUsageOrAccess(
     diagnostics.pipe(updateUsageOrAccess(context, value, type.enumType, options));
     return diagnostics.wrap(undefined);
   }
+
   if (
     type.kind !== "model" &&
     type.kind !== "enum" &&
     type.kind !== "union" &&
     type.kind !== "nullable"
-  )
+  ) {
     return diagnostics.wrap(undefined);
-  options.seenTypes.add(type);
+  }
+
+  if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
+    options.seenTypes.add(type);
+  }
 
   if (!options.skipFirst) {
     if (typeof value === "number") {
@@ -1580,6 +1597,10 @@ function updateTypesFromOperation(
           }),
         );
       }
+
+      // add serialization options to model type
+      updateSerializationOptions(context, sdkType, httpBody.contentTypes);
+
       // after completion of usage calculation for httpBody, check whether it has
       // conflicting usage between multipart and regular body
       if (sdkType.kind === "model") {
@@ -1626,6 +1647,9 @@ function updateTypesFromOperation(
           if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
           }
+
+          // add serialization options to model type
+          updateSerializationOptions(context, sdkType, innerResponse.body.contentTypes);
         }
         const access = getAccessOverride(context, operation) ?? "public";
         diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
@@ -1674,6 +1698,8 @@ function updateTypesFromOperation(
     diagnostics.pipe(updateUsageOrAccess(context, usage, sdkType));
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+    // add serialization options to model type, and always set to application/json for lro
+    updateSerializationOptions(context, sdkType, ["application/json"]);
   }
 }
 
@@ -1731,6 +1757,8 @@ function handleServiceOrphanType(
   const diagnostics = createDiagnosticCollector();
   const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
   diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.None, sdkType));
+  // add serialization options to model type
+  updateSerializationOptions(context, sdkType, []);
   return diagnostics.wrap(undefined);
 }
 
@@ -1864,4 +1892,195 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   updateSpreadModelUsageAndAccess(context);
 
   return diagnostics.wrap(undefined);
+}
+
+function updateSerializationOptions(
+  context: TCGCContext,
+  type: SdkType,
+  contentTypes: string[],
+  options?: PropagationOptions,
+) {
+  options = options ?? {};
+  options.seenTypes = options.seenTypes ?? new Set<SdkType>();
+  options.propagation = options?.propagation ?? true;
+  options.ignoreSubTypeStack = options.ignoreSubTypeStack ?? [];
+
+  if (options.seenTypes.has(type)) {
+    return; // avoid circular references
+  }
+
+  if (type.kind === "array" || type.kind === "dict") {
+    updateSerializationOptions(context, type.valueType, contentTypes, options);
+    return;
+  }
+
+  if (type.kind !== "model" && type.kind !== "union" && type.kind !== "nullable") return;
+
+  if (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1)) {
+    options.seenTypes.add(type);
+  }
+
+  if (type.kind === "union") {
+    for (const unionType of type.variantTypes) {
+      updateSerializationOptions(context, unionType, contentTypes, options);
+    }
+    return;
+  }
+  if (type.kind === "nullable") {
+    updateSerializationOptions(context, type.type, contentTypes, options);
+    return;
+  }
+
+  setSerializationOptions(context, type, contentTypes);
+  for (const property of type.properties) {
+    if (property.kind === "property") {
+      setSerializationOptions(context, property, contentTypes);
+    }
+  }
+
+  if (type.baseModel) {
+    options.ignoreSubTypeStack.push(true);
+    updateSerializationOptions(context, type.baseModel, contentTypes, options);
+    options.ignoreSubTypeStack.pop();
+  }
+  if (
+    type.discriminatedSubtypes &&
+    (options.ignoreSubTypeStack.length === 0 || !options.ignoreSubTypeStack.at(-1))
+  ) {
+    for (const discriminatedSubtype of Object.values(type.discriminatedSubtypes)) {
+      options.ignoreSubTypeStack.push(false);
+      updateSerializationOptions(context, discriminatedSubtype, contentTypes, options);
+      options.ignoreSubTypeStack.pop();
+    }
+  }
+  if (type.additionalProperties) {
+    options.ignoreSubTypeStack.push(false);
+    updateSerializationOptions(context, type.additionalProperties, contentTypes, options);
+    options.ignoreSubTypeStack.pop();
+  }
+  for (const property of type.properties) {
+    options.ignoreSubTypeStack.push(false);
+    updateSerializationOptions(context, property.type, contentTypes, options);
+    options.ignoreSubTypeStack.pop();
+  }
+  return;
+}
+
+function setSerializationOptions(
+  context: TCGCContext,
+  type: SdkModelType | SdkBodyModelPropertyType,
+  contentTypes: string[],
+) {
+  for (const contentType of contentTypes ?? []) {
+    if (isJsonContentType(contentType) && !type.serializationOptions.json) {
+      updateJsonSerializationOptions(context, type);
+    }
+
+    if (isXmlContentType(contentType) && !type.serializationOptions.xml) {
+      updateXmlSerializationOptions(context, type);
+    }
+  }
+  if (
+    !type.serializationOptions.xml &&
+    type.__raw &&
+    hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
+  ) {
+    updateJsonSerializationOptions(context, type);
+  }
+  if (
+    !type.serializationOptions.json &&
+    type.__raw &&
+    hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
+  ) {
+    updateXmlSerializationOptions(context, type);
+  }
+}
+
+function updateJsonSerializationOptions(
+  context: TCGCContext,
+  type: SdkModelType | SdkBodyModelPropertyType,
+) {
+  type.serializationOptions.json = {
+    name:
+      type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
+        ? resolveEncodedName(context.program, type.__raw, "application/json")
+        : type.name,
+  };
+}
+
+function updateXmlSerializationOptions(
+  context: TCGCContext,
+  type: SdkModelType | SdkBodyModelPropertyType,
+) {
+  type.serializationOptions.xml = {
+    name:
+      type.__raw?.kind === "Model" || type.__raw?.kind === "ModelProperty"
+        ? resolveEncodedName(context.program, type.__raw, "application/xml")
+        : type.name,
+    attribute: type.__raw?.kind === "ModelProperty" && isAttribute(context.program, type.__raw),
+    ns: type.__raw ? getNs(context.program, type.__raw) : undefined,
+    unwrapped: type.__raw?.kind === "ModelProperty" && isUnwrapped(context.program, type.__raw),
+  };
+
+  // set extra serialization info for array property
+  if (
+    type.__raw?.kind === "ModelProperty" &&
+    type.__raw.type.kind === "Model" &&
+    isArrayModelType(context.program, type.__raw.type)
+  ) {
+    if (!type.serializationOptions.xml.unwrapped) {
+      // if wrapped, set itemsName and itemsNS according to the array item type
+      const itemType = type.__raw.type.indexer.value;
+      if ("name" in itemType) {
+        // if the type has name then get the name
+        type.serializationOptions.xml.itemsName = resolveEncodedName(
+          context.program,
+          itemType as Type & { name: string },
+          "application/xml",
+        );
+        type.serializationOptions.xml.itemsNs = getNs(context.program, itemType);
+      } else {
+        // otherwise use the property name
+        type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
+        type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+      }
+    } else {
+      // if unwrapped, always set itemName to property name
+      type.serializationOptions.xml.itemsName = type.serializationOptions.xml.name;
+      type.serializationOptions.xml.itemsNs = type.serializationOptions.xml.ns;
+    }
+  }
+}
+
+function hasExplicitlyDefinedXmlSerializationInfo(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "Model" || type.kind === "ModelProperty" || type.kind === "Scalar") {
+    if (type.decorators && type.decorators.some((d) => d.definition?.namespace.name === "Xml")) {
+      return true;
+    }
+    const xmlName = resolveEncodedName(context.program, type, "application/xml");
+    if (xmlName && xmlName !== type.name) {
+      return true;
+    }
+  }
+  if (
+    type.kind === "ModelProperty" &&
+    type.type.kind === "Model" &&
+    isArrayModelType(context.program, type.type)
+  ) {
+    const itemType = type.type.indexer.value;
+    if (itemType && hasExplicitlyDefinedXmlSerializationInfo(context, itemType)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasExplicitlyDefinedJsonSerializationInfo(context: TCGCContext, type: Type): boolean {
+  if (type.kind === "ModelProperty") {
+    const jsonName = resolveEncodedName(context.program, type, "application/json");
+    if (jsonName && jsonName !== type.name) {
+      return true;
+    }
+  }
+  return false;
 }
