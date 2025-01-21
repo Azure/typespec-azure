@@ -27,16 +27,19 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 ### Generate TypeSpec with converter
 
 - Install dependencies
+
   - If you are starting from a scratch folder:
+
     ```shell
     npm install @azure-tools/typespec-client-generator-cli
     ```
 
-    **_Important!_** If it's not your first time install `@azure-tools/typespec-client-generator-cli`, update by 
+    **_Important!_** If it's not your first time install `@azure-tools/typespec-client-generator-cli`, update by
 
     ```shell
     npm update @autorest/openapi-to-typespec
     ```
+
   - If you are starting from [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs):
     ```shell
     npm install # Run at root
