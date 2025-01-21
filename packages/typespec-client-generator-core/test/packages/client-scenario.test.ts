@@ -405,7 +405,7 @@ describe("typespec-client-generator-core: client scenario", () => {
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
       message:
-        "Invalid 'initializedBy' value. First level client could not be initialized by parent.",
+        "Invalid 'initializedBy' value. First level client must have `InitializedBy.individually` specified in `initializedBy`.",
     });
   });
 
@@ -422,7 +422,7 @@ describe("typespec-client-generator-core: client scenario", () => {
     expectDiagnostics(runner.context.diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
       message:
-        "Invalid 'initializedBy' value. Sub client could not only be initialized individually.",
+        "Invalid 'initializedBy' value. Sub client must have `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
     });
   });
 });

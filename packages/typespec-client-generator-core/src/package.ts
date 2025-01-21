@@ -608,7 +608,7 @@ function createSdkClientInitializationType(
         createDiagnostic({
           code: "invalid-initialized-by",
           target: client.type,
-          format: { message: "First level client could not be initialized by parent." },
+          format: { message: "First level client must have `InitializedBy.individually` specified in `initializedBy`." },
         }),
       );
     } else if (
@@ -619,7 +619,7 @@ function createSdkClientInitializationType(
         createDiagnostic({
           code: "invalid-initialized-by",
           target: client.type,
-          format: { message: "Sub client could not only be initialized individually." },
+          format: { message: "Sub client must have `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`." },
         }),
       );
     } else {

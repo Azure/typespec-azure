@@ -1097,8 +1097,11 @@ export function getClientInitialization(
   let options = getScopedDecoratorData(context, clientInitializationKey, entity);
   if (options === undefined) return undefined;
   // backward compatibility
-  if (options.properties.get("initializedBy")) return undefined;
-  if (options.properties.get("parameters")) options = options.properties.get("parameters").type;
+  if (options.properties.get("parameters")) {
+    options = options.properties.get("parameters").type;
+  } else if (options.properties.get("initializedBy")) {
+    return undefined;
+  }
   const sdkModel = getSdkModel(context, options);
   const initializationProps = sdkModel.properties.map(
     (property: SdkModelPropertyType): SdkMethodParameter => {
