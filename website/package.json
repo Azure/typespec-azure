@@ -37,7 +37,7 @@
     "@azure-tools/typespec-azure-rulesets": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
     "@types/hast": "^3.0.4",
-    "@types/react": "~19.0.7",
+    "@types/react": "~18.3.11",
     "@types/react-dom": "~19.0.3",
     "@types/remark-heading-id": "^1.0.0",
     "@typespec/astro-utils": "workspace:~",
