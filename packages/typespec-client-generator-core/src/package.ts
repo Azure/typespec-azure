@@ -397,6 +397,8 @@ function getSdkMethodResponse(
   if (nonBodyExists && type) {
     type = {
       kind: "nullable",
+      name: createGeneratedName(context, operation, "NullableResponse"),
+      isGeneratedName: true,
       type: type,
       decorators: [],
       access: "public",

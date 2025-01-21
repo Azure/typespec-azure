@@ -310,6 +310,8 @@ export interface SdkDictionaryType extends SdkTypeBase {
 
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
+  name: string;
+  isGeneratedName: boolean;
   type: SdkType;
   usage: UsageFlags;
   access: AccessFlags;
