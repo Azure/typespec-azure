@@ -10,6 +10,7 @@ describe("typespec-client-generator-core: body model property types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
+
   afterEach(async () => {
     for (const modelsOrEnums of [
       runner.context.sdkPackage.models,
@@ -20,6 +21,7 @@ describe("typespec-client-generator-core: body model property types", () => {
       }
     }
   });
+
   it("required", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -31,6 +33,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     strictEqual(prop.optional, false);
     strictEqual(isReadOnly(prop), false);
   });
+
   it("optional", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -42,6 +45,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     const prop = getSdkBodyModelPropertyTypeHelper(runner);
     strictEqual(prop.optional, true);
   });
+
   it("readonly", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -54,6 +58,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     const prop = getSdkBodyModelPropertyTypeHelper(runner);
     strictEqual(isReadOnly(prop), true);
   });
+
   it("not readonly", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -66,27 +71,29 @@ describe("typespec-client-generator-core: body model property types", () => {
     const prop = getSdkBodyModelPropertyTypeHelper(runner);
     strictEqual(isReadOnly(prop), false);
   });
+
   it("names", async function () {
     await runner.compileWithBuiltInService(`
+      #suppress "deprecated" "for testing"
+      @test
+      @projectedName("java", "JavaTest")
+      model Test {
+        @projectedName("java", "javaProjectedName")
+        javaWireName: string;
+        @projectedName("client", "clientName")
+        clientProjectedName: string;
         #suppress "deprecated" "for testing"
-        @test
-        @usage(Usage.input | Usage.output)
-        @projectedName("java", "JavaTest")
-        model Test {
-          @projectedName("java", "javaProjectedName")
-          javaWireName: string;
-          @projectedName("client", "clientName")
-          clientProjectedName: string;
-          #suppress "deprecated" "for testing"
-          @projectedName("json", "projectedWireName")
-          @encodedName("application/json", "encodedWireName")
-          jsonEncodedAndProjectedName: string;
-          #suppress "deprecated" "for testing"
-          @projectedName("json", "realWireName")
-          jsonProjectedName: string; // deprecated
-          regular: string;
-        }
-      `);
+        @projectedName("json", "projectedWireName")
+        @encodedName("application/json", "encodedWireName")
+        jsonEncodedAndProjectedName: string;
+        #suppress "deprecated" "for testing"
+        @projectedName("json", "realWireName")
+        jsonProjectedName: string; // deprecated
+        regular: string;
+      }
+
+      op test(): Test;
+    `);
 
     const sdkModel = runner.context.sdkPackage.models[0];
     strictEqual(sdkModel.name, "JavaTest");
@@ -96,6 +103,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     ok(javaProjectedProp);
     strictEqual(javaProjectedProp.kind, "property");
     strictEqual(javaProjectedProp.serializedName, "javaWireName");
+    strictEqual(javaProjectedProp.serializationOptions.json?.name, "javaWireName");
 
     // client projected name test
 
@@ -103,6 +111,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     ok(clientProjectedProp);
     strictEqual(clientProjectedProp.kind, "property");
     strictEqual(clientProjectedProp.serializedName, "clientProjectedName");
+    strictEqual(clientProjectedProp.serializationOptions.json?.name, "clientProjectedName");
 
     // wire name test with encoded and projected
     const jsonEncodedProp = sdkModel.properties.find(
@@ -110,6 +119,8 @@ describe("typespec-client-generator-core: body model property types", () => {
     );
     ok(jsonEncodedProp);
     strictEqual(jsonEncodedProp.name, "jsonEncodedAndProjectedName");
+    strictEqual(jsonEncodedProp.kind, "property");
+    strictEqual(jsonEncodedProp.serializationOptions.json?.name, "encodedWireName");
 
     // wire name test with deprecated projected
     const jsonProjectedProp = sdkModel.properties.find(
@@ -117,6 +128,8 @@ describe("typespec-client-generator-core: body model property types", () => {
     );
     ok(jsonProjectedProp);
     strictEqual(jsonProjectedProp.name, "jsonProjectedName");
+    strictEqual(jsonProjectedProp.kind, "property");
+    strictEqual(jsonProjectedProp.serializationOptions.json?.name, "jsonProjectedName");
 
     // regular
     const regularProp = sdkModel.properties.find(
@@ -124,7 +137,10 @@ describe("typespec-client-generator-core: body model property types", () => {
     );
     ok(regularProp);
     strictEqual(regularProp.name, "regular");
+    strictEqual(regularProp.kind, "property");
+    strictEqual(regularProp.serializationOptions.json?.name, "regular");
   });
+
   it("union type", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -142,6 +158,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     strictEqual(variants[0].kind, "string");
     strictEqual(variants[1].kind, "int32");
   });
+
   it("versioning", async function () {
     runner = await createSdkTestRunner({
       "api-version": "all",
