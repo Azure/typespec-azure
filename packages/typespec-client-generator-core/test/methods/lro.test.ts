@@ -108,8 +108,13 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           strictEqual(lroMethod.kind, "lro");
           const lroMetadata = lroMethod.lroMetadata;
           ok(lroMetadata);
-          strictEqual(lroMetadata.finalResponse?.resultPath, "longRunningResult");
+          strictEqual(lroMetadata.finalResponse?.resultPath, "result"); // this is showing the typespec name, which is neither client name nor wire name
+          // find the model
+          const envelopeResult = runner.context.sdkPackage.models.find((m) => m.name === "OperationDetails");
+          const resultProperty = envelopeResult?.properties.find((p) => p.name === "longRunningResult");
+          strictEqual(resultProperty, lroMetadata.finalResponse?.result);
       });
+      
       it("LongRunningResourceCreateOrReplace", async () => {
         await runner.compileWithVersionedService(`
         @resource("users")
