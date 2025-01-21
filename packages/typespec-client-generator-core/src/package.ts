@@ -357,7 +357,10 @@ function getServiceMethodLroMetadata(
   };
 
   function getFinalResponse(): SdkLroServiceFinalResponse | undefined {
-    if (rawMetadata?.finalEnvelopeResult === undefined || rawMetadata.finalEnvelopeResult === "void") {
+    if (
+      rawMetadata?.finalEnvelopeResult === undefined ||
+      rawMetadata.finalEnvelopeResult === "void"
+    ) {
       return undefined;
     }
 
@@ -384,8 +387,8 @@ function getServiceMethodLroMetadata(
       envelopeResult,
       result,
       resultPath,
-      resultProperties: [sdkProperty!],
-    }
+      resultProperties: sdkProperty !== undefined ? [sdkProperty] : undefined,
+    };
   }
 }
 

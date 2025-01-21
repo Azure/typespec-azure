@@ -43,78 +43,6 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
     /** https://github.com/Azure/cadl-ranch/blob/6272003539d6e7d16bacfd846090520d70279dbd/packages/cadl-ranch-specs/http/azure/core/lro/standard/main.tsp#L124 */
     describe("standard LRO template: Azure.Core.ResourceOperations", () => {
-      it("result path", async () => {
-        await runner.compileWithBuiltInAzureCoreService(`
-          op CustomLongRunningOperation<
-            TParams extends TypeSpec.Reflection.Model,
-            TResponse extends TypeSpec.Reflection.Model
-          > is Foundations.Operation<
-            TParams,
-            AcceptedResponse & {
-              @pollingLocation
-              @header("Operation-Location")
-              operationLocation: ResourceLocation<TResponse>;
-            }
-          >;
-
-          @resource("resources")
-          model Resource {
-            @visibility("read")
-            id: string;
-
-            @key
-            @visibility("read")
-            name: string;
-
-            description?: string;
-            type: string;
-          }
-
-          // no "result" property
-          model OperationDetails {
-            @doc("Operation ID")
-            @key
-            @visibility("read", "create")
-            id: uuid;
-
-            status: Azure.Core.Foundations.OperationState;
-            error?: Azure.Core.Foundations.Error;
-
-            @lroResult
-            @clientName("longRunningResult")
-            @encodedName("application/json", "lro_result")
-            result?: Resource;
-          }
-
-          @doc("Response")
-          @route("/response")
-          interface ResponseOp {
-
-            @route("/lro-result")
-            lroInvalidResult is CustomLongRunningOperation<
-              {
-                @body request: Resource;
-              },
-              OperationDetails
-            >;
-          }
-          `);
-
-          const client = runner.context.sdkPackage.clients[0];
-          const method = client.methods[0];
-          strictEqual(method.kind, "clientaccessor");
-          const resourceOpClient = method.response;
-          const lroMethod = resourceOpClient.methods[0];
-          strictEqual(lroMethod.kind, "lro");
-          const lroMetadata = lroMethod.lroMetadata;
-          ok(lroMetadata);
-          strictEqual(lroMetadata.finalResponse?.resultPath, "result"); // this is showing the typespec name, which is neither client name nor wire name
-          // find the model
-          const envelopeResult = runner.context.sdkPackage.models.find((m) => m.name === "OperationDetails");
-          const resultProperty = envelopeResult?.properties.find((p) => p.name === "longRunningResult");
-          strictEqual(resultProperty, lroMetadata.finalResponse?.result);
-      });
-      
       it("LongRunningResourceCreateOrReplace", async () => {
         await runner.compileWithVersionedService(`
         @resource("users")
@@ -179,6 +107,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           "roundtrip model should have the usage of LroFinalEnvelope",
         );
         assert.isUndefined(metadata.finalResponse?.resultPath);
+        assert.isUndefined(metadata.finalResponse?.resultProperties);
       });
 
       it("LongRunningResourceDelete", async () => {
@@ -304,6 +233,11 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
         strictEqual(metadata.finalResponse?.result, returnModel);
         strictEqual(metadata.finalResponse?.resultPath, "result");
+        // find the property
+        const resultProperty = pollingModel.properties.find((p) => p.name === "result");
+        ok(metadata.finalResponse?.resultProperties);
+        strictEqual(metadata.finalResponse?.resultProperties[0], resultProperty);
+
         assert.isTrue(
           hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
           "the polling model here is also the final envelope model, it should have the usage of LroFinalEnvelope",
@@ -395,6 +329,10 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
         strictEqual(metadata.finalResponse?.result, returnModel);
         strictEqual(metadata.finalResponse?.resultPath, "result");
+        // find the property
+        const resultProperty = pollingModel.properties.find((p) => p.name === "result");
+        ok(metadata.finalResponse?.resultProperties);
+        strictEqual(metadata.finalResponse?.resultProperties[0], resultProperty);
         assert.isTrue(
           hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
           "the polling model here is also the final envelope model, it should have the usage of LroFinalEnvelope",
@@ -402,6 +340,83 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       });
     });
     describe("Custom LRO", () => {
+      it("@lroResult with client name and/or encoded name", async () => {
+        await runner.compileWithBuiltInAzureCoreService(`
+        op CustomLongRunningOperation<
+          TParams extends TypeSpec.Reflection.Model,
+          TResponse extends TypeSpec.Reflection.Model
+        > is Foundations.Operation<
+          TParams,
+          AcceptedResponse & {
+            @pollingLocation
+            @header("Operation-Location")
+            operationLocation: ResourceLocation<TResponse>;
+          }
+        >;
+
+        @resource("resources")
+        model Resource {
+          @visibility("read")
+          id: string;
+
+          @key
+          @visibility("read")
+          name: string;
+
+          description?: string;
+          type: string;
+        }
+
+        // no "result" property
+        model OperationDetails {
+          @doc("Operation ID")
+          @key
+          @visibility("read", "create")
+          id: uuid;
+
+          status: Azure.Core.Foundations.OperationState;
+          error?: Azure.Core.Foundations.Error;
+
+          @lroResult
+          @clientName("longRunningResult")
+          @encodedName("application/json", "lro_result")
+          result?: Resource;
+        }
+
+        @doc("Response")
+        @route("/response")
+        interface ResponseOp {
+
+          @route("/lro-result")
+          lroInvalidResult is CustomLongRunningOperation<
+            {
+              @body request: Resource;
+            },
+            OperationDetails
+          >;
+        }
+        `);
+
+        const client = runner.context.sdkPackage.clients[0];
+        const method = client.methods[0];
+        strictEqual(method.kind, "clientaccessor");
+        const resourceOpClient = method.response;
+        const lroMethod = resourceOpClient.methods[0];
+        strictEqual(lroMethod.kind, "lro");
+        const lroMetadata = lroMethod.lroMetadata;
+        ok(lroMetadata);
+        strictEqual(lroMetadata.finalResponse?.resultPath, "result"); // this is showing the typespec name, which is neither client name nor wire name
+        // find the model
+        const envelopeResult = runner.context.sdkPackage.models.find(
+          (m) => m.name === "OperationDetails",
+        );
+        const resultProperty = envelopeResult?.properties.find(
+          (p) => p.name === "longRunningResult",
+        );
+        ok(lroMetadata.finalResponse?.resultProperties);
+        strictEqual(resultProperty, lroMetadata.finalResponse?.resultProperties[0]);
+      });
+
       it("@pollingOperation", async () => {
         await runner.compileWithVersionedService(`
         @resource("analyze/jobs")
@@ -857,6 +872,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
       strictEqual(metadata.finalResponse?.result, roundtripModel);
       assert.isUndefined(metadata.finalResponse.resultPath);
+      assert.isUndefined(metadata.finalResponse.resultProperties);
     });
 
     it("ArmResourceDeleteWithoutOkAsync", async () => {
