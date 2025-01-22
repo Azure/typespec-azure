@@ -459,6 +459,10 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
   urlEncode: boolean;
   onClient: true;
   type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
+  /**
+   * @deprecated This property is deprecated. Use `type.templateArguments[x].serializedName` or `type.variantTypes[x].templateArguments[x].serializedName` instead.
+   */
+  serializedName?: string;
 }
 
 export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
