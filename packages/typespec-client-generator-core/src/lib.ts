@@ -67,13 +67,13 @@ export const $lib = createTypeSpecLibrary({
     access: {
       severity: "error",
       messages: {
-        default: `Access decorator value must be "public" or "internal".`,
+        default: `Access value must be "public" or "internal".`,
       },
     },
     "invalid-usage": {
       severity: "error",
       messages: {
-        default: `Usage decorator value must be 2 ("input") or 4 ("output").`,
+        default: `Usage value must be 2 ("input") or 4 ("output").`,
       },
     },
     "invalid-encode": {
@@ -247,7 +247,13 @@ export const $lib = createTypeSpecLibrary({
     "invalid-alternate-source-type": {
       severity: "error",
       messages: {
-        default: `@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
+        default: paramMessage`@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
+      },
+    },
+    "invalid-initialized-by": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
     },
   },

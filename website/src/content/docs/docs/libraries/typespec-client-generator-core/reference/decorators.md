@@ -272,10 +272,10 @@ interface MyInterface {}
 
 ### `@clientInitialization` {#@Azure.ClientGenerator.Core.clientInitialization}
 
-Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+Customize the client initialization way.
 
 ```typespec
-@Azure.ClientGenerator.Core.clientInitialization(options: Model, scope?: valueof string)
+@Azure.ClientGenerator.Core.clientInitialization(options: Azure.ClientGenerator.Core.ClientInitializationOptions, scope?: valueof string)
 ```
 
 #### Target
@@ -284,10 +284,10 @@ Client parameters you would like to add to the client. By default, we apply endp
 
 #### Parameters
 
-| Name    | Type             | Description                                                                                                                                                                                            |
-| ------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| options | `Model`          |                                                                                                                                                                                                        |
-| scope   | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name    | Type                                                                                                    | Description                                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| options | [`ClientInitializationOptions`](./data-types.md#Azure.ClientGenerator.Core.ClientInitializationOptions) |                                                                                                                                                                                                        |
+| scope   | `valueof string`                                                                                        | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 #### Examples
 
@@ -304,9 +304,9 @@ model MyServiceClientOptions {
   blobName: string;
 }
 
-@@clientInitialization(MyService, MyServiceClientOptions)
-// The generated client will have `blobName` on it. We will also
-// elevate the existing `blobName` parameter to the client level.
+@@clientInitialization(MyService, {parameters: MyServiceClientOptions})
+// The generated client will have `blobName` on its initialization method. We will also
+// elevate the existing `blobName` parameter from method level to client level.
 ```
 
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
