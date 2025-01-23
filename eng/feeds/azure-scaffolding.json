@@ -9,7 +9,7 @@
     "files": [
       {
         "path": "package.json",
-        "destination": "package.json",
+        "destination": "package.json"
       },
       {
         "path": "./data-plane/main.tsp",
@@ -64,7 +64,7 @@
     "files": [
       {
         "path": "package.json",
-        "destination": "package.json",
+        "destination": "package.json"
       },
       {
         "path": "./arm/main.tsp",
