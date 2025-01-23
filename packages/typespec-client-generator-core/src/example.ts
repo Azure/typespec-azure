@@ -13,7 +13,6 @@ import { getOperationId } from "@typespec/openapi";
 import {
   SdkArrayExampleValue,
   SdkArrayType,
-  SdkBodyModelPropertyType,
   SdkClientType,
   SdkDictionaryExampleValue,
   SdkDictionaryType,
@@ -612,13 +611,14 @@ function getSdkModelExample(
     const modelQueue = [type];
     while (modelQueue.length > 0) {
       const model = modelQueue.pop()!;
-      for (let property of model.properties) {
-        property = property as SdkBodyModelPropertyType;
+      for (const property of model.properties) {
+        // for query/path/cookie/header parameters, they should have been handled in parameters.
         if (
+          property.kind === "property" &&
           property.serializationOptions.json?.name &&
-          !properties.has(property.serializationOptions.json?.name)
+          !properties.has(property.serializationOptions.json.name)
         ) {
-          properties.set(property.serializationOptions.json?.name, property);
+          properties.set(property.serializationOptions.json.name, property);
         }
       }
       if (model.additionalProperties && additionalPropertiesType === undefined) {
