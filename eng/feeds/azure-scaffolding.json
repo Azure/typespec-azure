@@ -10,7 +10,6 @@
       {
         "path": "package.json",
         "destination": "package.json",
-        "skipGeneration": true
       },
       {
         "path": "./data-plane/main.tsp",
@@ -66,7 +65,6 @@
       {
         "path": "package.json",
         "destination": "package.json",
-        "skipGeneration": true
       },
       {
         "path": "./arm/main.tsp",
