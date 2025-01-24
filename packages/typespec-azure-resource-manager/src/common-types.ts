@@ -16,7 +16,7 @@ import {
 import { $useDependency, getVersion } from "@typespec/versioning";
 import {
   ArmCommonTypesVersionDecorator,
-  CommonTypesRefDecorator,
+  ExternalTypeRefDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
 import {
   ArmCommonTypeRecord,
@@ -251,14 +251,14 @@ function resolveCommonTypesVersion(
   };
 }
 
-export const $commonTypesRef: CommonTypesRefDecorator = (
+export const $externalTypeRef: ExternalTypeRefDecorator = (
   context: DecoratorContext,
   entity: Model | ModelProperty,
   jsonRef: string,
 ) => {
-  context.program.stateMap(ArmStateKeys.commonTypesRef).set(entity, jsonRef);
+  context.program.stateMap(ArmStateKeys.externalTypeRef).set(entity, jsonRef);
 };
 
-export function getCommonTypesRef(program: Program, entity: Type): string | undefined {
-  return program.stateMap(ArmStateKeys.commonTypesRef).get(entity);
+export function getExternalTypeRef(program: Program, entity: Type): string | undefined {
+  return program.stateMap(ArmStateKeys.externalTypeRef).get(entity);
 }

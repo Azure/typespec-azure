@@ -3,7 +3,7 @@ import { getService } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
-import { findArmCommonTypeRecord, getCommonTypesRef } from "../src/common-types.js";
+import { findArmCommonTypeRecord, getExternalTypeRef } from "../src/common-types.js";
 import type { ArmCommonTypeRecord } from "../src/commontypes.private.decorators.js";
 import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
@@ -211,11 +211,11 @@ describe("common types ref", () => {
   it("set external reference", async () => {
     const runner = await createAzureResourceManagerTestRunner();
     const [{ Foo }, diagnostics] = await runner.compileAndDiagnose(`
-        @test @Azure.ResourceManager.Legacy.commonTypesRef("../common.json#/definitions/Foo")
+        @test @Azure.ResourceManager.Legacy.externalTypeRef("../common.json#/definitions/Foo")
         model Foo {}
       `);
 
     expectDiagnosticEmpty(diagnostics);
-    strictEqual(getCommonTypesRef(runner.program, Foo), "../common.json#/definitions/Foo");
+    strictEqual(getExternalTypeRef(runner.program, Foo), "../common.json#/definitions/Foo");
   });
 });

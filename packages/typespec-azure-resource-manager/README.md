@@ -500,15 +500,15 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 ### Azure.ResourceManager.Legacy
 
-- [`@commonTypesRef`](#@commontypesref)
+- [`@externalTypeRef`](#@externalTypeRef)
 - [`@customAzureResource`](#@customazureresource)
 
-#### `@commonTypesRef`
+#### `@externalTypeRef`
 
 Specify an external reference that should be used when emitting this type.
 
 ```typespec
-@Azure.ResourceManager.Legacy.commonTypesRef(jsonRef: valueof string)
+@Azure.ResourceManager.Legacy.externalTypeRef(jsonRef: valueof string)
 ```
 
 ##### Target

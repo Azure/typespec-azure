@@ -5,7 +5,7 @@ export {
   getArmCommonTypeOpenAPIRef,
   getArmCommonTypesVersion,
   getArmCommonTypesVersions,
-  getCommonTypesRef,
+  getExternalTypeRef,
   isArmCommonType,
   type ArmCommonTypeVersions,
   type ArmCommonTypesResolutionOptions,

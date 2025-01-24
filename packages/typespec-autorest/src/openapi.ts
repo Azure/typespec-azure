@@ -12,7 +12,7 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
-  getCommonTypesRef,
+  getExternalTypeRef,
   isArmCommonType,
   isAzureResource,
   isConditionallyFlattened,
@@ -937,10 +937,10 @@ export async function getOpenAPIForService(
       };
     }
 
-    const commonTypesRefUrl = getCommonTypesRef(program, type);
-    if (commonTypesRefUrl) {
+    const externalTypeRefUrl = getExternalTypeRef(program, type);
+    if (externalTypeRefUrl) {
       return {
-        $ref: expandRef(commonTypesRefUrl),
+        $ref: expandRef(externalTypeRefUrl),
       };
     }
 

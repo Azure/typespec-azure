@@ -272,7 +272,7 @@ export type ResourceBaseTypeDecorator = (
  *  *  @param jsonRef - External reference(e.g. "../../common.json#/definitions/Foo")
  *
  */
-export type CommonTypesRefDecorator = (
+export type ExternalTypeRefDecorator = (
   context: DecoratorContext,
   entity: Model | ModelProperty,
   jsonRef: string,
@@ -304,5 +304,5 @@ export type AzureResourceManagerDecorators = {
 
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
-  commonTypesRef: CommonTypesRefDecorator;
+  externalTypeRef: ExternalTypeRefDecorator;
 };
