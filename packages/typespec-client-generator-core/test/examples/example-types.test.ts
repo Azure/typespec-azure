@@ -923,4 +923,52 @@ describe("typespec-client-generator-core: example types", () => {
 
     expectDiagnostics(runner.context.diagnostics, []);
   });
+
+  it("SdkModelExample with extra paramters", async () => {
+    await runner.host.addRealTypeSpecFile(
+      "./examples/getModelWithExtraParamter.json",
+      `${__dirname}/example-types/getModelWithExtraParamter.json`,
+    );
+    await runner.compile(`
+      @service({})
+      namespace TestClient {
+        model Test {
+          a: string;
+          b: int32;
+          @header("x-ms-prop")
+          prop: string;
+        }
+
+        op getModelWithExtraParamter(): Test;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+    ok(response);
+    const headers = response.headers;
+    ok(headers);
+    strictEqual(headers.length, 1);
+    strictEqual(headers[0].value.value, "test");
+    strictEqual(headers[0].header.serializedName, "x-ms-prop");
+
+    const bodyValue = response.bodyValue;
+    ok(bodyValue);
+    strictEqual(bodyValue.kind, "model");
+    strictEqual(bodyValue.type.kind, "model");
+    strictEqual(bodyValue.type.name, "Test");
+    strictEqual(Object.keys(bodyValue.value).length, 2);
+    strictEqual(bodyValue.value["a"].value, "a");
+    strictEqual(bodyValue.value["a"].kind, "string");
+    strictEqual(bodyValue.value["a"].type.kind, "string");
+    strictEqual(bodyValue.value["b"].value, 2);
+    strictEqual(bodyValue.value["b"].kind, "number");
+    strictEqual(bodyValue.value["b"].type.kind, "int32");
+
+    expectDiagnostics(runner.context.diagnostics, []);
+  });
 });

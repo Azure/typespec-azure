@@ -76,6 +76,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           hasFlag(initialResponse.usage, UsageFlags.LroInitial),
           "the response of a lro method should have the usage of LroInitial",
         );
+        strictEqual(initialResponse.serializationOptions.json?.name, "User");
 
         const metadata = method.lroMetadata;
         ok(metadata);
@@ -98,6 +99,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           hasFlag(pollingModel.usage, UsageFlags.Input),
           "polling model should not be input",
         );
+        strictEqual(pollingModel.serializationOptions.json?.name, "OperationStatus");
         strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
         strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
@@ -106,6 +108,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           hasFlag(roundtripModel.usage, UsageFlags.LroFinalEnvelope),
           "roundtrip model should have the usage of LroFinalEnvelope",
         );
+        strictEqual(roundtripModel.serializationOptions.json?.name, "User");
         assert.isUndefined(metadata.finalResponse?.resultPath);
         assert.isUndefined(metadata.finalResponse?.resultProperties);
       });
@@ -852,6 +855,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         hasFlag(roundtripModel.usage, UsageFlags.Input | UsageFlags.Output),
         "model should be input and output",
       );
+      strictEqual(roundtripModel.serializationOptions.json?.name, "Employee");
 
       const metadata = method.lroMetadata;
       ok(metadata);
