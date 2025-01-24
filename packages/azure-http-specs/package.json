@@ -35,27 +35,27 @@
   },
   "homepage": "https://azure.github.io/typespec-azure",
   "dependencies": {
-    "@typespec/spector": "workspace:~",
-    "@typespec/spec-api": "workspace:~"
+    "@typespec/spec-api": "workspace:~",
+    "@typespec/spector": "workspace:~"
   },
   "devDependencies": {
+    "@azure-tools/typespec-autorest": "workspace:~",
     "@azure-tools/typespec-azure-resource-manager": "workspace:~",
     "@azure-tools/typespec-client-generator-core": "workspace:~",
-    "@azure-tools/typespec-autorest": "workspace:~",
-    "@typespec/openapi3": "workspace:~",
-    "@typespec/openapi": "workspace:~",
     "@types/multer": "^1.4.10",
-    "@types/node": "~22.7.9",
-    "concurrently": "^9.0.1",
-    "typescript": "~5.6.3",
-    "rimraf": "~6.0.1"
+    "@types/node": "~22.10.7",
+    "@typespec/openapi": "workspace:~",
+    "@typespec/openapi3": "workspace:~",
+    "concurrently": "^9.1.2",
+    "rimraf": "~6.0.1",
+    "typescript": "~5.7.3"
   },
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:~",
-    "@typespec/versioning": "workspace:~",
     "@typespec/compiler": "workspace:~",
-    "@typespec/rest": "workspace:~",
     "@typespec/http": "workspace:~",
+    "@typespec/rest": "workspace:~",
+    "@typespec/versioning": "workspace:~",
     "@typespec/xml": "workspace:~"
   }
 }
