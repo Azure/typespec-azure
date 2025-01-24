@@ -110,7 +110,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         );
         strictEqual(roundtripModel.serializationOptions.json?.name, "User");
         assert.isUndefined(metadata.finalResponse?.resultPath);
-        assert.isUndefined(metadata.finalResponse?.resultProperties);
+        assert.isUndefined(metadata.finalResponse?.resultSegments);
       });
 
       it("LongRunningResourceDelete", async () => {
@@ -238,8 +238,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(metadata.finalResponse?.resultPath, "result");
         // find the property
         const resultProperty = pollingModel.properties.find((p) => p.name === "result");
-        ok(metadata.finalResponse?.resultProperties);
-        strictEqual(metadata.finalResponse?.resultProperties[0], resultProperty);
+        ok(metadata.finalResponse?.resultSegments);
+        strictEqual(metadata.finalResponse?.resultSegments[0], resultProperty);
 
         assert.isTrue(
           hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
@@ -334,8 +334,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         strictEqual(metadata.finalResponse?.resultPath, "result");
         // find the property
         const resultProperty = pollingModel.properties.find((p) => p.name === "result");
-        ok(metadata.finalResponse?.resultProperties);
-        strictEqual(metadata.finalResponse?.resultProperties[0], resultProperty);
+        ok(metadata.finalResponse?.resultSegments);
+        strictEqual(metadata.finalResponse?.resultSegments[0], resultProperty);
         assert.isTrue(
           hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
           "the polling model here is also the final envelope model, it should have the usage of LroFinalEnvelope",
@@ -416,8 +416,8 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         const resultProperty = envelopeResult?.properties.find(
           (p) => p.name === "longRunningResult",
         );
-        ok(lroMetadata.finalResponse?.resultProperties);
-        strictEqual(resultProperty, lroMetadata.finalResponse?.resultProperties[0]);
+        ok(lroMetadata.finalResponse?.resultSegments);
+        strictEqual(resultProperty, lroMetadata.finalResponse?.resultSegments[0]);
       });
 
       it("@pollingOperation", async () => {
@@ -876,7 +876,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
       strictEqual(metadata.finalResponse?.result, roundtripModel);
       assert.isUndefined(metadata.finalResponse.resultPath);
-      assert.isUndefined(metadata.finalResponse.resultProperties);
+      assert.isUndefined(metadata.finalResponse.resultSegments);
     });
 
     it("ArmResourceDeleteWithoutOkAsync", async () => {

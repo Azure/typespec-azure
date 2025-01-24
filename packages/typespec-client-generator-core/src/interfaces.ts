@@ -590,7 +590,7 @@ export interface SdkMethodResponse {
    * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
    * Temporarily this is not enabled for paging now.
    */
-  resultProperties?: SdkModelPropertyType[];
+  resultSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkServiceResponse {
@@ -734,11 +734,11 @@ export interface SdkLroServiceFinalResponse {
   /**
    * Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns.
    *
-   * @deprecated This property will be removed in future releases. Use `resultProperties` for synthesized property information.
+   * @deprecated This property will be removed in future releases. Use `resultSegments` for synthesized property information.
    */
   resultPath?: string;
   /** An array of properties to fetch {result} from the {envelopeResult} model. Note that this property is available only in some LRO patterns. */
-  resultProperties?: SdkModelPropertyType[];
+  resultSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>

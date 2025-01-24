@@ -318,7 +318,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   basicServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
 
-  basicServiceMethod.response.resultProperties = metadata.finalResponse?.resultProperties;
+  basicServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
 
   return diagnostics.wrap({
     ...basicServiceMethod,
@@ -390,7 +390,7 @@ function getServiceMethodLroMetadata(
       envelopeResult,
       result,
       resultPath,
-      resultProperties: sdkProperty !== undefined ? [sdkProperty] : undefined,
+      resultSegments: sdkProperty !== undefined ? [sdkProperty] : undefined,
     };
   }
 }
