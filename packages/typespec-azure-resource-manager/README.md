@@ -500,8 +500,25 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 ### Azure.ResourceManager.Legacy
 
-- [`@externalTypeRef`](#@externalTypeRef)
 - [`@customAzureResource`](#@customazureresource)
+- [`@externalTypeRef`](#@externaltyperef)
+
+#### `@customAzureResource`
+
+This decorator is used on resources that do not satisfy the definition of a resource
+but need to be identified as such.
+
+```typespec
+@Azure.ResourceManager.Legacy.customAzureResource
+```
+
+##### Target
+
+`Model`
+
+##### Parameters
+
+None
 
 #### `@externalTypeRef`
 
@@ -520,20 +537,3 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
-
-#### `@customAzureResource`
-
-This decorator is used on resources that do not satisfy the definition of a resource
-but need to be identified as such.
-
-```typespec
-@Azure.ResourceManager.Legacy.customAzureResource
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-None
