@@ -5,9 +5,9 @@ import "./main.tsp";
 
 using TypeSpec.Http;
 using Azure.ClientGenerator.Core;
-using Client.AlternateApiVersion.Service;
+using Client.AlternateApiVersion.Service.Header;
 using Spector;
 
 namespace Customizations;
 
-@@apiVersion(PathApiVersionParam.version);
+@@apiVersion(HeaderApiVersionParam.version);
