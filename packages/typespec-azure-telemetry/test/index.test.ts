@@ -6,6 +6,9 @@ import { MockTelemetryService } from "./utils/service.js";
 vi.mock("../src/reporters/no-op-reporter.js", { spy: true });
 
 describe("typespec-azure-telemetry", () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
   describe("createTelemetryReporter", () => {
     it.each([undefined, {}])("should not throw on bad inputs (%o)", async (props) => {
       const reporter = createTelemetryReporter(props as any);
@@ -66,7 +69,6 @@ describe("typespec-azure-telemetry", () => {
       const originalProcessEnv = { ...process.env };
       afterEach(() => {
         process.env = originalProcessEnv;
-        vi.resetAllMocks();
       });
 
       it("when DISABLE_TYPESPEC_AZURE_TELEMETRY is set", async () => {
@@ -79,6 +81,9 @@ describe("typespec-azure-telemetry", () => {
         expect(createNoOpReporter).toHaveBeenCalled();
         const noOpReporter = (createNoOpReporter as MockedFunction<typeof createNoOpReporter>).mock
           .results[0].value;
+        console.log(
+          (createNoOpReporter as MockedFunction<typeof createNoOpReporter>).mock.results.length,
+        );
         expect(reporter).toBe(noOpReporter);
       });
     });
