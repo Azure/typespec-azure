@@ -1,4 +1,4 @@
-import { createRule, Operation } from "@typespec/compiler";
+import { createRule, isTemplateInstance, Operation } from "@typespec/compiler";
 import { getHttpOperation, getResponsesForOperation, HttpOperationResponse } from "@typespec/http";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 /**
@@ -20,7 +20,12 @@ export const noResponseBodyRule = createRule({
     return {
       operation: (op: Operation) => {
         const [httpOperation] = getHttpOperation(context.program, op);
-        if (isTemplatedInterfaceOperation(op) || httpOperation.verb === "head") return;
+        if (
+          isTemplateInstance(op) ||
+          isTemplatedInterfaceOperation(op) ||
+          httpOperation.verb === "head"
+        )
+          return;
 
         const responses = getResponsesForOperation(context.program, op)[0].find(
           (v) => v.statusCodes !== 204 && v.statusCodes !== 202,
