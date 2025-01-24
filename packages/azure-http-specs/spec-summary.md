@@ -2415,6 +2415,24 @@ Expected header parameters:
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
 
+### Client_AlternateApiVersion_Service_Header_headerApiVersion
+
+- Endpoint: `post /azure/client-generator-core/api-version/header`
+
+Set a header as the service api version
+
+### Client_AlternateApiVersion_Service_Path_pathApiVersion
+
+- Endpoint: `post /azure/client-generator-core/api-version/path/{version}`
+
+Set a path service api version
+
+### Client_AlternateApiVersion_Service_Query_queryApiVersion
+
+- Endpoint: `post /azure/client-generator-core/api-version/query`
+
+Set a query parameter as the service api version
+
 ### Client_ClientNamespace
 
 - Endpoints:
