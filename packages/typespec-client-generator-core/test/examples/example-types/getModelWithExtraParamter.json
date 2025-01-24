@@ -1,0 +1,16 @@
+{
+  "operationId": "getModelWithExtraParamter",
+  "title": "getModelWithExtraParamter",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "headers": {
+        "x-ms-prop": "test"
+      },
+      "body": {
+        "a": "a",
+        "b": 2
+      }
+    }
+  }
+}
