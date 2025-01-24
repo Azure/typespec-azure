@@ -220,7 +220,7 @@
     }
   },
   "parameters": {
-    "PrivateEndpointConnectionParameter": {
+    "PrivateEndpointConnectionName": {
       "name": "name",
       "in": "path",
       "description": "The name of the private endpoint connection associated with the Azure resource.",

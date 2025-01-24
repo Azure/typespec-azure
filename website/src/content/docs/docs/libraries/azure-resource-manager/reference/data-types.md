@@ -1728,12 +1728,12 @@ interface Employees {
 | ------ | --------------------------------------------------------- | -------------------------------------- |
 | value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
 
-### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
+### `PrivateEndpointConnectionName` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionName}
 
 The name of the private endpoint connection associated with the Azure resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionName
 ```
 
 #### Properties
