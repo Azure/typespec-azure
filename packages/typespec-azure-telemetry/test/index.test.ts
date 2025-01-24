@@ -81,9 +81,6 @@ describe("typespec-azure-telemetry", () => {
         expect(createNoOpReporter).toHaveBeenCalled();
         const noOpReporter = (createNoOpReporter as MockedFunction<typeof createNoOpReporter>).mock
           .results[0].value;
-        console.log(
-          (createNoOpReporter as MockedFunction<typeof createNoOpReporter>).mock.results.length,
-        );
         expect(reporter).toBe(noOpReporter);
       });
     });
