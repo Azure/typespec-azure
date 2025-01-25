@@ -1689,6 +1689,12 @@ importers:
       vite:
         specifier: ^6.0.11
         version: 6.0.11(@types/node@22.10.10)(tsx@4.19.2)(yaml@2.7.0)
+      vite-plugin-checker:
+        specifier: ^0.8.0
+        version: 0.8.0(eslint@9.18.0)(optionator@0.9.4)(typescript@5.7.3)(vite@6.0.11(@types/node@22.10.10)(tsx@4.19.2)(yaml@2.7.0))
+      vite-plugin-dts:
+        specifier: 4.5.0
+        version: 4.5.0(@types/node@22.10.10)(rollup@4.31.0)(typescript@5.7.3)(vite@6.0.11(@types/node@22.10.10)(tsx@4.19.2)(yaml@2.7.0))
 
   core/packages/spector:
     dependencies:
@@ -2005,8 +2011,8 @@ importers:
         specifier: ^3.0.3
         version: 3.0.4(vitest@3.0.4)
       '@vscode/test-web':
-        specifier: ^0.0.62
-        version: 0.0.62
+        specifier: ^0.0.65
+        version: 0.0.65
       '@vscode/vsce':
         specifier: ~3.2.1
         version: 3.2.1
@@ -2170,52 +2176,6 @@ importers:
       typescript:
         specifier: ~5.7.3
         version: 5.7.3
-
-  packages/azure-spec-dashboard:
-    dependencies:
-      '@emotion/react':
-        specifier: ^11.14.0
-        version: 11.14.0(@types/react@18.3.18)(react@18.3.1)
-      '@fluentui/react-components':
-        specifier: ~9.57.0
-        version: 9.57.0(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
-      '@fluentui/react-icons':
-        specifier: ^2.0.271
-        version: 2.0.271(react@18.3.1)
-      '@typespec/spec-coverage-sdk':
-        specifier: workspace:~
-        version: link:../../core/packages/spec-coverage-sdk
-      react:
-        specifier: ~18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ~18.3.1
-        version: 18.3.1(react@18.3.1)
-      react-markdown:
-        specifier: ^9.0.3
-        version: 9.0.3(@types/react@18.3.18)(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ~18.3.11
-        version: 18.3.18
-      '@types/react-dom':
-        specifier: ~18.3.0
-        version: 18.3.5(@types/react@18.3.18)
-      '@vitejs/plugin-react':
-        specifier: ~4.3.4
-        version: 4.3.4(vite@6.0.11(@types/node@22.10.10)(tsx@4.19.2)(yaml@2.7.0))
-      rimraf:
-        specifier: ~6.0.1
-        version: 6.0.1
-      rollup-plugin-visualizer:
-        specifier: ~5.14.0
-        version: 5.14.0(rollup@4.31.0)
-      typescript:
-        specifier: ~5.7.3
-        version: 5.7.3
-      vite:
-        specifier: ^6.0.11
-        version: 6.0.11(@types/node@22.10.10)(tsx@4.19.2)(yaml@2.7.0)
 
   packages/e2e-tests:
     devDependencies:
@@ -2930,6 +2890,9 @@ importers:
       '@typespec/internal-build-utils':
         specifier: workspace:~
         version: link:../core/packages/internal-build-utils
+      '@typespec/spec-dashboard':
+        specifier: workspace:~
+        version: link:../core/packages/spec-dashboard
       astro-expressive-code:
         specifier: ^0.40.1
         version: 0.40.1(astro@5.1.9(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
@@ -6309,8 +6272,8 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
-  '@vscode/test-web@0.0.62':
-    resolution: {integrity: sha512-Ypug5PvhPOPFbuHVilai7t23tm3Wm5geIpC2DB09Gy9o0jZCduramiSdPf+YN7yhkFy1usFYtN3Eaks1XoBrOQ==}
+  '@vscode/test-web@0.0.65':
+    resolution: {integrity: sha512-jNc6FyJARgiru/2Y8vXSkaf399JFtTNxAAtwLPzSSU5C4+AJwvOOOhlVHQfmee51R9LIs6uwZryFxmqSfMhniQ==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -16548,7 +16511,7 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@vscode/test-web@0.0.62':
+  '@vscode/test-web@0.0.65':
     dependencies:
       '@koa/cors': 5.0.0
       '@koa/router': 13.1.0
