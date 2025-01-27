@@ -10,6 +10,6 @@ export default defineConfig({
     },
     outputFile: {
       junit: "./test-results.xml",
-    }
+    },
   },
 });
