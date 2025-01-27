@@ -6,6 +6,166 @@ import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents what type definitions in TypeSpec are generated as in emitted libraries
 
+## Namespace
+
+The namespace for models, enums, and unions will follow the namespace they belong to. You can use `@clientNamespace` to override it if needed.
+
+### Model in namespace
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```tsp
+namespace Service;
+
+model Foo {
+  prop: string;
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+```python
+from service.models import Foo
+
+foo = Foo(prop="hello")
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+As `flavor=azure`, Java emitter generates the model classes under `models` package.
+
+```java
+import service.models.Foo;
+
+Foo foo = new Foo("hello");
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Model in sub namespace
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```tsp
+namespace Service;
+
+namespace Container {
+  model Foo {
+    prop: string;
+  }
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+```python
+from service.container.models import Foo
+
+foo = Foo(prop="hello")
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+As `flavor=azure`, Java emitter generates the model classes under `models` package.
+
+```java
+import service.container.models.Foo;
+
+Foo foo = new Foo("hello");
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Model in namespace with renaming
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```tsp
+namespace Service;
+
+@clientNamespace("Service.Container")
+model Foo {
+  prop: string;
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+```python
+from service.container.models import Foo
+
+foo = Foo(prop="hello")
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+As `flavor=azure`, Java emitter generates the model classes under `models` package.
+
+```java
+import service.container.models.Foo;
+
+Foo foo = new Foo("hello");
+```
+
+</ClientTabItem>
+</ClientTabs>
+
 ## Models
 
 ### Flattening
@@ -2353,7 +2513,7 @@ public enum LR {
 ```typespec
 @versioned(Versions)
 @service
-namespace My.Service;
+namespace Service;
 
 enum Versions {
   v1,
@@ -2660,68 +2820,6 @@ TODO;
 ```java
 // Internal implementation
 jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
-```
-
-</ClientTabItem>
-</ClientTabs>
-
-## Namespace
-
-The namespace for models, enums, and unions will follow the namespace they belong to. You can use `@clientNamespace` to override it if needed.
-
-<ClientTabs>
-<ClientTabItem lang="typespec" >
-
-```tsp
-namespace My.Service;
-
-model Foo {
-  prop: string;
-}
-
-@clientNamespace("My.Service.Temp")
-model Bar {
-  prop: string;
-}
-```
-
-</ClientTabItem>
-
-<ClientTabItem lang="python">
-
-```python
-from my.service import Foo
-from my.service.temp import Bar
-
-foo = Foo(prop="hello")
-bar = Bar(prop="world")
-```
-
-</ClientTabItem>
-<ClientTabItem lang="csharp" >
-
-```csharp
-TODO
-```
-
-</ClientTabItem>
-<ClientTabItem lang="typescript" >
-
-```typescript
-TODO;
-```
-
-</ClientTabItem>
-<ClientTabItem lang="java" >
-
-As `flavor=azure`, Java emitter generates the model classes under `models` package.
-
-```java
-import my.service.models.Foo;
-import my.service.temp.models.Bar;
-
-Foo foo = new Foo("hello");
-Bar bar = new Bar("world");
 ```
 
 </ClientTabItem>

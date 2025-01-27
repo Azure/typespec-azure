@@ -3,7 +3,7 @@ import {
   AzureResourceManagerDecorators,
   AzureResourceManagerLegacyDecorators,
 } from "../generated-defs/Azure.ResourceManager.js";
-import { $armCommonTypesVersion } from "./common-types.js";
+import { $armCommonTypesVersion, $externalTypeRef } from "./common-types.js";
 import { $armLibraryNamespace, $armProviderNamespace, $useLibraryNamespace } from "./namespace.js";
 import {
   $armResourceAction,
@@ -59,6 +59,7 @@ export const $decorators = {
   } satisfies AzureResourceManagerDecorators,
   "Azure.ResourceManager.Legacy": {
     customAzureResource: $customAzureResource,
+    externalTypeRef: $externalTypeRef,
   } satisfies AzureResourceManagerLegacyDecorators,
 };
 

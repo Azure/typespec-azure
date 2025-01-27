@@ -13,6 +13,7 @@ import {
 import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
+  getExternalTypeRef,
   isArmCommonType,
   isAzureResource,
   isConditionallyFlattened,
@@ -934,6 +935,13 @@ export async function getOpenAPIForService(
     if (refUrl) {
       return {
         $ref: expandRef(refUrl),
+      };
+    }
+
+    const externalTypeRefUrl = getExternalTypeRef(program, type);
+    if (externalTypeRefUrl) {
+      return {
+        $ref: expandRef(externalTypeRefUrl),
       };
     }
 

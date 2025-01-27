@@ -1,4 +1,4 @@
-import {
+import type {
   DecoratorContext,
   EnumMember,
   EnumValue,
@@ -273,6 +273,17 @@ export type IdentifiersDecorator = (
   properties: string[],
 ) => void;
 
+/**
+ *  * Specify an external reference that should be used when emitting this type.
+ *  *  @param jsonRef - External reference(e.g. "../../common.json#/definitions/Foo")
+ *
+ */
+export type ExternalTypeRefDecorator = (
+  context: DecoratorContext,
+  entity: Model | ModelProperty,
+  jsonRef: string,
+) => void;
+
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
@@ -300,4 +311,5 @@ export type AzureResourceManagerDecorators = {
 
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
+  externalTypeRef: ExternalTypeRefDecorator;
 };
