@@ -24,8 +24,7 @@ beforeAll(async () => {
 });
 
 // Make sure it works with the latest version of dependencies and not just the local build.
-// REMOVE FOR NOW as TCGC now release out of sync from release/ branch so this is unnecessary and it is blocking migration to $decorators
-it.skip("works with latest version of packages", async () => {
+it("works with latest version of packages", async () => {
   const dir = await setupScenario("basic-latest");
   await execSuccessAsync("npm", ["install", tgzFile], { cwd: dir });
   await execSuccessAsync("npx", ["tsp", "compile", "."], { cwd: dir });
