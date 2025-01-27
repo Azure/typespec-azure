@@ -1,32 +1,18 @@
 import { findTestPackageRoot } from "@typespec/compiler/testing";
 import { SpawnOptions, spawn } from "child_process";
-import { cp, readdir, rm } from "fs/promises";
+import { cp } from "fs/promises";
 import { join, resolve } from "path";
-import { beforeAll, it } from "vitest";
+import { it } from "vitest";
 
 const packageRoot = await findTestPackageRoot(import.meta.url);
 const tempDir = join(packageRoot, "temp/e2e");
 
-let tgzFile: string;
-beforeAll(async () => {
-  await rm(tempDir, { recursive: true, force: true });
-
-  await execSuccessAsync("pnpm", ["pack", "--pack-destination", tempDir]);
-  const files = await readdir(tempDir);
-
-  const filename = files.find((x) => x.startsWith("azure-tools-typespec-client-generator-core-"));
-  if (filename === undefined) {
-    throw new Error(
-      `Cannot resolve package starting with "azure-tools-typespec-client-generator-core-"`,
-    );
-  }
-  tgzFile = join(tempDir, filename);
-});
-
 // Make sure it works with the latest version of dependencies and not just the local build.
 it("works with latest version of packages", async () => {
   const dir = await setupScenario("basic-latest");
-  await execSuccessAsync("npm", ["install", tgzFile], { cwd: dir });
+  await execSuccessAsync("npm", ["install", "@azure-tools/typespec-client-generator-core@latest"], {
+    cwd: dir,
+  });
   await execSuccessAsync("npx", ["tsp", "compile", "."], { cwd: dir });
 });
 
