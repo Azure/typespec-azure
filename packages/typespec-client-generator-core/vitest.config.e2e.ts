@@ -10,8 +10,6 @@ export default defineConfig({
     },
     outputFile: {
       junit: "./test-results.xml",
-    },
-
-    include: ["e2e/**/*.e2e.ts"],
+    }
   },
 });
