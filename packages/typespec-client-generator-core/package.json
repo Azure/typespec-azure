@@ -45,7 +45,6 @@
     "test:watch": "vitest -w",
     "test:ui": "vitest --ui",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/libraries/typespec-client-generator-core/reference"
