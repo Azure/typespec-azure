@@ -153,4 +153,42 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
       )
       .toBeValid();
   });
+
+  it("allows templates but emit on use of the template ", async () => {
+    await tester
+      .expect(
+        `
+          @armProviderNamespace
+          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+          namespace Microsoft.ContosoProviderHub;
+
+          op SampleTemplate<
+            Resource extends Foundations.Resource,
+            Response extends {} = ArmResponse<Resource>
+          > is ArmCustomPatchAsync<Resource, Response = Response>;
+
+          model Image is Azure.ResourceManager.TrackedResource<{name: string}> {
+            ...ResourceNameParameter<
+              Resource = Image
+            >;
+          }
+
+          @armResourceOperations
+          interface Images {
+            @parameterVisibility
+            update is SampleTemplate<
+              Image,
+              Response =  (ArmAcceptedLroResponse<LroHeaders = Azure.Core.Foundations.RetryAfterHeader &
+                ArmLroLocationHeader<FinalResult = Image>> & {
+                @body _: Image;
+              })
+            >;
+          }
+        `,
+      )
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/no-response-body",
+        message: `The body of 202 response should be empty.`,
+      });
+  });
 });
