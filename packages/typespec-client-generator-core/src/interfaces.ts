@@ -245,6 +245,15 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
   );
 }
 
+export interface SdkStringType extends SdkBuiltInType {
+  kind: "string";
+  // other properties specific to SdkStringType
+}
+
+function isStringSdkBuiltInType(type: SdkBuiltInType): type is SdkStringType {
+  return type.kind === "string";
+}
+
 export function isSdkIntKind(kind: string): kind is keyof typeof SdkIntKindsEnum {
   return kind in SdkIntKindsEnum;
 }
