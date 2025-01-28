@@ -1,3 +1,4 @@
+import { ContextTagKeys } from "@microsoft/applicationinsights-common";
 import { getAppInsightsClient } from "../clients/app-insights.js";
 import { getFetchHttpOverride } from "../http-overrides/fetch.js";
 import { getNodeHttpOverride } from "../http-overrides/node-http.js";
@@ -24,6 +25,7 @@ export function createTelemetryReporter(props: CreateTelemetryReporterProps): Te
     const commonProps = getCommonProperties();
     const machineId = getMachineId();
 
+    const tags = new ContextTagKeys();
     return {
       logEvent(eventName, data) {
         try {
@@ -36,9 +38,13 @@ export function createTelemetryReporter(props: CreateTelemetryReporterProps): Te
                 id: machineId,
               },
             },
+            tags: { [tags.sessionId]: commonProps.sessionId },
             baseData: {
               name: eventName,
-              properties: { ...commonProps, ...data.properties },
+              properties: {
+                ...commonProps,
+                ...data.properties,
+              },
               measurements: data.measurements,
             },
           });
