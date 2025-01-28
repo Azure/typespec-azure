@@ -435,3 +435,21 @@ but need to be identified as such.
 #### Parameters
 
 None
+
+### `@externalTypeRef` {#@Azure.ResourceManager.Legacy.externalTypeRef}
+
+Specify an external reference that should be used when emitting this type.
+
+```typespec
+@Azure.ResourceManager.Legacy.externalTypeRef(jsonRef: valueof string)
+```
+
+#### Target
+
+`Model | ModelProperty`
+
+#### Parameters
+
+| Name    | Type             | Description                                                   |
+| ------- | ---------------- | ------------------------------------------------------------- |
+| jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |

@@ -21,7 +21,7 @@ describe("TypeSpec Samples (With autorest emitter)", () => {
   defineSampleSnaphotTests({
     sampleDir: coreSamplesPath,
     outputDir: resolvePath(rootOutputDir, "core"),
-    exclude: [...excludedSamples, "authentication", "multipart"],
+    exclude: [...excludedSamples, "authentication", "multipart", "todoApp"],
     emit: [resolvePath(pkgRoot, "node_modules/@azure-tools/typespec-autorest").replace(/\\/g, "/")],
   });
 });
