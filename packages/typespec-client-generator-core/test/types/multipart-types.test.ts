@@ -103,6 +103,19 @@ describe("typespec-client-generator-core: multipart types", () => {
     );
     ok(multiPartRequest);
     deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
+
+    const addressProperty = multiPartRequest.properties.find((x) => x.name === "address");
+    ok(addressProperty);
+    strictEqual(addressProperty.kind, "property");
+    ok(addressProperty.serializationOptions.multipart);
+    strictEqual(addressProperty.serializationOptions.multipart.isFilePart, false);
+    strictEqual(addressProperty.serializationOptions.multipart.isMulti, false);
+
+    const cityProperty = address.properties.find((x) => x.name === "city");
+    ok(cityProperty);
+    strictEqual(cityProperty.kind, "property");
+    ok(cityProperty.serializationOptions.json);
+    strictEqual(cityProperty.serializationOptions.json.name, "city");
   });
 
   it("multipart conflicting model usage for mixed operations", async function () {
