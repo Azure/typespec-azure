@@ -10,7 +10,7 @@ import "@azure-tools/typespec-client-generator-core";
 
 using TypeSpec.Http;
 using TypeSpec.Versioning;
-using Azure.ClientGenerator.Core;
+using global.Azure.ClientGenerator.Core;
 using Spector;
 
 @scenarioService(
@@ -19,12 +19,12 @@ using Spector;
     versioned: ApiVersions,
   }
 )
-namespace Client.AlternateApiVersion.Service.Header;
+namespace _Specs_.Azure.ClientGenerator.Core.ApiVersion.Header;
 
 @doc("Supported api versions.")
 enum ApiVersions {
   @doc("Api version 2025-01-01.")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+  @useDependency(global.Azure.Core.Versions.v1_0_Preview_2)
   v2025_01_01: "2025-01-01",
 }
 

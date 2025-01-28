@@ -4,8 +4,8 @@ import "@azure-tools/typespec-client-generator-core";
 import "./main.tsp";
 
 using TypeSpec.Http;
-using Azure.ClientGenerator.Core;
-using Client.AlternateApiVersion.Service.Header;
+using global.Azure.ClientGenerator.Core;
+using _Specs_.Azure.ClientGenerator.Core.ApiVersion.Header;
 using Spector;
 
 namespace Customizations;
