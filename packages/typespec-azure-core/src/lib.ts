@@ -176,6 +176,15 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Expected property '${"propertyName"}' to be a ${"kind"} parameter.`,
       },
     },
+    "identifiers-invalid-type": {
+      severity: "error",
+      messages: {
+        default:
+          "The @identifiers decorator must be applied to a property that is an array of objects",
+        incorrectProperties:
+          "The @identifiers decorator expects a parameter that is an array of strings or an empty array.",
+      },
+    },
     "expected-success-response": {
       severity: "error",
       messages: {
@@ -248,6 +257,7 @@ export const $lib = createTypeSpecLibrary({
     armResourceIdentifierConfig: {
       description: "Data for `@armResourceIdentifierConfig` decorator",
     },
+    identifiers: { description: "Data for `@identifiers` decorator" },
     operationLink: { description: "Data for `@operationLink` decorator" },
     requestParameter: { description: "Data for `@requestParameter` decorator" },
     responseParameter: { description: "Data for `@responseParameter` decorator" },

@@ -12,6 +12,7 @@ import {
   $finalLocation,
   $finalOperation,
   $fixed,
+  $identifiers,
   $items,
   $lroCanceled,
   $lroErrorResult,
@@ -69,6 +70,7 @@ export const $decorators = {
     finalOperation: $finalOperation,
     useFinalStateVia: $useFinalStateVia,
     nextPageOperation: $nextPageOperation,
+    identifiers: $identifiers,
   } satisfies AzureCoreDecorators,
 
   "Azure.Core.Foundations": {

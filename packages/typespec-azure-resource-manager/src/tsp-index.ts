@@ -20,7 +20,6 @@ import {
   $armVirtualResource,
   $customAzureResource,
   $extensionResource,
-  $identifiers,
   $locationResource,
   $resourceBaseType,
   $resourceGroupResource,
@@ -55,7 +54,6 @@ export const $decorators = {
     armCommonTypesVersion: $armCommonTypesVersion,
     armVirtualResource: $armVirtualResource,
     resourceBaseType: $resourceBaseType,
-    identifiers: $identifiers,
   } satisfies AzureResourceManagerDecorators,
   "Azure.ResourceManager.Legacy": {
     customAzureResource: $customAzureResource,

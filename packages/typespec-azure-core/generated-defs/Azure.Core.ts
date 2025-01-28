@@ -184,6 +184,12 @@ export type NextPageOperationDecorator = (
   parameters?: Type,
 ) => void;
 
+export type IdentifiersDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  properties: string[],
+) => void;
+
 export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
@@ -202,4 +208,5 @@ export type AzureCoreDecorators = {
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
   nextPageOperation: NextPageOperationDecorator;
+  identifiers: IdentifiersDecorator;
 };

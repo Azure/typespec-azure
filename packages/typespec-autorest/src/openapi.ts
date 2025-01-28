@@ -4,6 +4,7 @@ import {
   PagedResultMetadata,
   UnionEnum,
   extractLroStates,
+  getArmIdentifiers,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
   getLroMetadata,
@@ -12,7 +13,6 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
-  getArmIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
   isAzureResource,

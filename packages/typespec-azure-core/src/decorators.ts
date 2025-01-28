@@ -2,17 +2,20 @@ import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js
 import { getAllProperties } from "./utils.js";
 
 import {
+  ArrayModelType,
   createDiagnosticCollector,
   DecoratorContext,
   Diagnostic,
   DiagnosticCollector,
   Enum,
   EnumMember,
+  getKeyName,
   getKnownValues,
   getNamespaceFullName,
   getTypeName,
   ignoreDiagnostics,
   IntrinsicType,
+  isArrayModelType,
   isKey,
   isNeverType,
   isStringType,
@@ -52,6 +55,7 @@ import {
   FinalLocationDecorator,
   FinalOperationDecorator,
   FixedDecorator,
+  IdentifiersDecorator,
   ItemsDecorator,
   LroCanceledDecorator,
   LroErrorResultDecorator,
@@ -1030,6 +1034,101 @@ export function getFinalStateOverride(
   operation: Operation,
 ): FinalStateValue | undefined {
   return program.stateMap(AzureCoreStateKeys.finalStateOverride).get(operation);
+}
+
+export const $identifiers: IdentifiersDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty,
+  properties: string[],
+) => {
+  const { program } = context;
+  const { type } = entity;
+
+  if (
+    type.kind !== "Model" ||
+    !isArrayModelType(program, type) ||
+    type.indexer.value.kind !== "Model"
+  ) {
+    reportDiagnostic(program, {
+      code: "identifiers-invalid-type",
+      target: entity,
+    });
+    return;
+  }
+
+  const propertiesValues = properties.values;
+  if (!Array.isArray(propertiesValues)) {
+    reportDiagnostic(program, {
+      code: "identifiers-invalid-type",
+      messageId: "incorrectProperties",
+      target: entity,
+    });
+    return;
+  }
+
+  context.program.stateMap(AzureCoreStateKeys.identifiers).set(
+    type.indexer.value,
+    propertiesValues.map((property) => property.value),
+  );
+};
+
+/**
+ * This function returns all arm identifiers for the given array model type
+ * This includes the identifiers specified using the @identifiers decorator
+ * and the identifiers using the @key decorator.
+ *
+ * @param program The program to process.
+ * @param entity The array model type to check.
+ * @returns returns list of arm identifiers for the given array model type if any or undefined.
+ */
+export function getArmIdentifiers(program: Program, entity: ArrayModelType): string[] | undefined {
+  const value = entity.indexer.value;
+
+  const getIdentifiers = program.stateMap(AzureCoreStateKeys.identifiers).get(value);
+  if (getIdentifiers !== undefined) {
+    return getIdentifiers;
+  }
+
+  const result: string[] = [];
+  if (value.kind === "Model") {
+    for (const property of value.properties.values()) {
+      const pathToKey = getPathToKey(program, property);
+      if (pathToKey !== undefined) {
+        result.push(property.name + pathToKey);
+      } else if (getKeyName(program, property)) {
+        result.push(property.name);
+      }
+    }
+  }
+
+  return result.length > 0 ? result : undefined;
+}
+
+function getPathToKey(
+  program: Program,
+  entity: ModelProperty,
+  visited = new Set<ModelProperty>(),
+): string | undefined {
+  if (entity.type.kind !== "Model") {
+    return undefined;
+  }
+  if (visited.has(entity)) {
+    return undefined;
+  }
+  visited.add(entity);
+
+  for (const property of entity.type.properties.values()) {
+    if (property.type.kind !== "Model" && getKeyName(program, property)) {
+      return "/" + property.name;
+    }
+    if (property.type.kind === "Model") {
+      const path = getPathToKey(program, property, visited);
+      if (path !== undefined) {
+        return "/" + property.name + path;
+      }
+    }
+  }
+  return undefined;
 }
 
 export const $omitKeyProperties: OmitKeyPropertiesDecorator = (

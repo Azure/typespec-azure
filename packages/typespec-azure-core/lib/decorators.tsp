@@ -210,4 +210,20 @@ namespace Azure.Core.Foundations.Private {
     target: TypeSpec.Reflection.Operation,
     states: valueof ("operation-location" | "location" | "azure-async-operation")[]
   );
+
+  /**
+   * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
+   * The properties that are used as identifiers for the object needs to be provided as a list of strings.
+   *
+   * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
+   *
+   * @example
+   * ```typespec
+   * model Pet {
+   *  @identifiers(["size"])
+   *  dog: Dog;
+   * }
+   * ```
+   */
+  extern dec identifiers(entity: ModelProperty, properties: string[]);
 }

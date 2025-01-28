@@ -1,3 +1,4 @@
+import { getArmIdentifiers } from "@azure-tools/typespec-azure-core";
 import {
   ArrayModelType,
   ModelProperty,
@@ -9,8 +10,6 @@ import {
 } from "@typespec/compiler";
 import { getExtensions } from "@typespec/openapi";
 import { isArmCommonType } from "../common-types.js";
-import { getArmIdentifiers } from "../resource.js";
-
 export const missingXmsIdentifiersRule = createRule({
   name: "missing-x-ms-identifiers",
   description: `Array properties should describe their identifying properties with x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", [id-prop])  where "id-prop" is a list of the names of identifying properties in the item type.`,

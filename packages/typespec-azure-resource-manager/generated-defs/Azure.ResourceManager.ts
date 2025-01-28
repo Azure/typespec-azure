@@ -267,12 +267,6 @@ export type ResourceBaseTypeDecorator = (
   baseType: Type,
 ) => void;
 
-export type IdentifiersDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-  properties: string[],
-) => void;
-
 /**
  *  * Specify an external reference that should be used when emitting this type.
  *  *  @param jsonRef - External reference(e.g. "../../common.json#/definitions/Foo")
@@ -306,7 +300,6 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
-  identifiers: IdentifiersDecorator;
 };
 
 export type AzureResourceManagerLegacyDecorators = {
