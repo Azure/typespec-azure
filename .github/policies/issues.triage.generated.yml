@@ -24,6 +24,8 @@ configuration:
                 - hasLabel:
                     label: lib:azure-resource-manager
                 - hasLabel:
+                    label: lib:azure-http-specs
+                - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
                     label: eng
@@ -47,6 +49,8 @@ configuration:
                   label: lib:azure-core
               - labelAdded:
                   label: lib:azure-resource-manager
+              - labelAdded:
+                  label: lib:azure-http-specs
               - labelAdded:
                   label: emitter:autorest
               - labelAdded:
@@ -73,6 +77,8 @@ configuration:
               - labelRemoved:
                   label: lib:azure-resource-manager
               - labelRemoved:
+                  label: lib:azure-http-specs
+              - labelRemoved:
                   label: emitter:autorest
               - labelRemoved:
                   label: eng
@@ -88,6 +94,8 @@ configuration:
                     label: lib:azure-core
                 - hasLabel:
                     label: lib:azure-resource-manager
+                - hasLabel:
+                    label: lib:azure-http-specs
                 - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
