@@ -14,6 +14,12 @@ title: Usage & Configuration
 npm install -g @azure-tools/typespec-client-generator-cli
 ```
 
+## Prerequisites
+
+Users working with a repository that already accepts this tool can continue to the [Usage](#usage) section.
+
+Repo owners should follow the steps in the [Per repository set up](#per-repository-set-up) section.
+
 ## Usage
 
 ```bash
@@ -23,9 +29,28 @@ tsp-client <command> [options]
 ## Commands
 
 Use one of the supported commands to get started generating clients from a TypeSpec project.
+
 This tool will default to using your current working directory to generate clients in and will
 use it to look for relevant configuration files. To specify a different output directory, use
 the `-o` or `--output-dir` option.
+
+To see supported commands, run:
+
+```bash
+tsp-client --help
+```
+
+To see supported parameters and options for a specific command, run:
+
+```bash
+tsp-client <command> --help
+```
+
+Example using the `init` command:
+
+```bash
+tsp-client init --help
+```
 
 ### init
 
@@ -40,7 +65,7 @@ This command should be run from the root of the repository. Example repository r
 Example:
 
 ```bash
-azure-sdk-for-python> tsp-client init -c https://github.com/Azure/azure-rest-api-specs/blob/431eb865a581da2cd7b9e953ae52cb146f31c2a6/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
+azure-sdk-for-python> tsp-client init -c https://github.com/Azure/azure-rest-api-specs/blob/dee71463cbde1d416c47cf544e34f7966a94ddcb/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
 ```
 
 ### update
@@ -77,38 +102,135 @@ azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-c
 
 ### convert
 
-Convert an existing swagger specification to a TypeSpec project. This command should only be run once to get started working on a TypeSpec project. TypeSpec projects will need to be optimized manually and fully reviewed after conversion. When using this command a path or url to a swagger README file is required through the `--swagger-readme` flag.
+Convert an existing swagger specification to a TypeSpec project. This command should only be run once to get started working on a TypeSpec project. TypeSpec projects will need to be optimized manually and fully reviewed after conversion. When using this command a path or url to a swagger README file is required through the `--swagger-readme` flag. By default, the converted TypeSpec project will leverage TypeSpec built-in libraries with standard patterns and templates (highly recommended), which will cause discrepancies between the generated TypeSpec and original swagger. If you really don't want this intended discrepancy, add `--fully-compatible` flag to generate a TypeSpec project that is fully compatible with the swagger.
 
 Example:
 
 ```bash
-azure-rest-api-specs/specification/contosowidgetmanager> tsp-client convert --swagger-readme ./data-plane/readme.md -o ./Contoso.WidgetManager
+azure-rest-api-specs/specification/contosowidgetmanager> tsp-client convert --swagger-readme <path to swagger README file>/readme.md -o ./Contoso.WidgetManager
 ```
+
+### compare
+
+Compares two Swagger definitions to identify the relevant differences between them. This command is useful when comparing an existing Swagger definition with a TypeSpec generated one. The `compare` command requires two parameters: `--lhs` which will typically be the original hand-authored Swagger and `--rhs` which will usually be the folder containing your TypeSpec. The command will generate the Swagger and compare the two definitions. The command will ignore differences in the Swagger that don't
+correspond to differences in the service, allowing you to focus only on differences that are relevant.
 
 ### sort-swagger
 
 Sort an existing swagger specification to be the same content order with TypeSpec generated swagger. This will allow you to easily compare and identify differences between the existing swagger and TypeSpec generated one. You should run this command on existing swagger files and check them in prior to creating converted TypeSpec PRs.
 
-## Options
+### generate-config-files
+
+This command generates the default configuration files used by tsp-client. Run this command to generate the `emitter-package.json` and `emitter-package-lock.json` under the **eng/** directory of your current repository.
+
+**Required: Use the `--package-json` flag to specify the path to the package.json file of the emitter you will use to generate client libraries.**
+
+Example:
 
 ```bash
-  --arm                     Convert ARM swagger specification to TypeSpec       [boolean]
-  -c, --tsp-config          The tspconfig.yaml file to use                      [string]
-  --commit                  Commit to be used for project init or update        [string]
-  -d, --debug               Enable debug logging                                [boolean]
-  --emitter-options         The options to pass to the emitter                  [string]
-  --generate-lock-file      Generate a lock file under the eng/ directory from
-                            an existing emitter-package.json                    [boolean]
-  -h, --help                Show help                                           [boolean]
-  --local-spec-repo         Path to local repository with the TypeSpec project  [string]
-  --save-inputs             Don't clean up the temp directory after generation  [boolean]
-  --skip-sync-and-generate  Skip sync and generate during project init          [boolean]
-  --swagger-readme          Path or url to swagger readme file                  [string]
-  -o, --output-dir          Specify an alternate output directory for the
-                            generated files. Default is your current directory  [string]
-  --repo                    Repository where the project is defined for init
-                            or update                                           [string]
-  -v, --version             Show version number                                 [boolean]
+tsp-client generate-config-files --package-json <path to emitter repo clone>/package.json
+```
+
+Example using the `azure-sdk-for-js` and the `@azure-tools/typespec-ts` emitter:
+
+```bash
+azure-sdk-for-js> tsp-client generate-config-files --package-json <relative or absolute path to repo clone of @azure-tools/typespec-ts package>/package.json
+```
+
+To be explicit about specifying dependencies you'd like pinned, add a new field in the package.json file of your emitter called `"azure-sdk/emitter-package-json-pinning"` with a list of the dependencies you want to be forwarded to the emitter-package.json. These dependencies must be specified in your package.json's devDependencies in order for the tool to assign the correct version.
+
+Example package.json using `"azure-sdk/emitter-package-json-pinning"`:
+
+```json
+{
+  "name": "@azure-tools/typespec-foo",
+  "version": "0.3.0",
+  "author": "Microsoft Corporation",
+  "description": "Example package.json for tsp-client",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./testing": "./dist/src/testing/index.js"
+  },
+  "dependencies": {
+    "semver": "~7.6.2",
+    "tsx": "~4.19.1"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "~0.64.0",
+    "@typespec/http": "~0.63.0",
+    "@typespec/rest": "~0.63.0",
+    "@typespec/versioning": "~0.63.0",
+    "@typespec/openapi": "~0.63.0",
+    "@azure-tools/typespec-azure-resource-manager": "~0.49.0",
+    "@azure-tools/typespec-azure-core": "~0.49.0",
+    "@azure-tools/typespec-azure-rulesets": "~0.49.0",
+    "@azure-tools/typespec-autorest": "~0.49.0",
+    "@azure-tools/typespec-client-generator-core": "~0.49.1"
+  },
+  "azure-sdk/emitter-package-json-pinning": ["@typespec/compiler"]
+}
+```
+
+Example `emitter-package.json` generated from the package.json shown above:
+
+```json
+{
+  "main": "dist/src/index.js",
+  "dependencies": {
+    "@azure-tools/typespec-foo": "0.3.0"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "~0.64.0"
+  }
+}
+```
+
+If you need to override dependencies for your emitter-package.json you can create a json file to explicitly list the package and corresponding version you want to override. This will add an `overrides` section in your emitter-package.json that will be used during `npm install` or `npm ci`. [See npm overrides doc.](https://docs.npmjs.com/cli/v10/configuring-npm/package-json?v=true#overrides)
+
+Example json file with package overrides:
+
+```json
+{
+  "@azure-tools/typespec-foo": "0.2.0",
+  "@typespec/compiler": "0.61.0"
+}
+```
+
+Example command specifying overrides:
+
+```bash
+tsp-client generate-config-files --package-json <path to emitter repo clone>/package.json --overrides <path to overrides file>.json
+```
+
+Example `emitter-package.json` generated using overrides:
+
+```json
+{
+  "main": "dist/src/index.js",
+  "dependencies": {
+    "@azure-tools/typespec-foo": "0.3.0"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "~0.64.0"
+  },
+  "overrides": {
+    "@azure-tools/typespec-foo": "0.2.0",
+    "@typespec/compiler": "0.61.0"
+  }
+}
+```
+
+### generate-lock-file
+
+Generate an emitter-package-lock.json under the eng/ directory based on existing `<repo-root>/eng/emitter-package.json`.
+
+Example:
+
+```bash
+azure-sdk-for-python> tsp-client generate-lock-file
 ```
 
 ## Important concepts
@@ -127,12 +249,13 @@ This file should live under the project directory for each service.
 
 The file has the following properties:
 
-| Property              | Description                                                                                                                                                                                                                                                                                           | IsRequired            |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| directory             | The top level directory where the main.tsp for the service lives. This should be relative to the spec repo root such as `specification/cognitiveservices/OpenAI.Inference`                                                                                                                            | true                  |
-| additionalDirectories | Sometimes a typespec file will use a relative import that might not be under the main directory. In this case a single `directory` will not be enough to pull down all necessary files. To support this you can specify additional directories as a list to sync so that all needed files are synced. | false: default = null |
-| commit                | The commit sha for the version of the typespec files you want to generate off of. This allows us to have idempotence on generation until we opt into pointing at a later version.                                                                                                                     | true                  |
-| repo                  | The repo this spec lives in. This should be either `Azure/azure-rest-api-specs` or `Azure/azure-rest-api-specs-pr`.                                                                                                                                                                                   | true                  |
+| Property                                                        | Description                                                                                                                                                                                                                                                                                           | IsRequired            |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| <a id="directory-anchor"></a> directory                         | The top level directory where the main.tsp for the service lives. This should be relative to the spec repo root such as `specification/cognitiveservices/OpenAI.Inference`                                                                                                                            | true                  |
+| <a id="additionalDirectories-anchor"></a> additionalDirectories | Sometimes a typespec file will use a relative import that might not be under the main directory. In this case a single `directory` will not be enough to pull down all necessary files. To support this you can specify additional directories as a list to sync so that all needed files are synced. | false: default = null |
+| <a id="commit-anchor"></a> commit                               | The commit sha for the version of the typespec files you want to generate off of. This allows us to have idempotence on generation until we opt into pointing at a later version.                                                                                                                     | true                  |
+| <a id="repo-anchor"></a> repo                                   | The repo this spec lives in. This should be either `Azure/azure-rest-api-specs` or `Azure/azure-rest-api-specs-pr`. Note that pr will work locally but not in CI until we add another change to handle token based auth.                                                                              | true                  |
+| <a id="entrypointFile-anchor"></a> entrypointFile               | A specific entrypoint file used to compile the TypeSpec project. NOTE: This option should only be used with a non-standard entrypoint file name. DO NOT use this option with standard entrypoints: `client.tsp` or `main.tsp`.                                                                        | false                 |
 
 Example:
 
@@ -146,7 +269,7 @@ additionalDirectories:
 
 ## Per repository set up
 
-Each repository that intends to support `tsp-client` for generating and updating client libraries will need to set up an `emitter-package.json` file under the `eng/` directory at the root of the repository. Client libraries generated with this tool will be outputted based on the information in the tspconfig.yaml file of the TypeSpec specification. The service directory is specified through the `parameters.service-dir.default` parameter in tspconfig.yaml, additionally the `package-dir` option for the specific emitter is appended to the end of the path.
+Each repository that intends to support `tsp-client` for generating and updating client libraries will need to set up an `emitter-package.json` file under the `eng/` directory at the root of the repository. Client libraries generated with this tool will be outputted based on the information in the tspconfig.yaml file of the TypeSpec specification. The service directory is specified through the `parameters.service-dir.default` parameter in the tspconfig.yaml, additionally the `package-dir` option for the specific emitter is appended to the end of the path.
 
 See the following example of a valid tspconfig.yaml file: https://github.com/Azure/azure-rest-api-specs/blob/main/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
 
@@ -161,7 +284,7 @@ Please note that these requirements apply on the repository where the client lib
 
 ### TempTypeSpecFiles
 
-This tool creates a `TempTypeSpecFiles` directory when syncing a TypeSpec project to your local repository. This temporary folder will contain a copy of the TypeSpec project specified by the parameters set in the tsp-location.yaml file. If you pass the `--save-inputs` flag to the commandline tool, this directory will not be deleted. Repositories should add an entry in the .gitignore so that none of these files are accidentally checked in if `--save-inputs` flag is passed in.
+This tool creates a `TempTypeSpecFiles` directory when syncing a TypeSpec project to your local repository. This temporary folder will contain a copy of the TypeSpec project specified by the parameters set in the tsp-location.yaml file. If you pass the `--save-inputs` flag to the commandline tool, this directory will not be deleted. You should add a new entry in the .gitignore of your repo so that none of these files are accidentally checked in if `--save-inputs` flag is passed in.
 
 ```diff title=".gitignore" lang="sh"
 + TempTypeSpecFiles/
