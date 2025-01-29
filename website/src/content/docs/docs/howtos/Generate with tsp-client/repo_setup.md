@@ -1,4 +1,6 @@
-# tsp-client repo setup
+---
+title: Repo setup
+---
 
 Each repository that intends to support `tsp-client` for generating and updating client libraries will need to set up an `emitter-package.json` file under the `eng/` directory at the root of the repository. Client libraries generated with this tool will be outputted based on the information in the tspconfig.yaml file of the TypeSpec specification. The service directory is specified through the `parameters.service-dir.default` parameter in the tspconfig.yaml, additionally the `package-dir` option for the specific emitter is appended to the end of the path.
 
@@ -37,13 +39,17 @@ Example:
 }
 ```
 
-> NOTE: tsp compile currently requires the "main" line to be there.
+:::note
+tsp compile currently requires the "main" line to be there.
+:::
 
-> NOTE: This file replaces the package.json checked into the `azure-rest-api-spec` repository.
+This file replaces the package.json checked into the `azure-rest-api-spec` repository.
 
 ### emitter-package-lock.json (Optional)
 
 `emitter-package-lock.json` will be used the same as a `package-lock.json`. The tool will run a clean npm installation before generating client libraries. This file allows consistent dependency trees and allows each repository to control their dependency installation.
 The file should be checked into this location: `<root of repo>/eng/emitter-package-lock.json`
 
-> NOTE: The tool will run `npm ci` to install dependencies, so ensure that the `emitter-package-lock.json` and `emitter-package.json` files both exist and are in sync with each other.
+:::caution
+The tool will run `npm ci` to install dependencies, so ensure that the `emitter-package-lock.json` and `emitter-package.json` files both exist and are in sync with each other.
+:::
