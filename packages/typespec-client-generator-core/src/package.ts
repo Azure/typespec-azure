@@ -28,6 +28,7 @@ import {
 } from "./decorators.js";
 import { getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
+  SdkApiVersionParameter,
   SdkBodyModelPropertyType,
   SdkClient,
   SdkClientType,
@@ -69,6 +70,7 @@ import {
   getTypeDecorators,
   getValueTypeValue,
   isNeverOrVoidType,
+  isOnClient,
   isSubscriptionId,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -80,6 +82,7 @@ import {
   getDefaultApiVersion,
   getHttpOperationWithCache,
   getLibraryName,
+  isApiVersion,
 } from "./public-utils.js";
 import {
   addEncodeInfo,
@@ -467,9 +470,9 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
       const operationLocation = getLocationOfOperation(operation);
-      if (sdkMethodParam.isApiVersionParam) {
+      if (isApiVersion(context, param)) {
         if (
-          !context.__clientToParameters.get(operationLocation)?.find((x) => x.isApiVersionParam)
+          !context.__clientToParameters.get(operationLocation)?.find((x) => x.kind === "apiVersion")
         ) {
           clientParams.push(sdkMethodParam);
         }
@@ -600,10 +603,22 @@ function getSdkMethodParameter(
   context: TCGCContext,
   type: ModelProperty,
   operation: Operation,
-): [SdkMethodParameter, readonly Diagnostic[]] {
+): [SdkMethodParameter | SdkApiVersionParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const base = diagnostics.pipe(getSdkModelPropertyType(context, type, operation));
+  if (isApiVersion(context, type) && base.onClient) {
+    if (base.type.kind !== "string") {
+      throw new Error("ApiVersion must be a string");
+    }
+    return diagnostics.wrap({
+      ...base,
+      kind: "apiVersion",
+      isApiVersionParam: true,
+      onClient: true,
+    } as SdkApiVersionParameter);
+  }
   return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
+    ...base,
     kind: "method",
   });
 }
@@ -833,16 +848,16 @@ function addDefaultClientParameters<
   if (credentialParam) {
     client.initialization.properties.push(credentialParam);
   }
-  let apiVersionParam = context.__clientToParameters
+  let apiVersionParam: SdkApiVersionParameter | undefined = context.__clientToParameters
     .get(client.__raw.type)
-    ?.find((x) => x.isApiVersionParam);
+    ?.find((x) => x.kind === "apiVersion");
   if (!apiVersionParam) {
     for (const operationGroup of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
       apiVersionParam = context.__clientToParameters
         .get(operationGroup.type)
-        ?.find((x) => x.isApiVersionParam);
+        ?.find((x) => x.kind === "apiVersion");
       if (apiVersionParam) break;
     }
   }

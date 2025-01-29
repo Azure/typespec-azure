@@ -153,13 +153,16 @@ export type SdkType =
   | SdkCredentialType
   | SdkEndpointType;
 
-export interface SdkBuiltInType extends SdkTypeBase {
-  kind: SdkBuiltInKinds;
+export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
+  extends SdkTypeBase {
+  kind: TKind;
   encode?: string;
   name: string;
-  baseType?: SdkBuiltInType;
+  baseType?: SdkBuiltInType<TKind>;
   crossLanguageDefinitionId: string;
 }
+
+export interface SdkStringType extends SdkBuiltInType<"string"> {}
 
 type TypeEquality<T, U> = keyof T extends keyof U
   ? keyof U extends keyof T
@@ -243,15 +246,6 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
     isSdkFixedPointKind(kind) ||
     kind in SdkGenericBuiltInStringKindsEnum
   );
-}
-
-export interface SdkStringType extends SdkBuiltInType {
-  kind: "string";
-  // other properties specific to SdkStringType
-}
-
-function isStringSdkBuiltInType(type: SdkBuiltInType): type is SdkStringType {
-  return type.kind === "string";
 }
 
 export function isSdkIntKind(kind: string): kind is keyof typeof SdkIntKindsEnum {
@@ -416,6 +410,9 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   apiVersions: string[];
   onClient: boolean;
   clientDefaultValue?: unknown;
+  /**
+   * @deprecated This property is deprecated. See if the kind is `apiVersion` instead
+   */
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
@@ -475,6 +472,14 @@ export interface SdkEndpointParameter
   serializedName?: string;
 }
 
+export interface SdkApiVersionParameter
+  extends SdkModelPropertyTypeBase<SdkBuiltInType<"string"> | SdkEnumValueType> {
+  kind: "apiVersion";
+  onClient: true;
+  type: SdkBuiltInType<"string">;
+  isApiVersionParam: true;
+}
+
 export interface SdkCredentialParameter
   extends SdkModelPropertyTypeBase<SdkCredentialType | SdkUnionType<SdkCredentialType>> {
   kind: "credential";
@@ -486,6 +491,7 @@ export type SdkModelPropertyType<TType extends SdkTypeBase = SdkType> =
   | SdkParameter<TType>
   | SdkEndpointParameter
   | SdkCredentialParameter
+  | SdkApiVersionParameter
   | SdkQueryParameter<TType>
   | SdkPathParameter<TType>
   | SdkBodyParameter<TType>
@@ -637,6 +643,7 @@ interface SdkServiceOperationBase {}
 export type SdkParameter<TType extends SdkTypeBase = SdkType> =
   | SdkEndpointParameter
   | SdkCredentialParameter
+  | SdkApiVersionParameter
   | SdkMethodParameter<TType>;
 
 export interface SdkHttpOperation extends SdkServiceOperationBase {

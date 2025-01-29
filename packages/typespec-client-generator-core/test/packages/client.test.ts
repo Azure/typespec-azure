@@ -555,7 +555,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(apiVersionParam.name, "apiVersion");
     strictEqual(apiVersionParam.onClient, true);
     strictEqual(apiVersionParam.optional, false);
-    strictEqual(apiVersionParam.kind, "method");
+    strictEqual(apiVersionParam.kind, "apiVersion");
     strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
   });
 
@@ -625,7 +625,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(apiVersionParam.name, "apiVersion");
     strictEqual(apiVersionParam.onClient, true);
     strictEqual(apiVersionParam.optional, false);
-    strictEqual(apiVersionParam.kind, "method");
+    strictEqual(apiVersionParam.kind, "apiVersion");
     strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01");
   });
 
@@ -927,7 +927,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(clientApiVersionParam.name, "apiVersion");
     strictEqual(clientApiVersionParam.onClient, true);
     strictEqual(clientApiVersionParam.optional, false);
-    strictEqual(clientApiVersionParam.kind, "method");
+    strictEqual(clientApiVersionParam.kind, "apiVersion");
     strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
     strictEqual(clientApiVersionParam.isApiVersionParam, true);
     strictEqual(clientApiVersionParam.type.kind, "string");
@@ -981,7 +981,7 @@ describe("typespec-client-generator-core: client", () => {
     strictEqual(clientApiVersionParam.name, "apiVersion");
     strictEqual(clientApiVersionParam.onClient, true);
     strictEqual(clientApiVersionParam.optional, false);
-    strictEqual(clientApiVersionParam.kind, "method");
+    strictEqual(clientApiVersionParam.kind, "apiVersion");
     strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
     strictEqual(clientApiVersionParam.isApiVersionParam, true);
     strictEqual(clientApiVersionParam.type.kind, "string");
