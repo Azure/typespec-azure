@@ -70,7 +70,6 @@ import {
   getTypeDecorators,
   getValueTypeValue,
   isNeverOrVoidType,
-  isOnClient,
   isSubscriptionId,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
