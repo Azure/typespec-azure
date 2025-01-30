@@ -19,7 +19,10 @@ export const AreaLabels = defineLabels({
     color: "957300",
     description: "Issues for @azure-tools/typespec-azure-core library",
   },
-
+  "lib:azure-http-specs": {
+    color: "c7aee6",
+    description: "For issues/prs related to the @azure-tools/typespec-azure-http-specs package",
+  },
   "emitter:autorest": {
     color: "957300",
     description: "Issues for @azure-tools/typespec-autorest emitter",
@@ -47,6 +50,7 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   "lib:azure-resource-manager": ["packages/typespec-azure-resource-manager/"],
   "emitter:autorest": ["packages/typespec-autorest/"],
   "lib:tcgc": ["packages/typespec-client-generator-core/"],
+  "lib:azure-http-specs": ["packages/typespec-azure-http-specs/"],
   ide: [],
   "cli/psh": [],
 };
