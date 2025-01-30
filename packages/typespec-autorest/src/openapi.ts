@@ -15,6 +15,7 @@ import {
   getArmIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
+  isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
@@ -2389,6 +2390,7 @@ export async function getOpenAPIForService(
 
       const armIdentifiers = getArmIdentifiers(program, typespecType);
       if (
+        isArmProviderNamespace(program, typespecType.namespace) &&
         armIdentifiers !== undefined &&
         armIdentifiers.length > 0 &&
         !ifArmIdentifiersDefault(armIdentifiers)
