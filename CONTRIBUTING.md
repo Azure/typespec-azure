@@ -185,7 +185,6 @@ each individual repo as you would any other.
 
 ```bash
 pnpm e2e-tests
-
 ```
 
 ### Test with local cadl-ranch repo
