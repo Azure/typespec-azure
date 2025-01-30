@@ -919,7 +919,10 @@ function addDefaultClientParameters<
   if (subId) {
     defaultClientParamters.push(subId);
   }
-  client.clientInitialization.parameters = [...defaultClientParamters, ...client.clientInitialization.parameters];
+  client.clientInitialization.parameters = [
+    ...defaultClientParamters,
+    ...client.clientInitialization.parameters,
+  ];
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {
