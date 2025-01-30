@@ -586,4 +586,25 @@ describe("typespec-client-generator-core: serialization options", () => {
     strictEqual(model.properties[0].kind, "property");
     strictEqual(model.properties[0].serializationOptions.json?.name, "rename");
   });
+
+  it("@unwrapped for string property", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      model BlobName {
+        @unwrapped content: string;
+      }
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "content");
+    strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
+  });
 });

@@ -546,6 +546,8 @@ export function getSdkUnionWithDiagnostics(
     if (nullOption !== undefined) {
       retval = {
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+        isGeneratedName: !type.name,
         type: retval,
         access: "public",
         usage: UsageFlags.None,

@@ -1,5 +1,29 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.50.2
+
+### Bug Fixes
+
+- [#2115](https://github.com/Azure/typespec-azure/pull/2115) Fix regression of example mapping for model with parameters.
+
+### Deprecations
+
+- [#2115](https://github.com/Azure/typespec-azure/pull/2115) Deprecate `serializedName` property of `SdkEndpointParameter`. Use `type.templateArguments[x].serializedName` or `type.variantTypes[x].templateArguments[x].serializedName` instead.
+
+
+## 0.50.1
+
+### Features
+
+- [#2097](https://github.com/Azure/typespec-azure/pull/2097) support `name` and `isGeneratedName` for nullable type
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Add `serializationOptions` property to `SdkModelType` and `SdkBodyModelPropertyType`. Its type is `SerializationOptions` which contains the info of how to serialize to Json/Xml/Multipart value.
+
+### Deprecations
+
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `serializedName` property in `SdkBodyModelPropertyType`, use `serializationOptions.xxx.name` instead.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `multipartOptions` in `SdkBodyModelPropertyType`, use `serializationOptions.multipart` instead.
+
+
 ## 0.50.0
 
 ### Features
