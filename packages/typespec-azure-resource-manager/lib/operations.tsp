@@ -705,6 +705,7 @@ op checkLocalNameAvailability<
  */
 @post
 @action
+@Private.armUpdateProviderNamespace
 @armResourceCollectionAction
 op ArmProviderActionSync<
   Request extends {} | void = void,
@@ -732,6 +733,7 @@ op ArmProviderActionSync<
  */
 @post
 @action
+@Private.armUpdateProviderNamespace
 @armResourceCollectionAction
 op ArmProviderActionAsync<
   Request extends {} | void = void,
