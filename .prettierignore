@@ -77,6 +77,5 @@ core/packages/http-client-csharp/
 core/packages/http-client-java/
 core/packages/http-client-python/
 
-
 .gitattributes
 CODEOWNERS
