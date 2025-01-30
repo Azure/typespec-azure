@@ -77,6 +77,7 @@ export interface SdkEmitterOptions {
   "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
+  namespace?: string;
 }
 
 export interface SdkClient {
