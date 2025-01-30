@@ -860,7 +860,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
     clientNamespace: getClientNamespace(context, client.type),
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
-    init: diagnostics.pipe(createSdkClientInitializationType(context, client)),
+    clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
@@ -873,7 +873,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
   // eslint-disable-next-line @typescript-eslint/no-deprecated
-  sdkClientType.initialization.properties = [...sdkClientType.init.parameters];
+  sdkClientType.initialization.properties = [...sdkClientType.clientInitialization.parameters];
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -919,7 +919,7 @@ function addDefaultClientParameters<
   if (subId) {
     defaultClientParamters.push(subId);
   }
-  client.init.parameters = [...defaultClientParamters, ...client.init.parameters];
+  client.clientInitialization.parameters = [...defaultClientParamters, ...client.clientInitialization.parameters];
 }
 
 function populateApiVersionInformation(context: TCGCContext): void {

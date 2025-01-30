@@ -33,9 +33,9 @@ describe("typespec-client-generator-core: client scenario", () => {
     strictEqual(sdkPackage.clients.length, 1);
     const client = sdkPackage.clients[0];
     strictEqual(client.name, "PetStoreClient");
-    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
-    strictEqual(client.init.parameters.length, 1);
-    strictEqual(client.init.parameters[0].name, "endpoint");
+    strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.clientInitialization.parameters.length, 1);
+    strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
 
     const methods = client.methods;
     strictEqual(methods.length, 2);
@@ -82,23 +82,23 @@ describe("typespec-client-generator-core: client scenario", () => {
     strictEqual(sdkPackage.clients.length, 1);
     const client = sdkPackage.clients[0];
     strictEqual(client.name, "ServiceClient");
-    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
-    strictEqual(client.init.parameters.length, 4);
-    strictEqual(client.init.parameters[0].name, "endpoint");
-    strictEqual(client.init.parameters[1].name, "credential");
-    strictEqual(client.init.parameters[2].name, "apiVersion");
-    strictEqual(client.init.parameters[3].name, "subscriptionId");
+    strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.clientInitialization.parameters.length, 4);
+    strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
+    strictEqual(client.clientInitialization.parameters[1].name, "credential");
+    strictEqual(client.clientInitialization.parameters[2].name, "apiVersion");
+    strictEqual(client.clientInitialization.parameters[3].name, "subscriptionId");
     strictEqual(client.methods.length, 1); // client accessor methods which have already deprecated
     strictEqual(client.children?.length, 1);
 
     const tests = client.children?.find((c) => c.name === "Tests");
     ok(tests);
-    strictEqual(tests.init.initializedBy, InitializedByFlags.Parent);
-    strictEqual(tests.init.parameters.length, 4);
-    strictEqual(tests.init.parameters[0].name, "endpoint");
-    strictEqual(tests.init.parameters[1].name, "credential");
-    strictEqual(tests.init.parameters[2].name, "apiVersion");
-    strictEqual(tests.init.parameters[3].name, "subscriptionId");
+    strictEqual(tests.clientInitialization.initializedBy, InitializedByFlags.Parent);
+    strictEqual(tests.clientInitialization.parameters.length, 4);
+    strictEqual(tests.clientInitialization.parameters[0].name, "endpoint");
+    strictEqual(tests.clientInitialization.parameters[1].name, "credential");
+    strictEqual(tests.clientInitialization.parameters[2].name, "apiVersion");
+    strictEqual(tests.clientInitialization.parameters[3].name, "subscriptionId");
     strictEqual(tests.methods.length, 1);
     strictEqual(tests.methods[0].name, "get");
   });
@@ -143,43 +143,43 @@ describe("typespec-client-generator-core: client scenario", () => {
     strictEqual(sdkPackage.clients.length, 1);
     const client = sdkPackage.clients[0];
     strictEqual(client.name, "PetStoreClient");
-    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
-    strictEqual(client.init.parameters.length, 1);
-    strictEqual(client.init.parameters[0].name, "endpoint");
+    strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.clientInitialization.parameters.length, 1);
+    strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(client.methods.length, 2); // client accessor methods which have already deprecated
     strictEqual(client.children?.length, 2);
 
     const pets = client.children?.find((c) => c.name === "Pets");
     ok(pets);
-    strictEqual(pets.init.initializedBy, InitializedByFlags.Parent);
-    strictEqual(pets.init.parameters.length, 1);
-    strictEqual(pets.init.parameters[0].name, "endpoint");
+    strictEqual(pets.clientInitialization.initializedBy, InitializedByFlags.Parent);
+    strictEqual(pets.clientInitialization.parameters.length, 1);
+    strictEqual(pets.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(pets?.methods.length, 2); // client accessor methods which have already deprecated
     strictEqual(pets?.children?.length, 2);
 
     const dogs = pets.children?.find((c) => c.name === "Dogs");
     ok(dogs);
-    strictEqual(dogs.init.initializedBy, InitializedByFlags.Parent);
-    strictEqual(dogs.init.parameters.length, 1);
-    strictEqual(dogs.init.parameters[0].name, "endpoint");
+    strictEqual(dogs.clientInitialization.initializedBy, InitializedByFlags.Parent);
+    strictEqual(dogs.clientInitialization.parameters.length, 1);
+    strictEqual(dogs.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(dogs?.methods.length, 2);
     strictEqual(dogs?.methods[0].name, "feed");
     strictEqual(dogs?.methods[1].name, "pet");
 
     const cats = pets.children?.find((c) => c.name === "Cats");
     ok(cats);
-    strictEqual(cats.init.initializedBy, InitializedByFlags.Parent);
-    strictEqual(cats.init.parameters.length, 1);
-    strictEqual(cats.init.parameters[0].name, "endpoint");
+    strictEqual(cats.clientInitialization.initializedBy, InitializedByFlags.Parent);
+    strictEqual(cats.clientInitialization.parameters.length, 1);
+    strictEqual(cats.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(cats?.methods.length, 2);
     strictEqual(cats?.methods[0].name, "feed");
     strictEqual(cats?.methods[1].name, "pet");
 
     const actions = client.children?.find((c) => c.name === "Actions");
     ok(actions);
-    strictEqual(actions.init.initializedBy, InitializedByFlags.Parent);
-    strictEqual(actions.init.parameters.length, 1);
-    strictEqual(actions.init.parameters[0].name, "endpoint");
+    strictEqual(actions.clientInitialization.initializedBy, InitializedByFlags.Parent);
+    strictEqual(actions.clientInitialization.parameters.length, 1);
+    strictEqual(actions.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(actions?.methods.length, 2); // client accessor methods which have already deprecated
     strictEqual(actions?.methods[0].name, "open");
     strictEqual(actions?.methods[1].name, "close");
@@ -237,28 +237,28 @@ describe("typespec-client-generator-core: client scenario", () => {
     strictEqual(sdkPackage.clients.length, 1);
     const client = sdkPackage.clients[0];
     strictEqual(client.name, "FaceAdministrationClient");
-    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
-    strictEqual(client.init.parameters.length, 1);
-    strictEqual(client.init.parameters[0].name, "endpoint");
+    strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.clientInitialization.parameters.length, 1);
+    strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(client.methods.length, 2); // client accessor methods which have already deprecated
     strictEqual(client.children?.length, 2);
 
     const largeFaceList = client.children?.find((c) => c.name === "LargeFaceList");
     ok(largeFaceList);
-    strictEqual(largeFaceList.init.initializedBy, InitializedByFlags.Parent);
-    strictEqual(largeFaceList.init.parameters.length, 2);
-    strictEqual(largeFaceList.init.parameters[0].name, "endpoint");
-    strictEqual(largeFaceList.init.parameters[1].name, "largeFaceListId");
+    strictEqual(largeFaceList.clientInitialization.initializedBy, InitializedByFlags.Parent);
+    strictEqual(largeFaceList.clientInitialization.parameters.length, 2);
+    strictEqual(largeFaceList.clientInitialization.parameters[0].name, "endpoint");
+    strictEqual(largeFaceList.clientInitialization.parameters[1].name, "largeFaceListId");
     strictEqual(largeFaceList?.methods.length, 1);
     strictEqual(largeFaceList?.methods[0].name, "get");
     strictEqual(largeFaceList?.methods[0].parameters.length, 0);
 
     const largePersonGroup = client.children?.find((c) => c.name === "LargePersonGroup");
     ok(largePersonGroup);
-    strictEqual(largePersonGroup.init.initializedBy, InitializedByFlags.Parent);
-    strictEqual(largePersonGroup.init.parameters.length, 2);
-    strictEqual(largePersonGroup.init.parameters[0].name, "endpoint");
-    strictEqual(largePersonGroup.init.parameters[1].name, "largePersonGroupId");
+    strictEqual(largePersonGroup.clientInitialization.initializedBy, InitializedByFlags.Parent);
+    strictEqual(largePersonGroup.clientInitialization.parameters.length, 2);
+    strictEqual(largePersonGroup.clientInitialization.parameters[0].name, "endpoint");
+    strictEqual(largePersonGroup.clientInitialization.parameters[1].name, "largePersonGroupId");
     strictEqual(largePersonGroup?.methods.length, 1);
     strictEqual(largePersonGroup?.methods[0].name, "get");
     strictEqual(largePersonGroup?.methods[0].parameters.length, 0);
@@ -306,20 +306,20 @@ describe("typespec-client-generator-core: client scenario", () => {
     strictEqual(sdkPackage.clients.length, 1);
     const client = sdkPackage.clients[0];
     strictEqual(client.name, "PetStoreClient");
-    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
-    strictEqual(client.init.parameters.length, 1);
-    strictEqual(client.init.parameters[0].name, "endpoint");
+    strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.clientInitialization.parameters.length, 1);
+    strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(client.methods.length, 2); // client accessor methods which have already deprecated
     strictEqual(client.children?.length, 2);
 
     const pets = client.children?.find((c) => c.name === "Pets");
     ok(pets);
     strictEqual(
-      pets.init.initializedBy,
+      pets.clientInitialization.initializedBy,
       InitializedByFlags.Individually | InitializedByFlags.Parent,
     );
-    strictEqual(pets.init.parameters.length, 1);
-    strictEqual(pets.init.parameters[0].name, "endpoint");
+    strictEqual(pets.clientInitialization.parameters.length, 1);
+    strictEqual(pets.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(pets?.methods.length, 2);
     strictEqual(pets.methods[0].name, "feed");
     strictEqual(pets.methods[1].name, "pet");
@@ -327,11 +327,11 @@ describe("typespec-client-generator-core: client scenario", () => {
     const actions = client.children?.find((c) => c.name === "Actions");
     ok(actions);
     strictEqual(
-      actions.init.initializedBy,
+      actions.clientInitialization.initializedBy,
       InitializedByFlags.Individually | InitializedByFlags.Parent,
     );
-    strictEqual(actions.init.parameters.length, 1);
-    strictEqual(actions.init.parameters[0].name, "endpoint");
+    strictEqual(actions.clientInitialization.parameters.length, 1);
+    strictEqual(actions.clientInitialization.parameters[0].name, "endpoint");
     strictEqual(actions?.methods.length, 2);
     strictEqual(actions.methods[0].name, "open");
     strictEqual(actions.methods[1].name, "close");
@@ -366,23 +366,23 @@ describe("typespec-client-generator-core: client scenario", () => {
     strictEqual(sdkPackage.clients.length, 1);
     const client = sdkPackage.clients[0];
     strictEqual(client.name, "ContainerClient");
-    strictEqual(client.init.initializedBy, InitializedByFlags.Individually);
-    strictEqual(client.init.parameters.length, 2);
-    strictEqual(client.init.parameters[0].name, "endpoint");
-    strictEqual(client.init.parameters[1].name, "containerName");
+    strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
+    strictEqual(client.clientInitialization.parameters.length, 2);
+    strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
+    strictEqual(client.clientInitialization.parameters[1].name, "containerName");
     strictEqual(client.methods.length, 1); // client accessor methods which have already deprecated
     strictEqual(client.children?.length, 1);
 
     const blob = client.children?.find((c) => c.name === "Blob");
     ok(blob);
     strictEqual(
-      blob.init.initializedBy,
+      blob.clientInitialization.initializedBy,
       InitializedByFlags.Individually | InitializedByFlags.Parent,
     );
-    strictEqual(blob.init.parameters.length, 3);
-    strictEqual(blob.init.parameters[0].name, "endpoint");
-    strictEqual(blob.init.parameters[1].name, "containerName");
-    strictEqual(blob.init.parameters[2].name, "blobName");
+    strictEqual(blob.clientInitialization.parameters.length, 3);
+    strictEqual(blob.clientInitialization.parameters[0].name, "endpoint");
+    strictEqual(blob.clientInitialization.parameters[1].name, "containerName");
+    strictEqual(blob.clientInitialization.parameters[2].name, "blobName");
     strictEqual(blob?.methods.length, 1);
     strictEqual(blob.methods[0].name, "download");
     strictEqual(blob.methods[0].parameters.length, 0);

@@ -178,10 +178,10 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   doc?: string;
   summary?: string;
   /**
-   * @deprecated Use `init.paramters` instead.
+   * @deprecated Use `clientInitialization.paramters` instead.
    */
   initialization: SdkInitializationType;
-  init: SdkClientInitializationType;
+  clientInitialization: SdkClientInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
   /**
