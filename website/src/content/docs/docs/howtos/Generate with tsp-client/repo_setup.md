@@ -10,7 +10,7 @@ Using the tspconfig.yaml linked above, by default, the client libraries will be 
 
 ### Required set up
 
-Please note that these requirements apply on the repository where the client library is going to be generated. Repo owners should make sure to follow these requirements. Users working within a repository that already accepts this tool can refer to the [Usage](<./tsp_client.md>) doc.
+Please note that these requirements apply on the repository where the client library is going to be generated. Repo owners should make sure to follow these requirements. Users working within a repository that already accepts this tool can refer to the [Usage](./../Generate%20with%20tsp-client/tsp_client.md) doc.
 
 - Add an emitter-package.json to the repo following this [configuration](#emitter-packagejson-required).
 - Add the [TempTypeSpecFiles](#temptypespecfiles) directory to the .gitignore file for your repository.

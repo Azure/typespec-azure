@@ -18,7 +18,7 @@ npm install -g @azure-tools/typespec-client-generator-cli
 
 Users working with a repository that already accepts this tool can continue to the [Usage](#usage) section.
 
-Repo owners should follow the steps in the [tsp-client repo setup](<./repo_setup.md>) doc.
+Repo owners should follow the steps in the [tsp-client repo setup](./../Generate%20with%20tsp-client/repo_setup.md) doc.
 
 ## Usage
 
