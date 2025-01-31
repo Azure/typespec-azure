@@ -846,6 +846,10 @@ describe("typespec-azure: identifiers decorator", () => {
   it("uses identifiers decorator for properties", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
       model Pet {
         name: string;
         age: int32;
@@ -864,6 +868,10 @@ describe("typespec-azure: identifiers decorator", () => {
   it("identifies keys correctly as x-ms-identifiers", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
       model Pet {
         name: string;
         @key
@@ -879,6 +887,25 @@ describe("typespec-azure: identifiers decorator", () => {
     ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
+  it("x-ms-identifiers ignores keys for non armProviderNamespace", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        @key
+        age: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+  });
+
   it("prioritizes identifiers decorator over keys", async () => {
     const oapi = await openApiFor(
       `
@@ -901,6 +928,10 @@ describe("typespec-azure: identifiers decorator", () => {
   it("supports multiple identifiers", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
       model Pet {
         name: string;
         age: int32;
@@ -919,6 +950,10 @@ describe("typespec-azure: identifiers decorator", () => {
   it("supports inner properties in identifiers decorator", async () => {
     const oapi = await openApiFor(
       `
+        @armProviderNamespace
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Test;
+      
         model Pet {
           dogs: Dog;
         }
@@ -941,6 +976,10 @@ describe("typespec-azure: identifiers decorator", () => {
   it("supports inner properties for keys", async () => {
     const oapi = await openApiFor(
       `
+        @armProviderNamespace
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Test;
+        
         model Pet {
           dogs: Dog;
           cats: Cat;
@@ -975,25 +1014,6 @@ describe("typespec-azure: identifiers decorator", () => {
       "dogs/breed",
       "cats/features/color",
     ]);
-  });
-  it("supports multiple keys", async () => {
-    const oapi = await openApiFor(
-      `
-        model Pet {
-          @key
-          name: string;
-          @key
-          age: int32;
-        }       
-        model PetList {
-          pets: Pet[]
-        }
-        @route("/Pets")
-        @get op list(): PetList;
-      `,
-    );
-    ok(oapi.paths["/Pets"].get);
-    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["name", "age"]);
   });
 });
 

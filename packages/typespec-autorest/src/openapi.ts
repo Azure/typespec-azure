@@ -2388,12 +2388,11 @@ export async function getOpenAPIForService(
         }),
       };
 
+      const indexer = typespecType.indexer.value as Model;
       const armIdentifiers = getArmIdentifiers(program, typespecType);
       if (
-        isArmProviderNamespace(program, typespecType.namespace) &&
-        armIdentifiers !== undefined &&
-        armIdentifiers.length > 0 &&
-        !ifArmIdentifiersDefault(armIdentifiers)
+        isArmProviderNamespace(program, indexer.namespace) &&
+        hasValidArmIdentifiers(armIdentifiers)
       ) {
         array["x-ms-identifiers"] = armIdentifiers;
       } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
@@ -2403,6 +2402,14 @@ export async function getOpenAPIForService(
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;
+  }
+
+  function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
+    return (
+      armIdentifiers !== undefined &&
+      armIdentifiers.length > 0 &&
+      !ifArmIdentifiersDefault(armIdentifiers)
+    );
   }
 
   function getSchemaForScalar(scalar: Scalar): OpenAPI2Schema {
