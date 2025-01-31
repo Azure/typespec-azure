@@ -22,7 +22,7 @@ npm install -g @azure-tools/typespec-client-generator-cli
 3. Switch to the language repository clone you want to generate a client library in. Example:
 
 ```bash
-cd <path to>/azure-sdk-for-python
+cd < path to > /azure-sdk-for-python
 ```
 
 4. From the root of the repository run the following command:
@@ -34,7 +34,7 @@ azure-sdk-for-python> tsp-client init -c <path to local typespec project at tspc
 Example:
 
 ```bash
-azure-sdk-for-python> tsp-client init -c ../azure-rest-api-specs/specification/contosowidgetmanager/Contoso.WidgetManager/
+azure-sdk-for-python > tsp-client init -c ../azure-rest-api-specs/specification/contosowidgetmanager/Contoso.WidgetManager/
 ```
 
 :::info

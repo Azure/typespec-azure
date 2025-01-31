@@ -211,6 +211,5 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 # Playwright temp file
 .last_run.json
 
-
 # Astro
 .astro/

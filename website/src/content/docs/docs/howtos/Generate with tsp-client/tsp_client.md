@@ -17,7 +17,7 @@ npm install -g @azure-tools/typespec-client-generator-cli
 ## Usage
 
 ```bash
-tsp-client <command> [options]
+tsp-client < command > [options]
 ```
 
 ## Commands
@@ -40,7 +40,7 @@ This command should be run from the root of the repository. Example repository r
 Example:
 
 ```bash
-azure-sdk-for-python> tsp-client init -c https://github.com/Azure/azure-rest-api-specs/blob/431eb865a581da2cd7b9e953ae52cb146f31c2a6/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
+azure-sdk-for-python > tsp-client init -c https://github.com/Azure/azure-rest-api-specs/blob/431eb865a581da2cd7b9e953ae52cb146f31c2a6/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
 ```
 
 ### update
@@ -50,7 +50,7 @@ The `update` command will look for a [tsp-location.yaml](#tsp-locationyaml) file
 Example:
 
 ```bash
-azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client update
+azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager > tsp-client update
 ```
 
 ### sync
@@ -62,7 +62,7 @@ By default the `sync` command will look for a tsp-location.yaml to get the proje
 Example:
 
 ```bash
-azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client sync
+azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager > tsp-client sync
 ```
 
 ### generate
@@ -72,7 +72,7 @@ Generate a client library from a TypeSpec project. The `generate` command should
 Example:
 
 ```bash
-azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client generate
+azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager > tsp-client generate
 ```
 
 ### convert
@@ -82,7 +82,7 @@ Convert an existing swagger specification to a TypeSpec project. This command sh
 Example:
 
 ```bash
-azure-rest-api-specs/specification/contosowidgetmanager> tsp-client convert --swagger-readme ./data-plane/readme.md -o ./Contoso.WidgetManager
+azure-rest-api-specs/specification/contosowidgetmanager > tsp-client convert --swagger-readme ./data-plane/readme.md -o ./Contoso.WidgetManager
 ```
 
 ### sort-swagger
