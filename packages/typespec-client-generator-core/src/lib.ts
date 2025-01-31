@@ -195,12 +195,6 @@ export const $lib = createTypeSpecLibrary({
         nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
       },
     },
-    "conflicting-client-namespace": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Client namespace: "${"clientNamespace"}" conflicts with tspconfig namespace flag in language scope: "${"scope"}"`,
-      },
-    },
     "example-loading": {
       severity: "warning",
       messages: {
