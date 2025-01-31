@@ -192,7 +192,7 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
-        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
       },
     },
     "conflicting-client-namespace": {
