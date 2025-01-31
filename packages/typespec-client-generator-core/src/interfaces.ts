@@ -659,6 +659,11 @@ export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
   resultPath?: string; // if exists, tells you how to get from the service response to the method response.
+  /**
+   * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
+   * Temporarily this is not enabled for paging now.
+   */
+  resultSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkServiceResponse {
@@ -799,8 +804,14 @@ export interface SdkLroServiceFinalResponse {
   envelopeResult: SdkModelType;
   /** Meaningful result type */
   result: SdkModelType;
-  /** Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns. */
+  /**
+   * Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns.
+   *
+   * @deprecated This property will be removed in future releases. Use `resultSegments` for synthesized property information.
+   */
   resultPath?: string;
+  /** An array of properties to fetch {result} from the {envelopeResult} model. Note that this property is available only in some LRO patterns. */
+  resultSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>

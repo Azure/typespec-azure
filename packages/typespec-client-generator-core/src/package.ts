@@ -29,6 +29,7 @@ import {
 import { getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
   InitializedByFlags,
+  SdkBodyModelPropertyType,
   SdkClient,
   SdkClientInitializationType,
   SdkClientType,
@@ -38,6 +39,7 @@ import {
   SdkHttpOperation,
   SdkInitializationType,
   SdkLroPagingServiceMethod,
+  SdkLroServiceFinalResponse,
   SdkLroServiceMetadata,
   SdkLroServiceMethod,
   SdkMethod,
@@ -317,7 +319,10 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
 
   basicServiceMethod.response.type = metadata.finalResponse?.result;
 
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   basicServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
+
+  basicServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
 
   return diagnostics.wrap({
     ...basicServiceMethod,
@@ -348,18 +353,7 @@ function getServiceMethodLroMetadata(
   return {
     __raw: rawMetadata,
     finalStateVia: rawMetadata.finalStateVia,
-    finalResponse:
-      rawMetadata.finalEnvelopeResult !== undefined && rawMetadata.finalEnvelopeResult !== "void"
-        ? {
-            envelopeResult: diagnostics.pipe(
-              getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-            ) as SdkModelType,
-            result: diagnostics.pipe(
-              getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
-            ) as SdkModelType,
-            resultPath: rawMetadata.finalResultPath,
-          }
-        : undefined,
+    finalResponse: getFinalResponse(),
     finalStep:
       rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,
     pollingStep: {
@@ -368,6 +362,41 @@ function getServiceMethodLroMetadata(
       ) as SdkModelType,
     },
   };
+
+  function getFinalResponse(): SdkLroServiceFinalResponse | undefined {
+    if (
+      rawMetadata?.finalEnvelopeResult === undefined ||
+      rawMetadata.finalEnvelopeResult === "void"
+    ) {
+      return undefined;
+    }
+
+    const envelopeResult = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
+    ) as SdkModelType;
+    const result = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
+    ) as SdkModelType;
+    const resultPath = rawMetadata.finalResultPath;
+    // find the property inside the envelope result using the final result path
+    let sdkProperty: SdkBodyModelPropertyType | undefined = undefined;
+    for (const property of envelopeResult.properties) {
+      if (property.__raw === undefined || property.kind !== "property") {
+        continue;
+      }
+      if (property.__raw?.name === resultPath) {
+        sdkProperty = property;
+        break;
+      }
+    }
+
+    return {
+      envelopeResult,
+      result,
+      resultPath,
+      resultSegments: sdkProperty !== undefined ? [sdkProperty] : undefined,
+    };
+  }
 }
 
 function getSdkMethodResponse(
@@ -536,7 +565,7 @@ function getSdkInitializationType(
   client: SdkClient | SdkOperationGroup,
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let initializationModel = getClientInitialization(context, client.type); // eslint-disable-line @typescript-eslint/no-deprecated
+  let initializationModel = getClientInitialization(context, client.type);
   const access = client.kind === "SdkClient" ? "public" : "internal";
   if (initializationModel) {
     initializationModel.access = access;
@@ -683,7 +712,7 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     } else {
       sdkClientType.children = [operationGroupClient];
     }
-    const clientInitialization = getClientInitialization(context, operationGroup.type); // eslint-disable-line @typescript-eslint/no-deprecated
+    const clientInitialization = getClientInitialization(context, operationGroup.type);
     const parameters: SdkParameter[] = [];
     if (clientInitialization) {
       for (const property of clientInitialization.properties) {
@@ -872,7 +901,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   );
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
+
   sdkClientType.initialization.properties = [...sdkClientType.clientInitialization.parameters];
   return diagnostics.wrap(sdkClientType);
 }

@@ -185,7 +185,6 @@ each individual repo as you would any other.
 
 ```bash
 pnpm e2e-tests
-
 ```
 
 ### Test with local cadl-ranch repo
@@ -306,15 +305,16 @@ TypeSpec repo use labels to help categorize and manage issues and PRs. The follo
 
 Area of the codebase
 
-| Name                         | Color   | Description                                                    |
-| ---------------------------- | ------- | -------------------------------------------------------------- |
-| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library |
-| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library            |
-| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library            |
-| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter              |
-| `eng`                        | #65bfff |                                                                |
-| `ide`                        | #846da1 | Issues for Azure specific ide features                         |
-| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                              |
+| Name                         | Color   | Description                                                                  |
+| ---------------------------- | ------- | ---------------------------------------------------------------------------- |
+| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library               |
+| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
+| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
+| `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package |
+| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                            |
+| `eng`                        | #65bfff |                                                                              |
+| `ide`                        | #846da1 | Issues for Azure specific ide features                                       |
+| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                            |
 
 #### issue_kinds
 
