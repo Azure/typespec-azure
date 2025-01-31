@@ -240,6 +240,31 @@ describe("typespec-client-generator-core: namespaces", () => {
     strictEqual(petActionClient.namespace, "PetStoreRenamed.SubNamespace");
   });
 
+  it("restructure client with namespace flag", async () => {
+    await runner.compile(
+      `
+      @service({
+        title: "Pet Store",
+      })
+      namespace PetStore;
+
+      @route("/feed")
+      op feed(): void;
+
+      @route("/op2")
+      op pet(): void;
+    `,
+    );
+    const sdkPackage = (
+      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+        namespace: "PetStoreRenamed",
+      })
+    ).sdkPackage;
+    const foodClient = sdkPackage.clients.find((x) => x.name === "PetStoreRenamedClient");
+    ok(foodClient);
+    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+  });
+
   it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
     await runner.compileWithCustomization(
       `
@@ -277,7 +302,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     );
     const sdkPackage = (
       await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
-        namespace: "PetStoreRenamedRenamed"
+        namespace: "PetStoreRenamed",
       })
     ).sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");

@@ -1200,9 +1200,16 @@ export function getClientNamespace(
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  if (override) return override;
+  if (override) {
+    if (context.namespace && !override.startsWith(context.namespace)) {
+      if (context.namespace) {
+        throw new Error("The client namespace needs to correspond with the overwritten namespace.");
+      }
+    }
+    return override;
+  }
   if (!entity.namespace) {
-    return "";
+    return context.namespace || "";
   }
   if (entity.kind === "Namespace") {
     return getNamespaceFullNameWithOverride(context, entity);
@@ -1222,13 +1229,15 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
     segments.unshift(current.name);
     current = current.namespace;
   }
-  const retval = segments.join(".");
-  if (context.namespace && !retval.startsWith(context.namespace)) {
-    if (context.namespace) {
-      throw new Error("The client namespace needs to correspond with the overwritten namespace.");
-    }
+  if (context.namespace) {
+    // if we override with namespace flag, we should override the global namespace to the namespace flag
+    const globalNamespaceName = getNamespaceFullName(context.program.getGlobalNamespaceType());
+    return segments
+      .join(".")
+      .replace(globalNamespaceName, context.namespace);
   }
-  return retval;
+
+  return segments.join(".");
 }
 
 export const $scope: ScopeDecorator = (
