@@ -103,19 +103,6 @@ describe("typespec-client-generator-core: multipart types", () => {
     );
     ok(multiPartRequest);
     deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
-
-    const addressProperty = multiPartRequest.properties.find((x) => x.name === "address");
-    ok(addressProperty);
-    strictEqual(addressProperty.kind, "property");
-    ok(addressProperty.serializationOptions.multipart);
-    strictEqual(addressProperty.serializationOptions.multipart.isFilePart, false);
-    strictEqual(addressProperty.serializationOptions.multipart.isMulti, false);
-
-    const cityProperty = address.properties.find((x) => x.name === "city");
-    ok(cityProperty);
-    strictEqual(cityProperty.kind, "property");
-    ok(cityProperty.serializationOptions.json);
-    strictEqual(cityProperty.serializationOptions.json.name, "city");
   });
 
   it("multipart conflicting model usage for mixed operations", async function () {
@@ -441,6 +428,11 @@ describe("typespec-client-generator-core: multipart types", () => {
     deepEqual(address.serializationOptions.multipart.defaultContentTypes, ["application/json"]);
     strictEqual(address.multipartOptions, address.serializationOptions.multipart);
     strictEqual(address.type.kind, "model");
+
+    const city = address.type.properties.find((x) => x.name === "city") as SdkBodyModelPropertyType;
+    ok(city);
+    ok(city.serializationOptions.json);
+    strictEqual(city.serializationOptions.json.name, "city");
   });
 
   it("File[] of multipart with @multipartBody for model", async function () {
