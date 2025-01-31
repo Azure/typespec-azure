@@ -565,7 +565,7 @@ function getSdkInitializationType(
   client: SdkClient | SdkOperationGroup,
 ): [SdkInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let initializationModel = getClientInitialization(context, client.type);
+  let initializationModel = getClientInitialization(context, client.type); // eslint-disable-line @typescript-eslint/no-deprecated
   const access = client.kind === "SdkClient" ? "public" : "internal";
   if (initializationModel) {
     initializationModel.access = access;
@@ -712,7 +712,7 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     } else {
       sdkClientType.children = [operationGroupClient];
     }
-    const clientInitialization = getClientInitialization(context, operationGroup.type);
+    const clientInitialization = getClientInitialization(context, operationGroup.type); // eslint-disable-line @typescript-eslint/no-deprecated
     const parameters: SdkParameter[] = [];
     if (clientInitialization) {
       for (const property of clientInitialization.properties) {
@@ -902,7 +902,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
 
-  sdkClientType.initialization.properties = [...sdkClientType.clientInitialization.parameters];
+  sdkClientType.initialization.properties = [...sdkClientType.clientInitialization.parameters]; // eslint-disable-line @typescript-eslint/no-deprecated
   return diagnostics.wrap(sdkClientType);
 }
 
