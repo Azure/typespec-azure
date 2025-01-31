@@ -2,6 +2,7 @@ import {
   BooleanLiteral,
   createDiagnosticCollector,
   Diagnostic,
+  Enum,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
@@ -29,11 +30,12 @@ import {
   HttpOperationResponseContent,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getClientNamespace, getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
   SdkClient,
+  SdkContext,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
@@ -85,6 +87,8 @@ export function parseEmitterName(
 }
 
 /**
+ *
+ * @deprecated Use `.namespaces` from sdkContext.sdkPackage instead
  *
  * @param context
  * @param namespace If we know explicitly the namespace of the client, pass this in

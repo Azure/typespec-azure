@@ -33,6 +33,8 @@ import {
   SdkClient,
   SdkClientInitializationType,
   SdkClientType,
+  SdkContext,
+  SdkEmitterOptions,
   SdkEndpointParameter,
   SdkEndpointType,
   SdkEnumType,
@@ -174,7 +176,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     baseServiceMethod.response.resultPath = getPropertyPathFromModel(
       context,
       responseType?.__raw,
@@ -295,7 +296,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
   baseServiceMethod.response.resultPath = getPropertyPathFromSegment(
     context,
     pagedMetadata.modelType,
@@ -1137,8 +1137,11 @@ function populateApiVersionInformation(context: TCGCContext): void {
   }
 }
 
-export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
-  context: TCGCContext,
+export function getSdkPackage<
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
 ): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
@@ -1157,13 +1160,14 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
     crossLanguagePackageId,
     namespaces: [],
   };
-  organizeNamespaces(sdkPackage);
+  organizeNamespaces(context, sdkPackage);
   return diagnostics.wrap(sdkPackage);
 }
 
-function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
-  sdkPackage: SdkPackage<TServiceOperation>,
-) {
+function organizeNamespaces<
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: SdkContext<TOptions, TServiceOperation>, sdkPackage: SdkPackage<TServiceOperation>) {
   const clients = [...sdkPackage.clients];
   while (clients.length > 0) {
     const client = clients.shift()!;
@@ -1184,7 +1188,7 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   }
 }
 
-function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
+function getSdkNamespace<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   sdkPackage: SdkPackage<TServiceOperation>,
   namespace: string,
 ) {

@@ -64,6 +64,7 @@ export interface TCGCContext {
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
+  namespace?: string;
 }
 
 export interface SdkContext<
@@ -920,6 +921,9 @@ export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   name: string;
+  /**
+   * @deprecated Look at `.namespaces` instead
+   */
   rootNamespace: string;
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
