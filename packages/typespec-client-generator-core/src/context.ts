@@ -94,6 +94,7 @@ export async function createSdkContext<
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
+    namespace: context.options["namespace"],
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {

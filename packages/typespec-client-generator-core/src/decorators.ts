@@ -1222,7 +1222,13 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
     segments.unshift(current.name);
     current = current.namespace;
   }
-  return segments.join(".");
+  const retval = segments.join(".");
+  if (context.namespace && !retval.startsWith(context.namespace)) {
+    if (context.namespace) {
+      throw new Error("The client namespace needs to correspond with the overwritten namespace.");
+    }
+  }
+  return retval;
 }
 
 export const $scope: ScopeDecorator = (
