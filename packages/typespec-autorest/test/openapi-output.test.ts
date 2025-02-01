@@ -973,6 +973,34 @@ describe("typespec-azure: identifiers decorator", () => {
     ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/breed"]);
   });
+  it("support inner models in different namespace but route models should be on armProviderNamespace", async () => {
+    const oapi = await openApiFor(
+      `
+        @armProviderNamespace
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Test
+        {
+        
+          @route("/Pets")
+          @get op list(): PetList;
+        
+          model PetList {
+            @identifiers(["age"])
+            pets: Microsoft.Modeling.Pet[]
+          }
+        }
+        
+        namespace Microsoft.Modeling
+        {
+          model Pet {
+            age: int32;
+          }
+        }
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["age"]);
+  });
   it("supports inner properties for keys", async () => {
     const oapi = await openApiFor(
       `
