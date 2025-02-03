@@ -2,7 +2,6 @@ import {
   BooleanLiteral,
   createDiagnosticCollector,
   Diagnostic,
-  Enum,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
@@ -30,12 +29,11 @@ import {
   HttpOperationResponseContent,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { getClientNamespace, getParamAlias } from "./decorators.js";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
   SdkClient,
-  SdkContext,
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
