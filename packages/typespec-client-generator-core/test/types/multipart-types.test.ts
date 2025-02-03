@@ -428,6 +428,11 @@ describe("typespec-client-generator-core: multipart types", () => {
     deepEqual(address.serializationOptions.multipart.defaultContentTypes, ["application/json"]);
     strictEqual(address.multipartOptions, address.serializationOptions.multipart);
     strictEqual(address.type.kind, "model");
+
+    const city = address.type.properties.find((x) => x.name === "city") as SdkBodyModelPropertyType;
+    ok(city);
+    ok(city.serializationOptions.json);
+    strictEqual(city.serializationOptions.json.name, "city");
   });
 
   it("File[] of multipart with @multipartBody for model", async function () {
