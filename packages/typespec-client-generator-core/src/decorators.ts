@@ -1243,9 +1243,7 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
   if (context.namespace) {
     // if we override with namespace flag, we should override the global namespace to the namespace flag
     const globalNamespaceName = getNamespaceFullName(context.program.getGlobalNamespaceType());
-    return segments
-      .join(".")
-      .replace(globalNamespaceName, context.namespace);
+    return segments.join(".").replace(globalNamespaceName, context.namespace);
   }
 
   return segments.join(".");
