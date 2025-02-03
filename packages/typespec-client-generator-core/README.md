@@ -67,6 +67,10 @@ options:
 
 **Type:** `string`
 
+### `namespace`
+
+**Type:** `string`
+
 ## Decorators
 
 ### Azure.ClientGenerator.Core
