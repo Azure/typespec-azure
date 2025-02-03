@@ -60,6 +60,7 @@ import {
   AllScopes,
   clientNameKey,
   clientNamespaceKey,
+  getRootUserDefinedNamespaceName,
   getValidApiVersion,
   isAzureCoreTspModel,
   negationScopesKey,
@@ -1212,12 +1213,9 @@ export function getClientNamespace(
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
-    if (context.namespace && !override.startsWith(context.namespace)) {
-      if (context.namespace) {
-        throw new Error("The client namespace needs to correspond with the overwritten namespace.");
-      }
-    }
-    return override;
+    const rootNamespaceName = getRootUserDefinedNamespaceName(context);
+    // if you've defined a namespace flag, we replace the root name with the flag
+    return override.replace(rootNamespaceName, context.namespace || rootNamespaceName);
   }
   if (!entity.namespace) {
     return context.namespace || "";
@@ -1241,9 +1239,9 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
     current = current.namespace;
   }
   if (context.namespace) {
-    // if we override with namespace flag, we should override the global namespace to the namespace flag
-    const globalNamespaceName = getNamespaceFullName(context.program.getGlobalNamespaceType());
-    return segments.join(".").replace(globalNamespaceName, context.namespace);
+    const rootNamespaceName = getRootUserDefinedNamespaceName(context);
+
+    return segments.join(".").replace(rootNamespaceName, context.namespace);
   }
 
   return segments.join(".");
