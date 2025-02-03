@@ -29,7 +29,7 @@ import {
   HttpOperationResponseContent,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getParamAlias, listClients } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -596,4 +596,25 @@ export function findRootSourceProperty(property: ModelProperty): ModelProperty {
     property = property.sourceProperty;
   }
   return property;
+}
+/**
+ * Get all of the root user-defined namespaces in a TypeSpec definition if they're tied to a client
+ * @param context
+ * @returns
+ */
+export function getRootUserDefinedNamespaceName(context: TCGCContext): string {
+  const rootNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()];
+
+  // We explicitly want namespaces that are used to define a client, not namespaces that define the service of a client
+  const clientNamespaces = listClients(context).map((x) =>
+    x.type.kind === "Namespace" ? x.type : x.type.namespace,
+  );
+  const globalNamespaces = rootNamespaces.filter((x) => clientNamespaces.includes(x));
+  // if we override with namespace flag, we should override the global namespace to the namespace flag
+  if (globalNamespaces.length !== 1) {
+    throw new Error(
+      "You can only use the `--namespace` flag in conjunction with a single namespace.",
+    );
+  }
+  return globalNamespaces[0].name;
 }
