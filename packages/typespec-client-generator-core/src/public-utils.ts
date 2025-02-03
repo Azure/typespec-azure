@@ -103,15 +103,15 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
 /**
  * Get the client's namespace for generation. If package-name is passed in config, we return
  * that value as our namespace. Otherwise, we default to the TypeSpec service namespace.
- * 
+ *
  * @deprecated Access namespace information by iterating through `sdkPackage.namespaces` instead
- * 
+ *
  * @param program
  * @param context
  * @returns
  */
 export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type);
+  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type); // eslint-disable-line @typescript-eslint/no-deprecated
 }
 
 /**
