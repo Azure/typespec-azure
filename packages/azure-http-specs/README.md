@@ -37,6 +37,76 @@ op returnString(): string;
 
 #### Writing mockapis
 
+1. Create a `mockapi.ts` file next to the `main.tsp` of the scenario
+2. Create and export a variable called `Scenarios` with a `Record<string, ScenarioMockApi>` type
+3. For each of the scenarios assign a new property to the `Scenarios` variable. The property name should be in the following format: `<Scenario namespace>_<scenario operation name>`. The value can be:
+   - `passOnSuccess`: This will take one or multiple routes and will only pass the scenario if all the routes gets called with a 2xx success code.
+
+##### Example
+
+```ts
+import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+
+export const Scenarios: Record<string, ScenarioMockApi> = {};
+
+Scenarios.String_returnString = passOnSuccess([
+  {
+    uri: "/path/for/scenario/simple",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: "mystring",
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+```
+
+##### How to build a response
+
+Examples of response objects:
+
+```ts
+// Minimum requirement is the status code.
+response: {
+  status: 200,
+};
+```
+
+##### Return a body
+
+```ts
+// Return json
+response: {
+  status: 200,
+  body: json({ foo: 123 }),
+};
+
+// Return raw content
+response: {
+  status: 200,
+  body: {
+    contentType: "application/text",
+    rawContent: "foobar",
+  },
+};
+```
+
+##### Return headers
+
+```ts
+// Return json
+response: {
+  status: 200,
+  headers: {
+      MyHeader: "value-1"
+      MyHeaderOther: req.headers.MyRequestHeader
+  }
+};
+
+```
+
 #### Validate the scenarios are valid
 
 ```
