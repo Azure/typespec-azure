@@ -124,7 +124,7 @@ export async function getAllServicesAtAllVersions(
   const serviceRecords: AutorestServiceRecord[] = [];
   for (const service of services) {
     const versions = getVersionsMutators(program, service.type).filter(
-      (v) => !options.version || options.version === v.version?.name,
+      (v) => !options.version || options.version === v.version?.value,
     );
 
     if (versions.length === 0) {
@@ -177,10 +177,10 @@ export async function getAllServicesAtAllVersions(
             service,
             services.length > 1,
             options,
-            record.version?.name,
+            record.version?.value,
           ),
           service,
-          version: record.version?.name,
+          version: record.version?.value,
           tcgcSdkContext,
         };
 
@@ -188,7 +188,7 @@ export async function getAllServicesAtAllVersions(
         serviceRecord.versions.push({
           ...result,
           service,
-          version: record.version!.name,
+          version: record.version!.value,
         });
       }
     }
