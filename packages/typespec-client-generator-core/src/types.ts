@@ -1994,6 +1994,14 @@ function setSerializationOptions(
   ) {
     updateXmlSerializationOptions(context, type);
   }
+  const defaultContentTypes = type.serializationOptions.multipart?.defaultContentTypes;
+  if (defaultContentTypes && type.kind === "property" && type.type.kind === "model") {
+    for (const prop of type.type.properties) {
+      if (prop.kind === "property") {
+        setSerializationOptions(context, prop, defaultContentTypes);
+      }
+    }
+  }
 }
 
 function updateJsonSerializationOptions(
