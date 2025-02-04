@@ -23,7 +23,7 @@ Repo owners should follow the steps in the [tsp-client repo setup](./repo_setup.
 ## Usage
 
 ```bash
-tsp-client <command> [options]
+tsp-client < command > [options]
 ```
 
 ## Commands
@@ -43,7 +43,7 @@ tsp-client --help
 To see supported parameters and options for a specific command, run:
 
 ```bash
-tsp-client <command> --help
+tsp-client < command > --help
 ```
 
 Example using the `init` command:
@@ -65,7 +65,7 @@ This command should be run from the root of the repository. Example repository r
 Example:
 
 ```bash
-azure-sdk-for-python> tsp-client init -c https://github.com/Azure/azure-rest-api-specs/blob/dee71463cbde1d416c47cf544e34f7966a94ddcb/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
+azure-sdk-for-python > tsp-client init -c https://github.com/Azure/azure-rest-api-specs/blob/dee71463cbde1d416c47cf544e34f7966a94ddcb/specification/contosowidgetmanager/Contoso.WidgetManager/tspconfig.yaml
 ```
 
 ### update
@@ -75,7 +75,7 @@ The `update` command will look for a [tsp-location.yaml](#tsp-locationyaml) file
 Example:
 
 ```bash
-azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client update
+azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager > tsp-client update
 ```
 
 ### sync
@@ -87,7 +87,7 @@ By default the `sync` command will look for a tsp-location.yaml to get the proje
 Example:
 
 ```bash
-azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client sync
+azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager > tsp-client sync
 ```
 
 ### generate
@@ -97,7 +97,7 @@ Generate a client library from a TypeSpec project. The `generate` command should
 Example:
 
 ```bash
-azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager> tsp-client generate
+azure-sdk-for-python/sdk/contosowidgetmanager/azure-contoso-widgetmanager > tsp-client generate
 ```
 
 ### convert
@@ -107,7 +107,7 @@ Convert an existing swagger specification to a TypeSpec project. This command sh
 Example:
 
 ```bash
-azure-rest-api-specs/specification/contosowidgetmanager> tsp-client convert --swagger-readme <path to swagger README file>/readme.md -o ./Contoso.WidgetManager
+azure-rest-api-specs/specification/contosowidgetmanager > tsp-client convert -o ./Contoso.WidgetManager --swagger-readme < path-to > /readme.md
 ```
 
 ### compare
@@ -128,13 +128,15 @@ This command generates the default configuration files used by tsp-client. Run t
 Example:
 
 ```bash
-tsp-client generate-config-files --package-json <path to emitter repo clone>/package.json
+tsp-client generate-config-files --package-json < path-to-emitter-repo-clone > /package.json
 ```
 
 Example using the `azure-sdk-for-js` and the `@azure-tools/typespec-ts` emitter:
 
+The `--package-json` flag should be the relative or absolute path to repo clone of the @azure-tools/typespec-ts package.
+
 ```bash
-azure-sdk-for-js> tsp-client generate-config-files --package-json <relative or absolute path to repo clone of @azure-tools/typespec-ts package>/package.json
+azure-sdk-for-js > tsp-client generate-config-files --package-json < path-to-emitter-repo-clone > /package.json
 ```
 
 To be explicit about specifying dependencies you'd like pinned, add a new field in the package.json file of your emitter called `"azure-sdk/emitter-package-json-pinning"` with a list of the dependencies you want to be forwarded to the emitter-package.json. These dependencies must be specified in your package.json's devDependencies in order for the tool to assign the correct version.
@@ -202,7 +204,7 @@ Example json file with package overrides:
 Example command specifying overrides:
 
 ```bash
-tsp-client generate-config-files --package-json <path to emitter repo clone>/package.json --overrides <path to overrides file>.json
+tsp-client generate-config-files --overrides my_overrides.json --package-json < path-to-emitter-repo-clone > /package.json
 ```
 
 Example `emitter-package.json` generated using overrides:
@@ -230,7 +232,7 @@ Generate an emitter-package-lock.json under the eng/ directory based on existing
 Example:
 
 ```bash
-azure-sdk-for-python> tsp-client generate-lock-file
+azure-sdk-for-python > tsp-client generate-lock-file
 ```
 
 ## Important concepts
