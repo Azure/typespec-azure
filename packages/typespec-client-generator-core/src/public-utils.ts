@@ -12,7 +12,6 @@ import {
   createDiagnosticCollector,
   getEffectiveModelType,
   getFriendlyName,
-  getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
