@@ -609,12 +609,14 @@ export function getRootUserDefinedNamespaceName(context: TCGCContext): string {
   const clientNamespaces = listClients(context).map((x) =>
     x.type.kind === "Namespace" ? x.type : x.type.namespace,
   );
-  const globalNamespaces: Namespace[] = [];
+  const globalNamespaces: string[] = [];
   for (const namespace of clientNamespaces) {
-    let currNamespace = namespace;
+    const segments = [];
+    let currNamespace: Namespace | undefined = namespace;
     while (currNamespace) {
+      segments.unshift(currNamespace.name);
       if (rootNamespaces.includes(currNamespace)) {
-        globalNamespaces.push(currNamespace);
+        globalNamespaces.push(segments.join("."));
         break;
       }
       currNamespace = currNamespace.namespace;
@@ -626,5 +628,5 @@ export function getRootUserDefinedNamespaceName(context: TCGCContext): string {
       "You can only use the `--namespace` flag in conjunction with a single namespace.",
     );
   }
-  return globalNamespaces[0].name;
+  return globalNamespaces[0];
 }
