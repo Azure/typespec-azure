@@ -14,9 +14,12 @@ import {
   resolvePath,
   Service,
 } from "@typespec/compiler";
-import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
+import {
+  unsafe_mutateSubgraphWithNamespace,
+  unsafe_MutatorWithNamespace,
+} from "@typespec/compiler/experimental";
 import { resolveInfo } from "@typespec/openapi";
-import { getVersionsMutators, VersionSnapshot } from "@typespec/versioning";
+import { getVersioningMutators } from "@typespec/versioning";
 import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
@@ -123,31 +126,9 @@ export async function getAllServicesAtAllVersions(
 
   const serviceRecords: AutorestServiceRecord[] = [];
   for (const service of services) {
-    const versions = getVersionsMutators(program, service.type).filter(
-      (v) => !options.version || options.version === v.version?.value,
-    );
+    const versions = getVersioningMutators(program, service.type);
 
-    if (versions.length === 0) {
-      if (options.version) {
-        reportDiagnostic(program, { code: "no-matching-version-found", target: service.type });
-      } else {
-        const context: AutorestEmitterContext = {
-          program,
-          outputFile: resolveOutputFile(program, service, services.length > 1, options),
-          service: service,
-          tcgcSdkContext,
-        };
-
-        const result = await getOpenAPIForService(context, options);
-        serviceRecords.push({
-          service,
-          versioned: false,
-          ...result,
-        });
-      }
-    }
-
-    if (versions.length === 1 && versions[0].version === undefined) {
+    if (versions === undefined) {
       const context: AutorestEmitterContext = {
         program,
         outputFile: resolveOutputFile(program, service, services.length > 1, options),
@@ -155,13 +136,34 @@ export async function getAllServicesAtAllVersions(
         tcgcSdkContext,
       };
 
-      const result = await getVersionSnapshotDocument(context, versions[0], options);
+      const result = await getOpenAPIForService(context, options);
+      serviceRecords.push({
+        service,
+        versioned: false,
+        ...result,
+      });
+    } else if (versions.kind === "transient") {
+      const context: AutorestEmitterContext = {
+        program,
+        outputFile: resolveOutputFile(program, service, services.length > 1, options),
+        service: service,
+        tcgcSdkContext,
+      };
+
+      const result = await getVersionSnapshotDocument(context, versions.mutator, options);
       serviceRecords.push({
         service,
         versioned: false,
         ...result,
       });
     } else {
+      const filteredVersions = versions.snapshots.filter(
+        (v) => !options.version || options.version === v.version?.value,
+      );
+
+      if (filteredVersions.length === 0 && options.version) {
+        reportDiagnostic(program, { code: "no-matching-version-found", target: service.type });
+      }
       const serviceRecord: AutorestVersionedServiceRecord = {
         service,
         versioned: true,
@@ -169,7 +171,7 @@ export async function getAllServicesAtAllVersions(
       };
       serviceRecords.push(serviceRecord);
 
-      for (const record of versions) {
+      for (const record of filteredVersions) {
         const context: AutorestEmitterContext = {
           program,
           outputFile: resolveOutputFile(
@@ -184,7 +186,7 @@ export async function getAllServicesAtAllVersions(
           tcgcSdkContext,
         };
 
-        const result = await getVersionSnapshotDocument(context, record, options);
+        const result = await getVersionSnapshotDocument(context, record.mutator, options);
         serviceRecord.versions.push({
           ...result,
           service,
@@ -199,12 +201,12 @@ export async function getAllServicesAtAllVersions(
 
 async function getVersionSnapshotDocument(
   context: AutorestEmitterContext,
-  snapshot: VersionSnapshot,
+  mutator: unsafe_MutatorWithNamespace,
   options: ResolvedAutorestEmitterOptions,
 ) {
   const subgraph = unsafe_mutateSubgraphWithNamespace(
     context.program,
-    [snapshot.mutator],
+    [mutator],
     context.service.type,
   );
 
