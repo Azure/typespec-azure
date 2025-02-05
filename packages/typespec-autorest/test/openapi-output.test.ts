@@ -436,6 +436,24 @@ describe("typespec-autorest: definitions", () => {
         required: ["name"],
       });
     });
+
+    it("overrides x-ms-enum.name with @clientName", async () => {
+      const res = await oapiForModel(
+        "FooResponse",
+        `
+        @clientName("RenamedFoo")
+        union Foo {
+          foo: "foo",
+          bar: "bar"
+        }
+
+        model FooResponse {
+          foo: Foo;
+        }`,
+      );
+      const schema = res.defs.RenamedFoo;
+      deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
+    });
   });
 
   it("recovers logical type name", async () => {
@@ -753,6 +771,12 @@ describe("typespec-autorest: enums", () => {
       enum: ["Dog", "Cat"],
       "x-ms-enum": { name: "PetType", modelAsString: true },
     });
+  });
+
+  it("overrides x-ms-enum.name with @clientName", async () => {
+    const res = await oapiForModel("Foo", `@clientName("RenamedFoo") enum Foo {foo, bar}`);
+    const schema = res.defs.RenamedFoo;
+    deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
   });
 });
 

@@ -1163,6 +1163,7 @@ export function getSdkModelPropertyTypeBase(
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+    visibility: getSdkVisibility(context, type),
   });
 }
 
@@ -1317,7 +1318,6 @@ export function getSdkModelPropertyType(
     ...base,
     kind: "property",
     optional: type.optional,
-    visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
     isMultipartFileInput: false,
