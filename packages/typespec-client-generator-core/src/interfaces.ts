@@ -741,9 +741,18 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 }
 
 interface SdkPagingServiceMethodOptions {
+  /**
+   * @deprecated This property will be removed in future releases. Use `pagingMetadata` for synthesized paging metadata. If you still want to access primitive paging info, use `pagingMetadata.__raw`.
+   */
   __raw_paged_metadata?: PagedResultMetadata;
   pagingMetadata?: SdkPageableServiceMetadata;
+  /**
+   * @deprecated This property will be removed in future releases. Use `pagingMetadata.nextLinkSegments` for synthesized paging metadata.
+   */
   nextLinkPath?: string; // off means fake paging
+  /**
+   * @deprecated This property will be removed in future releases. Use `pagingMetadata.nextLinkOperation` for synthesized paging metadata.
+   */
   nextLinkOperation?: SdkServiceOperation;
 }
 
