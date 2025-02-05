@@ -2,6 +2,7 @@ import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkEmitterOptions } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "../test-host.js";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 
 describe("typespec-client-generator-core: namespaces", () => {
   let runner: SdkTestRunner;
@@ -353,6 +354,39 @@ describe("typespec-client-generator-core: namespaces", () => {
       strictEqual(bazNamespace.enums.length, 0);
       strictEqual(bazNamespace.unions.length, 0);
       strictEqual(bazNamespace.namespaces.length, 0);
+    });
+    it("use namespace config flag with an azure spec", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+        op get(): string;
+      `);
+
+      const sdkPackage = (
+        await createSdkContextTestHelper<SdkEmitterOptions>(runnerWithCore.context.program, {
+          namespace: "Azure.My.Service",
+        })
+      ).sdkPackage;
+
+      const myNamespace = sdkPackage.namespaces.find((x) => x.name === "My");
+      ok(!myNamespace);
+      strictEqual(sdkPackage.namespaces.length, 1);
+      const azureNamespace = sdkPackage.namespaces[0];
+      strictEqual(azureNamespace.fullName, "Azure");
+      strictEqual(azureNamespace.clients.length, 0);
+      strictEqual(azureNamespace.namespaces.length, 1);
+      const myAzureNamespace = azureNamespace.namespaces[0];
+      strictEqual(myAzureNamespace.fullName, "Azure.My");
+      strictEqual(myAzureNamespace.name, "My");
+      strictEqual(myAzureNamespace.clients.length, 0);
+      strictEqual(myAzureNamespace.namespaces.length, 1);
+      const myServiceAzureNamespace = myAzureNamespace.namespaces[0];
+      strictEqual(myServiceAzureNamespace.fullName, "Azure.My.Service");
+      strictEqual(myServiceAzureNamespace.name, "Service");
+      strictEqual(myServiceAzureNamespace.clients[0].name, "ServiceClient");
     });
   });
   it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
