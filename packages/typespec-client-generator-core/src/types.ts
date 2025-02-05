@@ -1163,6 +1163,7 @@ export function getSdkModelPropertyTypeBase(
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+    visibility: getSdkVisibility(context, type),
   });
 }
 
@@ -1317,7 +1318,6 @@ export function getSdkModelPropertyType(
     ...base,
     kind: "property",
     optional: type.optional,
-    visibility: getSdkVisibility(context, type),
     discriminator: false,
     serializedName: getPropertyNames(context, type)[1],
     isMultipartFileInput: false,
@@ -1993,6 +1993,14 @@ function setSerializationOptions(
     hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {
     updateXmlSerializationOptions(context, type);
+  }
+  const defaultContentTypes = type.serializationOptions.multipart?.defaultContentTypes;
+  if (defaultContentTypes && type.kind === "property" && type.type.kind === "model") {
+    for (const prop of type.type.properties) {
+      if (prop.kind === "property") {
+        setSerializationOptions(context, prop, defaultContentTypes);
+      }
+    }
   }
 }
 
