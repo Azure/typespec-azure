@@ -458,6 +458,7 @@ export async function getOpenAPIForService(
         prop.type.kind === "Scalar" &&
         ignoreDiagnostics(
           program.checker.isTypeAssignableTo(
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             prop.type.projectionBase ?? prop.type,
             program.checker.getStdType("url"),
             prop.type,
@@ -750,6 +751,7 @@ export async function getOpenAPIForService(
   }
 
   function isBytes(type: Type) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const baseType = type.projectionBase ?? type;
     return ignoreDiagnostics(
       program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type),
