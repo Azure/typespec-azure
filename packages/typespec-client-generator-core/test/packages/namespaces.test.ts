@@ -1,3 +1,4 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkEmitterOptions } from "../../src/interfaces.js";
@@ -378,58 +379,42 @@ describe("typespec-client-generator-core: namespaces", () => {
       ok(foodClient);
       strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
     });
+    it("use namespace config flag with an azure spec", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compileWithBuiltInAzureCoreService(`
+      op get(): string;
+    `);
 
+      const sdkPackage = (
+        await createSdkContextTestHelper<SdkEmitterOptions>(runnerWithCore.context.program, {
+          namespace: "Azure.My.Service",
+        })
+      ).sdkPackage;
+
+      const myNamespace = sdkPackage.namespaces.find((x) => x.name === "My");
+      ok(!myNamespace);
+      strictEqual(sdkPackage.namespaces.length, 1);
+      const azureNamespace = sdkPackage.namespaces[0];
+      strictEqual(azureNamespace.fullName, "Azure");
+      strictEqual(azureNamespace.clients.length, 0);
+      strictEqual(azureNamespace.namespaces.length, 1);
+      const myAzureNamespace = azureNamespace.namespaces[0];
+      strictEqual(myAzureNamespace.fullName, "Azure.My");
+      strictEqual(myAzureNamespace.name, "My");
+      strictEqual(myAzureNamespace.clients.length, 0);
+      strictEqual(myAzureNamespace.namespaces.length, 1);
+      const myServiceAzureNamespace = myAzureNamespace.namespaces[0];
+      strictEqual(myServiceAzureNamespace.fullName, "Azure.My.Service");
+      strictEqual(myServiceAzureNamespace.name, "Service");
+      strictEqual(myServiceAzureNamespace.clients[0].name, "ServiceClient");
+    });
     it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
       await runner.compileWithCustomization(
         `
-        @service({
-          title: "Pet Store",
-        })
-        namespace PetStore;
-  
-        @route("/feed")
-        op feed(): void;
-  
-        @route("/op2")
-        op pet(): void;
-      `,
-        `
-        namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
-  
-        @client({
-          name: "FoodClient",
-          service: PetStore
-        })
-        interface Client1 {
-          feed is PetStore.feed
-        }
-  
-        @client({
-          name: "PetActionClient",
-          service: PetStore
-        })
-        @clientNamespace("PetStoreRenamed.SubNamespace") // use @clientNamespace to specify the namespace of the client
-        interface Client2 {
-          pet is PetStore.pet
-        }
-      `,
-      );
-      const sdkPackage = (
-        await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
-          namespace: "PetStoreRenamed",
-        })
-      ).sdkPackage;
-      const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
-      ok(foodClient);
-      strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
-      const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
-      ok(petActionClient);
-      strictEqual(petActionClient.clientNamespace, "PetStoreRenamed.SubNamespace");
-    });
-  });
-  it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
-    await runner.compileWithCustomization(
-      `
       @service({
         title: "Pet Store",
       })
@@ -441,7 +426,7 @@ describe("typespec-client-generator-core: namespaces", () => {
       @route("/op2")
       op pet(): void;
     `,
-      `
+        `
       namespace PetStoreRenamed;
 
       @client({
@@ -461,34 +446,34 @@ describe("typespec-client-generator-core: namespaces", () => {
         pet is PetStore.pet
       }
     `,
-    );
-    const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
-        namespace: "PetStoreFlagRenamed",
-      })
-    ).sdkPackage;
-    const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
-    ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreFlagRenamed");
-    const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
-    ok(petActionClient);
-    strictEqual(petActionClient.clientNamespace, "PetStoreFlagRenamed.SubNamespace");
+      );
+      const sdkPackage = (
+        await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          namespace: "PetStoreFlagRenamed",
+        })
+      ).sdkPackage;
+      const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
+      ok(foodClient);
+      strictEqual(foodClient.clientNamespace, "PetStoreFlagRenamed");
+      const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
+      ok(petActionClient);
+      strictEqual(petActionClient.clientNamespace, "PetStoreFlagRenamed.SubNamespace");
 
-    strictEqual(sdkPackage.namespaces.length, 1);
-    const petStoreFlagRenamedNamespace = sdkPackage.namespaces[0];
-    strictEqual(petStoreFlagRenamedNamespace.fullName, "PetStoreFlagRenamed");
-    strictEqual(petStoreFlagRenamedNamespace.clients.length, 1);
-    strictEqual(petStoreFlagRenamedNamespace.clients[0].name, "FoodClient");
-    strictEqual(petStoreFlagRenamedNamespace.namespaces.length, 1);
-    const subNamespace = petStoreFlagRenamedNamespace.namespaces[0];
-    strictEqual(subNamespace.fullName, "PetStoreFlagRenamed.SubNamespace");
-    strictEqual(subNamespace.clients.length, 1);
-    strictEqual(subNamespace.clients[0].name, "PetActionClient");
-    strictEqual(subNamespace.namespaces.length, 0);
-  });
+      strictEqual(sdkPackage.namespaces.length, 1);
+      const petStoreFlagRenamedNamespace = sdkPackage.namespaces[0];
+      strictEqual(petStoreFlagRenamedNamespace.fullName, "PetStoreFlagRenamed");
+      strictEqual(petStoreFlagRenamedNamespace.clients.length, 1);
+      strictEqual(petStoreFlagRenamedNamespace.clients[0].name, "FoodClient");
+      strictEqual(petStoreFlagRenamedNamespace.namespaces.length, 1);
+      const subNamespace = petStoreFlagRenamedNamespace.namespaces[0];
+      strictEqual(subNamespace.fullName, "PetStoreFlagRenamed.SubNamespace");
+      strictEqual(subNamespace.clients.length, 1);
+      strictEqual(subNamespace.clients[0].name, "PetActionClient");
+      strictEqual(subNamespace.namespaces.length, 0);
+    });
 
-  it("complicated nested namespaces", async () => {
-    await runner.compile(`
+    it("complicated nested namespaces", async () => {
+      await runner.compile(`
       @service({})
       @route("/a")
       namespace A {
@@ -508,49 +493,50 @@ describe("typespec-client-generator-core: namespaces", () => {
       }
     `);
 
-    const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
-        namespace: "Azure.A",
-      })
-    ).sdkPackage;
-    strictEqual(sdkPackage.namespaces.length, 1);
-    const azureNamespace = sdkPackage.namespaces.find((x) => x.name === "Azure");
-    ok(azureNamespace);
-    strictEqual(azureNamespace.namespaces.length, 1);
-    const aNamespace = azureNamespace.namespaces.find((x) => x.name === "A");
-    ok(aNamespace);
-    strictEqual(aNamespace.fullName, "Azure.A");
-    strictEqual(aNamespace.clients.length, 2); // A and AG
-    strictEqual(aNamespace.models.length, 0);
-    strictEqual(aNamespace.enums.length, 0);
-    strictEqual(aNamespace.unions.length, 0);
-    strictEqual(aNamespace.namespaces.length, 1); // AA
+      const sdkPackage = (
+        await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          namespace: "Azure.A",
+        })
+      ).sdkPackage;
+      strictEqual(sdkPackage.namespaces.length, 1);
+      const azureNamespace = sdkPackage.namespaces.find((x) => x.name === "Azure");
+      ok(azureNamespace);
+      strictEqual(azureNamespace.namespaces.length, 1);
+      const aNamespace = azureNamespace.namespaces.find((x) => x.name === "A");
+      ok(aNamespace);
+      strictEqual(aNamespace.fullName, "Azure.A");
+      strictEqual(aNamespace.clients.length, 2); // A and AG
+      strictEqual(aNamespace.models.length, 0);
+      strictEqual(aNamespace.enums.length, 0);
+      strictEqual(aNamespace.unions.length, 0);
+      strictEqual(aNamespace.namespaces.length, 1); // AA
 
-    const aaNamespace = aNamespace.namespaces.find((x) => x.name === "AA");
-    ok(aaNamespace);
-    strictEqual(aaNamespace.fullName, "Azure.A.AA");
-    strictEqual(aaNamespace.clients.length, 2); // AA and AAG
-    strictEqual(aaNamespace.models.length, 0);
-    strictEqual(aaNamespace.enums.length, 0);
-    strictEqual(aaNamespace.unions.length, 0);
-    strictEqual(aaNamespace.namespaces.length, 2); // AAA and AAB
+      const aaNamespace = aNamespace.namespaces.find((x) => x.name === "AA");
+      ok(aaNamespace);
+      strictEqual(aaNamespace.fullName, "Azure.A.AA");
+      strictEqual(aaNamespace.clients.length, 2); // AA and AAG
+      strictEqual(aaNamespace.models.length, 0);
+      strictEqual(aaNamespace.enums.length, 0);
+      strictEqual(aaNamespace.unions.length, 0);
+      strictEqual(aaNamespace.namespaces.length, 2); // AAA and AAB
 
-    const aaaNamespace = aaNamespace.namespaces.find((x) => x.name === "AAA");
-    ok(aaaNamespace);
-    strictEqual(aaaNamespace.fullName, "Azure.A.AA.AAA");
-    strictEqual(aaaNamespace.clients.length, 1); // AAA
-    strictEqual(aaaNamespace.models.length, 0);
-    strictEqual(aaaNamespace.enums.length, 0);
-    strictEqual(aaaNamespace.unions.length, 0);
-    strictEqual(aaaNamespace.namespaces.length, 0);
+      const aaaNamespace = aaNamespace.namespaces.find((x) => x.name === "AAA");
+      ok(aaaNamespace);
+      strictEqual(aaaNamespace.fullName, "Azure.A.AA.AAA");
+      strictEqual(aaaNamespace.clients.length, 1); // AAA
+      strictEqual(aaaNamespace.models.length, 0);
+      strictEqual(aaaNamespace.enums.length, 0);
+      strictEqual(aaaNamespace.unions.length, 0);
+      strictEqual(aaaNamespace.namespaces.length, 0);
 
-    const aabNamespace = aaNamespace.namespaces.find((x) => x.name === "AAB");
-    ok(aabNamespace);
-    strictEqual(aabNamespace.fullName, "Azure.A.AA.AAB");
-    strictEqual(aabNamespace.clients.length, 3); // AAB, AABGroup1 and AABGroup2
-    strictEqual(aabNamespace.models.length, 0);
-    strictEqual(aabNamespace.enums.length, 0);
-    strictEqual(aabNamespace.unions.length, 0);
-    strictEqual(aabNamespace.namespaces.length, 0);
+      const aabNamespace = aaNamespace.namespaces.find((x) => x.name === "AAB");
+      ok(aabNamespace);
+      strictEqual(aabNamespace.fullName, "Azure.A.AA.AAB");
+      strictEqual(aabNamespace.clients.length, 3); // AAB, AABGroup1 and AABGroup2
+      strictEqual(aabNamespace.models.length, 0);
+      strictEqual(aabNamespace.enums.length, 0);
+      strictEqual(aabNamespace.unions.length, 0);
+      strictEqual(aabNamespace.namespaces.length, 0);
+    });
   });
 });
