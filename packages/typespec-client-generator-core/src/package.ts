@@ -584,7 +584,7 @@ function getSdkInitializationType(
       access,
       usage: UsageFlags.Input,
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-      clientNamespace: getClientNamespace(context, client.type),
+      clientNamespace: diagnostics.pipe(getClientNamespace(context, client.type)),
       apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
       decorators: [],
       serializationOptions: {},
@@ -852,7 +852,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
-      clientNamespace: getClientNamespace(context, rawClient.service),
+      clientNamespace: diagnostics.pipe(getClientNamespace(context, rawClient.service)),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -889,7 +889,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!, // eslint-disable-line @typescript-eslint/no-deprecated
-    clientNamespace: getClientNamespace(context, client.type),
+    clientNamespace: diagnostics.pipe(getClientNamespace(context, client.type)),
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
@@ -915,7 +915,7 @@ function addDefaultClientParameters<
   const defaultClientParamters = [];
   // there will always be an endpoint property
   defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
-  const credentialParam = getSdkCredentialParameter(context, client.__raw);
+  const credentialParam = diagnostics.pipe(getSdkCredentialParameter(context, client.__raw));
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }

@@ -601,7 +601,10 @@ export function getValueTypeValue(
  * @param context
  * @returns
  */
-export function getRootUserDefinedNamespaceName(context: TCGCContext): string {
+export function getRootUserDefinedNamespaceName(
+  context: TCGCContext,
+): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const rootNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()];
 
   // We explicitly want namespaces that are used to define a client, not namespaces that define the service of a client
@@ -623,9 +626,14 @@ export function getRootUserDefinedNamespaceName(context: TCGCContext): string {
   }
   // if we override with namespace flag, we should override the global namespace to the namespace flag
   if (globalNamespaces.length !== 1) {
-    throw new Error(
-      "You can only use the `--namespace` flag in conjunction with a single namespace.",
+    diagnostics.add(
+      createDiagnostic({
+        code: "unclear-namespace-overriding",
+        messageId: "default",
+        format: {},
+        target: context.program.getGlobalNamespaceType(),
+      }),
     );
   }
-  return globalNamespaces[0];
+  return diagnostics.wrap(globalNamespaces[0] || "");
 }

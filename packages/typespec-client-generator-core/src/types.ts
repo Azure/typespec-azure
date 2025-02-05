@@ -533,7 +533,7 @@ export function getSdkUnionWithDiagnostics(
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
         name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
         isGeneratedName: !type.name,
-        clientNamespace: getClientNamespace(context, type),
+        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
         variantTypes: nonNullOptions.map((x) =>
           diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
         ),
@@ -551,7 +551,7 @@ export function getSdkUnionWithDiagnostics(
         type: retval,
         access: "public",
         usage: UsageFlags.None,
-        clientNamespace: getClientNamespace(context, type),
+        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
       };
     }
 
@@ -733,7 +733,7 @@ export function getSdkModelWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
-      clientNamespace: getClientNamespace(context, type),
+      clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       properties: [],
@@ -864,7 +864,7 @@ function getSdkEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
-      clientNamespace: getClientNamespace(context, type),
+      clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
@@ -932,7 +932,7 @@ export function getSdkUnionEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
       name,
       isGeneratedName: !type.union.name,
-      clientNamespace: getClientNamespace(context, type.union),
+      clientNamespace: diagnostics.pipe(getClientNamespace(context, type.union)),
       doc: getDoc(context.program, union),
       summary: getSummary(context.program, union),
       valueType:
@@ -1077,7 +1077,8 @@ function getSdkCredentialType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   authentication: Authentication,
-): SdkCredentialType | SdkUnionType<SdkCredentialType> {
+): [SdkCredentialType | SdkUnionType<SdkCredentialType>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
@@ -1090,30 +1091,31 @@ function getSdkCredentialType(
     }
   }
   if (credentialTypes.length > 1) {
-    return {
+    return diagnostics.wrap({
       __raw: client.service,
       kind: "union",
       variantTypes: credentialTypes,
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
-      clientNamespace: getClientNamespace(context, client.service),
+      clientNamespace: diagnostics.pipe(getClientNamespace(context, client.service)),
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.CredentialUnion`,
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
-    } as SdkUnionType<SdkCredentialType>;
+    } as SdkUnionType<SdkCredentialType>);
   }
-  return credentialTypes[0];
+  return diagnostics.wrap(credentialTypes[0]);
 }
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
-): SdkCredentialParameter | undefined {
+): [SdkCredentialParameter | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const auth = getAuthentication(context.program, client.service);
-  if (!auth) return undefined;
-  return {
-    type: getSdkCredentialType(context, client, auth),
+  if (!auth) return diagnostics.wrap(undefined);
+  return diagnostics.wrap({
+    type: diagnostics.pipe(getSdkCredentialType(context, client, auth)),
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
@@ -1124,7 +1126,7 @@ export function getSdkCredentialParameter(
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
-  };
+  });
 }
 
 export function getSdkModelPropertyTypeBase(

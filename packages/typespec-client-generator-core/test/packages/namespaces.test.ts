@@ -1,8 +1,8 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkEmitterOptions } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "../test-host.js";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 
 describe("typespec-client-generator-core: namespaces", () => {
   let runner: SdkTestRunner;
