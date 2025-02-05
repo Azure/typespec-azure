@@ -482,6 +482,7 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
+  visibility?: Visibility[];
 }
 
 /**
@@ -585,7 +586,6 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
    * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
    */
   multipartOptions?: MultipartOptions;
-  visibility?: Visibility[];
   flatten: boolean;
 }
 
