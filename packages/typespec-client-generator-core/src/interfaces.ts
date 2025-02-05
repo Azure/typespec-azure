@@ -29,6 +29,8 @@ import {
 } from "@typespec/http";
 import { TspLiteralType } from "./internal-utils.js";
 
+// Types for TCGC lib
+
 export interface TCGCContext {
   program: Program;
   emitterName: string;
@@ -79,31 +81,14 @@ export interface SdkEmitterOptions {
   "emitter-name"?: string;
 }
 
+// Types for TCGC customization decorators
+
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
   service: Namespace;
   type: Namespace | Interface;
   crossLanguageDefinitionId: string;
-}
-
-export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
-  extends DecoratedType {
-  __raw: SdkClient | SdkOperationGroup;
-  kind: "client";
-  name: string;
-  clientNamespace: string; // fully qualified namespace
-  doc?: string;
-  summary?: string;
-  initialization: SdkInitializationType;
-  methods: SdkMethod<TServiceOperation>[];
-  apiVersions: string[];
-  /**
-   * @deprecated Use `clientNamespace` instead.
-   */
-  nameSpace: string; // fully qualified
-  crossLanguageDefinitionId: string;
-  parent?: SdkClientType<TServiceOperation>;
 }
 
 export interface SdkOperationGroup {
@@ -113,6 +98,63 @@ export interface SdkOperationGroup {
   groupPath: string;
   service: Namespace;
 }
+
+export type AccessFlags = "internal" | "public";
+
+/**
+ * This enum represents the different ways a model can be used in a method.
+ */
+export enum UsageFlags {
+  None = 0,
+  Input = 1 << 1,
+  Output = 1 << 2,
+  ApiVersionEnum = 1 << 3,
+  // Input and Json will also be set when JsonMergePatch is set.
+  JsonMergePatch = 1 << 4,
+  // Input will also be set when MultipartFormData is set.
+  MultipartFormData = 1 << 5,
+  // Used in spread.
+  Spread = 1 << 6,
+  /**
+   * @deprecated Use `Exception` instead.
+   */
+  // Output will also be set when Error is set.
+  Error = 1 << 7,
+  // Set when type is used in conjunction with an application/json content type.
+  Json = 1 << 8,
+  // Set when type is used in conjunction with an application/xml content type.
+  Xml = 1 << 9,
+  // Set when type is used for exception output.
+  Exception = 1 << 10,
+  // Set when type is used as LRO initial response.
+  LroInitial = 1 << 11,
+  // Set when type is used as LRO polling response.
+  LroPolling = 1 << 12,
+  // Set when type is used as LRO final envelop response.
+  LroFinalEnvelope = 1 << 13,
+}
+
+/**
+ * Flags used to indicate how a client is initialized.
+ * `Individually` means the client is initialized individually.
+ * `Parent` means the client is initialized by its parent.
+ */
+export enum InitializedByFlags {
+  Individually = 1 << 0,
+  Parent = 1 << 1,
+}
+
+/**
+ * Options used to indicate how to initialize a client.
+ * `parameters` is a model that used to .
+ * `initializedBy` is a flag that indicates how the client is initialized.
+ */
+export interface ClientInitializationOptions {
+  parameters?: Model;
+  initializedBy?: InitializedByFlags;
+}
+
+// Types for TCGC specific type  graph
 
 interface DecoratedType {
   // Client types sourced from TypeSpec decorated types will have this generic decoratores list.
@@ -126,6 +168,31 @@ export interface DecoratorInfo {
   name: string;
   // A dict of the decorator's arguments. For example, `{ encoding: "base64url" }`.
   arguments: Record<string, any>;
+}
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
+  __raw: SdkClient | SdkOperationGroup;
+  kind: "client";
+  name: string;
+  clientNamespace: string; // fully qualified namespace
+  doc?: string;
+  summary?: string;
+  /**
+   * @deprecated Use `clientInitialization.paramters` instead.
+   */
+  initialization: SdkInitializationType;
+  clientInitialization: SdkClientInitializationType;
+  methods: SdkMethod<TServiceOperation>[];
+  apiVersions: string[];
+  /**
+   * @deprecated Use `clientNamespace` instead.
+   */
+  nameSpace: string; // fully qualified
+  crossLanguageDefinitionId: string;
+  // The parent client of this client. The structure follows the definition hierarchy.
+  parent?: SdkClientType<TServiceOperation>;
+  // The children of this client. The structure follows the definition hierarchy.
+  children?: SdkClientType<TServiceOperation>[];
 }
 
 interface SdkTypeBase extends DecoratedType {
@@ -361,8 +428,6 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   usage: UsageFlags;
 }
 
-export type AccessFlags = "internal" | "public";
-
 export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
@@ -383,6 +448,14 @@ export interface SdkModelType extends SdkTypeBase {
 
 export interface SdkInitializationType extends SdkModelType {
   properties: SdkParameter[];
+}
+
+export interface SdkClientInitializationType extends SdkTypeBase {
+  kind: "clientinitialization";
+  name: string;
+  isGeneratedName: boolean;
+  parameters: SdkParameter[];
+  initializedBy: InitializedByFlags;
 }
 
 export interface SdkCredentialType extends SdkTypeBase {
@@ -409,6 +482,7 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
+  visibility?: Visibility[];
 }
 
 /**
@@ -512,7 +586,6 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
    * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
    */
   multipartOptions?: MultipartOptions;
-  visibility?: Visibility[];
   flatten: boolean;
 }
 
@@ -586,6 +659,11 @@ export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
   resultPath?: string; // if exists, tells you how to get from the service response to the method response.
+  /**
+   * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
+   * Temporarily this is not enabled for paging now.
+   */
+  resultSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkServiceResponse {
@@ -726,8 +804,14 @@ export interface SdkLroServiceFinalResponse {
   envelopeResult: SdkModelType;
   /** Meaningful result type */
   result: SdkModelType;
-  /** Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns. */
+  /**
+   * Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns.
+   *
+   * @deprecated This property will be removed in future releases. Use `resultSegments` for synthesized property information.
+   */
   resultPath?: string;
+  /** An array of properties to fetch {result} from the {envelopeResult} model. Note that this property is available only in some LRO patterns. */
+  resultSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -749,6 +833,9 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
+/**
+ * @deprecated Use `parent` and `children` property from `SdkClientType` to find client hierarchy instead.
+ */
 export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
   extends SdkMethodBase {
   kind: "clientaccessor";
@@ -757,7 +844,7 @@ export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation
 
 export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkServiceMethod<TServiceOperation>
-  | SdkClientAccessor<TServiceOperation>;
+  | SdkClientAccessor<TServiceOperation>; // eslint-disable-line @typescript-eslint/no-deprecated
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   name: string;
@@ -783,39 +870,6 @@ export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
 export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
-
-/**
- * This enum represents the different ways a model can be used in a method.
- */
-export enum UsageFlags {
-  None = 0,
-  Input = 1 << 1,
-  Output = 1 << 2,
-  ApiVersionEnum = 1 << 3,
-  // Input and Json will also be set when JsonMergePatch is set.
-  JsonMergePatch = 1 << 4,
-  // Input will also be set when MultipartFormData is set.
-  MultipartFormData = 1 << 5,
-  // Used in spread.
-  Spread = 1 << 6,
-  /**
-   * @deprecated Use `Exception` instead.
-   */
-  // Output will also be set when Error is set.
-  Error = 1 << 7,
-  // Set when type is used in conjunction with an application/json content type.
-  Json = 1 << 8,
-  // Set when type is used in conjunction with an application/xml content type.
-  Xml = 1 << 9,
-  // Set when type is used for exception output.
-  Exception = 1 << 10,
-  // Set when type is used as LRO initial response.
-  LroInitial = 1 << 11,
-  // Set when type is used as LRO polling response.
-  LroPolling = 1 << 12,
-  // Set when type is used as LRO final envelop response.
-  LroFinalEnvelope = 1 << 13,
-}
 
 interface SdkExampleBase {
   kind: string;
