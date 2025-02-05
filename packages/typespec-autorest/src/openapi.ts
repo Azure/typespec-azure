@@ -2400,7 +2400,6 @@ export async function getOpenAPIForService(
         }),
       };
 
-      const indexer = typespecType.indexer.value as Model;
       const armIdentifiers = getArmIdentifiers(program, typespecType);
       if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
         array["x-ms-identifiers"] = armIdentifiers;
