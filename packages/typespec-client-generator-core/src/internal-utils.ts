@@ -609,7 +609,17 @@ export function getRootUserDefinedNamespaceName(context: TCGCContext): string {
   const clientNamespaces = listClients(context).map((x) =>
     x.type.kind === "Namespace" ? x.type : x.type.namespace,
   );
-  const globalNamespaces = rootNamespaces.filter((x) => clientNamespaces.includes(x));
+  const globalNamespaces: Namespace[] = [];
+  for (const namespace of clientNamespaces) {
+    let currNamespace = namespace;
+    while (currNamespace) {
+      if (rootNamespaces.includes(currNamespace)) {
+        globalNamespaces.push(currNamespace);
+        break;
+      }
+      currNamespace = currNamespace.namespace;
+    }
+  }
   // if we override with namespace flag, we should override the global namespace to the namespace flag
   if (globalNamespaces.length !== 1) {
     throw new Error(
