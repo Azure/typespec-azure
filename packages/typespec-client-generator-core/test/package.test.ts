@@ -1268,8 +1268,6 @@ describe("typespec-client-generator-core: package", () => {
           id: string;
         }
       }
-
-      
     `);
     const sdkPackage = runner.context.sdkPackage;
     strictEqual(sdkPackage.models.length, 1);
