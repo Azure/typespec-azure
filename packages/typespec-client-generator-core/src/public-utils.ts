@@ -14,7 +14,6 @@ import {
   getFriendlyName,
   getNamespaceFullName,
   getProjectedName,
-  getVisibility,
   ignoreDiagnostics,
   listServices,
   resolveEncodedName,
@@ -51,6 +50,7 @@ import {
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
+  hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
   removeVersionsLargerThanExplicitlySpecified,
@@ -132,11 +132,10 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
   if (type.name) {
     return type;
   }
-
   const effective = getEffectiveModelType(
     program,
     type,
-    (t) => !isMetadata(context.program, t) && !getVisibility(context.program, t)?.includes("none"), // eslint-disable-line @typescript-eslint/no-deprecated
+    (t) => !isMetadata(context.program, t) && !hasNoneVisibility(context, t),
   );
   if (effective.name) {
     return effective;
