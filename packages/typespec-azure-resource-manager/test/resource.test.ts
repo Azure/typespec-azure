@@ -898,7 +898,7 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
     
     model Pets
     {
-      @identifiers(["name", "age"])
+      @identifiers(#["name", "age"])
       dogs: Dog[];
     }
 `);
@@ -922,7 +922,7 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
     
     model Pets
     {
-      @identifiers(["breed/type"])
+      @identifiers(#["breed/type"])
       dogs: Dog[];
     }
 `);
@@ -942,7 +942,7 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
     
     model Pets
     {
-      @identifiers(["age"])
+      @identifiers(#["age"])
       dogs: Dog;
     }
 `);

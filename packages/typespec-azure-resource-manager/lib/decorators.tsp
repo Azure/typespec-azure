@@ -201,9 +201,9 @@ extern dec resourceBaseType(
  * @example
  * ```typespec
  * model Pet {
- *  @identifiers(["size"])
+ *  @identifiers(#["size"])
  *  dog: Dog;
  * }
  * ```
  */
-extern dec identifiers(entity: ModelProperty, properties: string[]);
+extern dec identifiers(entity: ModelProperty, properties: valueof string[]);

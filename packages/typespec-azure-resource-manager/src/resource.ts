@@ -397,19 +397,9 @@ export const $identifiers: IdentifiersDecorator = (
     return;
   }
 
-  const propertiesValues = properties.values;
-  if (!Array.isArray(propertiesValues)) {
-    reportDiagnostic(program, {
-      code: "decorator-param-wrong-type",
-      messageId: "armIdentifiersProperties",
-      target: entity,
-    });
-    return;
-  }
-
   context.program.stateMap(ArmStateKeys.armIdentifiers).set(
     type.indexer.value,
-    propertiesValues.map((property) => property.value),
+    properties.values,
   );
 };
 
