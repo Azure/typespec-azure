@@ -1,5 +1,6 @@
 import { defineLinter } from "@typespec/compiler";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
+import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
 import { armPostResponseCodesRule } from "./rules/arm-post-response-codes.js";
@@ -7,7 +8,7 @@ import { armPutResponseCodesRule } from "./rules/arm-put-response-codes.js";
 import { armResourceActionNoSegmentRule } from "./rules/arm-resource-action-no-segment.js";
 import { armResourceDuplicatePropertiesRule } from "./rules/arm-resource-duplicate-property.js";
 import { interfacesRule } from "./rules/arm-resource-interfaces.js";
-import { invalidActionVerbRule } from "./rules/arm-resource-invalid-action-verb.js";
+import { armResourceInvalidActionVerbRule } from "./rules/arm-resource-invalid-action-verb.js";
 import { armResourceEnvelopeProperties } from "./rules/arm-resource-invalid-envelope-property.js";
 import { armResourceInvalidVersionFormatRule } from "./rules/arm-resource-invalid-version-format.js";
 import { armResourceKeyInvalidCharsRule } from "./rules/arm-resource-key-invalid-chars.js";
@@ -46,12 +47,13 @@ const rules = [
   armResourceOperationsRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
+  armCustomResourceUsageDiscourage,
   beyondNestingRule,
   coreOperationsRule,
   deleteOperationMissingRule,
   envelopePropertiesRules,
   interfacesRule,
-  invalidActionVerbRule,
+  armResourceInvalidActionVerbRule,
   listBySubscriptionRule,
   lroLocationHeaderRule,
   missingXmsIdentifiersRule,

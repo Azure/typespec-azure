@@ -1,5 +1,23 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.11.0
+
+No changes, version bump only.
+
+## 0.10.0
+
+### Bug Fixes
+
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+
+## 0.9.0
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
 ## 0.8.0
 
 ### Bump dependencies

@@ -13,7 +13,6 @@ import { getOperationId } from "@typespec/openapi";
 import {
   SdkArrayExampleValue,
   SdkArrayType,
-  SdkBodyModelPropertyType,
   SdkClientType,
   SdkDictionaryExampleValue,
   SdkDictionaryType,
@@ -252,6 +251,9 @@ function handleHttpOperationExamples(
     operation.examples.push(operationExample);
   }
 
+  // sort examples by file path
+  operation.examples.sort((a, b) => (a.filePath > b.filePath ? 1 : -1));
+
   return diagnostics.wrap(undefined);
 }
 
@@ -268,9 +270,7 @@ function handleHttpParameters(
     example.parameters !== null
   ) {
     for (const name of Object.keys(example.parameters)) {
-      let parameter = parameters.find(
-        (p) => (p.kind !== "body" && p.serializedName === name) || p.name === name,
-      );
+      let parameter = parameters.find((p) => p.serializedName === name);
       // fallback to body in example for any body parameter
       if (!parameter && name === "body") {
         parameter = parameters.find((p) => p.kind === "body");
@@ -611,10 +611,14 @@ function getSdkModelExample(
     const modelQueue = [type];
     while (modelQueue.length > 0) {
       const model = modelQueue.pop()!;
-      for (let property of model.properties) {
-        property = property as SdkBodyModelPropertyType;
-        if (!properties.has(property.serializedName)) {
-          properties.set(property.serializedName, property);
+      for (const property of model.properties) {
+        // for query/path/cookie/header parameters, they should have been handled in parameters.
+        if (
+          property.kind === "property" &&
+          property.serializationOptions.json?.name &&
+          !properties.has(property.serializationOptions.json.name)
+        ) {
+          properties.set(property.serializationOptions.json.name, property);
         }
       }
       if (model.additionalProperties && additionalPropertiesType === undefined) {

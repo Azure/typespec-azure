@@ -233,14 +233,6 @@
         }
       }
     },
-    "IfMatchHeader": {
-      "type": "object",
-      "description": "The default ARM If-Match header type."
-    },
-    "IfNoneMatchHeader": {
-      "type": "object",
-      "description": "The default ARM If-Match header type."
-    },
     "KeyVaultProperties": {
       "type": "object",
       "properties": {
@@ -310,8 +302,7 @@
         },
         "display": {
           "$ref": "#/definitions/OperationDisplay",
-          "description": "Localized display information for this particular operation.",
-          "readOnly": true
+          "description": "Localized display information for this particular operation."
         },
         "origin": {
           "$ref": "#/definitions/Origin",
@@ -320,7 +311,8 @@
         },
         "actionType": {
           "$ref": "#/definitions/ActionType",
-          "description": "Extensible enum. Indicates the action type. \"Internal\" refers to actions that are for internal only APIs."
+          "description": "Extensible enum. Indicates the action type. \"Internal\" refers to actions that are for internal only APIs.",
+          "readOnly": true
         }
       }
     },
@@ -360,7 +352,9 @@
           "items": {
             "$ref": "#/definitions/Operation"
           },
-          "x-ms-identifiers": []
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "nextLink": {
           "type": "string",
@@ -548,7 +542,8 @@
         },
         "eTag": {
           "type": "string",
-          "description": "The etag field is *not* required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.\nEntity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),\nIf-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields."
+          "description": "The etag field is *not* required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.\nEntity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),\nIf-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.",
+          "readOnly": true
         },
         "identity": {
           "$ref": "#/definitions/Identity"
@@ -741,6 +736,24 @@
       "minLength": 1,
       "x-ms-parameter-location": "client",
       "x-ms-client-name": "apiVersion"
+    },
+    "If-Match": {
+      "name": "If-Match",
+      "in": "header",
+      "description": "The If-Match header that makes a request conditional.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "ifMatch"
+    },
+    "If-None-Match": {
+      "name": "If-None-Match",
+      "in": "header",
+      "description": "The If-None-Match header that makes a request conditional.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "ifNoneMatch"
     },
     "LocationParameter": {
       "name": "location",

@@ -31,7 +31,7 @@ core/packages/compiler/test/formatter/**/*.tsp
 # That is an example with error and can't be formatted
 core/packages/samples/specs/local-typespec/test.tsp
 
-# Don't check format website generated files. 
+# Don't check format website generated files.
 core/packages/website/.docusaurus/
 core/packages/website/build/
 core/packages/website/versioned_sidebars/
@@ -41,21 +41,16 @@ packages/website/build/
 packages/website/versioned_sidebars/
 packages/website/versions.json
 
-
 # Auto generated reference docs.
-docs/**/reference/
+**/docs/**/reference/
 packages/website/versioned_docs/**/reference/
-core/docs/**/reference/
-core/docs/standard-library/built-in-decorators.md
-core/docs/standard-library/built-in-data-types.md
-core/packages/website/versioned_docs/**/reference/
-core/packages/website/versioned_docs/**/standard-library/built-in-decorators.md
-core/packages/website/versioned_docs/**/standard-library/built-in-data-types.md
+core/website/src/content/docs/docs/standard-library/built-in-decorators.md
+core/website/src/content/docs/docs/standard-library/built-in-data-types.md
 
 # Auto generated version list
 packages/website/playground-versions.json
+core/website/playground-versions.json
 core/packages/website/playground-versions.json
-core/packages/website-astro/playground-versions.json
 
 /core/eng/feeds/
 
@@ -81,3 +76,6 @@ packages/samples/common-types/**/*.json
 core/packages/http-client-csharp/
 core/packages/http-client-java/
 core/packages/http-client-python/
+
+.gitattributes
+CODEOWNERS

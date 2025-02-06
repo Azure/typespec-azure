@@ -33,6 +33,7 @@ import {
   getArmResourceInfo,
   getResourceBaseType,
   isArmVirtualResource,
+  isCustomAzureResource,
   ResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -234,8 +235,11 @@ export function armRenameListByOperationInternal(
     [parentTypeName, parentFriendlyTypeName] = getArmParentName(context.program, resourceType);
   }
   const parentType = getParentResource(program, resourceType);
-
-  if (parentType && !isArmVirtualResource(program, parentType)) {
+  if (
+    parentType &&
+    !isArmVirtualResource(program, parentType) &&
+    !isCustomAzureResource(program, parentType)
+  ) {
     const parentResourceInfo = getArmResourceInfo(program, parentType);
     if (
       !parentResourceInfo &&
@@ -278,7 +282,7 @@ export function armRenameListByOperationInternal(
 
 function getArmParentName(program: Program, resource: Model): string[] {
   const parent = getParentResource(program, resource);
-  if (parent && isArmVirtualResource(program, parent)) {
+  if (parent && (isArmVirtualResource(program, parent) || isCustomAzureResource(program, parent))) {
     const parentName = getFriendlyName(program, parent) ?? parent.name;
     if (parentName === undefined || parentName.length < 2) {
       return ["", ""];

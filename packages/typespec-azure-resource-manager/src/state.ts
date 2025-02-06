@@ -14,12 +14,14 @@ export const ArmStateKeys = {
   armLibraryNamespaces: azureResourceManagerCreateStateSymbol("armLibraryNamespaces"),
   usesArmLibraryNamespaces: azureResourceManagerCreateStateSymbol("usesArmLibraryNamespaces"),
   armCommonTypesVersion: azureResourceManagerCreateStateSymbol("armCommonTypesVersion"),
+  externalTypeRef: azureResourceManagerCreateStateSymbol("externalTypeRef"),
 
   // resource.ts
   armResourcesCached: azureResourceManagerCreateStateSymbol("armResourcesCached"),
   armSingletonResources: azureResourceManagerCreateStateSymbol("armSingletonResources"),
   resourceBaseType: azureResourceManagerCreateStateSymbol("resourceBaseTypeKey"),
   armBuiltInResource: azureResourceManagerCreateStateSymbol("armExternalResource"),
+  customAzureResource: azureResourceManagerCreateStateSymbol("azureCustomResource"),
 
   // private.decorator.ts
   azureResourceBase: azureResourceManagerCreateStateSymbol("azureResourceBase"),

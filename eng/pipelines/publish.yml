@@ -58,6 +58,17 @@ extends:
                 env:
                   NPM_AUTH_TOKEN: $(azure-sdk-npm-token)
 
+              - pwsh: |
+                  $publishSummary = Get-Content "./publish-summary.json" | ConvertFrom-Json
+                  if ($publishSummary.packages.'@azure-tools/azure-http-specs'.published -eq $true) {
+                    Write-Output "Setting PublishAzureHttpSpecs variable to true."
+                    Write-Host "##vso[task.setvariable variable=PublishAzureHttpSpecs]true"
+                  } else {
+                    Write-Output "Setting PublishAzureHttpSpecs variable to false."
+                    Write-Host "##vso[task.setvariable variable=PublishAzureHttpSpecs]false"
+                  }
+                displayName: "Check if @azure-tools/azure-http-specs was published"
+
               - script: |
                   echo "Publish summary:"
                   cat ./publish-summary.json
@@ -88,6 +99,21 @@ extends:
                       --destination-path cadl-azure/ ^
                       --source "./packages/typespec-azure-playground-website/dist/" ^
                       --overwrite
+
+              - script: pnpm run validate-scenarios --debug
+                displayName: Validate Scenarios
+
+              - script: pnpm run validate-mock-apis --debug
+                displayName: Validate mock apis
+
+              - task: AzureCLI@2
+                displayName: Upload scenario manifest
+                condition: eq(variables['PublishAzureHttpSpecs'], 'true')
+                inputs:
+                  azureSubscription: "TypeSpec Storage"
+                  scriptType: "bash"
+                  scriptLocation: "inlineScript"
+                  inlineScript: "pnpm upload-manifest"
 
           - job: npm_preview
             timeoutInMinutes: 90

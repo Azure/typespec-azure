@@ -65,8 +65,7 @@
             "in": "path",
             "description": "The unique identifier for the operationStatus resource",
             "required": true,
-            "type": "string",
-            "format": "uuid"
+            "type": "string"
           }
         ],
         "responses": {
@@ -138,8 +137,7 @@
             "in": "path",
             "description": "The unique identifier for the operationStatus resource",
             "required": true,
-            "type": "string",
-            "format": "uuid"
+            "type": "string"
           }
         ],
         "responses": {
@@ -183,8 +181,7 @@
             "in": "path",
             "description": "The unique identifier for the operationStatus resource",
             "required": true,
-            "type": "string",
-            "format": "uuid"
+            "type": "string"
           }
         ],
         "responses": {
@@ -205,11 +202,6 @@
     }
   },
   "definitions": {
-    "Azure.Core.uuid": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Universally Unique Identifier"
-    },
     "Azure.ResourceManager.ResourceProvisioningState": {
       "type": "string",
       "description": "The provisioning state of a resource type.",
@@ -250,7 +242,7 @@
           "description": "The operation status"
         },
         "id": {
-          "$ref": "#/definitions/Azure.Core.uuid",
+          "type": "string",
           "description": "The unique identifier for the operationStatus resource"
         },
         "name": {
@@ -296,7 +288,7 @@
           "description": "The operation status"
         },
         "id": {
-          "$ref": "#/definitions/Azure.Core.uuid",
+          "type": "string",
           "description": "The unique identifier for the operationStatus resource"
         },
         "name": {
@@ -342,7 +334,7 @@
           "description": "The operation status"
         },
         "id": {
-          "$ref": "#/definitions/Azure.Core.uuid",
+          "type": "string",
           "description": "The unique identifier for the operationStatus resource"
         },
         "name": {

@@ -1,0 +1,176 @@
+---
+title: Overview
+sidebar_position: 0
+toc_min_heading_level: 2
+toc_max_heading_level: 3
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+TypeSpec Azure Core library
+
+## Install
+
+<Tabs>
+<TabItem  label="In a spec" default>
+
+```bash
+npm install @azure-tools/typespec-azure-core
+```
+
+</TabItem>
+<TabItem  label="In a library" default>
+
+```bash
+npm install --save-peer @azure-tools/typespec-azure-core
+```
+
+</TabItem>
+</Tabs>
+
+## Azure
+
+## Azure.Core
+
+### Decorators
+
+- [`@finalLocation`](./decorators.md#@Azure.Core.finalLocation)
+- [`@finalOperation`](./decorators.md#@Azure.Core.finalOperation)
+- [`@fixed`](./decorators.md#@Azure.Core.fixed)
+- [`@items`](./decorators.md#@Azure.Core.items)
+- [`@lroCanceled`](./decorators.md#@Azure.Core.lroCanceled)
+- [`@lroErrorResult`](./decorators.md#@Azure.Core.lroErrorResult)
+- [`@lroFailed`](./decorators.md#@Azure.Core.lroFailed)
+- [`@lroResult`](./decorators.md#@Azure.Core.lroResult)
+- [`@lroStatus`](./decorators.md#@Azure.Core.lroStatus)
+- [`@lroSucceeded`](./decorators.md#@Azure.Core.lroSucceeded)
+- [`@nextPageOperation`](./decorators.md#@Azure.Core.nextPageOperation)
+- [`@operationLink`](./decorators.md#@Azure.Core.operationLink)
+- [`@pagedResult`](./decorators.md#@Azure.Core.pagedResult)
+- [`@pollingLocation`](./decorators.md#@Azure.Core.pollingLocation)
+- [`@pollingOperation`](./decorators.md#@Azure.Core.pollingOperation)
+- [`@pollingOperationParameter`](./decorators.md#@Azure.Core.pollingOperationParameter)
+- [`@useFinalStateVia`](./decorators.md#@Azure.Core.useFinalStateVia)
+
+### Interfaces
+
+- [`ResourceOperations`](./interfaces.md#Azure.Core.ResourceOperations)
+
+### Operations
+
+- [`GetResourceOperationStatus`](./interfaces.md#Azure.Core.GetResourceOperationStatus)
+- [`LongRunningResourceAction`](./interfaces.md#Azure.Core.LongRunningResourceAction)
+- [`LongRunningResourceCollectionAction`](./interfaces.md#Azure.Core.LongRunningResourceCollectionAction)
+- [`LongRunningResourceCreateOrReplace`](./interfaces.md#Azure.Core.LongRunningResourceCreateOrReplace)
+- [`LongRunningResourceCreateOrUpdate`](./interfaces.md#Azure.Core.LongRunningResourceCreateOrUpdate)
+- [`LongRunningResourceCreateWithServiceProvidedName`](./interfaces.md#Azure.Core.LongRunningResourceCreateWithServiceProvidedName)
+- [`LongRunningResourceDelete`](./interfaces.md#Azure.Core.LongRunningResourceDelete)
+- [`LongRunningRpcOperation`](./interfaces.md#Azure.Core.LongRunningRpcOperation)
+- [`ResourceAction`](./interfaces.md#Azure.Core.ResourceAction)
+- [`ResourceCollectionAction`](./interfaces.md#Azure.Core.ResourceCollectionAction)
+- [`ResourceCreateOrReplace`](./interfaces.md#Azure.Core.ResourceCreateOrReplace)
+- [`ResourceCreateOrUpdate`](./interfaces.md#Azure.Core.ResourceCreateOrUpdate)
+- [`ResourceCreateWithServiceProvidedName`](./interfaces.md#Azure.Core.ResourceCreateWithServiceProvidedName)
+- [`ResourceDelete`](./interfaces.md#Azure.Core.ResourceDelete)
+- [`ResourceList`](./interfaces.md#Azure.Core.ResourceList)
+- [`ResourceRead`](./interfaces.md#Azure.Core.ResourceRead)
+- [`ResourceUpdate`](./interfaces.md#Azure.Core.ResourceUpdate)
+- [`RpcOperation`](./interfaces.md#Azure.Core.RpcOperation)
+
+### Models
+
+- [`AadOauth2Auth`](./data-types.md#Azure.Core.AadOauth2Auth)
+- [`AadTokenAuthFlow`](./data-types.md#Azure.Core.AadTokenAuthFlow)
+- [`ArmResourceIdentifierAllowedResource`](./data-types.md#Azure.Core.ArmResourceIdentifierAllowedResource)
+- [`AzureApiKeyAuthentication`](./data-types.md#Azure.Core.AzureApiKeyAuthentication)
+- [`ClientRequestIdHeader`](./data-types.md#Azure.Core.ClientRequestIdHeader)
+- [`ConditionalRequestHeaders`](./data-types.md#Azure.Core.ConditionalRequestHeaders)
+- [`EmbeddingVector`](./data-types.md#Azure.Core.EmbeddingVector)
+- [`EtagProperty`](./data-types.md#Azure.Core.EtagProperty)
+- [`EtagResponseEnvelope`](./data-types.md#Azure.Core.EtagResponseEnvelope)
+- [`ExpandQueryParameter`](./data-types.md#Azure.Core.ExpandQueryParameter)
+- [`FilterParameter`](./data-types.md#Azure.Core.FilterParameter)
+- [`FilterQueryParameter`](./data-types.md#Azure.Core.FilterQueryParameter)
+- [`MaxPageSizeQueryParameter`](./data-types.md#Azure.Core.MaxPageSizeQueryParameter)
+- [`OrderByQueryParameter`](./data-types.md#Azure.Core.OrderByQueryParameter)
+- [`Page`](./data-types.md#Azure.Core.Page)
+- [`PollingOptions`](./data-types.md#Azure.Core.PollingOptions)
+- [`RepeatabilityRequestHeaders`](./data-types.md#Azure.Core.RepeatabilityRequestHeaders)
+- [`RepeatabilityResponseHeaders`](./data-types.md#Azure.Core.RepeatabilityResponseHeaders)
+- [`RequestIdResponseHeader`](./data-types.md#Azure.Core.RequestIdResponseHeader)
+- [`RequestParameter`](./data-types.md#Azure.Core.RequestParameter)
+- [`ResourceOperationStatus`](./data-types.md#Azure.Core.ResourceOperationStatus)
+- [`ResponseProperty`](./data-types.md#Azure.Core.ResponseProperty)
+- [`SelectQueryParameter`](./data-types.md#Azure.Core.SelectQueryParameter)
+- [`SkipQueryParameter`](./data-types.md#Azure.Core.SkipQueryParameter)
+- [`StandardListQueryParameters`](./data-types.md#Azure.Core.StandardListQueryParameters)
+- [`StatusMonitorOptions`](./data-types.md#Azure.Core.StatusMonitorOptions)
+- [`StatusMonitorPollingOptions`](./data-types.md#Azure.Core.StatusMonitorPollingOptions)
+- [`TopQueryParameter`](./data-types.md#Azure.Core.TopQueryParameter)
+
+## Azure.Core.Foundations
+
+### Decorators
+
+- [`@omitKeyProperties`](./decorators.md#@Azure.Core.Foundations.omitKeyProperties)
+- [`@requestParameter`](./decorators.md#@Azure.Core.Foundations.requestParameter)
+- [`@responseProperty`](./decorators.md#@Azure.Core.Foundations.responseProperty)
+
+### Operations
+
+- [`GetOperationStatus`](./interfaces.md#Azure.Core.Foundations.GetOperationStatus)
+- [`LongRunningOperation`](./interfaces.md#Azure.Core.Foundations.LongRunningOperation)
+- [`LongRunningResourceUpdate`](./interfaces.md#Azure.Core.Foundations.LongRunningResourceUpdate)
+- [`NonPagedResourceList`](./interfaces.md#Azure.Core.Foundations.NonPagedResourceList)
+- [`Operation`](./interfaces.md#Azure.Core.Foundations.Operation)
+- [`ResourceCollectionOperation`](./interfaces.md#Azure.Core.Foundations.ResourceCollectionOperation)
+- [`ResourceList`](./interfaces.md#Azure.Core.Foundations.ResourceList)
+- [`ResourceOperation`](./interfaces.md#Azure.Core.Foundations.ResourceOperation)
+
+### Models
+
+- [`ApiVersionParameter`](./data-types.md#Azure.Core.Foundations.ApiVersionParameter)
+- [`CollectionKeysOf`](./data-types.md#Azure.Core.Foundations.CollectionKeysOf)
+- [`CreateableAndUpdateableProperties`](./data-types.md#Azure.Core.Foundations.CreateableAndUpdateableProperties)
+- [`CustomizationFields`](./data-types.md#Azure.Core.Foundations.CustomizationFields)
+- [`CustomPage`](./data-types.md#Azure.Core.Foundations.CustomPage)
+- [`CustomParameters`](./data-types.md#Azure.Core.Foundations.CustomParameters)
+- [`CustomResponseFields`](./data-types.md#Azure.Core.Foundations.CustomResponseFields)
+- [`Error`](./data-types.md#Azure.Core.Foundations.Error)
+- [`ErrorResponse`](./data-types.md#Azure.Core.Foundations.ErrorResponse)
+- [`ErrorResponseBase`](./data-types.md#Azure.Core.Foundations.ErrorResponseBase)
+- [`InnerError`](./data-types.md#Azure.Core.Foundations.InnerError)
+- [`ItemKeysOf`](./data-types.md#Azure.Core.Foundations.ItemKeysOf)
+- [`LocationOfCreatedResourceResponse`](./data-types.md#Azure.Core.Foundations.LocationOfCreatedResourceResponse)
+- [`LocationOfCreatedResourceWithServiceProvidedNameResponse`](./data-types.md#Azure.Core.Foundations.LocationOfCreatedResourceWithServiceProvidedNameResponse)
+- [`LongRunningStatusLocation`](./data-types.md#Azure.Core.Foundations.LongRunningStatusLocation)
+- [`OperationStatus`](./data-types.md#Azure.Core.Foundations.OperationStatus)
+- [`ResourceBody`](./data-types.md#Azure.Core.Foundations.ResourceBody)
+- [`ResourceCreateOrReplaceModel`](./data-types.md#Azure.Core.Foundations.ResourceCreateOrReplaceModel)
+- [`ResourceCreateOrUpdateModel`](./data-types.md#Azure.Core.Foundations.ResourceCreateOrUpdateModel)
+- [`ResourceUpdateModel`](./data-types.md#Azure.Core.Foundations.ResourceUpdateModel)
+- [`RetryAfterHeader`](./data-types.md#Azure.Core.Foundations.RetryAfterHeader)
+
+## Azure.Core.Traits
+
+### Decorators
+
+- [`@trait`](./decorators.md#@Azure.Core.Traits.trait)
+- [`@traitAdded`](./decorators.md#@Azure.Core.Traits.traitAdded)
+- [`@traitContext`](./decorators.md#@Azure.Core.Traits.traitContext)
+- [`@traitLocation`](./decorators.md#@Azure.Core.Traits.traitLocation)
+
+### Models
+
+- [`ListQueryParametersTrait`](./data-types.md#Azure.Core.Traits.ListQueryParametersTrait)
+- [`NoClientRequestId`](./data-types.md#Azure.Core.Traits.NoClientRequestId)
+- [`NoConditionalRequests`](./data-types.md#Azure.Core.Traits.NoConditionalRequests)
+- [`NoRepeatableRequests`](./data-types.md#Azure.Core.Traits.NoRepeatableRequests)
+- [`QueryParametersTrait`](./data-types.md#Azure.Core.Traits.QueryParametersTrait)
+- [`RequestHeadersTrait`](./data-types.md#Azure.Core.Traits.RequestHeadersTrait)
+- [`ResponseHeadersTrait`](./data-types.md#Azure.Core.Traits.ResponseHeadersTrait)
+- [`SupportsClientRequestId`](./data-types.md#Azure.Core.Traits.SupportsClientRequestId)
+- [`SupportsConditionalRequests`](./data-types.md#Azure.Core.Traits.SupportsConditionalRequests)
+- [`SupportsRepeatableRequests`](./data-types.md#Azure.Core.Traits.SupportsRepeatableRequests)
+- [`TraitOverride`](./data-types.md#Azure.Core.Traits.TraitOverride)
+- [`VersionParameterTrait`](./data-types.md#Azure.Core.Traits.VersionParameterTrait)

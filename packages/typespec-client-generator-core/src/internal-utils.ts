@@ -50,6 +50,9 @@ import { getClientTypeWithDiagnostics } from "./types.js";
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 export const clientNameKey = createStateSymbol("clientName");
+export const clientNamespaceKey = createStateSymbol("clientNamespace");
+export const negationScopesKey = createStateSymbol("negationScopes");
+export const scopeKey = createStateSymbol("scope");
 
 /**
  *
@@ -329,7 +332,7 @@ export function intOrFloat(value: number): "int32" | "float32" {
  * @param t
  * @returns
  */
-export function isAzureCoreModel(t: Type): boolean {
+export function isAzureCoreTspModel(t: Type): boolean {
   return (
     (t.kind === "Model" || t.kind === "Enum" || t.kind === "Union") &&
     t.namespace !== undefined &&
@@ -486,14 +489,14 @@ export function filterApiVersionsInEnum(
   }
 }
 
+const jsonRegex = new RegExp(/^(application|text)\/(.+\+)?json$/);
 export function isJsonContentType(contentType: string): boolean {
-  const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
-  return regex.test(contentType);
+  return jsonRegex.test(contentType);
 }
 
+const xmlRegex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
 export function isXmlContentType(contentType: string): boolean {
-  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
-  return regex.test(contentType);
+  return xmlRegex.test(contentType);
 }
 
 export function twoParamsEquivalent(

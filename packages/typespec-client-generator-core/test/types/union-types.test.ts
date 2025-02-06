@@ -1,4 +1,4 @@
-import { ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkArrayType, UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -10,6 +10,7 @@ describe("typespec-client-generator-core: union types", () => {
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
+
   afterEach(async () => {
     for (const modelsOrEnums of [
       runner.context.sdkPackage.models,
@@ -20,6 +21,7 @@ describe("typespec-client-generator-core: union types", () => {
       }
     }
   });
+
   it("primitive union", async function () {
     await runner.compileWithBuiltInService(
       `
@@ -32,12 +34,18 @@ describe("typespec-client-generator-core: union types", () => {
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "union");
     strictEqual(sdkType.name, "TestName");
+    strictEqual(sdkType.isGeneratedName, true);
+    strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(sdkType.access, "public");
     ok(sdkType.isGeneratedName);
     const values = sdkType.variantTypes;
     strictEqual(values.length, 2);
     strictEqual(values[0].kind, "string");
     strictEqual(values[1].kind, "int32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
   });
+
   it("nullable", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -48,9 +56,15 @@ describe("typespec-client-generator-core: union types", () => {
 
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
+    strictEqual(nullableType.name, "TestName");
+    strictEqual(nullableType.isGeneratedName, true);
+    strictEqual(nullableType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(nullableType.access, "public");
 
     const sdkType = nullableType.type;
     strictEqual(sdkType.kind, "float32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
   });
 
   it("nullable with more types", async function () {
@@ -63,12 +77,18 @@ describe("typespec-client-generator-core: union types", () => {
 
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
+    strictEqual(nullableType.name, "TestName");
+    strictEqual(nullableType.isGeneratedName, true);
+    strictEqual(nullableType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(nullableType.access, "public");
 
     const sdkType = nullableType.type;
     strictEqual(sdkType.kind, "union");
     strictEqual(sdkType.variantTypes.length, 2);
     strictEqual(sdkType.variantTypes[0].kind, "string");
     strictEqual(sdkType.variantTypes[1].kind, "float32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
   });
 
   it("record with nullable", async function () {
@@ -83,7 +103,13 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(sdkType.kind, "dict");
     const elementType = sdkType.valueType;
     strictEqual(elementType.kind, "nullable");
+    strictEqual(elementType.name, "TestName");
+    strictEqual(elementType.isGeneratedName, true);
+    strictEqual(elementType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(elementType.access, "public");
     strictEqual(elementType.type.kind, "float32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
   });
 
   it("record with nullable with more types", async function () {
@@ -98,12 +124,18 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(sdkType.kind, "dict");
     const elementType = sdkType.valueType;
     strictEqual(elementType.kind, "nullable");
+    strictEqual(elementType.name, "TestName");
+    strictEqual(elementType.isGeneratedName, true);
+    strictEqual(elementType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(elementType.access, "public");
 
     const elementTypeValueType = elementType.type;
     strictEqual(elementTypeValueType.kind, "union");
     strictEqual(elementTypeValueType.variantTypes.length, 2);
     strictEqual(elementTypeValueType.variantTypes[0].kind, "string");
     strictEqual(elementTypeValueType.variantTypes[1].kind, "float32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
   });
 
   it("array with nullable", async function () {
@@ -118,7 +150,13 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(sdkType.kind, "array");
     const elementType = sdkType.valueType;
     strictEqual(elementType.kind, "nullable");
+    strictEqual(elementType.name, "TestName");
+    strictEqual(elementType.isGeneratedName, true);
+    strictEqual(elementType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(elementType.access, "public");
     strictEqual(elementType.type.kind, "float32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
   });
 
   it("array with nullable with more types", async function () {
@@ -133,11 +171,17 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(sdkType.kind, "array");
     const elementType = sdkType.valueType;
     strictEqual(elementType.kind, "nullable");
+    strictEqual(elementType.name, "TestName");
+    strictEqual(elementType.isGeneratedName, true);
+    strictEqual(elementType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(elementType.access, "public");
     const elementTypeValueType = elementType.type;
     strictEqual(elementTypeValueType.kind, "union");
     strictEqual(elementTypeValueType.variantTypes.length, 2);
     strictEqual(elementTypeValueType.variantTypes[0].kind, "string");
     strictEqual(elementTypeValueType.variantTypes[1].kind, "float32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
   });
 
   it("additional property is nullable", async function () {
@@ -168,7 +212,13 @@ describe("typespec-client-generator-core: union types", () => {
     const additionalProperties = extendsType.additionalProperties;
     ok(additionalProperties);
     strictEqual(additionalProperties.kind, "nullable");
+    strictEqual(additionalProperties.name, "TestExtendsAdditionalProperty");
+    strictEqual(additionalProperties.isGeneratedName, true);
+    strictEqual(additionalProperties.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(additionalProperties.access, "public");
     strictEqual(additionalProperties.type.kind, "string");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], additionalProperties);
 
     const isType = models.find((x) => x.name === "TestIs");
     ok(isType);
@@ -176,7 +226,13 @@ describe("typespec-client-generator-core: union types", () => {
     const isTypeAdditionalProperties = isType.additionalProperties;
     ok(isTypeAdditionalProperties);
     strictEqual(isTypeAdditionalProperties.kind, "nullable");
+    strictEqual(isTypeAdditionalProperties.name, "TestIsAdditionalProperty");
+    strictEqual(isTypeAdditionalProperties.isGeneratedName, true);
+    strictEqual(isTypeAdditionalProperties.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(isTypeAdditionalProperties.access, "public");
     strictEqual(isTypeAdditionalProperties.type.kind, "string");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[1], isTypeAdditionalProperties);
 
     const spreadType = models.find((x) => x.name === "TestSpread");
     ok(spreadType);
@@ -184,7 +240,13 @@ describe("typespec-client-generator-core: union types", () => {
     const spreadTypeAdditionalProperties = spreadType.additionalProperties;
     ok(spreadTypeAdditionalProperties);
     strictEqual(spreadTypeAdditionalProperties.kind, "nullable");
+    strictEqual(spreadTypeAdditionalProperties.name, "TestSpreadAdditionalProperty");
+    strictEqual(spreadTypeAdditionalProperties.isGeneratedName, true);
+    strictEqual(spreadTypeAdditionalProperties.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(spreadTypeAdditionalProperties.access, "public");
     strictEqual(spreadTypeAdditionalProperties.type.kind, "string");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[2], spreadTypeAdditionalProperties);
   });
 
   it("additional property nullable with more types", async function () {
@@ -216,6 +278,10 @@ describe("typespec-client-generator-core: union types", () => {
     const extendsTypeAdditionalProperties = extendsType.additionalProperties;
     ok(extendsTypeAdditionalProperties);
     strictEqual(extendsTypeAdditionalProperties.kind, "nullable");
+    strictEqual(extendsTypeAdditionalProperties.name, "TestExtendsAdditionalProperty");
+    strictEqual(extendsTypeAdditionalProperties.isGeneratedName, true);
+    strictEqual(extendsTypeAdditionalProperties.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(extendsTypeAdditionalProperties.access, "public");
     const extendsAdPropUnderlyingType = extendsTypeAdditionalProperties.type;
     strictEqual(extendsAdPropUnderlyingType.kind, "union");
     strictEqual(extendsAdPropUnderlyingType.name, "TestExtendsAdditionalProperty");
@@ -224,13 +290,18 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(extendsAdPropUnderlyingType.variantTypes[0].kind, "string");
     strictEqual(extendsAdPropUnderlyingType.variantTypes[1].kind, "float32");
 
+    deepStrictEqual(runner.context.sdkPackage.unions[0], extendsTypeAdditionalProperties);
+
     const isType = models.find((x) => x.name === "TestIs");
     ok(isType);
     strictEqual(isType.kind, "model");
     const isTypeAdditionalProperties = isType.additionalProperties;
     ok(isTypeAdditionalProperties);
     strictEqual(isTypeAdditionalProperties.kind, "nullable");
-
+    strictEqual(isTypeAdditionalProperties.name, "TestIsAdditionalProperty");
+    strictEqual(isTypeAdditionalProperties.isGeneratedName, true);
+    strictEqual(isTypeAdditionalProperties.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(isTypeAdditionalProperties.access, "public");
     const isTypeAdditionalPropertiesUnderlyingType = isTypeAdditionalProperties.type;
     strictEqual(isTypeAdditionalPropertiesUnderlyingType.kind, "union");
     strictEqual(isTypeAdditionalPropertiesUnderlyingType.name, "TestIsAdditionalProperty");
@@ -239,14 +310,18 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(isTypeAdditionalPropertiesUnderlyingType.variantTypes[0].kind, "string");
     strictEqual(isTypeAdditionalPropertiesUnderlyingType.variantTypes[1].kind, "float32");
 
+    deepStrictEqual(runner.context.sdkPackage.unions[1], isTypeAdditionalProperties);
+
     const spreadType = models.find((x) => x.name === "TestSpread");
     ok(spreadType);
     strictEqual(spreadType.kind, "model");
-
     const spreadTypeAdditionalProperties = spreadType.additionalProperties;
     ok(spreadTypeAdditionalProperties);
     strictEqual(spreadTypeAdditionalProperties.kind, "nullable");
-
+    strictEqual(spreadTypeAdditionalProperties.name, "TestSpreadAdditionalProperty");
+    strictEqual(spreadTypeAdditionalProperties.isGeneratedName, true);
+    strictEqual(spreadTypeAdditionalProperties.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(spreadTypeAdditionalProperties.access, "public");
     const spreadTypeAdditionalPropertiesUnderlyingType = spreadTypeAdditionalProperties.type;
     strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.kind, "union");
     strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.name, "TestSpreadAdditionalProperty");
@@ -254,6 +329,8 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.variantTypes.length, 2);
     strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.variantTypes[0].kind, "string");
     strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.variantTypes[1].kind, "float32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[2], spreadTypeAdditionalProperties);
   });
 
   it("model with simple union property", async function () {
@@ -266,6 +343,8 @@ describe("typespec-client-generator-core: union types", () => {
 
     const sdkType = getSdkTypeHelper(runner);
     strictEqual(sdkType.kind, "union");
+    strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(sdkType.access, "public");
     const values = sdkType.variantTypes;
     strictEqual(values.length, 2);
     strictEqual(values[0].kind, "int32");
@@ -273,6 +352,8 @@ describe("typespec-client-generator-core: union types", () => {
 
     const elementType = (<SdkArrayType>values[1]).valueType;
     strictEqual(elementType.kind, "int32");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
   });
 
   it("model with named union", async function () {
@@ -311,6 +392,10 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(property.kind, "property");
     const sdkType = property.type;
     strictEqual(sdkType.kind, "union");
+    strictEqual(sdkType.name, "MyNamedUnion");
+    strictEqual(sdkType.isGeneratedName, false);
+    strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(sdkType.access, "public");
     const variants = sdkType.variantTypes;
     strictEqual(variants.length, 2);
     strictEqual(variants[0].kind, "model");
@@ -325,6 +410,70 @@ describe("typespec-client-generator-core: union types", () => {
       variants[1],
       models.find((x) => x.kind === "model" && x.name === "Model2"),
     );
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
+  });
+
+  it("model with nullable named union", async function () {
+    await runner.compileWithBuiltInService(`
+      @usage(Usage.input | Usage.output)
+      model BaseModel {
+        name: string;
+      }
+      @usage(Usage.input | Usage.output)
+      model Model1 extends BaseModel {
+        prop1: int32;
+      }
+      @usage(Usage.input | Usage.output)
+      model Model2 extends BaseModel {
+        prop2: int32;
+      }
+      @usage(Usage.input | Usage.output)
+      union MyNamedUnion {
+        one: Model1,
+        two: Model2,
+        null,
+      }
+
+      @usage(Usage.input | Usage.output)
+      model ModelWithNamedUnionProperty {
+        prop: MyNamedUnion;
+      }
+      `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 4);
+    const modelWithNamedUnionProperty = models.find(
+      (x) => x.kind === "model" && x.name === "ModelWithNamedUnionProperty",
+    );
+    ok(modelWithNamedUnionProperty);
+    const property = modelWithNamedUnionProperty.properties[0];
+    strictEqual(property.kind, "property");
+    const sdkType = property.type;
+    strictEqual(sdkType.kind, "nullable");
+    strictEqual(sdkType.name, "MyNamedUnion");
+    strictEqual(sdkType.isGeneratedName, false);
+    strictEqual(sdkType.type.kind, "union");
+    strictEqual(sdkType.type.name, "MyNamedUnion");
+    strictEqual(sdkType.type.isGeneratedName, false);
+    strictEqual(sdkType.type.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(sdkType.type.access, "public");
+    const variants = sdkType.type.variantTypes;
+    strictEqual(variants.length, 2);
+    strictEqual(variants[0].kind, "model");
+    strictEqual(variants[0].name, "Model1");
+    strictEqual(
+      variants[0],
+      models.find((x) => x.kind === "model" && x.name === "Model1"),
+    );
+    strictEqual(variants[1].kind, "model");
+    strictEqual(variants[1].name, "Model2");
+    strictEqual(
+      variants[1],
+      models.find((x) => x.kind === "model" && x.name === "Model2"),
+    );
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
   });
 
   it("model with nullable enum property", async function () {
@@ -340,6 +489,8 @@ describe("typespec-client-generator-core: union types", () => {
 
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
+    strictEqual(nullableType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(nullableType.access, "public");
 
     const sdkType = nullableType.type;
     strictEqual(sdkType.kind, "enum");
@@ -348,6 +499,8 @@ describe("typespec-client-generator-core: union types", () => {
 
     const values = sdkType.values;
     strictEqual(values.length, 3);
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
   });
 
   it("model with nullable union as enum", async function () {
@@ -360,6 +513,10 @@ describe("typespec-client-generator-core: union types", () => {
 
     const nullableType = getSdkTypeHelper(runner);
     strictEqual(nullableType.kind, "nullable");
+    strictEqual(nullableType.name, "HomePet");
+    strictEqual(nullableType.isGeneratedName, true);
+    strictEqual(nullableType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(nullableType.access, "public");
 
     const sdkType = nullableType.type;
     strictEqual(sdkType.kind, "enum");
@@ -368,6 +525,8 @@ describe("typespec-client-generator-core: union types", () => {
 
     const values = sdkType.values;
     strictEqual(values.length, 3);
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
   });
 
   it("model with nullable model property", async function () {
@@ -389,10 +548,16 @@ describe("typespec-client-generator-core: union types", () => {
     ok(model);
     const nullableType = model.properties[0].type;
     strictEqual(nullableType.kind, "nullable");
+    strictEqual(nullableType.name, "TestProp");
+    strictEqual(nullableType.isGeneratedName, true);
+    strictEqual(nullableType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(nullableType.access, "public");
 
     const sdkType = nullableType.type;
     strictEqual(sdkType.kind, "model");
     strictEqual(sdkType.name, "PropertyModel");
+
+    deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
   });
 
   it("mix types", async function () {
@@ -419,9 +584,12 @@ describe("typespec-client-generator-core: union types", () => {
     ok(model);
     const nullableModel = models.find((x) => x.kind === "model" && x.name === "TestNullable");
     ok(nullableModel);
-    strictEqual(model.properties[0].type.kind, "union");
     const unionType = model.properties[0].type;
     strictEqual(unionType.kind, "union");
+    strictEqual(unionType.name, "TestProp");
+    strictEqual(unionType.isGeneratedName, true);
+    strictEqual(unionType.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(unionType.access, "public");
     for (const v of unionType.variantTypes) {
       if (v.kind === "model") {
         strictEqual(v.name, "ModelType");
@@ -429,8 +597,12 @@ describe("typespec-client-generator-core: union types", () => {
         strictEqual(v.kind, "constant");
       }
     }
+    deepStrictEqual(runner.context.sdkPackage.unions[0], unionType);
+
     const nullableProp = nullableModel.properties[0];
     strictEqual(nullableProp.type.kind, "nullable");
+    strictEqual(nullableProp.type.usage, UsageFlags.Input | UsageFlags.Output);
+    strictEqual(nullableProp.type.access, "public");
     strictEqual(nullableProp.type.type.kind, "union");
     strictEqual(nullableProp.type.type.variantTypes.length, 3);
 
@@ -445,6 +617,8 @@ describe("typespec-client-generator-core: union types", () => {
         strictEqual(v.kind, "constant");
       }
     }
+
+    deepStrictEqual(runner.context.sdkPackage.unions[1], nullableProp.type);
   });
 
   it("usage", async function () {
@@ -481,12 +655,19 @@ describe("typespec-client-generator-core: union types", () => {
     ok(foo);
     strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Json);
     strictEqual(foo.access, "internal");
+
     const enums = runner.context.sdkPackage.enums;
     strictEqual(enums.length, 1);
     const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
     ok(unionAsEnum);
     strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Json);
     strictEqual(unionAsEnum.access, "internal");
+
+    const unions = runner.context.sdkPackage.unions;
+    strictEqual(unions.length, 1);
+    strictEqual(unions[0].kind, "nullable");
+    strictEqual(unions[0].usage, UsageFlags.Input | UsageFlags.Json);
+    strictEqual(unions[0].access, "internal");
   });
 
   it("usage override", async function () {
@@ -505,6 +686,8 @@ describe("typespec-client-generator-core: union types", () => {
         prop: string;
       }
 
+      @usage(Usage.input | Usage.output)
+      @access(Access.public)
       union NullableUnion {
         Foo,
         null
@@ -533,6 +716,12 @@ describe("typespec-client-generator-core: union types", () => {
     ok(unionAsEnum);
     strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
     strictEqual(unionAsEnum.access, "public");
+
+    const unions = runner.context.sdkPackage.unions;
+    strictEqual(unions.length, 1);
+    strictEqual(unions[0].kind, "nullable");
+    strictEqual(unions[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+    strictEqual(unions[0].access, "public");
   });
 
   it("usage override for orphan union as enum", async function () {
@@ -584,5 +773,6 @@ describe("typespec-client-generator-core: union types", () => {
     const values = sdkType.values;
     strictEqual(values.length, 1);
     strictEqual(values[0].value, "A");
+    deepStrictEqual(runner.context.sdkPackage.enums[0], sdkType);
   });
 });

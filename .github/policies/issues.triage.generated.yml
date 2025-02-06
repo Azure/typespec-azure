@@ -24,9 +24,15 @@ configuration:
                 - hasLabel:
                     label: lib:azure-resource-manager
                 - hasLabel:
+                    label: lib:azure-http-specs
+                - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
                     label: eng
+                - hasLabel:
+                    label: ide
+                - hasLabel:
+                    label: cli/psh
         then:
           - addLabel:
               label: needs-area
@@ -44,9 +50,15 @@ configuration:
               - labelAdded:
                   label: lib:azure-resource-manager
               - labelAdded:
+                  label: lib:azure-http-specs
+              - labelAdded:
                   label: emitter:autorest
               - labelAdded:
                   label: eng
+              - labelAdded:
+                  label: ide
+              - labelAdded:
+                  label: cli/psh
         then:
           - removeLabel:
               label: needs-area
@@ -65,9 +77,15 @@ configuration:
               - labelRemoved:
                   label: lib:azure-resource-manager
               - labelRemoved:
+                  label: lib:azure-http-specs
+              - labelRemoved:
                   label: emitter:autorest
               - labelRemoved:
                   label: eng
+              - labelRemoved:
+                  label: ide
+              - labelRemoved:
+                  label: cli/psh
           - not:
               or:
                 - hasLabel:
@@ -77,9 +95,15 @@ configuration:
                 - hasLabel:
                     label: lib:azure-resource-manager
                 - hasLabel:
+                    label: lib:azure-http-specs
+                - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
                     label: eng
+                - hasLabel:
+                    label: ide
+                - hasLabel:
+                    label: cli/psh
         then:
           - addLabel:
               label: needs-area

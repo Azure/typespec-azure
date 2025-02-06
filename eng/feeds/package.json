@@ -10,6 +10,6 @@
   "description": "",
   "devDependencies": {
     "@typespec/compiler": "workspace:~",
-    "vitest": "^2.1.2"
+    "vitest": "^3.0.4"
   }
 }

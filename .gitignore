@@ -126,6 +126,8 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
+spec-coverage.json
+manifest.json
 
 # nyc test coverage
 .nyc_output
@@ -201,10 +203,13 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 # JetBrains Rider
 .idea/
 
-docs/**/js-api/
+**/docs/**/js-api/
 
 # vitest temporary files
 **/vitest.config.ts.timestamp*
 
 # Playwright temp file
 .last_run.json
+
+# Astro
+.astro/

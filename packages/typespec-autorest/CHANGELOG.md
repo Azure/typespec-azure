@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.50.0
+
+No changes, version bump only.
+
+## 0.49.0
+
+### Bug Fixes
+
+- [#1838](https://github.com/Azure/typespec-azure/pull/1838) Emit error `@azure-tools/typespec-autorest/no-matching-version-found` when the version option is used and does not match any versions of the service.
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+
+## 0.48.0
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+### Features
+
+- [#1566](https://github.com/Azure/typespec-azure/pull/1566) Emit `x-ms-pageable` whenever possible for new core paging model
+
+
 ## 0.47.0
 
 ### Bump dependencies

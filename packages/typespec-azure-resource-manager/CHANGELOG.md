@@ -1,5 +1,45 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.50.0
+
+No changes, version bump only.
+
+## 0.49.0
+
+### Bug Fixes
+
+- [#1866](https://github.com/Azure/typespec-azure/pull/1866) Fix the `no-empty-model` rule to prevent it from being triggered for Records, as this is already covered by another rule.
+- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Replace usage of  `Azure.Core.nextLink`  to `TypeSpec.nextLink`.
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+### Features
+
+- [#1689](https://github.com/Azure/typespec-azure/pull/1689) Add common-types v6 with changes in managed identity, private links, and types.
+- [#1272](https://github.com/Azure/typespec-azure/pull/1272) Add `armResourceType` scalar, and changed some properties to be `armResourceType` instead of string
+- [#1881](https://github.com/Azure/typespec-azure/pull/1881) common-types consistency with original swagger
+- [#1923](https://github.com/Azure/typespec-azure/pull/1923) Add the `@Azure.ResourceManager.Legacy.customAzureResource` decorator to identify ARM resources that do not use the base resource types.
+- [#1740](https://github.com/Azure/typespec-azure/pull/1740) Update the `arm no-response-body` rule to behave similarly to the core rule, but with the additional requirement that the 202 response can and should also be empty
+
+
+## 0.48.0
+
+### Bug Fixes
+
+- [#1759](https://github.com/Azure/typespec-azure/pull/1759) Fix the `ArmOperationStatus` model to match the Azure-AsyncOperation Resource format, where the `id` is of type `string` instead of `Core.uuid`.
+- [#1741](https://github.com/Azure/typespec-azure/pull/1741) Fix the `arm-resource-invalid-action-verb` rule. The rule should only allow `@post` and `@get` verbs, but it wasn't flagging other verbs.
+- [#1744](https://github.com/Azure/typespec-azure/pull/1744) Fix the `x-ms-identifier` rule. The `x-ms-identifier` supports indexing into inner properties, but the linter does not support that and reports a warning.
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+### Features
+
+- [#1670](https://github.com/Azure/typespec-azure/pull/1670) Add an envelope model for a standard availability zones API contract.
+- [#1674](https://github.com/Azure/typespec-azure/pull/1674) Remove restrictions requiring Foundation.Resource in ArmResourceListByParent. This will allow using the template for non-standard resources / collection actions that return a list.
+As part of the change, the response can now return any type. This will be specified in the response section using a new  `ResourceListCustomResult<type>` model.
+
+
 ## 0.47.1
 
 ### Bug Fixes

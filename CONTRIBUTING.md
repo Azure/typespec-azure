@@ -30,7 +30,7 @@ recommended to test a private of the change before merging.
    + "@azure-tools/typespec-autorest": "https://.../package.tgz"
    ```
 
-5. Also edit `eng/pipelines/templates/steps/npm-install.yml`, to force install
+5. Also edit `.github/actions/setup-node-npm-ci/action.yaml`, to force install
    your private build:
 
    ```diff
@@ -185,7 +185,6 @@ each individual repo as you would any other.
 
 ```bash
 pnpm e2e-tests
-
 ```
 
 ### Test with local cadl-ranch repo
@@ -306,13 +305,16 @@ TypeSpec repo use labels to help categorize and manage issues and PRs. The follo
 
 Area of the codebase
 
-| Name                         | Color   | Description                                                    |
-| ---------------------------- | ------- | -------------------------------------------------------------- |
-| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library |
-| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library            |
-| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library            |
-| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter              |
-| `eng`                        | #65bfff |                                                                |
+| Name                         | Color   | Description                                                                  |
+| ---------------------------- | ------- | ---------------------------------------------------------------------------- |
+| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library               |
+| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
+| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
+| `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package |
+| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                            |
+| `eng`                        | #65bfff |                                                                              |
+| `ide`                        | #846da1 | Issues for Azure specific ide features                                       |
+| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                            |
 
 #### issue_kinds
 
@@ -352,6 +354,7 @@ Process labels
 | -------------- | ------- | --------------------------------------------------------------------------------- |
 | `needs-area`   | #ffffff |                                                                                   |
 | `needs-info`   | #ffffff | Mark an issue that needs reply from the author or it will be closed automatically |
+| `stale`        | #ffffff | Mark a PR that hasn't been recently updated and will be closed.                   |
 | `triaged:core` | #5319e7 |                                                                                   |
 
 #### misc

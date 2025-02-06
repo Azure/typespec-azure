@@ -1,5 +1,169 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.50.3
+
+### Bug Fixes
+
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type. The options now could set how to initialize the client. Though the implementation could support backward compatibility, it's better to have all specs that use this decorator change from `@clientInitialization(CustomizedOption)` to `@clientInitialization({parameters: CustomizedOption})`. A new helper `getClientInitializationOptions` is added for getting the new `ClientInitializationOptions` info from the `@clientInitialization` decorator.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Add new `children` property to `SdkClientType` to include all the sub client belong to that client.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Add `clientInitialization` property to `SdkClientType`. Its type is `SdkClientInitializationType` which includes the initialization parameters and how to initialize the client.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `initialization` property of `SdkClientType`. Use `init.paramters` of `SdkClientType` instead.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `SdkClientAccessor` type. Use `parent` and `children` property from `SdkClientType` to find client hierarchy instead.
+
+
+## 0.50.2
+
+### Bug Fixes
+
+- [#2115](https://github.com/Azure/typespec-azure/pull/2115) Fix regression of example mapping for model with parameters.
+
+### Deprecations
+
+- [#2115](https://github.com/Azure/typespec-azure/pull/2115) Deprecate `serializedName` property of `SdkEndpointParameter`. Use `type.templateArguments[x].serializedName` or `type.variantTypes[x].templateArguments[x].serializedName` instead.
+
+
+## 0.50.1
+
+### Features
+
+- [#2097](https://github.com/Azure/typespec-azure/pull/2097) support `name` and `isGeneratedName` for nullable type
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Add `serializationOptions` property to `SdkModelType` and `SdkBodyModelPropertyType`. Its type is `SerializationOptions` which contains the info of how to serialize to Json/Xml/Multipart value.
+
+### Deprecations
+
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `serializedName` property in `SdkBodyModelPropertyType`, use `serializationOptions.xxx.name` instead.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `multipartOptions` in `SdkBodyModelPropertyType`, use `serializationOptions.multipart` instead.
+
+
+## 0.50.0
+
+### Features
+
+- [#1998](https://github.com/Azure/typespec-azure/pull/1998) Add `@scope` decorator to define the language scope for operation
+- [#2029](https://github.com/Azure/typespec-azure/pull/2029) add `@alternateType` decorator
+
+
+## 0.49.1
+
+### Bug Fixes
+
+- [#2000](https://github.com/Azure/typespec-azure/pull/2000) ensure operation examples to be ordered
+- [#2004](https://github.com/Azure/typespec-azure/pull/2004) get correct pageable info for azure pageable operation with inheritance return model
+- [#2034](https://github.com/Azure/typespec-azure/pull/2034) refine cross language definition id logic
+
+### Features
+
+- [#2010](https://github.com/Azure/typespec-azure/pull/2010) add `getHttpOperationParameter` helper function
+- [#1978](https://github.com/Azure/typespec-azure/pull/1978) Add `@apiVersion` decorator to override whether a parameter is an api version or not
+
+### Breaking Changes
+
+- [#2007](https://github.com/Azure/typespec-azure/pull/2007) fix typo of `crossLanguageDefinitionId` of method.
+
+
+## 0.49.0
+
+### Bug Fixes
+
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+### Features
+
+- [#1812](https://github.com/Azure/typespec-azure/pull/1812) add `SdkCookieParameter` type and support `@cookie` in TypeSpec http lib
+- [#1783](https://github.com/Azure/typespec-azure/pull/1783) Implement scope negation for TCGC decorators
+- [#1912](https://github.com/Azure/typespec-azure/pull/1912) support emit code model
+
+
+## 0.48.6
+
+### Bug Fixes
+
+- [#1966](https://github.com/Azure/typespec-azure/pull/1966) Allow for responses without bodies to be errors, depending on presence of `@error` decorator
+
+
+## 0.48.5
+
+### Breaking Changes
+
+- [#1957](https://github.com/Azure/typespec-azure/pull/1957) Introduce new usage: `LroInitial`, `LroPolling`, `LroFinalEnvelope`. Usage and access now properly propagate on polling model, final result and final envelop result of `lroMetadata`.
+
+
+## 0.48.4
+
+### Bug Fixes
+
+- [#1935](https://github.com/Azure/typespec-azure/pull/1935) fix wrong `unexpected-pageable-operation-return-type` because of nullable type
+
+
+## 0.48.3
+
+### Bug Fixes
+
+- [#1907](https://github.com/Azure/typespec-azure/pull/1907) use the right path parameter name when filtering method parameter
+
+### Features
+
+- [#1919](https://github.com/Azure/typespec-azure/pull/1919) support typespec common paging
+- [#1918](https://github.com/Azure/typespec-azure/pull/1918) remove none visibility property for model
+
+
+## 0.48.2
+
+### Bug Fixes
+
+- [#1858](https://github.com/Azure/typespec-azure/pull/1858) do not replace operation with `@override` when `listOperationsInOperationGroup`
+- [#1833](https://github.com/Azure/typespec-azure/pull/1833) do not add protocol usage for protocol method's response type
+
+### Features
+
+- [#1835](https://github.com/Azure/typespec-azure/pull/1835) add `isPagedResultModel` helper function
+- [#1834](https://github.com/Azure/typespec-azure/pull/1834) add `disableUsageAccessPropagationToBase` to support language that does not generate base model
+- [#1858](https://github.com/Azure/typespec-azure/pull/1858) add `isOverride` flag to `SdkServiceMethod`.
+
+### Breaking Changes
+
+- [#1854](https://github.com/Azure/typespec-azure/pull/1854) deprecate `Error` usage and add `Exception` usage. for all models used in exception response, they will no longer have `Output` usage, but have `Exception` usage.
+
+
+## 0.48.1
+
+### Bug Fixes
+
+- [#1813](https://github.com/Azure/typespec-azure/pull/1813) fix wrong encode for body response of binary type
+- [#1786](https://github.com/Azure/typespec-azure/pull/1786) support client namespace
+
+
+## 0.48.0
+
+### Bug Fixes
+
+- [#1806](https://github.com/Azure/typespec-azure/pull/1806) remove filtering core model flag
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
+## 0.47.4
+
+### Bug Fixes
+
+- [#1763](https://github.com/Azure/typespec-azure/pull/1763) support serialized name for body parameter to avoid example mis-mapping
+- [#1761](https://github.com/Azure/typespec-azure/pull/1761) use root source property to map operation params to method
+- [#1775](https://github.com/Azure/typespec-azure/pull/1775) remove unused path parameter from method
+- [#1700](https://github.com/Azure/typespec-azure/pull/1700) We no longer filter out core models. The `filter-out-core-models` parameter to `SdkContext` is also removed
+- [#1772](https://github.com/Azure/typespec-azure/pull/1772) use array instead of set to make the types ordered by typespec definition
+- [#1762](https://github.com/Azure/typespec-azure/pull/1762) make union/nullable type to be reference type and add usage/access support for them
+
+
+## 0.47.3
+
+### Bug Fixes
+
+- [#1731](https://github.com/Azure/typespec-azure/pull/1731) fix wrong compare target for response body with anonymous model when finding anonymous model context
+- [#1698](https://github.com/Azure/typespec-azure/pull/1698) have paging respect renames
+
+
 ## 0.47.2
 
 ### Bug Fixes

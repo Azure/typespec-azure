@@ -46,3 +46,22 @@ configuration:
             then:
               - addLabel:
                   label: lib:tcgc
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - packages/typespec-azure-http-specs/**/*
+            then:
+              - addLabel:
+                  label: lib:azure-http-specs
+          - if:
+              - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: ide
+          - if:
+              - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: cli/psh

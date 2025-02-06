@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Contoso Widget Manager
-  version: 2023-02-07
+  version: '2023-02-07'
 tags: []
 paths:
   /manufacturers:
@@ -647,6 +647,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+security:
+  - ApiKeyAuth: []
 components:
   parameters:
     Azure.Core.ClientRequestIdHeader:
@@ -880,8 +882,8 @@ components:
     Versions:
       type: string
       enum:
-        - 2022-08-31
-        - 2023-02-07
+        - '2022-08-31'
+        - '2023-02-07'
       description: The Contoso Widget Manager service version.
     Widget:
       type: object
@@ -910,3 +912,8 @@ components:
           type: string
           description: The ID of the widget's manufacturer.
       description: A widget.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Key

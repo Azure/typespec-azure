@@ -1,5 +1,32 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.50.0
+
+No changes, version bump only.
+
+## 0.49.0
+
+### Bug Fixes
+
+- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Remove `Azure.Core.nextLink` as there is a nextLink instance in `TypeSpec.nextLink`, which is causing an ambiguous problem between the two.
+- [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
+
+### Features
+
+- [#1272](https://github.com/Azure/typespec-azure/pull/1272) Add `armResourceType` scalar, and changed some properties to be `armResourceType` instead of string
+
+
+## 0.48.0
+
+### Bug Fixes
+
+- [#1545](https://github.com/Azure/typespec-azure/pull/1545) Add docs for linting rules and stop excluding non `Azure.` namespace
+
+### Bump dependencies
+
+- [#1663](https://github.com/Azure/typespec-azure/pull/1663) Upgrade dependencies
+
+
 ## 0.47.0
 
 ### Bug Fixes

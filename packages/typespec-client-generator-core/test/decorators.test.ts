@@ -1,10 +1,8 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Interface, Model, Operation } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  createSdkContext,
   getAccess,
   getClient,
   getClientNameOverride,
@@ -2195,836 +2193,422 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   });
 
-  describe("createSdkContext", () => {
-    it("multiple call with versioning", async () => {
-      const tsp = `
-        @service({
-          title: "Contoso Widget Manager",
-        })
-        @versioned(Contoso.WidgetManager.Versions)
-        namespace Contoso.WidgetManager;
-        
-        enum Versions {
-          v1,
-        }
-
-        @client({name: "TestClient"})
-        @test
-        interface Test {}
-      `;
-
-      const runnerWithVersion = await createSdkTestRunner({
-        emitterName: "@azure-tools/typespec-python",
-      });
-
-      await runnerWithVersion.compile(tsp);
-      let clients = listClients(runnerWithVersion.context);
-      strictEqual(clients.length, 1);
-      ok(clients[0].type);
-
-      const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
-      clients = listClients(newSdkContext);
-      strictEqual(clients.length, 1);
-      ok(clients[0].type);
-    });
-  });
-
-  describe("@override", () => {
-    it("basic", async () => {
-      await runner.compileWithCustomization(
-        `
-        @service
-        namespace MyService;
-        model Params {
-          foo: string;
-          bar: string;
-        }
-
-        op func(...Params): void;
-        `,
-        `
-        namespace MyCustomizations;
-
-        op func(params: MyService.Params): void;
-
-        @@override(MyService.func, MyCustomizations.func);
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-
-      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
-      ok(paramsModel);
-
-      const client = sdkPackage.clients[0];
-      strictEqual(client.methods.length, 1);
-      const method = client.methods[0];
-
-      strictEqual(method.kind, "basic");
-      strictEqual(method.name, "func");
-      strictEqual(method.parameters.length, 2);
-      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeParam);
-      const paramsParam = method.parameters.find((x) => x.name === "params");
-      ok(paramsParam);
-      strictEqual(paramsModel, paramsParam.type);
-
-      ok(method.operation.bodyParam);
-      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
-      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
-    });
-
-    it("basic with scope", async () => {
-      const mainCode = `
-        @service
-        namespace MyService;
-        model Params {
-          foo: string;
-          bar: string;
-        }
-
-        op func(...Params): void;
-        `;
-
-      const customizationCode = `
-        namespace MyCustomizations;
-
-        op func(params: MyService.Params): void;
-
-        @@override(MyService.func, MyCustomizations.func, "csharp");
-        `;
-      await runner.compileWithCustomization(mainCode, customizationCode);
-      // runner has python scope, so shouldn't be overridden
-
-      ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
-      const sdkPackage = runner.context.sdkPackage;
-      const client = sdkPackage.clients[0];
-      strictEqual(client.methods.length, 1);
-      const method = client.methods[0];
-      strictEqual(method.kind, "basic");
-      strictEqual(method.name, "func");
-      strictEqual(method.parameters.length, 3);
-
-      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeParam);
-
-      const fooParam = method.parameters.find((x) => x.name === "foo");
-      ok(fooParam);
-
-      const barParam = method.parameters.find((x) => x.name === "bar");
-      ok(barParam);
-
-      const httpOp = method.operation;
-      strictEqual(httpOp.parameters.length, 1);
-      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
-
-      ok(httpOp.bodyParam);
-      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
-      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], fooParam);
-      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], barParam);
-
-      const runnerWithCsharp = await createSdkTestRunner({
+  describe("scope negation", () => {
+    it("single scope negation", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCsharp.compileWithCustomization(mainCode, customizationCode);
-      ok(runnerWithCsharp.context.sdkPackage.models.find((x) => x.name === "Params"));
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
 
-      const sdkPackageWithCsharp = runnerWithCsharp.context.sdkPackage;
-      strictEqual(sdkPackageWithCsharp.clients.length, 1);
-
-      strictEqual(sdkPackageWithCsharp.clients[0].methods.length, 1);
-      const methodWithCsharp = sdkPackageWithCsharp.clients[0].methods[0];
-      strictEqual(methodWithCsharp.kind, "basic");
-      strictEqual(methodWithCsharp.name, "func");
-      strictEqual(methodWithCsharp.parameters.length, 2);
-      const contentTypeParamWithCsharp = methodWithCsharp.parameters.find(
-        (x) => x.name === "contentType",
-      );
-      ok(contentTypeParamWithCsharp);
-
-      const paramsParamWithCsharp = methodWithCsharp.parameters.find((x) => x.name === "params");
-      ok(paramsParamWithCsharp);
-      strictEqual(
-        sdkPackageWithCsharp.models.find((x) => x.name === "Params"),
-        paramsParamWithCsharp.type,
-      );
-
-      const httpOpWithCsharp = methodWithCsharp.operation;
-      strictEqual(httpOpWithCsharp.parameters.length, 1);
-      strictEqual(
-        httpOpWithCsharp.parameters[0].correspondingMethodParams[0],
-        contentTypeParamWithCsharp,
-      );
-      ok(httpOpWithCsharp.bodyParam);
-      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
-      strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
     });
 
-    it("regrouping", async () => {
-      const mainCode = `
-        @service
-        namespace MyService;
-        model Params {
-          foo: string;
-          bar: string;
-          fooBar: string;
-        }
-
-        op func(...Params): void;
-        `;
-
-      const customizationCode = `
-        namespace MyCustomizations;
-
-        model ParamsCustomized {
-          ...PickProperties<MyService.Params, "foo" | "bar">;
-        }
-
-        op func(params: MyCustomizations.ParamsCustomized, ...PickProperties<MyService.Params, "fooBar">): void;
-
-        @@override(MyService.func, MyCustomizations.func);
-        `;
-      await runner.compileWithCustomization(mainCode, customizationCode);
-      // runner has python scope, so shouldn't be overridden
-
-      ok(!runner.context.sdkPackage.models.find((x) => x.name === "Params"));
-      const sdkPackage = runner.context.sdkPackage;
-      const client = sdkPackage.clients[0];
-      strictEqual(client.methods.length, 1);
-      const method = client.methods[0];
-      strictEqual(method.kind, "basic");
-      strictEqual(method.name, "func");
-      strictEqual(method.parameters.length, 3);
-
-      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeParam);
-
-      const paramsParam = method.parameters.find((x) => x.name === "params");
-      ok(paramsParam);
-
-      const fooBarParam = method.parameters.find((x) => x.name === "fooBar");
-      ok(fooBarParam);
-
-      const httpOp = method.operation;
-      strictEqual(httpOp.parameters.length, 1);
-      strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
-
-      ok(httpOp.bodyParam);
-      strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 2);
-      strictEqual(httpOp.bodyParam.correspondingMethodParams[0], paramsParam);
-      strictEqual(httpOp.bodyParam.correspondingMethodParams[1], fooBarParam);
-    });
-
-    it("params mismatch", async () => {
-      const mainCode = `
-        @service
-        namespace MyService;
-        model Params {
-          foo: string;
-          bar: string;
-        }
-
-        op func(...Params): void;
-        `;
-
-      const customizationCode = `
-        namespace MyCustomizations;
-
-        model ParamsCustomized {
-          foo: string;
-          bar: string;
-        }
-
-        op func(params: MyCustomizations.ParamsCustomized): void;
-
-        @@override(MyService.func, MyCustomizations.func);
-        `;
-      const diagnostics = (
-        await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
-      )[1];
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/override-method-parameters-mismatch",
+    it("multiple scopes negation", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
-    });
-
-    it("recursive params", async () => {
-      await runner.compileWithCustomization(
-        `
+      await runnerWithCSharp.compile(`
         @service
-        namespace MyService;
-        model Params {
-          foo: string;
-          params: Params[];
+        namespace MyService {
+          @clientName("TestRenamed", "!(csharp, java)")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
         }
+      `);
 
-        op func(...Params): void;
-        `,
-        `
-        namespace MyCustomizations;
-
-        op func(input: MyService.Params): void;
-
-        @@override(MyService.func, MyCustomizations.func);
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-
-      const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
-      ok(paramsModel);
-
-      const client = sdkPackage.clients[0];
-      strictEqual(client.methods.length, 1);
-      const method = client.methods[0];
-
-      strictEqual(method.kind, "basic");
-      strictEqual(method.name, "func");
-      strictEqual(method.parameters.length, 2);
-      const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
-      ok(contentTypeParam);
-      const inputParam = method.parameters.find((x) => x.name === "input");
-      ok(inputParam);
-      strictEqual(paramsModel, inputParam.type);
-
-      ok(method.operation.bodyParam);
-      strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
-      strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
     });
 
-    it("core template", async () => {
-      const runnerWithCore = await createSdkTestRunner({
-        librariesToAdd: [AzureCoreTestLibrary],
-        autoUsings: ["Azure.Core"],
-        emitterName: "@azure-tools/typespec-java",
+    it("non-negation scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
       });
-      await runnerWithCore.compileWithCustomization(
-        `
-        @useDependency(Versions.v1_0_Preview_2)
-        @server("http://localhost:3000", "endpoint")
-        @service()
-        namespace My.Service;
-
-        model Params {
-          foo: string;
-          params: Params[];
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!(python, java)")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
         }
+      `);
 
-        @route("/template")
-        op templateOp is Azure.Core.RpcOperation<
-          Params,
-          Params
-        >;
-        `,
-        `
-        namespace My.Customizations;
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
 
-        op templateOp(params: My.Service.Params): My.Service.Params;
+    it("allow combination of negation scope and normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "csharp, !java")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
 
-        @@override(My.Service.templateOp, My.Customizations.templateOp);
-        `,
-      );
-      const sdkPackage = runnerWithCore.context.sdkPackage;
-      const method = sdkPackage.clients[0].methods[0];
-      strictEqual(method.parameters.length, 3);
-      ok(method.parameters.find((x) => x.name === "contentType"));
-      ok(method.parameters.find((x) => x.name === "accept"));
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
 
-      const paramsParam = method.parameters.find((x) => x.name === "params");
-      ok(paramsParam);
-      strictEqual(paramsParam.type.kind, "model");
-      strictEqual(paramsParam.type.name, "Params");
+    it("allow combination of negation scope and normal scope for the same scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp, csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("allow combination of negation scope and normal scope for the same multiple scopes", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp, csharp, python, !python, java")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("allow multiple separated negation scopes", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamed", "!csharp, !java")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "Test");
+      ok(testModel);
+    });
+
+    it("negation scope override normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "!python, !java")
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
+    });
+
+    it("normal scope incrementally add", async () => {
+      const tsp = `
+        @service
+        @test namespace MyService {
+          @test
+          @clientName("TestRenamedAgain", "csharp")
+          @clientName("TestRenamed", "!python, !java")
+          model Test {
+            prop: string;
+          }
+          @test
+          @access(Access.internal)
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `;
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(tsp);
+      const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+      const csharpTestModel = csharpSdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(csharpTestModel);
+
+      const runnerWithPython = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-python",
+      });
+      await runnerWithPython.compile(tsp);
+      const pythonSdkPackage = runnerWithPython.context.sdkPackage;
+      const pythonTestModel = pythonSdkPackage.models.find((x) => x.name === "Test");
+      ok(pythonTestModel);
+    });
+
+    it("negation scope override negation scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "!python, !java")
+          @clientName("TestRenamed", "!go")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
+    });
+
+    it("negation scope override normal scope with the same scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "!csharp")
+          @clientName("TestRenamed", "csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
+      ok(testModel);
+    });
+
+    it("normal scope override negation scope with the same scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          @clientName("TestRenamedAgain", "csharp")
+          @clientName("TestRenamed", "!csharp")
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
+      ok(testModel);
     });
   });
-  describe("@clientInitialization", () => {
-    it("main client", async () => {
-      await runner.compileWithCustomization(
-        `
+
+  describe("scope decorator", () => {
+    it("include operation from csharp client", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
         @service
-        namespace MyService;
-
-        op download(@path blobName: string): void;
-        `,
-        `
-        namespace MyCustomizations;
-
-        model MyClientInitialization {
-          blobName: string;
-        }
-
-        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 2);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
-      ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
-      ok(blobName);
-      strictEqual(blobName.clientDefaultValue, undefined);
-      strictEqual(blobName.onClient, true);
-      strictEqual(blobName.optional, false);
-
-      const methods = client.methods;
-      strictEqual(methods.length, 1);
-      const download = methods[0];
-      strictEqual(download.name, "download");
-      strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 0);
-
-      const downloadOp = download.operation;
-      strictEqual(downloadOp.parameters.length, 1);
-      const blobNameOpParam = downloadOp.parameters[0];
-      strictEqual(blobNameOpParam.name, "blobName");
-      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
-      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
-      strictEqual(blobNameOpParam.onClient, true);
-    });
-
-    it("On Interface", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        model clientInitModel
-        {
-            p1: string;
-        }
-
-        @route("/bump")
-        @clientInitialization(clientInitModel)
-        interface bumpParameter {
-            @route("/op1")
-            @doc("bump parameter")
-            @post
-            @convenientAPI(true)
-            op op1(@path p1: string, @query q1: string): void;
-
-            @route("/op2")
-            @doc("bump parameter")
-            @post
-            @convenientAPI(true)
-            op op2(@path p1: string): void;
-        }
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const clientAccessor = sdkPackage.clients[0].methods[0];
-      strictEqual(clientAccessor.kind, "clientaccessor");
-      const bumpParameterClient = clientAccessor.response;
-
-      const methods = bumpParameterClient.methods;
-      strictEqual(methods.length, 2);
-
-      const op1Method = methods.find((x) => x.name === "op1");
-      ok(op1Method);
-      strictEqual(op1Method.kind, "basic");
-      strictEqual(op1Method.parameters.length, 1);
-      strictEqual(op1Method.parameters[0].name, "q1");
-      const op1Op = op1Method.operation;
-      strictEqual(op1Op.parameters.length, 2);
-      strictEqual(op1Op.parameters[0].name, "p1");
-      strictEqual(op1Op.parameters[0].onClient, true);
-      strictEqual(op1Op.parameters[1].name, "q1");
-      strictEqual(op1Op.parameters[1].onClient, false);
-    });
-    it("subclient", async () => {
-      await runner.compileWithCustomization(
-        `
-        @service
-        namespace StorageClient {
-
-          @route("/main")
-          op download(@path blobName: string): void;
-
-          interface BlobClient {
-            @route("/blob")
-            op download(@path blobName: string): void;
+        namespace MyService {
+          model Test {
+            prop: string;
           }
+          @scope("csharp")
+          op func(
+            @body body: Test
+          ): void;
         }
-        `,
-        `
-        model ClientInitialization {
-          blobName: string
-        };
+      `);
 
-        @@clientInitialization(StorageClient, ClientInitialization);
-        @@clientInitialization(StorageClient.BlobClient, ClientInitialization);
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const clients = sdkPackage.clients;
-      strictEqual(clients.length, 1);
-      const client = clients[0];
-      strictEqual(client.name, "StorageClient");
-      strictEqual(client.initialization.access, "public");
-      strictEqual(client.initialization.properties.length, 2);
-      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
-      ok(blobName);
-      strictEqual(blobName.onClient, true);
-
-      const methods = client.methods;
-      strictEqual(methods.length, 2);
-
-      // the main client's function should not have `blobName` as a client method parameter
-      const mainClientDownload = methods.find((x) => x.kind === "basic" && x.name === "download");
-      ok(mainClientDownload);
-      strictEqual(mainClientDownload.parameters.length, 0);
-
-      const getBlobClient = methods.find((x) => x.kind === "clientaccessor");
-      ok(getBlobClient);
-      strictEqual(getBlobClient.kind, "clientaccessor");
-      strictEqual(getBlobClient.name, "getBlobClient");
-      strictEqual(getBlobClient.parameters.length, 1);
-      const blobNameParam = getBlobClient.parameters.find((x) => x.name === "blobName");
-      ok(blobNameParam);
-      strictEqual(blobNameParam.onClient, true);
-      strictEqual(blobNameParam.optional, false);
-      strictEqual(blobNameParam.kind, "method");
-
-      const blobClient = getBlobClient.response;
-
-      strictEqual(blobClient.kind, "client");
-      strictEqual(blobClient.name, "BlobClient");
-      strictEqual(blobClient.initialization.access, "internal");
-      strictEqual(blobClient.initialization.properties.length, 2);
-
-      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
-      const blobClientBlobInitializationProp = blobClient.initialization.properties.find(
-        (x) => x.name === "blobName",
-      );
-      ok(blobClientBlobInitializationProp);
-      strictEqual(blobClientBlobInitializationProp.kind, "method");
-      strictEqual(blobClientBlobInitializationProp.onClient, true);
-      strictEqual(blobClient.methods.length, 1);
-
-      const download = blobClient.methods[0];
-      strictEqual(download.name, "download");
-      strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 0);
-
-      const downloadOp = download.operation;
-      strictEqual(downloadOp.parameters.length, 1);
-      const blobNameOpParam = downloadOp.parameters[0];
-      strictEqual(blobNameOpParam.name, "blobName");
-      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
-      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobClientBlobInitializationProp);
-      strictEqual(blobNameOpParam.onClient, true);
-    });
-    it("some methods don't have client initialization params", async () => {
-      await runner.compileWithCustomization(
-        `
-        @service
-        namespace MyService;
-
-        op download(@path blobName: string, @header header: int32): void;
-        op noClientParams(@query query: int32): void;
-        `,
-        `
-        namespace MyCustomizations;
-
-        model MyClientInitialization {
-          blobName: string;
-        }
-
-        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 2);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
-      ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
-      ok(blobName);
-      strictEqual(blobName.clientDefaultValue, undefined);
-      strictEqual(blobName.onClient, true);
-      strictEqual(blobName.optional, false);
-
-      const methods = client.methods;
-      strictEqual(methods.length, 2);
-      const download = methods[0];
-      strictEqual(download.name, "download");
-      strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 1);
-
-      const headerParam = download.parameters.find((x) => x.name === "header");
-      ok(headerParam);
-      strictEqual(headerParam.onClient, false);
-
-      const downloadOp = download.operation;
-      strictEqual(downloadOp.parameters.length, 2);
-      const blobNameOpParam = downloadOp.parameters[0];
-      strictEqual(blobNameOpParam.name, "blobName");
-      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
-      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
-      strictEqual(blobNameOpParam.onClient, true);
-
-      const noClientParamsMethod = methods[1];
-      strictEqual(noClientParamsMethod.name, "noClientParams");
-      strictEqual(noClientParamsMethod.kind, "basic");
-      strictEqual(noClientParamsMethod.parameters.length, 1);
-      strictEqual(noClientParamsMethod.parameters[0].name, "query");
-      strictEqual(noClientParamsMethod.parameters[0].onClient, false);
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
     });
 
-    it("multiple client params", async () => {
-      await runner.compileWithCustomization(
-        `
+    it("exclude operation from csharp client", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
         @service
-        namespace MyService;
-
-        op download(@path blobName: string, @path containerName: string): void;
-        `,
-        `
-        namespace MyCustomizations;
-
-        model MyClientInitialization {
-          blobName: string;
-          containerName: string;
-        }
-
-        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 3);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
-      ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
-      ok(blobName);
-      strictEqual(blobName.clientDefaultValue, undefined);
-      strictEqual(blobName.onClient, true);
-      strictEqual(blobName.optional, false);
-
-      const containerName = client.initialization.properties.find(
-        (x) => x.name === "containerName",
-      );
-      ok(containerName);
-      strictEqual(containerName.clientDefaultValue, undefined);
-      strictEqual(containerName.onClient, true);
-
-      const methods = client.methods;
-      strictEqual(methods.length, 1);
-      const download = methods[0];
-      strictEqual(download.name, "download");
-      strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 0);
-
-      const downloadOp = download.operation;
-      strictEqual(downloadOp.parameters.length, 2);
-      const blobNameOpParam = downloadOp.parameters[0];
-      strictEqual(blobNameOpParam.name, "blobName");
-      strictEqual(blobNameOpParam.correspondingMethodParams.length, 1);
-      strictEqual(blobNameOpParam.correspondingMethodParams[0], blobName);
-
-      const containerNameOpParam = downloadOp.parameters[1];
-      strictEqual(containerNameOpParam.name, "containerName");
-      strictEqual(containerNameOpParam.correspondingMethodParams.length, 1);
-      strictEqual(containerNameOpParam.correspondingMethodParams[0], containerName);
-    });
-
-    it("@operationGroup with same model on parent client", async () => {
-      await runner.compile(
-        `
-        @service
-        namespace MyService;
-
-        @operationGroup
-        interface MyInterface {
-          op download(@path blobName: string, @path containerName: string): void;
-        }
-
-        model MyClientInitialization {
-          blobName: string;
-          containerName: string;
-        }
-
-        @@clientInitialization(MyService, MyClientInitialization);
-        @@clientInitialization(MyService.MyInterface, MyClientInitialization);
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      strictEqual(sdkPackage.clients.length, 1);
-
-      const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.access, "public");
-      strictEqual(client.initialization.properties.length, 3);
-      ok(client.initialization.properties.find((x) => x.kind === "endpoint"));
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
-      ok(blobName);
-      strictEqual(blobName.clientDefaultValue, undefined);
-      strictEqual(blobName.onClient, true);
-
-      const containerName = client.initialization.properties.find(
-        (x) => x.name === "containerName",
-      );
-      ok(containerName);
-      strictEqual(containerName.clientDefaultValue, undefined);
-      strictEqual(containerName.onClient, true);
-
-      const methods = client.methods;
-      strictEqual(methods.length, 1);
-      const clientAccessor = methods[0];
-      strictEqual(clientAccessor.kind, "clientaccessor");
-      const og = clientAccessor.response;
-      strictEqual(og.kind, "client");
-
-      strictEqual(og.initialization.access, "internal");
-      strictEqual(og.initialization.properties.length, 3);
-      ok(og.initialization.properties.find((x) => x.kind === "endpoint"));
-      ok(og.initialization.properties.find((x) => x === blobName));
-      ok(og.initialization.properties.find((x) => x === containerName));
-
-      const download = og.methods[0];
-      strictEqual(download.name, "download");
-      strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 0);
-
-      const op = download.operation;
-      strictEqual(op.parameters.length, 2);
-      strictEqual(op.parameters[0].correspondingMethodParams[0], blobName);
-      strictEqual(op.parameters[1].correspondingMethodParams[0], containerName);
-      strictEqual(op.parameters[0].onClient, true);
-      strictEqual(op.parameters[1].onClient, true);
-    });
-
-    it("redefine client structure", async () => {
-      await runner.compileWithCustomization(
-        `
-        @service
-        namespace MyService;
-
-        op uploadContainer(@path containerName: string): void;
-        op uploadBlob(@path containerName: string, @path blobName: string): void;
-        `,
-        `
-        namespace MyCustomizations {
-          model ContainerClientInitialization {
-            containerName: string;
+        namespace MyService {
+          model Test {
+            prop: string;
           }
-          @client({service: MyService})
-          @clientInitialization(ContainerClientInitialization)
-          namespace ContainerClient {
-            op upload is MyService.uploadContainer;
-
-
-            model BlobClientInitialization {
-              containerName: string;
-              blobName: string;
-            }
-
-            @client({service: MyService})
-            @clientInitialization(BlobClientInitialization)
-            namespace BlobClient {
-              op upload is MyService.uploadBlob;
-            }
-          }
+          @scope("!csharp")
+          op func(
+            @body body: Test
+          ): void;
         }
-        
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      strictEqual(sdkPackage.clients.length, 2);
+      `);
 
-      const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
-      ok(containerClient);
-      strictEqual(containerClient.initialization.access, "public");
-      strictEqual(containerClient.initialization.properties.length, 2);
-      ok(containerClient.initialization.properties.find((x) => x.kind === "endpoint"));
-
-      const containerName = containerClient.initialization.properties.find(
-        (x) => x.name === "containerName",
-      );
-      ok(containerName);
-
-      const methods = containerClient.methods;
-      strictEqual(methods.length, 1);
-      strictEqual(methods[0].name, "upload");
-      strictEqual(methods[0].kind, "basic");
-      strictEqual(methods[0].parameters.length, 0);
-      strictEqual(methods[0].operation.parameters.length, 1);
-      strictEqual(methods[0].operation.parameters[0].correspondingMethodParams[0], containerName);
-
-      const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
-      ok(blobClient);
-      strictEqual(blobClient.initialization.access, "public");
-      strictEqual(blobClient.initialization.properties.length, 3);
-      ok(blobClient.initialization.properties.find((x) => x.kind === "endpoint"));
-
-      const containerNameOnBlobClient = blobClient.initialization.properties.find(
-        (x) => x.name === "containerName",
-      );
-      ok(containerNameOnBlobClient);
-
-      const blobName = blobClient.initialization.properties.find((x) => x.name === "blobName");
-      ok(blobName);
-
-      const blobMethods = blobClient.methods;
-      strictEqual(blobMethods.length, 1);
-      strictEqual(blobMethods[0].name, "upload");
-      strictEqual(blobMethods[0].kind, "basic");
-      strictEqual(blobMethods[0].parameters.length, 0);
-      strictEqual(blobMethods[0].operation.parameters.length, 2);
-      strictEqual(
-        blobMethods[0].operation.parameters[0].correspondingMethodParams[0],
-        containerNameOnBlobClient,
-      );
-      strictEqual(blobMethods[0].operation.parameters[1].correspondingMethodParams[0], blobName);
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      strictEqual(client, undefined);
+      strictEqual(model, undefined);
     });
 
-    it("@paramAlias", async () => {
-      await runner.compileWithCustomization(
-        `
+    it("negation scope override", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const runnerWithJava = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const spec = `
         @service
-        namespace MyService;
-
-        op download(@path blob: string): void;
-        op upload(@path blobName: string): void;
-        `,
-        `
-        namespace MyCustomizations;
-
-        model MyClientInitialization {
-          @paramAlias("blob")
-          blobName: string;
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          @scope("!java")
+          @scope("!csharp")
+          op func(
+            @body body: Test
+          ): void;
         }
-
-        @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
-        `,
+      `;
+      await runnerWithCSharp.compile(spec);
+      const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+      const csharpSdkClient = csharpSdkPackage.clients.find((x) =>
+        x.methods.find((m) => m.name === "func"),
       );
-      const sdkPackage = runner.context.sdkPackage;
-      const client = sdkPackage.clients[0];
-      strictEqual(client.initialization.properties.length, 2);
-      const endpoint = client.initialization.properties.find((x) => x.kind === "endpoint");
-      ok(endpoint);
-      const blobName = client.initialization.properties.find((x) => x.name === "blobName");
-      ok(blobName);
-      strictEqual(blobName.clientDefaultValue, undefined);
-      strictEqual(blobName.onClient, true);
-      strictEqual(blobName.optional, false);
+      const csharpSdkModel = csharpSdkPackage.models.find((x) => x.name === "Test");
+      ok(csharpSdkClient);
+      ok(csharpSdkModel);
 
-      const methods = client.methods;
-      strictEqual(methods.length, 2);
-      const download = methods[0];
-      strictEqual(download.name, "download");
-      strictEqual(download.kind, "basic");
-      strictEqual(download.parameters.length, 0);
+      await runnerWithJava.compile(spec);
+      const javaSdkPackage = runnerWithJava.context.sdkPackage;
+      const javaSdkClient = javaSdkPackage.clients.find((x) =>
+        x.methods.find((m) => m.name === "func"),
+      );
+      const javaSdkModel = javaSdkPackage.models.find((x) => x.name === "Test");
+      strictEqual(javaSdkClient, undefined);
+      strictEqual(javaSdkModel, undefined);
+    });
 
-      const downloadOp = download.operation;
-      strictEqual(downloadOp.parameters.length, 1);
-      strictEqual(downloadOp.parameters[0].name, "blob");
-      strictEqual(downloadOp.parameters[0].correspondingMethodParams.length, 1);
-      strictEqual(downloadOp.parameters[0].correspondingMethodParams[0], blobName);
+    it("no scope decorator", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
 
-      const upload = methods[1];
-      strictEqual(upload.name, "upload");
-      strictEqual(upload.kind, "basic");
-      strictEqual(upload.parameters.length, 0);
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
+    });
 
-      const uploadOp = upload.operation;
-      strictEqual(uploadOp.parameters.length, 1);
-      strictEqual(uploadOp.parameters[0].name, "blobName");
-      strictEqual(uploadOp.parameters[0].correspondingMethodParams.length, 1);
-      strictEqual(uploadOp.parameters[0].correspondingMethodParams[0], blobName);
+    it("negation scope override normal scope", async () => {
+      const runnerWithCSharp = await createSdkTestRunner({
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      await runnerWithCSharp.compile(`
+        @service
+        namespace MyService {
+          model Test {
+            prop: string;
+          }
+          @scope("!csharp")
+          @scope("csharp")
+          op func(
+            @body body: Test
+          ): void;
+        }
+      `);
+
+      const sdkPackage = runnerWithCSharp.context.sdkPackage;
+      const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
+      const model = sdkPackage.models.find((x) => x.name === "Test");
+      ok(client);
+      ok(model);
     });
   });
 });

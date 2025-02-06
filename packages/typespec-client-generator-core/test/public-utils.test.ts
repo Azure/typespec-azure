@@ -17,17 +17,14 @@ import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
   getGeneratedName,
+  getHttpOperationWithCache,
   getLibraryName,
   getPropertyNames,
   isApiVersion,
+  isAzureCoreModel,
 } from "../src/public-utils.js";
 import { getAllModels, getSdkUnion } from "../src/types.js";
-import {
-  SdkTestRunner,
-  createSdkContextTestHelper,
-  createSdkTestRunner,
-  createTcgcTestRunnerForEmitter,
-} from "./test-host.js";
+import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: public-utils", () => {
   let runner: SdkTestRunner;
@@ -400,7 +397,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   describe("getPropertyNames", () => {
     it("property language projected name", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -426,7 +423,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property language projected name augmented", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -451,7 +448,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -473,7 +470,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -492,7 +489,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property with projected client and json name", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -519,7 +516,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("property with projected language and json name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -542,7 +539,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   describe("getLibraryName", () => {
     it("operation client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test @clientName("rightName") op func(@query("api-version") myApiVersion: string): void;
       `)) as { func: Operation };
@@ -555,7 +552,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation language projected name", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         @clientName("madeForCS", "csharp")
@@ -573,7 +570,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation language projected name augmented", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         op func(@query("api-version") myApiVersion: string): void;
@@ -592,7 +589,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation json projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
@@ -607,7 +604,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("operation no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
         @test
         op func(@query("api-version") myApiVersion: string): void;
@@ -621,7 +618,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @clientName("RightName")
@@ -638,7 +635,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model language projected name", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @clientName("CsharpModel", "csharp")
@@ -658,7 +655,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model language projected name augmented", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -679,7 +676,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model json projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
@@ -696,7 +693,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -712,7 +709,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model friendly name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
@@ -729,7 +726,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("model friendly name augmented", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         model MyModel {
@@ -747,7 +744,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("should return language specific name when both language specific name and friendly name exist", async () => {
       async function helper(expected: string, emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
@@ -769,7 +766,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("should return client name when both client name and friendly name exist", async () => {
       async function helper(expected: string, emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
         @test
         @friendlyName("FriendlyName")
@@ -788,7 +785,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("parameter client projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -806,7 +803,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("parameter language projected name", async () => {
       async function helper(emitterName: string, expected: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -828,7 +825,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("parameter json projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -846,7 +843,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
     it("parameter no projected name", async () => {
       async function helper(emitterName: string) {
-        const runner = await createTcgcTestRunnerForEmitter(emitterName);
+        const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
         op func(
           @test
@@ -1396,7 +1393,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.kind, "enum");
         strictEqual(unionEnum.name, "AStatus");
         ok(unionEnum.isGeneratedName);
-        strictEqual(unionEnum.crossLanguageDefinitionId, "A.status.anonymous");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.status.anonymous");
         strictEqual(models[0].kind, "model");
         const statusProp = models[0].properties[0];
         strictEqual(statusProp.kind, "property");
@@ -1468,7 +1465,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         const unionEnum = test1.properties[0].type;
         strictEqual(unionEnum.name, "AChoiceStatus");
         ok(unionEnum.isGeneratedName);
-        strictEqual(unionEnum.crossLanguageDefinitionId, "A.choice.status.anonymous");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.choice.status.anonymous");
       });
     });
 
@@ -1555,7 +1552,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(unionEnum.name, "AStatus");
         ok(unionEnum.isGeneratedName);
         // not a defined type in tsp, so no crossLanguageDefinitionId
-        strictEqual(unionEnum.crossLanguageDefinitionId, "A.status.anonymous");
+        strictEqual(unionEnum.crossLanguageDefinitionId, "TestService.A.status.anonymous");
       });
     });
 
@@ -1610,11 +1607,11 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(repeatabilityResult.type.kind, "Union");
         const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
         strictEqual(unionEnum.kind, "enum");
-        strictEqual(unionEnum.name, "ResponseWithAnonymousUnionRepeatabilityResult");
+        strictEqual(unionEnum.name, "TestResponseRepeatabilityResult");
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "ResponseWithAnonymousUnion.repeatabilityResult.anonymous",
+          "MyService.test.ResponseRepeatabilityResult.anonymous",
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1642,7 +1639,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         // not a defined type in tsp, so no crossLanguageDefinitionId
         strictEqual(
           unionEnum.crossLanguageDefinitionId,
-          "test.RequestRepeatabilityResult.anonymous",
+          "MyService.test.RequestRepeatabilityResult.anonymous",
         );
         ok(unionEnum.isGeneratedName);
       });
@@ -1676,7 +1673,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         strictEqual(stringType.isGeneratedName, true);
         strictEqual(
           stringType.crossLanguageDefinitionId,
-          "test.RequestRepeatabilityResult.anonymous",
+          "MyService.test.RequestRepeatabilityResult.anonymous",
         );
       });
 
@@ -1703,90 +1700,106 @@ describe("typespec-client-generator-core: public-utils", () => {
         );
         strictEqual(name, "TestModelAnonymousProp");
       });
-    });
 
-    describe("getLroMetadata", () => {
-      const lroCode = `
-      @versioned(Versions)
-      @service({title: "Test Service"})
-      namespace TestService;
-      alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
-      NoRepeatableRequests &
-      NoClientRequestId>;
+      it("anonymous model in response", async () => {
+        const { test } = (await runner.compile(`
+        @service({})
+        namespace MyService {
+          @test
+          op test(): {@header header: string, prop: string};
+        }
+        `)) as { test: Operation };
 
-      @doc("The API version.")
-      enum Versions {
-        @doc("The 2022-12-01-preview version.")
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        v2022_12_01_preview: "2022-12-01-preview",
-      }
-
-      @resource("users")
-      @doc("Details about a user.")
-      model User {
-      @key
-      @visibility("read")
-      @doc("The name of user.")
-      name: string;
-
-      @doc("The role of user")
-      role: string;
-      }
-
-      @doc("The parameters for exporting a user.")
-      model UserExportParams {
-      @query
-      @doc("The format of the data.")
-      format: string;
-      }
-
-      @doc("The exported user data.")
-      model ExportedUser {
-      @doc("The name of user.")
-      name: string;
-
-      @doc("The exported URI.")
-      resourceUri: string;
-      }
-
-      op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
-    `;
-      it("filter-out-core-models true", async () => {
-        const runnerWithCore = await createSdkTestRunner({
-          librariesToAdd: [AzureCoreTestLibrary],
-          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-          emitterName: "@azure-tools/typespec-java",
-        });
-        await runnerWithCore.compile(lroCode);
-        const models = runnerWithCore.context.sdkPackage.models;
-        strictEqual(models.length, 1);
-        deepStrictEqual(models[0].name, "ExportedUser");
-      });
-      it("filter-out-core-models false", async () => {
-        const runnerWithCore = await createSdkTestRunner({
-          librariesToAdd: [AzureCoreTestLibrary],
-          autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-          emitterName: "@azure-tools/typespec-java",
-        });
-        await runnerWithCore.compile(lroCode);
-        runnerWithCore.context.filterOutCoreModels = false;
-        const models = getAllModels(runnerWithCore.context);
-        strictEqual(models.length, 8);
-        // there should only be one non-core model
-        deepStrictEqual(
-          models.map((x) => x.name).sort(),
-          [
-            "ResourceOperationStatusUserExportedUserError",
-            "OperationState",
-            "Error",
-            "InnerError",
-            "ExportedUser",
-            "ErrorResponse",
-            "OperationStatusExportedUserError",
-            "Versions",
-          ].sort(),
+        const httpOperation = getHttpOperationWithCache(runner.context, test);
+        const name = getGeneratedName(
+          runner.context,
+          httpOperation.responses[0].responses[0].body?.type as Model,
         );
+        strictEqual(name, "TestResponse");
       });
+    });
+  });
+
+  describe("getLroMetadata", () => {
+    const lroCode = `
+    @versioned(Versions)
+    @service({title: "Test Service"})
+    namespace TestService;
+    alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
+    NoRepeatableRequests &
+    NoClientRequestId>;
+
+    @doc("The API version.")
+    enum Versions {
+      @doc("The 2022-12-01-preview version.")
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
+
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+    @key
+    @visibility("read")
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The role of user")
+    role: string;
+    }
+
+    @doc("The parameters for exporting a user.")
+    model UserExportParams {
+    @query
+    @doc("The format of the data.")
+    format: string;
+    }
+
+    @doc("The exported user data.")
+    model ExportedUser {
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The exported URI.")
+    resourceUri: string;
+    }
+
+    op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+  `;
+    it("filter-out-core-models true", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(lroCode);
+      const models = runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
+      strictEqual(models.length, 1);
+      deepStrictEqual(models[0].name, "ExportedUser");
+    });
+    it("filter-out-core-models false", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(lroCode);
+      const models = getAllModels(runnerWithCore.context);
+      strictEqual(models.length, 8);
+      // there should only be one non-core model
+      deepStrictEqual(
+        models.map((x) => x.name).sort(),
+        [
+          "ResourceOperationStatusUserExportedUserError",
+          "OperationState",
+          "Error",
+          "InnerError",
+          "ExportedUser",
+          "ErrorResponse",
+          "OperationStatusExportedUserError",
+          "Versions",
+        ].sort(),
+      );
     });
   });
 });

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: (title)
-  version: 2022-08-31
+  version: '2022-08-31'
 tags: []
 paths:
   /widgets/{widgetName}:
@@ -45,6 +45,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WidgetServiceErrorResponse'
+security:
+  - ApiKeyAuth: []
 components:
   parameters:
     Azure.Core.ClientRequestIdHeader:
@@ -123,7 +125,7 @@ components:
     Versions:
       type: string
       enum:
-        - 2022-08-31
+        - '2022-08-31'
       description: The Contoso Widget Manager service version.
     Widget:
       type: object
@@ -170,3 +172,8 @@ components:
           type: string
           description: The error message.
       description: A custom error type for the Widget Manager service.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Key

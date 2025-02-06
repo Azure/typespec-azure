@@ -187,7 +187,6 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        @list
         op foo is Azure.Core.Foundations.Operation<{}, ETagParam & MyPage>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);
@@ -227,7 +226,6 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        @list
         op foo is Azure.Core.Foundations.Operation<{}, MyFooPageResult>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);

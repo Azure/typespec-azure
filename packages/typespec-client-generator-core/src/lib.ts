@@ -1,4 +1,20 @@
-import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
+import { SdkEmitterOptions } from "./interfaces.js";
+
+const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
+  type: "object",
+  additionalProperties: true,
+  properties: {
+    "generate-protocol-methods": { type: "boolean", nullable: true },
+    "generate-convenience-methods": { type: "boolean", nullable: true },
+    "package-name": { type: "string", nullable: true },
+    "flatten-union-as-enum": { type: "boolean", nullable: true },
+    "api-version": { type: "string", nullable: true },
+    "examples-directory": { type: "string", nullable: true },
+    "examples-dir": { type: "string", nullable: true },
+    "emitter-name": { type: "string", nullable: true },
+  },
+};
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
@@ -24,13 +40,13 @@ export const $lib = createTypeSpecLibrary({
     "invalid-access": {
       severity: "error",
       messages: {
-        default: `Access decorator value must be "public" or "internal".`,
+        default: `Access value must be "public" or "internal".`,
       },
     },
     "invalid-usage": {
       severity: "error",
       messages: {
-        default: `Usage decorator value must be 2 ("input") or 4 ("output").`,
+        default: `Usage value must be 2 ("input") or 4 ("output").`,
       },
     },
     "conflicting-multipart-model-usage": {
@@ -182,6 +198,33 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Decorator ${"decoratorName"} cannot be used twice on the same declaration with same scope.`,
       },
     },
+    "empty-client-namespace": {
+      severity: "warning",
+      messages: {
+        default: `Cannot pass an empty value to the @clientNamespace decorator`,
+      },
+    },
+    "unexpected-pageable-operation-return-type": {
+      severity: "error",
+      messages: {
+        default: `Operation is pageable but does not return a correct type.`,
+      },
+    },
+    "invalid-alternate-source-type": {
+      severity: "error",
+      messages: {
+        default: paramMessage`@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
+      },
+    },
+    "invalid-initialized-by": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
+      },
+    },
+  },
+  emitter: {
+    options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,
   },
 });
 

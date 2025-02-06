@@ -10,6 +10,7 @@ import {
   SdkPackage,
   SdkServiceMethod,
 } from "../src/interfaces.js";
+import { isAzureCoreModel } from "../src/public-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 describe("typespec-client-generator-core: package", () => {
@@ -69,243 +70,6 @@ describe("typespec-client-generator-core: package", () => {
     });
   });
 
-  describe("Responses", () => {
-    it("basic returning void", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        @error
-        model Error {
-          code: int32;
-          message: string;
-        }
-        @delete op delete(@path id: string): void | Error;
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(method.name, "delete");
-      const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.length, 1);
-
-      const voidResponse = serviceResponses.find((x) => x.statusCodes === 204);
-      ok(voidResponse);
-      strictEqual(voidResponse.kind, "http");
-      strictEqual(voidResponse.type, undefined);
-      strictEqual(voidResponse.headers.length, 0);
-
-      const errorResponse = method.operation.exceptions.find((x) => x.statusCodes === "*");
-      ok(errorResponse);
-      strictEqual(errorResponse.kind, "http");
-      ok(errorResponse.type);
-      strictEqual(errorResponse.type.kind, "model");
-      strictEqual(errorResponse.type, sdkPackage.models[0]);
-
-      strictEqual(method.response.type, undefined);
-      strictEqual(method.response.resultPath, undefined);
-    });
-    it("basic returning void and error model has status code", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        @error
-        model Error {
-          @statusCode _: 403;
-          code: int32;
-          message: string;
-        }
-        @delete op delete(@path id: string): void | Error;
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(method.name, "delete");
-      const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.length, 1);
-
-      const voidResponse = serviceResponses.find((x) => x.statusCodes === 204);
-      ok(voidResponse);
-      strictEqual(voidResponse.kind, "http");
-      strictEqual(voidResponse.type, undefined);
-      strictEqual(voidResponse.headers.length, 0);
-
-      const errorResponse = method.operation.exceptions.find((x) => x.statusCodes === 403);
-      ok(errorResponse);
-      strictEqual(errorResponse.kind, "http");
-      ok(errorResponse.type);
-      strictEqual(errorResponse.type.kind, "model");
-      strictEqual(errorResponse.type, sdkPackage.models[0]);
-
-      strictEqual(method.response.type, undefined);
-      strictEqual(method.response.resultPath, undefined);
-    });
-    it("basic returning model", async () => {
-      await runner.compileWithBuiltInService(
-        `
-      model Widget {
-        @visibility("read", "update")
-        @path
-        id: string;
-
-        weight: int32;
-        color: "red" | "blue";
-      }
-
-      @error
-      model Error {
-        code: int32;
-        message: string;
-      }
-      @post op create(...Widget): Widget | Error;
-      `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 3);
-      strictEqual(method.name, "create");
-      const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.length, 1);
-
-      const createResponse = serviceResponses.find((x) => x.statusCodes === 200);
-      ok(createResponse);
-      strictEqual(createResponse.kind, "http");
-      strictEqual(
-        createResponse.type,
-        sdkPackage.models.find((x) => x.name === "Widget"),
-      );
-      strictEqual(createResponse.headers.length, 0);
-
-      const errorResponse = method.operation.exceptions.find((x) => x.statusCodes === "*");
-      ok(errorResponse);
-      strictEqual(errorResponse.kind, "http");
-      ok(errorResponse.type);
-      strictEqual(errorResponse.type.kind, "model");
-      strictEqual(
-        errorResponse.type,
-        sdkPackage.models.find((x) => x.name === "Error"),
-      );
-
-      strictEqual(method.response.kind, "method");
-      const methodResponseType = method.response.type;
-      strictEqual(methodResponseType, createResponse.type);
-      strictEqual(method.response.resultPath, undefined);
-    });
-
-    it("Headers and body", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        model Widget {
-          @header id: string;
-          weight: int32;
-        }
-  
-        op operation(): Widget;
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(method.name, "operation");
-      const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.length, 1);
-
-      strictEqual(method.parameters.length, 1);
-
-      const createResponse = serviceResponses.find((x) => x.statusCodes === 200);
-      ok(createResponse);
-      strictEqual(createResponse.kind, "http");
-      strictEqual(
-        createResponse.type,
-        sdkPackage.models.find((x) => x.name === "Widget"),
-      );
-      strictEqual(createResponse.headers.length, 1);
-      strictEqual(createResponse.headers[0].serializedName, "id");
-
-      strictEqual(method.response.kind, "method");
-      strictEqual(method.response.resultPath, undefined);
-      const methodResponseType = method.response.type;
-      ok(methodResponseType);
-      strictEqual(
-        methodResponseType,
-        sdkPackage.models.find((x) => x.name === "Widget"),
-      );
-      strictEqual(methodResponseType.properties.length, 2);
-      strictEqual(methodResponseType.properties.filter((x) => x.kind === "header").length, 1);
-    });
-
-    it("Headers and body with null", async () => {
-      await runner.compileWithBuiltInService(
-        `
-      model Widget {
-        weight: int32;
-      }
-
-      op operation(): {@header id: string | null, @body body: Widget | null};
-      `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      const serviceResponses = method.operation.responses;
-
-      const createResponse = serviceResponses.find((x) => x.statusCodes === 200);
-      ok(createResponse);
-      strictEqual(createResponse.headers[0].type.kind, "nullable");
-      strictEqual(createResponse.type?.kind, "nullable");
-      strictEqual(method.response.type?.kind, "nullable");
-    });
-
-    it("OkResponse with NoContentResponse", async () => {
-      await runner.compileWithBuiltInService(
-        `
-      model Widget {
-        weight: int32;
-      }
-
-      op operation(): Widget | NoContentResponse;
-      `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      const serviceResponses = method.operation.responses;
-
-      const okResponse = serviceResponses.find((x) => x.statusCodes === 200);
-      ok(okResponse);
-
-      const noContentResponse = serviceResponses.find((x) => x.statusCodes === 204);
-      ok(noContentResponse);
-      strictEqual(noContentResponse.type, undefined);
-      strictEqual(method.response.type?.kind, "nullable");
-      strictEqual(
-        method.response.type?.type,
-        sdkPackage.models.find((x) => x.name === "Widget"),
-      );
-    });
-
-    it("NoContentResponse", async () => {
-      await runner.compileWithBuiltInService(
-        `
-        @delete op delete(@path id: string): NoContentResponse;
-        `,
-      );
-      const sdkPackage = runner.context.sdkPackage;
-      const method = getServiceMethodOfClient(sdkPackage);
-      strictEqual(sdkPackage.models.length, 0);
-      strictEqual(method.name, "delete");
-      strictEqual(method.response.type, undefined);
-      const serviceResponses = method.operation.responses;
-      strictEqual(serviceResponses.length, 1);
-
-      const voidResponse = serviceResponses.find((x) => x.statusCodes === 204);
-      ok(voidResponse);
-      strictEqual(voidResponse.kind, "http");
-      strictEqual(voidResponse.type, undefined);
-      strictEqual(voidResponse.headers.length, 0);
-      strictEqual(voidResponse.contentTypes, undefined);
-
-      strictEqual(method.response.type, undefined);
-      strictEqual(method.response.resultPath, undefined);
-    });
-  });
   describe("Vanilla Widget Service", () => {
     async function compileVanillaWidgetService(runner: SdkTestRunner, code: string) {
       return await runner.compile(`
@@ -349,10 +113,10 @@ describe("typespec-client-generator-core: package", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "create");
       strictEqual(method.kind, "basic");
-      strictEqual(method.parameters.length, 5);
+      strictEqual(method.parameters.length, 4);
       deepStrictEqual(
         method.parameters.map((x) => x.name),
-        ["id", "weight", "color", "contentType", "accept"],
+        ["weight", "color", "contentType", "accept"],
       );
 
       const bodyParameter = method.operation.bodyParam;
@@ -728,9 +492,9 @@ describe("typespec-client-generator-core: package", () => {
     @parentResource(Widget)
     model WidgetAnalytics {
       @key("analyticsId")
-      @doc("The identifier for the analytics object.  There is only one named 'current'.")
+      @doc("The identifier for the analytics object.")
       @visibility("read")
-      id: "current";
+      id: string;
 
       @doc("The number of uses of the widget.")
       useCount: int64;
@@ -888,7 +652,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(getStatus.name, "getWidgetOperationStatus");
       strictEqual(getStatus.kind, "basic");
       strictEqual(
-        getStatus.crossLanguageDefintionId,
+        getStatus.crossLanguageDefinitionId,
         "Contoso.WidgetManager.Widgets.getWidgetOperationStatus",
       );
       strictEqual(getStatus.parameters.length, 3);
@@ -965,7 +729,7 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(createOrUpdate.kind, "lro");
       strictEqual(createOrUpdate.parameters.length, 11);
       strictEqual(
-        createOrUpdate.crossLanguageDefintionId,
+        createOrUpdate.crossLanguageDefinitionId,
         "Contoso.WidgetManager.Widgets.createOrUpdateWidget",
       );
       deepStrictEqual(createOrUpdate.parameters.map((x) => x.name).sort(), [
@@ -1038,14 +802,13 @@ describe("typespec-client-generator-core: package", () => {
       ok(exception.type);
       strictEqual(exception.type.kind, "model");
       strictEqual(exception.type.crossLanguageDefinitionId, "Azure.Core.Foundations.ErrorResponse");
-      // we shouldn't generate this model
-      strictEqual(
+      ok(
         sdkPackage.models.find(
-          (x) => x.crossLanguageDefinitionId === "Azure.Core.Foundations.ErrorResponse",
+          (x) =>
+            x.crossLanguageDefinitionId === "Azure.Core.Foundations.ErrorResponse" &&
+            isAzureCoreModel(x),
         ),
-        undefined,
       );
-
       const methodResponse = createOrUpdate.response;
       strictEqual(methodResponse.kind, "method");
       strictEqual(methodResponse.type, widgetModel);
@@ -1067,8 +830,16 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(method.name, "delete");
       strictEqual(method.kind, "lro");
       strictEqual(method.response.type, undefined);
-      strictEqual(runnerWithCore.context.sdkPackage.models.length, 0);
-      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 1);
+      strictEqual(runnerWithCore.context.sdkPackage.models.length, 3);
+      strictEqual(
+        runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length,
+        0,
+      );
+      strictEqual(runnerWithCore.context.sdkPackage.enums.length, 2);
+      strictEqual(
+        runnerWithCore.context.sdkPackage.enums.filter((x) => !isAzureCoreModel(x)).length,
+        1,
+      );
     });
     it("paging", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -1085,8 +856,12 @@ describe("typespec-client-generator-core: package", () => {
       );
       const sdkPackage = runnerWithCore.context.sdkPackage;
       strictEqual(sdkPackage.clients.length, 1);
-      strictEqual(sdkPackage.models.length, 1);
-      strictEqual(sdkPackage.models[0].name, "Manufacturer");
+      strictEqual(sdkPackage.models.length, 5);
+      strictEqual(sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length, 1);
+      const manufacturerModel = sdkPackage.models.find(
+        (x) => !isAzureCoreModel(x) && x.name === "Manufacturer",
+      );
+      ok(manufacturerModel);
       const widgetClient = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
         ?.response as SdkClientType<SdkHttpOperation>;
       ok(widgetClient);
@@ -1103,7 +878,7 @@ describe("typespec-client-generator-core: package", () => {
 
       strictEqual(listManufacturers.name, "listManufacturers");
       strictEqual(
-        listManufacturers.crossLanguageDefintionId,
+        listManufacturers.crossLanguageDefinitionId,
         "Contoso.WidgetManager.Widgets.listManufacturers",
       );
       strictEqual(listManufacturers.kind, "paging");
@@ -1115,7 +890,7 @@ describe("typespec-client-generator-core: package", () => {
       const methodResponse = listManufacturers.response.type;
       ok(methodResponse);
       strictEqual(methodResponse.kind, "array");
-      deepStrictEqual(methodResponse.valueType, sdkPackage.models[0]);
+      deepStrictEqual(methodResponse.valueType, manufacturerModel);
 
       const operation = listManufacturers.operation;
       strictEqual(operation.kind, "http");
@@ -1154,7 +929,7 @@ describe("typespec-client-generator-core: package", () => {
       ok(valueProperty);
       strictEqual(valueProperty.kind, "property");
       strictEqual(valueProperty.type.kind, "array");
-      strictEqual(valueProperty.type.valueType, sdkPackage.models[0]);
+      strictEqual(valueProperty.type.valueType, manufacturerModel);
 
       const nextLinkProperty = pagingModel.properties.find((x) => x.name === "nextLink");
       ok(nextLinkProperty);
@@ -1174,6 +949,66 @@ describe("typespec-client-generator-core: package", () => {
       );
       ok(clientRequestIdProperty);
       strictEqual(clientRequestIdProperty.kind, "header");
+    });
+
+    it("azure widget getWidgetAnalytics", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await compileAzureWidgetService(
+        runnerWithCore,
+        `
+      @doc("Get a WidgetAnalytics")
+      getWidgetAnalytics is Operations.ResourceRead<WidgetAnalytics>;
+      `,
+      );
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const parentClient = sdkPackage.clients.filter(
+        (c) => c.initialization.access === "public",
+      )[0];
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(parentClient.name, "WidgetManagerClient");
+      strictEqual(method.name, "getWidgetAnalytics");
+      strictEqual(method.kind, "basic");
+      strictEqual(method.parameters.length, 8);
+
+      const methodWidgetName = method.parameters.find((p) => p.name === "widgetName");
+      ok(methodWidgetName);
+      strictEqual(methodWidgetName.kind, "method");
+      strictEqual(methodWidgetName.isApiVersionParam, false);
+      deepStrictEqual(methodWidgetName.apiVersions, ["2022-08-30"]);
+      strictEqual(methodWidgetName.onClient, false);
+      strictEqual(methodWidgetName.optional, false);
+
+      const operationWidgetName = method.operation.parameters.find((x) => x.name === "widgetName");
+      ok(operationWidgetName);
+      strictEqual(operationWidgetName.kind, "path");
+      strictEqual(operationWidgetName.name, "widgetName");
+      strictEqual(operationWidgetName.serializedName, "widgetName");
+      strictEqual(operationWidgetName.onClient, false);
+      strictEqual(operationWidgetName.correspondingMethodParams.length, 1);
+      strictEqual(operationWidgetName.correspondingMethodParams[0], methodWidgetName);
+
+      const methodAnalyticsId = method.parameters.find((p) => p.name === "analyticsId");
+      ok(methodAnalyticsId);
+      strictEqual(methodAnalyticsId.kind, "method");
+      strictEqual(methodAnalyticsId.isApiVersionParam, false);
+      deepStrictEqual(methodAnalyticsId.apiVersions, ["2022-08-30"]);
+      strictEqual(methodAnalyticsId.onClient, false);
+      strictEqual(methodAnalyticsId.optional, false);
+
+      const operationAnalyticsId = method.operation.parameters.find(
+        (x) => x.name === "analyticsId",
+      );
+      ok(operationAnalyticsId);
+      strictEqual(operationAnalyticsId.kind, "path");
+      strictEqual(operationAnalyticsId.name, "analyticsId");
+      strictEqual(operationAnalyticsId.serializedName, "analyticsId");
+      strictEqual(operationAnalyticsId.onClient, false);
+      strictEqual(operationAnalyticsId.correspondingMethodParams.length, 1);
+      strictEqual(operationAnalyticsId.correspondingMethodParams[0], methodAnalyticsId);
     });
   });
 
@@ -1421,8 +1256,8 @@ describe("typespec-client-generator-core: package", () => {
         }
       `);
       const sdkPackage = runnerWithCore.context.sdkPackage;
-      strictEqual(sdkPackage.models.length, 0);
-      strictEqual(sdkPackage.enums.length, 1);
+      strictEqual(sdkPackage.models.length, 1);
+      strictEqual(sdkPackage.enums.length, 2);
     });
   });
 });

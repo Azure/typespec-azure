@@ -1,10 +1,8 @@
-import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   AugmentDecoratorStatementNode,
   DecoratorContext,
   DecoratorExpressionNode,
   DecoratorFunction,
-  EmitContext,
   Enum,
   EnumMember,
   Interface,
@@ -15,10 +13,10 @@ import {
   Operation,
   Program,
   RekeyableMap,
+  Scalar,
   SyntaxKind,
   Type,
   Union,
-  createDiagnosticCollector,
   getDiscriminator,
   getNamespaceFullName,
   getProjectedName,
@@ -32,44 +30,44 @@ import {
 import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
+  AlternateTypeDecorator,
+  ApiVersionDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
+  ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
+  ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { defaultDecoratorsAllowList } from "./configs.js";
-import { handleClientExamples } from "./example.js";
 import {
   AccessFlags,
+  ClientInitializationOptions,
   LanguageScopes,
   SdkClient,
-  SdkContext,
-  SdkEmitterOptions,
-  SdkHttpOperation,
   SdkInitializationType,
   SdkMethodParameter,
   SdkModelPropertyType,
   SdkOperationGroup,
-  SdkServiceOperation,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
 import {
   AllScopes,
   clientNameKey,
+  clientNamespaceKey,
   getValidApiVersion,
-  isAzureCoreModel,
-  parseEmitterName,
+  isAzureCoreTspModel,
+  negationScopesKey,
+  scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getSdkPackage } from "./package.js";
 import { getLibraryName } from "./public-utils.js";
-import { getSdkEnum, getSdkModel, getSdkUnion, getSdkUnionEnumWithDiagnostics } from "./types.js";
+import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -87,6 +85,13 @@ function getScopedDecoratorData(
   if (languageScope === undefined || typeof languageScope === "string") {
     const scope = languageScope ?? context.emitterName;
     if (Object.keys(retval).includes(scope)) return retval[scope];
+
+    // if the scope is negated, we should return undefined
+    // if the scope is not negated, we should return the value for AllScopes
+    const negationScopes = retval[negationScopesKey];
+    if (negationScopes !== undefined && negationScopes.includes(scope)) {
+      return undefined;
+    }
   }
   return retval[AllScopes]; // in this case it applies to all languages
 }
@@ -114,20 +119,60 @@ function setScopedDecoratorData(
     return;
   }
 
-  // if scope specified, create or overwrite with the new value
-  const splitScopes = scope.split(",").map((s) => s.trim());
   const targetEntry = context.program.stateMap(key).get(target);
-
-  // if target doesn't exist in decorator map, create a new entry
-  if (!targetEntry) {
-    const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
+  const [negationScopes, scopes] = parseScopes(context, scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    // override the previous value for negation scopes
+    const newObject: Record<string | symbol, any> =
+      scopes !== undefined && scopes.length > 0
+        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
+        : Object.fromEntries([[AllScopes, value]]);
+    newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
-    return;
+
+    // if a scope exists in the target entry and it overlaps with the negation scope, it means negation scope doesn't override it
+    if (targetEntry !== undefined) {
+      const existingScopes = Object.getOwnPropertyNames(targetEntry);
+      const intersections = existingScopes.filter((x) => negationScopes.includes(x));
+      if (intersections !== undefined && intersections.length > 0) {
+        for (const scopeToKeep of intersections) {
+          newObject[scopeToKeep] = targetEntry[scopeToKeep];
+        }
+      }
+    }
+  } else if (scopes !== undefined && scopes.length > 0) {
+    // for normal scopes, add them incrementally
+    const newObject = Object.fromEntries(scopes.map((scope) => [scope, value]));
+    context.program
+      .stateMap(key)
+      .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+  }
+}
+
+function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
+  if (scope === undefined) {
+    return [undefined, undefined];
   }
 
-  // if target exists, overwrite existed value
-  const newObject = Object.fromEntries(splitScopes.map((scope) => [scope, value]));
-  context.program.stateMap(key).set(target, { ...targetEntry, ...newObject });
+  // handle !(scope1, scope2,...) syntax
+  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
+  }
+
+  // handle !scope1, !scope2, scope3, ... syntax
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const negationScopes: string[] = [];
+  const scopes: string[] = [];
+  for (const s of splitScopes) {
+    if (s.startsWith("!")) {
+      negationScopes.push(s.slice(1));
+    } else {
+      scopes.push(s);
+    }
+  }
+  return [negationScopes, scopes];
 }
 
 const clientKey = createStateSymbol("client");
@@ -576,9 +621,16 @@ export function listOperationsInOperationGroup(
     }
 
     for (const op of current.operations.values()) {
-      // Skip templated operations
-      if (!isTemplateDeclarationOrInstance(op)) {
-        operations.push(getOverriddenClientMethod(context, op) ?? op);
+      if (!IsInScope(context, op)) {
+        continue;
+      }
+
+      // Skip templated operations and omit operations
+      if (
+        !isTemplateDeclarationOrInstance(op) &&
+        !context.program.stateMap(omitOperation).get(op)
+      ) {
+        operations.push(op);
       }
     }
 
@@ -594,70 +646,6 @@ export function listOperationsInOperationGroup(
 
   addOperations(group.type);
   return operations;
-}
-
-export function createTCGCContext(program: Program, emitterName: string): TCGCContext {
-  const diagnostics = createDiagnosticCollector();
-  return {
-    program,
-    emitterName: diagnostics.pipe(parseEmitterName(program, emitterName)),
-    diagnostics: diagnostics.diagnostics,
-    originalProgram: program,
-    __clientToParameters: new Map(),
-    __tspTypeToApiVersions: new Map(),
-    __clientToApiVersionClientDefaultValue: new Map(),
-    previewStringRegex: /-preview$/,
-  };
-}
-
-interface VersioningStrategy {
-  readonly strategy?: "ignore";
-  readonly previewStringRegex?: RegExp; // regex to match preview versions
-}
-
-export interface CreateSdkContextOptions {
-  readonly versioning?: VersioningStrategy;
-  additionalDecorators?: string[];
-}
-
-export async function createSdkContext<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(
-  context: EmitContext<TOptions>,
-  emitterName?: string,
-  options?: CreateSdkContextOptions,
-): Promise<SdkContext<TOptions, TServiceOperation>> {
-  const diagnostics = createDiagnosticCollector();
-  const protocolOptions = true; // context.program.getLibraryOptions("generate-protocol-methods");
-  const convenienceOptions = true; // context.program.getLibraryOptions("generate-convenience-methods");
-  const generateProtocolMethods = context.options["generate-protocol-methods"] ?? protocolOptions;
-  const generateConvenienceMethods =
-    context.options["generate-convenience-methods"] ?? convenienceOptions;
-  const tcgcContext = createTCGCContext(
-    context.program,
-    (emitterName ?? context.program.emitters[0]?.metadata?.name)!,
-  );
-  const sdkContext: SdkContext<TOptions, TServiceOperation> = {
-    ...tcgcContext,
-    emitContext: context,
-    sdkPackage: undefined!,
-    generateProtocolMethods: generateProtocolMethods,
-    generateConvenienceMethods: generateConvenienceMethods,
-    filterOutCoreModels: context.options["filter-out-core-models"] ?? true,
-    packageName: context.options["package-name"],
-    flattenUnionAsEnum: context.options["flatten-union-as-enum"] ?? true,
-    apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
-    examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
-    decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
-    previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
-  };
-  sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
-  for (const client of sdkContext.sdkPackage.clients) {
-    diagnostics.pipe(await handleClientExamples(sdkContext, client));
-  }
-  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
-  return sdkContext;
 }
 
 const protocolAPIKey = createStateSymbol("protocolAPI");
@@ -742,12 +730,11 @@ export function getUsageOverride(
 }
 
 export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
-  const diagnostics = createDiagnosticCollector();
   switch (entity.kind) {
     case "Union":
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(entity));
-      if (unionAsEnum) {
-        return diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum)).usage;
+      const type = getSdkUnion(context, entity);
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+        return type.usage;
       }
       return UsageFlags.None;
     case "Model":
@@ -771,6 +758,7 @@ export const $access: AccessDecorator = (
       format: {},
       target: entity,
     });
+    return;
   }
   setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
 };
@@ -801,7 +789,7 @@ export function getAccess(context: TCGCContext, entity: Model | Enum | Operation
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "model") {
+      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
         return type.access;
       }
       return "public";
@@ -829,6 +817,7 @@ export const $flattenProperty: FlattenPropertyDecorator = (
       format: {},
       target: target,
     });
+    return;
   }
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line @typescript-eslint/no-deprecated
 };
@@ -876,6 +865,7 @@ export const $clientName: ClientNameDecorator = (
       format: {},
       target: entity,
     });
+    return;
   }
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 };
@@ -889,6 +879,7 @@ export function getClientNameOverride(
 }
 
 const overrideKey = createStateSymbol("override");
+const omitOperation = createStateSymbol("omitOperation");
 
 // Recursive function to collect parameter names
 function collectParams(
@@ -905,7 +896,7 @@ function collectParams(
         while (sourceProp.sourceProperty) {
           sourceProp = sourceProp.sourceProperty;
         }
-        if (sourceProp.model && !isAzureCoreModel(sourceProp.model)) {
+        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
           params.push(value);
         } else if (!sourceProp.model) {
           params.push(value);
@@ -937,6 +928,9 @@ export const $override = (
   override: Operation,
   scope?: LanguageScopes,
 ) => {
+  // omit all override operation
+  context.program.stateMap(omitOperation).set(override, true);
+
   // Extract and sort parameter names
   const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
     a.name.localeCompare(b.name),
@@ -960,6 +954,7 @@ export const $override = (
         overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
       },
     });
+    return;
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
@@ -979,6 +974,49 @@ export function getOverriddenClientMethod(
   return getScopedDecoratorData(context, overrideKey, entity);
 }
 
+const alternateTypeKey = createStateSymbol("alternateType");
+
+/**
+ * Replace a source type with an alternate type in a specific scope.
+ *
+ * @param context the decorator context
+ * @param source source type to be replaced
+ * @param alternate target type to replace the source type
+ * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
+ */
+export const $alternateType: AlternateTypeDecorator = (
+  context: DecoratorContext,
+  source: ModelProperty | Scalar,
+  alternate: Scalar,
+  scope?: LanguageScopes,
+) => {
+  if (source.kind === "ModelProperty" && source.type.kind !== "Scalar") {
+    reportDiagnostic(context.program, {
+      code: "invalid-alternate-source-type",
+      format: {
+        typeName: source.type.kind,
+      },
+      target: source,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
+};
+
+/**
+ * Get the alternate type for a source type in a specific scope.
+ *
+ * @param context the Sdk Context
+ * @param source source type to be replaced
+ * @returns alternate type to replace the source type, or undefined if no alternate type is found
+ */
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar,
+): Scalar | undefined {
+  return getScopedDecoratorData(context, alternateTypeKey, source);
+}
+
 export const $useSystemTextJsonConverter: DecoratorFunction = (
   context: DecoratorContext,
   entity: Model,
@@ -990,26 +1028,74 @@ const clientInitializationKey = createStateSymbol("clientInitialization");
 export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  options: Model,
+  options: Type,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(
-    context,
-    $clientInitialization,
-    clientInitializationKey,
-    target,
-    options,
-    scope,
-  );
+  if (options.kind === "Model") {
+    if (options.properties.get("initializedBy")) {
+      const value = options.properties.get("initializedBy")!.type;
+
+      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+
+      if (value.kind === "EnumMember") {
+        if (typeof value.value !== "number" || !isValidValue(value.value)) {
+          reportDiagnostic(context.program, {
+            code: "invalid-initialized-by",
+            format: { message: "Please use `InitializedBy` enum to set the value." },
+            target: target,
+          });
+          return;
+        }
+      } else if (value.kind === "Union") {
+        for (const variant of value.variants.values()) {
+          if (
+            variant.type.kind !== "EnumMember" ||
+            typeof variant.type.value !== "number" ||
+            !isValidValue(variant.type.value)
+          ) {
+            reportDiagnostic(context.program, {
+              code: "invalid-initialized-by",
+              format: { message: "Please use `InitializedBy` enum to set the value." },
+              target: target,
+            });
+            return;
+          }
+        }
+      }
+    }
+
+    setScopedDecoratorData(
+      context,
+      $clientInitialization,
+      clientInitializationKey,
+      target,
+      options,
+      scope,
+    );
+  }
 };
 
+/**
+ * Get `SdkInitializationType` for namespace or interface. The info is from `@clientInitialization` decorator.
+ *
+ * @param context
+ * @param entity namespace or interface which represents a client
+ * @returns
+ * @deprecated This function is deprecated. Use `getClientInitializationOptions` instead.
+ */
 export function getClientInitialization(
   context: TCGCContext,
   entity: Namespace | Interface,
 ): SdkInitializationType | undefined {
-  const model = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (!model) return model;
-  const sdkModel = getSdkModel(context, model);
+  let options = getScopedDecoratorData(context, clientInitializationKey, entity);
+  if (options === undefined) return undefined;
+  // backward compatibility
+  if (options.properties.get("parameters")) {
+    options = options.properties.get("parameters").type;
+  } else if (options.properties.get("initializedBy")) {
+    return undefined;
+  }
+  const sdkModel = getSdkModel(context, options);
   const initializationProps = sdkModel.properties.map(
     (property: SdkModelPropertyType): SdkMethodParameter => {
       property.onClient = true;
@@ -1023,17 +1109,158 @@ export function getClientInitialization(
   };
 }
 
+/**
+ * Get client initialization options for namespace or interface. The info is from `@clientInitialization` decorator.
+ *
+ * @param context
+ * @param entity namespace or interface which represents a client
+ * @returns
+ */
+export function getClientInitializationOptions(
+  context: TCGCContext,
+  entity: Namespace | Interface,
+): ClientInitializationOptions | undefined {
+  const options = getScopedDecoratorData(context, clientInitializationKey, entity);
+  if (options === undefined) return undefined;
+
+  // backward compatibility
+  if (
+    options.properties.get("initializedBy") === undefined &&
+    options.properties.get("parameters") === undefined
+  ) {
+    return {
+      parameters: options,
+    };
+  }
+
+  let initializedBy = undefined;
+
+  if (options.properties.get("initializedBy")) {
+    if (options.properties.get("initializedBy").type.kind === "EnumMember") {
+      initializedBy = options.properties.get("initializedBy").type.value;
+    } else if (options.properties.get("initializedBy").type.kind === "Union") {
+      initializedBy = 0;
+      for (const variant of options.properties.get("initializedBy").type.variants.values()) {
+        initializedBy |= variant.type.value;
+      }
+    }
+  }
+
+  return {
+    parameters: options.properties.get("parameters")?.type,
+    initializedBy: initializedBy,
+  };
+}
+
 const paramAliasKey = createStateSymbol("paramAlias");
 
-export const paramAliasDecorator: ParamAliasDecorator = (
+export const $paramAlias: ParamAliasDecorator = (
   context: DecoratorContext,
   original: ModelProperty,
   paramAlias: string,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, paramAliasDecorator, paramAliasKey, original, paramAlias, scope);
+  setScopedDecoratorData(context, $paramAlias, paramAliasKey, original, paramAlias, scope);
 };
 
 export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
   return getScopedDecoratorData(context, paramAliasKey, original);
+}
+
+const apiVersionKey = createStateSymbol("apiVersion");
+
+export const $apiVersion: ApiVersionDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value?: boolean,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $apiVersion, apiVersionKey, target, value ?? true, scope);
+};
+
+export function getIsApiVersion(context: TCGCContext, param: ModelProperty): boolean | undefined {
+  return getScopedDecoratorData(context, apiVersionKey, param);
+}
+
+export const $clientNamespace: ClientNamespaceDecorator = (
+  context: DecoratorContext,
+  entity: Namespace | Interface | Model | Enum | Union,
+  value: string,
+  scope?: LanguageScopes,
+) => {
+  if (value.trim() === "") {
+    reportDiagnostic(context.program, {
+      code: "empty-client-namespace",
+      format: {},
+      target: entity,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
+};
+
+export function getClientNamespace(
+  context: TCGCContext,
+  entity: Namespace | Interface | Model | Enum | Union,
+): string {
+  const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
+  if (override) return override;
+  if (!entity.namespace) {
+    return "";
+  }
+  if (entity.kind === "Namespace") {
+    return getNamespaceFullNameWithOverride(context, entity);
+  }
+  return getNamespaceFullNameWithOverride(context, entity.namespace);
+}
+
+function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
+  const segments = [];
+  let current: Namespace | undefined = namespace;
+  while (current && current.name !== "") {
+    const override = getScopedDecoratorData(context, clientNamespaceKey, current);
+    if (override) {
+      segments.unshift(override);
+      break;
+    }
+    segments.unshift(current.name);
+    current = current.namespace;
+  }
+  return segments.join(".");
+}
+
+export const $scope: ScopeDecorator = (
+  context: DecoratorContext,
+  entity: Operation,
+  scope?: LanguageScopes,
+) => {
+  const [negationScopes, scopes] = parseScopes(context, scope);
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    // for negation scope, override the previous value
+    setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
+  }
+  if (scopes !== undefined && scopes.length > 0) {
+    // for normal scope, add them incrementally
+    const targetEntry = context.program.stateMap(scopeKey).get(entity);
+    setScopedDecoratorData(
+      context,
+      $scope,
+      scopeKey,
+      entity,
+      !targetEntry ? scopes : [...Object.values(targetEntry), ...scopes],
+    );
+  }
+};
+
+function IsInScope(context: TCGCContext, entity: Operation): boolean {
+  const scopes = getScopedDecoratorData(context, scopeKey, entity);
+  if (scopes !== undefined && scopes.includes(context.emitterName)) {
+    return true;
+  }
+
+  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+  if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
+    return false;
+  }
+  return true;
 }
