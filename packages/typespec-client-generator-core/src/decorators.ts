@@ -494,7 +494,7 @@ export function getOperationGroup(
     findOperationGroupService(context.program, type, context.emitterName) ?? (type as any);
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
-      code: "client-service",
+      code: "client-without-service",
       format: { name: type.name },
       target: type,
     });

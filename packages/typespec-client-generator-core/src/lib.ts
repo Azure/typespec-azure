@@ -25,7 +25,7 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Client name "${"name"}" must end with Client. Use @client({name: "...Client"})`,
       },
     },
-    "client-service": {
+    "client-without-service": {
       severity: "warning",
       messages: {
         default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS})`,

@@ -1,5 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -1260,11 +1261,31 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.enums.length, 2);
     });
   });
-  it("models only package", async () => {
-    await runner.compile(`
-      @client{name: "EventGridClient"}
+  it("models only package raises warning", async () => {
+    const diagnostics = await runner.diagnose(`
+      @client
       @usage(Usage.input | Usage.output)
-      namespace EventGrid {
+      namespace EventGridClient {
+        model CloudEvent {
+          id: string;
+        }
+      }
+
+      
+    `);
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-without-service",
+        message: `Client "EventGridClient" is not inside a service namespace. Use @client({service: MyServiceNS})`,
+      },
+    ]);
+  });
+  it("models only package suppress warning", async () => {
+    await runner.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-without-service" "For testing"
+      @client
+      @usage(Usage.input | Usage.output)
+      namespace EventGridClient {
         model CloudEvent {
           id: string;
         }
@@ -1274,7 +1295,9 @@ describe("typespec-client-generator-core: package", () => {
     `);
     const sdkPackage = runner.context.sdkPackage;
     strictEqual(sdkPackage.models.length, 1);
-    strictEqual(sdkPackage.clients.length, 0);
+    strictEqual(sdkPackage.models[0].name, "CloudEvent");
+    strictEqual(sdkPackage.clients.length, 1);
+    strictEqual(sdkPackage.clients[0].methods.length, 0);
   });
 });
 

@@ -178,7 +178,7 @@ function validateClientDecoratorsHaveService(context: TCGCContext) {
   for (const client of listClients(context)) {
     if (!isService(context.program, client.service)) {
       reportDiagnostic(context.program, {
-        code: "client-service",
+        code: "client-without-service",
         format: { name: client.name },
         target: client.type,
       });
