@@ -25,6 +25,7 @@ import {
   getEncode,
   getKnownValues,
   getLifecycleVisibilityEnum,
+  getLocationContext,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -1867,8 +1868,11 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  for (const client of listClients(context)) {
-    const namespaces = [client.service];
+  const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
+    (x) => getLocationContext(context.program, x).type === "project",
+  );
+  for (const currNamespace of allNamespaces) {
+    const namespaces = [currNamespace];
     while (namespaces.length) {
       const namespace = namespaces.pop()!;
       // orphan models
