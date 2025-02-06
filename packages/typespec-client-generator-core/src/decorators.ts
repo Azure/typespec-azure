@@ -211,14 +211,6 @@ export const $client: ClientDecorator = (
     });
   }
 
-  if (!isService(context.program, service)) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-  }
-
   const client: SdkClient = {
     kind: "SdkClient",
     name,

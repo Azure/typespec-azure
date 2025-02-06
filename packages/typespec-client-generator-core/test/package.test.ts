@@ -1260,6 +1260,22 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(sdkPackage.enums.length, 2);
     });
   });
+  it("models only package", async () => {
+    await runner.compile(`
+      @client{name: "EventGridClient"}
+      @usage(Usage.input | Usage.output)
+      namespace EventGrid {
+        model CloudEvent {
+          id: string;
+        }
+      }
+
+      
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.models.length, 1);
+    strictEqual(sdkPackage.clients.length, 0);
+  });
 });
 
 function getServiceMethodOfClient(
