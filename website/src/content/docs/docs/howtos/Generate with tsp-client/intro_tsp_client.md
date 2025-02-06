@@ -58,7 +58,9 @@ Initialize the client library directory using a tspconfig.yaml. When running thi
 
 The `init` command generates a directory structure following the standard pattern used across Azure SDK language repositories, creates a [tsp-location.yaml](#tsp-locationyaml) file to control generation, and performs an initial generation of the client library. If you want to skip client library generation, then pass the `--skip-sync-and-generate` flag.
 
-> IMPORTANT: This command should be run from the root of the repository. Example repository root: `azure-sdk-for-python/`
+:::caution
+This command should be run from the root of the repository. Example repository root: `azure-sdk-for-python/`
+:::
 
 Example:
 
