@@ -1299,6 +1299,34 @@ describe("typespec-client-generator-core: package", () => {
     strictEqual(sdkPackage.clients.length, 1);
     strictEqual(sdkPackage.clients[0].methods.length, 0);
   });
+
+  it("models only package with versioning decorators", async () => {
+    await runner.compile(`
+      @usage(Usage.input | Usage.output)
+      @versioned(ServiceApiVersions)
+      namespace EventGridClient {
+        enum ServiceApiVersions {
+          v2018_01_01: "2018-01-01",
+          v2024_01_01: "2024-01-01",
+        }
+        model CloudEvent {
+          id: string;
+        }
+
+        model HealthcareFhirResourceCreatedEventData {
+          @madeRequired(ServiceApiVersions.v2024_01_01)
+          resourceVersionId: int64;
+        }
+      }
+
+      
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.models.length, 2);
+    strictEqual(sdkPackage.models[0].name, "CloudEvent");
+    strictEqual(sdkPackage.clients.length, 1);
+    strictEqual(sdkPackage.clients[0].methods.length, 0);
+  });
 });
 
 function getServiceMethodOfClient(
