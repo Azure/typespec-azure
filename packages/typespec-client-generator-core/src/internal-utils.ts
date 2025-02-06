@@ -3,7 +3,9 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
+  getLifecycleVisibilityEnum,
   getNamespaceFullName,
+  getVisibilityForClass,
   Interface,
   isNeverType,
   isNullType,
@@ -592,4 +594,10 @@ export function getValueTypeValue(
       // TODO: handle scalar value
       return undefined;
   }
+}
+
+export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): boolean {
+  const lifecycle = getLifecycleVisibilityEnum(context.program);
+  const visibility = getVisibilityForClass(context.program, type, lifecycle);
+  return visibility.size === 0;
 }
