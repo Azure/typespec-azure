@@ -1274,8 +1274,7 @@ describe("typespec-client-generator-core: package", () => {
     const sdkPackage = runner.context.sdkPackage;
     strictEqual(sdkPackage.models.length, 1);
     strictEqual(sdkPackage.models[0].name, "CloudEvent");
-    strictEqual(sdkPackage.clients.length, 1);
-    strictEqual(sdkPackage.clients[0].methods.length, 0);
+    strictEqual(sdkPackage.clients.length, 0);
   });
 
   it("models only package with azure and versioning decorators", async () => {
