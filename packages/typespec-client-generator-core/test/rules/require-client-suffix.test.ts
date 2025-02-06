@@ -7,7 +7,7 @@ import { beforeEach, describe, it } from "vitest";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import { createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: require-client-suffix", () => {
+describe("require-client-suffix", () => {
   let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
