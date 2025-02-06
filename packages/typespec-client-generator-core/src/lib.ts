@@ -25,12 +25,6 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Client "${"name"}" is not inside a service namespace. Use @client({service: MyServiceNS})`,
       },
     },
-    "invalid-client-format": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Format "${"format"}" can only apply to "${"expectedTargetTypes"}"`,
-      },
-    },
     "union-null": {
       severity: "error",
       messages: {
