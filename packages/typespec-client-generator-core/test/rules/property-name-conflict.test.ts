@@ -26,8 +26,7 @@ it("emit warning if property name conflicts with model name", async () => {
   });
 });
 
-// TODO: reenable when rule is moved to tcgc and can resolve if clientName was set
-it.skip(`is valid if conflict resolved through @clientName("newName", "csharp")`, async () => {
+it(`is valid if conflict resolved through @clientName("newName", "csharp")`, async () => {
   await tester
     .expect(
       `model Foo { 
@@ -37,8 +36,7 @@ it.skip(`is valid if conflict resolved through @clientName("newName", "csharp")`
     .toBeValid();
 });
 
-// TODO: reenable when rule is moved to tcgc and can resolve if clientName was set
-it.skip(`is valid if conflict resolved through @clientName("newName")`, async () => {
+it(`is valid if conflict resolved through @clientName("newName")`, async () => {
   await tester
     .expect(
       `model Foo { 
@@ -48,8 +46,7 @@ it.skip(`is valid if conflict resolved through @clientName("newName")`, async ()
     .toBeValid();
 });
 
-// TODO: reenable when rule is moved to tcgc and can resolve if clientName was set
-it.skip("emit warning if conflict not resolved through @clientName", async () => {
+it("emit warning if conflict not resolved through @clientName", async () => {
   await tester
     .expect(
       `model Foo { 
@@ -62,8 +59,7 @@ it.skip("emit warning if conflict not resolved through @clientName", async () =>
     });
 });
 
-// TODO: reenable when rule is moved to tcgc and can resolve if clientName was set
-it.skip(`emit warning if @clientName("newName") introduces conflict`, async () => {
+it(`emit warning if @clientName("newName") introduces conflict`, async () => {
   await tester
     .expect(
       `model Foo { 
@@ -76,8 +72,7 @@ it.skip(`emit warning if @clientName("newName") introduces conflict`, async () =
     });
 });
 
-// TODO: reenable when rule is moved to tcgc and can resolve if clientName was set
-it.skip(`emit warning if @clientName("newName", "csharp") introduces conflict`, async () => {
+it(`emit warning if @clientName("newName", "csharp") introduces conflict`, async () => {
   await tester
     .expect(
       `model Foo { 
@@ -90,8 +85,7 @@ it.skip(`emit warning if @clientName("newName", "csharp") introduces conflict`, 
     });
 });
 
-// TODO: reenable when rule is moved to tcgc and can resolve if clientName was set
-it.skip(`is valid if @clientName("newName") causes conflict but @clientName("newName", "csharp") resolves it`, async () => {
+it(`is valid if @clientName("newName") causes conflict but @clientName("newName", "csharp") resolves it`, async () => {
   await tester
     .expect(
       `model Foo {
