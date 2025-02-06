@@ -4,7 +4,6 @@ import {
   Enum,
   EnumMember,
   Interface,
-  isService,
   Model,
   ModelProperty,
   Namespace,
@@ -18,25 +17,16 @@ import {
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { createTCGCContext } from "./context.js";
-import { getClientNameOverride, listClients } from "./decorators.js";
+import { getClientNameOverride } from "./decorators.js";
 import { TCGCContext } from "./interfaces.js";
 import { AllScopes, clientNameKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 
 export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core");
-  validateClientNameClashes(tcgcContext);
-  validateClientDecoratorsHaveService(tcgcContext);
-}
-
-function validateClientNameClashes(tcgcContext: TCGCContext) {
-  const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
+  const languageScopes = getDefinedLanguageScopes(program);
   for (const scope of languageScopes) {
-    validateClientNamesPerNamespace(
-      tcgcContext,
-      scope,
-      tcgcContext.program.getGlobalNamespaceType(),
-    );
+    validateClientNamesPerNamespace(tcgcContext, scope, program.getGlobalNamespaceType());
   }
 }
 
@@ -170,18 +160,6 @@ function reportDuplicateClientNames(
           target: item,
         });
       }
-    }
-  }
-}
-
-function validateClientDecoratorsHaveService(context: TCGCContext) {
-  for (const client of listClients(context)) {
-    if (!isService(context.program, client.service)) {
-      reportDiagnostic(context.program, {
-        code: "client-without-service",
-        format: { name: client.name },
-        target: client.type,
-      });
     }
   }
 }

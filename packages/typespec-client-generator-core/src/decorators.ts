@@ -211,6 +211,14 @@ export const $client: ClientDecorator = (
     });
   }
 
+  if (!isService(context.program, service)) {
+    reportDiagnostic(context.program, {
+      code: "client-service",
+      format: { name },
+      target: context.decoratorTarget,
+    });
+  }
+
   const client: SdkClient = {
     kind: "SdkClient",
     name,
@@ -494,7 +502,7 @@ export function getOperationGroup(
     findOperationGroupService(context.program, type, context.emitterName) ?? (type as any);
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
-      code: "client-without-service",
+      code: "client-service",
       format: { name: type.name },
       target: type,
     });
