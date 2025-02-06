@@ -1,10 +1,6 @@
 ---
 title: "Linter usage"
-toc_min_heading_level: 2
-toc_max_heading_level: 3
 ---
-
-# Linter
 
 ## Usage
 
@@ -25,7 +21,7 @@ Available ruleSets:
 
 ## Rules
 
-| Name                                                                 | Description                                                             |
-| -------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `@azure-tools/typespec-client-generator-core/require-client-suffix`  | Client names should end with 'Client'.                                  |
-| `@azure-tools/typespec-client-generator-core/property-name-conflict` | Avoid naming conflicts between a property and a model of the same name. |
+| Name                                                                                                                                                                                      | Description                                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)   | Client names should end with 'Client'.                                  |
+| [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict) | Avoid naming conflicts between a property and a model of the same name. |

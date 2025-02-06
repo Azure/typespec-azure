@@ -1,5 +1,6 @@
 import { createRule, Interface, Namespace, paramMessage } from "@typespec/compiler";
-import { createTCGCContext, getClient } from "../decorators.js";
+import { getClient } from "../decorators.js";
+import { createTCGCContext } from "../context.js";
 
 export const requireClientSuffixRule = createRule({
   name: "require-client-suffix",
