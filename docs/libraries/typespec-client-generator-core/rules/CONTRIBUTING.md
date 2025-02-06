@@ -16,7 +16,7 @@ The process for adding a rule starts off the same for both: for language-specifi
 
 **If you are adding a language-specific rule**, you will also need this extra step 4. Add reference to the rule in the `[language]Rules` array in [`typespec-azure/packages/typespec-client-generator-core/src/linter.ts`][tcgc-linter]
 
-For Azure generations then, all rules, including all language-specific rules, will be run on the specs.
+For Azure generations then, all language-agnostic rules and all tier-1 language rules, will be run on the specs.
 For unbranded generations, since we've added the rules into specific `best-practices:[language]` rulesets, you can explicitly specify a subset of rules in your `tsp-config.yaml`, i.e. if I only want Python best-practices, I could add this in my `tsp-config.yaml`:
 
 ```yaml
