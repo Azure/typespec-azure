@@ -879,7 +879,7 @@ describe("typespec-azure: identifiers decorator", () => {
         age: int32;
       }
       model PetList {
-        @identifiers(["age"])
+        @identifiers(#["age"])
         value: Pet[]
       }
       @route("/Pets")
@@ -939,7 +939,7 @@ describe("typespec-azure: identifiers decorator", () => {
         age: int32;
       }
       model PetList {
-        @identifiers([])
+        @identifiers(#[])
         value: Pet[]
       }
       @route("/Pets")
@@ -961,7 +961,7 @@ describe("typespec-azure: identifiers decorator", () => {
         age: int32;
       }
       model PetList {
-        @identifiers(["name", "age"])
+        @identifiers(#["name", "age"])
         value: Pet[]
       }
       @route("/Pets")
@@ -987,7 +987,7 @@ describe("typespec-azure: identifiers decorator", () => {
         }
         
         model PetList {
-          @identifiers(["dogs/breed"])
+          @identifiers(#["dogs/breed"])
           pets: Pet[]
         }
         @route("/Pets")
@@ -1009,7 +1009,7 @@ describe("typespec-azure: identifiers decorator", () => {
           @get op list(): PetList;
         
           model PetList {
-            @identifiers(["age"])
+            @identifiers(#["age"])
             pets: Microsoft.Modeling.Pet[]
           }
         }

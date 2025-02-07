@@ -397,10 +397,7 @@ export const $identifiers: IdentifiersDecorator = (
     return;
   }
 
-  context.program.stateMap(ArmStateKeys.armIdentifiers).set(
-    type.indexer.value,
-    properties.values,
-  );
+  context.program.stateMap(ArmStateKeys.armIdentifiers).set(type.indexer.value, properties);
 };
 
 /**
