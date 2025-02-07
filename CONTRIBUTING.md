@@ -185,7 +185,6 @@ each individual repo as you would any other.
 
 ```bash
 pnpm e2e-tests
-
 ```
 
 ### Test with local cadl-ranch repo
@@ -201,8 +200,10 @@ pnpm e2e-tests --local-cadl-ranch=/Users/some/dev/cadl-ranch
 ### Prerequisites
 
 1. Install the GitHub CLI and configure your account. Some of the tools use your GitHub account.
-2. Check that validation of the `typespec-next` branch is green in [pipelines](https://dev.azure.com/azure-sdk/public/_build?definitionId=6143&_a=summary).
-   1. **Note**: Anytime a new PR is merged during the release process, make sure this validation is green.
+2. Check that validation of the `typespec-next` branch is green:
+   1. [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs/actions/workflows/typespec-validation-all.yaml)
+   2. [azure-rest-api-specs-pr](https://github.com/Azure/azure-rest-api-specs-pr/actions/workflows/typespec-validation-all.yaml)
+   3. **Note**: Anytime a new PR is merged during the release process, make sure this validation is green.
 3. Verify that the CodeGen nightly [builds](https://dev.azure.com/azure-sdk/public/_dashboards/dashboard/ef641981-29b5-4a67-9e8f-1e4ae2fe4894) are green.
    1. **Note**: Check with codegen owners if a build is red due to a change unrelated to the TypeSpec release.
 
@@ -214,49 +215,67 @@ Do the following to publish a new release:
    be publishing and that they should hold off on merging until the process
    is complete.
 
-2. Make sure your working copy is clean and you are up-to-date and on the
+2. Make sure the core submodule is up to date and `typespec-next` validations are passing.
+
+3. Make sure your working copy is clean and you are up-to-date and on the
    main branch (both typespec-azure and core should point to main).
 
-3. Generate release notes for TypeSpec once the full list of changes are in.
+4. Generate release notes for TypeSpec once the full list of changes are in.
 
    1. In your fork of the core (typespec) repo, run `npx chronus changelog --policy typespec > out.md`.
-   1. Create a new entry in `docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
+   2. Create a new entry in `./core/website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/microsoft/typespec/pull/4102
 
-4. Generate release notes for TypeSpec Azure once the full list of changes are in.
+5. Generate release notes for TypeSpec Azure once the full list of changes are in.
 
    1. In your fork of the typespec-azure repo, run `npx chronus changelog --policy typespec-azure > out.md`.
-   1. Create a new entry in `docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
+   2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
 
-5. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
+6. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
 
    1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
 
-6. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
+7. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
 
-7. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
+8. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
 
-8. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
+9. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
 
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
    - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
 
    - Double-check that updated version numbers are correct. Running the tool multiple times will increment the version number multiple times as well.
 
-9. Push and merge TypeSpec (core) PR.
+10. Push and merge TypeSpec (core) PR.
 
-10. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
+11. Update core submodule to use `main` in TypeSpec-Azure `publish/` branch and push/merge PR.
 
-11. Make sure release pipeline completed and packages are on NPM.
+12. Make sure release pipeline completed and packages are on NPM.
+    - [Core Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=3226)
+    - [TypeSpec Azure Publish Pipeline](https://dev.azure.com/azure-sdk/internal/_build?definitionId=1793)
 
 ### Followups
 
 1. Upgrade https://github.com/Azure/azure-rest-api-specs to use new versions of TypeSpec.
    1. Example PR: https://github.com/Azure/azure-rest-api-specs/pull/30122
-1. Upgrade https://github.com/Azure/cadl-ranch to use new versions of TypeSpec.
-   1. Example PR: https://github.com/Azure/cadl-ranch/pull/668
-1. Send an email to the `TypeSpec Partners` group announcing the release.
+2. Upgrade https://github.com/Azure/azure-rest-api-specs-pr to use new versions of TypeSpec.
+   1. Example PR: https://github.com/Azure/azure-rest-api-specs-pr/pull/20878
+3. Send an email to the `TypeSpec Partners` group announcing the release.
+   - Include the TypeSpec/TypeSpec-Azure release notes (links plus contents) as part of the announcement.
+     Example:
+
+```md
+TypeSpec X.X and Azure libraries Y.Y were just released
+[TypeSpec X.X Release Notes](link/to/published/release-notes)
+[TypeSpec Azure Y.Y Release Notes](link/to/published/release-notes)
+
+Take a look at what's included in TypeSpec X.X!
+<-- Copy of release notes -->
+
+And here's what changed with TypeSpec Azure Y.Y libraries!
+<-- Copy of release notes -->
+```
 
 **NOTE**: The reason for step 1 to ask for folks to avoid merging while
 publishing is in progress is that any changes merged to the repo while the
@@ -306,15 +325,16 @@ TypeSpec repo use labels to help categorize and manage issues and PRs. The follo
 
 Area of the codebase
 
-| Name                         | Color   | Description                                                    |
-| ---------------------------- | ------- | -------------------------------------------------------------- |
-| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library |
-| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library            |
-| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library            |
-| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter              |
-| `eng`                        | #65bfff |                                                                |
-| `ide`                        | #846da1 | Issues for Azure specific ide features                         |
-| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                              |
+| Name                         | Color   | Description                                                                  |
+| ---------------------------- | ------- | ---------------------------------------------------------------------------- |
+| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library               |
+| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
+| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
+| `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package |
+| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                            |
+| `eng`                        | #65bfff |                                                                              |
+| `ide`                        | #846da1 | Issues for Azure specific ide features                                       |
+| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                            |
 
 #### issue_kinds
 

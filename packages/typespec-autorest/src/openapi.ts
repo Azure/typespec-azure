@@ -12,6 +12,7 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
+  getExternalTypeRef,
   isArmCommonType,
   isAzureResource,
   isConditionallyFlattened,
@@ -936,6 +937,13 @@ export async function getOpenAPIForService(
       };
     }
 
+    const externalTypeRefUrl = getExternalTypeRef(program, type);
+    if (externalTypeRefUrl) {
+      return {
+        $ref: expandRef(externalTypeRefUrl),
+      };
+    }
+
     if (
       isArmCommonType(type) &&
       (type.kind === "Model" ||
@@ -1762,11 +1770,13 @@ export async function getOpenAPIForService(
         foundCustom = true;
       }
     }
+
+    const clientName = getClientName(context, union as any);
     const schema: OpenAPI2Schema = {
       type: e.kind,
       enum: [...e.flattenedMembers.values()].map((x) => x.value),
       "x-ms-enum": {
-        name: union.name,
+        name: clientName ?? union.name,
         modelAsString: e.open,
       },
     };
@@ -2302,8 +2312,9 @@ export async function getOpenAPIForService(
         modelAsString: false,
       };
     } else if (type.kind === "Enum") {
+      const clientName = getClientName(context, type);
       schema["x-ms-enum"] = {
-        name: type.name,
+        name: clientName ?? type.name,
         modelAsString: false,
       };
 

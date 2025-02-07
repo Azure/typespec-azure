@@ -3,7 +3,9 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
+  getLifecycleVisibilityEnum,
   getNamespaceFullName,
+  getVisibilityForClass,
   Interface,
   isNeverType,
   isNullType,
@@ -489,16 +491,6 @@ export function filterApiVersionsInEnum(
   }
 }
 
-export function isJsonContentType(contentType: string): boolean {
-  const regex = new RegExp(/^(application|text)\/(.+\+)?json$/);
-  return regex.test(contentType);
-}
-
-export function isXmlContentType(contentType: string): boolean {
-  const regex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
-  return regex.test(contentType);
-}
-
 export function twoParamsEquivalent(
   context: TCGCContext,
   param1?: ModelProperty,
@@ -592,4 +584,10 @@ export function getValueTypeValue(
       // TODO: handle scalar value
       return undefined;
   }
+}
+
+export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): boolean {
+  const lifecycle = getLifecycleVisibilityEnum(context.program);
+  const visibility = getVisibilityForClass(context.program, type, lifecycle);
+  return visibility.size === 0;
 }

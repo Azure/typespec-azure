@@ -1,5 +1,40 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.50.3
+
+### Bug Fixes
+
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Change `@clientInitialization` decorator's `options` parameter to `ClientInitializationOptions` type. The options now could set how to initialize the client. Though the implementation could support backward compatibility, it's better to have all specs that use this decorator change from `@clientInitialization(CustomizedOption)` to `@clientInitialization({parameters: CustomizedOption})`. A new helper `getClientInitializationOptions` is added for getting the new `ClientInitializationOptions` info from the `@clientInitialization` decorator.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Add new `children` property to `SdkClientType` to include all the sub client belong to that client.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Add `clientInitialization` property to `SdkClientType`. Its type is `SdkClientInitializationType` which includes the initialization parameters and how to initialize the client.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `initialization` property of `SdkClientType`. Use `init.paramters` of `SdkClientType` instead.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `SdkClientAccessor` type. Use `parent` and `children` property from `SdkClientType` to find client hierarchy instead.
+
+
+## 0.50.2
+
+### Bug Fixes
+
+- [#2115](https://github.com/Azure/typespec-azure/pull/2115) Fix regression of example mapping for model with parameters.
+
+### Deprecations
+
+- [#2115](https://github.com/Azure/typespec-azure/pull/2115) Deprecate `serializedName` property of `SdkEndpointParameter`. Use `type.templateArguments[x].serializedName` or `type.variantTypes[x].templateArguments[x].serializedName` instead.
+
+
+## 0.50.1
+
+### Features
+
+- [#2097](https://github.com/Azure/typespec-azure/pull/2097) support `name` and `isGeneratedName` for nullable type
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Add `serializationOptions` property to `SdkModelType` and `SdkBodyModelPropertyType`. Its type is `SerializationOptions` which contains the info of how to serialize to Json/Xml/Multipart value.
+
+### Deprecations
+
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `serializedName` property in `SdkBodyModelPropertyType`, use `serializationOptions.xxx.name` instead.
+- [#2027](https://github.com/Azure/typespec-azure/pull/2027) Deprecate `multipartOptions` in `SdkBodyModelPropertyType`, use `serializationOptions.multipart` instead.
+
+
 ## 0.50.0
 
 ### Features

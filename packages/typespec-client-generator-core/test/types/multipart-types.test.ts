@@ -51,9 +51,10 @@ describe("typespec-client-generator-core: multipart types", () => {
     const profileImage = model.properties.find((x) => x.name === "profileImage");
     ok(profileImage);
     strictEqual(profileImage.kind, "property");
+    ok(profileImage.serializationOptions.multipart);
+    strictEqual(profileImage.serializationOptions.multipart.isFilePart, true);
     strictEqual(profileImage.isMultipartFileInput, true);
-    ok(profileImage.multipartOptions);
-    strictEqual(profileImage.multipartOptions.isFilePart, true);
+    strictEqual(profileImage.multipartOptions, profileImage.serializationOptions.multipart);
   });
 
   it("multipart conflicting model usage", async function () {
@@ -161,9 +162,11 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(modelA.properties.length, 1);
     const modelAProp = modelA.properties[0];
     strictEqual(modelAProp.kind, "property");
+
+    ok(modelAProp.serializationOptions.multipart);
+    strictEqual(modelAProp.serializationOptions.multipart.isFilePart, true);
+    strictEqual(modelAProp.multipartOptions, modelAProp.serializationOptions.multipart);
     strictEqual(modelAProp.isMultipartFileInput, true);
-    ok(modelAProp.multipartOptions);
-    strictEqual(modelAProp.multipartOptions.isFilePart, true);
 
     const modelB = models.find((x) => x.name === "B");
     ok(modelB);
@@ -212,10 +215,11 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(model.properties.length, 1);
     const pictures = model.properties[0];
     strictEqual(pictures.kind, "property");
+    ok(pictures.serializationOptions.multipart);
+    strictEqual(pictures.serializationOptions.multipart.isFilePart, true);
+    strictEqual(pictures.serializationOptions.multipart.isMulti, true);
+    strictEqual(pictures.multipartOptions, pictures.serializationOptions.multipart);
     strictEqual(pictures.isMultipartFileInput, true);
-    ok(pictures.multipartOptions);
-    strictEqual(pictures.multipartOptions.isFilePart, true);
-    strictEqual(pictures.multipartOptions.isMulti, true);
   });
 
   it("multipart with encoding bytes raises error", async function () {
@@ -372,9 +376,10 @@ describe("typespec-client-generator-core: multipart types", () => {
 
     for (const p of multiPartRequest.properties.values()) {
       strictEqual(p.kind, "property");
-      ok(p.multipartOptions);
+      ok(p.serializationOptions.multipart);
       ok(p.type.kind === "array");
-      strictEqual(p.multipartOptions.isMulti, true);
+      strictEqual(p.serializationOptions.multipart.isMulti, true);
+      strictEqual(p.multipartOptions, p.serializationOptions.multipart);
     }
   });
 
@@ -398,26 +403,36 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
     const id = MultiPartRequest.properties.find((x) => x.name === "id") as SdkBodyModelPropertyType;
     strictEqual(id.optional, true);
-    ok(id.multipartOptions);
-    strictEqual(id.multipartOptions.isFilePart, false);
-    deepEqual(id.multipartOptions.defaultContentTypes, ["text/plain"]);
+    ok(id.serializationOptions.multipart);
+    strictEqual(id.serializationOptions.multipart.isFilePart, false);
+    deepEqual(id.serializationOptions.multipart.defaultContentTypes, ["text/plain"]);
+    strictEqual(id.multipartOptions, id.serializationOptions.multipart);
     const profileImage = MultiPartRequest.properties.find(
       (x) => x.name === "profileImage",
     ) as SdkBodyModelPropertyType;
     strictEqual(profileImage.optional, false);
-    ok(profileImage.multipartOptions);
-    strictEqual(profileImage.multipartOptions.isFilePart, true);
-    strictEqual(profileImage.multipartOptions.filename, undefined);
-    strictEqual(profileImage.multipartOptions.contentType, undefined);
-    deepEqual(profileImage.multipartOptions.defaultContentTypes, ["application/octet-stream"]);
+    ok(profileImage.serializationOptions.multipart);
+    strictEqual(profileImage.serializationOptions.multipart.isFilePart, true);
+    strictEqual(profileImage.serializationOptions.multipart.filename, undefined);
+    strictEqual(profileImage.serializationOptions.multipart.contentType, undefined);
+    deepEqual(profileImage.serializationOptions.multipart.defaultContentTypes, [
+      "application/octet-stream",
+    ]);
+    strictEqual(profileImage.multipartOptions, profileImage.serializationOptions.multipart);
     const address = MultiPartRequest.properties.find(
       (x) => x.name === "address",
     ) as SdkBodyModelPropertyType;
     strictEqual(address.optional, false);
-    ok(address.multipartOptions);
-    strictEqual(address.multipartOptions.isFilePart, false);
-    deepEqual(address.multipartOptions.defaultContentTypes, ["application/json"]);
+    ok(address.serializationOptions.multipart);
+    strictEqual(address.serializationOptions.multipart.isFilePart, false);
+    deepEqual(address.serializationOptions.multipart.defaultContentTypes, ["application/json"]);
+    strictEqual(address.multipartOptions, address.serializationOptions.multipart);
     strictEqual(address.type.kind, "model");
+
+    const city = address.type.properties.find((x) => x.name === "city") as SdkBodyModelPropertyType;
+    ok(city);
+    ok(city.serializationOptions.json);
+    strictEqual(city.serializationOptions.json.name, "city");
   });
 
   it("File[] of multipart with @multipartBody for model", async function () {
@@ -437,29 +452,36 @@ describe("typespec-client-generator-core: multipart types", () => {
       (x) => x.name === "fileArrayOnePart",
     ) as SdkBodyModelPropertyType;
     ok(fileArrayOnePart);
-    ok(fileArrayOnePart.multipartOptions);
+    ok(fileArrayOnePart.serializationOptions.multipart);
     strictEqual(fileArrayOnePart.type.kind, "array");
     strictEqual(fileArrayOnePart.type.valueType.kind, "model");
-    strictEqual(fileArrayOnePart.multipartOptions.isMulti, false);
-    strictEqual(fileArrayOnePart.multipartOptions.filename, undefined);
-    strictEqual(fileArrayOnePart.multipartOptions.contentType, undefined);
+    strictEqual(fileArrayOnePart.serializationOptions.multipart.isMulti, false);
+    strictEqual(fileArrayOnePart.serializationOptions.multipart.filename, undefined);
+    strictEqual(fileArrayOnePart.serializationOptions.multipart.contentType, undefined);
     // Maybe we won't meet this case in real world, but we still need to test it.
-    deepEqual(fileArrayOnePart.multipartOptions.defaultContentTypes, ["application/json"]);
+    deepEqual(fileArrayOnePart.serializationOptions.multipart.defaultContentTypes, [
+      "application/json",
+    ]);
+    strictEqual(fileArrayOnePart.multipartOptions, fileArrayOnePart.serializationOptions.multipart);
 
     const fileArrayMultiParts = MultiPartRequest.properties.find(
       (x) => x.name === "fileArrayMultiParts",
     ) as SdkBodyModelPropertyType;
     ok(fileArrayMultiParts);
-    ok(fileArrayMultiParts.multipartOptions);
+    ok(fileArrayMultiParts.serializationOptions.multipart);
     strictEqual(fileArrayMultiParts.type.kind, "array");
     strictEqual(fileArrayMultiParts.type.valueType.kind, "model");
-    strictEqual(fileArrayMultiParts.multipartOptions.isMulti, true);
-    ok(fileArrayMultiParts.multipartOptions.filename);
-    strictEqual(fileArrayMultiParts.multipartOptions.filename.optional, true);
-    ok(fileArrayMultiParts.multipartOptions.contentType);
-    strictEqual(fileArrayMultiParts.multipartOptions.contentType.optional, true);
+    strictEqual(fileArrayMultiParts.serializationOptions.multipart.isMulti, true);
+    ok(fileArrayMultiParts.serializationOptions.multipart.filename);
+    strictEqual(fileArrayMultiParts.serializationOptions.multipart.filename.optional, true);
+    ok(fileArrayMultiParts.serializationOptions.multipart.contentType);
+    strictEqual(fileArrayMultiParts.serializationOptions.multipart.contentType.optional, true);
     // Typespec compiler will set default content type to ["*/*"] for "HttpPart<File>[]"
-    deepEqual(fileArrayMultiParts.multipartOptions.defaultContentTypes, ["*/*"]);
+    deepEqual(fileArrayMultiParts.serializationOptions.multipart.defaultContentTypes, ["*/*"]);
+    strictEqual(
+      fileArrayMultiParts.multipartOptions,
+      fileArrayMultiParts.serializationOptions.multipart,
+    );
   });
 
   it("File with specific content-type", async function () {
@@ -481,8 +503,14 @@ describe("typespec-client-generator-core: multipart types", () => {
       (x) => x.name === "file",
     ) as SdkBodyModelPropertyType;
     ok(fileOptionalFileName);
-    ok(fileOptionalFileName.multipartOptions);
-    deepEqual(fileOptionalFileName.multipartOptions.defaultContentTypes, ["image/png"]);
+    ok(fileOptionalFileName.serializationOptions.multipart);
+    deepEqual(fileOptionalFileName.serializationOptions.multipart.defaultContentTypes, [
+      "image/png",
+    ]);
+    strictEqual(
+      fileOptionalFileName.multipartOptions,
+      fileOptionalFileName.serializationOptions.multipart,
+    );
   });
 
   it("File of multipart with @multipartBody for model", async function () {
@@ -508,26 +536,34 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(fileOptionalFileName);
     strictEqual(fileOptionalFileName.optional, false);
-    ok(fileOptionalFileName.multipartOptions);
+    ok(fileOptionalFileName.serializationOptions.multipart);
     strictEqual(fileOptionalFileName.name, "fileOptionalFileName");
-    strictEqual(fileOptionalFileName.multipartOptions.isFilePart, true);
-    ok(fileOptionalFileName.multipartOptions.filename);
-    strictEqual(fileOptionalFileName.multipartOptions.filename.optional, true);
-    ok(fileOptionalFileName.multipartOptions.contentType);
-    strictEqual(fileOptionalFileName.multipartOptions.contentType.optional, true);
+    strictEqual(fileOptionalFileName.serializationOptions.multipart.isFilePart, true);
+    ok(fileOptionalFileName.serializationOptions.multipart.filename);
+    strictEqual(fileOptionalFileName.serializationOptions.multipart.filename.optional, true);
+    ok(fileOptionalFileName.serializationOptions.multipart.contentType);
+    strictEqual(fileOptionalFileName.serializationOptions.multipart.contentType.optional, true);
+    strictEqual(
+      fileOptionalFileName.multipartOptions,
+      fileOptionalFileName.serializationOptions.multipart,
+    );
 
     const fileRequiredFileName = MultiPartRequest.properties.find(
       (x) => x.name === "fileRequiredFileName",
     ) as SdkBodyModelPropertyType;
     ok(fileRequiredFileName);
     strictEqual(fileRequiredFileName.optional, false);
-    ok(fileRequiredFileName.multipartOptions);
+    ok(fileRequiredFileName.serializationOptions.multipart);
     strictEqual(fileRequiredFileName.name, "fileRequiredFileName");
-    strictEqual(fileRequiredFileName.multipartOptions.isFilePart, true);
-    ok(fileRequiredFileName.multipartOptions.filename);
-    strictEqual(fileRequiredFileName.multipartOptions.filename.optional, false);
-    ok(fileRequiredFileName.multipartOptions.contentType);
-    strictEqual(fileRequiredFileName.multipartOptions.contentType.optional, false);
+    strictEqual(fileRequiredFileName.serializationOptions.multipart.isFilePart, true);
+    ok(fileRequiredFileName.serializationOptions.multipart.filename);
+    strictEqual(fileRequiredFileName.serializationOptions.multipart.filename.optional, false);
+    ok(fileRequiredFileName.serializationOptions.multipart.contentType);
+    strictEqual(fileRequiredFileName.serializationOptions.multipart.contentType.optional, false);
+    strictEqual(
+      fileRequiredFileName.multipartOptions,
+      fileRequiredFileName.serializationOptions.multipart,
+    );
   });
 
   it("check 'multi' of multipart with @multipartBody for model", async function () {
@@ -554,8 +590,9 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(MultiPartRequest);
     for (const p of MultiPartRequest.properties.values()) {
       strictEqual(p.kind, "property");
-      ok(p.multipartOptions);
-      strictEqual(p.multipartOptions.isMulti, p.name.toLowerCase().includes("multi"));
+      ok(p.serializationOptions.multipart);
+      strictEqual(p.serializationOptions.multipart.isMulti, p.name.toLowerCase().includes("multi"));
+      strictEqual(p.multipartOptions, p.serializationOptions.multipart);
     }
   });
 
@@ -578,16 +615,21 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(stringsOnePart);
     strictEqual(stringsOnePart.type.kind, "array");
     strictEqual(stringsOnePart.type.valueType.kind, "string");
-    ok(stringsOnePart.multipartOptions);
-    strictEqual(stringsOnePart.multipartOptions.isMulti, false);
+    ok(stringsOnePart.serializationOptions.multipart);
+    strictEqual(stringsOnePart.serializationOptions.multipart.isMulti, false);
+    strictEqual(stringsOnePart.multipartOptions, stringsOnePart.serializationOptions.multipart);
     const stringsMultiParts = MultiPartRequest.properties.find(
       (x) => x.name === "stringsMultiParts",
     ) as SdkBodyModelPropertyType;
     ok(stringsMultiParts);
     strictEqual(stringsMultiParts.type.kind, "array");
     strictEqual(stringsMultiParts.type.valueType.kind, "string");
-    ok(stringsMultiParts.multipartOptions);
-    strictEqual(stringsMultiParts.multipartOptions.isMulti, true);
+    ok(stringsMultiParts.serializationOptions.multipart);
+    strictEqual(stringsMultiParts.serializationOptions.multipart.isMulti, true);
+    strictEqual(
+      stringsMultiParts.multipartOptions,
+      stringsMultiParts.serializationOptions.multipart,
+    );
   });
 
   it("check content-type in multipart with @multipartBody for model", async function () {
@@ -610,9 +652,15 @@ describe("typespec-client-generator-core: multipart types", () => {
     ) as SdkBodyModelPropertyType;
     ok(stringWithoutContentType);
     strictEqual(stringWithoutContentType.type.kind, "string");
-    ok(stringWithoutContentType.multipartOptions);
-    strictEqual(stringWithoutContentType.multipartOptions.contentType, undefined);
-    deepEqual(stringWithoutContentType.multipartOptions.defaultContentTypes, ["text/plain"]);
+    ok(stringWithoutContentType.serializationOptions.multipart);
+    strictEqual(stringWithoutContentType.serializationOptions.multipart.contentType, undefined);
+    deepEqual(stringWithoutContentType.serializationOptions.multipart.defaultContentTypes, [
+      "text/plain",
+    ]);
+    strictEqual(
+      stringWithoutContentType.multipartOptions,
+      stringWithoutContentType.serializationOptions.multipart,
+    );
 
     const stringWithContentType = MultiPartRequest.properties.find(
       (x) => x.name === "stringWithContentType",
@@ -620,20 +668,30 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(stringWithContentType);
     strictEqual(stringWithContentType.type.kind, "model");
     strictEqual(stringWithContentType.type.name, "MultiPartRequestStringWithContentType");
-    ok(stringWithContentType.multipartOptions);
-    ok(stringWithContentType.multipartOptions.contentType);
-    deepEqual(stringWithContentType.multipartOptions.defaultContentTypes, ["text/html"]);
+    ok(stringWithContentType.serializationOptions.multipart);
+    ok(stringWithContentType.serializationOptions.multipart.contentType);
+    deepEqual(stringWithContentType.serializationOptions.multipart.defaultContentTypes, [
+      "text/html",
+    ]);
+    strictEqual(
+      stringWithContentType.multipartOptions,
+      stringWithContentType.serializationOptions.multipart,
+    );
 
     const bytesWithoutContentType = MultiPartRequest.properties.find(
       (x) => x.name === "bytesWithoutContentType",
     ) as SdkBodyModelPropertyType;
     ok(bytesWithoutContentType);
     strictEqual(bytesWithoutContentType.type.kind, "bytes");
-    ok(bytesWithoutContentType.multipartOptions);
-    strictEqual(bytesWithoutContentType.multipartOptions.contentType, undefined);
-    deepEqual(bytesWithoutContentType.multipartOptions.defaultContentTypes, [
+    ok(bytesWithoutContentType.serializationOptions.multipart);
+    strictEqual(bytesWithoutContentType.serializationOptions.multipart.contentType, undefined);
+    deepEqual(bytesWithoutContentType.serializationOptions.multipart.defaultContentTypes, [
       "application/octet-stream",
     ]);
+    strictEqual(
+      bytesWithoutContentType.multipartOptions,
+      bytesWithoutContentType.serializationOptions.multipart,
+    );
 
     const bytesWithContentType = MultiPartRequest.properties.find(
       (x) => x.name === "bytesWithContentType",
@@ -641,9 +699,15 @@ describe("typespec-client-generator-core: multipart types", () => {
     ok(bytesWithContentType);
     strictEqual(bytesWithContentType.type.kind, "model");
     strictEqual(bytesWithContentType.type.name, "MultiPartRequestBytesWithContentType");
-    ok(bytesWithContentType.multipartOptions);
-    ok(bytesWithContentType.multipartOptions.contentType);
-    deepEqual(bytesWithContentType.multipartOptions.defaultContentTypes, ["image/png"]);
+    ok(bytesWithContentType.serializationOptions.multipart);
+    ok(bytesWithContentType.serializationOptions.multipart.contentType);
+    deepEqual(bytesWithContentType.serializationOptions.multipart.defaultContentTypes, [
+      "image/png",
+    ]);
+    strictEqual(
+      bytesWithContentType.multipartOptions,
+      bytesWithContentType.serializationOptions.multipart,
+    );
   });
 
   it("check isFilePart in multipart with @multipartBody for model", async function () {
@@ -667,9 +731,10 @@ describe("typespec-client-generator-core: multipart types", () => {
 
     for (const p of MultiPartRequest.properties.values()) {
       strictEqual(p.kind, "property");
-      ok(p.multipartOptions);
-      strictEqual(p.multipartOptions.isFilePart, true);
-      strictEqual(p.multipartOptions.isMulti, p.name.toLowerCase().includes("array"));
+      ok(p.serializationOptions.multipart);
+      strictEqual(p.serializationOptions.multipart.isFilePart, true);
+      strictEqual(p.serializationOptions.multipart.isMulti, p.name.toLowerCase().includes("array"));
+      strictEqual(p.multipartOptions, p.serializationOptions.multipart);
     }
   });
 
@@ -687,7 +752,9 @@ describe("typespec-client-generator-core: multipart types", () => {
     const nameProperty = MultiPartRequest.properties.find((x) => x.name === "name");
     ok(nameProperty);
     strictEqual(nameProperty.name, "name");
+    strictEqual(nameProperty.kind, "property");
     strictEqual((nameProperty as SdkBodyModelPropertyType).serializedName, "serializedName");
+    strictEqual(nameProperty.serializationOptions.multipart?.name, "serializedName");
   });
 
   it("multipart in client customization", async () => {
@@ -721,8 +788,9 @@ describe("typespec-client-generator-core: multipart types", () => {
     const property = MultiPartRequest.properties.find((x) => x.name === "profileImage");
     ok(property);
     strictEqual(property.kind, "property");
+    ok(property.serializationOptions.multipart);
+    strictEqual(property.serializationOptions.multipart.isFilePart, true);
+    strictEqual(property.multipartOptions, property.serializationOptions.multipart);
     strictEqual(property.isMultipartFileInput, true);
-    ok(property.multipartOptions);
-    strictEqual(property.multipartOptions.isFilePart, true);
   });
 });
