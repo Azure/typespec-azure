@@ -19,6 +19,7 @@ describe("typespec-client-generator-core: bytes types", () => {
       }
     }
   });
+
   describe("bytes SdkMethodParameter", () => {
     it("should use service operation parameter encoding", async () => {
       await runner.compile(`
@@ -37,7 +38,7 @@ describe("typespec-client-generator-core: bytes types", () => {
       strictEqual(param.type.kind, "bytes");
       strictEqual(param.type.name, "bytes");
       // this is from SdkHttpServiceOperationParameter
-      strictEqual(param.type.encode, "bytes");
+      strictEqual(param.type.encode, "base64");
       strictEqual(method.kind, "basic");
       const serviceBodyParam = (method as SdkBasicServiceMethod<SdkHttpOperation>).operation
         .bodyParam;

@@ -489,16 +489,6 @@ export function filterApiVersionsInEnum(
   }
 }
 
-const jsonRegex = new RegExp(/^(application|text)\/(.+\+)?json$/);
-export function isJsonContentType(contentType: string): boolean {
-  return jsonRegex.test(contentType);
-}
-
-const xmlRegex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
-export function isXmlContentType(contentType: string): boolean {
-  return xmlRegex.test(contentType);
-}
-
 export function twoParamsEquivalent(
   context: TCGCContext,
   param1?: ModelProperty,
