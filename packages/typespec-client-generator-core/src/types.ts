@@ -24,8 +24,10 @@ import {
   getDoc,
   getEncode,
   getKnownValues,
+  getLifecycleVisibilityEnum,
+  getLocationContext,
   getSummary,
-  getVisibility,
+  getVisibilityForClass,
   ignoreDiagnostics,
   isArrayModelType,
   isErrorModel,
@@ -95,6 +97,7 @@ import {
   getNullOption,
   getSdkTypeBaseHelper,
   getTypeDecorators,
+  hasNoneVisibility,
   intOrFloat,
   isHttpBodySpread,
   isMultipartOperation,
@@ -1052,23 +1055,23 @@ export function isReadOnly(property: SdkBodyModelPropertyType) {
 }
 
 function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility[] | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  const visibility = getVisibility(context.program, type);
+  const lifecycle = getLifecycleVisibilityEnum(context.program);
+  const visibility = getVisibilityForClass(context.program, type, lifecycle);
   if (visibility) {
     const result: Visibility[] = [];
-    if (visibility.includes("read")) {
+    if (lifecycle.members.get("Read") && visibility.has(lifecycle.members.get("Read")!)) {
       result.push(Visibility.Read);
     }
-    if (visibility.includes("create")) {
+    if (lifecycle.members.get("Create") && visibility.has(lifecycle.members.get("Create")!)) {
       result.push(Visibility.Create);
     }
-    if (visibility.includes("update")) {
+    if (lifecycle.members.get("Update") && visibility.has(lifecycle.members.get("Update")!)) {
       result.push(Visibility.Update);
     }
-    if (visibility.includes("delete")) {
+    if (lifecycle.members.get("Delete") && visibility.has(lifecycle.members.get("Delete")!)) {
       result.push(Visibility.Delete);
     }
-    if (visibility.includes("query")) {
+    if (lifecycle.members.get("Query") && visibility.has(lifecycle.members.get("Query")!)) {
       result.push(Visibility.Query);
     }
     return result;
@@ -1355,7 +1358,7 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
-      getVisibility(context.program, property)?.includes("none") || // eslint-disable-line @typescript-eslint/no-deprecated
+      hasNoneVisibility(context, property) ||
       sdkType.kind !== "model"
     ) {
       continue;
@@ -1868,8 +1871,11 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  for (const client of listClients(context)) {
-    const namespaces = [client.service];
+  const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
+    (x) => getLocationContext(context.program, x).type === "project",
+  );
+  for (const currNamespace of allNamespaces) {
+    const namespaces = [currNamespace];
     while (namespaces.length) {
       const namespace = namespaces.pop()!;
       // orphan models

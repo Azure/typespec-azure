@@ -48,13 +48,13 @@ model SystemAssignedServiceIdentity {
  * User assigned identity properties
  */
 model UserAssignedIdentity {
-  /** The principal ID of the assigned identity. */
-  @visibility("read")
-  principalId?: uuid;
-
   /** The client ID of the assigned identity. */
   @visibility("read")
   clientId?: uuid;
+
+  /** The principal ID of the assigned identity. */
+  @visibility("read")
+  principalId?: uuid;
 }
 
 /**
