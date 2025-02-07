@@ -55,7 +55,7 @@ for specific scenarios:
 
 Some additional sources:
 
-- The `tsp-client` CLI provides several commands to help during the TypeSpec development process, such as converting a swagger specification to a TypeSpec project, providing a simple interface to generate client libraries within the `azure-sdk-for-<language>` repositories, and more. For more information on the CLI tool, see the [tsp-client usage](https://aka.ms/azsdk/tsp-client) documenation
+- The `tsp-client` CLI provides several commands to help during the TypeSpec development process, such as converting a swagger specification to a TypeSpec project, providing a simple interface to generate client libraries within the `azure-sdk-for-<language>` repositories, and more. For more information on the CLI tool, see the [tsp-client usage](https://aka.ms/azsdk/tsp-client) documentation
 - Recordings
   - [TypeSpec lunch-and-learn for ARM in Stream Channel](https://msit.microsoftstream.com/channel/97c90840-98dc-b478-19e5-f1ecdab7312b)
   - [TypeSpec lunch-and-learn for Azure SDK](https://microsoft-my.sharepoint.com/:v:/r/personal/scotk_microsoft_com/Documents/Recordings/Lunch%20Learning%20Series%20_%20Mark%20Cowlishaw%20-%20TypeSpec%20Walkthrough-20211117_120334-Meeting%20Recording.mp4?csf=1&web=1&e=27IgaX)
