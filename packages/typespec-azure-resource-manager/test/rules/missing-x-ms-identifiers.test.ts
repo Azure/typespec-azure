@@ -219,7 +219,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       .expect(
         `
         model Pet {
-          @identifiers(["name"])
+          @identifiers(#["name"])
           pet: Dog[];
         }
  
