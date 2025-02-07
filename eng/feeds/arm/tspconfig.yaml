@@ -7,17 +7,17 @@ options:
     azure-resource-provider-folder: "resource-manager"
     output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-csharp":
-    package-dir: "{package-name}"
+    package-dir: "{replace-with-your-package-name}"
     clear-output-folder: true
     model-namespace: false
     namespace: "{package-dir}"
   "@azure-tools/typespec-python":
-    package-dir: "{package-dir}"
-    package-name: "{package-name}"
+    package-dir: "{replace-with-your-package-dir}"
+    package-name: "{package-dir}"
     generate-test: true
     generate-sample: true
   "@azure-tools/typespec-java":
-    package-dir: "{package-dir}"
+    package-dir: "{replace-with-your-package-dir}"
     namespace: "{namespace}"
     service-name: "{service-name}"
   "@azure-tools/typespec-ts":
