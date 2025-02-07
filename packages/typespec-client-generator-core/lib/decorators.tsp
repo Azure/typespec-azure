@@ -388,7 +388,7 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * namespace MyCustomizations;
  *
  * op myOperationCustomization(params: MyService.Params): void;
- * 
+ *
  * @@override(MyService.myOperation, myOperationCustomization);
  *
  * // method signature is now `op myOperation(params: Params)`
@@ -409,7 +409,7 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * namespace MyCustomizations;
  *
  * op myOperationCustomization(params: MyService.Params): void;
- * 
+ *
  * @@override(MyService.myOperation, myOperationCustomization, "csharp")
  *
  * // method signature is now `op myOperation(params: Params)` just for csharp
