@@ -24,8 +24,10 @@ import {
   getDoc,
   getEncode,
   getKnownValues,
+  getLifecycleVisibilityEnum,
+  getLocationContext,
   getSummary,
-  getVisibility,
+  getVisibilityForClass,
   ignoreDiagnostics,
   isArrayModelType,
   isErrorModel,
@@ -95,13 +97,12 @@ import {
   getNullOption,
   getSdkTypeBaseHelper,
   getTypeDecorators,
+  hasNoneVisibility,
   intOrFloat,
   isHttpBodySpread,
-  isJsonContentType,
   isMultipartOperation,
   isNeverOrVoidType,
   isOnClient,
-  isXmlContentType,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -118,6 +119,7 @@ import {
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
+import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
   context: TCGCContext,
@@ -185,7 +187,11 @@ export function addEncodeInfo(
   if (innerType.kind === "bytes") {
     if (encodeData) {
       innerType.encode = encodeData.encoding as BytesKnownEncoding;
-    } else if (!defaultContentType || defaultContentType === "application/json") {
+    } else if (
+      !defaultContentType ||
+      isMediaTypeJson(defaultContentType) ||
+      isMediaTypeXml(defaultContentType)
+    ) {
       innerType.encode = "base64";
     } else {
       innerType.encode = "bytes";
@@ -1049,23 +1055,23 @@ export function isReadOnly(property: SdkBodyModelPropertyType) {
 }
 
 function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility[] | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  const visibility = getVisibility(context.program, type);
+  const lifecycle = getLifecycleVisibilityEnum(context.program);
+  const visibility = getVisibilityForClass(context.program, type, lifecycle);
   if (visibility) {
     const result: Visibility[] = [];
-    if (visibility.includes("read")) {
+    if (lifecycle.members.get("Read") && visibility.has(lifecycle.members.get("Read")!)) {
       result.push(Visibility.Read);
     }
-    if (visibility.includes("create")) {
+    if (lifecycle.members.get("Create") && visibility.has(lifecycle.members.get("Create")!)) {
       result.push(Visibility.Create);
     }
-    if (visibility.includes("update")) {
+    if (lifecycle.members.get("Update") && visibility.has(lifecycle.members.get("Update")!)) {
       result.push(Visibility.Update);
     }
-    if (visibility.includes("delete")) {
+    if (lifecycle.members.get("Delete") && visibility.has(lifecycle.members.get("Delete")!)) {
       result.push(Visibility.Delete);
     }
-    if (visibility.includes("query")) {
+    if (lifecycle.members.get("Query") && visibility.has(lifecycle.members.get("Query")!)) {
       result.push(Visibility.Query);
     }
     return result;
@@ -1352,7 +1358,7 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
-      getVisibility(context.program, property)?.includes("none") || // eslint-disable-line @typescript-eslint/no-deprecated
+      hasNoneVisibility(context, property) ||
       sdkType.kind !== "model"
     ) {
       continue;
@@ -1580,10 +1586,10 @@ function updateTypesFromOperation(
       } else {
         updateUsageOrAccess(context, UsageFlags.Input, sdkType);
       }
-      if (httpBody.contentTypes.some((x) => isJsonContentType(x))) {
+      if (httpBody.contentTypes.some((x) => isMediaTypeJson(x))) {
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
       }
-      if (httpBody.contentTypes.some((x) => isXmlContentType(x))) {
+      if (httpBody.contentTypes.some((x) => isMediaTypeXml(x))) {
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Xml, sdkType));
       }
       if (httpBody.contentTypes.includes("application/merge-patch+json")) {
@@ -1644,7 +1650,7 @@ function updateTypesFromOperation(
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkType));
           }
 
-          if (innerResponse.body.contentTypes.some((x) => isJsonContentType(x))) {
+          if (innerResponse.body.contentTypes.some((x) => isMediaTypeJson(x))) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
           }
 
@@ -1865,8 +1871,11 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  for (const client of listClients(context)) {
-    const namespaces = [client.service];
+  const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
+    (x) => getLocationContext(context.program, x).type === "project",
+  );
+  for (const currNamespace of allNamespaces) {
+    const namespaces = [currNamespace];
     while (namespaces.length) {
       const namespace = namespaces.pop()!;
       // orphan models
@@ -1972,23 +1981,23 @@ function setSerializationOptions(
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes ?? []) {
-    if (isJsonContentType(contentType) && !type.serializationOptions.json) {
+    if (isMediaTypeJson(contentType) && !type.serializationOptions.json) {
       updateJsonSerializationOptions(context, type);
     }
 
-    if (isXmlContentType(contentType) && !type.serializationOptions.xml) {
+    if (isMediaTypeXml(contentType) && !type.serializationOptions.xml) {
       updateXmlSerializationOptions(context, type);
     }
   }
   if (
-    !type.serializationOptions.xml &&
+    !type.serializationOptions.json &&
     type.__raw &&
     hasExplicitlyDefinedJsonSerializationInfo(context, type.__raw)
   ) {
     updateJsonSerializationOptions(context, type);
   }
   if (
-    !type.serializationOptions.json &&
+    !type.serializationOptions.xml &&
     type.__raw &&
     hasExplicitlyDefinedXmlSerializationInfo(context, type.__raw)
   ) {

@@ -607,4 +607,50 @@ describe("typespec-client-generator-core: serialization options", () => {
     strictEqual(model.properties[0].serializationOptions.xml?.name, "content");
     strictEqual(model.properties[0].serializationOptions.xml?.unwrapped, true);
   });
+
+  it("different xml content type", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      @encodedName("application/xml", "XmlTag")
+      model Tag {
+        @Xml.name("XmlName")
+        name: string;
+      }
+
+      op test(): {@header("content-type") contentType: "text/xml; charset=utf-8"; @body body: Tag};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.serializationOptions.xml?.name, "XmlTag");
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.xml?.name, "XmlName");
+  });
+
+  it("different json content type", async function () {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [XmlTestLibrary],
+      autoUsings: ["TypeSpec.Xml"],
+    });
+
+    await runner.compileWithBuiltInService(`
+      model Tag {
+        @encodedName("application/json", "rename")
+        name: string;
+      }
+
+      op test(): {@header("content-type") contentType: "application/json; serialization=json"; @body body: Tag};
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.properties[0].kind, "property");
+    strictEqual(model.properties[0].serializationOptions.json?.name, "rename");
+  });
 });

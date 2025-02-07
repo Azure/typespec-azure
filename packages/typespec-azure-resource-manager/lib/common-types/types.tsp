@@ -74,7 +74,7 @@ model ResourceModelWithAllowedPropertySet extends TrackedResource {
    * Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),
    * If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. */
   @visibility("read")
-  eTag?: string;
+  etag?: string;
 
   @typeChangedFrom(Versions.v6, Identity)
   identity?: ManagedServiceIdentity;
