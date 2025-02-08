@@ -847,6 +847,228 @@ describe("typespec-autorest: extension decorator", () => {
   });
 });
 
+describe("typespec-azure: identifiers decorator", () => {
+  it("ignores name/id keys for x-ms-identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        @key
+        name: string;
+        @key
+        id: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
+  });
+  it("uses identifiers decorator for properties", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        age: int32;
+      }
+      model PetList {
+        @identifiers(#["age"])
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
+  });
+  it("identifies keys correctly as x-ms-identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        @key
+        age: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
+  });
+  it("x-ms-identifiers ignores keys for non armProviderNamespace", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        @key
+        age: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+  });
+
+  it("prioritizes identifiers decorator over keys", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        @key
+        age: int32;
+      }
+      model PetList {
+        @identifiers(#[])
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+  });
+  it("supports multiple identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        age: int32;
+      }
+      model PetList {
+        @identifiers(#["name", "age"])
+        value: Pet[]
+      }
+      @route("/Pets")
+      @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name", "age"]);
+  });
+  it("supports inner properties in identifiers decorator", async () => {
+    const oapi = await openApiFor(
+      `
+        @armProviderNamespace
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Test;
+      
+        model Pet {
+          dogs: Dog;
+        }
+        
+        model Dog {
+          breed: string;
+        }
+        
+        model PetList {
+          @identifiers(#["dogs/breed"])
+          pets: Pet[]
+        }
+        @route("/Pets")
+        @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/breed"]);
+  });
+  it("support inner models in different namespace but route models should be on armProviderNamespace", async () => {
+    const oapi = await openApiFor(
+      `
+        @armProviderNamespace
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Test
+        {
+        
+          @route("/Pets")
+          @get op list(): PetList;
+        
+          model PetList {
+            @identifiers(#["age"])
+            pets: Microsoft.Modeling.Pet[]
+          }
+        }
+        
+        namespace Microsoft.Modeling
+        {
+          model Pet {
+            age: int32;
+          }
+        }
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["age"]);
+  });
+  it("supports inner properties for keys", async () => {
+    const oapi = await openApiFor(
+      `
+        @armProviderNamespace
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        namespace Microsoft.Test;
+        
+        model Pet {
+          dogs: Dog;
+          cats: Cat;
+        }
+         
+        model Dog {
+          @key
+          breed: string;
+        }
+        
+        model Cat
+        {
+          features: Features;
+        }
+        
+        model Features {
+            @key
+            color:string;
+            size:int32;
+        }
+        
+        model PetList {
+          pets: Pet[]
+        }
+        
+        @route("/Pets")
+        @get op list(): PetList;
+      `,
+    );
+    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], [
+      "dogs/breed",
+      "cats/features/color",
+    ]);
+  });
+});
+
 describe("typespec-autorest: multipart formData", () => {
   it("expands model into formData parameters", async () => {
     const oapi = await openApiFor(`
