@@ -2,17 +2,26 @@ import {
   createDiagnosticCollector,
   EmitContext,
   emitFile,
+  ModelProperty,
+  Operation,
   Program,
   resolvePath,
+  Type,
 } from "@typespec/compiler";
+import { HttpOperation } from "@typespec/http";
 import { stringify } from "yaml";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
 import {
   SdkContext,
   SdkEmitterOptions,
+  SdkEnumType,
   SdkHttpOperation,
+  SdkModelPropertyType,
+  SdkModelType,
+  SdkNullableType,
   SdkServiceOperation,
+  SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
 import { parseEmitterName } from "./internal-utils.js";
@@ -33,6 +42,9 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
     __pagedResultSet: new Set(),
+    referencedTypeMap: new Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>(),
+    httpOperationCache: new Map<Operation, HttpOperation>(),
+    referencedPropertyMap: new Map<ModelProperty, SdkModelPropertyType>(),
   };
 }
 
