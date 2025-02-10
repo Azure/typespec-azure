@@ -74,6 +74,15 @@ export function isArmLibraryNamespace(program: Program, namespace: Namespace): b
   return program.stateMap(ArmStateKeys.armLibraryNamespaces).get(namespace) === true;
 }
 
+export function isArmProviderNamespace(
+  program: Program,
+  namespace: Namespace | undefined,
+): boolean {
+  return (
+    namespace !== undefined && program.stateMap(ArmStateKeys.armProviderNamespaces).has(namespace)
+  );
+}
+
 function isArmNamespaceOverride(program: Program, entity: Namespace): boolean {
   return (
     program.stateMap(ArmStateKeys.armProviderNamespaces).size === 1 &&
