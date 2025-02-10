@@ -50,6 +50,8 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   __rawClients?: SdkClient[];
   apiVersion?: string;
+  // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
