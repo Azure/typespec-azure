@@ -447,7 +447,17 @@ describe("typespec-client-generator-core: multipart types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    const fileModel = models.find((x) => x.name === "File");
     ok(MultiPartRequest);
+    ok(fileModel);
+    // filename property
+    const filenameProperty = fileModel.properties.find(
+      (x) => x.name === "filename",
+    ) as SdkBodyModelPropertyType;
+    // contentType property
+    const contentTypeProperty = fileModel.properties.find(
+      (x) => x.name === "contentType",
+    ) as SdkBodyModelPropertyType;
     const fileArrayOnePart = MultiPartRequest.properties.find(
       (x) => x.name === "fileArrayOnePart",
     ) as SdkBodyModelPropertyType;
@@ -474,8 +484,15 @@ describe("typespec-client-generator-core: multipart types", () => {
     strictEqual(fileArrayMultiParts.serializationOptions.multipart.isMulti, true);
     ok(fileArrayMultiParts.serializationOptions.multipart.filename);
     strictEqual(fileArrayMultiParts.serializationOptions.multipart.filename.optional, true);
+    // assert the filename property here is the same instance that comes from model File
+    strictEqual(fileArrayMultiParts.serializationOptions.multipart.filename, filenameProperty);
     ok(fileArrayMultiParts.serializationOptions.multipart.contentType);
     strictEqual(fileArrayMultiParts.serializationOptions.multipart.contentType.optional, true);
+    // assert the contentType property here is the same instance that comes from model File
+    strictEqual(
+      fileArrayMultiParts.serializationOptions.multipart.contentType,
+      contentTypeProperty,
+    );
     // Typespec compiler will set default content type to ["*/*"] for "HttpPart<File>[]"
     deepEqual(fileArrayMultiParts.serializationOptions.multipart.defaultContentTypes, ["*/*"]);
     strictEqual(
@@ -529,37 +546,74 @@ describe("typespec-client-generator-core: multipart types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 3);
     const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+    const fileModel = models.find((x) => x.name === "File");
     ok(MultiPartRequest);
     ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
+    ok(fileModel);
     const fileOptionalFileName = MultiPartRequest.properties.find(
       (x) => x.name === "fileOptionalFileName",
     ) as SdkBodyModelPropertyType;
     ok(fileOptionalFileName);
+    const filenameProperty = fileModel.properties.find(
+      (p) => p.name === "filename",
+    ) as SdkBodyModelPropertyType;
+    const contentTypeProperty = fileModel.properties.find(
+      (p) => p.name === "contentType",
+    ) as SdkBodyModelPropertyType;
+    ok(filenameProperty);
+    ok(contentTypeProperty);
     strictEqual(fileOptionalFileName.optional, false);
     ok(fileOptionalFileName.serializationOptions.multipart);
     strictEqual(fileOptionalFileName.name, "fileOptionalFileName");
     strictEqual(fileOptionalFileName.serializationOptions.multipart.isFilePart, true);
     ok(fileOptionalFileName.serializationOptions.multipart.filename);
     strictEqual(fileOptionalFileName.serializationOptions.multipart.filename.optional, true);
+    // assert the filename property here is the same instance that comes from model File
+    strictEqual(fileOptionalFileName.serializationOptions.multipart.filename, filenameProperty);
     ok(fileOptionalFileName.serializationOptions.multipart.contentType);
     strictEqual(fileOptionalFileName.serializationOptions.multipart.contentType.optional, true);
+    // assert the contentType property here is the same instance that comes from model File
+    strictEqual(
+      fileOptionalFileName.serializationOptions.multipart.contentType,
+      contentTypeProperty,
+    );
     strictEqual(
       fileOptionalFileName.multipartOptions,
       fileOptionalFileName.serializationOptions.multipart,
     );
 
+    const requiredMetaDataModel = models.find((x) => x.name === "RequiredMetaData");
+    ok(requiredMetaDataModel);
     const fileRequiredFileName = MultiPartRequest.properties.find(
       (x) => x.name === "fileRequiredFileName",
     ) as SdkBodyModelPropertyType;
+    const requiredFilenameProperty = requiredMetaDataModel.properties.find(
+      (p) => p.name === "filename",
+    ) as SdkBodyModelPropertyType;
+    const requiredContentTypeProperty = requiredMetaDataModel.properties.find(
+      (p) => p.name === "contentType",
+    ) as SdkBodyModelPropertyType;
     ok(fileRequiredFileName);
+    ok(requiredFilenameProperty);
+    ok(requiredContentTypeProperty);
     strictEqual(fileRequiredFileName.optional, false);
     ok(fileRequiredFileName.serializationOptions.multipart);
     strictEqual(fileRequiredFileName.name, "fileRequiredFileName");
     strictEqual(fileRequiredFileName.serializationOptions.multipart.isFilePart, true);
     ok(fileRequiredFileName.serializationOptions.multipart.filename);
     strictEqual(fileRequiredFileName.serializationOptions.multipart.filename.optional, false);
+    // assert the filename property here is the same instance that comes from model RequiredMetaData
+    strictEqual(
+      fileRequiredFileName.serializationOptions.multipart.filename,
+      requiredFilenameProperty,
+    );
     ok(fileRequiredFileName.serializationOptions.multipart.contentType);
     strictEqual(fileRequiredFileName.serializationOptions.multipart.contentType.optional, false);
+    // assert the contentType property here is the same instance that comes from model RequiredMetaData
+    strictEqual(
+      fileRequiredFileName.serializationOptions.multipart.contentType,
+      requiredContentTypeProperty,
+    );
     strictEqual(
       fileRequiredFileName.multipartOptions,
       fileRequiredFileName.serializationOptions.multipart,

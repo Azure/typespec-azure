@@ -344,6 +344,8 @@ export function getSdkHttpParameter(
     // we don't url encode if the type can be assigned to url
     const urlEncode = !ignoreDiagnostics(
       program.checker.isTypeAssignableTo(
+        // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         param.type.projectionBase ?? param.type,
         program.checker.getStdType("url"),
         param.type,
