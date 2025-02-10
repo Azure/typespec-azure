@@ -39,9 +39,10 @@ export interface TCGCContext {
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
-  referencedTypeMap?: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  referencedTypeMap: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  referencedPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache?: Map<Operation, HttpOperation>;
+  httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
