@@ -1386,9 +1386,6 @@ function updateReferencedPropertyMap(
   if (sdkType.kind !== "property") {
     return;
   }
-  if (context.referencedPropertyMap === undefined) {
-    context.referencedPropertyMap = new Map<ModelProperty, SdkModelPropertyType>();
-  }
   context.referencedPropertyMap.set(type, sdkType);
 }
 
@@ -1401,13 +1398,7 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
   ) {
     return;
   }
-  if (context.referencedTypeMap === undefined) {
-    context.referencedTypeMap = new Map<
-      Type,
-      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
-    >();
-  }
-  context.referencedTypeMap.set(type, sdkType);
+  context.referencedTypeMap?.set(type, sdkType);
 }
 
 interface PropagationOptions {
@@ -1851,12 +1842,6 @@ export function getAllReferencedTypes(
 
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (context.referencedTypeMap === undefined) {
-    context.referencedTypeMap = new Map<
-      Type,
-      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
-    >();
-  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client

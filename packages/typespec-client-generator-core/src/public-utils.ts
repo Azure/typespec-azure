@@ -661,14 +661,11 @@ export function getHttpOperationWithCache(
   context: TCGCContext,
   operation: Operation,
 ): HttpOperation {
-  if (context.httpOperationCache === undefined) {
-    context.httpOperationCache = new Map<Operation, HttpOperation>();
-  }
-  if (context.httpOperationCache.has(operation)) {
+  if (context.httpOperationCache?.has(operation)) {
     return context.httpOperationCache.get(operation)!;
   }
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
-  context.httpOperationCache.set(operation, httpOperation);
+  context.httpOperationCache?.set(operation, httpOperation);
   return httpOperation;
 }
 
