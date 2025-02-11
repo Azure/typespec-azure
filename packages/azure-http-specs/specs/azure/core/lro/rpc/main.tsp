@@ -2,6 +2,7 @@ import "@azure-tools/typespec-azure-core";
 import "@typespec/spector";
 import "@typespec/rest";
 import "@typespec/versioning";
+import "@azure-tools/typespec-client-generator-core";
 
 using Azure.Core;
 using global.Azure.Core.Traits;
@@ -18,6 +19,7 @@ using Spector;
     versioned: Versions,
   }
 )
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.lro.rpc", "java")
 namespace _Specs_.Azure.Core.Lro.Rpc;
 
 @doc("The API version.")
