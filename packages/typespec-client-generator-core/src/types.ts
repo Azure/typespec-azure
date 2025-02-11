@@ -1825,14 +1825,6 @@ function filterOutTypes(
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
   const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
   for (const sdkType of context.referencedTypeMap?.values() ?? []) {
-    if (
-      sdkType.kind !== "model" &&
-      sdkType.kind !== "enum" &&
-      sdkType.kind !== "union" &&
-      sdkType.kind !== "nullable"
-    ) {
-      continue;
-    }
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;
