@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.51.0
+
+### Bug Fixes
+
+- [#2178](https://github.com/Azure/typespec-azure/pull/2178) Fixing `etag` property name on common-types from `eTag` to `etag`.
+- [#2077](https://github.com/Azure/typespec-azure/pull/2077) Fix provider name not being replaced in the route when using `ArmProviderActionSync` or `ArmProviderActionAsync` operation.
+- [#2085](https://github.com/Azure/typespec-azure/pull/2085) Exclude template instances from the `no-response-body` rule.
+- [#2185](https://github.com/Azure/typespec-azure/pull/2185) Fix common-types privatelink typo in `@key("privateLinkResourcenName") from privateLinkResourcenName to privateLinkResourceName`
+
+### Bump dependencies
+
+- [#2109](https://github.com/Azure/typespec-azure/pull/2109) Upgrade dependencies
+
+### Features
+
+- [#2091](https://github.com/Azure/typespec-azure/pull/2091) Add `@externalTypeRef` decorator, to been able to specify an external reference that should be used when emitting.
+- [#2173](https://github.com/Azure/typespec-azure/pull/2173) Update versioning handling to use new mutator approach
+- [#2094](https://github.com/Azure/typespec-azure/pull/2094) Use the `@identifiers` decorator to identify and utilize identifiers for `x-ms-identifiers`. Additionally, use the `@key` decorator to identify identifiers.
+
+
 ## 0.50.0
 
 No changes, version bump only.
