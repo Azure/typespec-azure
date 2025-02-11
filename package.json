@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@9.5.0",
   "scripts": {
-    "run-all": "pnpm -r --filter=!./core/",
+    "run-all": "pnpm -r --filter=\"!./core/**\"",
     "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build && pnpm check:eng",
     "check-version-mismatch": "syncpack list-mismatches",
     "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
