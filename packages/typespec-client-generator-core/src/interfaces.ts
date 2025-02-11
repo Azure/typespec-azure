@@ -39,9 +39,10 @@ export interface TCGCContext {
   packageName?: string;
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
-  referencedTypeMap?: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  referencedTypeMap: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  referencedPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache?: Map<Operation, HttpOperation>;
+  httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
@@ -49,6 +50,8 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   __rawClients?: SdkClient[];
   apiVersion?: string;
+  // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   originalProgram: Program;
@@ -741,8 +744,10 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 
 interface SdkPagingServiceMethodOptions {
   __raw_paged_metadata?: PagedResultMetadata;
-  nextLinkPath?: string; // off means fake paging
+  nextLinkPath?: string;
   nextLinkOperation?: SdkServiceOperation;
+  continuationTokenParameter?: SdkMethodParameter;
+  continuationTokenResponseSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>

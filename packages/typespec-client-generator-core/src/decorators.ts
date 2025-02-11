@@ -306,6 +306,8 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
       throw new Error("Version projects should only contain one element");
     const projectedVersion = versionProjections[0];
     if (projectedVersion.projections.length > 0) {
+      // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       projectedProgram = context.program = projectProgram(
         context.originalProgram,
         projectedVersion.projections,
