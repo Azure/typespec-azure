@@ -1,6 +1,7 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { SdkArrayType, UsageFlags } from "../../src/interfaces.js";
+import { SdkArrayType, SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
@@ -393,7 +394,7 @@ describe("typespec-client-generator-core: union types", () => {
     const sdkType = property.type;
     strictEqual(sdkType.kind, "union");
     strictEqual(sdkType.name, "MyNamedUnion");
-    strictEqual(sdkType.isGeneratedName, false);
+    strictEqual(sdkType.isGeneratedName, true);
     strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
     strictEqual(sdkType.access, "public");
     const variants = sdkType.variantTypes;
@@ -455,7 +456,7 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(sdkType.isGeneratedName, false);
     strictEqual(sdkType.type.kind, "union");
     strictEqual(sdkType.type.name, "MyNamedUnion");
-    strictEqual(sdkType.type.isGeneratedName, false);
+    strictEqual(sdkType.type.isGeneratedName, true);
     strictEqual(sdkType.type.usage, UsageFlags.Input | UsageFlags.Output);
     strictEqual(sdkType.type.access, "public");
     const variants = sdkType.type.variantTypes;
@@ -558,6 +559,89 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(sdkType.name, "PropertyModel");
 
     deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
+  });
+
+  it("nullable union with anonymous model", async function () {
+    await runner.compileWithBuiltInService(`
+      union A {
+        null,
+        {
+          code?: string,
+          message?: string,
+          propA?: A,
+        },
+      }
+      op post(@body body: A): { @body body: A }; 
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 1);
+    strictEqual(models[0].kind, "model");
+    strictEqual(models[0].name, "PostRequest");
+
+    const unions = runner.context.sdkPackage.unions;
+    strictEqual(unions.length, 1);
+    strictEqual(unions[0].kind, "nullable");
+    strictEqual(unions[0].name, "A");
+    deepStrictEqual(unions[0].type, models[0]);
+
+    const method = runner.context.sdkPackage.clients[0].methods[0];
+    ok(method);
+    const bodyParamType = method.parameters[0].type;
+    strictEqual(bodyParamType.kind, "nullable");
+    deepStrictEqual(bodyParamType.type, models[0]);
+    const responseBodyType = (method.response as SdkMethodResponse).type;
+    ok(responseBodyType);
+    strictEqual(responseBodyType.kind, "nullable");
+    deepStrictEqual(responseBodyType.type, models[0]);
+  });
+
+  it("nullable union circular", async function () {
+    await runner.compileAndDiagnose(`
+      @service({})
+      namespace Test {
+        union Test {
+          null,
+          Test,
+        }
+
+        op test(test: Test): void;
+      }
+    `);
+
+    expectDiagnostics(runner.context.diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/union-circular",
+    });
+  });
+
+  it("complicated union circular", async function () {
+    await runner.compileAndDiagnose(`
+      @service({})
+      namespace Test {
+        union A {
+          "A",
+          B,
+        }
+        
+        union B {
+          "B",
+          C,
+        }
+
+        union C {
+          "C",
+          A,
+        }
+
+        op test(test: A): void;
+      }
+    `);
+
+    const diagnostic = {
+      code: "@azure-tools/typespec-client-generator-core/union-circular",
+    };
+    // A, B, C all have one diagnostic
+    expectDiagnostics(runner.context.diagnostics, [diagnostic, diagnostic, diagnostic]);
   });
 
   it("mix types", async function () {
