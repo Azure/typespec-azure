@@ -1,5 +1,26 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.51.0
+
+### Bug Fixes
+
+- [#2176](https://github.com/Azure/typespec-azure/pull/2176) Enhance content type judge logic, which fix missing serialization options of models and wrong bytes encode.
+- [#2181](https://github.com/Azure/typespec-azure/pull/2181) Fix wrong example doc of `@override` decorator.
+- [#2167](https://github.com/Azure/typespec-azure/pull/2167) add cache for `SdkModelPropertyType` in TCGCContext
+- [#2172](https://github.com/Azure/typespec-azure/pull/2172) move to core's `getVisibilityForClass` to determine a property's visibility
+- [#2159](https://github.com/Azure/typespec-azure/pull/2159) add `.json` serialization information for json model serialization within multipart
+- [#2163](https://github.com/Azure/typespec-azure/pull/2163) add visibility for other properties
+
+### Bump dependencies
+
+- [#2109](https://github.com/Azure/typespec-azure/pull/2109) Upgrade dependencies
+
+### Features
+
+- [#2102](https://github.com/Azure/typespec-azure/pull/2102) Add a `resultSegments` property to `SdkLroServiceFinalResponse` and deprecate `resultPath` property. Add a `resultSegments` property to `SdkMethodResponse`.
+- [#2179](https://github.com/Azure/typespec-azure/pull/2179) add support for models-only packages
+
+
 ## 0.50.3
 
 ### Bug Fixes

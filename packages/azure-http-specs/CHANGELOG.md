@@ -1,5 +1,16 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.6
+
+### Bug Fixes
+
+- [#2087](https://github.com/Azure/typespec-azure/pull/2087) Add @apiVersion scenarios and mock apis
+
+### Bump dependencies
+
+- [#2109](https://github.com/Azure/typespec-azure/pull/2109) Upgrade dependencies
+
+
 ## 0.1.0-alpha.5
 
 ### Bug Fixes
