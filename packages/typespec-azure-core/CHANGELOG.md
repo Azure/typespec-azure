@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.51.0
+
+### Bump dependencies
+
+- [#2109](https://github.com/Azure/typespec-azure/pull/2109) Upgrade dependencies
+
+
 ## 0.50.0
 
 No changes, version bump only.

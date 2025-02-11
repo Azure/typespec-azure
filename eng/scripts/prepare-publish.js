@@ -69,7 +69,7 @@ if (production) {
   await typespecRun("git", "merge", "--ff-only", "FETCH_HEAD");
 }
 // Stage the typespec core publish
-await typespecRun("pnpm", "change", "version");
+await typespecRun("pnpm", "change", "version", "--exclude", "standalone");
 if (!args.values.onlyBumpVersions) {
   await typespecRun("pnpm", "update-latest-docs");
 }
@@ -210,6 +210,10 @@ async function rebuildAndRegenSamplesToBumpTemplateVersions() {
     await typespecAzureRun("pnpm", "regen-samples");
   }
 
+  if ((await checkForChangedFiles(coreRepoRoot, undefined, { silent: true })) && production) {
+    await typespecRun("git", "add", "-A");
+    await typespecRun("git", "commit", "-m", "Rebuild and regen samples to bump template versions");
+  }
   if ((await checkForChangedFiles(repoRoot, undefined, { silent: true })) && production) {
     await typespecAzureRun("git", "add", "-A");
     await typespecAzureRun(
