@@ -1,4 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { Visibility } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkModelType, UsageFlags } from "../../src/interfaces.js";
@@ -1777,7 +1778,7 @@ describe("typespec-client-generator-core: model types", () => {
     await runner.compileWithBuiltInService(`
       model Test{
           prop: string;
-          @visibility("none")
+          @invisible(Lifecycle)
           nonProp: string;
       }
       @post
@@ -1786,5 +1787,27 @@ describe("typespec-client-generator-core: model types", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].properties.length, 1);
+  });
+
+  it("header property on body root model visibility", async function () {
+    await runner.compileWithBuiltInService(`
+        model InputModel {
+          @visibility("read")
+          @header("x-name")
+          name: string;
+        }
+        op foo(@bodyRoot body: InputModel): void;
+        `);
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.models.length, 1);
+    const inputModel = sdkPackage.models[0];
+    strictEqual(inputModel.name, "InputModel");
+    strictEqual(inputModel.properties.length, 1);
+    const nameProperty = inputModel.properties[0];
+    strictEqual(nameProperty.name, "name");
+    strictEqual(nameProperty.kind, "header");
+    ok(nameProperty.visibility);
+    strictEqual(nameProperty.visibility.length, 1);
+    strictEqual(nameProperty.visibility[0], Visibility.Read);
   });
 });

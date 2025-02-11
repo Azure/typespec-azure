@@ -12,8 +12,10 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
+  getArmIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
+  isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
@@ -458,6 +460,7 @@ export async function getOpenAPIForService(
         prop.type.kind === "Scalar" &&
         ignoreDiagnostics(
           program.checker.isTypeAssignableTo(
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             prop.type.projectionBase ?? prop.type,
             program.checker.getStdType("url"),
             prop.type,
@@ -750,6 +753,7 @@ export async function getOpenAPIForService(
   }
 
   function isBytes(type: Type) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const baseType = type.projectionBase ?? type;
     return ignoreDiagnostics(
       program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type),
@@ -963,7 +967,7 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
-  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext, namespace?: Namespace): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
       undefined;
     const ref = resolveExternalRef(type);
@@ -1013,7 +1017,7 @@ export async function getOpenAPIForService(
     const name = getOpenAPITypeName(program, type, typeNameOptions);
 
     if (shouldInline(program, type)) {
-      const schema = getSchemaForInlineType(type, name, schemaContext);
+      const schema = getSchemaForInlineType(type, name, schemaContext, namespace);
 
       if (schema === undefined && isErrorType(type)) {
         // Exit early so that syntax errors are exposed.  This error will
@@ -1040,7 +1044,12 @@ export async function getOpenAPIForService(
       return { $ref: pending.ref };
     }
   }
-  function getSchemaForInlineType(type: Type, name: string, context: SchemaContext) {
+  function getSchemaForInlineType(
+    type: Type,
+    name: string,
+    context: SchemaContext,
+    namespace?: Namespace,
+  ) {
     if (inProgressInlineTypes.has(type)) {
       reportDiagnostic(program, {
         code: "inline-cycle",
@@ -1050,7 +1059,7 @@ export async function getOpenAPIForService(
       return {};
     }
     inProgressInlineTypes.add(type);
-    const schema = getSchemaForType(type, context);
+    const schema = getSchemaForType(type, context, namespace);
     inProgressInlineTypes.delete(type);
     return schema;
   }
@@ -1627,17 +1636,20 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getSchemaForType(type: Type, schemaContext: SchemaContext): OpenAPI2Schema | undefined {
+  function getSchemaForType(
+    type: Type,
+    schemaContext: SchemaContext,
+    namespace?: Namespace,
+  ): OpenAPI2Schema | undefined {
     const builtinType = getSchemaForLiterals(type);
     if (builtinType !== undefined) {
       return builtinType;
     }
-
     switch (type.kind) {
       case "Intrinsic":
         return getSchemaForIntrinsicType(type);
       case "Model":
-        return getSchemaForModel(type, schemaContext);
+        return getSchemaForModel(type, schemaContext, namespace);
       case "ModelProperty":
         return getSchemaForType(type.type, schemaContext);
       case "Scalar":
@@ -1770,11 +1782,13 @@ export async function getOpenAPIForService(
         foundCustom = true;
       }
     }
+
+    const clientName = getClientName(context, union as any);
     const schema: OpenAPI2Schema = {
       type: e.kind,
       enum: [...e.flattenedMembers.values()].map((x) => x.value),
       "x-ms-enum": {
-        name: union.name,
+        name: clientName ?? union.name,
         modelAsString: e.open,
       },
     };
@@ -1841,6 +1855,10 @@ export async function getOpenAPIForService(
     );
   }
 
+  function ifArmIdentifiersDefault(armIdentifiers: string[]) {
+    return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
+  }
+
   function getSchemaForUnionVariant(
     variant: UnionVariant,
     schemaContext: SchemaContext,
@@ -1885,8 +1903,8 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  function getSchemaForModel(model: Model, schemaContext: SchemaContext) {
-    const array = getArrayType(model, schemaContext);
+  function getSchemaForModel(model: Model, schemaContext: SchemaContext, namespace?: Namespace) {
+    const array = getArrayType(model, schemaContext, namespace);
     if (array) {
       return array;
     }
@@ -2071,7 +2089,7 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context);
+      propSchema = getSchemaOrRef(prop.type, context, prop.model?.namespace);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2310,8 +2328,9 @@ export async function getOpenAPIForService(
         modelAsString: false,
       };
     } else if (type.kind === "Enum") {
+      const clientName = getClientName(context, type);
       schema["x-ms-enum"] = {
-        name: type.name,
+        name: clientName ?? type.name,
         modelAsString: false,
       };
 
@@ -2372,7 +2391,11 @@ export async function getOpenAPIForService(
   /**
    * If the model is an array model return the OpenAPI2Schema for the array type.
    */
-  function getArrayType(typespecType: Model, context: SchemaContext): OpenAPI2Schema | undefined {
+  function getArrayType(
+    typespecType: Model,
+    context: SchemaContext,
+    namespace?: Namespace,
+  ): OpenAPI2Schema | undefined {
     if (isArrayModelType(program, typespecType)) {
       const array: OpenAPI2Schema = {
         type: "array",
@@ -2381,12 +2404,25 @@ export async function getOpenAPIForService(
           visibility: context.visibility | Visibility.Item,
         }),
       };
-      if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
+
+      const armIdentifiers = getArmIdentifiers(program, typespecType);
+      if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
+        array["x-ms-identifiers"] = armIdentifiers;
+      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];
       }
+
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;
+  }
+
+  function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
+    return (
+      armIdentifiers !== undefined &&
+      armIdentifiers.length > 0 &&
+      !ifArmIdentifiersDefault(armIdentifiers)
+    );
   }
 
   function getSchemaForScalar(scalar: Scalar): OpenAPI2Schema {

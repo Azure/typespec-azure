@@ -387,8 +387,9 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * // client.tsp
  * namespace MyCustomizations;
  *
- * @override(MyService.operation)
- * op myOperationCustomization(params: Params): void;
+ * op myOperationCustomization(params: MyService.Params): void;
+ *
+ * @@override(MyService.myOperation, myOperationCustomization);
  *
  * // method signature is now `op myOperation(params: Params)`
  * ```
@@ -407,8 +408,9 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * // client.tsp
  * namespace MyCustomizations;
  *
- * @override(MyService.operation, "csharp")
- * op myOperationCustomization(params: Params): void;
+ * op myOperationCustomization(params: MyService.Params): void;
+ *
+ * @@override(MyService.myOperation, myOperationCustomization, "csharp")
  *
  * // method signature is now `op myOperation(params: Params)` just for csharp
  * ```
@@ -431,7 +433,22 @@ extern dec override(original: Operation, override: Operation, scope?: valueof st
 extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
 
 /**
- * Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+ * InitializedBy value.
+ */
+enum InitializedBy {
+  /**
+   * The client could be initialized individually.
+   */
+  individually: 1,
+
+  /**
+   * The client could be initialized by parent client.
+   */
+  parent: 2,
+}
+
+/**
+ * Customize the client initialization way.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -449,16 +466,32 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
  *   blobName: string;
  * }
  *
- * @@clientInitialization(MyService, MyServiceClientOptions)
- * // The generated client will have `blobName` on it. We will also
- * // elevate the existing `blobName` parameter to the client level.
+ * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
+ * // The generated client will have `blobName` on its initialization method. We will also
+ * // elevate the existing `blobName` parameter from method level to client level.
  * ```
  */
 extern dec clientInitialization(
   target: Namespace | Interface,
-  options: Model,
+  options: ClientInitializationOptions,
   scope?: valueof string
 );
+
+/**
+ * Client initialization customization options.
+ */
+model ClientInitializationOptions {
+  /**
+   * Redefine the client initialization parameters you would like to add to the client.
+   * By default, we apply endpoint, credential, and api-version parameters. If you specify parameters model, we will append the properties of the model to the parameters list of the client initialization.
+   */
+  parameters?: Model;
+
+  /**
+   * Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent`.
+   */
+  initializedBy?: EnumMember | Union;
+}
 
 /**
  * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.

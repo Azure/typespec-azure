@@ -8,6 +8,10 @@ using Spector;
 
 @doc("Illustrates the model flatten cases.")
 @scenarioService("/azure/client-generator-core/flatten-property")
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "azure.clientgenerator.core.flattenproperty",
+  "java"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.FlattenProperty;
 
 @doc("This is the model with one level of flattening.")

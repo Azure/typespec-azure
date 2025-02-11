@@ -46,6 +46,7 @@ import {
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   AccessFlags,
+  ClientInitializationOptions,
   LanguageScopes,
   SdkClient,
   SdkInitializationType,
@@ -312,6 +313,8 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
       throw new Error("Version projects should only contain one element");
     const projectedVersion = versionProjections[0];
     if (projectedVersion.projections.length > 0) {
+      // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       projectedProgram = context.program = projectProgram(
         context.originalProgram,
         projectedVersion.projections,
@@ -764,6 +767,7 @@ export const $access: AccessDecorator = (
       format: {},
       target: entity,
     });
+    return;
   }
   setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
 };
@@ -822,6 +826,7 @@ export const $flattenProperty: FlattenPropertyDecorator = (
       format: {},
       target: target,
     });
+    return;
   }
   setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line @typescript-eslint/no-deprecated
 };
@@ -869,6 +874,7 @@ export const $clientName: ClientNameDecorator = (
       format: {},
       target: entity,
     });
+    return;
   }
   setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
 };
@@ -957,6 +963,7 @@ export const $override = (
         overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
       },
     });
+    return;
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
@@ -1000,6 +1007,7 @@ export const $alternateType: AlternateTypeDecorator = (
       },
       target: source,
     });
+    return;
   }
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
 };
@@ -1029,26 +1037,74 @@ const clientInitializationKey = createStateSymbol("clientInitialization");
 export const $clientInitialization: ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  options: Model,
+  options: Type,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(
-    context,
-    $clientInitialization,
-    clientInitializationKey,
-    target,
-    options,
-    scope,
-  );
+  if (options.kind === "Model") {
+    if (options.properties.get("initializedBy")) {
+      const value = options.properties.get("initializedBy")!.type;
+
+      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+
+      if (value.kind === "EnumMember") {
+        if (typeof value.value !== "number" || !isValidValue(value.value)) {
+          reportDiagnostic(context.program, {
+            code: "invalid-initialized-by",
+            format: { message: "Please use `InitializedBy` enum to set the value." },
+            target: target,
+          });
+          return;
+        }
+      } else if (value.kind === "Union") {
+        for (const variant of value.variants.values()) {
+          if (
+            variant.type.kind !== "EnumMember" ||
+            typeof variant.type.value !== "number" ||
+            !isValidValue(variant.type.value)
+          ) {
+            reportDiagnostic(context.program, {
+              code: "invalid-initialized-by",
+              format: { message: "Please use `InitializedBy` enum to set the value." },
+              target: target,
+            });
+            return;
+          }
+        }
+      }
+    }
+
+    setScopedDecoratorData(
+      context,
+      $clientInitialization,
+      clientInitializationKey,
+      target,
+      options,
+      scope,
+    );
+  }
 };
 
+/**
+ * Get `SdkInitializationType` for namespace or interface. The info is from `@clientInitialization` decorator.
+ *
+ * @param context
+ * @param entity namespace or interface which represents a client
+ * @returns
+ * @deprecated This function is deprecated. Use `getClientInitializationOptions` instead.
+ */
 export function getClientInitialization(
   context: TCGCContext,
   entity: Namespace | Interface,
 ): SdkInitializationType | undefined {
-  const model = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (!model) return model;
-  const sdkModel = getSdkModel(context, model);
+  let options = getScopedDecoratorData(context, clientInitializationKey, entity);
+  if (options === undefined) return undefined;
+  // backward compatibility
+  if (options.properties.get("parameters")) {
+    options = options.properties.get("parameters").type;
+  } else if (options.properties.get("initializedBy")) {
+    return undefined;
+  }
+  const sdkModel = getSdkModel(context, options);
   const initializationProps = sdkModel.properties.map(
     (property: SdkModelPropertyType): SdkMethodParameter => {
       property.onClient = true;
@@ -1059,6 +1115,49 @@ export function getClientInitialization(
   return {
     ...sdkModel,
     properties: initializationProps,
+  };
+}
+
+/**
+ * Get client initialization options for namespace or interface. The info is from `@clientInitialization` decorator.
+ *
+ * @param context
+ * @param entity namespace or interface which represents a client
+ * @returns
+ */
+export function getClientInitializationOptions(
+  context: TCGCContext,
+  entity: Namespace | Interface,
+): ClientInitializationOptions | undefined {
+  const options = getScopedDecoratorData(context, clientInitializationKey, entity);
+  if (options === undefined) return undefined;
+
+  // backward compatibility
+  if (
+    options.properties.get("initializedBy") === undefined &&
+    options.properties.get("parameters") === undefined
+  ) {
+    return {
+      parameters: options,
+    };
+  }
+
+  let initializedBy = undefined;
+
+  if (options.properties.get("initializedBy")) {
+    if (options.properties.get("initializedBy").type.kind === "EnumMember") {
+      initializedBy = options.properties.get("initializedBy").type.value;
+    } else if (options.properties.get("initializedBy").type.kind === "Union") {
+      initializedBy = 0;
+      for (const variant of options.properties.get("initializedBy").type.variants.values()) {
+        initializedBy |= variant.type.value;
+      }
+    }
+  }
+
+  return {
+    parameters: options.properties.get("parameters")?.type,
+    initializedBy: initializedBy,
   };
 }
 
@@ -1104,6 +1203,7 @@ export const $clientNamespace: ClientNamespaceDecorator = (
       format: {},
       target: entity,
     });
+    return;
   }
   setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
 };

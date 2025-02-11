@@ -393,8 +393,9 @@ export type FlattenPropertyDecorator = (
  * // client.tsp
  * namespace MyCustomizations;
  *
- * @override(MyService.operation)
- * op myOperationCustomization(params: Params): void;
+ * op myOperationCustomization(params: MyService.Params): void;
+ *
+ * @@override(MyService.myOperation, myOperationCustomization);
  *
  * // method signature is now `op myOperation(params: Params)`
  * ```
@@ -412,8 +413,9 @@ export type FlattenPropertyDecorator = (
  * // client.tsp
  * namespace MyCustomizations;
  *
- * @override(MyService.operation, "csharp")
- * op myOperationCustomization(params: Params): void;
+ * op myOperationCustomization(params: MyService.Params): void;
+ *
+ * @@override(MyService.myOperation, myOperationCustomization, "csharp")
  *
  * // method signature is now `op myOperation(params: Params)` just for csharp
  * ```
@@ -445,7 +447,7 @@ export type UseSystemTextJsonConverterDecorator = (
 ) => void;
 
 /**
- * Client parameters you would like to add to the client. By default, we apply endpoint, credential, and api-version parameters. If you add clientInitialization, we will append those to the default list of parameters.
+ * Customize the client initialization way.
  *
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
@@ -463,15 +465,15 @@ export type UseSystemTextJsonConverterDecorator = (
  *   blobName: string;
  * }
  *
- * @@clientInitialization(MyService, MyServiceClientOptions)
- * // The generated client will have `blobName` on it. We will also
- * // elevate the existing `blobName` parameter to the client level.
+ * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
+ * // The generated client will have `blobName` on its initialization method. We will also
+ * // elevate the existing `blobName` parameter from method level to client level.
  * ```
  */
 export type ClientInitializationDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  options: Model,
+  options: Type,
   scope?: string,
 ) => void;
 
