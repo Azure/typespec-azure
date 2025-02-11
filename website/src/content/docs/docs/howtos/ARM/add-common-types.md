@@ -1,4 +1,6 @@
-# Adding Common Types to Azure Resource Manager (ARM)
+---
+title: Adding Common Types to Azure Resource Manager (ARM)
+---
 
 This guide provides detailed instructions on how to add and manage common types in Azure Resource Manager (ARM) using TypeSpec. Common types are reusable components that can be shared across multiple ARM templates, ensuring consistency and reducing redundancy.
 
