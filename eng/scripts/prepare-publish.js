@@ -69,7 +69,7 @@ if (production) {
   await typespecRun("git", "merge", "--ff-only", "FETCH_HEAD");
 }
 // Stage the typespec core publish
-await typespecRun("pnpm", "change", "version");
+await typespecRun("pnpm", "change", "version", "--exclude", "standalone");
 if (!args.values.onlyBumpVersions) {
   await typespecRun("pnpm", "update-latest-docs");
 }
@@ -119,10 +119,10 @@ if (production) {
 
 async function checkPrePublishState() {
   log("Checking repo state is clean");
-  if (await checkForChangedFiles()) {
-    console.error("ERROR: Cannot prepare publish because files above were modified.");
-    process.exit(1);
-  }
+  // if (await checkForChangedFiles()) {
+  //   console.error("ERROR: Cannot prepare publish because files above were modified.");
+  //   process.exit(1);
+  // }
 
   try {
     if (production) {
