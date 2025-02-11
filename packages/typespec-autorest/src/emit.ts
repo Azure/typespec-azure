@@ -1,22 +1,25 @@
 import { createTCGCContext } from "@azure-tools/typespec-client-generator-core";
 import {
+  compilerAssert,
   EmitContext,
-  Namespace,
-  NoTarget,
-  Program,
-  Service,
   emitFile,
   getDirectoryPath,
   getNamespaceFullName,
   getService,
   interpolatePath,
   listServices,
-  projectProgram,
+  NoTarget,
+  Program,
   reportDeprecated,
   resolvePath,
+  Service,
 } from "@typespec/compiler";
+import {
+  unsafe_mutateSubgraphWithNamespace,
+  unsafe_MutatorWithNamespace,
+} from "@typespec/compiler/experimental";
 import { resolveInfo } from "@typespec/openapi";
-import { buildVersionProjections } from "@typespec/versioning";
+import { getVersioningMutators } from "@typespec/versioning";
 import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
@@ -123,31 +126,13 @@ export async function getAllServicesAtAllVersions(
 
   const serviceRecords: AutorestServiceRecord[] = [];
   for (const service of services) {
-    const originalProgram = program;
-    const versions = buildVersionProjections(program, service.type).filter(
-      (v) => !options.version || options.version === v.version,
-    );
+    const versions = getVersioningMutators(program, service.type);
 
-    if (versions.length === 0) {
-      reportDiagnostic(program, { code: "no-matching-version-found", target: service.type });
-    }
-
-    if (versions.length === 1 && versions[0].version === undefined) {
-      let projectedProgram;
-      if (versions[0].projections.length > 0) {
-        projectedProgram = program = projectProgram(originalProgram, versions[0].projections);
-      }
-      const projectedServiceNs: Namespace = projectedProgram
-        ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
-        : service.type;
-      const projectedService =
-        projectedServiceNs === program.getGlobalNamespaceType()
-          ? { type: program.getGlobalNamespaceType() }
-          : getService(program, projectedServiceNs)!;
+    if (versions === undefined) {
       const context: AutorestEmitterContext = {
         program,
         outputFile: resolveOutputFile(program, service, services.length > 1, options),
-        service: projectedService,
+        service: service,
         tcgcSdkContext,
       };
 
@@ -157,7 +142,28 @@ export async function getAllServicesAtAllVersions(
         versioned: false,
         ...result,
       });
+    } else if (versions.kind === "transient") {
+      const context: AutorestEmitterContext = {
+        program,
+        outputFile: resolveOutputFile(program, service, services.length > 1, options),
+        service: service,
+        tcgcSdkContext,
+      };
+
+      const result = await getVersionSnapshotDocument(context, versions.mutator, options);
+      serviceRecords.push({
+        service,
+        versioned: false,
+        ...result,
+      });
     } else {
+      const filteredVersions = versions.snapshots.filter(
+        (v) => !options.version || options.version === v.version?.value,
+      );
+
+      if (filteredVersions.length === 0 && options.version) {
+        reportDiagnostic(program, { code: "no-matching-version-found", target: service.type });
+      }
       const serviceRecord: AutorestVersionedServiceRecord = {
         service,
         versioned: true,
@@ -165,40 +171,52 @@ export async function getAllServicesAtAllVersions(
       };
       serviceRecords.push(serviceRecord);
 
-      for (const record of versions) {
-        const projectedProgram = (program = projectProgram(originalProgram, record.projections));
-
-        const projectedServiceNs: Namespace = projectedProgram
-          ? (projectedProgram.projector.projectedTypes.get(service.type) as Namespace)
-          : service.type;
-        const projectedService =
-          projectedServiceNs === program.getGlobalNamespaceType()
-            ? { type: program.getGlobalNamespaceType() }
-            : getService(program, projectedServiceNs)!;
+      for (const record of filteredVersions) {
         const context: AutorestEmitterContext = {
           program,
           outputFile: resolveOutputFile(
             program,
-            projectedService,
+            service,
             services.length > 1,
             options,
-            record.version,
+            record.version?.value,
           ),
-          service: projectedService,
-          version: record.version,
+          service,
+          version: record.version?.value,
           tcgcSdkContext,
         };
-        const result = await getOpenAPIForService(context, options);
+
+        const result = await getVersionSnapshotDocument(context, record.mutator, options);
         serviceRecord.versions.push({
           ...result,
-          service: projectedService,
-          version: record.version!,
+          service,
+          version: record.version!.value,
         });
       }
     }
   }
 
   return serviceRecords;
+}
+
+async function getVersionSnapshotDocument(
+  context: AutorestEmitterContext,
+  mutator: unsafe_MutatorWithNamespace,
+  options: ResolvedAutorestEmitterOptions,
+) {
+  const subgraph = unsafe_mutateSubgraphWithNamespace(
+    context.program,
+    [mutator],
+    context.service.type,
+  );
+
+  compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
+  const document = await getOpenAPIForService(
+    { ...context, service: getService(context.program, subgraph.type)! },
+    options,
+  );
+
+  return document;
 }
 
 async function emitAllServiceAtAllVersions(

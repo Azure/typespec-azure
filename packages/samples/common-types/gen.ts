@@ -87,6 +87,11 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
   replaceUuidRefs(document, "Azure.Core.uuid");
   replaceUuidRefs(document, "Azure.Core.azureLocation");
   replaceUuidRefs(document, "Azure.Core.armResourceType");
+  replaceParameterName(
+    document,
+    "PrivateEndpointConnectionParameter",
+    "PrivateEndpointConnectionName",
+  );
 
   return document;
 }
@@ -104,5 +109,14 @@ function replaceUuidRefs(document: OpenAPI2Document, refId: string) {
         }
       }
     }
+  }
+}
+
+function replaceParameterName(document: OpenAPI2Document, oldName: string, newName: string) {
+  if (document.parameters && oldName in document.parameters) {
+    const value = document.parameters[oldName];
+    value.name = newName.charAt(0).toLowerCase() + newName.slice(1);
+    document.parameters[newName.charAt(0).toUpperCase() + newName.slice(1)] = value;
+    delete document.parameters[oldName];
   }
 }

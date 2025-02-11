@@ -3,6 +3,7 @@ import "@typespec/spector";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
+import "@azure-tools/typespec-client-generator-core";
 
 using Azure.Core;
 using TypeSpec.Http;
@@ -18,6 +19,7 @@ using Spector;
     versioned: Versions,
   }
 )
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.page", "java")
 namespace _Specs_.Azure.Core.Page;
 
 @doc("The version of the API.")

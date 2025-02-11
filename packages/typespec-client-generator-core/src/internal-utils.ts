@@ -3,7 +3,9 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
+  getLifecycleVisibilityEnum,
   getNamespaceFullName,
+  getVisibilityForClass,
   Interface,
   isNeverType,
   isNullType,
@@ -491,16 +493,6 @@ export function filterApiVersionsInEnum(
   }
 }
 
-const jsonRegex = new RegExp(/^(application|text)\/(.+\+)?json$/);
-export function isJsonContentType(contentType: string): boolean {
-  return jsonRegex.test(contentType);
-}
-
-const xmlRegex = new RegExp(/^(application|text)\/(.+\+)?xml$/);
-export function isXmlContentType(contentType: string): boolean {
-  return xmlRegex.test(contentType);
-}
-
 export function twoParamsEquivalent(
   context: TCGCContext,
   param1?: ModelProperty,
@@ -636,4 +628,9 @@ export function getRootUserDefinedNamespaceName(
     );
   }
   return diagnostics.wrap(globalNamespaces[0] || "");
+}
+export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): boolean {
+  const lifecycle = getLifecycleVisibilityEnum(context.program);
+  const visibility = getVisibilityForClass(context.program, type, lifecycle);
+  return visibility.size === 0;
 }

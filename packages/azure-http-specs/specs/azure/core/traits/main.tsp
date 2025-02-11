@@ -3,6 +3,7 @@ import "@typespec/spector";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
+import "@azure-tools/typespec-client-generator-core";
 
 using global.Azure.Core;
 using global.Azure.Core.Traits;
@@ -20,6 +21,7 @@ using Spector;
   }
 )
 @versioned(Versions)
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.trait", "java")
 namespace _Specs_.Azure.Core.Traits;
 
 @doc("Service versions")

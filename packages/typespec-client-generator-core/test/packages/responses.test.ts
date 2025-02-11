@@ -305,7 +305,7 @@ describe("typespec-client-generator-core: responses", () => {
     await runner.compileWithBuiltInService(`
       model Test{
           prop: string;
-          @visibility("none")
+          @invisible(Lifecycle)
           nonProp: string;
       }
       op get(): Test;

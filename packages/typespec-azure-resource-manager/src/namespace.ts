@@ -11,6 +11,7 @@ import {
   addService,
   getNamespaceFullName,
 } from "@typespec/compiler";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import * as http from "@typespec/http";
 import { getAuthentication, setAuthentication, setRouteOptionsForNamespace } from "@typespec/http";
 import { getResourceTypeForKeyParam } from "@typespec/rest";
@@ -74,6 +75,15 @@ export function isArmLibraryNamespace(program: Program, namespace: Namespace): b
   return program.stateMap(ArmStateKeys.armLibraryNamespaces).get(namespace) === true;
 }
 
+export function isArmProviderNamespace(
+  program: Program,
+  namespace: Namespace | undefined,
+): boolean {
+  return (
+    namespace !== undefined && program.stateMap(ArmStateKeys.armProviderNamespaces).has(namespace)
+  );
+}
+
 function isArmNamespaceOverride(program: Program, entity: Namespace): boolean {
   return (
     program.stateMap(ArmStateKeys.armProviderNamespaces).size === 1 &&
@@ -133,9 +143,10 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
 ) => {
   const { program } = context;
 
+  const inRealm = unsafe_Realm.realmForType.has(entity);
   const override = isArmNamespaceOverride(program, entity);
   const namespaceCount = program.stateMap(ArmStateKeys.armProviderNamespaces).size;
-  if (namespaceCount > 0 && !override) {
+  if (namespaceCount > 0 && !override && !inRealm) {
     reportDiagnostic(program, {
       code: "single-arm-provider",
       target: context.decoratorTarget,
@@ -144,7 +155,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
   }
 
   // armProviderNamespace will set the service namespace if it's not done already
-  if (!override) {
+  if (!override || inRealm) {
     addService(program, entity);
 
     if (!http.getServers(program, entity)) {

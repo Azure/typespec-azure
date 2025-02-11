@@ -144,7 +144,7 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
   /** The name of the private link associated with the Azure resource. */
   @path
   @TypeSpec.Rest.segment(Segment)
-  @key("privateLinkResourcenName")
+  @key("privateLinkResourceName")
   name: string;
 }
 

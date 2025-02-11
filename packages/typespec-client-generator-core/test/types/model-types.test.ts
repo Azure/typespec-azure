@@ -1778,7 +1778,7 @@ describe("typespec-client-generator-core: model types", () => {
     await runner.compileWithBuiltInService(`
       model Test{
           prop: string;
-          @visibility("none")
+          @invisible(Lifecycle)
           nonProp: string;
       }
       @post
