@@ -119,10 +119,10 @@ if (production) {
 
 async function checkPrePublishState() {
   log("Checking repo state is clean");
-  // if (await checkForChangedFiles()) {
-  //   console.error("ERROR: Cannot prepare publish because files above were modified.");
-  //   process.exit(1);
-  // }
+  if (await checkForChangedFiles()) {
+    console.error("ERROR: Cannot prepare publish because files above were modified.");
+    process.exit(1);
+  }
 
   try {
     if (production) {
@@ -210,6 +210,10 @@ async function rebuildAndRegenSamplesToBumpTemplateVersions() {
     await typespecAzureRun("pnpm", "regen-samples");
   }
 
+  if ((await checkForChangedFiles(coreRepoRoot, undefined, { silent: true })) && production) {
+    await typespecRun("git", "add", "-A");
+    await typespecRun("git", "commit", "-m", "Rebuild and regen samples to bump template versions");
+  }
   if ((await checkForChangedFiles(repoRoot, undefined, { silent: true })) && production) {
     await typespecAzureRun("git", "add", "-A");
     await typespecAzureRun(
