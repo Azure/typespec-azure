@@ -619,22 +619,18 @@ export function getRootUserDefinedNamespaceName(
     while (currNamespace) {
       segments.unshift(currNamespace.name);
       if (rootNamespaces.includes(currNamespace)) {
-        globalNamespaces.push(segments.join("."));
-        break;
+        const currNamespaceString = segments.join(".");
+        if (!globalNamespaces.includes(currNamespaceString)) {
+          globalNamespaces.push(segments.join("."));
+          break;
+        }
       }
       currNamespace = currNamespace.namespace;
     }
   }
-  // if we override with namespace flag, we should override the global namespace to the namespace flag
   if (globalNamespaces.length !== 1) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "unclear-namespace-overriding",
-        messageId: "default",
-        format: {},
-        target: context.program.getGlobalNamespaceType(),
-      }),
-    );
+    // if there are multiple root namespaces defined by users, we flatten them into one
+    return diagnostics.wrap(context.namespace || "");
   }
   return diagnostics.wrap(globalNamespaces[0] || "");
 }
