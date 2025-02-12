@@ -342,6 +342,11 @@ export function getPropertyPathFromModel(
 ): string | undefined {
   const queue: { model: Model; path: ModelProperty[] }[] = [];
 
+  if (model.baseModel) {
+    const baseResult = getPropertyPathFromModel(context, model.baseModel, predicate);
+    if (baseResult) return baseResult;
+  }
+
   for (const prop of model.properties.values()) {
     if (predicate(prop)) {
       return getLibraryName(context, prop);
@@ -374,6 +379,13 @@ export function getPropertySegmentsFromModelOrParameters(
   predicate: (property: SdkModelPropertyType) => boolean,
 ): SdkModelPropertyType[] | undefined {
   const queue: { model: SdkModelType; path: SdkModelPropertyType[] }[] = [];
+
+  if (!Array.isArray(source)) {
+    if (source.baseModel) {
+      const baseResult = getPropertySegmentsFromModelOrParameters(source.baseModel, predicate);
+      if (baseResult) return baseResult;
+    }
+  }
 
   for (const prop of Array.isArray(source) ? source : source.properties.values()) {
     if (predicate(prop)) {
