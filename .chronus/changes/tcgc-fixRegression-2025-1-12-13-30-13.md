@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-add `.json` serialization information for json model serialization within multipart
+Make sure to keep orphan models

@@ -8,7 +8,7 @@ using TypeSpec.Http;
 using Azure.Core;
 using Azure.ResourceManager;
 
-namespace {{parameters.ServiceNamespace}};
+namespace Microsoft.{{parameters.ServiceNamespace}};
 
 /** Employee resource */
 model Employee is TrackedResource<EmployeeProperties> {

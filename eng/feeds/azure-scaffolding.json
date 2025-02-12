@@ -111,9 +111,9 @@
     ],
     "inputs": {
       "ServiceNamespace": {
-        "description": "Please provide ARM Resource Provider Name in Pascal case:",
+        "description": "Please provide ARM Resource Provider Name in Pascal case, excluding the 'Microsoft.' prefix:",
         "type": "text",
-        "initialValue": "Microsoft.Contoso"
+        "initialValue": "Contoso"
       }
     }
   },
@@ -237,9 +237,9 @@
     ],
     "inputs": {
       "ServiceNamespace": {
-        "description": "Please provide ARM Resource Provider Name in Pascal case:",
+        "description": "Please provide ARM Resource Provider Name in Pascal case, excluding the 'Microsoft.' prefix:",
         "type": "text",
-        "initialValue": "Microsoft.Contoso"
+        "initialValue": "Contoso"
       }
     }
   }
