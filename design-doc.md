@@ -2,15 +2,26 @@
 
 ## Overview
 
-Currently, the client treats the `nextLink` in paging as opaque and does not inject query parameters that were part of the initial request when following the next link. This proposal aims to enhance the client by adding capability to reinject query parameters into next requests for paging operations.
+Currently, we treat the `nextLink` in paging as opaque and does not inject query parameters that were part of the initial request when following the next link. This proposal aims to enhance our `nextLink` handling by adding capability to reinject query parameters into next requests for paging operations.
 
 ## Problem
 
-This is an existing issue in 1-2 brownfield Azure services: Keyvault and potentially AppConfig.
+This is an existing issue in 1-2 brownfield Azure services: Keyvault, Storage and potentially AppConfig.
 
 ### Keyvault
 
 KV only has one instance in `listCertificates`, there is an optional query parameter `includePending`, which dictates whether to include pending certificates in the returned list of certificates. The service does not automatically reinject the value of `includePending` into the next link, so for all subsequent calls during paging, you will have to reinject `includePending=True` if you would like to continue seeing pending certificates in subsequent pages.
+
+### Storage
+
+Storage does a combination of continuation token paging and needing to reinject optional query parameters into the next GET calls. For example, `listBlobsInContainer` has the following paging process
+
+1. GET `<storage-container-url>/?comp=list`
+2. extract value of `NextMarker` from HTTP response body
+3. if `NextMarker` value is empty BREAK
+4. GET `<storage-container-url>/?comp=list;marker=<next-marker-value>`
+5. if `maxresults` was passed by the user, reinject this value into the GET call 
+6. GOTO 2
 
 ### AppConfig
 
@@ -31,7 +42,7 @@ The examples used throughout the rest of this doc will reference the `includePen
 ```tsp
 @get nextPage is Azure.Core.Foundations.Operation<{ nextLink: string, includePending?: string }, Azure.Core.Page<Certificate>>;
 
-@nextPageOperation(
+@Azure.Core.nextPageOperation(
     nextPage,
     { nextLink: ResponseProperty<"nextLink">, includePending: RequestParameter<"includePending"> }
 )
@@ -107,6 +118,8 @@ list is Azure.Core.ResourceOperations<ServiceTraits>.ResourceList<
     },
 >;
 ```
+
+My thinking is we can start out with support for this decorator in tcgc, and depending on eventual usage scenarios, we can move it further up the library chain.
 
 #### Details
 
