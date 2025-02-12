@@ -41,6 +41,7 @@ import {
   getAuthentication,
   getHttpPart,
   getServers,
+  isBody,
   isHeader,
   isOrExtendsHttpFile,
   isStatusCode,
@@ -118,7 +119,6 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
-import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
@@ -1186,7 +1186,7 @@ function isFilePart(context: TCGCContext, type: SdkType): boolean {
       return true;
     }
     // HttpPart<{@body body: bytes}> or HttpPart<{@body body: File}>
-    const body = type.properties.find((x) => x.kind === "body");
+    const body = type.properties.find((x) => x.__raw && isBody(context.program, x.__raw));
     if (body) {
       return isFilePart(context, body.type);
     }
@@ -1310,7 +1310,7 @@ export function getSdkModelPropertyType(
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  let property = context.referencedPropertyMap?.get(type);
+  let property = context.modelPropertyMap?.get(type);
 
   if (!property) {
     const clientParams = operation
@@ -1322,7 +1322,6 @@ export function getSdkModelPropertyType(
     if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
     const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
 
-    if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
     property = {
       ...base,
       kind: "property",
@@ -1386,7 +1385,7 @@ function updateReferencedPropertyMap(
   if (sdkType.kind !== "property") {
     return;
   }
-  context.referencedPropertyMap.set(type, sdkType);
+  context.modelPropertyMap.set(type, sdkType);
 }
 
 function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkType) {

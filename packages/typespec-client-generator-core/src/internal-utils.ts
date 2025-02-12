@@ -591,3 +591,11 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   const visibility = getVisibilityForClass(context.program, type, lifecycle);
   return visibility.size === 0;
 }
+
+export function updateReferencedPropertyMap(
+  context: TCGCContext,
+  type: ModelProperty,
+  sdkType: SdkModelPropertyType,
+) {
+  context.modelPropertyMap.set(type, sdkType);
+}

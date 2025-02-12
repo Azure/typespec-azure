@@ -337,84 +337,88 @@ export function getSdkHttpParameter(
   location?: "path" | "query" | "header" | "body" | "cookie",
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
-  const program = context.program;
-  const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
-  if (isPathParam(context.program, param) || location === "path") {
-    // we don't url encode if the type can be assigned to url
-    const urlEncode = !ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(
-        // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        param.type.projectionBase ?? param.type,
-        program.checker.getStdType("url"),
-        param.type,
-      ),
-    );
-    return diagnostics.wrap({
-      ...base,
-      kind: "path",
-      urlEncode,
-      explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
-      style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
-      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? false,
-      serializedName: getPathParamName(program, param) ?? base.name,
-      correspondingMethodParams,
-      optional: false,
-    });
+  let parameter = context.httpParameterMap?.get(param);
+
+  if (!parameter) {
+    const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
+    const program = context.program;
+    const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
+    if (isPathParam(context.program, param) || location === "path") {
+      // we don't url encode if the type can be assigned to url
+      const urlEncode = !ignoreDiagnostics(
+        program.checker.isTypeAssignableTo(
+          // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
+          param.type.projectionBase ?? param.type,
+          program.checker.getStdType("url"),
+          param.type,
+        ),
+      );
+      parameter = {
+        ...base,
+        kind: "path",
+        urlEncode,
+        explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
+        style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
+        allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? false,
+        serializedName: getPathParamName(program, param) ?? base.name,
+        correspondingMethodParams,
+        optional: false,
+      };
+    } else if (isCookieParam(context.program, param) || location === "cookie") {
+      parameter = {
+        ...base,
+        kind: "cookie",
+        serializedName: getCookieParamOptions(program, param)?.name ?? base.name,
+        correspondingMethodParams,
+        optional: param.optional,
+      };
+    } else if (isBody(context.program, param) || location === "body") {
+      parameter = {
+        ...base,
+        kind: "body",
+        serializedName: param.name === "" ? "body" : getWireName(context, param),
+        contentTypes: ["application/json"], // will update when we get to the operation level
+        defaultContentType: "application/json", // will update when we get to the operation level
+        optional: param.optional,
+        correspondingMethodParams,
+      };
+    } else if (isQueryParam(context.program, param) || location === "query") {
+      parameter = {
+        ...base,
+        optional: param.optional,
+        collectionFormat: getCollectionFormat(context, param),
+        correspondingMethodParams,
+        kind: "query",
+        serializedName: getQueryParamName(program, param) ?? base.name,
+        explode: (httpParam as HttpOperationQueryParameter)?.explode,
+      };
+    } else {
+      if (!(isHeader(context.program, param) || location === "header")) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "unexpected-http-param-type",
+            target: param,
+            format: {
+              paramName: param.name,
+              expectedType: "path, query, header, or body",
+              actualType: param.kind,
+            },
+          }),
+        );
+      }
+      parameter = {
+        ...base,
+        optional: param.optional,
+        collectionFormat: getCollectionFormat(context, param),
+        correspondingMethodParams,
+        kind: "header",
+        serializedName: getHeaderFieldName(program, param) ?? base.name,
+      };
+    }
+    context.httpParameterMap.set(param, parameter);
   }
-  if (isCookieParam(context.program, param) || location === "cookie") {
-    return diagnostics.wrap({
-      ...base,
-      kind: "cookie",
-      serializedName: getCookieParamOptions(program, param)?.name ?? base.name,
-      correspondingMethodParams,
-      optional: param.optional,
-    });
-  }
-  if (isBody(context.program, param) || location === "body") {
-    return diagnostics.wrap({
-      ...base,
-      kind: "body",
-      serializedName: param.name === "" ? "body" : getWireName(context, param),
-      contentTypes: ["application/json"], // will update when we get to the operation level
-      defaultContentType: "application/json", // will update when we get to the operation level
-      optional: param.optional,
-      correspondingMethodParams,
-    });
-  }
-  const headerQueryBase = {
-    ...base,
-    optional: param.optional,
-    collectionFormat: getCollectionFormat(context, param),
-    correspondingMethodParams,
-  };
-  if (isQueryParam(context.program, param) || location === "query") {
-    return diagnostics.wrap({
-      ...headerQueryBase,
-      kind: "query",
-      serializedName: getQueryParamName(program, param) ?? base.name,
-      explode: (httpParam as HttpOperationQueryParameter)?.explode,
-    });
-  }
-  if (!(isHeader(context.program, param) || location === "header")) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "unexpected-http-param-type",
-        target: param,
-        format: {
-          paramName: param.name,
-          expectedType: "path, query, header, or body",
-          actualType: param.kind,
-        },
-      }),
-    );
-  }
-  return diagnostics.wrap({
-    ...headerQueryBase,
-    kind: "header",
-    serializedName: getHeaderFieldName(program, param) ?? base.name,
-  });
+  return diagnostics.wrap(parameter);
 }
 
 function getSdkHttpResponseAndExceptions(

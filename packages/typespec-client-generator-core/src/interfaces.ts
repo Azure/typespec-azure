@@ -40,7 +40,9 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   arm?: boolean;
   referencedTypeMap: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
-  referencedPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
+  modelPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
+  methodParameterMap: Map<ModelProperty, SdkMethodParameter>;
+  httpParameterMap: Map<ModelProperty, SdkHttpParameter>;
   generatedNames?: Map<Union | Model | TspLiteralType, string>;
   httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
@@ -744,10 +746,14 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 
 interface SdkPagingServiceMethodOptions {
   __raw_paged_metadata?: PagedResultMetadata;
+  /**
+   * @deprecated Use `nextLinkSegments` instead.
+   */
   nextLinkPath?: string;
+  nextLinkSegments?: SdkModelPropertyType[];
   nextLinkOperation?: SdkServiceOperation;
-  continuationTokenParameter?: SdkMethodParameter;
-  continuationTokenResponseSegments?: SdkModelPropertyType[];
+  continuationTokenParameterSegments?: SdkModelPropertyType[];
+  continuationTokenResponseSegments?: SdkModelPropertyType[] | SdkServiceResponseHeader[];
 }
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>

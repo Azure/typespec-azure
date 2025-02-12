@@ -193,7 +193,6 @@ describe("typespec-client-generator-core: responses", () => {
       sdkPackage.models.find((x) => x.name === "Widget"),
     );
     strictEqual(methodResponseType.properties.length, 2);
-    strictEqual(methodResponseType.properties.filter((x) => x.kind === "header").length, 1);
   });
 
   it("Headers and body with null", async () => {

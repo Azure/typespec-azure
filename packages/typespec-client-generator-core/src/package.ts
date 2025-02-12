@@ -12,7 +12,7 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
-import { getServers, HttpServer } from "@typespec/http";
+import { getServers, HttpServer, isHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
@@ -151,7 +151,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   if (isList(context.program, operation)) {
     const pagingOperation = diagnostics.pipe(getPagingOperation(context.program, operation));
 
-    if (responseType?.__raw?.kind !== "Model" || !pagingOperation) {
+    if (
+      responseType?.__raw?.kind !== "Model" ||
+      responseType.kind !== "model" ||
+      !pagingOperation
+    ) {
       diagnostics.add(
         createDiagnostic({
           code: "unexpected-pageable-operation-return-type",
@@ -173,13 +177,68 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       responseType?.__raw,
       (p) => p === pagingOperation.output.pageItems.property,
     );
-    const nextLinkPath = pagingOperation.output.nextLink
-      ? getPropertyPathFromModel(
-          context,
-          responseType?.__raw,
-          (p) => p === pagingOperation.output.nextLink!.property,
-        )
-      : undefined;
+    const pageItemsProperty = diagnostics.pipe(
+      getSdkModelPropertyType(context, pagingOperation.output.pageItems.property),
+    );
+    basic.response.resultSegments = getPropertySegmentsFromModelOrParameters(
+      responseType,
+      (p) => p === pageItemsProperty,
+    );
+
+    let nextLinkPath = undefined;
+    let nextLinkSegments = undefined;
+    if (pagingOperation.output.nextLink) {
+      nextLinkPath = getPropertyPathFromModel(
+        context,
+        responseType?.__raw,
+        (p) => p === pagingOperation.output.nextLink!.property,
+      );
+      const nextLinkProperty = diagnostics.pipe(
+        getSdkModelPropertyType(context, pagingOperation.output.nextLink?.property),
+      );
+      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+        responseType,
+        (p) => p === nextLinkProperty,
+      );
+    }
+
+    let continuationTokenParameterSegments = undefined;
+    let continuationTokenResponseSegments = undefined;
+    if (pagingOperation.input.continuationToken) {
+      // find direct parameter first, then find nested property if it's not a direct parameter
+      const directParameter = operation.parameters.properties.get(
+        pagingOperation.input.continuationToken.property.name,
+      );
+      if (directParameter === pagingOperation.input.continuationToken.property) {
+        continuationTokenParameterSegments = [
+          diagnostics.pipe(getSdkMethodParameter(context, directParameter, operation)),
+        ];
+      } else {
+        const continuationTokenParameter = diagnostics.pipe(
+          getSdkModelPropertyType(context, pagingOperation.input.continuationToken.property),
+        );
+        continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
+          basic.parameters,
+          (p) => p === continuationTokenParameter,
+        );
+      }
+    }
+    if (pagingOperation.output.continuationToken) {
+      if (isHeader(context.program, pagingOperation.output.continuationToken.property)) {
+        continuationTokenResponseSegments = basic.operation.responses
+          .map((r) => r.headers)
+          .flat()
+          .filter((h) => h.__raw === pagingOperation.output.continuationToken!.property);
+      } else {
+        const continuationTokenProperty = diagnostics.pipe(
+          getSdkModelPropertyType(context, pagingOperation.output.continuationToken.property),
+        );
+        continuationTokenResponseSegments = getPropertySegmentsFromModelOrParameters(
+          responseType,
+          (p) => p === continuationTokenProperty,
+        );
+      }
+    }
 
     context.__pagedResultSet.add(responseType);
     // tcgc will let all paging method return a list of items
@@ -191,13 +250,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       ...basic,
       kind: "paging",
       nextLinkPath,
+      nextLinkSegments,
+      continuationTokenParameterSegments,
+      continuationTokenResponseSegments,
     });
   }
 
   // azure core paging
   const pagedMetadata = getPagedResult(context.program, operation)!;
 
-  if (responseType?.__raw?.kind !== "Model" || !pagedMetadata.itemsProperty) {
+  if (
+    responseType?.__raw?.kind !== "Model" ||
+    responseType.kind !== "model" ||
+    !pagedMetadata.itemsProperty
+  ) {
     diagnostics.add(
       createDiagnostic({
         code: "unexpected-pageable-operation-return-type",
@@ -226,16 +292,36 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     pagedMetadata.modelType,
     pagedMetadata.itemsSegments,
   );
+  const pageItemsProperty = diagnostics.pipe(
+    getSdkModelPropertyType(context, pagedMetadata.itemsProperty),
+  );
+  basic.response.resultSegments = getPropertySegmentsFromModelOrParameters(
+    responseType,
+    (p) => p === pageItemsProperty,
+  );
+
+  let nextLinkPath = undefined;
+  let nextLinkSegments = undefined;
+  if (pagedMetadata.nextLinkProperty) {
+    nextLinkPath = getPropertyPathFromSegment(
+      context,
+      pagedMetadata.modelType,
+      pagedMetadata?.nextLinkSegments,
+    );
+    const nextLinkProperty = diagnostics.pipe(
+      getSdkModelPropertyType(context, pagedMetadata.nextLinkProperty),
+    );
+    nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+      responseType,
+      (p) => p === nextLinkProperty,
+    );
+  }
 
   return diagnostics.wrap({
     ...basic,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath: getPropertyPathFromSegment(
-      context,
-      pagedMetadata.modelType,
-      pagedMetadata?.nextLinkSegments,
-    ),
+    nextLinkPath,
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
           getSdkServiceOperation<TServiceOperation>(
@@ -245,6 +331,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           ),
         )
       : undefined,
+    nextLinkSegments,
   });
 }
 
@@ -274,6 +361,36 @@ export function getPropertyPathFromModel(
           .join(".");
       }
       if (prop.type.kind === "Model") {
+        queue.push({ model: prop.type, path: path.concat(prop) });
+      }
+    }
+  }
+
+  return undefined;
+}
+
+export function getPropertySegmentsFromModelOrParameters(
+  source: SdkModelType | SdkMethodParameter[],
+  predicate: (property: SdkModelPropertyType) => boolean,
+): SdkModelPropertyType[] | undefined {
+  const queue: { model: SdkModelType; path: SdkModelPropertyType[] }[] = [];
+
+  for (const prop of Array.isArray(source) ? source : source.properties.values()) {
+    if (predicate(prop)) {
+      return [prop];
+    }
+    if (prop.type.kind === "model") {
+      queue.push({ model: prop.type, path: [prop] });
+    }
+  }
+
+  while (queue.length > 0) {
+    const { model, path } = queue.shift()!;
+    for (const prop of model.properties.values()) {
+      if (predicate(prop)) {
+        return path.concat(prop);
+      }
+      if (prop.type.kind === "model") {
         queue.push({ model: prop.type, path: path.concat(prop) });
       }
     }
@@ -684,10 +801,15 @@ function getSdkMethodParameter(
   operation: Operation,
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
-    kind: "method",
-  });
+  let parameter = context.methodParameterMap.get(type);
+  if (!parameter) {
+    parameter = {
+      ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
+      kind: "method",
+    };
+    context.methodParameterMap.set(type, parameter);
+  }
+  return diagnostics.wrap(parameter as SdkMethodParameter);
 }
 
 function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
