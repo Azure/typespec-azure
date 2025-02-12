@@ -511,13 +511,25 @@ export function getSdkUnionWithDiagnostics(
     if (nonNullOptions.length === 0) {
       diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
+      updateReferencedTypeMap(context, type, retval);
     } else if (checkUnionCircular(type)) {
       diagnostics.add(createDiagnostic({ code: "union-circular", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
+      updateReferencedTypeMap(context, type, retval);
     } else {
       // if a union is `type | null`, then we will return a nullable wrapper type of the type
       if (nonNullOptions.length === 1 && nullOption !== undefined) {
-        retval = diagnostics.pipe(
+        retval = {
+          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+          name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+          isGeneratedName: !type.name,
+          type: diagnostics.pipe(getUnknownType(context, type)),
+          access: "public",
+          usage: UsageFlags.None,
+          clientNamespace: getClientNamespace(context, type),
+        };
+        updateReferencedTypeMap(context, type, retval);
+        retval.type = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, nonNullOptions[0], operation),
         );
       } else if (
@@ -534,6 +546,18 @@ export function getSdkUnionWithDiagnostics(
           retval = diagnostics.pipe(
             getSdkUnionEnumWithDiagnostics(context, unionAsEnum, operation),
           );
+          if (nullOption !== undefined) {
+            retval = {
+              ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+              name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+              isGeneratedName: !type.name,
+              type: retval,
+              access: "public",
+              usage: UsageFlags.None,
+              clientNamespace: getClientNamespace(context, type),
+            };
+          }
+          updateReferencedTypeMap(context, type, retval);
         }
       }
 
@@ -544,29 +568,33 @@ export function getSdkUnionWithDiagnostics(
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: true, // always set inner union type as generated name
           clientNamespace: getClientNamespace(context, type),
-          variantTypes: nonNullOptions.map((x) =>
-            diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
-          ),
+          variantTypes: [],
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           access: "public",
           usage: UsageFlags.None,
         };
-      }
-
-      if (nullOption !== undefined) {
-        retval = {
-          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
-          name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
-          isGeneratedName: !type.name,
-          type: retval,
-          access: "public",
-          usage: UsageFlags.None,
-          clientNamespace: getClientNamespace(context, type),
-        };
+        if (nullOption !== undefined) {
+          retval = {
+            ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+            name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+            isGeneratedName: !type.name,
+            type: retval,
+            access: "public",
+            usage: UsageFlags.None,
+            clientNamespace: getClientNamespace(context, type),
+          };
+        }
+        updateReferencedTypeMap(context, type, retval);
+        const variantTypes = nonNullOptions.map((x) =>
+          diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
+        );
+        if (retval.kind === "nullable" && retval.type.kind === "union") {
+          retval.type.variantTypes = variantTypes;
+        } else if (retval.kind === "union") {
+          retval.variantTypes = variantTypes;
+        }
       }
     }
-
-    updateReferencedTypeMap(context, type, retval);
   }
 
   return diagnostics.wrap(retval);

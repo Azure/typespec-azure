@@ -561,7 +561,7 @@ describe("typespec-client-generator-core: union types", () => {
     deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
   });
 
-  it("nullable union with anonymous model", async function () {
+  it("nullable union with anonymous model ref self", async function () {
     await runner.compileWithBuiltInService(`
       union A {
         null,
@@ -575,15 +575,17 @@ describe("typespec-client-generator-core: union types", () => {
     `);
 
     const models = runner.context.sdkPackage.models;
+    const unions = runner.context.sdkPackage.unions;
+
     strictEqual(models.length, 1);
     strictEqual(models[0].kind, "model");
     strictEqual(models[0].name, "PostRequest");
+    strictEqual(models[0].properties[2].type, unions[0]);
 
-    const unions = runner.context.sdkPackage.unions;
     strictEqual(unions.length, 1);
     strictEqual(unions[0].kind, "nullable");
     strictEqual(unions[0].name, "A");
-    deepStrictEqual(unions[0].type, models[0]);
+    strictEqual(unions[0].type, models[0]);
 
     const method = runner.context.sdkPackage.clients[0].methods[0];
     ok(method);
