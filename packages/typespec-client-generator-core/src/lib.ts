@@ -262,13 +262,7 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
-    },
-    "unclear-namespace-overriding": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Since there are multiple user-defined root namespaces, it is unclear what namespace you are attempting to override with the namespace flag config. Please either consolidate your tsp so there is only one root namespace in your spec, or remove the namespace flag from your config`,
-      },
-    },
+    }
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,
