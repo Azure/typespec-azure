@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Deprecate `nextLinkPath` in `SdkPagingServiceMethodOptions`. Use `nextLinkSegments` instead. 
+Deprecate `nextLinkPath` in `SdkPagingServiceMethodOptions`. Use `nextLinkSegments` instead. 
