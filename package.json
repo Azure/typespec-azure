@@ -6,6 +6,7 @@
   "packageManager": "pnpm@9.5.0",
   "scripts": {
     "run-all": "pnpm -r --filter=!./core/",
+    "run-azure-only": "pnpm -r --filter=\"!./core/**\"",
     "build": "pnpm run-all --workspace-concurrency=Infinity --aggregate-output --reporter=append-only build && pnpm check:eng",
     "check-version-mismatch": "syncpack list-mismatches",
     "check:eng": "tsc -p ./tsconfig.eng.json --noEmit",
@@ -27,7 +28,7 @@
     "regen-samples": "pnpm run-all run regen-samples",
     "test": "vitest run --workspace ./vitest.workspace.fast.ts",
     "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
-    "test:e2e": "pnpm run-all run test:e2e",
+    "test:e2e": "pnpm run-azure-only run test:e2e",
     "update-latest-docs": "pnpm run-all run update-latest-docs",
     "watch": "tsc --build ./tsconfig.ws.json --watch",
     "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config ./eng/config/labels.ts",
@@ -59,7 +60,7 @@
     "tsx": "^4.19.2",
     "typescript": "~5.7.3",
     "typescript-eslint": "^8.21.0",
-    "vitest": "^3.0.4"
+    "vitest": "^3.0.5"
   },
   "syncpack": {
     "dependencyTypes": [
