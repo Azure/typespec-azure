@@ -28,8 +28,8 @@ import {
 } from "./decorators.js";
 import { getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
-  SdkApiVersionParameter,
   InitializedByFlags,
+  SdkApiVersionParameter,
   SdkBodyModelPropertyType,
   SdkClient,
   SdkClientInitializationType,
