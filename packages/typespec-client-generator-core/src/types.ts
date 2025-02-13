@@ -539,7 +539,7 @@ export function getSdkUnionWithDiagnostics(
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
         name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
         isGeneratedName: !type.name,
-        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+        clientNamespace: getClientNamespace(context, type),
         variantTypes: nonNullOptions.map((x) =>
           diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
         ),
@@ -557,7 +557,7 @@ export function getSdkUnionWithDiagnostics(
         type: retval,
         access: "public",
         usage: UsageFlags.None,
-        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+        clientNamespace: getClientNamespace(context, type),
       };
     }
 
@@ -739,7 +739,7 @@ export function getSdkModelWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
-      clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+      clientNamespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       properties: [],
@@ -870,7 +870,7 @@ function getSdkEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
-      clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+      clientNamespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
@@ -938,7 +938,7 @@ export function getSdkUnionEnumWithDiagnostics(
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
       name,
       isGeneratedName: !type.union.name,
-      clientNamespace: diagnostics.pipe(getClientNamespace(context, type.union)),
+      clientNamespace: getClientNamespace(context, type.union),
       doc: getDoc(context.program, union),
       summary: getSummary(context.program, union),
       valueType:
@@ -1103,7 +1103,7 @@ function getSdkCredentialType(
       variantTypes: credentialTypes,
       name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
-      clientNamespace: diagnostics.pipe(getClientNamespace(context, client.service)),
+      clientNamespace: getClientNamespace(context, client.service),
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.CredentialUnion`,
       decorators: [],
       access: "public",
