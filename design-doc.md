@@ -20,7 +20,7 @@ Storage does a combination of continuation token paging and needing to reinject 
 2. extract value of `NextMarker` from HTTP response body
 3. if `NextMarker` value is empty BREAK
 4. GET `<storage-container-url>/?comp=list;marker=<next-marker-value>`
-5. if `maxresults` was passed by the user, reinject this value into the GET call 
+5. if `maxresults` was passed by the user, reinject this value into the GET call
 6. GOTO 2
 
 ### AppConfig
@@ -63,12 +63,13 @@ list is Azure.Core.ResourceList<Certificate>;
 #### Todos
 
 1. Fix [this](https://github.com/Azure/typespec-azure/issues/1880) github issue
-2. Ensure support for `@nextPageOperation` in all language emitters
+2. TCGC abstracts support for `@nextPageOperation`
+3. Language emitters will need to make sure that they can support next link url reformatting with specfic query params
 
 ### Adding an incomplete next link scalar type
 
 ```tsp
-scalar incompleteNextLink<ParametersToReinject[]> extends url;
+scalar nextLinkWithAdditionalParams<ParametersToReinject[]> extends url;
 
 model ListCertificateOptions {
     includePending?: string;
@@ -76,7 +77,7 @@ model ListCertificateOptions {
 
 model Page {
     @pagedItems items: Certificate[];
-    @nextLink nextLink: incompleteNextLink<[ListCertificateOptions.includePending]>;
+    @nextLink nextLink: nextLinkWithAdditionalParams<[ListCertificateOptions.includePending]>;
 }
 
 op listCertificates(...ListCertificateOptions)
@@ -92,13 +93,17 @@ If we found more use cases, we could elevate the definition of this scalar into 
 #### Cons
 
 1. Slightly more involved than getting `@nextPageOperation` to work, but not by much.
+2. Discoverability of the scalar option is a challenge, especially if we start off by limiting it to individual spec-level definitions
 
 #### Todos
 
-1. Have emitters recognize this definition. Look at the `armResourceIdentifier` decorator implementation from the ARM library.
-2. Potentially move it into a higher-up library.
+1. TCGC will abstract this information
+2. Language emitters will need to make sure that they can support next link url reformatting with specfic query params
+3. Potentially move it into a higher-up library.
 
 ### The `@reinject` Decorator
+
+>NOTE: @srnagar has a suggestion to rename it as `@nextLinkQuery` for clarity
 
 ```tsp
 model Page<T> {
@@ -135,7 +140,7 @@ My thinking is we can start out with support for this decorator in tcgc, and dep
 
 - Adds another decorator
 - Definition isn't the most clear
-- Do we need to add a new decorator if we can polish up `@nextPageOperation` to work and persist that decorator?
+- Do we need to add a new decorator if we can polish up `@nextPageOperation` to work and persist that decorator and move it to TypeSpec core?
 
 #### Todos
 
@@ -148,3 +153,4 @@ My thinking is we can start out with support for this decorator in tcgc, and dep
 - [ ] design to choose
 - [ ] Should this be for azure brownfield services only? Thoughts about this being 3p behavior?
 - [ ] location of design change. Will we update code in generic TypeSpec, Azure Core, or TCGC. If we choose TCGC, will there be an eventual plan to move this higher?
+- [ ] Do we want to consider next link paging with header parameter reinjection?
