@@ -498,4 +498,39 @@ describe("typespec-client-generator-core: namespaces", () => {
       strictEqual(aNamespace.namespaces.length, 0);
     });
   });
+
+  it("customization with models from original namespace", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service({})
+      namespace Original {
+        model MyModel {
+          prop: string;
+        }
+      }
+    `,
+      `
+      @client({service: Original, name: "MyClient"})
+      namespace Customization {
+        op foo(): void;
+      }
+      @@usage(Original.MyModel, Usage.input | Usage.output);
+    `,
+    );
+
+    const sdkPackage = (
+      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+        namespace: "Renamed",
+      })
+    ).sdkPackage;
+    strictEqual(sdkPackage.namespaces.length, 1);
+    const ns = sdkPackage.namespaces[0];
+    strictEqual(ns.fullName, "Renamed");
+    strictEqual(ns.clients.length, 1);
+    strictEqual(ns.clients[0].name, "MyClient");
+    strictEqual(ns.models.length, 1);
+    strictEqual(ns.models[0].name, "MyModel");
+    strictEqual(ns.enums.length, 0);
+    strictEqual(ns.namespaces.length, 0);
+  });
 });
