@@ -262,7 +262,7 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
-    }
+    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,

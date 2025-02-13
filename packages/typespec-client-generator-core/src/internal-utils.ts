@@ -29,7 +29,7 @@ import {
   HttpOperationResponseContent,
 } from "@typespec/http";
 import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { getParamAlias, listClients } from "./decorators.js";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -590,47 +590,9 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   const visibility = getVisibilityForClass(context.program, type, lifecycle);
   return visibility.size === 0;
 }
-
 export function findRootSourceProperty(property: ModelProperty): ModelProperty {
   while (property.sourceProperty) {
     property = property.sourceProperty;
   }
   return property;
-}
-/**
- * Get all of the root user-defined namespaces in a TypeSpec definition if they're tied to a client
- * @param context
- * @returns
- */
-export function getRootUserDefinedNamespaceName(
-  context: TCGCContext,
-): [string, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const rootNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()];
-
-  // We explicitly want namespaces that are used to define a client, not namespaces that define the service of a client
-  const clientNamespaces = listClients(context).map((x) =>
-    x.type.kind === "Namespace" ? x.type : x.type.namespace,
-  );
-  const globalNamespaces: string[] = [];
-  for (const namespace of clientNamespaces) {
-    const segments = [];
-    let currNamespace: Namespace | undefined = namespace;
-    while (currNamespace) {
-      segments.unshift(currNamespace.name);
-      if (rootNamespaces.includes(currNamespace)) {
-        const currNamespaceString = segments.join(".");
-        if (!globalNamespaces.includes(currNamespaceString)) {
-          globalNamespaces.push(segments.join("."));
-          break;
-        }
-      }
-      currNamespace = currNamespace.namespace;
-    }
-  }
-  if (globalNamespaces.length !== 1) {
-    // if there are multiple root namespaces defined by users, we flatten them into one
-    return diagnostics.wrap(context.namespace || "");
-  }
-  return diagnostics.wrap(globalNamespaces[0] || "");
 }

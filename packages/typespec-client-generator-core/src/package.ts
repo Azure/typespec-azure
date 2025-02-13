@@ -718,7 +718,7 @@ function getSdkInitializationType(
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
-    const namespace = diagnostics.pipe(getClientNamespace(context, client.type));
+    const namespace = getClientNamespace(context, client.type);
     initializationModel = {
       __raw: client.service,
       doc: "Initialization class for the client",
@@ -990,7 +990,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   }
   let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
-    const namespace = diagnostics.pipe(getClientNamespace(context, rawClient.service));
+    const namespace = getClientNamespace(context, rawClient.service);
     type = {
       kind: "union",
       access: "public",
@@ -1028,7 +1028,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const namespace = diagnostics.pipe(getClientNamespace(context, client.type));
+  const namespace = getClientNamespace(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -1037,7 +1037,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-    nameSpace: getClientNamespaceStringHelper(context, client.service)!,
+    nameSpace: getClientNamespaceStringHelper(context, client.service)!, // eslint-disable-line @typescript-eslint/no-deprecated
     namespace: namespace,
     clientNamespace: namespace,
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),

@@ -3,7 +3,6 @@ import {
   DecoratorContext,
   DecoratorExpressionNode,
   DecoratorFunction,
-  Diagnostic,
   Enum,
   EnumMember,
   Interface,
@@ -18,7 +17,6 @@ import {
   SyntaxKind,
   Type,
   Union,
-  createDiagnosticCollector,
   getDiscriminator,
   getNamespaceFullName,
   getProjectedName,
@@ -63,7 +61,6 @@ import {
   clientNameKey,
   clientNamespaceKey,
   findRootSourceProperty,
-  getRootUserDefinedNamespaceName,
   getValidApiVersion,
   negationScopesKey,
   scopeKey,
@@ -1201,18 +1198,14 @@ export const $clientNamespace: ClientNamespaceDecorator = (
 export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
-): [string, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  if (override) {
-    const rootNamespaceName = diagnostics.pipe(getRootUserDefinedNamespaceName(context));
-    // if you've defined a namespace flag, we replace the root name with the flag
-    return diagnostics.wrap(
-      override.replace(rootNamespaceName, context.namespace || rootNamespaceName),
-    );
+): string {
+  if (context.namespace) {
+    return context.namespace;
   }
+  const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
+  if (override) return override;
   if (!entity.namespace) {
-    return diagnostics.wrap(context.namespace || "");
+    return "";
   }
   if (entity.kind === "Namespace") {
     return getNamespaceFullNameWithOverride(context, entity);
@@ -1220,11 +1213,10 @@ export function getClientNamespace(
   return getNamespaceFullNameWithOverride(context, entity.namespace);
 }
 
-function getNamespaceFullNameWithOverride(
-  context: TCGCContext,
-  namespace: Namespace,
-): [string, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
+function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
+  if (context.namespace) {
+    return context.namespace;
+  }
   const segments = [];
   let current: Namespace | undefined = namespace;
   while (current && current.name !== "") {
@@ -1236,13 +1228,7 @@ function getNamespaceFullNameWithOverride(
     segments.unshift(current.name);
     current = current.namespace;
   }
-  if (context.namespace) {
-    const rootNamespaceName = diagnostics.pipe(getRootUserDefinedNamespaceName(context));
-
-    return diagnostics.wrap(segments.join(".").replace(rootNamespaceName, context.namespace));
-  }
-
-  return diagnostics.wrap(segments.join("."));
+  return segments.join(".");
 }
 
 export const $scope: ScopeDecorator = (

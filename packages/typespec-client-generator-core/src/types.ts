@@ -520,7 +520,7 @@ export function getSdkUnionWithDiagnostics(
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
     } else {
-      const namespace = diagnostics.pipe(getClientNamespace(context, type));
+      const namespace = getClientNamespace(context, type);
       // if a union is `type | null`, then we will return a nullable wrapper type of the type
       if (nonNullOptions.length === 1 && nullOption !== undefined) {
         retval = {
@@ -610,12 +610,13 @@ export function getSdkUnionWithDiagnostics(
 
     // other cases
     if (retval === undefined) {
+      const namespace = getClientNamespace(context, type);
       retval = {
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
         name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
         isGeneratedName: !type.name,
-        namespace: diagnostics.pipe(getClientNamespace(context, type)),
-        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+        namespace,
+        clientNamespace: namespace,
         variantTypes: nonNullOptions.map((x) =>
           diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
         ),
@@ -626,6 +627,7 @@ export function getSdkUnionWithDiagnostics(
     }
 
     if (nullOption !== undefined) {
+      const namespace = getClientNamespace(context, type);
       retval = {
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
         name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
@@ -634,8 +636,8 @@ export function getSdkUnionWithDiagnostics(
         type: retval,
         access: "public",
         usage: UsageFlags.None,
-        namespace: diagnostics.pipe(getClientNamespace(context, type)),
-        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+        namespace,
+        clientNamespace: namespace,
       };
     }
 
@@ -651,7 +653,7 @@ function getEmptyUnionType(
   operation?: Operation,
 ): [SdkUnionType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const namespace = diagnostics.pipe(getClientNamespace(context, type));
+  const namespace = getClientNamespace(context, type);
 
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
@@ -851,7 +853,7 @@ export function getSdkModelWithDiagnostics(
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
     const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // eslint-disable-line @typescript-eslint/no-deprecated
-    const namespace = diagnostics.pipe(getClientNamespace(context, type));
+    const namespace = getClientNamespace(context, type);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -984,7 +986,7 @@ function getSdkEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   let sdkType = context.__referencedTypeCache?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
-    const namespace = diagnostics.pipe(getClientNamespace(context, type));
+    const namespace = getClientNamespace(context, type);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
@@ -1052,7 +1054,7 @@ export function getSdkUnionEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   const union = type.union;
   const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
-  const namespace = diagnostics.pipe(getClientNamespace(context, type.union));
+  const namespace = getClientNamespace(context, type.union);
   const sdkType: SdkEnumType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
@@ -1216,7 +1218,7 @@ function getSdkCredentialType(
     }
   }
   if (credentialTypes.length > 1) {
-    const namespace = diagnostics.pipe(getClientNamespace(context, client.service));
+    const namespace = getClientNamespace(context, client.service);
     return diagnostics.wrap({
       __raw: client.service,
       kind: "union",
