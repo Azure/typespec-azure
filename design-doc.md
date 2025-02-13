@@ -6,7 +6,7 @@ Currently, we treat the `nextLink` in paging as opaque and does not inject query
 
 ## Problem
 
-This is an existing issue in 1-2 brownfield Azure services: Keyvault, Storage and potentially AppConfig.
+This is an existing issue in 3 brownfield Azure services: Keyvault, Storage and AppConfig.
 
 ### Keyvault
 
@@ -22,10 +22,6 @@ Storage does a combination of continuation token paging and needing to reinject 
 4. GET `<storage-container-url>/?comp=list;marker=<next-marker-value>`
 5. if `maxresults` was passed by the user, reinject this value into the GET call
 6. GOTO 2
-
-### AppConfig
-
-I can't get in touch with anyone on the client-side team working with AppConfig since they're all no longer with us.
 
 The examples used throughout the rest of this doc will reference the `includePending` issue from KV.
 
