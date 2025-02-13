@@ -330,30 +330,20 @@ describe("typespec-client-generator-core: namespaces", () => {
       const fooRenamedNamespace = sdkPackage.namespaces.find((x) => x.name === "FooRenamed");
       ok(fooRenamedNamespace);
       strictEqual(fooRenamedNamespace.fullName, "FooRenamed");
-      strictEqual(fooRenamedNamespace.clients.length, 1);
-      strictEqual(fooRenamedNamespace.clients[0].name, "FooClient");
-      strictEqual(fooRenamedNamespace.models.length, 0);
+      strictEqual(fooRenamedNamespace.clients.length, 3);
+      const fooClient = fooRenamedNamespace.clients.find((x) => x.name === "FooClient");
+      ok(fooClient);
+      strictEqual(fooClient.clientNamespace, "FooRenamed");
+      const barClient = fooRenamedNamespace.clients.find((x) => x.name === "Bar");
+      ok(barClient);
+      strictEqual(barClient.clientNamespace, "FooRenamed");
+      const bazClient = fooRenamedNamespace.clients.find((x) => x.name === "Baz");
+      ok(bazClient);
+      strictEqual(bazClient.clientNamespace, "FooRenamed");
+      strictEqual(fooRenamedNamespace.models.length, 2);
       strictEqual(fooRenamedNamespace.enums.length, 0);
       strictEqual(fooRenamedNamespace.unions.length, 0);
-      strictEqual(fooRenamedNamespace.namespaces.length, 2);
-
-      const barNamespace = fooRenamedNamespace.namespaces.find((x) => x.name === "Bar");
-      ok(barNamespace);
-      strictEqual(barNamespace.fullName, "FooRenamed.Bar");
-      strictEqual(barNamespace.clients.length, 1);
-      strictEqual(barNamespace.models.length, 1);
-      strictEqual(barNamespace.enums.length, 0);
-      strictEqual(barNamespace.unions.length, 0);
-      strictEqual(barNamespace.namespaces.length, 0);
-
-      const bazNamespace = fooRenamedNamespace.namespaces.find((x) => x.name === "Baz");
-      ok(bazNamespace);
-      strictEqual(bazNamespace.fullName, "FooRenamed.Baz");
-      strictEqual(bazNamespace.clients.length, 1);
-      strictEqual(bazNamespace.models.length, 1);
-      strictEqual(bazNamespace.enums.length, 0);
-      strictEqual(bazNamespace.unions.length, 0);
-      strictEqual(bazNamespace.namespaces.length, 0);
+      strictEqual(fooRenamedNamespace.namespaces.length, 0);
     });
     it("restructure client with namespace flag", async () => {
       await runner.compile(
@@ -457,19 +447,15 @@ describe("typespec-client-generator-core: namespaces", () => {
       strictEqual(foodClient.clientNamespace, "PetStoreFlagRenamed");
       const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
       ok(petActionClient);
-      strictEqual(petActionClient.clientNamespace, "PetStoreFlagRenamed.SubNamespace");
+      strictEqual(petActionClient.clientNamespace, "PetStoreFlagRenamed");
 
       strictEqual(sdkPackage.namespaces.length, 1);
       const petStoreFlagRenamedNamespace = sdkPackage.namespaces[0];
       strictEqual(petStoreFlagRenamedNamespace.fullName, "PetStoreFlagRenamed");
-      strictEqual(petStoreFlagRenamedNamespace.clients.length, 1);
-      strictEqual(petStoreFlagRenamedNamespace.clients[0].name, "FoodClient");
-      strictEqual(petStoreFlagRenamedNamespace.namespaces.length, 1);
-      const subNamespace = petStoreFlagRenamedNamespace.namespaces[0];
-      strictEqual(subNamespace.fullName, "PetStoreFlagRenamed.SubNamespace");
-      strictEqual(subNamespace.clients.length, 1);
-      strictEqual(subNamespace.clients[0].name, "PetActionClient");
-      strictEqual(subNamespace.namespaces.length, 0);
+      strictEqual(petStoreFlagRenamedNamespace.clients.length, 2);
+      ok(petStoreFlagRenamedNamespace.clients.find((x) => x.name === "FoodClient"));
+      ok(petStoreFlagRenamedNamespace.clients.find((x) => x.name === "PetActionClient"));
+      strictEqual(petStoreFlagRenamedNamespace.namespaces.length, 0);
     });
 
     it("complicated nested namespaces", async () => {
@@ -505,38 +491,11 @@ describe("typespec-client-generator-core: namespaces", () => {
       const aNamespace = azureNamespace.namespaces.find((x) => x.name === "A");
       ok(aNamespace);
       strictEqual(aNamespace.fullName, "Azure.A");
-      strictEqual(aNamespace.clients.length, 2); // A and AG
+      strictEqual(aNamespace.clients.length, 8); // all clients get flattened into Azure.A
       strictEqual(aNamespace.models.length, 0);
       strictEqual(aNamespace.enums.length, 0);
       strictEqual(aNamespace.unions.length, 0);
-      strictEqual(aNamespace.namespaces.length, 1); // AA
-
-      const aaNamespace = aNamespace.namespaces.find((x) => x.name === "AA");
-      ok(aaNamespace);
-      strictEqual(aaNamespace.fullName, "Azure.A.AA");
-      strictEqual(aaNamespace.clients.length, 2); // AA and AAG
-      strictEqual(aaNamespace.models.length, 0);
-      strictEqual(aaNamespace.enums.length, 0);
-      strictEqual(aaNamespace.unions.length, 0);
-      strictEqual(aaNamespace.namespaces.length, 2); // AAA and AAB
-
-      const aaaNamespace = aaNamespace.namespaces.find((x) => x.name === "AAA");
-      ok(aaaNamespace);
-      strictEqual(aaaNamespace.fullName, "Azure.A.AA.AAA");
-      strictEqual(aaaNamespace.clients.length, 1); // AAA
-      strictEqual(aaaNamespace.models.length, 0);
-      strictEqual(aaaNamespace.enums.length, 0);
-      strictEqual(aaaNamespace.unions.length, 0);
-      strictEqual(aaaNamespace.namespaces.length, 0);
-
-      const aabNamespace = aaNamespace.namespaces.find((x) => x.name === "AAB");
-      ok(aabNamespace);
-      strictEqual(aabNamespace.fullName, "Azure.A.AA.AAB");
-      strictEqual(aabNamespace.clients.length, 3); // AAB, AABGroup1 and AABGroup2
-      strictEqual(aabNamespace.models.length, 0);
-      strictEqual(aabNamespace.enums.length, 0);
-      strictEqual(aabNamespace.unions.length, 0);
-      strictEqual(aabNamespace.namespaces.length, 0);
+      strictEqual(aNamespace.namespaces.length, 0);
     });
   });
 });
