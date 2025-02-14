@@ -667,15 +667,6 @@ export interface SdkMethodResponse {
    * Temporarily this is not enabled for paging now.
    */
   resultSegments?: SdkModelPropertyType[];
-  /**
-   * Extra info that are not used in direct response but may be useful for some languages.
-   */
-  extraInfo?: SdkMethodResponseExtraInfo[];
-}
-
-export interface SdkMethodResponseExtraInfo {
-  type: SdkType;
-  resultSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkServiceResponse {
