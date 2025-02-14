@@ -813,6 +813,8 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponse.kind, "method");
       strictEqual(methodResponse.type, widgetModel);
       strictEqual(createOrUpdate.response.resultPath, "result");
+      strictEqual(createOrUpdate.response.resultSegments?.length, 1);
+      strictEqual(createOrUpdate.response.resultSegments[0], createOrUpdate.lroMetadata.finalResponse?.envelopeResult.properties[3]);
     });
     it("lro delete", async () => {
       const runnerWithCore = await createSdkTestRunner({

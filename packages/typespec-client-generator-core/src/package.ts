@@ -64,6 +64,7 @@ import {
 import {
   createGeneratedName,
   filterApiVersionsWithDecorators,
+  findRootSourceProperty,
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
@@ -172,17 +173,15 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     basic.response.resultPath = getPropertyPathFromModel(
       context,
       responseType?.__raw,
       (p) => p === pagingOperation.output.pageItems.property,
     );
-    const pageItemsProperty = diagnostics.pipe(
-      getSdkModelPropertyType(context, pagingOperation.output.pageItems.property),
-    );
     basic.response.resultSegments = getPropertySegmentsFromModelOrParameters(
       responseType,
-      (p) => p === pageItemsProperty,
+      (p) => p.__raw === pagingOperation.output.pageItems.property,
     );
 
     let nextLinkPath = undefined;
@@ -193,35 +192,22 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         responseType?.__raw,
         (p) => p === pagingOperation.output.nextLink!.property,
       );
-      const nextLinkProperty = diagnostics.pipe(
-        getSdkModelPropertyType(context, pagingOperation.output.nextLink?.property),
-      );
       nextLinkSegments = getPropertySegmentsFromModelOrParameters(
         responseType,
-        (p) => p === nextLinkProperty,
+        (p) => p.__raw === pagingOperation.output.nextLink?.property,
       );
     }
 
     let continuationTokenParameterSegments = undefined;
     let continuationTokenResponseSegments = undefined;
     if (pagingOperation.input.continuationToken) {
-      // find direct parameter first, then find nested property if it's not a direct parameter
-      const directParameter = operation.parameters.properties.get(
-        pagingOperation.input.continuationToken.property.name,
+      continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
+        basic.parameters,
+        (p) =>
+          p.__raw?.kind === "ModelProperty" &&
+          findRootSourceProperty(p.__raw) ===
+            findRootSourceProperty(pagingOperation.input.continuationToken!.property),
       );
-      if (directParameter === pagingOperation.input.continuationToken.property) {
-        continuationTokenParameterSegments = [
-          diagnostics.pipe(getSdkMethodParameter(context, directParameter, operation)),
-        ];
-      } else {
-        const continuationTokenParameter = diagnostics.pipe(
-          getSdkModelPropertyType(context, pagingOperation.input.continuationToken.property),
-        );
-        continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
-          basic.parameters,
-          (p) => p === continuationTokenParameter,
-        );
-      }
     }
     if (pagingOperation.output.continuationToken) {
       if (isHeader(context.program, pagingOperation.output.continuationToken.property)) {
@@ -230,12 +216,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           .flat()
           .filter((h) => h.__raw === pagingOperation.output.continuationToken!.property);
       } else {
-        const continuationTokenProperty = diagnostics.pipe(
-          getSdkModelPropertyType(context, pagingOperation.output.continuationToken.property),
-        );
         continuationTokenResponseSegments = getPropertySegmentsFromModelOrParameters(
           responseType,
-          (p) => p === continuationTokenProperty,
+          (p) => p.__raw === pagingOperation.output.continuationToken!.property,
         );
       }
     }
@@ -287,17 +270,15 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   basic.response.resultPath = getPropertyPathFromSegment(
     context,
     pagedMetadata.modelType,
     pagedMetadata.itemsSegments,
   );
-  const pageItemsProperty = diagnostics.pipe(
-    getSdkModelPropertyType(context, pagedMetadata.itemsProperty),
-  );
   basic.response.resultSegments = getPropertySegmentsFromModelOrParameters(
     responseType,
-    (p) => p === pageItemsProperty,
+    (p) => p.__raw === pagedMetadata.itemsProperty,
   );
 
   let nextLinkPath = undefined;
@@ -308,12 +289,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       pagedMetadata.modelType,
       pagedMetadata?.nextLinkSegments,
     );
-    const nextLinkProperty = diagnostics.pipe(
-      getSdkModelPropertyType(context, pagedMetadata.nextLinkProperty),
-    );
     nextLinkSegments = getPropertySegmentsFromModelOrParameters(
       responseType,
-      (p) => p === nextLinkProperty,
+      (p) => p.__raw === pagedMetadata.nextLinkProperty,
     );
   }
 
@@ -450,7 +428,6 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
 
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   basicServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
-
   basicServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
 
   return diagnostics.wrap({

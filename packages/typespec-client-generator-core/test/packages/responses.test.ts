@@ -318,4 +318,18 @@ describe("typespec-client-generator-core: responses", () => {
       models[0],
     );
   });
+
+  it("rename for response header", async function () {
+    await runner.compileWithBuiltInService(`
+      model Test{
+          prop: string;
+      }
+      op get(): {@header @clientName("xRename") x: string};
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+    const header = method.operation.responses[0].headers[0];
+    strictEqual(header.serializedName, "x");
+    strictEqual(header.name, "xRename");
+  });
 });
