@@ -4,6 +4,7 @@ import {
   Diagnostic,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
+  getLocationContext,
   getNamespaceFullName,
   getVisibilityForClass,
   Interface,
@@ -590,4 +591,27 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   const lifecycle = getLifecycleVisibilityEnum(context.program);
   const visibility = getVisibilityForClass(context.program, type, lifecycle);
   return visibility.size === 0;
+}
+
+export function getAllUserDefinedNamespaces(
+  context: TCGCContext,
+  namespace?: Namespace,
+  retval?: Namespace[],
+): Namespace[] {
+  if (!retval) {
+    retval = [];
+  }
+  if (!namespace) {
+    for (const namespace of context.program.getGlobalNamespaceType().namespaces.values()) {
+      retval = retval.concat(getAllUserDefinedNamespaces(context, namespace));
+    }
+  } else {
+    if (retval.includes(namespace)) return retval;
+    if (getLocationContext(context.program, namespace).type !== "project") return retval;
+    retval.push(namespace);
+    for (const subNamespace of namespace.namespaces.values()) {
+      retval = retval.concat(getAllUserDefinedNamespaces(context, subNamespace));
+    }
+  }
+  return retval;
 }

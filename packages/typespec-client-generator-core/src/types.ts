@@ -25,7 +25,6 @@ import {
   getEncode,
   getKnownValues,
   getLifecycleVisibilityEnum,
-  getLocationContext,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -89,6 +88,7 @@ import {
 import {
   createGeneratedName,
   filterApiVersionsInEnum,
+  getAllUserDefinedNamespaces,
   getAvailableApiVersions,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
@@ -1878,16 +1878,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
-    (x) => getLocationContext(context.program, x).type === "project",
-  );
-  // make sure we also include all client namespaces as well
-  for (const client of listClients(context)) {
-    if (!allNamespaces.includes(client.service)) {
-      allNamespaces.push(client.service);
-    }
-  }
-  for (const currNamespace of allNamespaces) {
+  const userDefinedNamespaces = getAllUserDefinedNamespaces(context);
+  for (const currNamespace of userDefinedNamespaces) {
     const namespaces = [currNamespace];
     while (namespaces.length) {
       const namespace = namespaces.pop()!;
