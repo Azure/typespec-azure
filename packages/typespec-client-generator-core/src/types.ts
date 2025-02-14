@@ -510,61 +510,130 @@ export function getSdkUnionWithDiagnostics(
 
     if (nonNullOptions.length === 0) {
       diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
-      return diagnostics.wrap(diagnostics.pipe(getUnknownType(context, type)));
-    }
+      retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
+      updateReferencedTypeMap(context, type, retval);
+    } else if (checkUnionCircular(type)) {
+      diagnostics.add(createDiagnostic({ code: "union-circular", target: type }));
+      retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
+      updateReferencedTypeMap(context, type, retval);
+    } else {
+      // if a union is `type | null`, then we will return a nullable wrapper type of the type
+      if (nonNullOptions.length === 1 && nullOption !== undefined) {
+        retval = {
+          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+          name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+          isGeneratedName: !type.name,
+          type: diagnostics.pipe(getUnknownType(context, type)),
+          access: "public",
+          usage: UsageFlags.None,
+          clientNamespace: getClientNamespace(context, type),
+        };
+        updateReferencedTypeMap(context, type, retval);
+        retval.type = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, nonNullOptions[0], operation),
+        );
+      } else if (
+        // judge if the union can be converted to enum
+        // if language does not need flatten union as enum
+        // filter the case that union is composed of union or enum
+        context.flattenUnionAsEnum ||
+        ![...type.variants.values()].some((variant) => {
+          return variant.type.kind === "Union" || variant.type.kind === "Enum";
+        })
+      ) {
+        const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
+        if (unionAsEnum) {
+          retval = diagnostics.pipe(
+            getSdkUnionEnumWithDiagnostics(context, unionAsEnum, operation),
+          );
+          if (nullOption !== undefined) {
+            retval = {
+              ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+              name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+              isGeneratedName: !type.name,
+              type: retval,
+              access: "public",
+              usage: UsageFlags.None,
+              clientNamespace: getClientNamespace(context, type),
+            };
+          }
+          updateReferencedTypeMap(context, type, retval);
+        }
+      }
 
-    // if a union is `type | null`, then we will return a nullable wrapper type of the type
-    if (nonNullOptions.length === 1 && nullOption !== undefined) {
-      retval = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, nonNullOptions[0], operation),
-      );
-    } else if (
-      // judge if the union can be converted to enum
-      // if language does not need flatten union as enum
-      // filter the case that union is composed of union or enum
-      context.flattenUnionAsEnum ||
-      ![...type.variants.values()].some((variant) => {
-        return variant.type.kind === "Union" || variant.type.kind === "Enum";
-      })
-    ) {
-      const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
-      if (unionAsEnum) {
-        retval = diagnostics.pipe(getSdkUnionEnumWithDiagnostics(context, unionAsEnum, operation));
+      // other cases
+      if (retval === undefined) {
+        retval = {
+          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
+          name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+          isGeneratedName: true, // always set inner union type as generated name
+          clientNamespace: getClientNamespace(context, type),
+          variantTypes: [],
+          crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
+          access: "public",
+          usage: UsageFlags.None,
+        };
+        if (nullOption !== undefined) {
+          retval = {
+            ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+            name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+            isGeneratedName: !type.name,
+            type: retval,
+            access: "public",
+            usage: UsageFlags.None,
+            clientNamespace: getClientNamespace(context, type),
+          };
+        }
+        updateReferencedTypeMap(context, type, retval);
+        const variantTypes = nonNullOptions.map((x) =>
+          diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
+        );
+        if (retval.kind === "nullable" && retval.type.kind === "union") {
+          retval.type.variantTypes = variantTypes;
+        } else if (retval.kind === "union") {
+          retval.variantTypes = variantTypes;
+        }
       }
     }
-
-    // other cases
-    if (retval === undefined) {
-      retval = {
-        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
-        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
-        isGeneratedName: !type.name,
-        clientNamespace: getClientNamespace(context, type),
-        variantTypes: nonNullOptions.map((x) =>
-          diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
-        ),
-        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
-        access: "public",
-        usage: UsageFlags.None,
-      };
-    }
-
-    if (nullOption !== undefined) {
-      retval = {
-        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
-        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
-        isGeneratedName: !type.name,
-        type: retval,
-        access: "public",
-        usage: UsageFlags.None,
-        clientNamespace: getClientNamespace(context, type),
-      };
-    }
-
-    updateReferencedTypeMap(context, type, retval);
   }
 
   return diagnostics.wrap(retval);
+}
+
+function getEmptyUnionType(
+  context: TCGCContext,
+  type: Union,
+  operation?: Operation,
+): [SdkUnionType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+
+  return diagnostics.wrap({
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
+    name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+    isGeneratedName: !type.name,
+    clientNamespace: getClientNamespace(context, type),
+    variantTypes: [],
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
+    access: "public",
+    usage: UsageFlags.None,
+  });
+}
+function checkUnionCircular(type: Union): boolean {
+  const visited = new Set<Union>();
+  const stack = [type];
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    if (visited.has(current)) {
+      return true;
+    }
+    visited.add(current);
+    for (const variant of current.variants.values()) {
+      if (variant.type.kind === "Union") {
+        stack.push(variant.type);
+      }
+    }
+  }
+  return false;
 }
 
 function getSdkConstantWithDiagnostics(
@@ -931,35 +1000,32 @@ export function getSdkUnionEnumWithDiagnostics(
 ): [SdkEnumType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const union = type.union;
-  let sdkType = context.referencedTypeMap?.get(union) as SdkEnumType | undefined;
-  if (!sdkType) {
-    const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
-    sdkType = {
-      ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
-      name,
-      isGeneratedName: !type.union.name,
-      clientNamespace: getClientNamespace(context, type.union),
-      doc: getDoc(context.program, union),
-      summary: getSummary(context.program, union),
-      valueType:
-        diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
-        diagnostics.pipe(
-          getSdkEnumValueType(
-            context,
-            [...type.flattenedMembers.values()].map((v) => v.value),
-          ),
+  const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
+  const sdkType: SdkEnumType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
+    name,
+    isGeneratedName: !type.union.name,
+    clientNamespace: getClientNamespace(context, type.union),
+    doc: getDoc(context.program, union),
+    summary: getSummary(context.program, union),
+    valueType:
+      diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
+      diagnostics.pipe(
+        getSdkEnumValueType(
+          context,
+          [...type.flattenedMembers.values()].map((v) => v.value),
         ),
-      values: [],
-      isFixed: !type.open,
-      isFlags: false,
-      usage: UsageFlags.None, // We will add usage as we loop through the operations
-      access: "public", // Dummy value until we update models map
-      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, union, operation),
-      apiVersions: getAvailableApiVersions(context, type.union, type.union.namespace),
-      isUnionAsEnum: true,
-    };
-    sdkType.values = diagnostics.pipe(getSdkUnionEnumValues(context, type, sdkType));
-  }
+      ),
+    values: [],
+    isFixed: !type.open,
+    isFlags: false,
+    usage: UsageFlags.None, // We will add usage as we loop through the operations
+    access: "public", // Dummy value until we update models map
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, union, operation),
+    apiVersions: getAvailableApiVersions(context, type.union, type.union.namespace),
+    isUnionAsEnum: true,
+  };
+  sdkType.values = diagnostics.pipe(getSdkUnionEnumValues(context, type, sdkType));
   return diagnostics.wrap(sdkType);
 }
 
@@ -1880,6 +1946,12 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
     (x) => getLocationContext(context.program, x).type === "project",
   );
+  // make sure we also include all client namespaces as well
+  for (const client of listClients(context)) {
+    if (!allNamespaces.includes(client.service)) {
+      allNamespaces.push(client.service);
+    }
+  }
   for (const currNamespace of allNamespaces) {
     const namespaces = [currNamespace];
     while (namespaces.length) {

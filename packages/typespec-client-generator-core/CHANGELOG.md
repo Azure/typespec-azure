@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.51.1
+
+### Bug Fixes
+
+- [#2211](https://github.com/Azure/typespec-azure/pull/2211) Make sure to keep orphan models
+
+
 ## 0.51.0
 
 ### Bug Fixes

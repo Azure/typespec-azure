@@ -382,9 +382,6 @@ export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[
   let nonBodyExists = false;
   for (const response of responses) {
     if (response.type) {
-      if (response.type.kind === "nullable") {
-        nonBodyExists = true;
-      }
       allResponseBodies.push(response.type);
     } else {
       nonBodyExists = true;
