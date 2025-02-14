@@ -647,8 +647,7 @@ export type SdkHttpParameter =
   | SdkPathParameter
   | SdkBodyParameter
   | SdkHeaderParameter
-  | SdkCookieParameter
-  | SdkServiceResponseHeader;
+  | SdkCookieParameter;
 
 export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
