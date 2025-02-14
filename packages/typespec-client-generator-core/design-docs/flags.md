@@ -16,7 +16,7 @@ Currently, emitters don't really use it, but it would be great to move language 
 
 Should remove any logic that derives namespace names from the value of `package-name`.
 
-Default value is `none`.
+Default value is `undefined`.
 
 ## 4. `flatten-union-as-enum`
 
@@ -28,8 +28,12 @@ Specifies the directory where the emitter will look for example files. If the fl
 
 ## 6. `emitter-name`
 
-The name of the emitter you are calling TCGC from. TCGC uses this to keep track of what scope you belong to, and what information to set for you. I feel this should not be a `tspconfig.yaml` flag, but an option you can pass to TCGC when calling `createSdkContext`
+The name of the emitter you are calling TCGC from. TCGC uses this to keep track of what scope you belong to, and what information to set for you. I feel we should remove this from `tspconfig.yaml`. It is currently the second optional argument to pass to `createSdkContext`, which I think is the only place you should be able to pass it in
 
 ## 7. `namespace`
 
 If you want to override the namespaces set in the spec. In the process of adding, see [this](https://github.com/Azure/typespec-azure/pull/2161) PR. Affects the values in `SdkPackage.namespaces`.
+
+## 8. `api-version`
+
+Use this flag if you would like to generate the sdk only for a specific version. Default value is `all`. Also accepts values `latest` and `all`.
