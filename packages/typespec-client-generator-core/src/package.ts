@@ -138,12 +138,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  const basic = diagnostics.pipe(
+  const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
   // nullable response type means the underlaying operation has multiple responses and only one of them is not empty, which is what we want
-  let responseType = basic.response.type;
+  let responseType = baseServiceMethod.response.type;
   if (responseType?.kind === "nullable") {
     responseType = responseType.type;
   }
@@ -168,18 +168,18 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       );
       // return as page method with no paging info
       return diagnostics.wrap({
-        ...basic,
+        ...baseServiceMethod,
         kind: "paging",
       });
     }
 
     // eslint-disable-next-line @typescript-eslint/no-deprecated
-    basic.response.resultPath = getPropertyPathFromModel(
+    baseServiceMethod.response.resultPath = getPropertyPathFromModel(
       context,
       responseType?.__raw,
       (p) => p === pagingOperation.output.pageItems.property,
     );
-    basic.response.resultSegments = getPropertySegmentsFromModelOrParameters(
+    baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
       responseType,
       (p) => p.__raw === pagingOperation.output.pageItems.property,
     );
@@ -202,7 +202,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     let continuationTokenResponseSegments = undefined;
     if (pagingOperation.input.continuationToken) {
       continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
-        basic.parameters,
+        baseServiceMethod.parameters,
         (p) =>
           p.__raw?.kind === "ModelProperty" &&
           findRootSourceProperty(p.__raw) ===
@@ -211,7 +211,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     }
     if (pagingOperation.output.continuationToken) {
       if (isHeader(context.program, pagingOperation.output.continuationToken.property)) {
-        continuationTokenResponseSegments = basic.operation.responses
+        continuationTokenResponseSegments = baseServiceMethod.operation.responses
           .map((r) => r.headers)
           .flat()
           .filter((h) => h.__raw === pagingOperation.output.continuationToken!.property);
@@ -225,12 +225,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     context.__pagedResultSet.add(responseType);
     // tcgc will let all paging method return a list of items
-    basic.response.type = diagnostics.pipe(
+    baseServiceMethod.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagingOperation?.output.pageItems.property.type),
     );
 
     return diagnostics.wrap({
-      ...basic,
+      ...baseServiceMethod,
       kind: "paging",
       nextLinkPath,
       nextLinkSegments,
@@ -258,7 +258,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     );
     // return as page method with no paging info
     return diagnostics.wrap({
-      ...basic,
+      ...baseServiceMethod,
       kind: "paging",
     });
   }
@@ -266,17 +266,17 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   context.__pagedResultSet.add(responseType);
 
   // tcgc will let all paging method return a list of items
-  basic.response.type = diagnostics.pipe(
+  baseServiceMethod.response.type = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
   );
 
   // eslint-disable-next-line @typescript-eslint/no-deprecated
-  basic.response.resultPath = getPropertyPathFromSegment(
+  baseServiceMethod.response.resultPath = getPropertyPathFromSegment(
     context,
     pagedMetadata.modelType,
     pagedMetadata.itemsSegments,
   );
-  basic.response.resultSegments = getPropertySegmentsFromModelOrParameters(
+  baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
     responseType,
     (p) => p.__raw === pagedMetadata.itemsProperty,
   );
@@ -296,7 +296,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   }
 
   return diagnostics.wrap({
-    ...basic,
+    ...baseServiceMethod,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
     nextLinkPath,
@@ -305,7 +305,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           getSdkServiceOperation<TServiceOperation>(
             context,
             pagedMetadata.nextLinkOperation,
-            basic.parameters,
+            baseServiceMethod.parameters,
           ),
         )
       : undefined,
@@ -420,18 +420,18 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const metadata = getServiceMethodLroMetadata(context, operation)!;
-  const basicServiceMethod = diagnostics.pipe(
+  const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
-  basicServiceMethod.response.type = metadata.finalResponse?.result;
+  baseServiceMethod.response.type = metadata.finalResponse?.result;
 
   // eslint-disable-next-line @typescript-eslint/no-deprecated
-  basicServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
-  basicServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
+  baseServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
+  baseServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
 
   return diagnostics.wrap({
-    ...basicServiceMethod,
+    ...baseServiceMethod,
     kind: "lro",
     __raw_lro_metadata: metadata.__raw,
     lroMetadata: metadata,
@@ -439,7 +439,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
       getSdkServiceOperation<TServiceOperation>(
         context,
         metadata.__raw.operation,
-        basicServiceMethod.parameters,
+        baseServiceMethod.parameters,
       ),
     ),
   });
