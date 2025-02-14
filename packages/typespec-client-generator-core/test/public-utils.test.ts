@@ -395,7 +395,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   });
 
   describe("getPropertyNames", () => {
-    it("property language projected name", async () => {
+    it("property language client name", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -421,7 +421,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-python", "made_for_python");
       await helper("@azure-tools/typespec-ts", "MadeForTS");
     });
-    it("property language projected name augmented", async () => {
+    it("property language client name augmented", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -446,7 +446,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-python", "made_for_python");
       await helper("@azure-tools/typespec-ts", "MadeForTS");
     });
-    it("property client projected name", async () => {
+    it("property client client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -468,7 +468,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-python");
       await helper("@azure-tools/typespec-ts");
     });
-    it("property no projected name", async () => {
+    it("property no client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -487,7 +487,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("property with projected client and json name", async () => {
+    it("property with client and json name", async () => {
       async function helper(emitterName: string, expectedLibraryName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -514,7 +514,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-python", "made_for_python");
       await helper("@azure-tools/typespec-ts", "MadeForTS");
     });
-    it("property with projected language and json name", async () => {
+    it("property with language and json name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -537,7 +537,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     });
   });
   describe("getLibraryName", () => {
-    it("operation client projected name", async () => {
+    it("operation client client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
@@ -550,7 +550,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("operation language projected name", async () => {
+    it("operation language client name", async () => {
       async function helper(emitterName: string, expected: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
@@ -568,7 +568,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts", "madeForTS");
       await helper("@azure-tools/typespec-python", "made_for_python");
     });
-    it("operation language projected name augmented", async () => {
+    it("operation language client name augmented", async () => {
       async function helper(emitterName: string, expected: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
@@ -587,7 +587,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts", "madeForTS");
       await helper("@azure-tools/typespec-python", "made_for_python");
     });
-    it("operation json projected name", async () => {
+    it("operation json client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
@@ -602,7 +602,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("operation no projected name", async () => {
+    it("operation no client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { func } = (await runner.compile(`
@@ -616,7 +616,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("model client projected name", async () => {
+    it("model client client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -633,7 +633,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("model language projected name", async () => {
+    it("model language client name", async () => {
       async function helper(emitterName: string, expected: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -653,7 +653,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts", "JavascriptModel");
       await helper("@azure-tools/typespec-python", "PythonModel");
     });
-    it("model language projected name augmented", async () => {
+    it("model language client name augmented", async () => {
       async function helper(emitterName: string, expected: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -674,7 +674,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts", "JavascriptModel");
       await helper("@azure-tools/typespec-python", "PythonModel");
     });
-    it("model json projected name", async () => {
+    it("model json client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -691,7 +691,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("model no projected name", async () => {
+    it("model no client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { MyModel } = (await runner.compile(`
@@ -783,7 +783,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("clientName", "@azure-tools/typespec-python");
     });
 
-    it("parameter client projected name", async () => {
+    it("parameter client client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
@@ -801,7 +801,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("parameter language projected name", async () => {
+    it("parameter language client name", async () => {
       async function helper(emitterName: string, expected: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
@@ -823,7 +823,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-python", "python_param");
     });
 
-    it("parameter json projected name", async () => {
+    it("parameter json client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`
@@ -841,7 +841,7 @@ describe("typespec-client-generator-core: public-utils", () => {
       await helper("@azure-tools/typespec-ts");
       await helper("@azure-tools/typespec-python");
     });
-    it("parameter no projected name", async () => {
+    it("parameter no client name", async () => {
       async function helper(emitterName: string) {
         const runner = await createSdkTestRunner({ emitterName });
         const { param } = (await runner.compile(`

@@ -13,7 +13,6 @@ import {
   getEffectiveModelType,
   getFriendlyName,
   getNamespaceFullName,
-  getProjectedName,
   ignoreDiagnostics,
   listServices,
   resolveEncodedName,
@@ -154,14 +153,13 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
 }
 
 /**
- * Get the library name of a property / parameter / operation / model / enum. Takes projections into account
+ * Get the library name of a property / parameter / operation / model / enum.
  *
  * Returns name in the following order of priority
  * 1. language emitter name, i.e. @clientName("csharpSpecificName", "csharp") => "csharpSpecificName"
  * 2. client name, i.e. @clientName(""clientName") => "clientName"
- * 3. deprecated projected name
- * 4. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
- * 5. name in typespec
+ * 3. friendly name, i.e. @friendlyName("friendlyName") => "friendlyName"
+ * 4. name in typespec
  *
  * @param context
  * @param type
@@ -172,22 +170,13 @@ export function getLibraryName(
   type: Type & { name?: string | symbol },
 ): string {
   // 1. check if there's a client name
-  let emitterSpecificName = getClientNameOverride(context, type);
+  const emitterSpecificName = getClientNameOverride(context, type);
   if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
-
-  // 2. check if there's a specific name for our language with deprecated @projectedName
-  emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
-  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
-
-  // 3. check if there's a client name with deprecated @projectedName
-  const clientSpecificName = getProjectedName(context.program, type, "client");
-  if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
-
-  // 4. check if there's a friendly name, if so return friendly name
+  // 2. check if there's a friendly name, if so return friendly name
   const friendlyName = getFriendlyName(context.program, type);
   if (friendlyName) return friendlyName;
 
-  // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
+  // 3. if type is derived from template and name is the same as template, add template parameters' name as suffix
   if (
     typeof type.name === "string" &&
     type.name !== "" &&
@@ -222,8 +211,7 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
   // 1. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
-  // 2. Check if there's deprecated language projection
-  return getProjectedName(context.program, type, "json") ?? type.name;
+  return type.name
 }
 
 /**
