@@ -728,7 +728,10 @@ describe("typespec-client-generator-core: union types", () => {
     strictEqual(nullableProp.type.access, "public");
     strictEqual(nullableProp.type.type.kind, "union");
     strictEqual(nullableProp.type.type.variantTypes.length, 3);
-    strictEqual(nullableProp.type.crossLanguageDefinitionId, "TestService.TestNullable.prop.anonymous");
+    strictEqual(
+      nullableProp.type.crossLanguageDefinitionId,
+      "TestService.TestNullable.prop.anonymous",
+    );
 
     // now check without null with help of helper function
     const sdkType = nullableProp.type.type;
