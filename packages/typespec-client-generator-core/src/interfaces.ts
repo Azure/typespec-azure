@@ -414,7 +414,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
 
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
-  value: string | number | boolean | null;
+  value: string | number | boolean;
   valueType: SdkBuiltInType;
   name: string;
   isGeneratedName: boolean;
@@ -666,6 +666,15 @@ export interface SdkMethodResponse {
    * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
    * Temporarily this is not enabled for paging now.
    */
+  resultSegments?: SdkModelPropertyType[];
+  /**
+   * Extra info that are not used in direct response but may be useful for some languages.
+   */
+  extraInfo?: SdkMethodResponseExtraInfo[];
+}
+
+export interface SdkMethodResponseExtraInfo {
+  type: SdkType;
   resultSegments?: SdkModelPropertyType[];
 }
 
