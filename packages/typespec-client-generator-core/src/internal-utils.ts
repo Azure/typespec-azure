@@ -607,8 +607,9 @@ export function getAllUserDefinedNamespaces(
     }
   } else {
     if (retval.includes(namespace)) return retval;
-    if (getLocationContext(context.program, namespace).type !== "project") return retval;
-    retval.push(namespace);
+    if (getLocationContext(context.program, namespace).type === "project") {
+      retval.push(namespace);
+    }
     for (const subNamespace of namespace.namespaces.values()) {
       retval = retval.concat(getAllUserDefinedNamespaces(context, subNamespace));
     }
