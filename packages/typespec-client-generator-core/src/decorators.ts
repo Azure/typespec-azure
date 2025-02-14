@@ -60,8 +60,8 @@ import {
   AllScopes,
   clientNameKey,
   clientNamespaceKey,
+  findRootSourceProperty,
   getValidApiVersion,
-  isAzureCoreTspModel,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -901,15 +901,7 @@ function collectParams(
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
-        let sourceProp = value;
-        while (sourceProp.sourceProperty) {
-          sourceProp = sourceProp.sourceProperty;
-        }
-        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
-          params.push(value);
-        } else if (!sourceProp.model) {
-          params.push(value);
-        }
+        params.push(findRootSourceProperty(value));
       }
     }
   });

@@ -49,6 +49,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  findRootSourceProperty,
   getAvailableApiVersions,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
@@ -691,13 +692,6 @@ function filterOutUselessPathParameters(
       i--;
     }
   }
-}
-
-function findRootSourceProperty(property: ModelProperty): ModelProperty {
-  while (property.sourceProperty) {
-    property = property.sourceProperty;
-  }
-  return property;
 }
 
 function getCollectionFormat(
