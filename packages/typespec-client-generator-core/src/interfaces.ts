@@ -382,6 +382,7 @@ export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   name: string;
   isGeneratedName: boolean;
+  crossLanguageDefinitionId: string;
   type: SdkType;
   usage: UsageFlags;
   access: AccessFlags;
