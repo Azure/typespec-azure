@@ -1881,6 +1881,12 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
     (x) => getLocationContext(context.program, x).type === "project",
   );
+  // make sure we also include all client namespaces as well
+  for (const client of listClients(context)) {
+    if (!allNamespaces.includes(client.service)) {
+      allNamespaces.push(client.service);
+    }
+  }
   for (const currNamespace of allNamespaces) {
     const namespaces = [currNamespace];
     while (namespaces.length) {
