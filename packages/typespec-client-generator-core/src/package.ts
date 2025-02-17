@@ -790,13 +790,13 @@ function getSdkMethodParameter(
   operation: Operation,
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let parameter = context.methodParameterMap.get(type);
+  let parameter = context.__methodParameterCache.get(type);
   if (!parameter) {
     parameter = {
       ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
       kind: "method",
     };
-    context.methodParameterMap.set(type, parameter);
+    context.__methodParameterCache.set(type, parameter);
   }
   return diagnostics.wrap(parameter as SdkMethodParameter);
 }

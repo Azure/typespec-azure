@@ -338,7 +338,7 @@ export function getSdkHttpParameter(
   location?: "path" | "query" | "header" | "body" | "cookie",
 ): [SdkHttpParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let parameter = context.httpParameterMap?.get(param);
+  let parameter = context.__httpParameterCache?.get(param);
 
   if (!parameter) {
     const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
@@ -417,7 +417,7 @@ export function getSdkHttpParameter(
         serializedName: getHeaderFieldName(program, param) ?? base.name,
       };
     }
-    context.httpParameterMap.set(param, parameter);
+    context.__httpParameterCache.set(param, parameter);
   }
   return diagnostics.wrap(parameter);
 }

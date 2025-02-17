@@ -316,7 +316,7 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
       // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       projectedProgram = context.program = projectProgram(
-        context.originalProgram,
+        context.__originalProgram,
         projectedVersion.projections,
       );
     }

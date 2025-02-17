@@ -33,34 +33,37 @@ import { TspLiteralType } from "./internal-utils.js";
 
 export interface TCGCContext {
   program: Program;
+  diagnostics: readonly Diagnostic[];
   emitterName: string;
+  arm?: boolean;
+
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  referencedTypeMap: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
-  modelPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
-  methodParameterMap: Map<ModelProperty, SdkMethodParameter>;
-  httpParameterMap: Map<ModelProperty, SdkHttpParameter>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache: Map<Operation, HttpOperation>;
+  apiVersion?: string;
+  examplesDir?: string;
+
+  decoratorsAllowList?: string[];
+  previewStringRegex: RegExp;
+  disableUsageAccessPropagationToBase: boolean;
+
+  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
+  __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
+  __httpParameterCache: Map<ModelProperty, SdkHttpParameter>;
+  __generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  __httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
+  __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  apiVersion?: string;
   // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
-  originalProgram: Program;
-  examplesDir?: string;
-  decoratorsAllowList?: string[];
-  previewStringRegex: RegExp;
-  disableUsageAccessPropagationToBase: boolean;
+  __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
 }
 

@@ -501,7 +501,7 @@ export function getSdkUnionWithDiagnostics(
   type: Union,
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
-  let retval: SdkType | undefined = context.referencedTypeMap?.get(type);
+  let retval: SdkType | undefined = context.__referencedTypeCache?.get(type);
   const diagnostics = createDiagnosticCollector();
 
   if (!retval) {
@@ -799,7 +799,7 @@ export function getSdkModelWithDiagnostics(
   operation?: Operation,
 ): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let sdkType = context.referencedTypeMap?.get(type) as SdkModelType | undefined;
+  let sdkType = context.__referencedTypeCache?.get(type) as SdkModelType | undefined;
 
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
@@ -836,7 +836,7 @@ export function getSdkModelWithDiagnostics(
     // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     if (type.baseModel) {
-      sdkType.baseModel = context.referencedTypeMap?.get(type.baseModel) as
+      sdkType.baseModel = context.__referencedTypeCache?.get(type.baseModel) as
         | SdkModelType
         | undefined;
       if (sdkType.baseModel === undefined) {
@@ -933,7 +933,7 @@ function getSdkEnumWithDiagnostics(
   operation?: Operation,
 ): [SdkEnumType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let sdkType = context.referencedTypeMap?.get(type) as SdkEnumType | undefined;
+  let sdkType = context.__referencedTypeCache?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
@@ -1034,8 +1034,8 @@ export function getClientTypeWithDiagnostics(
   type: Type,
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
-  if (!context.knownScalars) {
-    context.knownScalars = getKnownScalars();
+  if (!context.__knownScalars) {
+    context.__knownScalars = getKnownScalars();
   }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
@@ -1376,7 +1376,7 @@ export function getSdkModelPropertyType(
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  let property = context.modelPropertyMap?.get(type);
+  let property = context.__modelPropertyCache?.get(type);
 
   if (!property) {
     const clientParams = operation
@@ -1451,7 +1451,7 @@ function updateReferencedPropertyMap(
   if (sdkType.kind !== "property") {
     return;
   }
-  context.modelPropertyMap.set(type, sdkType);
+  context.__modelPropertyCache.set(type, sdkType);
 }
 
 function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkType) {
@@ -1463,7 +1463,7 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
   ) {
     return;
   }
-  context.referencedTypeMap?.set(type, sdkType);
+  context.__referencedTypeCache?.set(type, sdkType);
 }
 
 interface PropagationOptions {
@@ -1790,13 +1790,13 @@ function updateTypesFromOperation(
 function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // set access for all orphan model without override
-  for (const sdkType of context.referencedTypeMap?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
     const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (!sdkType.__accessSet && accessOverride === undefined) {
       diagnostics.pipe(updateUsageOrAccess(context, "public", sdkType));
     }
   }
-  for (const sdkType of context.referencedTypeMap?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
     const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (accessOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, accessOverride, sdkType, { isOverride: true }));
@@ -1807,7 +1807,7 @@ function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[
 
 function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  for (const sdkType of context.referencedTypeMap?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
     const usageOverride = getUsageOverride(context, sdkType.__raw as any);
     if (usageOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, usageOverride, sdkType, { isOverride: true }));
@@ -1817,7 +1817,7 @@ function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]
 }
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
-  for (const [_, sdkType] of context.referencedTypeMap?.entries() ?? []) {
+  for (const [_, sdkType] of context.__referencedTypeCache?.entries() ?? []) {
     if (
       sdkType.kind === "model" &&
       (sdkType.usage & UsageFlags.Spread) > 0 &&
@@ -1851,7 +1851,7 @@ function filterOutTypes(
   filter: number,
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
   const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
-  for (const sdkType of context.referencedTypeMap?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;
