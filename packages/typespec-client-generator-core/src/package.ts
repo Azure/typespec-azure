@@ -537,6 +537,7 @@ function getSdkMethodResponse(
     type = {
       kind: "nullable",
       name: createGeneratedName(context, operation, "NullableResponse"),
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
       isGeneratedName: true,
       type: type,
       decorators: [],
