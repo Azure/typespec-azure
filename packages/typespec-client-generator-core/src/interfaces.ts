@@ -177,7 +177,14 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   doc?: string;
   summary?: string;
   /**
@@ -386,14 +393,28 @@ export interface SdkNullableType extends SdkTypeBase {
   type: SdkType;
   usage: UsageFlags;
   access: AccessFlags;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -424,7 +445,14 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
@@ -437,7 +465,14 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
