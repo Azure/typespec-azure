@@ -170,6 +170,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       return diagnostics.wrap({
         ...baseServiceMethod,
         kind: "paging",
+        pagingMetadata: {},
       });
     }
 
@@ -233,9 +234,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       ...baseServiceMethod,
       kind: "paging",
       nextLinkPath,
-      nextLinkSegments,
-      continuationTokenParameterSegments,
-      continuationTokenResponseSegments,
+      pagingMetadata: {
+        __raw: pagingOperation,
+        nextLinkSegments,
+        continuationTokenParameterSegments,
+        continuationTokenResponseSegments,
+      },
     });
   }
 
@@ -260,6 +264,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     return diagnostics.wrap({
       ...baseServiceMethod,
       kind: "paging",
+      pagingMetadata: {},
     });
   }
 
@@ -309,7 +314,19 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           ),
         )
       : undefined,
-    nextLinkSegments,
+    pagingMetadata: {
+      __raw: pagedMetadata,
+      nextLinkSegments,
+      nextLinkOperation: pagedMetadata?.nextLinkOperation
+        ? diagnostics.pipe(
+            getSdkServiceMethod<TServiceOperation>(
+              context,
+              pagedMetadata.nextLinkOperation,
+              client,
+            ),
+          )
+        : undefined,
+    },
   });
 }
 

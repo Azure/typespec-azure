@@ -42,8 +42,8 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "nextLink");
-    strictEqual(method.nextLinkSegments?.length, 1);
-    strictEqual(method.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
@@ -71,8 +71,8 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "next");
-    strictEqual(method.nextLinkSegments?.length, 1);
-    strictEqual(method.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
@@ -100,8 +100,8 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "next");
-    strictEqual(method.nextLinkSegments?.length, 1);
-    strictEqual(method.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
@@ -131,8 +131,8 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "nextLink");
-    strictEqual(method.nextLinkSegments?.length, 1);
-    strictEqual(method.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
@@ -165,10 +165,13 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "pagination.nextLink");
-    strictEqual(method.nextLinkSegments?.length, 2);
-    strictEqual(method.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 2);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
     strictEqual(sdkPackage.models[0].properties[1].type.kind, "model");
-    strictEqual(method.nextLinkSegments[1], sdkPackage.models[0].properties[1].type.properties[0]);
+    strictEqual(
+      method.pagingMetadata.nextLinkSegments[1],
+      sdkPackage.models[0].properties[1].type.properties[0],
+    );
 
     const response = method.response;
     strictEqual(response.kind, "method");
@@ -231,8 +234,8 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "nextLink");
-    strictEqual(method.nextLinkSegments?.length, 1);
-    strictEqual(method.nextLinkSegments[0], sdkPackage.models[1].properties[1]);
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[1].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
@@ -260,16 +263,19 @@ describe("typespec-client-generator-core: paged operation", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "test");
       strictEqual(method.kind, "paging");
-      strictEqual(method.continuationTokenParameterSegments?.length, 1);
-      strictEqual(method.continuationTokenParameterSegments?.[0], method.parameters[0]);
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
       strictEqual(
         method.operation.parameters[0].correspondingMethodParams[0],
         method.parameters[0],
       );
-      strictEqual(method.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.continuationTokenResponseSegments?.[0],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
         method.operation.responses[0].type.properties[1],
       );
     });
@@ -292,12 +298,15 @@ describe("typespec-client-generator-core: paged operation", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "test");
       strictEqual(method.kind, "paging");
-      strictEqual(method.continuationTokenParameterSegments?.length, 1);
-      strictEqual(method.continuationTokenParameterSegments?.[0], method.parameters[0]);
-      strictEqual(method.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.continuationTokenResponseSegments?.[0],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
         method.operation.responses[0].type.properties[1],
       );
     });
@@ -320,12 +329,15 @@ describe("typespec-client-generator-core: paged operation", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "test");
       strictEqual(method.kind, "paging");
-      strictEqual(method.continuationTokenParameterSegments?.length, 1);
-      strictEqual(method.continuationTokenParameterSegments?.[0], method.parameters[0]);
-      strictEqual(method.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.continuationTokenResponseSegments?.[0],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
         method.operation.responses[0].type.properties[1],
       );
     });
@@ -349,12 +361,15 @@ describe("typespec-client-generator-core: paged operation", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "test");
       strictEqual(method.kind, "paging");
-      strictEqual(method.continuationTokenParameterSegments?.length, 1);
-      strictEqual(method.continuationTokenParameterSegments?.[0], method.parameters[0]);
-      strictEqual(method.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.continuationTokenResponseSegments?.[0],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
         method.operation.responses[0].headers[0],
       );
     });
@@ -378,12 +393,15 @@ describe("typespec-client-generator-core: paged operation", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "test");
       strictEqual(method.kind, "paging");
-      strictEqual(method.continuationTokenParameterSegments?.length, 1);
-      strictEqual(method.continuationTokenParameterSegments?.[0], method.parameters[0]);
-      strictEqual(method.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.continuationTokenResponseSegments?.[0],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
         method.operation.responses[0].headers[0],
       );
     });
@@ -407,12 +425,15 @@ describe("typespec-client-generator-core: paged operation", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "test");
       strictEqual(method.kind, "paging");
-      strictEqual(method.continuationTokenParameterSegments?.length, 1);
-      strictEqual(method.continuationTokenParameterSegments?.[0], method.parameters[0]);
-      strictEqual(method.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.continuationTokenResponseSegments?.[0],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
         method.operation.responses[0].headers[0],
       );
     });
@@ -446,21 +467,24 @@ describe("typespec-client-generator-core: paged operation", () => {
       const method = getServiceMethodOfClient(sdkPackage);
       strictEqual(method.name, "test");
       strictEqual(method.kind, "paging");
-      strictEqual(method.continuationTokenParameterSegments?.length, 2);
-      strictEqual(method.continuationTokenParameterSegments?.[0], method.parameters[0]);
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 2);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
       strictEqual(method.parameters[0].type.kind, "model");
       strictEqual(
-        method.continuationTokenParameterSegments?.[1],
+        method.pagingMetadata.continuationTokenParameterSegments?.[1],
         method.parameters[0].type.properties[0],
       );
       strictEqual(
         method.operation.parameters[0].correspondingMethodParams[0],
         method.parameters[0].type.properties[0],
       );
-      strictEqual(method.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.continuationTokenResponseSegments?.[0],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
         method.operation.responses[0].type.properties[1],
       );
     });

@@ -14,6 +14,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  PagingOperation,
   Program,
   ProjectedProgram,
   Type,
@@ -784,21 +785,42 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
   kind: "basic";
 }
 
-interface SdkPagingServiceMethodOptions {
+interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
+  /**
+   * @deprecated Use `pagingMetadata.__raw` instead.
+   */
   __raw_paged_metadata?: PagedResultMetadata;
   /**
-   * @deprecated Use `nextLinkSegments` instead.
+   * @deprecated Use `pagingMetadata.nextLinkSegments` instead.
    */
   nextLinkPath?: string;
-  nextLinkSegments?: SdkModelPropertyType[];
+  /**
+   * @deprecated Use `pagingMetadata.nextLinkOperation` instead.
+   */
   nextLinkOperation?: SdkServiceOperation;
+  pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
+}
+
+/**
+ * Paging operation metadata.
+ */
+export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
+  /** Paging metadata from TypeSpec core library. */
+  __raw?: PagedResultMetadata | PagingOperation;
+
+  /** Segments to indicate how to get next page link value from response. */
+  nextLinkSegments?: SdkModelPropertyType[];
+  /** Method used to get next page. If not defined, use the initial method. */
+  nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** Segments to indicate how to set continuation token for next page request. */
   continuationTokenParameterSegments?: SdkModelPropertyType[];
+  /** Segments to indicate how to get continuation token value from response. */
   continuationTokenResponseSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "paging";
 }
 
@@ -874,7 +896,7 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "lropaging";
 }
 
