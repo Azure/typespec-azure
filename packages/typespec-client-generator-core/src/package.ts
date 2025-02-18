@@ -526,7 +526,8 @@ function getSdkMethodResponse(
       variantTypes: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
-      clientNamespace: client.clientNamespace,
+      namespace: client.namespace,
+      clientNamespace: client.namespace,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
       decorators: [],
     };
@@ -543,7 +544,8 @@ function getSdkMethodResponse(
       decorators: [],
       access: "public",
       usage: UsageFlags.Output,
-      clientNamespace: client.clientNamespace,
+      namespace: client.namespace,
+      clientNamespace: client.namespace,
     };
   }
   return {
@@ -679,6 +681,7 @@ function getSdkInitializationType(
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
+    const namespace = getClientNamespace(context, client.type);
     initializationModel = {
       __raw: client.service,
       doc: "Initialization class for the client",
@@ -689,7 +692,8 @@ function getSdkInitializationType(
       access,
       usage: UsageFlags.Input,
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-      clientNamespace: getClientNamespace(context, client.type),
+      namespace,
+      clientNamespace: namespace,
       apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
       decorators: [],
       serializationOptions: {},
@@ -954,6 +958,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   }
   let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
+    const namespace = getClientNamespace(context, rawClient.service);
     type = {
       kind: "union",
       access: "public",
@@ -962,7 +967,8 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
-      clientNamespace: getClientNamespace(context, rawClient.service),
+      namespace,
+      clientNamespace: namespace,
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -990,6 +996,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const namespace = getClientNamespace(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -999,7 +1006,8 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    clientNamespace: getClientNamespace(context, client.type),
+    namespace: namespace,
+    clientNamespace: namespace,
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
@@ -1127,20 +1135,20 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   const clients = [...sdkPackage.clients];
   while (clients.length > 0) {
     const client = clients.shift()!;
-    getSdkNamespace(sdkPackage, client.clientNamespace).clients.push(client);
+    getSdkNamespace(sdkPackage, client.namespace).clients.push(client);
     client.methods
       .filter((m) => m.kind === "clientaccessor")
       .map((m) => m.response)
       .map((c) => clients.push(c));
   }
   for (const model of sdkPackage.models) {
-    getSdkNamespace(sdkPackage, model.clientNamespace).models.push(model);
+    getSdkNamespace(sdkPackage, model.namespace).models.push(model);
   }
   for (const enumType of sdkPackage.enums) {
-    getSdkNamespace(sdkPackage, enumType.clientNamespace).enums.push(enumType);
+    getSdkNamespace(sdkPackage, enumType.namespace).enums.push(enumType);
   }
   for (const unionType of sdkPackage.unions) {
-    getSdkNamespace(sdkPackage, unionType.clientNamespace).unions.push(unionType);
+    getSdkNamespace(sdkPackage, unionType.namespace).unions.push(unionType);
   }
 }
 
