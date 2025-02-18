@@ -1693,7 +1693,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { TestModel: Model };
 
-        runner.context.generatedNames?.clear();
+        runner.context.__generatedNames?.clear();
         const name = getGeneratedName(
           runner.context,
           [...TestModel.properties.values()][0].type as Model,

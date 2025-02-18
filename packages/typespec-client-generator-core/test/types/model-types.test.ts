@@ -781,7 +781,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-    for (const [type, sdkType] of runner.context.referencedTypeMap?.entries() ?? []) {
+    for (const [type, sdkType] of runner.context.__referencedTypeCache?.entries() ?? []) {
       if (isAzureCoreTspModel(type)) {
         ok(sdkType.usage !== UsageFlags.None);
       }
@@ -1057,7 +1057,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(fish?.properties[0].kind, "property");
     strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-    const salmon = Array.from(runner.context.referencedTypeMap?.values() ?? []).find(
+    const salmon = Array.from(runner.context.__referencedTypeCache?.values() ?? []).find(
       (x) => x.kind === "model" && x.name === "Salmon",
     ) as SdkModelType;
     strictEqual(salmon?.serializationOptions.json, undefined);
@@ -1116,7 +1116,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(fish?.properties[0].kind, "property");
     strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-    const types = Array.from(runner.context.referencedTypeMap?.values() ?? []);
+    const types = Array.from(runner.context.__referencedTypeCache?.values() ?? []);
 
     const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
     strictEqual(shark?.serializationOptions.json, undefined);
@@ -1805,7 +1805,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(inputModel.properties.length, 1);
     const nameProperty = inputModel.properties[0];
     strictEqual(nameProperty.name, "name");
-    strictEqual(nameProperty.kind, "header");
+    strictEqual(nameProperty.kind, "property");
     ok(nameProperty.visibility);
     strictEqual(nameProperty.visibility.length, 1);
     strictEqual(nameProperty.visibility[0], Visibility.Read);

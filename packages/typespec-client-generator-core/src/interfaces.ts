@@ -14,6 +14,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  PagingOperation,
   Program,
   ProjectedProgram,
   Type,
@@ -33,32 +34,37 @@ import { TspLiteralType } from "./internal-utils.js";
 
 export interface TCGCContext {
   program: Program;
+  diagnostics: readonly Diagnostic[];
   emitterName: string;
+  arm?: boolean;
+
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  referencedTypeMap: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
-  referencedPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache: Map<Operation, HttpOperation>;
+  apiVersion?: string;
+  examplesDir?: string;
+
+  decoratorsAllowList?: string[];
+  previewStringRegex: RegExp;
+  disableUsageAccessPropagationToBase: boolean;
+
+  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
+  __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
+  __httpParameterCache: Map<ModelProperty, SdkHttpParameter>;
+  __generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  __httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
+  __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  apiVersion?: string;
   // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
-  originalProgram: Program;
-  examplesDir?: string;
-  decoratorsAllowList?: string[];
-  previewStringRegex: RegExp;
-  disableUsageAccessPropagationToBase: boolean;
+  __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
 }
 
@@ -593,7 +599,8 @@ export type SdkModelPropertyType =
   | SdkPathParameter
   | SdkBodyParameter
   | SdkHeaderParameter
-  | SdkCookieParameter;
+  | SdkCookieParameter
+  | SdkServiceResponseHeader;
 
 export interface MultipartOptions {
   name: string;
@@ -686,21 +693,21 @@ export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
 }
 
-export interface SdkServiceResponseHeader {
+export interface SdkServiceResponseHeader extends SdkModelPropertyTypeBase {
   __raw: ModelProperty;
+  kind: "responseheader";
   serializedName: string;
-  type: SdkType;
-  doc?: string;
-  summary?: string;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
-  resultPath?: string; // if exists, tells you how to get from the service response to the method response.
   /**
-   * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
-   * Temporarily this is not enabled for paging now.
+   * @deprecated Use `resultSegments` instead.
+   */
+  resultPath?: string;
+  /**
+   * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
   resultSegments?: SdkModelPropertyType[];
 }
@@ -778,17 +785,42 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
   kind: "basic";
 }
 
-interface SdkPagingServiceMethodOptions {
+interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
+  /**
+   * @deprecated Use `pagingMetadata.__raw` instead.
+   */
   __raw_paged_metadata?: PagedResultMetadata;
+  /**
+   * @deprecated Use `pagingMetadata.nextLinkSegments` instead.
+   */
   nextLinkPath?: string;
+  /**
+   * @deprecated Use `pagingMetadata.nextLinkOperation` instead.
+   */
   nextLinkOperation?: SdkServiceOperation;
-  continuationTokenParameter?: SdkMethodParameter;
+  pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
+}
+
+/**
+ * Paging operation metadata.
+ */
+export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
+  /** Paging metadata from TypeSpec core library. */
+  __raw?: PagedResultMetadata | PagingOperation;
+
+  /** Segments to indicate how to get next page link value from response. */
+  nextLinkSegments?: SdkModelPropertyType[];
+  /** Method used to get next page. If not defined, use the initial method. */
+  nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** Segments to indicate how to set continuation token for next page request. */
+  continuationTokenParameterSegments?: SdkModelPropertyType[];
+  /** Segments to indicate how to get continuation token value from response. */
   continuationTokenResponseSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "paging";
 }
 
@@ -864,7 +896,7 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "lropaging";
 }
 

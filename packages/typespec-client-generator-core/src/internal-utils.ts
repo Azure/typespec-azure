@@ -588,3 +588,10 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   const visibility = getVisibilityForClass(context.program, type, lifecycle);
   return visibility.size === 0;
 }
+
+export function findRootSourceProperty(property: ModelProperty): ModelProperty {
+  while (property.sourceProperty) {
+    property = property.sourceProperty;
+  }
+  return property;
+}
