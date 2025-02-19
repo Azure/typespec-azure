@@ -223,13 +223,16 @@ export type SdkType =
   | SdkCredentialType
   | SdkEndpointType;
 
-export interface SdkBuiltInType extends SdkTypeBase {
-  kind: SdkBuiltInKinds;
+export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
+  extends SdkTypeBase {
+  kind: TKind;
   encode?: string;
   name: string;
-  baseType?: SdkBuiltInType;
+  baseType?: SdkBuiltInType<TKind>;
   crossLanguageDefinitionId: string;
 }
+
+export interface SdkStringType extends SdkBuiltInType<"string"> {}
 
 type TypeEquality<T, U> = keyof T extends keyof U
   ? keyof U extends keyof T
@@ -472,9 +475,10 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase extends DecoratedType {
+export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
+  extends DecoratedType {
   __raw?: ModelProperty;
-  type: SdkType;
+  type: TType;
   name: string;
   isGeneratedName: boolean;
   doc?: string;
@@ -482,6 +486,9 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   apiVersions: string[];
   onClient: boolean;
   clientDefaultValue?: unknown;
+  /**
+   * @deprecated This property is deprecated. See if the kind is `apiVersion` instead
+   */
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
@@ -531,33 +538,42 @@ export interface XmlSerializationOptions {
   };
 }
 
-export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
+export interface SdkEndpointParameter
+  extends SdkModelPropertyTypeBase<SdkEndpointType | SdkUnionType<SdkEndpointType>> {
   kind: "endpoint";
   urlEncode: boolean;
   onClient: true;
-  type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   /**
    * @deprecated This property is deprecated. Use `type.templateArguments[x].serializedName` or `type.variantTypes[x].templateArguments[x].serializedName` instead.
    */
   serializedName?: string;
 }
 
-export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
+export interface SdkApiVersionParameter
+  extends SdkModelPropertyTypeBase<SdkBuiltInType<"string"> | SdkEnumValueType> {
+  kind: "apiVersion";
+  onClient: true;
+  type: SdkBuiltInType<"string">;
+  isApiVersionParam: true;
+}
+
+export interface SdkCredentialParameter
+  extends SdkModelPropertyTypeBase<SdkCredentialType | SdkUnionType<SdkCredentialType>> {
   kind: "credential";
-  type: SdkCredentialType | SdkUnionType<SdkCredentialType>;
   onClient: true;
 }
 
-export type SdkModelPropertyType =
-  | SdkBodyModelPropertyType
-  | SdkParameter
+export type SdkModelPropertyType<TType extends SdkTypeBase = SdkType> =
+  | SdkBodyModelPropertyType<TType>
+  | SdkParameter<TType>
   | SdkEndpointParameter
   | SdkCredentialParameter
-  | SdkQueryParameter
-  | SdkPathParameter
-  | SdkBodyParameter
-  | SdkHeaderParameter
-  | SdkCookieParameter;
+  | SdkApiVersionParameter
+  | SdkQueryParameter<TType>
+  | SdkPathParameter<TType>
+  | SdkBodyParameter<TType>
+  | SdkHeaderParameter<TType>
+  | SdkCookieParameter<TType>;
 
 export interface MultipartOptions {
   name: string;
@@ -573,7 +589,8 @@ export interface MultipartOptions {
   defaultContentTypes: string[];
 }
 
-export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
+export interface SdkBodyModelPropertyType<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "property";
   discriminator: boolean;
   /**
@@ -594,14 +611,16 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
-export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
+export interface SdkHeaderParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
+export interface SdkQueryParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
@@ -609,7 +628,8 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   explode: boolean;
 }
 
-export interface SdkPathParameter extends SdkModelPropertyTypeBase {
+export interface SdkPathParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "path";
   /**
    * @deprecated This property is deprecated. Use `allowReserved` instead.
@@ -624,13 +644,15 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
+export interface SdkCookieParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "cookie";
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
+export interface SdkBodyParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "body";
   serializedName: string;
   optional: boolean;
@@ -646,7 +668,8 @@ export type SdkHttpParameter =
   | SdkHeaderParameter
   | SdkCookieParameter;
 
-export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
+export interface SdkMethodParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "method";
 }
 
@@ -693,7 +716,11 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
 
 interface SdkServiceOperationBase {}
 
-export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
+export type SdkParameter<TType extends SdkTypeBase = SdkType> =
+  | SdkEndpointParameter
+  | SdkCredentialParameter
+  | SdkApiVersionParameter
+  | SdkMethodParameter<TType>;
 
 export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;
