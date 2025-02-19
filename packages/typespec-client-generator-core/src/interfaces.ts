@@ -442,7 +442,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
 
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
-  value: string | number | boolean | null;
+  value: string | number | boolean;
   valueType: SdkBuiltInType;
   name: string;
   isGeneratedName: boolean;
