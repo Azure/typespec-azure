@@ -178,11 +178,17 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     baseServiceMethod.response.resultPath = getPropertyPathFromModel(
       context,
       responseType?.__raw,
-      (p) => p === pagingOperation.output.pageItems.property,
+      (p) =>
+        p.kind === "ModelProperty" &&
+        findRootSourceProperty(p) ===
+          findRootSourceProperty(pagingOperation.output.pageItems.property),
     );
     baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
       responseType,
-      (p) => p.__raw === pagingOperation.output.pageItems.property,
+      (p) =>
+        p.__raw?.kind === "ModelProperty" &&
+        findRootSourceProperty(p.__raw) ===
+          findRootSourceProperty(pagingOperation.output.pageItems.property),
     );
 
     let nextLinkPath = undefined;
@@ -191,11 +197,17 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       nextLinkPath = getPropertyPathFromModel(
         context,
         responseType?.__raw,
-        (p) => p === pagingOperation.output.nextLink!.property,
+        (p) =>
+          p.kind === "ModelProperty" &&
+          findRootSourceProperty(p) ===
+            findRootSourceProperty(pagingOperation.output.nextLink!.property),
       );
       nextLinkSegments = getPropertySegmentsFromModelOrParameters(
         responseType,
-        (p) => p.__raw === pagingOperation.output.nextLink?.property,
+        (p) =>
+          p.__raw?.kind === "ModelProperty" &&
+          findRootSourceProperty(p.__raw) ===
+            findRootSourceProperty(pagingOperation.output.nextLink!.property),
       );
     }
 
@@ -215,11 +227,19 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         continuationTokenResponseSegments = baseServiceMethod.operation.responses
           .map((r) => r.headers)
           .flat()
-          .filter((h) => h.__raw === pagingOperation.output.continuationToken!.property);
+          .filter(
+            (h) =>
+              h.__raw?.kind === "ModelProperty" &&
+              findRootSourceProperty(h.__raw) ===
+                findRootSourceProperty(pagingOperation.output.continuationToken!.property),
+          );
       } else {
         continuationTokenResponseSegments = getPropertySegmentsFromModelOrParameters(
           responseType,
-          (p) => p.__raw === pagingOperation.output.continuationToken!.property,
+          (p) =>
+            p.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(p.__raw) ===
+              findRootSourceProperty(pagingOperation.output.continuationToken!.property),
         );
       }
     }
