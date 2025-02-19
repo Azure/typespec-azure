@@ -1,11 +1,5 @@
 # @azure-tools/azure-http-specs
 
-## 0.1.0-alpha.7
-
-### Bug Fixes
-
-- [#2224](https://github.com/Azure/typespec-azure/pull/2224) Add javascript for clienNamespace
-
 ## 0.1.0-alpha.6
 
 ### Bug Fixes
