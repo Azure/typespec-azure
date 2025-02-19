@@ -8,6 +8,7 @@ using Spector;
 
 @doc("Test for internal decorator.")
 @scenarioService("/azure/client-generator-core/usage")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
 namespace _Specs_.Azure.ClientGenerator.Core.Usage;
 
 @scenario
@@ -15,6 +16,7 @@ namespace _Specs_.Azure.ClientGenerator.Core.Usage;
   This scenario contains two public operations. Both should be generated and exported.
   The models are override to roundtrip, so they should be generated and exported as well.
   """)
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
 namespace ModelInOperation {
   @doc("Usage override to roundtrip.")
   @global.Azure.ClientGenerator.Core.usage(

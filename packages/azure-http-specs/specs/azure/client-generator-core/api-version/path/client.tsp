@@ -11,3 +11,8 @@ using Spector;
 namespace Customizations;
 
 @@apiVersion(PathApiVersionParam.version);
+
+@@clientNamespace(Client.AlternateApiVersion.Service.Path,
+  "azure.clientgenerator.core.apiversion.path",
+  "java"
+);

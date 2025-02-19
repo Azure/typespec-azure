@@ -1310,41 +1310,46 @@ export function getSdkModelPropertyType(
 ): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  const clientParams = operation
-    ? context.__clientToParameters.get(getLocationOfOperation(operation))
-    : undefined;
-  const correspondingClientParams = clientParams?.find((x) =>
-    twoParamsEquivalent(context, x.__raw, type),
-  );
-  if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
-  const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+  let property = context.referencedPropertyMap?.get(type);
 
-  if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
-  const result: SdkBodyModelPropertyType = {
-    ...base,
-    kind: "property",
-    optional: type.optional,
-    discriminator: false,
-    serializedName: getPropertyNames(context, type)[1],
-    isMultipartFileInput: false,
-    flatten: shouldFlattenProperty(context, type),
-    serializationOptions: {},
-  };
-  if (operation && type.model) {
-    const httpOperation = getHttpOperationWithCache(context, operation);
-    const httpBody = httpOperation.parameters.body;
-    if (httpBody) {
-      const httpBodyType = isHttpBodySpread(httpBody)
-        ? getHttpBodySpreadModel(httpBody.type as Model)
-        : httpBody.type;
-      if (type.model === httpBodyType) {
-        // only try to add multipartOptions for property of body
-        diagnostics.pipe(updateMultiPartInfo(context, type, result, operation));
-        result.multipartOptions = result.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
+  if (!property) {
+    const clientParams = operation
+      ? context.__clientToParameters.get(getLocationOfOperation(operation))
+      : undefined;
+    const correspondingClientParams = clientParams?.find((x) =>
+      twoParamsEquivalent(context, x.__raw, type),
+    );
+    if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
+    const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+
+    if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
+    property = {
+      ...base,
+      kind: "property",
+      optional: type.optional,
+      discriminator: false,
+      serializedName: getPropertyNames(context, type)[1],
+      isMultipartFileInput: false,
+      flatten: shouldFlattenProperty(context, type),
+      serializationOptions: {},
+    };
+    updateReferencedPropertyMap(context, type, property);
+    if (operation && type.model) {
+      const httpOperation = getHttpOperationWithCache(context, operation);
+      const httpBody = httpOperation.parameters.body;
+      if (httpBody) {
+        const httpBodyType = isHttpBodySpread(httpBody)
+          ? getHttpBodySpreadModel(httpBody.type as Model)
+          : httpBody.type;
+        if (type.model === httpBodyType) {
+          // only try to add multipartOptions for property of body
+          diagnostics.pipe(updateMultiPartInfo(context, type, property, operation));
+          property.multipartOptions = property.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
+        }
       }
     }
   }
-  return diagnostics.wrap(result);
+  return diagnostics.wrap(property);
 }
 
 function addPropertiesToModelType(
@@ -1373,6 +1378,17 @@ function addPropertiesToModelType(
   return diagnostics.wrap(undefined);
 }
 
+function updateReferencedPropertyMap(
+  context: TCGCContext,
+  type: ModelProperty,
+  sdkType: SdkModelPropertyType,
+) {
+  if (sdkType.kind !== "property") {
+    return;
+  }
+  context.referencedPropertyMap.set(type, sdkType);
+}
+
 function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkType) {
   if (
     sdkType.kind !== "model" &&
@@ -1382,10 +1398,7 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
   ) {
     return;
   }
-  if (context.referencedTypeMap === undefined) {
-    context.referencedTypeMap = new Map<Type, SdkModelType | SdkEnumType>();
-  }
-  context.referencedTypeMap.set(type, sdkType);
+  context.referencedTypeMap?.set(type, sdkType);
 }
 
 interface PropagationOptions {
@@ -1829,12 +1842,6 @@ export function getAllReferencedTypes(
 
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if (context.referencedTypeMap === undefined) {
-    context.referencedTypeMap = new Map<
-      Type,
-      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
-    >();
-  }
   for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       // operations on a client
@@ -1874,6 +1881,12 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
     (x) => getLocationContext(context.program, x).type === "project",
   );
+  // make sure we also include all client namespaces as well
+  for (const client of listClients(context)) {
+    if (!allNamespaces.includes(client.service)) {
+      allNamespaces.push(client.service);
+    }
+  }
   for (const currNamespace of allNamespaces) {
     const namespaces = [currNamespace];
     while (namespaces.length) {

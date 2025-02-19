@@ -1,5 +1,22 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.51.0
+
+### Bug Fixes
+
+- [#2137](https://github.com/Azure/typespec-azure/pull/2137) Ensure that `@clientName` value propagates to `x-ms-enum.name` for enums and unions.
+
+### Bump dependencies
+
+- [#2109](https://github.com/Azure/typespec-azure/pull/2109) Upgrade dependencies
+
+### Features
+
+- [#2091](https://github.com/Azure/typespec-azure/pull/2091) Add `@externalTypeRef` decorator, to been able to specify an external reference that should be used when emitting.
+- [#2173](https://github.com/Azure/typespec-azure/pull/2173) Update versioning handling to use new mutator approach
+- [#2094](https://github.com/Azure/typespec-azure/pull/2094) Use the `@identifiers` decorator to identify and utilize identifiers for `x-ms-identifiers`. Additionally, use the `@key` decorator to identify identifiers.
+
+
 ## 0.50.0
 
 No changes, version bump only.
