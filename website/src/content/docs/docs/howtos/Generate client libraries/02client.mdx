@@ -23,6 +23,7 @@ Code generators for different languages will organize clients and operation grou
 <ClientTabs>
 
 ```typespec
+@versioned(Versions)
 @service({
   title: "Pet Store",
 })
@@ -32,11 +33,9 @@ enum Versions {
   v1,
 }
 
-@route("/feed")
-op feed(): void;
+@route("/feed") op feed(): void;
 
-@route("/op2")
-op pet(): void;
+@route("/pet") op pet(): void;
 ```
 
 ```python
@@ -85,29 +84,33 @@ client.pet();
 
 </ClientTabs>
 
-### Client with one-layer child operation groups
+### The client has operation groups with a single layer of child groups
 
-`PetStore` has two operation groups. Operation group `Dogs` is from a sub namespace, and `Cats` is from an interface.
+The PetStore includes two operation groups: `Dogs`, which belongs to a subnamespace, and `Cats`, which is part of an interface.
 
 <ClientTabs>
 
 ```typespec
+@versioned(Versions)
 @service({
   title: "Pet Store",
-  version: "v1",
 })
 namespace PetStore;
 
+enum Versions {
+  v1,
+}
+
 @route("/dogs")
 interface Dogs {
-  feed(): void;
-  pet(): void;
+  @route("feed") feed(): void;
+  @route("pet") pet(): void;
 }
 
 @route("/cats")
 namespace Cats {
-  op feed(): void;
-  op pet(): void;
+  @route("feed") op feed(): void;
+  @route("pet") op pet(): void;
 }
 ```
 
@@ -155,44 +158,45 @@ catsClient.pet();
 
 </ClientTabs>
 
-### Client with multi-layer child operation group
+### The client has multi-layer child operation groups
 
 `PetStore` has three operation groups. Operation group `Billings` is from an interface, `Pets` is from a sub namespace, and `Actions` is from an interface. `Pets` has one nested operation group `Actions` from an interface.
 
 <ClientTabs>
 
 ```typespec title="main.tsp"
+@versioned(Versions)
 @service({
   title: "Pet Store",
-  version: "v1",
 })
 namespace PetStore;
 
-@route("/info")
-op info(): void;
+enum Versions {
+  v1,
+}
+
+@route("/info") op info(): void;
 
 @route("/billings")
 interface Billings {
-  @route("history")
-  history(): void;
+  @route("history") history(): void;
 }
 
 @route("/pets")
 namespace Pets {
-  @route("info")
-  op info(): void;
+  @route("info") op info(): void;
 
   @route("/actions")
   interface Actions {
-    feed(): void;
-    pet(): void;
+    @route("feed") feed(): void;
+    @route("pet") pet(): void;
   }
 }
 
 @route("/actions")
 interface Actions {
-  open(): void;
-  close(): void;
+  @route("open") open(): void;
+  @route("close") close(): void;
 }
 ```
 
