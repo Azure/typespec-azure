@@ -36,6 +36,15 @@ namespace ClientNamespaceSecondClient {
 @@clientNamespace(Second.Model, "client.clientnamespace.second", "java");
 @@clientNamespace(Second.Model, "client.clientnamespace.second", "python");
 @@clientNamespace(Second.Model, "client.clientnamespace.second", "javascript");
-@@clientNamespace(Second.Model.SecondClientEnumType, "client.clientnamespace.second.sub", "java");
-@@clientNamespace(Second.Model.SecondClientEnumType, "client.clientnamespace.second.sub", "python");
-@@clientNamespace(Second.Model.SecondClientEnumType, "client.clientnamespace.second.sub", "javascript");
+@@clientNamespace(Second.Model.SecondClientEnumType,
+  "client.clientnamespace.second.sub",
+  "java"
+);
+@@clientNamespace(Second.Model.SecondClientEnumType,
+  "client.clientnamespace.second.sub",
+  "python"
+);
+@@clientNamespace(Second.Model.SecondClientEnumType,
+  "client.clientnamespace.second.sub",
+  "javascript"
+);
