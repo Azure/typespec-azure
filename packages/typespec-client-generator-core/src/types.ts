@@ -1083,7 +1083,8 @@ function getSdkCredentialType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   authentication: Authentication,
-): SdkCredentialType | SdkUnionType<SdkCredentialType> {
+): [SdkCredentialType | SdkUnionType<SdkCredentialType>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
@@ -1096,7 +1097,7 @@ function getSdkCredentialType(
     }
   }
   if (credentialTypes.length > 1) {
-    return {
+    return diagnostics.wrap({
       __raw: client.service,
       kind: "union",
       variantTypes: credentialTypes,
@@ -1107,19 +1108,20 @@ function getSdkCredentialType(
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
-    } as SdkUnionType<SdkCredentialType>;
+    } as SdkUnionType<SdkCredentialType>);
   }
-  return credentialTypes[0];
+  return diagnostics.wrap(credentialTypes[0]);
 }
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
-): SdkCredentialParameter | undefined {
+): [SdkCredentialParameter | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const auth = getAuthentication(context.program, client.service);
-  if (!auth) return undefined;
-  return {
-    type: getSdkCredentialType(context, client, auth),
+  if (!auth) return diagnostics.wrap(undefined);
+  return diagnostics.wrap({
+    type: diagnostics.pipe(getSdkCredentialType(context, client, auth)),
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
@@ -1130,7 +1132,7 @@ export function getSdkCredentialParameter(
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
-  };
+  });
 }
 
 export function getSdkModelPropertyTypeBase(

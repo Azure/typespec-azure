@@ -33,6 +33,8 @@ import {
   SdkClient,
   SdkClientInitializationType,
   SdkClientType,
+  SdkContext,
+  SdkEmitterOptions,
   SdkEndpointParameter,
   SdkEndpointType,
   SdkEnumType,
@@ -886,7 +888,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-    nameSpace: getClientNamespaceStringHelper(context, client.service)!,
+    nameSpace: getClientNamespaceStringHelper(context, client.service)!, // eslint-disable-line @typescript-eslint/no-deprecated
     clientNamespace: getClientNamespace(context, client.type),
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
@@ -913,7 +915,7 @@ function addDefaultClientParameters<
   const defaultClientParamters = [];
   // there will always be an endpoint property
   defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
-  const credentialParam = getSdkCredentialParameter(context, client.__raw);
+  const credentialParam = diagnostics.pipe(getSdkCredentialParameter(context, client.__raw));
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
@@ -985,8 +987,11 @@ function populateApiVersionInformation(context: TCGCContext): void {
   }
 }
 
-export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
-  context: TCGCContext,
+export function getSdkPackage<
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
+  context: SdkContext<TOptions, TServiceOperation>,
 ): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
@@ -994,8 +999,8 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    name: getClientNamespaceString(context)!,
-    rootNamespace: getClientNamespaceString(context)!,
+    name: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
+    rootNamespace: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
@@ -1005,13 +1010,14 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
     crossLanguagePackageId,
     namespaces: [],
   };
-  organizeNamespaces(sdkPackage);
+  organizeNamespaces(context, sdkPackage);
   return diagnostics.wrap(sdkPackage);
 }
 
-function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
-  sdkPackage: SdkPackage<TServiceOperation>,
-) {
+function organizeNamespaces<
+  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(context: SdkContext<TOptions, TServiceOperation>, sdkPackage: SdkPackage<TServiceOperation>) {
   const clients = [...sdkPackage.clients];
   while (clients.length > 0) {
     const client = clients.shift()!;
@@ -1032,7 +1038,7 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   }
 }
 
-function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
+function getSdkNamespace<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
   sdkPackage: SdkPackage<TServiceOperation>,
   namespace: string,
 ) {

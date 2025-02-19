@@ -60,6 +60,7 @@ export interface TCGCContext {
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
   __pagedResultSet: Set<SdkType>;
+  namespace?: string;
 }
 
 export interface SdkContext<
@@ -82,6 +83,7 @@ export interface SdkEmitterOptions {
   "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
+  namespace?: string;
 }
 
 // Types for TCGC customization decorators
@@ -853,6 +855,9 @@ export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   name: string;
+  /**
+   * @deprecated Look at `.namespaces` instead
+   */
   rootNamespace: string;
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
