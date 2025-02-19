@@ -2973,8 +2973,8 @@ importers:
         specifier: ^0.40.1
         version: 0.40.1(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
       astro-rehype-relative-markdown-links:
-        specifier: ^0.18.1
-        version: 0.18.1(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
+        specifier: ^0.16.0
+        version: 0.16.0(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
       hast-util-to-html:
         specifier: ^9.0.4
         version: 9.0.4
@@ -7022,10 +7022,10 @@ packages:
     peerDependencies:
       astro: ^4.0.0-beta || ^5.0.0-beta || ^3.3.0
 
-  astro-rehype-relative-markdown-links@0.18.1:
-    resolution: {integrity: sha512-PA2oLXs8+8CX+/cDEeHo4UJfMPKXazIJM8BgnQloR/vGXRnW3KjbLI3nqSoNVmq91YaFv2UHfHKoetEcfwieUw==}
+  astro-rehype-relative-markdown-links@0.16.0:
+    resolution: {integrity: sha512-J6y4LV//jBe+o7IREWpz3r3uljLreWvaFi0WlhW3erLfUVpx3jGhQTYnU54LZDZMHNs234n+1C8wmiEaeHDBaw==}
     peerDependencies:
-      astro: '>=2 <6'
+      astro: '>=2.x <5'
 
   astro@5.1.10:
     resolution: {integrity: sha512-qFu4jC7BRlhwHgk9Pa1sTQWw60zYWlriNTt6bMGMKkPxCd4Dd84fGn+NjbrJ/JeKwF7YXX0gY1saDF/RS6TMVA==}
@@ -18483,7 +18483,7 @@ snapshots:
       astro: 5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       rehype-expressive-code: 0.40.1
 
-  astro-rehype-relative-markdown-links@0.18.1(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)):
+  astro-rehype-relative-markdown-links@0.16.0(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)):
     dependencies:
       astro: 5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       catch-unknown: 2.0.0
