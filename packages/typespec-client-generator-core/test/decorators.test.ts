@@ -1143,7 +1143,7 @@ describe("typespec-client-generator-core: decorators", () => {
     });
   });
 
-  describe("versioning projection", () => {
+  describe("versioning mutation", () => {
     it("basic default version", async () => {
       const runnerWithVersion = await createSdkTestRunner({
         emitterName: "@azure-tools/typespec-python",

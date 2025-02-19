@@ -338,48 +338,6 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(runner.context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
 
-  it("projected name", async () => {
-    await runner.compileAndDiagnose(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @usage(Usage.input | Usage.output)
-          @projectedName("java", "JavaEnum1")
-          enum Enum1{
-            @projectedName("java", "JavaOne")
-            One: "one",
-            two,
-            three
-          }
-        }
-      `);
-
-    async function helper(emitterName: string, enumName: string, enumValueName: string) {
-      const runner = await createSdkTestRunner({ emitterName });
-      const { Enum1 } = (await runner.compile(`
-        @service({})
-        namespace MyService {
-          #suppress "deprecated" "for testing"
-          @test
-          @usage(Usage.input | Usage.output)
-          @projectedName("java", "JavaEnum1")
-          enum Enum1{
-            #suppress "deprecated" "for testing"
-            @projectedName("java", "JavaOne")
-            One: "one",
-            two,
-            three
-          }
-        }
-      `)) as { Enum1: Enum };
-      const enum1 = getSdkEnum(runner.context, Enum1);
-      strictEqual(enum1.name, enumName);
-      strictEqual(enum1.values[0].name, enumValueName);
-    }
-    await helper("@azure-tools/typespec-csharp", "Enum1", "One");
-    await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
-  });
-
   it("union as enum rename", async () => {
     const { TestUnion } = (await runner.compileWithCustomization(
       `
