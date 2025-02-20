@@ -2134,8 +2134,8 @@ model Azure.ResourceManager.CommonTypes.UserAssignedIdentity
 
 | Name         | Type        | Description                                |
 | ------------ | ----------- | ------------------------------------------ |
-| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 | principalId? | `Core.uuid` | The principal ID of the assigned identity. |
+| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 
 ### `ResourceHome` {#Azure.ResourceManager.CommonTypes.ResourceHome}
 

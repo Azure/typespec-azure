@@ -518,6 +518,7 @@ model SubscriptionIdParameter {
   @typeChangedFrom(Versions.v4, string)
   @path
   @segment("subscriptions")
+  @minLength(1)
   subscriptionId: uuid;
 }
 
