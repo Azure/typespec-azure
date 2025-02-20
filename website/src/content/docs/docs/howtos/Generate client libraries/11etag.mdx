@@ -48,6 +48,14 @@ public Response get(MatchConditions matchConditions);
 ```
 
 ```go
+type ClientGetOptions struct {
+	// The request should only proceed if an entity matches this string.
+	IfMatch *string
+
+	// The request should only proceed if no entity matches this string.
+	IfNoneMatch *string
+}
+
 func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 ```
 
