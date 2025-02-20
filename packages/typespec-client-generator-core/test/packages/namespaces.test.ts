@@ -233,9 +233,9 @@ describe("typespec-client-generator-core: namespaces", () => {
     const sdkPackage = runner.context.sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
     const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
     ok(petActionClient);
-    strictEqual(petActionClient.clientNamespace, "PetStoreRenamed.SubNamespace");
+    strictEqual(petActionClient.namespace, "PetStoreRenamed.SubNamespace");
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-client-generator-core",
-  "version": "0.51.0",
+  "version": "0.51.2",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Data Plane Generation library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -23,8 +23,8 @@
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
-      "default": "./dist/src/index.js",
-      "typespec": "./lib/main.tsp"
+      "typespec": "./lib/main.tsp",
+      "default": "./dist/src/index.js"
     },
     "./testing": {
       "types": "./dist/src/testing/index.d.ts",

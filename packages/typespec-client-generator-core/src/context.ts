@@ -17,6 +17,8 @@ import {
   SdkEmitterOptions,
   SdkEnumType,
   SdkHttpOperation,
+  SdkHttpParameter,
+  SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
@@ -35,16 +37,21 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
       parseEmitterName(program, emitterName ?? program.emitters[0]?.metadata?.name),
     ),
     diagnostics: diagnostics.diagnostics,
-    originalProgram: program,
+    __originalProgram: program,
     __clientToParameters: new Map(),
     __tspTypeToApiVersions: new Map(),
     __clientToApiVersionClientDefaultValue: new Map(),
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
     __pagedResultSet: new Set(),
-    referencedTypeMap: new Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>(),
-    httpOperationCache: new Map<Operation, HttpOperation>(),
-    referencedPropertyMap: new Map<ModelProperty, SdkModelPropertyType>(),
+    __referencedTypeCache: new Map<
+      Type,
+      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
+    >(),
+    __httpOperationCache: new Map<Operation, HttpOperation>(),
+    __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
+    __methodParameterCache: new Map<ModelProperty, SdkMethodParameter>(),
+    __httpParameterCache: new Map<ModelProperty, SdkHttpParameter>(),
   };
 }
 

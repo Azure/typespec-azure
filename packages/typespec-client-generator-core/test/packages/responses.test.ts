@@ -193,7 +193,6 @@ describe("typespec-client-generator-core: responses", () => {
       sdkPackage.models.find((x) => x.name === "Widget"),
     );
     strictEqual(methodResponseType.properties.length, 2);
-    strictEqual(methodResponseType.properties.filter((x) => x.kind === "header").length, 1);
   });
 
   it("Headers and body with null", async () => {
@@ -318,5 +317,19 @@ describe("typespec-client-generator-core: responses", () => {
       (sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>).response.type,
       models[0],
     );
+  });
+
+  it("rename for response header", async function () {
+    await runner.compileWithBuiltInService(`
+      model Test{
+          prop: string;
+      }
+      op get(): {@header @clientName("xRename") x: string};
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
+    const header = method.operation.responses[0].headers[0];
+    strictEqual(header.serializedName, "x");
+    strictEqual(header.name, "xRename");
   });
 });
