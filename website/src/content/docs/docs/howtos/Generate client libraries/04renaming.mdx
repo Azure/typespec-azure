@@ -20,33 +20,7 @@ By default, any language code generator will assume the TYPESPEC name is the cli
 <ClientTabs>
 
 ```typespec title=main.tsp
-import "@typespec/http";
-import "@typespec/rest";
-import "@typespec/versioning";
-import "@azure-tools/typespec-azure-core";
-
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using Azure.Core;
-using TypeSpec.Versioning;
-
-@service({
-  title: "Pet Store Client",
-})
-@server(
-  "{endpoint}/widget",
-  "Pet Store APIs",
-  {
-    endpoint: string,
-  }
-)
-@versioned(PetStoreNamespace.Versions)
 namespace PetStoreNamespace;
-
-enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-  `2022-08-30`,
-}
 
 /** This is the input I need */
 @resource("input")
