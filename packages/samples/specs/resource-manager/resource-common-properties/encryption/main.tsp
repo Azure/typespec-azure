@@ -11,9 +11,7 @@ using Azure.ResourceManager;
 using Azure.Core;
 
 @armProviderNamespace("Contoso.CustomerManagedKeyExample")
-@service({
-  title: "Contoso.CustomerManagedKeyExample",
-})
+@service(#{ title: "Contoso.CustomerManagedKeyExample" })
 @versioned(Versions)
 @doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
 namespace Microsoft.UpdateTests;

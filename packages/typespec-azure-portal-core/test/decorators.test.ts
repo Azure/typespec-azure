@@ -288,7 +288,7 @@ export function createTestSpec(
   promotion?: string,
 ) {
   return `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @armProviderNamespace
     @versioned(Versions)
     namespace Microsoft.Foo;

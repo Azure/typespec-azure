@@ -22,7 +22,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("path basic", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@path path: string): void;
@@ -70,7 +70,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("path basic with null", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@path path: string | null): void;
@@ -130,7 +130,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("header basic", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@header header: string): void;
@@ -176,7 +176,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("header basic with null", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@header header: string | null): void;
@@ -193,7 +193,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("header collection format", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@header({format: "multi"}) header: string): void;
@@ -210,7 +210,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("query basic", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@query query: string): void;
@@ -254,7 +254,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("query basic with null", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@query query: string | null): void;
@@ -271,7 +271,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("query collection format", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
       
       #suppress "deprecated" "Legacy test"
@@ -289,7 +289,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("query collection format for csv", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
       
       #suppress "deprecated" "Legacy test"
@@ -307,7 +307,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("cookie basic", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace My.Service;
 
       op myOp(@cookie(#{name: "token"}) auth: string): void;
@@ -325,7 +325,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("body basic", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
 
         model Input {
@@ -386,7 +386,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("body basic with null", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
 
         model Input {
@@ -408,7 +408,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("body optional", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
 
         model Input {
@@ -469,7 +469,7 @@ describe("typespec-client-generator-core: parameters", () => {
 
   it("parameter grouping", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
 
         model RequestOptions {

@@ -17,9 +17,7 @@ using Azure.ResourceManager;
  * an Azure Resource Manager Resource
  */
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-})
+@service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 

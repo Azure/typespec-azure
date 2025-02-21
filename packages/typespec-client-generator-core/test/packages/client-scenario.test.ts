@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: client scenario", () => {
   it("normal client", async () => {
     await runner.compile(
       `
-      @service({
+      @service(#{
         title: "Pet Store",
       })
       namespace PetStore;
@@ -52,7 +52,7 @@ describe("typespec-client-generator-core: client scenario", () => {
     await runnerWithArm.compile(`
       @armProviderNamespace("My.Service")
       @server("http://localhost:3000", "endpoint")
-      @service({title: "My.Service"})
+      @service(#{title: "My.Service"})
       @versioned(Versions)
       @armCommonTypesVersion(CommonTypes.Versions.v5)
       namespace My.Service;
@@ -106,7 +106,7 @@ describe("typespec-client-generator-core: client scenario", () => {
   it("client with sub clients", async () => {
     await runner.compile(
       `
-      @service({
+      @service(#{
         title: "Pet Store",
       })
       namespace PetStore;
@@ -188,7 +188,7 @@ describe("typespec-client-generator-core: client scenario", () => {
   it("client with sub client and sub client has extra initialization paramters", async () => {
     await runner.compileWithCustomization(
       `
-      @service({
+      @service(#{
         title: "Azure AI Face API",
       })
       namespace Face;
@@ -267,7 +267,7 @@ describe("typespec-client-generator-core: client scenario", () => {
   it("client with sub client and sub client can also be initialized individually", async () => {
     await runner.compileWithCustomization(
       `
-      @service({
+      @service(#{
         title: "Pet Store",
       })
       namespace PetStore;

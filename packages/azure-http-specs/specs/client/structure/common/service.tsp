@@ -27,9 +27,7 @@ using Azure.ClientGenerator.Core;
     client: ClientType,
   }
 )
-@service({
-  title: "MultiClient",
-})
+@service(#{ title: "MultiClient" })
 namespace Client.Structure.Service;
 
 enum ClientType {

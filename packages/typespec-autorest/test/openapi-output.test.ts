@@ -1072,7 +1072,7 @@ describe("typespec-azure: identifiers decorator", () => {
 describe("typespec-autorest: multipart formData", () => {
   it("expands model into formData parameters", async () => {
     const oapi = await openApiFor(`
-    @service({
+    @service(#{
       name: "Widget",
     })
     namespace Widget;

@@ -14,7 +14,7 @@ using Azure.Core.Traits;
     }
   ]>
 )
-@service({
+@service(#{
   title: "Contoso Widget Manager",
 })
 @server(

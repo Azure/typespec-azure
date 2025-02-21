@@ -8,7 +8,7 @@ it("works with models", async () => {
   const v = await openApiFor(
     `
     @versioned(Versions)
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace MyService {
       enum Versions {
         @useDependency(MyLibrary.Versions.A)
@@ -75,7 +75,7 @@ it("works with models and projectedNames (LEGACY)", async () => {
   const v = await openApiFor(
     `
     @versioned(Versions)
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace MyService {
       enum Versions {
         @useDependency(MyLibrary.Versions.A)
@@ -146,7 +146,7 @@ it("Diagnostics for unsupported versioning decorators.", async () => {
   const diagnostics = await diagnoseOpenApiFor(
     `
     @versioned(Versions)
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace MyService {
       enum Versions {
         @useDependency(MyLibrary.Versions.A)
@@ -207,7 +207,7 @@ it("Get correct included versions when there is no value", async () => {
   const v = await openApiFor(
     `
     @versioned(Versions)
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace MyService {
       enum Versions {
         @useDependency(MyLibrary.Versions.A)

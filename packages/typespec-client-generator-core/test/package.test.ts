@@ -27,7 +27,7 @@ describe("typespec-client-generator-core: package", () => {
       });
       await runnerWithPackageName.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace Not.My.Package.Name;
       `);
 
@@ -36,7 +36,7 @@ describe("typespec-client-generator-core: package", () => {
     it("from namespace", async () => {
       await runner.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace My.Package.Name;
       `);
 
@@ -48,7 +48,7 @@ describe("typespec-client-generator-core: package", () => {
     it("basic namespace", async () => {
       await runner.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace My.Namespace;
       `);
 
@@ -58,11 +58,11 @@ describe("typespec-client-generator-core: package", () => {
     it("nested namespaces", async () => {
       await runner.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace My.Namespace {};
 
         @client({name: "MySecondClient"})
-        @service({})
+        @service
         namespace My.Namespace.Sub {};
       `);
 
@@ -73,7 +73,7 @@ describe("typespec-client-generator-core: package", () => {
   describe("Vanilla Widget Service", () => {
     async function compileVanillaWidgetService(runner: SdkTestRunner, code: string) {
       return await runner.compile(`
-      @service({
+      @service(#{
         title: "Widget Service",
       })
       @versioned(Versions)
@@ -360,7 +360,7 @@ describe("typespec-client-generator-core: package", () => {
         }
       ]>
     )
-    @service({
+    @service(#{
       title: "Contoso Widget Manager",
     })
     @server(
@@ -1045,7 +1045,7 @@ describe("typespec-client-generator-core: package", () => {
           }
         }
         
-        @service({})
+        @service
         @versioned(Versions)
         namespace Test {
           enum Versions {
@@ -1130,7 +1130,7 @@ describe("typespec-client-generator-core: package", () => {
           }
         }
         
-        @service({})
+        @service
         @versioned(Versions)
         namespace Test {
           enum Versions {
@@ -1220,7 +1220,7 @@ describe("typespec-client-generator-core: package", () => {
       await runnerWithCore.compile(`
         @versioned(MyVersions)
         @server("http://localhost:3000", "endpoint")
-        @service({name: "Service"})
+        @service(#{name: "Service"})
         namespace My.Service;
 
         enum MyVersions {
