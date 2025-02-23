@@ -14,6 +14,11 @@ This document outlines the method input signatures that language emitters will g
 <ClientTabItem lang="typespec" >
 
 ```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
 @get
 op get(): User;
 ```
@@ -101,6 +106,11 @@ func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (Clien
 <ClientTabItem lang="typespec" >
 
 ```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
 @post
 op post(@body body: User): void;
 ```
@@ -624,7 +634,8 @@ model BlobProperties {
   @path
   name: string;
 
-  @header testHeader: string;
+  @header
+  testHeader: string;
 }
 
 @route("blob_properties/{name}")
