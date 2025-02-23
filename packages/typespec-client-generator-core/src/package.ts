@@ -176,6 +176,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     baseServiceMethod.response.resultPath = getPropertyPathFromModel(
       context,
       responseType?.__raw,
@@ -296,6 +297,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   baseServiceMethod.response.resultPath = getPropertyPathFromSegment(
     context,
     pagedMetadata.modelType,
