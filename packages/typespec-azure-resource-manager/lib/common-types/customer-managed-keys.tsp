@@ -49,7 +49,7 @@ model KeyEncryptionKeyIdentity {
 
 /** Customer-managed key encryption properties for the resource. */
 @added(Versions.v4)
-model CustomerManagedKeyEncryption {
+model customerManagedKeyEncryption {
   /** All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault. */
   keyEncryptionKeyIdentity?: KeyEncryptionKeyIdentity;
 
@@ -60,11 +60,11 @@ model CustomerManagedKeyEncryption {
 /** (Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled. */
 @added(Versions.v4)
 @encodedName("application/json", "encryption")
-model Encryption {
+model encryption {
   /** Values are enabled and disabled. */
   infrastructureEncryption?: InfrastructureEncryption;
 
   /** All Customer-managed key encryption properties for the resource. */
   @added(Versions.v4)
-  customerManagedKeyEncryption?: CustomerManagedKeyEncryption;
+  customerManagedKeyEncryption?: customerManagedKeyEncryption;
 }

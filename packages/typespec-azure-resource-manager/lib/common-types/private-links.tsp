@@ -6,9 +6,9 @@ using Azure.Core;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-/** The Private Endpoint resource. */
+/** The private endpoint resource. */
 model PrivateEndpoint {
-  /** The resource identifier for private endpoint */
+  /** The resource identifier of the private endpoint */
   @visibility("read")
   @typeChangedFrom(CommonTypes.Versions.v4, string)
   id?: Azure.Core.armResourceIdentifier;
@@ -43,7 +43,7 @@ model PrivateLinkResourceListResult {
 
   /** URL to get the next set of operation list results (if there are any). */
   @visibility("read")
-  nextLink?: string;
+  nextLink?: url;
 }
 //#region
 /** The private endpoint connection resource */
@@ -61,7 +61,7 @@ model PrivateEndpointConnectionListResult {
 
   /** URL to get the next set of operation list results (if there are any). */
   @visibility("read")
-  nextLink?: string;
+  nextLink?: url;
 }
 
 /** Properties of the private endpoint connection. */
@@ -113,7 +113,7 @@ union PrivateEndpointConnectionProvisioningState {
 
 /** The private endpoint connection status. */
 union PrivateEndpointServiceConnectionStatus {
-  /** Connectionaiting for approval or rejection */
+  /** Connection waiting for approval or rejection */
   Pending: "Pending",
 
   /** Connection approved */
