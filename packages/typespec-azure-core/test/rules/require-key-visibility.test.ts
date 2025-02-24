@@ -47,7 +47,7 @@ describe("typespec-azure-core: key-visibility-required rule", () => {
       .expect(
         `model Foo {
          @key
-         @visibility("read")
+         @visibility(Lifecycle.Read)
          name: string;
         }`,
       )
