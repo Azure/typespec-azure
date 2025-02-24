@@ -1,5 +1,15 @@
-import { Model, createRule, getVisibility, isKey, paramMessage } from "@typespec/compiler";
+import {
+  $invisible,
+  $removeVisibility,
+  $visibility,
+  Model,
+  createRule,
+  isKey,
+  paramMessage,
+} from "@typespec/compiler";
 import { isExcludedCoreType, isInlineModel, isTemplateDeclarationType } from "./utils.js";
+
+const VISIBILITY_DECORATORS = [$visibility, $invisible, $removeVisibility];
 
 export const requireKeyVisibility = createRule({
   name: "key-visibility-required",
@@ -18,8 +28,10 @@ export const requireKeyVisibility = createRule({
           model.name !== "object"
         ) {
           for (const [name, prop] of model.properties) {
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            if (isKey(context.program, prop) && !getVisibility(context.program, prop)) {
+            const hasExplicitVisibility = prop.decorators.some((dec) =>
+              VISIBILITY_DECORATORS.includes(dec.decorator),
+            );
+            if (isKey(context.program, prop) && !hasExplicitVisibility) {
               context.reportDiagnostic({
                 target: prop,
                 format: { name },
