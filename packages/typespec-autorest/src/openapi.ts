@@ -1201,6 +1201,7 @@ export async function getOpenAPIForService(
         part.body.type,
         { visibility, ignoreMetadataAnnotations: false },
         partName,
+        part.body.type,
       );
       if (schema) {
         if (part.multi) {
@@ -1276,6 +1277,7 @@ export async function getOpenAPIForService(
     type: Type,
     schemaContext: SchemaContext,
     paramName: string,
+    target: DiagnosticTarget,
   ): PrimitiveItems | undefined {
     if (isBytes(type)) {
       return { type: "file" };
@@ -1286,7 +1288,13 @@ export async function getOpenAPIForService(
       if (isBytes(elementType)) {
         return { type: "array", items: { type: "string", format: "binary" } };
       }
-      const schema = getSchemaForPrimitiveItems(elementType, schemaContext, paramName, type, true);
+      const schema = getSchemaForPrimitiveItems(
+        elementType,
+        schemaContext,
+        paramName,
+        target,
+        true,
+      );
       if (schema === undefined) {
         return undefined;
       }
@@ -1298,7 +1306,7 @@ export async function getOpenAPIForService(
         items: schema,
       };
     } else {
-      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, type, true);
+      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, target, true);
 
       if (schema === undefined) {
         return undefined;
@@ -1369,7 +1377,7 @@ export async function getOpenAPIForService(
     const result = {
       in: "formData",
       ...base,
-      ...(getFormDataSchema(param.type, schemaContext, base.name) as any),
+      ...(getFormDataSchema(param.type, schemaContext, base.name, param) as any),
       default: param.defaultValue && getDefaultValue(param.defaultValue, param),
     };
 
