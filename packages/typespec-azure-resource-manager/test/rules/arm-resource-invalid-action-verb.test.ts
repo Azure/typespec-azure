@@ -48,7 +48,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
 
       @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
@@ -176,7 +176,7 @@ describe("typespec-azure-resource-manager: generates armResourceAction paths cor
         @key("widgetName")
         @segment("widgets")
         @path
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
 
@@ -362,7 +362,7 @@ describe("typespec-azure-resource-manager: improper list by subscription operati
       @doc("Foo resource")
       @tenantResource
       model FooResource is ProxyResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
