@@ -1253,6 +1253,7 @@ export async function getOpenAPIForService(
     type: Type,
     schemaContext: SchemaContext,
     paramName: string,
+    target: DiagnosticTarget,
     multipart?: boolean,
   ): PrimitiveItems | undefined {
     const fullSchema = getSchemaForType(type, schemaContext);
@@ -1285,7 +1286,7 @@ export async function getOpenAPIForService(
       if (isBytes(elementType)) {
         return { type: "array", items: { type: "string", format: "binary" } };
       }
-      const schema = getSchemaForPrimitiveItems(elementType, schemaContext, paramName, true);
+      const schema = getSchemaForPrimitiveItems(elementType, schemaContext, paramName, type, true);
       if (schema === undefined) {
         return undefined;
       }
@@ -1297,7 +1298,7 @@ export async function getOpenAPIForService(
         items: schema,
       };
     } else {
-      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, true);
+      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, type, true);
 
       if (schema === undefined) {
         return undefined;
@@ -1392,14 +1393,19 @@ export async function getOpenAPIForService(
     "type" | "items"
   > {
     if (param.type.kind === "Model" && isArrayModelType(program, param.type)) {
-      const itemSchema = getSchemaForPrimitiveItems(param.type.indexer.value, schemaContext, name);
+      const itemSchema = getSchemaForPrimitiveItems(
+        param.type.indexer.value,
+        schemaContext,
+        name,
+        param,
+      );
       const schema = itemSchema && {
         ...itemSchema,
       };
       delete (schema as any).description;
       return { type: "array", items: schema };
     } else {
-      return getSchemaForPrimitiveItems(param.type, schemaContext, name) as any;
+      return getSchemaForPrimitiveItems(param.type, schemaContext, name, param) as any;
     }
   }
 
