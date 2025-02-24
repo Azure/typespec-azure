@@ -16,11 +16,11 @@ importers:
         version: 1.1.1
     devDependencies:
       '@chronus/chronus':
-        specifier: ^0.14.0
-        version: 0.14.1
+        specifier: ^0.15.0
+        version: 0.15.0
       '@chronus/github':
-        specifier: ^0.4.5
-        version: 0.4.6
+        specifier: ^0.4.7
+        version: 0.4.7
       '@eslint/js':
         specifier: ^9.18.0
         version: 9.19.0
@@ -3092,8 +3092,8 @@ importers:
         specifier: ^0.40.1
         version: 0.40.1(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
       astro-rehype-relative-markdown-links:
-        specifier: ^0.18.1
-        version: 0.18.1(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
+        specifier: ^0.16.0
+        version: 0.16.0(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
       hast-util-to-html:
         specifier: ^9.0.4
         version: 9.0.4
@@ -3971,18 +3971,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@chronus/chronus@0.14.1':
-    resolution: {integrity: sha512-rJtN18zFipONmzPTpApzri9TWibLTyK7oMpn6jaSBpZ0b1A/DhdZ8DsiiTvs+wHkAXdnMTqcOna15QLdOndfHQ==}
-    engines: {node: '>=16.0.0'}
-    hasBin: true
-
   '@chronus/chronus@0.15.0':
     resolution: {integrity: sha512-KUU14Ti75+H6XOeltDO7jrlxwiEhb0T18YZp8O8V/yJ7AkOR+R/XKSN70xLIJTNJAWpk1WEkGYCOgad883n6sw==}
-    engines: {node: '>=16.0.0'}
-    hasBin: true
-
-  '@chronus/github@0.4.6':
-    resolution: {integrity: sha512-6xeWuMUs/g/ml6QbjqBwFqf5CjlMKviOV/cBzcP7GPrhNUlzdNO7ng19tVePxsyaevRjv+MDqCA0WmEcVFyT0Q==}
     engines: {node: '>=16.0.0'}
     hasBin: true
 
@@ -7380,10 +7370,10 @@ packages:
     peerDependencies:
       astro: ^4.0.0-beta || ^5.0.0-beta || ^3.3.0
 
-  astro-rehype-relative-markdown-links@0.18.1:
-    resolution: {integrity: sha512-PA2oLXs8+8CX+/cDEeHo4UJfMPKXazIJM8BgnQloR/vGXRnW3KjbLI3nqSoNVmq91YaFv2UHfHKoetEcfwieUw==}
+  astro-rehype-relative-markdown-links@0.16.0:
+    resolution: {integrity: sha512-J6y4LV//jBe+o7IREWpz3r3uljLreWvaFi0WlhW3erLfUVpx3jGhQTYnU54LZDZMHNs234n+1C8wmiEaeHDBaw==}
     peerDependencies:
-      astro: '>=2 <6'
+      astro: '>=2.x <5'
 
   astro@5.1.10:
     resolution: {integrity: sha512-qFu4jC7BRlhwHgk9Pa1sTQWw60zYWlriNTt6bMGMKkPxCd4Dd84fGn+NjbrJ/JeKwF7YXX0gY1saDF/RS6TMVA==}
@@ -11364,7 +11354,7 @@ packages:
     engines: {node: '>= 14.18.0'}
 
   readline-sync@1.4.9:
-    resolution: {integrity: sha1-PtqOZfI80qF+YTAbHwADOWr17No=}
+    resolution: {integrity: sha512-mp5h1N39kuKbCRGebLPIKTBOhuDw55GaNg5S+K9TW9uDAS1wIHpGUc2YokdUMZJb8GqS49sWmWEDijaESYh0Hg==}
     engines: {node: '>= 0.8.0'}
 
   realpath-missing@1.1.0:
@@ -14569,26 +14559,6 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@chronus/chronus@0.14.1':
-    dependencies:
-      cross-spawn: 7.0.6
-      globby: 14.0.2
-      is-unicode-supported: 2.1.0
-      micromatch: 4.0.8
-      pacote: 20.0.0
-      picocolors: 1.1.1
-      pluralize: 8.0.0
-      prompts: 2.4.2
-      semver: 7.6.3
-      source-map-support: 0.5.21
-      std-env: 3.8.0
-      yaml: 2.7.0
-      yargs: 17.7.2
-      zod: 3.24.1
-    transitivePeerDependencies:
-      - bluebird
-      - supports-color
-
   '@chronus/chronus@0.15.0':
     dependencies:
       cross-spawn: 7.0.6
@@ -14605,19 +14575,6 @@ snapshots:
       yaml: 2.7.0
       yargs: 17.7.2
       zod: 3.24.1
-    transitivePeerDependencies:
-      - bluebird
-      - supports-color
-
-  '@chronus/github@0.4.6':
-    dependencies:
-      '@chronus/chronus': 0.14.1
-      '@octokit/graphql': 8.1.2
-      '@octokit/rest': 21.1.0
-      cross-spawn: 7.0.6
-      octokit: 4.1.0
-      picocolors: 1.1.1
-      yargs: 17.7.2
     transitivePeerDependencies:
       - bluebird
       - supports-color
@@ -19129,7 +19086,7 @@ snapshots:
       astro: 5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       rehype-expressive-code: 0.40.1
 
-  astro-rehype-relative-markdown-links@0.18.1(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)):
+  astro-rehype-relative-markdown-links@0.16.0(astro@5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)):
     dependencies:
       astro: 5.1.10(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@types/node@22.10.10)(rollup@4.31.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       catch-unknown: 2.0.0
