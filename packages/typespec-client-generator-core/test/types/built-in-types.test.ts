@@ -275,7 +275,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     model User {
       @key
       @doc("The user's name.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
 
       ...Azure.Core.EtagProperty;

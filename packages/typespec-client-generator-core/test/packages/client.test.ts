@@ -511,7 +511,7 @@ describe("typespec-client-generator-core: client", () => {
         model User {
           @key
           @doc("The user's id.")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           id: int32;
 
           @doc("The user's name.")
@@ -588,7 +588,7 @@ describe("typespec-client-generator-core: client", () => {
         model User {
           @key
           @doc("The user's id.")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           id: int32;
 
           @doc("The user's name.")

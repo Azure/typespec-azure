@@ -85,7 +85,7 @@ describe("typespec-client-generator-core: package", () => {
       }
 
       model Widget {
-        @visibility("read", "update")
+        @visibility(Lifecycle.Read, Lifecycle.Update)
         @path
         id: string;
 
@@ -409,7 +409,7 @@ describe("typespec-client-generator-core: package", () => {
     model Widget {
       @key("widgetName")
       @doc("The widget name.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
 
       @doc("The widget color.")
@@ -468,7 +468,7 @@ describe("typespec-client-generator-core: package", () => {
     model WidgetPart {
       @key("widgetPartName")
       @doc("The name of the part.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
 
       @doc("The ID to use for reordering the part.")
@@ -493,7 +493,7 @@ describe("typespec-client-generator-core: package", () => {
     model WidgetAnalytics {
       @key("analyticsId")
       @doc("The identifier for the analytics object.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       id: string;
 
       @doc("The number of uses of the widget.")
@@ -508,7 +508,7 @@ describe("typespec-client-generator-core: package", () => {
     model Manufacturer {
       @key("manufacturerId")
       @doc("The manufacturer's unique ID.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       id: string;
 
       @doc("The manufacturer's name.")
@@ -1084,7 +1084,7 @@ describe("typespec-client-generator-core: package", () => {
       });
       await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
         model MyProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @doc("Display name of the Azure Extended Zone.")
           displayName: string;
         }
@@ -1251,7 +1251,7 @@ describe("typespec-client-generator-core: package", () => {
           @path
           @segment("operationStatuses")
           id: Azure.Core.uuid;
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name?: string;
         }
       `);
