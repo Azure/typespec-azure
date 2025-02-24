@@ -44,7 +44,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       model Widget {
         @key("widgetName")
         @doc(".")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
         @doc(".")
         manufacturerId: string;
