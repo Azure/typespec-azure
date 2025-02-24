@@ -196,7 +196,7 @@ describe("typespec-client-generator-core: parameters", () => {
       @service({})
       namespace My.Service;
 
-      op myOp(@header({format: "multi"}) header: string): void;
+      op myOp(@header(#{format: "multi"}) header: string): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);

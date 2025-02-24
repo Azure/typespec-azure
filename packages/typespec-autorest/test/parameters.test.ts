@@ -177,7 +177,7 @@ describe("header parameters", () => {
   it("create a header param of array type", async () => {
     const res = await openApiFor(
       `
-      op test(@header({format: "csv"}) arg1: string[]): void;
+      op test(@header(#{format: "csv"}) arg1: string[]): void;
       `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {
