@@ -65,6 +65,7 @@
     "@typespec/http": "workspace:~",
     "@typespec/openapi": "workspace:~",
     "@typespec/rest": "workspace:~",
+    "@typespec/streams": "workspace:~",
     "@typespec/versioning": "workspace:~",
     "@typespec/xml": "workspace:~"
   },
@@ -79,6 +80,7 @@
     "@typespec/openapi": "workspace:~",
     "@typespec/prettier-plugin-typespec": "workspace:~",
     "@typespec/rest": "workspace:~",
+    "@typespec/streams": "workspace:~",
     "@typespec/tspd": "workspace:~",
     "@typespec/xml": "workspace:~",
     "@vitest/coverage-v8": "^3.0.4",
