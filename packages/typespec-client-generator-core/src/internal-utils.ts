@@ -383,9 +383,6 @@ export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[
   let nonBodyExists = false;
   for (const response of responses) {
     if (response.type) {
-      if (response.type.kind === "nullable") {
-        nonBodyExists = true;
-      }
       allResponseBodies.push(response.type);
     } else {
       nonBodyExists = true;
@@ -615,4 +612,11 @@ export function getAllUserDefinedNamespaces(
     }
   }
   return retval;
+}
+
+export function findRootSourceProperty(property: ModelProperty): ModelProperty {
+  while (property.sourceProperty) {
+    property = property.sourceProperty;
+  }
+  return property;
 }
