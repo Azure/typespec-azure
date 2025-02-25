@@ -1065,7 +1065,7 @@ function addDefaultClientParameters<
   const defaultClientParamters = [];
   // there will always be an endpoint property
   defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
-  const credentialParam = diagnostics.pipe(getSdkCredentialParameter(context, client.__raw));
+  const credentialParam = getSdkCredentialParameter(context, client.__raw);
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }

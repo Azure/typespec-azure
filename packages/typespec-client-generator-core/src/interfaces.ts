@@ -37,6 +37,7 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   emitterName: string;
   arm?: boolean;
+  namespace?: string;
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
@@ -86,6 +87,7 @@ export interface SdkEmitterOptions {
   "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
+  namespace?: string;
 }
 
 // Types for TCGC customization decorators
