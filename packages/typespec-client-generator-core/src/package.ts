@@ -33,8 +33,6 @@ import {
   SdkClient,
   SdkClientInitializationType,
   SdkClientType,
-  SdkContext,
-  SdkEmitterOptions,
   SdkEndpointParameter,
   SdkEndpointType,
   SdkEnumType,
@@ -1137,11 +1135,8 @@ function populateApiVersionInformation(context: TCGCContext): void {
   }
 }
 
-export function getSdkPackage<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(
-  context: SdkContext<TOptions, TServiceOperation>,
+export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
 ): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   populateApiVersionInformation(context);
@@ -1160,14 +1155,13 @@ export function getSdkPackage<
     crossLanguagePackageId,
     namespaces: [],
   };
-  organizeNamespaces(context, sdkPackage);
+  organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);
 }
 
-function organizeNamespaces<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
-  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
->(context: SdkContext<TOptions, TServiceOperation>, sdkPackage: SdkPackage<TServiceOperation>) {
+function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
+  sdkPackage: SdkPackage<TServiceOperation>,
+) {
   const clients = [...sdkPackage.clients];
   while (clients.length > 0) {
     const client = clients.shift()!;
@@ -1188,7 +1182,7 @@ function organizeNamespaces<
   }
 }
 
-function getSdkNamespace<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
   sdkPackage: SdkPackage<TServiceOperation>,
   namespace: string,
 ) {
