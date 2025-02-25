@@ -433,12 +433,13 @@ export interface SdkEnumType extends SdkTypeBase {
   isUnionAsEnum: boolean;
 }
 
-export interface SdkEnumValueType extends SdkTypeBase {
+export interface SdkEnumValueType<TValueType extends SdkTypeBase = SdkBuiltInType>
+  extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
   value: string | number;
   enumType: SdkEnumType;
-  valueType: SdkBuiltInType;
+  valueType: TValueType;
 }
 
 export interface SdkConstantType extends SdkTypeBase {
@@ -590,10 +591,12 @@ export interface SdkEndpointParameter
 }
 
 export interface SdkApiVersionParameter
-  extends SdkModelPropertyTypeBase<SdkBuiltInType<"string"> | SdkEnumValueType> {
+  extends SdkModelPropertyTypeBase<
+    SdkBuiltInType<"string"> | SdkEnumValueType<SdkBuiltInType<"string">>
+  > {
   kind: "apiVersion";
   onClient: true;
-  type: SdkBuiltInType<"string">;
+  type: SdkBuiltInType<"string"> | SdkEnumValueType<SdkBuiltInType<"string">>;
   isApiVersionParam: true;
 }
 
