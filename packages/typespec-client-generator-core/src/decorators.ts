@@ -3,6 +3,7 @@ import {
   DecoratorContext,
   DecoratorExpressionNode,
   DecoratorFunction,
+  Diagnostic,
   Enum,
   EnumMember,
   Interface,
@@ -17,6 +18,7 @@ import {
   SyntaxKind,
   Type,
   Union,
+  createDiagnosticCollector,
   getDiscriminator,
   getNamespaceFullName,
   getProjectedName,
@@ -1199,15 +1201,18 @@ export const $clientNamespace: ClientNamespaceDecorator = (
 export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
-): string {
+): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
-    const rootNamespaceName = getRootUserDefinedNamespaceName(context);
+    const rootNamespaceName = diagnostics.pipe(getRootUserDefinedNamespaceName(context));
     // if you've defined a namespace flag, we replace the root name with the flag
-    return override.replace(rootNamespaceName, context.namespace || rootNamespaceName);
+    return diagnostics.wrap(
+      override.replace(rootNamespaceName, context.namespace || rootNamespaceName),
+    );
   }
   if (!entity.namespace) {
-    return context.namespace || "";
+    return diagnostics.wrap(context.namespace || "");
   }
   if (entity.kind === "Namespace") {
     return getNamespaceFullNameWithOverride(context, entity);
@@ -1215,7 +1220,11 @@ export function getClientNamespace(
   return getNamespaceFullNameWithOverride(context, entity.namespace);
 }
 
-function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
+function getNamespaceFullNameWithOverride(
+  context: TCGCContext,
+  namespace: Namespace,
+): [string, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const segments = [];
   let current: Namespace | undefined = namespace;
   while (current && current.name !== "") {
@@ -1228,12 +1237,12 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
     current = current.namespace;
   }
   if (context.namespace) {
-    const rootNamespaceName = getRootUserDefinedNamespaceName(context);
+    const rootNamespaceName = diagnostics.pipe(getRootUserDefinedNamespaceName(context));
 
-    return segments.join(".").replace(rootNamespaceName, context.namespace);
+    return diagnostics.wrap(segments.join(".").replace(rootNamespaceName, context.namespace));
   }
 
-  return segments.join(".");
+  return diagnostics.wrap(segments.join("."));
 }
 
 export const $scope: ScopeDecorator = (
