@@ -839,7 +839,12 @@ function getSdkMethodParameter(
     const base = diagnostics.pipe(getSdkModelPropertyType(context, type, operation));
     if (isApiVersion(context, type) && base.onClient) {
       if (base.type.kind !== "string") {
-        throw new Error("ApiVersion must be a string");
+        diagnostics.add(
+          createDiagnostic({
+            code: "api-version-not-string",
+            target: type,
+          }),
+        );
       }
       parameter = {
         ...base,

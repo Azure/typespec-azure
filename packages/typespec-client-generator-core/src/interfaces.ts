@@ -245,8 +245,6 @@ export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
   crossLanguageDefinitionId: string;
 }
 
-export interface SdkStringType extends SdkBuiltInType<"string"> {}
-
 type TypeEquality<T, U> = keyof T extends keyof U
   ? keyof U extends keyof T
     ? true
