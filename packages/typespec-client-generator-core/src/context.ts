@@ -17,8 +17,6 @@ import {
   SdkEmitterOptions,
   SdkEnumType,
   SdkHttpOperation,
-  SdkHttpParameter,
-  SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
