@@ -4,35 +4,38 @@ title: Clients
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
-This page documents the client behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
+This page documents the default client hierarchy behavior as well as how to customize clients. To get a summary of the setup, please check out the previous page.
 
-JS RLC is not in the business of customization. it will ignore client.tsp and the follow scenarios will not have impact on the JS RLC user experiences. In this context, TypeScript part means JS Modular Emitter.
+The JS RLC doesn't support client hierarchy customization and will ignore client.tsp. Therefore, the following scenarios won't affect the JS RLC user experience. In this context, the TypeScript part refers to the JS Modular Emitter.
 
 ## Default behavior
 
-By default, each namespace with `@service` decorator will be generated as a root client. The name for that client will be the namespace name concatenating `Client` as suffix.
+Each namespace with `@service` decorator will automatically be generated as a root client by default. The client's name will be the namespace name with `Client` added as suffix.
 
 Other sub namespaces and interfaces of each root client will be generated as operation groups with hierarchy.
 
 The root client's SDK namespace will follow the namespace decorated with `@service`. If an operation group comes from a sub namespace, its SDK namespace will follow that namespace. If it comes from a interface, its SDK namespace will follow the namespace which the interface belongs to.
 
-Different language's code generator will have different way to organize clients and operation groups. Please refer the following examples.
+Code generators for different languages will organize clients and operation groups in various ways. Please refer the following examples:
 
 ### Single client
 
 <ClientTabs>
 
-```typespec title="main.tsp"
+```typespec
+@versioned(Versions)
 @service({
   title: "Pet Store",
 })
 namespace PetStore;
 
-@route("/feed")
-op feed(): void;
+enum Versions {
+  v1,
+}
 
-@route("/op2")
-op pet(): void;
+@route("/feed") op feed(): void;
+
+@route("/pet") op pet(): void;
 ```
 
 ```python
@@ -44,9 +47,23 @@ client.pet()
 ```
 
 ```csharp
+namespace PetStore
+{
+  public partial class PetStoreClient
+  {
+      public PetStoreClient(Uri endpoint, PetStoreClientOptions options){}
+
+      public virtual async Task<Response> FeedAsync(RequestContext context = null) {}
+      public virtual Response Feed(RequestContext context = null) {}
+      public virtual async Task<Response> PetAsync(RequestContext context = null) {}
+      public virtual Response Pet(RequestContext context = null) {}
+  }
+}
+
+// Create the client and invoke the operations
 using PetStore;
 
-PetStoreClient client = new PetStoreClient();
+PetStoreClient client = new PetStoreClient(url, options);
 client.Feed();
 client.Pet();
 ```
@@ -67,29 +84,33 @@ client.pet();
 
 </ClientTabs>
 
-### Client with one-layer child operation groups
+### The client has operation groups with a single layer of child groups
 
-`PetStore` has two operation groups. Operation group `Dogs` is from a sub namespace, and `Cats` is from an interface.
+The PetStore includes two operation groups: `Dogs`, which belongs to a subnamespace, and `Cats`, which is part of an interface.
 
 <ClientTabs>
 
 ```typespec
+@versioned(Versions)
 @service({
   title: "Pet Store",
-  version: "v1",
 })
 namespace PetStore;
 
+enum Versions {
+  v1,
+}
+
 @route("/dogs")
 interface Dogs {
-  feed(): void;
-  pet(): void;
+  @route("feed") feed(): void;
+  @route("pet") pet(): void;
 }
 
 @route("/cats")
 namespace Cats {
-  op feed(): void;
-  op pet(): void;
+  @route("feed") op feed(): void;
+  @route("pet") op pet(): void;
 }
 ```
 
@@ -137,44 +158,45 @@ catsClient.pet();
 
 </ClientTabs>
 
-### Client with multi-layer child operation group
+### The client has multi-layer child operation groups
 
 `PetStore` has three operation groups. Operation group `Billings` is from an interface, `Pets` is from a sub namespace, and `Actions` is from an interface. `Pets` has one nested operation group `Actions` from an interface.
 
 <ClientTabs>
 
 ```typespec title="main.tsp"
+@versioned(Versions)
 @service({
   title: "Pet Store",
-  version: "v1",
 })
 namespace PetStore;
 
-@route("/info")
-op info(): void;
+enum Versions {
+  v1,
+}
+
+@route("/info") op info(): void;
 
 @route("/billings")
 interface Billings {
-  @route("history")
-  history(): void;
+  @route("history") history(): void;
 }
 
 @route("/pets")
 namespace Pets {
-  @route("info")
-  op info(): void;
+  @route("info") op info(): void;
 
   @route("/actions")
   interface Actions {
-    feed(): void;
-    pet(): void;
+    @route("feed") feed(): void;
+    @route("pet") pet(): void;
   }
 }
 
 @route("/actions")
 interface Actions {
-  open(): void;
-  close(): void;
+  @route("open") open(): void;
+  @route("close") close(): void;
 }
 ```
 
