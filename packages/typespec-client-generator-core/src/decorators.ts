@@ -1199,6 +1199,9 @@ export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
+  if (context.namespace) {
+    return context.namespace;
+  }
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) return override;
   if (!entity.namespace) {
@@ -1211,6 +1214,9 @@ export function getClientNamespace(
 }
 
 function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
+  if (context.namespace) {
+    return context.namespace;
+  }
   const segments = [];
   let current: Namespace | undefined = namespace;
   while (current && current.name !== "") {

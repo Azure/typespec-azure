@@ -13,6 +13,7 @@ const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
     "examples-directory": { type: "string", nullable: true },
     "examples-dir": { type: "string", nullable: true },
     "emitter-name": { type: "string", nullable: true },
+    namespace: { type: "string", nullable: true },
   },
 };
 
