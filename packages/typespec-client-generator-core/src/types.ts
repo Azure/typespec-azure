@@ -520,7 +520,7 @@ export function getSdkUnionWithDiagnostics(
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
     } else {
-      const namespace = getClientNamespace(context, type);
+      const namespace = diagnostics.pipe(getClientNamespace(context, type));
       // if a union is `type | null`, then we will return a nullable wrapper type of the type
       if (nonNullOptions.length === 1 && nullOption !== undefined) {
         retval = {
@@ -607,6 +607,39 @@ export function getSdkUnionWithDiagnostics(
         }
       }
     }
+
+    // other cases
+    if (retval === undefined) {
+      retval = {
+        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
+        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+        isGeneratedName: !type.name,
+        namespace: diagnostics.pipe(getClientNamespace(context, type)),
+        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+        variantTypes: nonNullOptions.map((x) =>
+          diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
+        ),
+        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
+        access: "public",
+        usage: UsageFlags.None,
+      };
+    }
+
+    if (nullOption !== undefined) {
+      retval = {
+        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
+        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
+        isGeneratedName: !type.name,
+        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
+        type: retval,
+        access: "public",
+        usage: UsageFlags.None,
+        namespace: diagnostics.pipe(getClientNamespace(context, type)),
+        clientNamespace: diagnostics.pipe(getClientNamespace(context, type)),
+      };
+    }
+
+    updateReferencedTypeMap(context, type, retval);
   }
 
   return diagnostics.wrap(retval);
@@ -618,7 +651,7 @@ function getEmptyUnionType(
   operation?: Operation,
 ): [SdkUnionType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const namespace = getClientNamespace(context, type);
+  const namespace = diagnostics.pipe(getClientNamespace(context, type));
 
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
@@ -818,7 +851,7 @@ export function getSdkModelWithDiagnostics(
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
     const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // eslint-disable-line @typescript-eslint/no-deprecated
-    const namespace = getClientNamespace(context, type);
+    const namespace = diagnostics.pipe(getClientNamespace(context, type));
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
@@ -951,7 +984,7 @@ function getSdkEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   let sdkType = context.__referencedTypeCache?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
-    const namespace = getClientNamespace(context, type);
+    const namespace = diagnostics.pipe(getClientNamespace(context, type));
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
@@ -1019,7 +1052,7 @@ export function getSdkUnionEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   const union = type.union;
   const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
-  const namespace = getClientNamespace(context, type.union);
+  const namespace = diagnostics.pipe(getClientNamespace(context, type.union));
   const sdkType: SdkEnumType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
@@ -1169,7 +1202,8 @@ function getSdkCredentialType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   authentication: Authentication,
-): SdkCredentialType | SdkUnionType<SdkCredentialType> {
+): [SdkCredentialType | SdkUnionType<SdkCredentialType>, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
@@ -1182,8 +1216,8 @@ function getSdkCredentialType(
     }
   }
   if (credentialTypes.length > 1) {
-    const namespace = getClientNamespace(context, client.service);
-    return {
+    const namespace = diagnostics.pipe(getClientNamespace(context, client.service));
+    return diagnostics.wrap({
       __raw: client.service,
       kind: "union",
       variantTypes: credentialTypes,
@@ -1195,19 +1229,20 @@ function getSdkCredentialType(
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
-    } as SdkUnionType<SdkCredentialType>;
+    } as SdkUnionType<SdkCredentialType>);
   }
-  return credentialTypes[0];
+  return diagnostics.wrap(credentialTypes[0]);
 }
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
-): SdkCredentialParameter | undefined {
+): [SdkCredentialParameter | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const auth = getAuthentication(context.program, client.service);
-  if (!auth) return undefined;
-  return {
-    type: getSdkCredentialType(context, client, auth),
+  if (!auth) return diagnostics.wrap(undefined);
+  return diagnostics.wrap({
+    type: diagnostics.pipe(getSdkCredentialType(context, client, auth)),
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
@@ -1218,7 +1253,7 @@ export function getSdkCredentialParameter(
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
-  };
+  });
 }
 
 export function getSdkModelPropertyTypeBase(
@@ -1433,7 +1468,7 @@ export function getSdkModelPropertyType(
         if (type.model === httpBodyType) {
           // only try to add multipartOptions for property of body
           diagnostics.pipe(updateMultiPartInfo(context, type, property, operation));
-          property.multipartOptions = property.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
+          property.multipartOptions = property.serializationOptions.multipart;
         }
       }
     }

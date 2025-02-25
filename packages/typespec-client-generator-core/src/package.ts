@@ -718,7 +718,7 @@ function getSdkInitializationType(
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
-    const namespace = getClientNamespace(context, client.type);
+    const namespace = diagnostics.pipe(getClientNamespace(context, client.type));
     initializationModel = {
       __raw: client.service,
       doc: "Initialization class for the client",
@@ -990,7 +990,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   }
   let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
-    const namespace = getClientNamespace(context, rawClient.service);
+    const namespace = diagnostics.pipe(getClientNamespace(context, rawClient.service));
     type = {
       kind: "union",
       access: "public",
@@ -1028,7 +1028,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const namespace = getClientNamespace(context, client.type);
+  const namespace = diagnostics.pipe(getClientNamespace(context, client.type));
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -1065,7 +1065,7 @@ function addDefaultClientParameters<
   const defaultClientParamters = [];
   // there will always be an endpoint property
   defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
-  const credentialParam = getSdkCredentialParameter(context, client.__raw);
+  const credentialParam = diagnostics.pipe(getSdkCredentialParameter(context, client.__raw));
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
