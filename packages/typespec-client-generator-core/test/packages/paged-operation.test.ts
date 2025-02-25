@@ -1,8 +1,12 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Model, ModelProperty } from "@typespec/compiler";
-import { strictEqual } from "assert";
+import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { getPropertyPathFromModel } from "../../src/package.js";
+import { SdkMethodParameter } from "../../src/interfaces.js";
+import {
+  getPropertyPathFromModel,
+  getPropertySegmentsFromModelOrParameters,
+} from "../../src/package.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
 
@@ -38,10 +42,14 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "nextLink");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
     strictEqual(response.resultPath, "values");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   });
 
   it("normal paged result", async () => {
@@ -63,10 +71,39 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "next");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
     strictEqual(response.resultPath, "tests");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+  });
+
+  it("normal paged result in anonymous model with header", async () => {
+    await runner.compileWithBuiltInService(`
+      @list
+      op test(): {
+        @pageItems
+        tests: Test[];
+        @header
+        h: string;
+      };
+      model Test {
+        id: string;
+      }
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "paging");
+
+    const response = method.response;
+    strictEqual(response.kind, "method");
+    strictEqual(response.resultPath, "tests");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   });
 
   it("nullable paged result", async () => {
@@ -88,10 +125,14 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "next");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
     strictEqual(response.resultPath, "tests");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   });
 
   it("normal paged result with encoded name", async () => {
@@ -115,10 +156,14 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "nextLink");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
     strictEqual(response.resultPath, "values");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   });
 
   // skip for current paging implementation does not support nested paging value
@@ -145,10 +190,21 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "pagination.nextLink");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 2);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+    strictEqual(sdkPackage.models[0].properties[1].type.kind, "model");
+    strictEqual(
+      method.pagingMetadata.nextLinkSegments[1],
+      sdkPackage.models[0].properties[1].type.properties[0],
+    );
 
     const response = method.response;
     strictEqual(response.kind, "method");
     strictEqual(response.resultPath, "results.values");
+    strictEqual(response.resultSegments?.length, 2);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
+    strictEqual(response.resultSegments[1], sdkPackage.models[0].properties[0].type.properties[0]);
   });
 
   it("getPropertyPathFromModel test for nested case", async () => {
@@ -203,9 +259,329 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
     strictEqual(method.nextLinkPath, "nextLink");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[1].properties[1]);
 
     const response = method.response;
     strictEqual(response.kind, "method");
     strictEqual(response.resultPath, "values");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[1].properties[0]);
+  });
+
+  describe("common paging with continuation token", () => {
+    it("continuation token in response body and query parameter", async () => {
+      await runner.compileWithBuiltInService(`
+        @list
+        op test(@continuationToken @query token?: string): ListTestResult;
+        model ListTestResult {
+          @pageItems
+          items: Test[];
+          @continuationToken
+          nextToken?: string;
+        }
+        model Test {
+          prop: string;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "paging");
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(
+        method.operation.parameters[0].correspondingMethodParams[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.operation.responses[0].type?.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
+        method.operation.responses[0].type.properties[1],
+      );
+    });
+
+    it("continuation token in response body and header parameter", async () => {
+      await runner.compileWithBuiltInService(`
+        @list
+        op test(@continuationToken @header token?: string): ListTestResult;
+        model ListTestResult {
+          @pageItems
+          items: Test[];
+          @continuationToken
+          nextToken?: string;
+        }
+        model Test {
+          prop: string;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "paging");
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.operation.responses[0].type?.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
+        method.operation.responses[0].type.properties[1],
+      );
+    });
+
+    it("continuation token in response body and body parameter", async () => {
+      await runner.compileWithBuiltInService(`
+        @list
+        op test(@continuationToken token?: string): ListTestResult;
+        model ListTestResult {
+          @pageItems
+          items: Test[];
+          @continuationToken
+          nextToken?: string;
+        }
+        model Test {
+          prop: string;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "paging");
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.operation.responses[0].type?.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
+        method.operation.responses[0].type.properties[1],
+      );
+    });
+
+    it("continuation token in response header and query parameter", async () => {
+      await runner.compileWithBuiltInService(`
+        @list
+        op test(@continuationToken @query token?: string): ListTestResult;
+        model ListTestResult {
+          @pageItems
+          items: Test[];
+          @continuationToken
+          @header
+          nextToken?: string;
+        }
+        model Test {
+          prop: string;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "paging");
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.operation.responses[0].type?.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
+        method.operation.responses[0].headers[0],
+      );
+    });
+
+    it("continuation token in response header and header parameter", async () => {
+      await runner.compileWithBuiltInService(`
+        @list
+        op test(@continuationToken @header token?: string): ListTestResult;
+        model ListTestResult {
+          @pageItems
+          items: Test[];
+          @continuationToken
+          @header
+          nextToken?: string;
+        }
+        model Test {
+          prop: string;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "paging");
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.operation.responses[0].type?.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
+        method.operation.responses[0].headers[0],
+      );
+    });
+
+    it("continuation token in response header and body parameter", async () => {
+      await runner.compileWithBuiltInService(`
+        @list
+        op test(@continuationToken token?: string): ListTestResult;
+        model ListTestResult {
+          @pageItems
+          items: Test[];
+          @continuationToken
+          @header
+          nextToken?: string;
+        }
+        model Test {
+          prop: string;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "paging");
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.operation.responses[0].type?.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
+        method.operation.responses[0].headers[0],
+      );
+    });
+
+    it("continuation token with @override", async () => {
+      await runner.compileWithBuiltInService(`
+        @list
+        op test(...Options): ListTestResult;
+
+        model Options {
+          @continuationToken
+          @query
+          token?: string;
+        }
+
+        @list
+        op customizedOp(options: Options): ListTestResult;
+        @@override(test, customizedOp);
+
+        model ListTestResult {
+          @pageItems
+          items: Test[];
+          @continuationToken
+          nextToken?: string;
+        }
+        model Test {
+          prop: string;
+        }
+      `);
+      const sdkPackage = runner.context.sdkPackage;
+      const method = getServiceMethodOfClient(sdkPackage);
+      strictEqual(method.name, "test");
+      strictEqual(method.kind, "paging");
+      strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 2);
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[0],
+        method.parameters[0],
+      );
+      strictEqual(method.parameters[0].type.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenParameterSegments?.[1],
+        method.parameters[0].type.properties[0],
+      );
+      strictEqual(
+        method.operation.parameters[0].correspondingMethodParams[0],
+        method.parameters[0].type.properties[0],
+      );
+      strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
+      strictEqual(method.operation.responses[0].type?.kind, "model");
+      strictEqual(
+        method.pagingMetadata.continuationTokenResponseSegments?.[0],
+        method.operation.responses[0].type.properties[1],
+      );
+    });
+  });
+
+  it("getPropertySegmentsFromModelOrParameters test for nested case", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(): Test;
+      model Test {
+        a: {
+          b: {
+            a: string;
+          };
+        };
+        b: {
+          d: string;
+        };
+      }
+    `);
+    const testModel = runner.context.sdkPackage.models[0];
+    const aProperty = testModel.properties[0];
+    const bProperty = testModel.properties[1];
+    strictEqual(aProperty.type.kind, "model");
+    const aBProperty = aProperty.type.properties[0];
+    strictEqual(aBProperty.type.kind, "model");
+    const aBAProperty = aBProperty.type.properties[0];
+    strictEqual(bProperty.type.kind, "model");
+    const bDProperty = bProperty.type.properties[0];
+
+    deepStrictEqual(
+      getPropertySegmentsFromModelOrParameters(testModel, (p) => p === aBAProperty),
+      [aProperty, aBProperty, aBAProperty],
+    );
+    deepStrictEqual(
+      getPropertySegmentsFromModelOrParameters(testModel, (p) => p === bDProperty),
+      [bProperty, bDProperty],
+    );
+  });
+
+  it("getPropertySegmentsFromModelOrParameters test for nested case of parameter", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(param: Test): Test;
+      model Test {
+        a: {
+          b: {
+            a: string;
+          };
+        };
+        b: {
+          d: string;
+        };
+      }
+    `);
+    const testModel = runner.context.sdkPackage.models[0];
+    const aProperty = testModel.properties[0];
+    const bProperty = testModel.properties[1];
+    strictEqual(aProperty.type.kind, "model");
+    const aBProperty = aProperty.type.properties[0];
+    strictEqual(aBProperty.type.kind, "model");
+    const aBAProperty = aBProperty.type.properties[0];
+    strictEqual(bProperty.type.kind, "model");
+    const bDProperty = bProperty.type.properties[0];
+
+    const parameters = runner.context.sdkPackage.clients[0].methods[0]
+      .parameters as SdkMethodParameter[];
+    deepStrictEqual(
+      getPropertySegmentsFromModelOrParameters(parameters, (p) => p === aBAProperty),
+      [parameters[0], aProperty, aBProperty, aBAProperty],
+    );
+    deepStrictEqual(
+      getPropertySegmentsFromModelOrParameters(parameters, (p) => p === bDProperty),
+      [parameters[0], bProperty, bDProperty],
+    );
   });
 });
