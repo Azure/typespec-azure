@@ -365,7 +365,7 @@ describe("typespec-client-generator-core: namespaces", () => {
           namespace: "PetStoreRenamed",
         })
       ).sdkPackage;
-      const foodClient = sdkPackage.clients.find((x) => x.name === "PetStoreRenamedClient");
+      const foodClient = sdkPackage.clients.find((x) => x.name === "PetStoreClient");
       ok(foodClient);
       strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
     });
