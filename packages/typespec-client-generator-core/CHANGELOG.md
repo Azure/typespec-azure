@@ -1,5 +1,37 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.51.2
+
+### Bug Fixes
+
+- [#2229](https://github.com/Azure/typespec-azure/pull/2229) Fix missing result segments of anonymous paged response with header.
+- [#2196](https://github.com/Azure/typespec-azure/pull/2196) Do not allow union with circular ref, change union name inside nullable type and do not take nullable type as non-body response.
+
+### Features
+
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Add `pagingMetadata.continuationTokenParameterSegments` and `pagingMetadata.continuationTokenResponseSegments` to `SdkPagingServiceMetadata` to indicate the mapping of continuation token parameter and response.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Make `SdkServiceResponseHeader` to be part of `SdkModelPropertyType`. Then it could contain the client related info.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Add `SdkPagingServiceMetadata` type to store all paging related info.
+- [#2220](https://github.com/Azure/typespec-azure/pull/2220) Add `crossLanguageDefinitionId` property for `SdkNullableType`.
+
+### Deprecations
+
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Deprecate `__raw_paged_metadata`, `nextLinkPath` and `nextLinkOperation`  in `SdkPagingServiceMethodOptions`. Use `pagingMetadata.__raw`, `pagingMetadata.nextLinkSegments` and `pagingMetadata.nextLinkOperation` instead.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Deprecate `resultPath` in `SdkMethodResponse`. Use `resultSegments` instead.
+- [#2219](https://github.com/Azure/typespec-azure/pull/2219) Deprecate `clientNamespace` property in `SdkClientType`, `SdkNullableType`, `SdkEnumType`, `SdkUnionType` and `SdkModelType`. Use `namespace` instead.
+
+### Breaking Changes
+
+- [#2217](https://github.com/Azure/typespec-azure/pull/2217) Remove `null` form union for `value` property type of `SdkConstantType`. It is a breaking change, but since no logic will come to `null` type, it shall have little impact.
+
+
+## 0.51.1
+
+### Bug Fixes
+
+- [#2211](https://github.com/Azure/typespec-azure/pull/2211) Make sure to keep orphan models
+
+
 ## 0.51.0
 
 ### Bug Fixes
