@@ -44,7 +44,7 @@
     "@typespec/internal-build-utils": "workspace:~",
     "@typespec/spec-dashboard": "workspace:~",
     "astro-expressive-code": "^0.40.1",
-    "astro-rehype-relative-markdown-links": "^0.16.0",
+    "astro-rehype-relative-markdown-links": "^0.18.1",
     "hast-util-to-html": "^9.0.4",
     "rehype": "^13.0.2",
     "remark-heading-id": "^1.0.1",

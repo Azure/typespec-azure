@@ -33,7 +33,6 @@ model User {
 @sharedRoute
 op getOperationStatus is ResourceOperations.GetResourceOperationStatus<User, never>;
 
-/** Create or replace the User. */
 @pollingOperation(getOperationStatus)
 op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User>;
 ```
@@ -65,27 +64,6 @@ Long-running operation to delete a resource.
 <ClientTabs>
 
 ```typespec
-alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
-  NoRepeatableRequests &
-  NoClientRequestId>;
-
-/** Details about a user. */
-@resource("users")
-model User {
-  /** The name of user. */
-  @key
-  @visibility("read")
-  name: string;
-
-  /** The role of user */
-  role: string;
-}
-
-// Operation for polling the status of the LRO. SDK may exclude this operation from client.
-@sharedRoute
-op getOperationStatus is ResourceOperations.GetResourceOperationStatus<User, never>;
-
-/** Delete the User. */
 @pollingOperation(getOperationStatus)
 op delete is ResourceOperations.LongRunningResourceDelete<User>;
 ```
@@ -115,10 +93,6 @@ Long-running operation to invoke an action on a resource.
 <ClientTabs>
 
 ```typespec
-alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
-  NoRepeatableRequests &
-  NoClientRequestId>;
-
 /** Details about a user. */
 @resource("users")
 model User {
@@ -151,7 +125,6 @@ model ExportedUser {
 @sharedRoute
 op getExportOperationStatus is ResourceOperations.GetResourceOperationStatus<User, ExportedUser>;
 
-/** Action to export the data of the User. */
 @pollingOperation(getExportOperationStatus)
 op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
 ```

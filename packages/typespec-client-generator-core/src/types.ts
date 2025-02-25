@@ -607,41 +607,6 @@ export function getSdkUnionWithDiagnostics(
         }
       }
     }
-
-    // other cases
-    if (retval === undefined) {
-      const namespace = getClientNamespace(context, type);
-      retval = {
-        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
-        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
-        isGeneratedName: !type.name,
-        namespace,
-        clientNamespace: namespace,
-        variantTypes: nonNullOptions.map((x) =>
-          diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
-        ),
-        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
-        access: "public",
-        usage: UsageFlags.None,
-      };
-    }
-
-    if (nullOption !== undefined) {
-      const namespace = getClientNamespace(context, type);
-      retval = {
-        ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
-        name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
-        isGeneratedName: !type.name,
-        crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
-        type: retval,
-        access: "public",
-        usage: UsageFlags.None,
-        namespace,
-        clientNamespace: namespace,
-      };
-    }
-
-    updateReferencedTypeMap(context, type, retval);
   }
 
   return diagnostics.wrap(retval);
@@ -1470,7 +1435,7 @@ export function getSdkModelPropertyType(
         if (type.model === httpBodyType) {
           // only try to add multipartOptions for property of body
           diagnostics.pipe(updateMultiPartInfo(context, type, property, operation));
-          property.multipartOptions = property.serializationOptions.multipart;
+          property.multipartOptions = property.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
         }
       }
     }
