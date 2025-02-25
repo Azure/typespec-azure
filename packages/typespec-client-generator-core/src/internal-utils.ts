@@ -4,7 +4,6 @@ import {
   Diagnostic,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
-  getLocationContext,
   getNamespaceFullName,
   getVisibilityForClass,
   Interface,
@@ -49,6 +48,8 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
+
+import { $ } from "@typespec/compiler/experimental/typekit";
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -604,7 +605,7 @@ export function getAllUserDefinedNamespaces(
     }
   } else {
     if (retval.includes(namespace)) return retval;
-    if (getLocationContext(context.program, namespace).type === "project") {
+    if ($.type.isUserDefined(namespace)) {
       retval.push(namespace);
     }
     for (const subNamespace of namespace.namespaces.values()) {
