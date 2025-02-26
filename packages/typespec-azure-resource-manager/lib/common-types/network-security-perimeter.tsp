@@ -156,8 +156,9 @@ model NetworkSecurityPerimeterConfigurationProperties {
   provisioningState?: NetworkSecurityPerimeterConfigurationProvisioningState;
 
   /** List of provisioning issues, if any */
+  #suppress "deprecated" "Update to @identifiers in next release"
   @visibility("read")
-  @Azure.ResourceManager.identifiers(#[])
+  @OpenAPI.extension("x-ms-identifiers", [])
   provisioningIssues?: ProvisioningIssue[];
 
   networkSecurityPerimeter?: NetworkSecurityPerimeter;
@@ -196,8 +197,9 @@ model ProvisioningIssueProperties {
   suggestedResourceIds?: Azure.Core.armResourceIdentifier[];
 
   /** Access rules that can be added to the network security profile (NSP) to remediate the issue. */
+  #suppress "deprecated" "Update to @identifiers in next release"
   @visibility("read")
-  @Azure.ResourceManager.identifiers(#[])
+  @OpenAPI.extension("x-ms-identifiers", [])
   suggestedAccessRules?: AccessRule[];
 }
 
@@ -220,7 +222,8 @@ model NetworkSecurityProfile {
   accessRulesVersion?: int32;
 
   /** List of Access Rules */
-  @Azure.ResourceManager.identifiers(#["name"])
+  #suppress "deprecated" "Update to @identifiers in next release"
+  @OpenAPI.extension("x-ms-identifiers", ["name"])
   accessRules?: AccessRule[];
 
   /** Current diagnostic settings version */
