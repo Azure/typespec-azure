@@ -12,7 +12,7 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
-import { getServers, HttpServer } from "@typespec/http";
+import { getServers, HttpServer, isHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
@@ -64,6 +64,7 @@ import {
 import {
   createGeneratedName,
   filterApiVersionsWithDecorators,
+  findRootSourceProperty,
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientNamespaceStringHelper,
@@ -137,12 +138,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 ): [SdkPagingServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  const basic = diagnostics.pipe(
+  const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
   // nullable response type means the underlaying operation has multiple responses and only one of them is not empty, which is what we want
-  let responseType = basic.response.type;
+  let responseType = baseServiceMethod.response.type;
   if (responseType?.kind === "nullable") {
     responseType = responseType.type;
   }
@@ -151,7 +152,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   if (isList(context.program, operation)) {
     const pagingOperation = diagnostics.pipe(getPagingOperation(context.program, operation));
 
-    if (responseType?.__raw?.kind !== "Model" || !pagingOperation) {
+    if (
+      responseType?.__raw?.kind !== "Model" ||
+      responseType.kind !== "model" ||
+      !pagingOperation
+    ) {
       diagnostics.add(
         createDiagnostic({
           code: "unexpected-pageable-operation-return-type",
@@ -163,41 +168,109 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       );
       // return as page method with no paging info
       return diagnostics.wrap({
-        ...basic,
+        ...baseServiceMethod,
         kind: "paging",
+        pagingMetadata: {},
       });
     }
 
-    basic.response.resultPath = getPropertyPathFromModel(
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    baseServiceMethod.response.resultPath = getPropertyPathFromModel(
       context,
       responseType?.__raw,
-      (p) => p === pagingOperation.output.pageItems.property,
+      (p) =>
+        p.kind === "ModelProperty" &&
+        findRootSourceProperty(p) ===
+          findRootSourceProperty(pagingOperation.output.pageItems.property),
     );
-    const nextLinkPath = pagingOperation.output.nextLink
-      ? getPropertyPathFromModel(
-          context,
-          responseType?.__raw,
-          (p) => p === pagingOperation.output.nextLink!.property,
-        )
-      : undefined;
+    baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
+      responseType,
+      (p) =>
+        p.__raw?.kind === "ModelProperty" &&
+        findRootSourceProperty(p.__raw) ===
+          findRootSourceProperty(pagingOperation.output.pageItems.property),
+    );
+
+    let nextLinkPath = undefined;
+    let nextLinkSegments = undefined;
+    if (pagingOperation.output.nextLink) {
+      nextLinkPath = getPropertyPathFromModel(
+        context,
+        responseType?.__raw,
+        (p) =>
+          p.kind === "ModelProperty" &&
+          findRootSourceProperty(p) ===
+            findRootSourceProperty(pagingOperation.output.nextLink!.property),
+      );
+      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+        responseType,
+        (p) =>
+          p.__raw?.kind === "ModelProperty" &&
+          findRootSourceProperty(p.__raw) ===
+            findRootSourceProperty(pagingOperation.output.nextLink!.property),
+      );
+    }
+
+    let continuationTokenParameterSegments = undefined;
+    let continuationTokenResponseSegments = undefined;
+    if (pagingOperation.input.continuationToken) {
+      continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
+        baseServiceMethod.parameters,
+        (p) =>
+          p.__raw?.kind === "ModelProperty" &&
+          findRootSourceProperty(p.__raw) ===
+            findRootSourceProperty(pagingOperation.input.continuationToken!.property),
+      );
+    }
+    if (pagingOperation.output.continuationToken) {
+      if (isHeader(context.program, pagingOperation.output.continuationToken.property)) {
+        continuationTokenResponseSegments = baseServiceMethod.operation.responses
+          .map((r) => r.headers)
+          .flat()
+          .filter(
+            (h) =>
+              h.__raw?.kind === "ModelProperty" &&
+              findRootSourceProperty(h.__raw) ===
+                findRootSourceProperty(pagingOperation.output.continuationToken!.property),
+          );
+      } else {
+        continuationTokenResponseSegments = getPropertySegmentsFromModelOrParameters(
+          responseType,
+          (p) =>
+            p.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(p.__raw) ===
+              findRootSourceProperty(pagingOperation.output.continuationToken!.property),
+        );
+      }
+    }
 
     context.__pagedResultSet.add(responseType);
     // tcgc will let all paging method return a list of items
-    basic.response.type = diagnostics.pipe(
+    baseServiceMethod.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, pagingOperation?.output.pageItems.property.type),
     );
 
     return diagnostics.wrap({
-      ...basic,
+      ...baseServiceMethod,
       kind: "paging",
       nextLinkPath,
+      pagingMetadata: {
+        __raw: pagingOperation,
+        nextLinkSegments,
+        continuationTokenParameterSegments,
+        continuationTokenResponseSegments,
+      },
     });
   }
 
   // azure core paging
   const pagedMetadata = getPagedResult(context.program, operation)!;
 
-  if (responseType?.__raw?.kind !== "Model" || !pagedMetadata.itemsProperty) {
+  if (
+    responseType?.__raw?.kind !== "Model" ||
+    responseType.kind !== "model" ||
+    !pagedMetadata.itemsProperty
+  ) {
     diagnostics.add(
       createDiagnostic({
         code: "unexpected-pageable-operation-return-type",
@@ -209,42 +282,71 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     );
     // return as page method with no paging info
     return diagnostics.wrap({
-      ...basic,
+      ...baseServiceMethod,
       kind: "paging",
+      pagingMetadata: {},
     });
   }
 
   context.__pagedResultSet.add(responseType);
 
   // tcgc will let all paging method return a list of items
-  basic.response.type = diagnostics.pipe(
+  baseServiceMethod.response.type = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
   );
 
-  basic.response.resultPath = getPropertyPathFromSegment(
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  baseServiceMethod.response.resultPath = getPropertyPathFromSegment(
     context,
     pagedMetadata.modelType,
     pagedMetadata.itemsSegments,
   );
+  baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
+    responseType,
+    (p) => p.__raw === pagedMetadata.itemsProperty,
+  );
 
-  return diagnostics.wrap({
-    ...basic,
-    __raw_paged_metadata: pagedMetadata,
-    kind: "paging",
-    nextLinkPath: getPropertyPathFromSegment(
+  let nextLinkPath = undefined;
+  let nextLinkSegments = undefined;
+  if (pagedMetadata.nextLinkProperty) {
+    nextLinkPath = getPropertyPathFromSegment(
       context,
       pagedMetadata.modelType,
       pagedMetadata?.nextLinkSegments,
-    ),
+    );
+    nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+      responseType,
+      (p) => p.__raw === pagedMetadata.nextLinkProperty,
+    );
+  }
+
+  return diagnostics.wrap({
+    ...baseServiceMethod,
+    __raw_paged_metadata: pagedMetadata,
+    kind: "paging",
+    nextLinkPath,
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
           getSdkServiceOperation<TServiceOperation>(
             context,
             pagedMetadata.nextLinkOperation,
-            basic.parameters,
+            baseServiceMethod.parameters,
           ),
         )
       : undefined,
+    pagingMetadata: {
+      __raw: pagedMetadata,
+      nextLinkSegments,
+      nextLinkOperation: pagedMetadata?.nextLinkOperation
+        ? diagnostics.pipe(
+            getSdkServiceMethod<TServiceOperation>(
+              context,
+              pagedMetadata.nextLinkOperation,
+              client,
+            ),
+          )
+        : undefined,
+    },
   });
 }
 
@@ -254,6 +356,11 @@ export function getPropertyPathFromModel(
   predicate: (property: ModelProperty) => boolean,
 ): string | undefined {
   const queue: { model: Model; path: ModelProperty[] }[] = [];
+
+  if (model.baseModel) {
+    const baseResult = getPropertyPathFromModel(context, model.baseModel, predicate);
+    if (baseResult) return baseResult;
+  }
 
   for (const prop of model.properties.values()) {
     if (predicate(prop)) {
@@ -274,6 +381,43 @@ export function getPropertyPathFromModel(
           .join(".");
       }
       if (prop.type.kind === "Model") {
+        queue.push({ model: prop.type, path: path.concat(prop) });
+      }
+    }
+  }
+
+  return undefined;
+}
+
+export function getPropertySegmentsFromModelOrParameters(
+  source: SdkModelType | SdkMethodParameter[],
+  predicate: (property: SdkModelPropertyType) => boolean,
+): SdkModelPropertyType[] | undefined {
+  const queue: { model: SdkModelType; path: SdkModelPropertyType[] }[] = [];
+
+  if (!Array.isArray(source)) {
+    if (source.baseModel) {
+      const baseResult = getPropertySegmentsFromModelOrParameters(source.baseModel, predicate);
+      if (baseResult) return baseResult;
+    }
+  }
+
+  for (const prop of Array.isArray(source) ? source : source.properties.values()) {
+    if (predicate(prop)) {
+      return [prop];
+    }
+    if (prop.type.kind === "model") {
+      queue.push({ model: prop.type, path: [prop] });
+    }
+  }
+
+  while (queue.length > 0) {
+    const { model, path } = queue.shift()!;
+    for (const prop of model.properties.values()) {
+      if (predicate(prop)) {
+        return path.concat(prop);
+      }
+      if (prop.type.kind === "model") {
         queue.push({ model: prop.type, path: path.concat(prop) });
       }
     }
@@ -313,19 +457,18 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const metadata = getServiceMethodLroMetadata(context, operation)!;
-  const basicServiceMethod = diagnostics.pipe(
+  const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
-  basicServiceMethod.response.type = metadata.finalResponse?.result;
+  baseServiceMethod.response.type = metadata.finalResponse?.result;
 
   // eslint-disable-next-line @typescript-eslint/no-deprecated
-  basicServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
-
-  basicServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
+  baseServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
+  baseServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
 
   return diagnostics.wrap({
-    ...basicServiceMethod,
+    ...baseServiceMethod,
     kind: "lro",
     __raw_lro_metadata: metadata.__raw,
     lroMetadata: metadata,
@@ -333,7 +476,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
       getSdkServiceOperation<TServiceOperation>(
         context,
         metadata.__raw.operation,
-        basicServiceMethod.parameters,
+        baseServiceMethod.parameters,
       ),
     ),
   });
@@ -420,7 +563,8 @@ function getSdkMethodResponse(
       variantTypes: allResponseBodies,
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
-      clientNamespace: client.clientNamespace,
+      namespace: client.namespace,
+      clientNamespace: client.namespace,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
       decorators: [],
     };
@@ -431,12 +575,14 @@ function getSdkMethodResponse(
     type = {
       kind: "nullable",
       name: createGeneratedName(context, operation, "NullableResponse"),
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
       isGeneratedName: true,
       type: type,
       decorators: [],
       access: "public",
       usage: UsageFlags.Output,
-      clientNamespace: client.clientNamespace,
+      namespace: client.namespace,
+      clientNamespace: client.namespace,
     };
   }
   return {
@@ -572,6 +718,7 @@ function getSdkInitializationType(
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
+    const namespace = getClientNamespace(context, client.type);
     initializationModel = {
       __raw: client.service,
       doc: "Initialization class for the client",
@@ -582,7 +729,8 @@ function getSdkInitializationType(
       access,
       usage: UsageFlags.Input,
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-      clientNamespace: getClientNamespace(context, client.type),
+      namespace,
+      clientNamespace: namespace,
       apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
       decorators: [],
       serializationOptions: {},
@@ -842,6 +990,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   }
   let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
+    const namespace = getClientNamespace(context, rawClient.service);
     type = {
       kind: "union",
       access: "public",
@@ -850,7 +999,8 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
-      clientNamespace: getClientNamespace(context, rawClient.service),
+      namespace,
+      clientNamespace: namespace,
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -878,6 +1028,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const namespace = getClientNamespace(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -887,7 +1038,8 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    clientNamespace: getClientNamespace(context, client.type),
+    namespace: namespace,
+    clientNamespace: namespace,
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
@@ -1015,20 +1167,20 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   const clients = [...sdkPackage.clients];
   while (clients.length > 0) {
     const client = clients.shift()!;
-    getSdkNamespace(sdkPackage, client.clientNamespace).clients.push(client);
+    getSdkNamespace(sdkPackage, client.namespace).clients.push(client);
     client.methods
       .filter((m) => m.kind === "clientaccessor")
       .map((m) => m.response)
       .map((c) => clients.push(c));
   }
   for (const model of sdkPackage.models) {
-    getSdkNamespace(sdkPackage, model.clientNamespace).models.push(model);
+    getSdkNamespace(sdkPackage, model.namespace).models.push(model);
   }
   for (const enumType of sdkPackage.enums) {
-    getSdkNamespace(sdkPackage, enumType.clientNamespace).enums.push(enumType);
+    getSdkNamespace(sdkPackage, enumType.namespace).enums.push(enumType);
   }
   for (const unionType of sdkPackage.unions) {
-    getSdkNamespace(sdkPackage, unionType.clientNamespace).unions.push(unionType);
+    getSdkNamespace(sdkPackage, unionType.namespace).unions.push(unionType);
   }
 }
 
