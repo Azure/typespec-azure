@@ -1,0 +1,259 @@
+---
+title: Paging Operations
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc details what emitters will generate for paging operations.
+
+## Using next link to indicate how to get the next page
+
+Next link is an absolute url that returned by paging operation, which indicate how to get the next page.
+If the response does not return next link, it should be the last page.
+Next link should be annotated in response model with `@nextLink`.
+
+There are two ways to indicate the paging operation with `@nextLink`:
+
+1. Use `@pagedResult` and `@items` in `Azure.Core` lib.
+
+<ClientTabs>
+
+```typespec
+op listWithPage(): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+@pagedResult
+model UserList {
+  @items
+  value: User[];
+
+  @nextLink
+  nextLink?: url;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+2. Use `@list` and `@pageItems` in core.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+model UserList {
+  @pageItems
+  value: User[];
+
+  @nextLink
+  nextLink?: url;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+## Using continuation token to indicate how to get the next page
+
+Continuation token is a string that returned by paging operation, which could be used as a parameter value for the paging operation to get the next page.
+If the response does not return continuation token, it should be the last page.
+Continuation token should be annotated in one of the request parameter with `@continuationToken`, as well as response model with `@continuationToken`.
+
+1. Continuation token in query parameter and response body.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@query @continuationToken token?: string): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+model UserList {
+  @pageItems
+  value: User[];
+
+  @continuationToken
+  nextToken?: string;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+2. Continuation token in header parameter and response body.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@header @continuationToken token?: string): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+model UserList {
+  @pageItems
+  value: User[];
+
+  @continuationToken
+  nextToken?: string;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+3. Continuation token in query parameter and response header.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@query @continuationToken token?: string): {
+  @header
+  @continuationToken
+  nextToken?: string;
+
+  @pageItems
+  value: User[];
+};
+
+model User {
+  id: string;
+  name: string;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+4. Continuation token in header parameter and response header.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@query @continuationToken token?: string): {
+  @header
+  @continuationToken
+  nextToken?: string;
+
+  @pageItems
+  value: User[];
+};
+
+model User {
+  id: string;
+  name: string;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
