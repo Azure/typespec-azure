@@ -1,7 +1,4 @@
 import {
-  $invisible,
-  $removeVisibility,
-  $visibility,
   Model,
   createRule,
   getLifecycleVisibilityEnum,
@@ -10,8 +7,6 @@ import {
   paramMessage,
 } from "@typespec/compiler";
 import { isExcludedCoreType, isInlineModel, isTemplateDeclarationType } from "./utils.js";
-
-const VISIBILITY_DECORATORS = [$visibility, $invisible, $removeVisibility];
 
 export const requireKeyVisibility = createRule({
   name: "key-visibility-required",
