@@ -27,6 +27,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
+import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
 import { getParamAlias } from "./decorators.js";
 import {
@@ -54,6 +55,7 @@ import {
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
+  getStreamAsBytes,
   getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
@@ -143,7 +145,6 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
   if (tspBody) {
-    // explicit @body and @bodyRoot
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
@@ -209,6 +210,13 @@ function getSdkHttpParameters(
           retval.bodyParam,
         ),
       );
+      if (getStreamMetadata(context.program, httpOperation.parameters)) {
+        // map stream request body type to bytes
+        retval.bodyParam.type = diagnostics.pipe(
+          getStreamAsBytes(context, retval.bodyParam.type.__raw!),
+        );
+        retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
+      }
     }
   }
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
@@ -472,11 +480,16 @@ function getSdkHttpResponseAndExceptions(
           innerResponse.body.type.kind === "Model"
             ? getEffectivePayloadType(context, innerResponse.body.type)
             : innerResponse.body.type;
-        type = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-        );
-        if (innerResponse.body.property) {
-          addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+        if (getStreamMetadata(context.program, innerResponse)) {
+          // map stream response body type to bytes
+          type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
+        } else {
+          type = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+          );
+          if (innerResponse.body.property) {
+            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+          }
         }
       }
     }
