@@ -14,6 +14,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  PagingOperation,
   Program,
   Type,
   Union,
@@ -32,30 +33,33 @@ import { TspLiteralType } from "./internal-utils.js";
 
 export interface TCGCContext {
   program: Program;
+  diagnostics: readonly Diagnostic[];
   emitterName: string;
+  arm?: boolean;
+
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  referencedTypeMap: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
-  referencedPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache: Map<Operation, HttpOperation>;
-  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
-  __rawClients?: SdkClient[];
   apiVersion?: string;
-  __service_snapshot?: Map<Namespace, Namespace>;
-  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
-  originalProgram: Program;
   examplesDir?: string;
+
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
+
+  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
+  __generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  __httpOperationCache: Map<Operation, HttpOperation>;
+  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
+  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
+  __knownScalars?: Record<string, SdkBuiltInKinds>;
+  __rawClients?: SdkClient[];
+  __service_snapshot?: Map<Namespace, Namespace>;
+  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
+  __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
 }
 
@@ -174,7 +178,14 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   doc?: string;
   summary?: string;
   /**
@@ -379,17 +390,32 @@ export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   name: string;
   isGeneratedName: boolean;
+  crossLanguageDefinitionId: string;
   type: SdkType;
   usage: UsageFlags;
   access: AccessFlags;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -411,7 +437,7 @@ export interface SdkEnumValueType extends SdkTypeBase {
 
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
-  value: string | number | boolean | null;
+  value: string | number | boolean;
   valueType: SdkBuiltInType;
   name: string;
   isGeneratedName: boolean;
@@ -420,7 +446,14 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
@@ -433,7 +466,14 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
@@ -554,7 +594,8 @@ export type SdkModelPropertyType =
   | SdkPathParameter
   | SdkBodyParameter
   | SdkHeaderParameter
-  | SdkCookieParameter;
+  | SdkCookieParameter
+  | SdkServiceResponseHeader;
 
 export interface MultipartOptions {
   name: string;
@@ -647,21 +688,21 @@ export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
 }
 
-export interface SdkServiceResponseHeader {
+export interface SdkServiceResponseHeader extends SdkModelPropertyTypeBase {
   __raw: ModelProperty;
+  kind: "responseheader";
   serializedName: string;
-  type: SdkType;
-  doc?: string;
-  summary?: string;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
-  resultPath?: string; // if exists, tells you how to get from the service response to the method response.
   /**
-   * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
-   * Temporarily this is not enabled for paging now.
+   * @deprecated Use `resultSegments` instead.
+   */
+  resultPath?: string;
+  /**
+   * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
   resultSegments?: SdkModelPropertyType[];
 }
@@ -739,17 +780,42 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
   kind: "basic";
 }
 
-interface SdkPagingServiceMethodOptions {
+interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
+  /**
+   * @deprecated Use `pagingMetadata.__raw` instead.
+   */
   __raw_paged_metadata?: PagedResultMetadata;
+  /**
+   * @deprecated Use `pagingMetadata.nextLinkSegments` instead.
+   */
   nextLinkPath?: string;
+  /**
+   * @deprecated Use `pagingMetadata.nextLinkOperation` instead.
+   */
   nextLinkOperation?: SdkServiceOperation;
-  continuationTokenParameter?: SdkMethodParameter;
+  pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
+}
+
+/**
+ * Paging operation metadata.
+ */
+export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
+  /** Paging metadata from TypeSpec core library. */
+  __raw?: PagedResultMetadata | PagingOperation;
+
+  /** Segments to indicate how to get next page link value from response. */
+  nextLinkSegments?: SdkModelPropertyType[];
+  /** Method used to get next page. If not defined, use the initial method. */
+  nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** Segments to indicate how to set continuation token for next page request. */
+  continuationTokenParameterSegments?: SdkModelPropertyType[];
+  /** Segments to indicate how to get continuation token value from response. */
   continuationTokenResponseSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "paging";
 }
 
@@ -825,7 +891,7 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "lropaging";
 }
 

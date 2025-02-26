@@ -1369,7 +1369,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         ok(
           models.find(
             (x) =>
-              x.name === "AB" &&
+              x.name === "AB1" &&
               x.isGeneratedName &&
               x.crossLanguageDefinitionId === "TestService.A.b.anonymous",
           ),
@@ -1693,7 +1693,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { TestModel: Model };
 
-        runner.context.generatedNames?.clear();
+        runner.context.__generatedNames?.clear();
         const name = getGeneratedName(
           runner.context,
           [...TestModel.properties.values()][0].type as Model,

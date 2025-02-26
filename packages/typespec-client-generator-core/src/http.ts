@@ -49,6 +49,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  findRootSourceProperty,
   getAvailableApiVersions,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
@@ -440,14 +441,13 @@ function getSdkHttpResponseAndExceptions(
         : innerResponse.body?.contentTypes[0];
       for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
-        const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
-        addEncodeInfo(context, header, clientType, defaultContentType);
         headers.push({
+          ...diagnostics.pipe(
+            getSdkModelPropertyTypeBase(context, header, httpOperation.operation),
+          ),
           __raw: header,
-          doc: getDoc(context.program, header),
-          summary: getSummary(context.program, header),
+          kind: "responseheader",
           serializedName: getHeaderFieldName(context.program, header),
-          type: clientType,
         });
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -690,13 +690,6 @@ function filterOutUselessPathParameters(
       i--;
     }
   }
-}
-
-function findRootSourceProperty(property: ModelProperty): ModelProperty {
-  while (property.sourceProperty) {
-    property = property.sourceProperty;
-  }
-  return property;
 }
 
 function getCollectionFormat(
