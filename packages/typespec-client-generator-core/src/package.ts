@@ -834,33 +834,27 @@ function getSdkMethodParameter(
   operation: Operation,
 ): [SdkMethodParameter | SdkApiVersionParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let parameter = context.__methodParameterCache.get(type);
-  if (!parameter) {
-    const base = diagnostics.pipe(getSdkModelPropertyType(context, type, operation));
-    if (isApiVersion(context, type) && base.onClient) {
-      if (base.type.kind !== "string") {
-        diagnostics.add(
-          createDiagnostic({
-            code: "api-version-not-string",
-            target: type,
-          }),
-        );
-      }
-      parameter = {
-        ...base,
-        kind: "apiVersion",
-        isApiVersionParam: true,
-        onClient: true,
-      } as SdkApiVersionParameter;
-    } else {
-      parameter = {
-        ...base,
-        kind: "method",
-      };
+  const base = diagnostics.pipe(getSdkModelPropertyType(context, type, operation));
+  if (isApiVersion(context, type) && base.onClient) {
+    if (base.type.kind !== "string") {
+      diagnostics.add(
+        createDiagnostic({
+          code: "api-version-not-string",
+          target: type,
+        }),
+      );
     }
-    context.__methodParameterCache.set(type, parameter);
+    return diagnostics.wrap({
+      ...base,
+      kind: "apiVersion",
+      isApiVersionParam: true,
+      onClient: true,
+    } as SdkApiVersionParameter);
   }
-  return diagnostics.wrap(parameter as SdkMethodParameter);
+  return diagnostics.wrap({
+    ...base,
+    kind: "method",
+  });
 }
 
 function getSdkMethods<TServiceOperation extends SdkServiceOperation>(

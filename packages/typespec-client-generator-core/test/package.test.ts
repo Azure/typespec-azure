@@ -953,7 +953,7 @@ describe("typespec-client-generator-core: package", () => {
         (x) => x.name === "clientRequestId",
       );
       ok(clientRequestIdProperty);
-      strictEqual(clientRequestIdProperty.kind, "property");
+      strictEqual(clientRequestIdProperty.kind, "header");
     });
 
     it("azure widget getWidgetAnalytics", async () => {
