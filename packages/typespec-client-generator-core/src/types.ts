@@ -119,6 +119,7 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
+import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
