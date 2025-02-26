@@ -19,6 +19,7 @@ export interface JsonSchemaBase {
 export interface JsonSchemaObject extends JsonSchemaBase {
   type: "object";
   properties?: Record<string, JsonSchemaType>;
+  unevaluatedProperties?: JsonSchemaType | boolean;
   additionalProperties?: JsonSchemaType | boolean;
   patternProperties?: Record<string, JsonSchemaType>;
   "x-ordering"?: "keep" | "url";
@@ -86,6 +87,7 @@ function internalSort(
     const propertySchema =
       objectSchema?.properties?.[key] ??
       resolvePatternProperties(key, objectSchema?.patternProperties) ??
+      resolveAdditionalProperties(objectSchema?.unevaluatedProperties) ??
       resolveAdditionalProperties(objectSchema?.additionalProperties);
     if (propertySchema !== undefined) {
       o[key] = internalSort(v, propertySchema, reader);
