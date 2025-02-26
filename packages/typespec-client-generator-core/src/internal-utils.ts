@@ -619,3 +619,17 @@ export function findRootSourceProperty(property: ModelProperty): ModelProperty {
   }
   return property;
 }
+
+export function getStreamAsBytes(
+  context: TCGCContext,
+  type: Type,
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const unknownType: SdkBuiltInType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "bytes")),
+    name: "bytes",
+    encode: "bytes",
+    crossLanguageDefinitionId: "",
+  };
+  return diagnostics.wrap(unknownType);
+}
