@@ -47,6 +47,7 @@ import {
 } from "./interfaces.js";
 import {
   TspLiteralType,
+  getAllUserDefinedNamespaces,
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
@@ -345,20 +346,20 @@ function findContextPath(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
-  for (const client of listClients(context)) {
-    // orphan models
-    if (client.service) {
-      for (const model of client.service.models.values()) {
-        if (
-          [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
-        )
-          continue;
-        const result = getContextPath(context, model, type);
-        if (result.length > 0) {
-          return result;
-        }
+  // orphan models
+  for (const currNamespace of getAllUserDefinedNamespaces(context)) {
+    for (const model of currNamespace.models.values()) {
+      if (
+        [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+      )
+        continue;
+      const result = getContextPath(context, model, type);
+      if (result.length > 0) {
+        return result;
       }
     }
+  }
+  for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
