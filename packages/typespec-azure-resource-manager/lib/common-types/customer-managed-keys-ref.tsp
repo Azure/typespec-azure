@@ -4,33 +4,33 @@ using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-@@armCommonDefinition(Encryption,
+@@armCommonDefinition(encryption,
   "encryption",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "customermanagedkeys.json"
 );
-@@armCommonDefinition(Encryption,
+@@armCommonDefinition(encryption,
   "encryption",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "customermanagedkeys.json"
 );
-@@armCommonDefinition(Encryption,
+@@armCommonDefinition(encryption,
   "encryption",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "customermanagedkeys.json"
 );
 
-@@armCommonDefinition(CustomerManagedKeyEncryption,
+@@armCommonDefinition(customerManagedKeyEncryption,
   "customerManagedKeyEncryption",
   #{ version: Azure.ResourceManager.CommonTypes.Versions.v4, isDefault: true },
   "customermanagedkeys.json"
 );
-@@armCommonDefinition(CustomerManagedKeyEncryption,
+@@armCommonDefinition(customerManagedKeyEncryption,
   "customerManagedKeyEncryption",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "customermanagedkeys.json"
 );
-@@armCommonDefinition(CustomerManagedKeyEncryption,
+@@armCommonDefinition(customerManagedKeyEncryption,
   "customerManagedKeyEncryption",
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "customermanagedkeys.json"

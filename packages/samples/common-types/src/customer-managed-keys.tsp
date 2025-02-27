@@ -7,4 +7,4 @@ using ClientGenerator.Core;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-@@clientName(Encryption, "encryption", "@azure-tools/typespec-autorest");
+@@clientName(encryption, "encryption", "@azure-tools/typespec-autorest");
