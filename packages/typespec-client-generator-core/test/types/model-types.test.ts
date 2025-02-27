@@ -1805,7 +1805,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(inputModel.properties.length, 1);
     const nameProperty = inputModel.properties[0];
     strictEqual(nameProperty.name, "name");
-    strictEqual(nameProperty.kind, "property");
+    strictEqual(nameProperty.kind, "header");
     ok(nameProperty.visibility);
     strictEqual(nameProperty.visibility.length, 1);
     strictEqual(nameProperty.visibility[0], Visibility.Read);
