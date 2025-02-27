@@ -17,8 +17,6 @@ import {
   SdkEmitterOptions,
   SdkEnumType,
   SdkHttpOperation,
-  SdkHttpParameter,
-  SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
@@ -50,8 +48,6 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     >(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
-    __methodParameterCache: new Map<ModelProperty, SdkMethodParameter>(),
-    __httpParameterCache: new Map<ModelProperty, SdkHttpParameter>(),
   };
 }
 

@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.51.3
+
+### Bug Fixes
+
+- [#2252](https://github.com/Azure/typespec-azure/pull/2252) `isGeneratedName` always set to true only when it is the inner type of nullable union.
+- [#2252](https://github.com/Azure/typespec-azure/pull/2252) Remove parameter cache to retain HTTP metadata info for model property.
+
+
 ## 0.51.2
 
 ### Bug Fixes
