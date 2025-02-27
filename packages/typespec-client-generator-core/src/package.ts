@@ -832,15 +832,10 @@ function getSdkMethodParameter(
   operation: Operation,
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let parameter = context.__methodParameterCache.get(type);
-  if (!parameter) {
-    parameter = {
-      ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
-      kind: "method",
-    };
-    context.__methodParameterCache.set(type, parameter);
-  }
-  return diagnostics.wrap(parameter as SdkMethodParameter);
+  return diagnostics.wrap({
+    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
+    kind: "method",
+  });
 }
 
 function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
