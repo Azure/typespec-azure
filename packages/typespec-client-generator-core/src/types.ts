@@ -119,6 +119,7 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
+import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
@@ -509,10 +510,12 @@ export function getSdkUnionWithDiagnostics(
     const nullOption = getNullOption(type);
 
     if (nonNullOptions.length === 0) {
+      // union with only `null`, report diagnostic and return empty union
       diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
     } else if (checkUnionCircular(type)) {
+      // union with circular ref, report diagnostic and return empty union
       diagnostics.add(createDiagnostic({ code: "union-circular", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
@@ -546,6 +549,7 @@ export function getSdkUnionWithDiagnostics(
       ) {
         const unionAsEnum = diagnostics.pipe(getUnionAsEnum(type));
         if (unionAsEnum) {
+          // union as enum case
           retval = diagnostics.pipe(
             getSdkUnionEnumWithDiagnostics(context, unionAsEnum, operation),
           );
@@ -571,7 +575,7 @@ export function getSdkUnionWithDiagnostics(
         retval = {
           ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
-          isGeneratedName: true, // always set inner union type as generated name
+          isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
           namespace,
           clientNamespace: namespace,
           variantTypes: [],
@@ -1405,6 +1409,8 @@ export function getSdkModelPropertyType(
     );
     if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
     const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
+
+    if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
 
     property = {
       ...base,

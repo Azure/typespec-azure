@@ -424,7 +424,7 @@ describe("typespec-client-generator-core: union types", () => {
     const sdkType = property.type;
     strictEqual(sdkType.kind, "union");
     strictEqual(sdkType.name, "MyNamedUnion");
-    strictEqual(sdkType.isGeneratedName, true);
+    strictEqual(sdkType.isGeneratedName, false);
     strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
     strictEqual(sdkType.access, "public");
     const variants = sdkType.variantTypes;
