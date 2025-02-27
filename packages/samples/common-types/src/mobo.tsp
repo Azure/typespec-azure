@@ -6,4 +6,4 @@ using OpenAPI;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-@@extension(ManagedOnBehalfOfConfiguration.moboBrokerResources, "x-ms-identifiers", ["id"]);
+@@extension(ManagedOnBehalfOfConfiguration.moboBrokerResources, "x-ms-identifiers", #["id"]);
