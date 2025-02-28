@@ -322,10 +322,10 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  if (!context.generatedNames) {
-    context.generatedNames = new Map<Union | Model | TspLiteralType, string>();
+  if (!context.__generatedNames) {
+    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>();
   }
-  const generatedName = context.generatedNames.get(type);
+  const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -645,14 +645,16 @@ function buildNameFromContextPaths(
   // 3. simplely handle duplication
   let duplicateCount = 1;
   const rawCreateName = createName;
-  const generatedNames = [...(context.generatedNames?.values() ?? [])];
+  const generatedNames = [...(context.__generatedNames?.values() ?? [])];
   while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
-  if (context.generatedNames) {
-    context.generatedNames.set(type, createName);
+  if (context.__generatedNames) {
+    context.__generatedNames.set(type, createName);
   } else {
-    context.generatedNames = new Map<Union | Model | TspLiteralType, string>([[type, createName]]);
+    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>([
+      [type, createName],
+    ]);
   }
   return createName;
 }
@@ -661,11 +663,11 @@ export function getHttpOperationWithCache(
   context: TCGCContext,
   operation: Operation,
 ): HttpOperation {
-  if (context.httpOperationCache?.has(operation)) {
-    return context.httpOperationCache.get(operation)!;
+  if (context.__httpOperationCache?.has(operation)) {
+    return context.__httpOperationCache.get(operation)!;
   }
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
-  context.httpOperationCache?.set(operation, httpOperation);
+  context.__httpOperationCache?.set(operation, httpOperation);
   return httpOperation;
 }
 
