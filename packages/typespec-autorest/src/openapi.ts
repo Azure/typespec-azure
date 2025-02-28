@@ -103,6 +103,7 @@ import {
   resolvePath,
   serializeValueAsJson,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
@@ -1462,7 +1463,15 @@ export async function getOpenAPIForService(
     name?: string,
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(param, name);
-    let collectionFormat = getHeaderFieldOptions(program, param).format;
+    const headerOptions = getHeaderFieldOptions(program, param);
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    let collectionFormat = headerOptions.format;
+    if (
+      !collectionFormat &&
+      (typeof headerOptions.explode === "boolean" || $.array.is(param.type))
+    ) {
+      collectionFormat = headerOptions.explode ? "multi" : "csv";
+    }
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
       collectionFormat = undefined;
       reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
