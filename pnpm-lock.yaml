@@ -841,7 +841,7 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5(@types/debug@4.1.12)(@types/node@22.10.10)(@vitest/ui@3.0.4)(happy-dom@16.7.3)(jsdom@19.0.0)(tsx@4.19.2)(yaml@2.7.0)
 
-  core/packages/http-server-javascript:
+  core/packages/http-server-js:
     dependencies:
       prettier:
         specifier: ~3.4.2
@@ -1633,9 +1633,9 @@ importers:
       '@typespec/http-server-csharp':
         specifier: workspace:~
         version: link:../http-server-csharp
-      '@typespec/http-server-javascript':
+      '@typespec/http-server-js':
         specifier: workspace:~
-        version: link:../http-server-javascript
+        version: link:../http-server-js
       '@typespec/json-schema':
         specifier: workspace:~
         version: link:../json-schema
