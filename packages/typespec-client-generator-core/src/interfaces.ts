@@ -16,7 +16,6 @@ import {
   Operation,
   PagingOperation,
   Program,
-  ProjectedProgram,
   Type,
   Union,
 } from "@typespec/compiler";
@@ -58,9 +57,7 @@ export interface TCGCContext {
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
+  __versioning_client_type_cache?: Map<Namespace | Interface, Namespace | Interface>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
