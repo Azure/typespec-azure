@@ -15,6 +15,7 @@ export const preferCsvCollectionFormatRule = createRule({
         if (isExcludedCoreType(context.program, property)) return;
 
         const headerOptions = getHeaderFieldOptions(context.program, property);
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         if (headerOptions?.format !== undefined && headerOptions?.format !== "csv") {
           context.reportDiagnostic({
             target: property,
