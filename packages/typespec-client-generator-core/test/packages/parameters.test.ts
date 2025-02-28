@@ -196,7 +196,26 @@ describe("typespec-client-generator-core: parameters", () => {
       @service({})
       namespace My.Service;
 
+      #suppress "deprecated" "Legacy test"
       op myOp(@header(#{format: "multi"}) header: string): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const headerParam = method.operation.parameters[0];
+    strictEqual(headerParam.kind, "header");
+    strictEqual(headerParam.collectionFormat, "multi");
+  });
+
+  it("header collection format via explode", async () => {
+    await runner.compile(`@server("http://localhost:3000", "endpoint")
+      @service({})
+      namespace My.Service;
+
+      #suppress "deprecated" "Legacy test"
+      op myOp(@header(#{explode: true}) header: string): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);

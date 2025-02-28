@@ -174,10 +174,27 @@ describe("query parameters", () => {
 });
 
 describe("header parameters", () => {
-  it("create a header param of array type", async () => {
+  it("create a header param of array type via legacy format", async () => {
     const res = await openApiFor(
       `
+      #suppress "deprecated" "Legacy format"
       op test(@header(#{format: "csv"}) arg1: string[]): void;
+      `,
+    );
+    deepStrictEqual(res.paths["/"].get.parameters[0], {
+      in: "header",
+      name: "arg1",
+      required: true,
+      type: "array",
+      items: { type: "string" },
+      collectionFormat: "csv",
+    });
+  });
+
+  it("create a header param of array", async () => {
+    const res = await openApiFor(
+      `
+      op test(@header arg1: string[]): void;
       `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {
