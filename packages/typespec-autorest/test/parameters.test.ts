@@ -345,7 +345,7 @@ describe("body parameters", () => {
   });
 
   describe("request parameters resolving to no property in the body produce no body", () => {
-    it.each(["()", "(@header prop: string)", `(@visibility("none") prop: string)`])(
+    it.each(["()", "(@header prop: string)", `(@invisible(Lifecycle) prop: string)`])(
       "%s",
       async (params) => {
         const res = await openApiFor(`op test${params}: void;`);

@@ -346,7 +346,7 @@ describe("typespec-azure-core: operation templates", () => {
       @resource("widgets")
       model Widget {
         @key
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
 
@@ -968,7 +968,7 @@ model Job {
   /** job id */
   @path
   @key
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: uuid;
 
   /** job name */
@@ -1041,7 +1041,7 @@ model Job {
   /** job id */
   @path
   @key
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   /** Job instructions */
@@ -1350,7 +1350,7 @@ op createJob(
           @doc("The widget identity")
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -1485,7 +1485,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
         
@@ -1546,7 +1546,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1602,7 +1602,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1650,7 +1650,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1701,7 +1701,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1759,7 +1759,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1809,7 +1809,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1864,7 +1864,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1920,7 +1920,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -1968,7 +1968,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
           provisioningState: "Succeeded" | "Failed" | "Canceled" | "Running";
@@ -2104,7 +2104,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
         
@@ -2164,7 +2164,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
         
@@ -2225,7 +2225,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
         
@@ -2305,7 +2305,7 @@ op createJob(
         @resource("management/operations")
         model DeviceOperation {
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           operationId: string;
           error?: Azure.Core.Foundations.Error;
         }
@@ -2313,7 +2313,7 @@ op createJob(
         @resource("updates/operations")
         model UpdateOperation {
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           operationId: string;
           status: OperationStatus;
           resourceLocation?: string;
@@ -2392,7 +2392,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2450,7 +2450,7 @@ op createJob(
           @doc("The widget identity")
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2512,7 +2512,7 @@ op createJob(
           @doc("The widget identity")
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2563,7 +2563,7 @@ op createJob(
           @doc("The widget identity")
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2627,7 +2627,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2687,7 +2687,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2756,7 +2756,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2820,7 +2820,7 @@ op createJob(
           @doc("The widget identity")
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2872,7 +2872,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   
@@ -2947,7 +2947,7 @@ op createJob(
         model SimpleWidget {
           @key
           @segment("simpleWidgets")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           id: string;
   

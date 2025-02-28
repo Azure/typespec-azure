@@ -16,7 +16,7 @@ model Resource {}
 
 @useRef("./types.json#/definitions/ProxyResource")
 model ProxyResource {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id?: Azure.Core.armResourceIdentifier;
 }
 

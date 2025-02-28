@@ -41,11 +41,11 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
 @doc("Widget Resource Properties.")
 model WidgetResourceProperties {
   @doc("The widget color.")
-  @visibility("create", "read")
+  @visibility(Lifecycle.Create, Lifecycle.Read)
   color: string;
 
   /** Provisioning state */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
   ...EncryptionProperty;

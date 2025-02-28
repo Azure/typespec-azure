@@ -44,7 +44,7 @@ model EmployeeProperties {
   @encode("base64url")
   profile?: bytes;
 
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The status of the last operation.")
   provisioningState?: ProvisioningState;
 }

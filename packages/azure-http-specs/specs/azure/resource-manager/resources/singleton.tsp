@@ -20,7 +20,7 @@ model SingletonTrackedResource is TrackedResource<SingletonTrackedResourceProper
 
 @doc("Singleton Arm Resource Properties.")
 model SingletonTrackedResourceProperties {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The status of the last operation.")
   provisioningState?: ProvisioningState;
 
