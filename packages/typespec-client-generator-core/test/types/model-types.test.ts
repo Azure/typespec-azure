@@ -17,7 +17,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("basic", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InputModel {
             prop: string
@@ -38,7 +38,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("models in Record", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InnerModel {
             prop: string
@@ -59,7 +59,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("models in Array", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InnerModel {
             prop: string
@@ -80,7 +80,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("embedded models", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InnerModel {
             prop: string
@@ -105,7 +105,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("base model", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model BaseModel {
             prop: string
@@ -921,7 +921,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("no models filter core", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService { }
       `);
     const models = runner.context.sdkPackage.models;
@@ -930,7 +930,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("no models don't filter core", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService { }
       `);
     const models = runner.context.sdkPackage.models;
@@ -1378,7 +1378,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("additionalProperties usage", async () => {
     await runner.compileWithBuiltInService(`
-        @service({})
+        @service
         namespace MyService {
           model AdditionalPropertiesModel extends Record<Test> {
           }
@@ -1462,7 +1462,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("crossLanguageDefinitionId", async () => {
     await runner.compile(`
-        @service({})
+        @service
         namespace MyService {
           @usage(Usage.input)
           model InputModel {}
@@ -1524,7 +1524,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("model with deprecated annotation", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         namespace MyService;
         #deprecated "no longer support"
         model Test {
@@ -1541,7 +1541,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("orphan model", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
@@ -1560,7 +1560,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("model with client hierarchy", async () => {
     await runner.compile(`
-        @service({})
+        @service
         namespace Test1Client {
           model T1 {
             prop: string;
@@ -1656,7 +1656,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("never or void property", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
@@ -1675,7 +1675,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("xml usage", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         namespace MyService {
           model RoundTrip {
             prop: string;

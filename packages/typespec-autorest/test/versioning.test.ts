@@ -66,7 +66,7 @@ describe("typespec-autorest: versioning", () => {
     const { v1, v2, v3 } = await openApiFor(
       `
       @versioned(Versions)
-      @service({title: "My Service"})
+      @service(#{title: "My Service"})
       namespace MyService {
         enum Versions {
           @useDependency(MyLibrary.Versions.A)
@@ -169,7 +169,7 @@ describe("typespec-autorest: versioning", () => {
     const { v1, v2, v3 } = await openApiFor(
       `
       @versioned(Versions)
-      @service({title: "My Service"})
+      @service(#{title: "My Service"})
       #suppress "deprecated" "For testing"
       namespace MyService {
         enum Versions {

@@ -20,7 +20,7 @@ describe("typespec-client-generator-core: tuple types", () => {
   });
   it("model with tupled properties", async function () {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         namespace MyService;
         @usage(Usage.input | Usage.output)
         model MyFlow {

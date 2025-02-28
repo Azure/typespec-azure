@@ -10,9 +10,7 @@ using TypeSpec.Versioning;
 using Azure.ResourceManager;
 
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-})
+@service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 @doc("Contoso Resource Provider management API.")
 namespace Microsoft.ContosoProviderHub;

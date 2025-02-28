@@ -152,7 +152,7 @@ export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterO
 export async function oapiForModel(name: string, modelDef: string) {
   const oapi = await compileOpenAPI(`
     ${modelDef};
-    @service({title: "Testing model"})
+    @service(#{title: "Testing model"})
     @route("/")
     namespace root {
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."

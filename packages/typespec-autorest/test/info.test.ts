@@ -6,7 +6,7 @@ describe("typespec-autorest: info", () => {
   it("set the service title with @service", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My Service"})
+      @service(#{title: "My Service"})
       namespace Foo {}
       `,
     );
@@ -16,7 +16,7 @@ describe("typespec-autorest: info", () => {
   it("set the service version with @service", async () => {
     const res = await openApiFor(
       `
-      @service({
+      @service(#{
         #suppress "deprecated" "For test"
         version: "1.2.3-test"
       })
@@ -30,7 +30,7 @@ describe("typespec-autorest: info", () => {
     const res = await openApiFor(
       `
       @doc("My service description")
-      @service({title: "My Service"})
+      @service(#{title: "My Service"})
       namespace Foo {}
       `,
     );
@@ -41,7 +41,7 @@ describe("typespec-autorest: info", () => {
     const res = await openApiFor(
       `
       @externalDocs("https://example.com", "more info")
-      @service({title: "My Service"})
+      @service(#{title: "My Service"})
       namespace Foo {}
       `,
     );
@@ -54,7 +54,7 @@ describe("typespec-autorest: info", () => {
     const res = await openApiFor(
       `
       @doc("My service description")
-      @service({title: "My Service"})
+      @service(#{title: "My Service"})
       namespace Foo {}
       `,
     );
@@ -67,7 +67,7 @@ describe("typespec-autorest: info", () => {
     const res = await openApiFor(
       `
       @service
-      @info({
+      @info(#{
         termsOfService: "http://example.com/terms/",
         contact: {
           name: "API Support",

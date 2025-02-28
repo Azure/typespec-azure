@@ -76,9 +76,7 @@ If there is no explicitly defined `@client`, then every namespaces with `@servic
 - Example 1:
 
 ```typespec
-@service({
-  title: "Pet Store",
-})
+@service(#{ title: "Pet Store" })
 namespace PetStore {
   interface Dogs {
     feed(): void;
@@ -91,9 +89,7 @@ namespace PetStore {
   }
 }
 
-@service({
-  title: "Toy Store",
-})
+@service(#{ title: "Toy Store" })
 namespace ToyStore {
   interface Dolls {
     price(): void;
@@ -114,9 +110,7 @@ If there is any `@client` definition, then each top level `@client` will be a cl
 Example 2:
 
 ```typespec
-@service({
-  title: "Pet Store",
-})
+@service(#{ title: "Pet Store" })
 namespace PetStore {
   interface Dogs {
     feed(): void;
@@ -374,9 +368,7 @@ Users could elevate any method's parameter to the clients, as well as change the
 Example 3:
 
 ```typespec
-@service({
-  title: "My Service",
-})
+@service(#{ title: "My Service" })
 namespace MyService {
   interface InnerGroup {
     upload(@path blobName: string): void;
@@ -447,9 +439,7 @@ clients:
 1. Single client
 
 ```typespec
-@service({
-  title: "Scenario1",
-})
+@service(#{ title: "Scenario1" })
 namespace SingleClient {
   op do_something(): void;
 }
@@ -460,9 +450,7 @@ namespace SingleClient {
 - Sub client has same initialization parameters with parent client
 
 ```typespec
-@service({
-  title: "Scenario2",
-})
+@service(#{ title: "Scenario2" })
 namespace TestClient {
   op do_something(): void;
 
@@ -475,9 +463,7 @@ namespace TestClient {
 - Sub client has additional initialization parameter than parent client
 
 ```typespec
-@service({
-  title: "Scenario2",
-})
+@service(#{ title: "Scenario2" })
 namespace TestClient {
   op do_something(): void;
 
@@ -502,9 +488,7 @@ model SubClientOptions {
 - Sub client has same initialization parameters with parent client
 
 ```typespec
-@service({
-  title: "Scenario4",
-})
+@service(#{ title: "Scenario4" })
 namespace TestClient {
   op do_something(): void;
 
@@ -523,9 +507,7 @@ namespace TestClient {
 - Sub client has additional initialization parameter than parent client
 
 ```typespec
-@service({
-  title: "Scenario4",
-})
+@service(#{ title: "Scenario4" })
 namespace TestClient {
   op do_something(): void;
 

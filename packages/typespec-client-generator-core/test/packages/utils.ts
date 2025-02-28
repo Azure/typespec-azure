@@ -18,7 +18,7 @@ export function getServiceWithDefaultApiVersion(op: string) {
       endpoint: url,
     }
   )
-  @service({})
+  @service
   @versioned(Versions)
   namespace Server.Versions.Versioned;
 

@@ -9,9 +9,7 @@ using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using Azure.ResourceManager;
 
-@service({
-  title: "Microsoft.PrivateLinkTest",
-})
+@service(#{ title: "Microsoft.PrivateLinkTest" })
 @versioned(Microsoft.PrivateLinkTest.Versions)
 @armProviderNamespace
 namespace Microsoft.PrivateLinkTest;

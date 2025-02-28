@@ -5,7 +5,7 @@ import { openApiFor } from "./test-host.js";
 it("set the service title with @service", async () => {
   const res = await openApiFor(
     `
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace Foo {}
     `,
   );
@@ -15,7 +15,7 @@ it("set the service title with @service", async () => {
 it("set the service version with @service", async () => {
   const res = await openApiFor(
     `
-    @service({
+    @service(#{
       #suppress "deprecated" "For test"
       version: "1.2.3-test"
     })
@@ -29,7 +29,7 @@ it("set the service description with @doc", async () => {
   const res = await openApiFor(
     `
     @doc("My service description")
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace Foo {}
     `,
   );
@@ -40,7 +40,7 @@ it("set the service externalDocs with @externalDocs", async () => {
   const res = await openApiFor(
     `
     @externalDocs("https://example.com", "more info")
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace Foo {}
     `,
   );
@@ -53,7 +53,7 @@ it("lists the emitters used in the info section", async () => {
   const res = await openApiFor(
     `
     @doc("My service description")
-    @service({title: "My Service"})
+    @service(#{title: "My Service"})
     namespace Foo {}
     `,
   );
@@ -66,7 +66,7 @@ it("set the additional information with @info decorator", async () => {
   const res = await openApiFor(
     `
     @service
-    @info({
+    @info(#{
       termsOfService: "http://example.com/terms/",
       contact: {
         name: "API Support",

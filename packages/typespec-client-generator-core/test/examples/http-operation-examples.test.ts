@@ -20,7 +20,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
       `${__dirname}/http-operation-examples/simple.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op simple(): void;
       }
@@ -51,7 +51,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
       `${__dirname}/http-operation-examples/parameters.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @route("/{b}")
         op parameters(
@@ -115,7 +115,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
       `${__dirname}/http-operation-examples/bodyWithEncodedName.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op encodedname(
           @body @encodedName("application/json", "b") body: string,
@@ -147,7 +147,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
       `${__dirname}/http-operation-examples/bodyFallback.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op bodyTest(prop: string): void;
       }
@@ -178,7 +178,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
       `${__dirname}/http-operation-examples/parametersDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @route("/{b}")
         op parametersDiagnostic(
@@ -213,7 +213,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
       `${__dirname}/http-operation-examples/responses.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op responses(): {
           @statusCode
@@ -275,7 +275,7 @@ describe("typespec-client-generator-core: http operation examples", () => {
       `${__dirname}/http-operation-examples/responsesDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op responsesDiagnostic(): {
           @statusCode

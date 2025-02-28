@@ -14,10 +14,7 @@ At a glance, JS and Python supports natively union, while Java and C# will use o
 <ClientTabs>
 
 ```typespec title=client.tsp
-@service({
-  title: "Analyze",
-  version: "v1",
-})
+@service(#{ title: "Analyze", version: "v1" })
 namespace Analyze;
 @route("/analyze")
 @post

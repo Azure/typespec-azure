@@ -11,9 +11,7 @@ using Azure.ResourceManager;
 using Azure.Core;
 
 @armProviderNamespace("Contoso.CommonEnvelopePropertiesExample")
-@service({
-  title: "Contoso.CommonEnvelopePropertiesExample",
-})
+@service(#{ title: "Contoso.CommonEnvelopePropertiesExample" })
 @versioned(Versions)
 @doc("An example of using some of common envelope and property bag properties in a resource type. Their names are all end with 'Property'.")
 namespace Microsoft.UpdateTests;

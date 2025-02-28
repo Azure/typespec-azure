@@ -211,9 +211,7 @@ using Azure.Core;
 using Azure.Core.Traits;
 using TypeSpec.Versioning;
 
-@service({
-  title: "Contoso Widget Manager",
-})
+@service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
 

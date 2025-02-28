@@ -6,9 +6,7 @@ import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/comm
 using Autorest;
 using OpenAPI;
 
-@info({
-  title: "Network security perimeter common type definitions",
-})
+@info(#{ title: "Network security perimeter common type definitions" })
 namespace Azure.ResourceManager.CommonTypes;
 
 @useRef("./types.json#/definitions/Resource")

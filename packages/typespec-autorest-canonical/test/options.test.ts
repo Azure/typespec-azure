@@ -141,7 +141,7 @@ describe("'output-file' option", () => {
     await versionedRunner.compile(
       `
 @TypeSpec.Versioning.versioned(Versions)
-@service({title: "Widget Service"})
+@service(#{title: "Widget Service"})
 namespace DemoService;
 enum Versions {v1, v2}
 
@@ -170,7 +170,7 @@ op test(): void;
     await versionedRunner.compile(
       `
 @TypeSpec.Versioning.versioned(Versions)
-@service({title: "Widget Service"})
+@service(#{title: "Widget Service"})
 namespace TestService;
 enum Versions {v1, "v2-preview"}
 

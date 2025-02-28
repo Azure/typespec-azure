@@ -11,9 +11,7 @@ using Azure.ResourceManager;
 
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-})
+@service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 

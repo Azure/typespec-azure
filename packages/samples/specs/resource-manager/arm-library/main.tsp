@@ -11,9 +11,7 @@ using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using Azure.ResourceManager;
 
-@service({
-  title: "Microsoft.EnvelopeTest",
-})
+@service(#{ title: "Microsoft.EnvelopeTest" })
 @useLibraryNamespace(Microsoft.InterfacesTest, Microsoft.OperationsTest)
 @armProviderNamespace
 @versioned(Versions)

@@ -20,7 +20,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       runner.compileWithVersionedService = async function (code) {
         return await baseCompile(
           `
-        @service({})
+        @service
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
@@ -579,7 +579,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
     it("LRO defined in different namespace", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @versioned(Versions)
         namespace TestClient {
           enum Versions {
@@ -789,7 +789,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         return await baseCompile(
           `
         @armProviderNamespace
-        @service({})
+        @service
         @versioned(Versions)
         namespace TestClient;
         enum Versions {

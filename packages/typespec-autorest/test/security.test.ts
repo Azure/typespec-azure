@@ -7,7 +7,7 @@ describe("typespec-autorest: security", () => {
   it("set a basic auth", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @useAuth(BasicAuth)
       namespace MyService {}
       `,
@@ -23,7 +23,7 @@ describe("typespec-autorest: security", () => {
   it("set a ApiKeyAuth ", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-my-header">)
       namespace MyService {}
       `,
@@ -41,7 +41,7 @@ describe("typespec-autorest: security", () => {
   it("set a oauth2 auth", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
      
       @useAuth(OAuth2Auth<[MyFlow]>)
       namespace MyService {
@@ -71,7 +71,7 @@ describe("typespec-autorest: security", () => {
   it("can specify custom auth name with description", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @useAuth(MyAuth)
       @test namespace Foo {
         @doc("My custom basic auth")
@@ -91,7 +91,7 @@ describe("typespec-autorest: security", () => {
   it("can use multiple auth", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @useAuth(BasicAuth | [ApiKeyAuth<ApiKeyLocation.header, "x-my-header">, BasicAuth])
       namespace MyService {}
       `,
@@ -120,7 +120,7 @@ describe("typespec-autorest: security", () => {
   it("emits a diagnostic for unsupported HTTP authentication schemes", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @useAuth(BearerAuth)
       namespace MyService {}
       `,

@@ -24,7 +24,7 @@ describe("typespec-client-generator-core: helper", () => {
       `${__dirname}/helper/getTwo.json`,
     );
     const { get } = await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @test
         op get(): string;

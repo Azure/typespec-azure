@@ -15,7 +15,7 @@ describe("@embeddingVector", () => {
   it("returns embedding vector metadata for embedding vector models", async () => {
     const [result, _] = await runner.compileAndDiagnose(`
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @test @service({title:"MyService"})
+      @test @service(#{title:"MyService"})
       namespace MyNamespace;
 
       model MyVector is EmbeddingVector<int64>;
@@ -29,7 +29,7 @@ describe("@embeddingVector", () => {
   it("returns undefined for non-embedding vector models", async () => {
     const [result, _] = await runner.compileAndDiagnose(`
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @test @service({title:"MyService"})
+      @test @service(#{title:"MyService"})
       namespace MyNamespace;
 
       model Foo {};

@@ -24,7 +24,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
     namespace Microsoft.Foo;

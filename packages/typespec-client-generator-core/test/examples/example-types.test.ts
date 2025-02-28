@@ -20,7 +20,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getString.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getString(): string;
       }
@@ -46,7 +46,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getStringDiagnostic(): string;
       }
@@ -72,7 +72,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromConstant.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getStringFromConstant(): "test";
       }
@@ -98,7 +98,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromConstantDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getStringFromConstantDiagnostic(): "test";
       }
@@ -124,7 +124,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromEnum.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         enum TestEnum {
             one,two,three
@@ -153,7 +153,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromEnumDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         enum TestEnum {
             one,two,three
@@ -182,7 +182,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromEnumValue.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         enum TestEnum {
             one,two,three
@@ -211,7 +211,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromEnumValueDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         enum TestEnum {
             one,two,three
@@ -240,7 +240,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromDataTime.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getStringFromDataTime(): utcDateTime;
       }
@@ -267,7 +267,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromDuration.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getStringFromDuration(): duration;
       }
@@ -294,7 +294,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getNumber.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getNumber(): float32;
       }
@@ -320,7 +320,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getNumberDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getNumberDiagnostic(): float32;
       }
@@ -346,7 +346,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getNumberFromDateTime.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @encode(DateTimeKnownEncoding.unixTimestamp, int64)
         scalar timestamp extends utcDateTime;
@@ -376,7 +376,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getNumberFromDuration.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @encode(DurationKnownEncoding.seconds, float)
         scalar delta extends duration;
@@ -406,7 +406,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getBoolean.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getBoolean(): boolean;
       }
@@ -432,7 +432,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getBooleanDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getBooleanDiagnostic(): boolean;
       }
@@ -458,7 +458,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getNull.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getNull(): {@body body: string | null};
       }
@@ -485,7 +485,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getAny.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getAny(): unknown;
       }
@@ -510,7 +510,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getUnion.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getUnion(): {@body body: string | int32};
       }
@@ -534,7 +534,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getArray.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getArray(): string[];
       }
@@ -570,7 +570,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getArrayDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getArrayDiagnostic(): string[];
       }
@@ -596,7 +596,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getDictionary.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getDictionary(): Record<string>;
       }
@@ -632,7 +632,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getDictionaryDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op getDictionaryDiagnostic(): Record<string>;
       }
@@ -658,7 +658,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getModel.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         model Test {
           a: string;
@@ -704,7 +704,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getModelDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         model Test {
           a: string;
@@ -732,7 +732,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getModelDiscriminator.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @discriminator("kind")
         model Fish {
@@ -832,7 +832,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getModelDiscriminatorDiagnostic.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @discriminator("kind")
         model Fish {
@@ -879,7 +879,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getModelAdditionalProperties.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         model Test {
           a: string;
@@ -930,7 +930,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getModelWithExtraParamter.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         model Test {
           a: string;

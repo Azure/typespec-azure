@@ -330,7 +330,7 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
 
   it("template case", async () => {
     await runner.compile(`
-      @service({
+      @service(#{
         title: "Pet Store Service",
       })
       namespace PetStore;

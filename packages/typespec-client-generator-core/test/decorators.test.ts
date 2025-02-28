@@ -466,7 +466,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("doesn't mark a un-flattened model property", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Model1{
@@ -493,7 +493,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("throws deprecation warning if not suppressed", async () => {
       const diagnostics = await runner.diagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Model1{
@@ -517,7 +517,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("throws error when used on other targets", async () => {
       const diagnostics = await runner.diagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @flattenProperty
@@ -567,7 +567,7 @@ describe("typespec-client-generator-core: decorators", () => {
   describe("@clientName", () => {
     it("carry over", async () => {
       const { Test1, Test2, func1, func2 } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @clientName("Test1Rename")
@@ -596,7 +596,7 @@ describe("typespec-client-generator-core: decorators", () => {
     it("augment carry over", async () => {
       const { Test1, Test2, func1, func2 } = (await runner.compileWithCustomization(
         `
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Test1{}
@@ -629,7 +629,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("@clientName with scope of versioning", async () => {
       const testCode = `
-        @service({
+        @service(#{
           title: "Contoso Widget Manager",
         })
         @versioned(Contoso.WidgetManager.Versions)
@@ -670,7 +670,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("augmented @clientName with scope of versioning", async () => {
       const testCode = `
-        @service({
+        @service(#{
           title: "Contoso Widget Manager",
         })
         @versioned(Contoso.WidgetManager.Versions)
@@ -717,7 +717,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("decorator on template parameter", async function () {
       await runner.compileAndDiagnose(`
-        @service({})
+        @service
         namespace MyService;
         
         model ResourceBody<Resource> {
@@ -744,7 +744,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("empty client name", async () => {
       const diagnostics = await runner.diagnose(`
-        @service({})
+        @service
         namespace MyService;
         
         @clientName(" ")
@@ -1150,7 +1150,7 @@ describe("typespec-client-generator-core: decorators", () => {
       });
 
       await runnerWithVersion.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @versioned(Contoso.WidgetManager.Versions)
@@ -1249,7 +1249,7 @@ describe("typespec-client-generator-core: decorators", () => {
       });
 
       await runnerWithVersion.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @versioned(Contoso.WidgetManager.Versions)
@@ -1347,7 +1347,7 @@ describe("typespec-client-generator-core: decorators", () => {
       });
 
       await runnerWithVersion.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @versioned(Contoso.WidgetManager.Versions)
@@ -1445,7 +1445,7 @@ describe("typespec-client-generator-core: decorators", () => {
       });
 
       await runnerWithVersion.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @versioned(Contoso.WidgetManager.Versions)
@@ -1546,7 +1546,7 @@ describe("typespec-client-generator-core: decorators", () => {
       });
 
       await runnerWithVersion.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @versioned(Contoso.WidgetManager.Versions)
@@ -1635,7 +1635,7 @@ describe("typespec-client-generator-core: decorators", () => {
       });
 
       await runnerWithVersion.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @versioned(Contoso.WidgetManager.Versions)
@@ -1731,7 +1731,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("model only used in new version", async () => {
       const tsp = `
-        @service({
+        @service(#{
           title: "Contoso Widget Manager",
         })
         @versioned(Contoso.WidgetManager.Versions)
@@ -1985,7 +1985,7 @@ describe("typespec-client-generator-core: decorators", () => {
   describe("versioning impact for apis", () => {
     it("multiple clients", async () => {
       const tsp = `
-        @service({
+        @service(#{
           title: "Contoso Widget Manager",
         })
         @versioned(Contoso.WidgetManager.Versions)
@@ -2100,7 +2100,7 @@ describe("typespec-client-generator-core: decorators", () => {
 
     it("multiple operation groups", async () => {
       const tsp = `
-        @service({
+        @service(#{
           title: "Contoso Widget Manager",
         })
         @versioned(Contoso.WidgetManager.Versions)

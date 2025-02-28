@@ -24,7 +24,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("mark an namespace as a client", async () => {
       const { MyClient } = await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
       `);
 
@@ -42,7 +42,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("mark an interface as a client", async () => {
       const { MyService, MyClient } = await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService;
         @client({service: MyService})
         @test interface MyClient {}
@@ -63,7 +63,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("emit diagnostic if the client namespace doesn't ends with client", async () => {
       const diagnostics = await runner.diagnose(`
         @client
-        @service({})
+        @service
         @test namespace MyService;
       `);
 
@@ -75,7 +75,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("emit diagnostic if the client explicit name doesn't ends with Client", async () => {
       const diagnostics = await runner.diagnose(`
         @client({name: "MySDK"})
-        @service({})
+        @service
         @test namespace MyService;
       `);
 
@@ -86,7 +86,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("@client with scope", async () => {
       const testCode = `
-        @service({
+        @service(#{
           title: "DeviceUpdateClient",
         })
         namespace Azure.IoT.DeviceUpdate;
@@ -143,7 +143,7 @@ describe("typespec-client-generator-core: client related", () => {
   describe("listClients without @client", () => {
     it("use service namespace if there is not clients and append Client to service name", async () => {
       const { MyService } = await runner.compile(`
-        @service({})
+        @service
         @test
         namespace MyService;
       `);
@@ -165,7 +165,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("mark an namespace as an operation group", async () => {
       const { MyClient, MyGroup } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
 
         @operationGroup
@@ -186,7 +186,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("mark an interface as an operationGroup", async () => {
       const { MyClient, MyGroup } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
         @operationGroup
         @test
@@ -207,7 +207,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("list operations at root of client outside of operation group", async () => {
       const { MyClient } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
 
         @route("/root1") op atRoot1(): void;       
@@ -233,7 +233,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("list operations in an operation group", async () => {
       const { MyGroup } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
 
         @route("/root1") op atRoot1(): void;
@@ -258,7 +258,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("crossLanguageDefinitionId basic", async () => {
       const { one } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
 
         @test op one(): void;
@@ -270,7 +270,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("crossLanguageDefinitionId with interface", async () => {
       const { one } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
 
         interface Widgets {
@@ -284,7 +284,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("crossLanguageDefinitionId with subnamespace", async () => {
       const { one } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
 
         namespace Widgets {
@@ -298,7 +298,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("crossLanguageDefinitionId with subnamespace and interface", async () => {
       const { one } = (await runner.compile(`
         @client
-        @service({})
+        @service
         @test namespace MyClient;
 
         namespace SubNamespace {
@@ -317,7 +317,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("crossLanguagePackageId", async () => {
       await runner.compile(`
         @client({name: "MyPackageClient"})
-        @service({})
+        @service
         namespace My.Package.Namespace;
 
         namespace SubNamespace {
@@ -334,7 +334,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("@operationGroup with scope", async () => {
       const testCode = `
-        @service({
+        @service(#{
           title: "DeviceUpdateClient",
         })
         namespace Azure.IoT.DeviceUpdate;
@@ -396,7 +396,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("use service namespace if there is not clients and append Client to service name", async () => {
       const { MyService } = await runner.compile(`
-        @service({})
+        @service
         @test
         namespace MyService;
       `);
@@ -437,7 +437,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("@operationGroup with diagnostics", async () => {
       const testCode = [
         `
-        @service({
+        @service(#{
           title: "DeviceUpdateClient",
         })
         namespace Azure.IoT.DeviceUpdate;
@@ -497,7 +497,7 @@ describe("typespec-client-generator-core: client related", () => {
   describe("listOperationGroups without @client and @operationGroup", () => {
     it("list operations in namespace or interface", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @test namespace MyClient;
 
         @route("/root1") op atRoot1(): void;
@@ -531,7 +531,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("namespace and interface hierarchy", async () => {
       const { A, AA, AAA, AAB, AG, AAG, AABGroup1, AABGroup2 } = (await runner.compile(`
-        @service({})
+        @service
         @route("/a")
         @test namespace A {
           @route("/o1") op a_o1(): void;
@@ -775,7 +775,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("interface without operation", async () => {
       const { MyGroup, MyClient } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyClient;
 
         @route("/root1") op atRoot1(): void;
@@ -798,7 +798,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("empty namespaces and interfaces", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @test
         namespace MyService {
           namespace A {
@@ -844,11 +844,11 @@ describe("typespec-client-generator-core: client related", () => {
   describe("client hierarchy", () => {
     it("multi clients ", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace Test1Client {
           op x(): void;
         }
-        @service({})
+        @service
         namespace Test2Client {
           op y(): void;
         }
@@ -886,7 +886,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("omit one namespace", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace Test1Client {
           op x(): void;
         }
@@ -910,7 +910,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("nested namespace", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace Test1Client {
           namespace B {
             op x(): void;
@@ -940,7 +940,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("nested namespace and interface with naming change", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace Test1Client {
           @route("/b")
           @clientName("BRename")
@@ -987,7 +987,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("nested empty namespace and interface", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace Test1Client {
           namespace B {
             interface C {
@@ -1023,7 +1023,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("rename client name", async () => {
       await runner.compileWithCustomization(
         `
-        @service({})
+        @service
         namespace A {
           op x(): void;
         }
@@ -1050,7 +1050,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("rename client name - diagnostics", async () => {
       const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
         `
-        @service({})
+        @service
         namespace A {
           op x(): void;
         }
@@ -1082,7 +1082,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("split into two clients", async () => {
       await runner.compileWithCustomization(
         `
-        @service({})
+        @service
         namespace A {
           @route("/b")
           interface B {
@@ -1130,7 +1130,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("split into two clients - diagnostics", async () => {
       const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
         `
-        @service({})
+        @service
         namespace A {
           @route("/b")
           namespace B {
@@ -1196,7 +1196,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("one client and two operation groups", async () => {
       await runner.compileWithCustomization(
         `
-        @service({})
+        @service
         namespace PetStore {
           @route("/feed")
           op feed(): void;
@@ -1257,7 +1257,7 @@ describe("typespec-client-generator-core: client related", () => {
     it("operation group - diagnostics", async () => {
       const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
         `
-        @service({})
+        @service
         namespace A {
           @route("/b")
           namespace B {
@@ -1311,7 +1311,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("rearrange operations", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace A {
           @route("/b")
           namespace B {
@@ -1359,7 +1359,7 @@ describe("typespec-client-generator-core: client related", () => {
 
     it("rearrange operations with scope", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @server(
           "{endpoint}/face/{apiVersion}",
           "Azure AI Face API",
