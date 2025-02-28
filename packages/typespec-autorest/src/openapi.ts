@@ -61,6 +61,7 @@ import {
   getEncode,
   getFormat,
   getKnownValues,
+  getLifecycleVisibilityEnum,
   getMaxItems,
   getMaxLength,
   getMaxValue,
@@ -75,7 +76,7 @@ import {
   getRelativePathFromDirectory,
   getRootLength,
   getSummary,
-  getVisibility,
+  getVisibilityForClass,
   ignoreDiagnostics,
   interpolatePath,
   isArrayModelType,
@@ -2021,17 +2022,24 @@ export async function getOpenAPIForService(
       if (isReadonlyProperty(program, prop)) {
         property.readOnly = true;
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        const vis = getVisibility(program, prop);
-        if (vis) {
+        const lifecycle = getLifecycleVisibilityEnum(program);
+        const vis = getVisibilityForClass(program, prop, lifecycle);
+
+        const { read, create, update } = {
+          read: lifecycle.members.get("Read")!,
+          create: lifecycle.members.get("Create")!,
+          update: lifecycle.members.get("Update")!,
+        };
+
+        if (vis.size !== lifecycle.members.size) {
           const mutability = [];
-          if (vis.includes("read")) {
+          if (vis.has(read)) {
             mutability.push("read");
           }
-          if (vis.includes("update")) {
+          if (vis.has(update)) {
             mutability.push("update");
           }
-          if (vis.includes("create")) {
+          if (vis.has(create)) {
             mutability.push("create");
           }
           if (mutability.length > 0) {
@@ -2073,12 +2081,12 @@ export async function getOpenAPIForService(
   }
 
   function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
-    const sharedVisibilities = ["read", "create", "update", "write"];
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const visibilities = getVisibility(program, prop);
-    if (visibilities) {
+    const sharedVisibilities = ["Read", "Create", "Update"];
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    const visibilities = getVisibilityForClass(program, prop, lifecycle);
+    if (visibilities.size !== lifecycle.members.size) {
       for (const visibility of visibilities) {
-        if (!sharedVisibilities.includes(visibility)) {
+        if (!sharedVisibilities.includes(visibility.name)) {
           return false;
         }
       }

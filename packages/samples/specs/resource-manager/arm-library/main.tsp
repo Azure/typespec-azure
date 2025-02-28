@@ -52,7 +52,7 @@ interface AllProperties
 @doc("rp-specific properties for the resource with all envelope properties")
 model AllPropertiesProperties {
   @doc("The status of the last operation performed on this resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: SystemEnvelopeProvisioningState;
 
   @doc("Name of the resource")

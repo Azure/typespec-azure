@@ -30,7 +30,7 @@ enum Versions {
 model Widget {
   @key("widgetName")
   @doc("The widget name.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   @doc("The ID of the widget's manufacturer.")
@@ -44,7 +44,7 @@ model Widget {
 model Manufacturer {
   @key("manufacturerId")
   @doc("The manufacturer's unique ID.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: string;
 
   @doc("The manufacturer's name.")

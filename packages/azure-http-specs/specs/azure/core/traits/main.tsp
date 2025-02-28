@@ -44,7 +44,7 @@ alias RepeatableOperationsWithTraits = global.Azure.Core.ResourceOperations<Supp
 model User {
   @key
   @doc("The user's id.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: int32;
 
   @doc("The user's name.")

@@ -220,10 +220,10 @@ describe("typespec-client-generator-core: spread", () => {
           id?: string;
 
           @key("dataConnectionName")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
 
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           createdDate?: utcDateTime;
 
           frequencyOffset?: int32;

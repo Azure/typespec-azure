@@ -18,11 +18,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
       }
 
@@ -51,11 +51,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
       }
 
@@ -86,11 +86,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
         otherProp: FooPrime;
       }
@@ -122,11 +122,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
         otherProp: FooPrime;
       }

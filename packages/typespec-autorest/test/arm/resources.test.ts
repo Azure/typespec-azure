@@ -14,7 +14,7 @@ it("emits correct paths for tenant resources", async () => {
           @key("widgetName")
           @segment("widgets")
           @path
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
         }
 
@@ -45,7 +45,7 @@ it("emits correct paths for tenant resources", async () => {
         @key("flangeName")
         @segment("flanges")
         @path
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
       
@@ -103,7 +103,7 @@ it("emits correct paths for checkLocalName endpoints", async () => {
             @key("widgetName")
             @segment("widgets")
             @path
-            @visibility("read")
+            @visibility(Lifecycle.Read)
             name: string;
           }
 
@@ -149,7 +149,7 @@ it("emits correct paths for ArmResourceHead operation", async () => {
           @key("widgetName")
           @segment("widgets")
           @path
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
         }
         @doc("The properties of a widget")
