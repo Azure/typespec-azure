@@ -1183,3 +1183,172 @@ op Azure.ResourceManager.Foundations.checkNameAvailability(apiVersion: string, b
 | Request          | The operation request body                                               |
 | Response         | The operation response                                                   |
 | AdditionalParams | A parameter model with properties representing non-path parameters       |
+
+## Azure.ResourceManager.Legacy
+
+### `LegacyOperations` {#Azure.ResourceManager.Legacy.LegacyOperations}
+
+```typespec
+interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>
+```
+
+#### Template Parameters
+
+| Name                  | Description |
+| --------------------- | ----------- |
+| ParentParameters      |             |
+| ResourceTypeParameter |             |
+| ErrorType             |             |
+
+#### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: Resource): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                             |
+| ---------- | ----------------------------------------------------------------------- |
+| Resource   | the resource being created or updated                                   |
+| LroHeaders | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters | Optional. Additional parameters after the path parameters               |
+| Response   | Optional. The success response(s) for the PUT operation                 |
+
+#### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Resource): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | the resource being created or updated                     |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response(s) for the PUT operation   |
+
+#### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: PatchModel): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                             |
+| ---------- | ----------------------------------------------------------------------- |
+| Resource   | the resource being created or updated                                   |
+| PatchModel | the PATCH request model                                                 |
+| LroHeaders | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters | Optional. Additional parameters after the path parameters               |
+| Response   | Optional. The success response(s) for the PATCH operation               |
+
+#### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(properties: PatchModel): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | the resource being created or updated                     |
+| PatchModel | the PATCH request model                                   |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response(s) for the PATCH operation |
+
+#### `LegacyOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| LroHeaders | The lro headers for the operation                          |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+
+#### `LegacyOperations.DeleteSync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+
+#### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations.Read}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.Read(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being read                                   |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response for a get operation.       |
+
+#### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations.List}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being listed                                 |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The response returned by the list               |
+
+#### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionSync}
+
+A synchronous resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being acted upon                             |
+| Request    | The request model for the action                          |
+| Response   | The response model for the action                         |
+| Parameters | Optional. Additional parameters after the path parameters |
+
+#### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync}
+
+A long-running resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                               |
+| ---------- | ------------------------------------------------------------------------- |
+| Resource   | The resource being acted upon                                             |
+| Request    | The request model for the action                                          |
+| Result     |                                                                           |
+| LroHeaders | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters | Optional. Additional parameters after the path parameters                 |
+| Response   | The response model for the action                                         |
