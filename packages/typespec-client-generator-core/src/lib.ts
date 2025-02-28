@@ -262,6 +262,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
     },
+    "api-version-not-string": {
+      severity: "warning",
+      messages: {
+        default: `Api version must be a string or a string enum`,
+      },
+    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,
