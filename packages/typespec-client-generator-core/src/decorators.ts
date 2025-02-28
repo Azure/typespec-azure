@@ -111,7 +111,7 @@ function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
 }
 
 function setScopedDecoratorData(
-  context: DecoratorContext,
+  context: DecoratorContext | TCGCContext,
   decorator: DecoratorFunction,
   key: symbol,
   target: Type,
@@ -154,7 +154,10 @@ function setScopedDecoratorData(
   }
 }
 
-function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
+function parseScopes(
+  context: DecoratorContext | TCGCContext,
+  scope?: LanguageScopes,
+): [string[]?, string[]?] {
   if (scope === undefined) {
     return [undefined, undefined];
   }
@@ -321,6 +324,8 @@ function updateClientWithVersioning(context: TCGCContext, client: SdkClient) {
       context.__versioning_client_type_cache.set(client.type, subgraph.type);
       client.type = subgraph.type;
     }
+    // clear `@client` set on copy of the client when mutate sub graph
+    setScopedDecoratorData(context, $client, clientKey, client.type, undefined);
   }
 }
 
