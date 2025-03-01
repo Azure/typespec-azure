@@ -16,8 +16,8 @@ describe("typespec-autorest: info", () => {
   it("set the service version with @service", async () => {
     const res = await openApiFor(
       `
+      #suppress "deprecated" "For test"
       @service(#{
-        #suppress "deprecated" "For test"
         version: "1.2.3-test"
       })
       namespace Foo {}
