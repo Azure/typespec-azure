@@ -69,12 +69,12 @@ describe("typespec-autorest: info", () => {
       @service
       @info(#{
         termsOfService: "http://example.com/terms/",
-        contact: {
+        contact: #{
           name: "API Support",
           url: "http://www.example.com/support",
           email: "support@example.com"
         },
-        license: {
+        license: #{
           name: "Apache 2.0",
           url: "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
