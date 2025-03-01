@@ -69,7 +69,8 @@ interface ScaffoldedTemplateFixture {
   ) => Promise<void>;
 }
 
-describe("Init templates e2e tests", () => {
+// TODO: reenable after 0.66 release
+describe.skip("Init templates e2e tests", () => {
   beforeAll(async () => {
     await rm(testTempRoot, { recursive: true, force: true });
     await mkdir(testTempRoot, { recursive: true });
