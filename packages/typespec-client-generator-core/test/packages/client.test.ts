@@ -496,7 +496,7 @@ describe("typespec-client-generator-core: client", () => {
         @versioned(MyVersions)
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service(#{name: "Service"})
+        @service
         namespace My.Service;
 
         @doc("The version of the API.")
@@ -570,7 +570,7 @@ describe("typespec-client-generator-core: client", () => {
         @versioned(MyVersions)
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service(#{name: "Service"})
+        @service
         namespace My.Service;
 
         @doc("The version of the API.")
@@ -641,12 +641,12 @@ describe("typespec-client-generator-core: client", () => {
     await runnerWithCore.compile(`
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service(#{name: "ServiceOne"})
+        @service
         namespace My.Service.One {};
 
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service(#{name: "ServiceTwo"})
+        @service
         namespace My.Service.Two {};
       `);
     const sdkPackage = runnerWithCore.context.sdkPackage;

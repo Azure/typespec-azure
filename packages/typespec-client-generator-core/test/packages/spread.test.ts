@@ -198,7 +198,7 @@ describe("typespec-client-generator-core: spread", () => {
         @versioned(MyVersions)
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service(#{name: "Service"})
+        @service
         namespace My.Service;
         
         alias ServiceTraits = NoRepeatableRequests &

@@ -1225,7 +1225,7 @@ describe("typespec-client-generator-core: package", () => {
       await runnerWithCore.compile(`
         @versioned(MyVersions)
         @server("http://localhost:3000", "endpoint")
-        @service(#{name: "Service"})
+        @service
         namespace My.Service;
 
         enum MyVersions {
