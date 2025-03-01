@@ -45,7 +45,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
 
       @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
@@ -120,7 +120,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
 
       @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")

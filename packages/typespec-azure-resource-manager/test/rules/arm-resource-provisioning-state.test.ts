@@ -34,7 +34,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: FooProvisioningState;
         }
 
@@ -58,7 +58,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: FooProvisioningState;
         }
 
@@ -100,7 +100,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
             }
     
             model FooProperties {
-              @visibility("read")
+              @visibility(Lifecycle.Read)
               provisioningState?: State;
             }
     
@@ -128,7 +128,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: string;
         }
       `,
@@ -151,7 +151,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState: ResourceProvisioningState;
         }
       `,
@@ -194,7 +194,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read", "update")          
+          @visibility(Lifecycle.Read, Lifecycle.Update)          
           provisioningState?: ResourceProvisioningState;
         }
       `,
@@ -218,7 +218,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
               }
       
               model FooProperties {
-                @visibility("read")
+                @visibility(Lifecycle.Read)
                 provisioningState?: FooProvisioningState;
               }
 

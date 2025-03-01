@@ -11,7 +11,7 @@ it("can share types with a library namespace", async () => {
         model TestTrackedResource is TrackedResource<TestTrackedProperties> {
           @key("trackedResourceName")
           @segment("trackedResources")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           name: string;
         }
@@ -21,10 +21,10 @@ it("can share types with a library namespace", async () => {
           extends TrackedResourceOperations<TestTrackedResource, TestTrackedProperties> {}
         
         model TestTrackedProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: ResourceProvisioningState;
         
-          @visibility("create", "read")
+          @visibility(Lifecycle.Create, Lifecycle.Read)
           displayName?: string = "default";
         }
       }
@@ -96,10 +96,10 @@ it("can use private links with common-types references", async () => {
       }
       
       model TestTrackedProperties {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ResourceProvisioningState;
       
-        @visibility("create", "read")
+        @visibility(Lifecycle.Create, Lifecycle.Read)
         displayName?: string = "default";
       
         endpoints?: PrivateEndpoint[];
@@ -252,7 +252,7 @@ it("can emit x-ms-client-flatten with optional configuration", async () => {
       model EmployeeProperties {
         age?: int32;
         city?: string;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ResourceProvisioningState;
       }
       @parentResource(Employee)
@@ -286,7 +286,7 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
       model EmployeeProperties {
         age?: int32;
         city?: string;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ResourceProvisioningState;
       }
       @parentResource(Employee)

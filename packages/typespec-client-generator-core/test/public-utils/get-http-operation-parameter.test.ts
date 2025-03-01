@@ -290,7 +290,7 @@ describe("typespec-client-generator-core: public-utils getHttpOperationParameter
         @header contentType: "multipart/form-data",
         file_data: bytes,
 
-        @visibility("read") readOnly: string,
+        @visibility(Lifecycle.Read) readOnly: string,
 
         constant: "constant",
       ): OkResponse;

@@ -476,7 +476,7 @@ describe("typespec-client-generator-core: model types", () => {
   it("request/response header with enum value", async () => {
     await runner.compileWithBuiltInService(`
       model RepeatableResponse {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @header("Repeatability-Result")
         repeatabilityResult?: "accepted" | "rejected";
       }
@@ -766,7 +766,7 @@ describe("typespec-client-generator-core: model types", () => {
       model User {
         @key
         @doc("The user's id.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         id: int32;
 
         @doc("The user's name.")
@@ -800,7 +800,7 @@ describe("typespec-client-generator-core: model types", () => {
         model User {
           @key
           @doc("The user's id.")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           id: int32;
 
           @doc("The user's name.")
@@ -834,7 +834,7 @@ describe("typespec-client-generator-core: model types", () => {
       model User {
         @key
         @doc("The user's name.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
 
@@ -863,7 +863,7 @@ describe("typespec-client-generator-core: model types", () => {
       model User {
         @key
         @doc("The user's name.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
 
@@ -989,7 +989,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
       
         model RoundTripModel {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           result: ResultModel;
         }
       
@@ -1792,7 +1792,7 @@ describe("typespec-client-generator-core: model types", () => {
   it("header property on body root model visibility", async function () {
     await runner.compileWithBuiltInService(`
         model InputModel {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @header("x-name")
           name: string;
         }

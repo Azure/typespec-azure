@@ -50,7 +50,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
         model Test {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name?: string;
         }
       `);
@@ -63,7 +63,7 @@ describe("typespec-client-generator-core: body model property types", () => {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
         model Test {
-          @visibility("read", "create", "update")
+          @visibility(Lifecycle.Read, Lifecycle.Create, Lifecycle.Update)
           name?: string;
         }
       `);

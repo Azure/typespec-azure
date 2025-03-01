@@ -67,7 +67,7 @@ union WidgetColor {
 model Widget {
   /** The widget name. */
   @key("widgetName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   /** The widget color. */
@@ -128,7 +128,7 @@ model WidgetRepairStatusParams {
 model WidgetPart {
   /** The name of the part. */
   @key("widgetPartName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   /** The ID to use for reordering the part. */
@@ -153,7 +153,7 @@ model WidgetPartReorderRequest {
 model WidgetAnalytics {
   /** The identifier for the analytics object.  There is only one named 'current'. */
   @key("analyticsId")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: "current";
 
   /** The number of uses of the widget. */
@@ -168,7 +168,7 @@ model WidgetAnalytics {
 model Manufacturer {
   /** The manufacturer's unique ID. */
   @key("manufacturerId")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: string;
 
   /** The manufacturer's name. */

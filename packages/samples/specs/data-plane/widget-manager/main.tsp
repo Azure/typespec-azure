@@ -48,7 +48,7 @@ union WidgetColor {
 model Widget {
   @key("widgetName")
   @doc("The widget name.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   @doc("The widget color.")
@@ -109,7 +109,7 @@ model WidgetRepairStatusParams {
 model WidgetPart {
   @key("widgetPartName")
   @doc("The name of the part.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   @doc("The ID to use for reordering the part.")
@@ -134,7 +134,7 @@ model WidgetPartReorderRequest {
 model WidgetAnalytics {
   @key("analyticsId")
   @doc("The identifier for the analytics object.  There is only one named 'current'.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: "current";
 
   @doc("The number of uses of the widget.")
@@ -149,7 +149,7 @@ model WidgetAnalytics {
 model Manufacturer {
   @key("manufacturerId")
   @doc("The manufacturer's unique ID.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: string;
 
   @doc("The manufacturer's name.")
