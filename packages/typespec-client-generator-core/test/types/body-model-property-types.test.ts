@@ -167,7 +167,7 @@ describe("typespec-client-generator-core: body model property types", () => {
 
     await runner.compile(`
         @versioned(Versions)
-        @service({title: "Widget Service"})
+        @service(#{title: "Widget Service"})
         namespace DemoService;
 
         enum Versions {

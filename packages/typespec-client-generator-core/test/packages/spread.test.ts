@@ -21,7 +21,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("plain model with no decorators", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
 
         model Input {
@@ -70,7 +70,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("alias with no decorators", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
 
         alias BodyParameter = {
@@ -119,7 +119,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("rest template spreading of multiple models", async () => {
     await runner.compile(`
-      @service({
+      @service(#{
         title: "Pet Store Service",
       })
       namespace PetStore;
@@ -198,7 +198,7 @@ describe("typespec-client-generator-core: spread", () => {
         @versioned(MyVersions)
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service({name: "Service"})
+        @service
         namespace My.Service;
         
         alias ServiceTraits = NoRepeatableRequests &
@@ -477,7 +477,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("implicit spread", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
         op myOp(a: string, b: string): void;
         `);
@@ -523,7 +523,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("implicit spread with metadata", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
         op myOp(@header a: string, b: string): void;
         `);
@@ -578,7 +578,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("explicit spread", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
         model Test {
           a: string;
@@ -628,7 +628,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("explicit spread with metadata", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
         model Test {
           @header
@@ -688,7 +688,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("explicit multiple spread", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
         model Test1 {
           a: string;
@@ -742,7 +742,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("explicit multiple spread with metadata", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
         model Test1 {
           @header
@@ -804,7 +804,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("spread idempotent", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
           alias FooAlias = {
               @path id: string;
@@ -823,7 +823,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("model used as simple spread", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
           model Test {
             prop: string;
@@ -841,7 +841,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("model used as simple spread and output", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
           model Test {
             prop: string;
@@ -862,7 +862,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("model used as simple spread and other operation's output", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
           model Test {
             prop: string;
@@ -886,7 +886,7 @@ describe("typespec-client-generator-core: spread", () => {
 
   it("model used as simple spread and other operation's input", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace My.Service;
           model Test {
             prop: string;
@@ -908,7 +908,7 @@ describe("typespec-client-generator-core: spread", () => {
   it("model used as simple spread with versioning", async () => {
     await runner.compile(`
       @server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       @versioned(ServiceApiVersions)
       namespace My.Service;
       

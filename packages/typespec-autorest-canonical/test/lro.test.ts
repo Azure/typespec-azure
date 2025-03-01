@@ -16,7 +16,7 @@ it("includes x-ms-long-running-operation", async () => {
         }
       ]>
     )
-    @service({
+    @service(#{
       title: "Contoso Widget Manager",
     })
     @server(

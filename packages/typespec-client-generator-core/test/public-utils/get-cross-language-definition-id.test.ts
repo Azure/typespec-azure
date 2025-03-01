@@ -68,7 +68,7 @@ describe("typespec-client-generator-core: getCrossLanguageDefinitionId", () => {
       emitterName: "@azure-tools/typespec-java",
     });
     await runner.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @server(

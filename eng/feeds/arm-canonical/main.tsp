@@ -13,7 +13,7 @@ using Azure.ResourceManager;
 
 /** Microsoft.{{parameters.ServiceNamespace}} Resource Provider management API. */
 @armProviderNamespace
-@service({
+@service(#{
   title: "Microsoft.{{parameters.ServiceNamespace}} management service",
 })
 @versioned(Microsoft.Contoso.Versions)

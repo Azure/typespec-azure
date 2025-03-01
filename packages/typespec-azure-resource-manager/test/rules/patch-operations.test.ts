@@ -25,7 +25,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
     namespace Microsoft.Foo;
@@ -99,7 +99,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
     namespace Microsoft.Foo;

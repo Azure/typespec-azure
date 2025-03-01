@@ -11,9 +11,7 @@ using Azure.ResourceManager;
 using Azure.Core;
 
 @armProviderNamespace("Contoso.ManagedIdentityExample")
-@service({
-  title: "Contoso.ManagedIdentityExample",
-})
+@service(#{ title: "Contoso.ManagedIdentityExample" })
 @versioned(Versions)
 @doc("An example of using the ManagedIdentity properties in a resource type.")
 namespace Microsoft.UpdateTests;

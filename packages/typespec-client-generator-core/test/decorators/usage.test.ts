@@ -15,7 +15,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
   it("defaults calculated usage", async () => {
     const { Model1, Model2, Model3, Model4 } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Model1{ prop: string }
@@ -54,7 +54,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
   it("usage override", async () => {
     const { Model1, Model2, Model3, Model4, Enum1, Enum2 } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
@@ -131,7 +131,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
   it("usage propagation", async () => {
     const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @discriminator("kind")
           @test
@@ -190,7 +190,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
   it("usage and convenience", async () => {
     const { Fish } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Fish {
@@ -210,7 +210,7 @@ describe("typespec-client-generator-core: @usage", () => {
     strictEqual(getUsage(runner.context, Fish), UsageFlags.Input | UsageFlags.Json);
 
     const { Dog } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Dog {
@@ -232,7 +232,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
   it("patch usage", async () => {
     const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model PatchModel {
@@ -263,7 +263,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
   it("@usage Input and Output on Namespace", async () => {
     const { OrphanModel, InputModel, OutputModel, RoundtripModel } = (await runner.compile(`
-        @service({})
+        @service
         @test
         @usage(Usage.input | Usage.output)
         namespace MyService {
@@ -312,7 +312,7 @@ describe("typespec-client-generator-core: @usage", () => {
 
   it("@usage namespace override", async () => {
     const { OrphanModel, OrphanModelWithOverride } = (await runner.compile(`
-        @service({})
+        @service
         @test
         @usage(Usage.input)
         namespace MyService {

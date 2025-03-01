@@ -637,7 +637,7 @@ describe("typespec-client-generator-core: union types", () => {
 
   it("nullable union circular", async function () {
     await runner.compileAndDiagnose(`
-      @service({})
+      @service
       namespace Test {
         union Test {
           null,
@@ -655,7 +655,7 @@ describe("typespec-client-generator-core: union types", () => {
 
   it("complicated union circular", async function () {
     await runner.compileAndDiagnose(`
-      @service({})
+      @service
       namespace Test {
         union A {
           "A",

@@ -9,9 +9,7 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.Core.Traits;
 
-@service({
-  title: "Contoso Widget Manager",
-})
+@service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
 @useAuth(ApiKeyAuth<ApiKeyLocation.header, "X-Key">)
 namespace Contoso.WidgetManager;
