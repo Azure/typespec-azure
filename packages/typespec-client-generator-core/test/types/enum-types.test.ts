@@ -468,7 +468,7 @@ describe("typespec-client-generator-core: enum types", () => {
     });
     const { Foo } = (await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           @test
           union Foo {
