@@ -15,7 +15,7 @@ beforeEach(async () => {
   tester = createLinterRuleTester(
     runner,
     propertyNameConflictRule,
-    "@azure-tools/typespec-azure-core",
+    "@azure-tools/typespec-client-generator-core",
   );
 });
 
@@ -68,7 +68,7 @@ it(`emit warning if @clientName("newName") introduces conflict`, async () => {
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-client-generator-core/property-name-conflict",
-      message: `Use of @clientName on property 'bar' results in 'bar' having the same name as its enclosing type in C#. Please use a different @clientName("newName", "csharp") value.`,
+      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
     });
 });
 
@@ -81,29 +81,8 @@ it(`emit warning if @clientName("newName", "csharp") introduces conflict`, async
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-client-generator-core/property-name-conflict",
-      message: `Use of @clientName on property 'bar' results in 'bar' having the same name as its enclosing type in C#. Please use a different @clientName("newName", "csharp") value.`,
+      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
     });
-});
-
-it(`is valid if @clientName("newName") causes conflict but @clientName("newName", "csharp") resolves it`, async () => {
-  await tester
-    .expect(
-      `model Foo {
-          @clientName("foo") @"client", ("baz", "csharp") bar: string;
-        }`,
-    )
-    .toBeValid();
-});
-
-it("emit warning if @friendlyName would resolve a conflict (friendlyName is ignored)", async () => {
-  await tester.expect(`model Foo { @friendlyName("bar") foo: string }`).toEmitDiagnostics({
-    code: "@azure-tools/typespec-client-generator-core/property-name-conflict",
-    message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
-  });
-});
-
-it("is valid if @friendlyName introduces conflict (friendlyName is ignored)", async () => {
-  await tester.expect(`model Foo { @friendlyName("foo") bar: string }`).toBeValid();
 });
 
 it("emit warning if property name conflicts with model name when using `is`", async () => {

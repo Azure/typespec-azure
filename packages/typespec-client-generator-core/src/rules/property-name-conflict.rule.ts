@@ -1,4 +1,6 @@
 import { ModelProperty, createRule, paramMessage } from "@typespec/compiler";
+import { createTCGCContext } from "../context.js";
+import { getLibraryName } from "../public-utils.js";
 
 export const propertyNameConflictRule = createRule({
   name: "property-name-conflict",
@@ -11,13 +13,21 @@ export const propertyNameConflictRule = createRule({
   create(context) {
     return {
       modelProperty: (property: ModelProperty) => {
-        const modelName = property.model?.name.toLocaleLowerCase();
-        const propertyName = property.name.toLocaleLowerCase();
-        if (propertyName === modelName) {
-          context.reportDiagnostic({
-            format: { propertyName: property.name },
-            target: property,
-          });
+        const model = property.model;
+        if (!model) return;
+        const tcgcContext = createTCGCContext(context.program);
+        const emitterNames = ["csharp", "javascript", "python", "java", "rust", "golang"];
+        for (const emitterName of emitterNames) {
+          tcgcContext.emitterName = emitterName;
+          const modelName = getLibraryName(tcgcContext, model).toLocaleLowerCase();
+          const propertyName = getLibraryName(tcgcContext, property).toLocaleLowerCase();
+          if (propertyName === modelName) {
+            context.reportDiagnostic({
+              format: { propertyName },
+              target: property,
+            });
+          }
+          return;
         }
       },
     };
