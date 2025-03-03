@@ -16,19 +16,15 @@ export const propertyNameConflictRule = createRule({
         const model = property.model;
         if (!model) return;
         const tcgcContext = createTCGCContext(context.program);
-        const emitterNames = ["csharp", "javascript", "python", "java", "rust", "golang"];
-        for (const emitterName of emitterNames) {
-          tcgcContext.emitterName = emitterName;
-          const modelName = getLibraryName(tcgcContext, model).toLocaleLowerCase();
-          const propertyName = getLibraryName(tcgcContext, property).toLocaleLowerCase();
-          if (propertyName === modelName) {
-            context.reportDiagnostic({
-              format: { propertyName },
-              target: property,
-            });
-          }
-          return;
+        const modelName = getLibraryName(tcgcContext, model, "csharp").toLocaleLowerCase();
+        const propertyName = getLibraryName(tcgcContext, property, "csharp").toLocaleLowerCase();
+        if (propertyName === modelName) {
+          context.reportDiagnostic({
+            format: { propertyName },
+            target: property,
+          });
         }
+        return;
       },
     };
   },
