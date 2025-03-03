@@ -1,13 +1,7 @@
-import {
-  Enum,
-  Model,
-  createRule,
-  getProperty,
-  getVisibility,
-  paramMessage,
-} from "@typespec/compiler";
+import { Enum, Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
 
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { isReadonlyProperty } from "@typespec/openapi";
 import { getArmResource } from "../resource.js";
 import { getSourceProperty } from "./utils.js";
 
@@ -108,11 +102,7 @@ export const armResourceProvisioningStateRule = createRule({
           }
 
           // validate it must has a read only visibility
-          // eslint-disable-next-line @typescript-eslint/no-deprecated
-          const visibilities = getVisibility(context.program, provisioning);
-          if (
-            !(visibilities !== undefined && visibilities.length === 1 && visibilities[0] === "read")
-          ) {
+          if (!isReadonlyProperty(context.program, provisioning)) {
             context.reportDiagnostic({
               messageId: "missingReadOnlyVisibility",
               target: provisioning,

@@ -157,7 +157,7 @@ interface ResourceOperations<
    */
   @Foundations.Private.ensureVerb("ResourceCreateOrUpdate", "PATCH")
   @createsOrUpdatesResource(Resource)
-  @parameterVisibility("create", "update")
+  @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
   ResourceCreateOrUpdate<
     Resource extends TypeSpec.Reflection.Model,
     Traits extends TypeSpec.Reflection.Model = {}
@@ -192,7 +192,7 @@ interface ResourceOperations<
    */
   @Foundations.Private.ensureVerb("LongRunningResourceCreateOrUpdate", "PATCH")
   @createsOrUpdatesResource(Resource)
-  @parameterVisibility("create", "update")
+  @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
   LongRunningResourceCreateOrUpdate<
     Resource extends TypeSpec.Reflection.Model,
     Traits extends TypeSpec.Reflection.Model = {}

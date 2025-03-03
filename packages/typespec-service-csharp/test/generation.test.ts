@@ -371,7 +371,7 @@ enum WidgetColor {
 model Widget {
   @key("widgetName")
   @doc("The widget name.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
   @doc("The widget color.")
   color: WidgetColor;

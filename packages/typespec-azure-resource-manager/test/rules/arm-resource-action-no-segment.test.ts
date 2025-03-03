@@ -35,7 +35,7 @@ describe("typespec-azure-resource-manager: arm resource action no segment rule",
       @key("widgetName")
       @segment("widgets")
       @path
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
     }
 

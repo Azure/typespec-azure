@@ -29,7 +29,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
   describe("listSubClients", () => {
     it("no sub clients", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace MyClient;
       `);
 
@@ -40,7 +40,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("one sub client", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace MyClient {
           namespace SubClient {}
         }
@@ -55,7 +55,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("namespace and interface hierarchy", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @route("/a")
         namespace A {
           @route("/o1") op a_o1(): void;
@@ -162,7 +162,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
   describe("getValueTypeValue", () => {
     it("string default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -176,7 +176,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("boolean default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -190,7 +190,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("null default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -204,7 +204,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("numeric int default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -218,7 +218,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("numeric float default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -232,7 +232,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("enum member default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -251,7 +251,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("enum member without value default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -270,7 +270,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("array default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test
@@ -284,7 +284,7 @@ describe("typespec-client-generator-core: internal-utils", () => {
 
     it("object default value", async () => {
       const { Test } = (await runner.compile(`
-        @service({})
+        @service
         namespace My.Service;
 
         @test

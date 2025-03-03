@@ -237,65 +237,11 @@
         "relatives"
       ]
     },
-    "PersonCreateItem": {
-      "type": "object",
-      "properties": {
-        "secret": {
-          "type": "string",
-          "x-ms-mutability": [
-            "create"
-          ]
-        },
-        "name": {
-          "type": "string"
-        },
-        "test": {
-          "type": "string",
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
-        },
-        "relatives": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PersonRelativeCreateItem"
-          },
-          "x-ms-identifiers": [],
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        }
-      },
-      "required": [
-        "secret",
-        "name",
-        "test",
-        "relatives"
-      ]
-    },
     "PersonRelative": {
       "type": "object",
       "properties": {
         "person": {
           "$ref": "#/definitions/Person"
-        },
-        "relationship": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "person",
-        "relationship"
-      ]
-    },
-    "PersonRelativeCreateItem": {
-      "type": "object",
-      "properties": {
-        "person": {
-          "$ref": "#/definitions/PersonCreateItem"
         },
         "relationship": {
           "type": "string"
@@ -400,7 +346,7 @@
         "relatives": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/PersonRelativeCreateItem"
+            "$ref": "#/definitions/PersonRelative"
           },
           "x-ms-identifiers": [],
           "x-ms-mutability": [

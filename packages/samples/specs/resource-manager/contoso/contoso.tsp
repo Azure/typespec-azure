@@ -10,9 +10,7 @@ using TypeSpec.Versioning;
 using Azure.ResourceManager;
 
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-})
+@service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 @doc("Contoso Resource Provider management API.")
 namespace Microsoft.ContosoProviderHub;
@@ -44,7 +42,7 @@ model EmployeeProperties {
   @encode("base64url")
   profile?: bytes;
 
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The status of the last operation.")
   provisioningState?: ProvisioningState;
 }

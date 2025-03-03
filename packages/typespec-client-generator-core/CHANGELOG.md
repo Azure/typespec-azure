@@ -1,5 +1,66 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.51.3
+
+### Bug Fixes
+
+- [#2252](https://github.com/Azure/typespec-azure/pull/2252) `isGeneratedName` always set to true only when it is the inner type of nullable union.
+- [#2252](https://github.com/Azure/typespec-azure/pull/2252) Remove parameter cache to retain HTTP metadata info for model property.
+
+
+## 0.51.2
+
+### Bug Fixes
+
+- [#2229](https://github.com/Azure/typespec-azure/pull/2229) Fix missing result segments of anonymous paged response with header.
+- [#2196](https://github.com/Azure/typespec-azure/pull/2196) Do not allow union with circular ref, change union name inside nullable type and do not take nullable type as non-body response.
+
+### Features
+
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Add `pagingMetadata.continuationTokenParameterSegments` and `pagingMetadata.continuationTokenResponseSegments` to `SdkPagingServiceMetadata` to indicate the mapping of continuation token parameter and response.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Make `SdkServiceResponseHeader` to be part of `SdkModelPropertyType`. Then it could contain the client related info.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Add `SdkPagingServiceMetadata` type to store all paging related info.
+- [#2220](https://github.com/Azure/typespec-azure/pull/2220) Add `crossLanguageDefinitionId` property for `SdkNullableType`.
+
+### Deprecations
+
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Deprecate `__raw_paged_metadata`, `nextLinkPath` and `nextLinkOperation`  in `SdkPagingServiceMethodOptions`. Use `pagingMetadata.__raw`, `pagingMetadata.nextLinkSegments` and `pagingMetadata.nextLinkOperation` instead.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Deprecate `resultPath` in `SdkMethodResponse`. Use `resultSegments` instead.
+- [#2219](https://github.com/Azure/typespec-azure/pull/2219) Deprecate `clientNamespace` property in `SdkClientType`, `SdkNullableType`, `SdkEnumType`, `SdkUnionType` and `SdkModelType`. Use `namespace` instead.
+
+### Breaking Changes
+
+- [#2217](https://github.com/Azure/typespec-azure/pull/2217) Remove `null` form union for `value` property type of `SdkConstantType`. It is a breaking change, but since no logic will come to `null` type, it shall have little impact.
+
+
+## 0.51.1
+
+### Bug Fixes
+
+- [#2211](https://github.com/Azure/typespec-azure/pull/2211) Make sure to keep orphan models
+
+
+## 0.51.0
+
+### Bug Fixes
+
+- [#2176](https://github.com/Azure/typespec-azure/pull/2176) Enhance content type judge logic, which fix missing serialization options of models and wrong bytes encode.
+- [#2181](https://github.com/Azure/typespec-azure/pull/2181) Fix wrong example doc of `@override` decorator.
+- [#2167](https://github.com/Azure/typespec-azure/pull/2167) add cache for `SdkModelPropertyType` in TCGCContext
+- [#2172](https://github.com/Azure/typespec-azure/pull/2172) move to core's `getVisibilityForClass` to determine a property's visibility
+- [#2159](https://github.com/Azure/typespec-azure/pull/2159) add `.json` serialization information for json model serialization within multipart
+- [#2163](https://github.com/Azure/typespec-azure/pull/2163) add visibility for other properties
+
+### Bump dependencies
+
+- [#2109](https://github.com/Azure/typespec-azure/pull/2109) Upgrade dependencies
+
+### Features
+
+- [#2102](https://github.com/Azure/typespec-azure/pull/2102) Add a `resultSegments` property to `SdkLroServiceFinalResponse` and deprecate `resultPath` property. Add a `resultSegments` property to `SdkMethodResponse`.
+- [#2179](https://github.com/Azure/typespec-azure/pull/2179) add support for models-only packages
+
+
 ## 0.50.3
 
 ### Bug Fixes

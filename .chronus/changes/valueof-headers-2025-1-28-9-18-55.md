@@ -1,7 +1,8 @@
 ---
 changeKind: feature
 packages:
+  - "@azure-tools/typespec-autorest"
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-add support for models-only packages
+Adds support for `@header` explode field

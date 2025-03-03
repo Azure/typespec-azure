@@ -22,7 +22,12 @@ describe("typespec-azure-core: prefer-csv-collection-format rule", () => {
 
   it("emit warning if  using another format for a header ", async () => {
     await tester
-      .expect(`op foo(@header({format: "tsv"}) select: string[]): void;`)
+      .expect(
+        `
+        #suppress "deprecated" "Legacy format"
+        op foo(@header(#{format: "tsv"}) select: string[]): void;
+      `,
+      )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/prefer-csv-collection-format",
       });
