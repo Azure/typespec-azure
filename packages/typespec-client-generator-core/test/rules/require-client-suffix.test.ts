@@ -25,7 +25,7 @@ describe("require-client-suffix", () => {
       .expect(
         `
       @client
-      @service({})
+      @service
       namespace MyService;
       `,
       )
@@ -43,7 +43,7 @@ describe("require-client-suffix", () => {
       .expect(
         `
       @client({name: "MySDK"})
-      @service({})
+      @service
       namespace MyService;
       `,
       )

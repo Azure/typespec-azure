@@ -11,11 +11,14 @@ export const propertyNameConflictRule = createRule({
     default: paramMessage`Property '${"propertyName"}' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
   },
   create(context) {
+    const tcgcContext = createTCGCContext(
+      context.program,
+      "@azure-tools/typespec-client-generator-core",
+    );
     return {
       modelProperty: (property: ModelProperty) => {
         const model = property.model;
         if (!model) return;
-        const tcgcContext = createTCGCContext(context.program);
         const modelName = getLibraryName(tcgcContext, model, "csharp").toLocaleLowerCase();
         const propertyName = getLibraryName(tcgcContext, property, "csharp").toLocaleLowerCase();
         if (propertyName === modelName) {
