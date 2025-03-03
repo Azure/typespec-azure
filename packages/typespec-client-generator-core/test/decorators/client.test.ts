@@ -68,7 +68,7 @@ describe("typespec-client-generator-core: client related", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/client-name",
+        code: "@azure-tools/typespec-client-generator-core/require-client-suffix",
       });
     });
 
@@ -80,7 +80,7 @@ describe("typespec-client-generator-core: client related", () => {
       `);
 
       expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/client-name",
+        code: "@azure-tools/typespec-client-generator-core/require-client-suffix",
       });
     });
 

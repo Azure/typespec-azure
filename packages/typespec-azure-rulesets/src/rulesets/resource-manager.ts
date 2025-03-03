@@ -27,7 +27,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
     "@azure-tools/typespec-azure-core/no-unknown": true,
-    "@azure-tools/typespec-azure-core/property-name-conflict": true,
     "@azure-tools/typespec-azure-core/documentation-required": true,
     "@azure-tools/typespec-azure-core/key-visibility-required": true,
     "@azure-tools/typespec-azure-core/response-schema-problem": true,
@@ -85,5 +84,9 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/resource-name": true,
     "@azure-tools/typespec-azure-resource-manager/retry-after": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
+
+    // TCGC rules
+    "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
+    "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
   },
 } satisfies LinterRuleSet;

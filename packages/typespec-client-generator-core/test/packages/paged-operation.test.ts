@@ -277,7 +277,7 @@ describe("typespec-client-generator-core: paged operation", () => {
         model ListTestResult {
           @pageItems
           items: Test[];
-          @continuationToken
+          @continuationToken @header
           nextToken?: string;
         }
         model Test {
