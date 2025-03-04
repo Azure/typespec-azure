@@ -38,8 +38,8 @@
     "upload-manifest": "pnpm -r --filter=@azure-tools/azure-http-specs run upload-manifest"
   },
   "devDependencies": {
-    "@chronus/chronus": "^0.15.0",
-    "@chronus/github": "^0.4.7",
+    "@chronus/chronus": "^0.16.0",
+    "@chronus/github": "^0.4.8",
     "@eslint/js": "^9.18.0",
     "@pnpm/find-workspace-packages": "^6.0.9",
     "@types/node": "~22.10.10",
