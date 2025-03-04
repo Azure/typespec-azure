@@ -50,6 +50,7 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultPath, "values");
     strictEqual(response.resultSegments?.length, 1);
     strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
   it("normal paged result", async () => {
@@ -79,6 +80,7 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultPath, "tests");
     strictEqual(response.resultSegments?.length, 1);
     strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
   it("normal paged result in anonymous model with header", async () => {
@@ -104,6 +106,7 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultPath, "tests");
     strictEqual(response.resultSegments?.length, 1);
     strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
   it("nullable paged result", async () => {
@@ -133,6 +136,7 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultPath, "tests");
     strictEqual(response.resultSegments?.length, 1);
     strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
   it("normal paged result with encoded name", async () => {
@@ -164,6 +168,7 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultPath, "values");
     strictEqual(response.resultSegments?.length, 1);
     strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
   // skip for current paging implementation does not support nested paging value
@@ -205,6 +210,7 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
     strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
     strictEqual(response.resultSegments[1], sdkPackage.models[0].properties[0].type.properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
   it("getPropertyPathFromModel test for nested case", async () => {
@@ -267,6 +273,7 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(response.resultPath, "values");
     strictEqual(response.resultSegments?.length, 1);
     strictEqual(response.resultSegments[0], sdkPackage.models[1].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
   describe("common paging with continuation token", () => {
