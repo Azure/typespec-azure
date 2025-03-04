@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.52.0
+
+### Features
+
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+
 ## 0.51.0
 
 ### Bump dependencies
