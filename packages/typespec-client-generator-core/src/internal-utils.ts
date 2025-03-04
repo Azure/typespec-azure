@@ -26,12 +26,21 @@ import {
   Value,
 } from "@typespec/compiler";
 import {
+  unsafe_mutateSubgraphWithNamespace,
+  unsafe_MutatorWithNamespace,
+} from "@typespec/compiler/experimental";
+import {
   HttpOperation,
   HttpOperationBody,
   HttpOperationMultipartBody,
   HttpOperationResponseContent,
 } from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersioningMutators, getVersions } from "@typespec/versioning";
+import {
+  getAddedOnVersions,
+  getRemovedOnVersions,
+  getVersioningMutators,
+  getVersions,
+} from "@typespec/versioning";
 import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
@@ -51,7 +60,6 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
-import { unsafe_mutateSubgraphWithNamespace, unsafe_MutatorWithNamespace } from "@typespec/compiler/experimental";
 
 import { $ } from "@typespec/compiler/experimental/typekit";
 

@@ -16,7 +16,6 @@ import {
   Operation,
   PagingOperation,
   Program,
-  ProjectedProgram,
   Type,
   Union,
 } from "@typespec/compiler";
