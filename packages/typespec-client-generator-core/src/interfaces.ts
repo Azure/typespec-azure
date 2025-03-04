@@ -36,6 +36,7 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   emitterName: string;
   arm?: boolean;
+  globalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
@@ -57,7 +58,6 @@ export interface TCGCContext {
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  __versioning_client_type_cache?: Map<Namespace | Interface, Namespace | Interface>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;

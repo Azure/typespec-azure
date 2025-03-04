@@ -1,6 +1,5 @@
 import {
   AugmentDecoratorStatementNode,
-  compilerAssert,
   DecoratorContext,
   DecoratorExpressionNode,
   DecoratorFunction,
@@ -14,7 +13,6 @@ import {
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -27,12 +25,6 @@ import {
   Type,
   Union,
 } from "@typespec/compiler";
-import {
-  unsafe_mutateSubgraph,
-  unsafe_mutateSubgraphWithNamespace,
-  unsafe_MutatorWithNamespace,
-} from "@typespec/compiler/experimental";
-import { getVersioningMutators, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -66,7 +58,7 @@ import {
   clientNameKey,
   clientNamespaceKey,
   findRootSourceProperty,
-  getValidApiVersion,
+  listAllServiceNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -297,73 +289,6 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   );
 }
 
-function updateClientWithVersioning(context: TCGCContext, client: SdkClient) {
-  if (!context.__versioning_client_type_cache) {
-    context.__versioning_client_type_cache = new Map();
-  }
-
-  if (context.__versioning_client_type_cache.has(client.type)) {
-    client.type = context.__versioning_client_type_cache.get(client.type)!;
-  } else {
-    const allApiVersions = getVersions(context.program, client.service)[1]
-      ?.getVersions()
-      .map((x) => x.value);
-    if (!allApiVersions) return;
-    const apiVersion = getValidApiVersion(context, allApiVersions);
-    if (apiVersion === undefined) return;
-
-    const mutator = getVersioningMutator(context, client.service, apiVersion);
-    if (client.type.kind === "Namespace") {
-      const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], client.type);
-      compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
-      context.__versioning_client_type_cache.set(client.type, subgraph.type);
-      client.type = subgraph.type;
-    } else {
-      const subgraph = unsafe_mutateSubgraph(context.program, [mutator], client.type);
-      compilerAssert(subgraph.type.kind === "Interface", "Should not have mutated to another type");
-      context.__versioning_client_type_cache.set(client.type, subgraph.type);
-      client.type = subgraph.type;
-    }
-    // clear `@client` set on copy of the client when mutate sub graph
-    setScopedDecoratorData(context, $client, clientKey, client.type, undefined);
-  }
-}
-
-function getVersioningMutator(
-  context: TCGCContext,
-  service: Namespace,
-  apiVersion: string,
-): unsafe_MutatorWithNamespace {
-  const versionMutator = getVersioningMutators(context.program, service);
-  compilerAssert(
-    versionMutator !== undefined && versionMutator.kind !== "transient",
-    "Versioning service should not get undefined or transient versioning mutator",
-  );
-
-  const mutators = versionMutator.snapshots
-    .filter((snapshot) => apiVersion === snapshot.version.value)
-    .map((x) => x.mutator);
-  compilerAssert(mutators.length === 1, "One api version should not get multiple mutators");
-
-  return mutators[0];
-}
-
-function getVersioningClients(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
-  if (context.apiVersion !== "all") {
-    const versioningClients = [];
-    for (const client of clients) {
-      const versioningClient = { ...client };
-      updateClientWithVersioning(context, versioningClient);
-      // filter client not existed in the current version
-      if ((versioningClient.type as Type).kind !== "Intrinsic") {
-        versioningClients.push(versioningClient);
-      }
-    }
-    return versioningClients;
-  }
-  return clients;
-}
-
 /**
  * List all the clients.
  *
@@ -375,7 +300,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
-    context.__rawClients = getVersioningClients(context, explicitClients);
+    context.__rawClients = explicitClients;
     if (context.__rawClients.some((client) => isArm(client.service))) {
       context.arm = true;
     }
@@ -383,28 +308,26 @@ export function listClients(context: TCGCContext): SdkClient[] {
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
-  const services = listServices(context.program);
+  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
 
-  const clients: SdkClient[] = services.map((service) => {
-    let originalName = service.type.name;
-    const clientNameOverride = getClientNameOverride(context, service.type);
+  context.__rawClients = serviceNamespaces.map((service) => {
+    let originalName = service.name;
+    const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
+      originalName = getProjectedName(context.program, service, "client") ?? service.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-    context.arm = isArm(service.type);
+    context.arm = isArm(service);
     return {
       kind: "SdkClient",
       name: clientName,
-      service: service.type,
-      type: service.type,
-      crossLanguageDefinitionId: getNamespaceFullName(service.type),
+      service: service,
+      type: service,
+      crossLanguageDefinitionId: getNamespaceFullName(service),
     };
   });
-
-  context.__rawClients = getVersioningClients(context, clients);
   return context.__rawClients;
 }
 

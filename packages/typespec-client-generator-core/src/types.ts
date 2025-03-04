@@ -1894,6 +1894,7 @@ function filterOutTypes(
       result.push(sdkType);
     }
   }
+  const refTypes = Array.from(context.__referencedTypeCache?.entries() ?? []);
   return result;
 }
 

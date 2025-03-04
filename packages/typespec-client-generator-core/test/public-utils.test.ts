@@ -5,7 +5,6 @@ import {
   Namespace,
   Operation,
   ignoreDiagnostics,
-  listServices,
 } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { getHttpOperation, getServers } from "@typespec/http";
@@ -25,6 +24,7 @@ import {
 } from "../src/public-utils.js";
 import { getAllModels, getSdkUnion } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
+import { listAllServiceNamespaces } from "../src/internal-utils.js";
 
 describe("typespec-client-generator-core: public-utils", () => {
   let runner: SdkTestRunner;
@@ -34,7 +34,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   });
 
   function getServiceNamespace() {
-    return listServices(runner.context.program)[0].type;
+    return listAllServiceNamespaces(runner.context)[0];
   }
   describe("getDefaultApiVersion", () => {
     it("get single", async () => {
