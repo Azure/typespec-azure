@@ -847,7 +847,7 @@ describe("typespec-autorest: extension decorator", () => {
   });
 });
 
-describe("typespec-azure: identifiers decorator", () => {
+describe("identifiers decorator", () => {
   it("ignores name/id keys for x-ms-identifiers", async () => {
     const oapi = await openApiFor(
       `
@@ -860,11 +860,8 @@ describe("typespec-azure: identifiers decorator", () => {
       model PetList {
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
   it("uses identifiers decorator for properties", async () => {
@@ -882,11 +879,8 @@ describe("typespec-azure: identifiers decorator", () => {
         @identifiers(#["age"])
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
   it("identifies keys correctly as x-ms-identifiers", async () => {
@@ -904,11 +898,8 @@ describe("typespec-azure: identifiers decorator", () => {
       model PetList {
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
   it("x-ms-identifiers ignores keys for non armProviderNamespace", async () => {
@@ -922,11 +913,8 @@ describe("typespec-azure: identifiers decorator", () => {
       model PetList {
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
   });
 
@@ -942,13 +930,27 @@ describe("typespec-azure: identifiers decorator", () => {
         @identifiers(#[])
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
   });
+
+  it("prioritizes identifiers decorator over id prop", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        id: string;
+      }
+      model PetList {
+        @identifiers(#[])
+        value: Pet[]
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+  });
+
   it("supports multiple identifiers", async () => {
     const oapi = await openApiFor(
       `
@@ -964,11 +966,8 @@ describe("typespec-azure: identifiers decorator", () => {
         @identifiers(#["name", "age"])
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name", "age"]);
   });
   it("supports inner properties in identifiers decorator", async () => {
@@ -990,11 +989,8 @@ describe("typespec-azure: identifiers decorator", () => {
           @identifiers(#["dogs/breed"])
           pets: Pet[]
         }
-        @route("/Pets")
-        @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/breed"]);
   });
   it("support inner models in different namespace but route models should be on armProviderNamespace", async () => {
@@ -1022,7 +1018,6 @@ describe("typespec-azure: identifiers decorator", () => {
         }
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["age"]);
   });
   it("supports inner properties for keys", async () => {
@@ -1056,12 +1051,8 @@ describe("typespec-azure: identifiers decorator", () => {
         model PetList {
           pets: Pet[]
         }
-        
-        @route("/Pets")
-        @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], [
       "dogs/breed",
       "cats/features/color",
