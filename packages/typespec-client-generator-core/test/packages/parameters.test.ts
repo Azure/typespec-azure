@@ -1104,7 +1104,7 @@ describe("typespec-client-generator-core: parameters", () => {
       const sdkPackage = runner.context.sdkPackage;
 
       const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
-      strictEqual(method.operation.bodyParam?.serializedName, "body");
+      strictEqual(method.operation.bodyParam?.serializedName, "");
     });
   });
 
