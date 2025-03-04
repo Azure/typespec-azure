@@ -71,14 +71,14 @@
     "@typespec/xml": "workspace:~",
     "@vitejs/plugin-react": "~4.3.4",
     "es-module-shims": "~2.0.10",
-    "react": "~19.0.0",
-    "react-dom": "~19.0.0",
+    "react": "~18.3.1",
+    "react-dom": "~18.3.1",
     "vite": "^6.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.50.1",
     "@types/node": "~22.13.9",
-    "@types/react-dom": "~19.0.4",
+    "@types/react-dom": "~18.3.0",
     "@typespec/bundler": "workspace:~",
     "@typespec/playground": "workspace:~",
     "@vitest/coverage-v8": "^3.0.7",
