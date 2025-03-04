@@ -157,8 +157,8 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnC
   request: {
     body: {
       properties: {
-        username: "myusername",
-        password: "mypassword",
+        username: "my_username",
+        password: "my_password",
       }
     },
     params: {

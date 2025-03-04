@@ -813,8 +813,8 @@ Expected request body:
 {
   "location": <any string>,
   "properties": {
-    "username": "myusername",
-    "password": "mypassword"
+    "username": "my_username",
+    "password": "my_password"
   }
 }
 ```
