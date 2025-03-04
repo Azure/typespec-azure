@@ -24,6 +24,7 @@ import {
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
+  navigateType,
 } from "@typespec/compiler";
 import {
   AccessDecorator,
@@ -58,7 +59,10 @@ import {
   clientNameKey,
   clientNamespaceKey,
   findRootSourceProperty,
+  getRootGlobalNamespace,
+  listAllNamespaces,
   listAllServiceNamespaces,
+  listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -293,10 +297,10 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
  */
 export function listClients(context: TCGCContext): SdkClient[] {
   if (context.__rawClients) return context.__rawClients;
-  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
+  const namespaces: Namespace[] = listAllNamespaces(context, getRootGlobalNamespace(context));
 
   const explicitClients = [];
-  for (const ns of serviceNamespaces) {
+  for (const ns of namespaces) {
     if (getScopedDecoratorData(context, clientKey, ns)) {
       explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
     }
@@ -315,6 +319,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
+  const serviceNamespaces = listAllServiceNamespaces(context);
   context.__rawClients = serviceNamespaces.map((service) => {
     let originalName = service.name;
     const clientNameOverride = getClientNameOverride(context, service);

@@ -669,7 +669,7 @@ function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Names
   return subgraph.type;
 }
 
-export function listAllUserDefinedNamespaces(
+export function listAllNamespaces(
   context: TCGCContext,
   namespace: Namespace,
   retval?: Namespace[],
@@ -678,13 +678,20 @@ export function listAllUserDefinedNamespaces(
     retval = [];
   }
   if (retval.includes(namespace)) return retval;
-  if (getLocationContext(context.program, namespace).type === "project") {
-    retval.push(namespace);
-  }
+  retval.push(namespace);
   for (const ns of namespace.namespaces.values()) {
-    listAllUserDefinedNamespaces(context, ns, retval);
+    listAllNamespaces(context, ns, retval);
   }
   return retval;
+}
+
+export function listAllUserDefinedNamespaces(
+  context: TCGCContext,
+  namespace: Namespace,
+): Namespace[] {
+  return listAllNamespaces(context, namespace).filter(
+    (ns) => getLocationContext(context.program, ns).type === "project",
+  );
 }
 
 export function getRootGlobalNamespace(context: TCGCContext): Namespace {
