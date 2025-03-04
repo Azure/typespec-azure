@@ -24,7 +24,6 @@ import {
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  navigateType,
 } from "@typespec/compiler";
 import {
   AccessDecorator,
@@ -62,7 +61,6 @@ import {
   getRootGlobalNamespace,
   listAllNamespaces,
   listAllServiceNamespaces,
-  listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";

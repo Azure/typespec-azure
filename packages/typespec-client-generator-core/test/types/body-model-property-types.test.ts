@@ -1,5 +1,5 @@
-import { deepStrictEqual, ok, strictEqual } from "assert";
-import { afterEach, beforeEach, describe, it } from "vitest";
+import { ok, strictEqual } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { isReadOnly } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkBodyModelPropertyTypeHelper } from "./utils.js";
