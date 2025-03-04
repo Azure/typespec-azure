@@ -15,7 +15,6 @@ import {
   getNamespaceFullName,
   getProjectedName,
   ignoreDiagnostics,
-  listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
@@ -54,6 +53,7 @@ import {
   isAzureCoreTspModel,
   isHttpBodySpread,
   listAllUserDefinedNamespaces,
+  listAllServiceNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -109,7 +109,7 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
  * @returns
  */
 export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type);
+  return getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]);
 }
 
 /**
@@ -296,14 +296,14 @@ export function getCrossLanguageDefinitionId(
  */
 export function getCrossLanguagePackageId(context: TCGCContext): [string, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const services = listServices(context.program);
-  if (services.length === 0) return diagnostics.wrap("");
-  const serviceNamespace = getNamespaceFullName(services[0].type);
-  if (services.length > 1) {
+  const serviceNamespaces = listAllServiceNamespaces(context);
+  if (serviceNamespaces.length === 0) return diagnostics.wrap("");
+  const serviceNamespace = getNamespaceFullName(serviceNamespaces[0]);
+  if (serviceNamespaces.length > 1) {
     diagnostics.add(
       createDiagnostic({
         code: "multiple-services",
-        target: services[0].type,
+        target: serviceNamespaces[0],
         format: {
           service: serviceNamespace,
         },

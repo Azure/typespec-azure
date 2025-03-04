@@ -1,14 +1,17 @@
 import {
   BooleanLiteral,
+  compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
+  getLocationContext,
   getNamespaceFullName,
   getVisibilityForClass,
   Interface,
   isNeverType,
   isNullType,
+  isService,
   isVoidType,
   Model,
   ModelProperty,
@@ -28,7 +31,7 @@ import {
   HttpOperationMultipartBody,
   HttpOperationResponseContent,
 } from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import { getAddedOnVersions, getRemovedOnVersions, getVersioningMutators, getVersions } from "@typespec/versioning";
 import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
@@ -48,6 +51,7 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
+import { unsafe_mutateSubgraphWithNamespace, unsafe_MutatorWithNamespace } from "@typespec/compiler/experimental";
 
 import { $ } from "@typespec/compiler/experimental/typekit";
 
@@ -618,4 +622,81 @@ export function findRootSourceProperty(property: ModelProperty): ModelProperty {
     property = property.sourceProperty;
   }
   return property;
+}
+
+function getVersioningMutator(
+  context: TCGCContext,
+  service: Namespace,
+  apiVersion: string,
+): unsafe_MutatorWithNamespace {
+  const versionMutator = getVersioningMutators(context.program, service);
+  compilerAssert(
+    versionMutator !== undefined && versionMutator.kind !== "transient",
+    "Versioning service should not get undefined or transient versioning mutator",
+  );
+
+  const mutators = versionMutator.snapshots
+    .filter((snapshot) => apiVersion === snapshot.version.value)
+    .map((x) => x.mutator);
+  compilerAssert(mutators.length === 1, "One api version should not get multiple mutators");
+
+  return mutators[0];
+}
+
+function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
+  const globalNamespace = context.program.getGlobalNamespaceType();
+  const allApiVersions = getVersions(context.program, globalNamespace)[1]
+    ?.getVersions()
+    .map((x) => x.value);
+  if (!allApiVersions) return globalNamespace;
+
+  const apiVersion = getValidApiVersion(context, allApiVersions);
+  if (apiVersion === undefined) return globalNamespace;
+
+  const mutator = getVersioningMutator(context, globalNamespace, apiVersion);
+  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
+  compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
+  return subgraph.type;
+}
+
+function listAllUserDefinedNamespaces(
+  context: TCGCContext,
+  namespace: Namespace,
+  retval?: Namespace[],
+): Namespace[] {
+  if (!retval) {
+    retval = [];
+  }
+  if (retval.includes(namespace)) return retval;
+  if (getLocationContext(context.program, namespace).type === "project") {
+    retval.push(namespace);
+  }
+  for (const ns of namespace.namespaces.values()) {
+    listAllUserDefinedNamespaces(context, ns, retval);
+  }
+  return retval;
+}
+
+/**
+ * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
+ * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
+ * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
+ * instead to list all of the services in the global namespace.
+ *
+ * See https://github.com/microsoft/typespec/issues/6247
+ *
+ * @param context
+ */
+export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
+  const serviceNamespaces: Namespace[] = [];
+  let globalNamespace = context.globalNamespace;
+  if (!globalNamespace) {
+    globalNamespace = handleVersioningMutationForGlobalNamespace(context);
+  }
+  for (const ns of listAllUserDefinedNamespaces(context, globalNamespace)) {
+    if (isService(context.program, ns)) {
+      serviceNamespaces.push(ns);
+    }
+  }
+  return serviceNamespaces;
 }

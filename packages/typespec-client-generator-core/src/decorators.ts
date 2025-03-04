@@ -24,10 +24,7 @@ import {
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  listServices,
-  projectProgram,
 } from "@typespec/compiler";
-import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -61,7 +58,7 @@ import {
   clientNameKey,
   clientNamespaceKey,
   findRootSourceProperty,
-  getValidApiVersion,
+  listAllServiceNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -288,70 +285,6 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
     listScopedDecoratorData(context, operationGroupKey).length > 0
   );
 }
-
-function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
-  if (!context.__service_projection) {
-    context.__service_projection = new Map();
-  }
-
-  let projectedService;
-  let projectedProgram;
-
-  if (context.__service_projection.has(client.service)) {
-    [projectedService, projectedProgram] = context.__service_projection.get(client.service)!;
-  } else {
-    const allApiVersions = getVersions(context.program, client.service)[1]
-      ?.getVersions()
-      .map((x) => x.value);
-    if (!allApiVersions) return;
-    const apiVersion = getValidApiVersion(context, allApiVersions);
-    if (apiVersion === undefined) return;
-    const versionProjections = buildVersionProjections(context.program, client.service).filter(
-      (v) => apiVersion === v.version,
-    );
-    if (versionProjections.length !== 1)
-      throw new Error("Version projects should only contain one element");
-    const projectedVersion = versionProjections[0];
-    if (projectedVersion.projections.length > 0) {
-      // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      projectedProgram = context.program = projectProgram(
-        context.__originalProgram,
-        projectedVersion.projections,
-      );
-    }
-    projectedService = projectedProgram
-      ? (projectedProgram.projector.projectedTypes.get(client.service) as Namespace)
-      : client.service;
-    context.__service_projection.set(client.service, [projectedService, projectedProgram]);
-  }
-
-  if (client.service !== client.type) {
-    client.type = projectedProgram
-      ? (projectedProgram.projector.projectedTypes.get(client.type) as Interface)
-      : client.type;
-  } else {
-    client.type = projectedService;
-  }
-  client.service = projectedService;
-}
-
-function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
-  if (context.apiVersion !== "all") {
-    const projectedClients = [];
-    for (const client of clients) {
-      const projectedClient = { ...client };
-      serviceVersioningProjection(context, projectedClient);
-      // filter client not existed in the current version
-      if ((projectedClient.type as Type).kind !== "Intrinsic") {
-        projectedClients.push(projectedClient);
-      }
-    }
-    return projectedClients;
-  }
-  return clients;
-}
-
 /**
  * List all the clients.
  *
@@ -363,7 +296,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 
   const explicitClients = [...listScopedDecoratorData(context, clientKey)];
   if (explicitClients.length > 0) {
-    context.__rawClients = getClientsWithVersioning(context, explicitClients);
+    context.__rawClients = explicitClients;
     if (context.__rawClients.some((client) => isArm(client.service))) {
       context.arm = true;
     }
@@ -371,28 +304,26 @@ export function listClients(context: TCGCContext): SdkClient[] {
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
-  const services = listServices(context.program);
+  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
 
-  const clients: SdkClient[] = services.map((service) => {
-    let originalName = service.type.name;
-    const clientNameOverride = getClientNameOverride(context, service.type);
+  context.__rawClients = serviceNamespaces.map((service) => {
+    let originalName = service.name;
+    const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
+      originalName = getProjectedName(context.program, service, "client") ?? service.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-    context.arm = isArm(service.type);
+    context.arm = isArm(service);
     return {
       kind: "SdkClient",
       name: clientName,
-      service: service.type,
-      type: service.type,
-      crossLanguageDefinitionId: getNamespaceFullName(service.type),
+      service: service,
+      type: service,
+      crossLanguageDefinitionId: getNamespaceFullName(service),
     };
   });
-
-  context.__rawClients = getClientsWithVersioning(context, clients);
   return context.__rawClients;
 }
 
