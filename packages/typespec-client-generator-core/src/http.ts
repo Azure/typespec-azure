@@ -185,7 +185,7 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
-        serializedName: "body",
+        serializedName: "",
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
