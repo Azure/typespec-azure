@@ -2084,6 +2084,10 @@ export async function getOpenAPIForService(
     const sharedVisibilities = ["Read", "Create", "Update"];
     const lifecycle = getLifecycleVisibilityEnum(program);
     const visibilities = getVisibilityForClass(program, prop, lifecycle);
+    // If the property does not have default visibility (all Lifecycle modifiers)
+    // then we have to look at the active modifiers to determine if it has any
+    // visibility other than read, create, or update, since those are compatible
+    // with x-ms-mutability.
     if (visibilities.size !== lifecycle.members.size) {
       for (const visibility of visibilities) {
         if (!sharedVisibilities.includes(visibility.name)) {
@@ -2091,7 +2095,10 @@ export async function getOpenAPIForService(
         }
       }
     }
-    return true;
+    // Otherwise, the property can be shared if it has default visibility or only
+    // shared visibilities, but not if it is _invisible_. The property is invisible
+    // if it has no active modifiers.
+    return visibilities.size !== 0;
   }
 
   function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
