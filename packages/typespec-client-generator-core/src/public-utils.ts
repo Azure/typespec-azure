@@ -54,6 +54,7 @@ import {
   isHttpBodySpread,
   listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
+  listAllServiceNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";

@@ -19,7 +19,6 @@ import {
   Union,
   getDiscriminator,
   getNamespaceFullName,
-  getProjectedName,
   ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
@@ -316,14 +315,15 @@ export function listClients(context: TCGCContext): SdkClient[] {
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
-  const serviceNamespaces = listAllServiceNamespaces(context);
+  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
+
   context.__rawClients = serviceNamespaces.map((service) => {
     let originalName = service.name;
     const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName = getProjectedName(context.program, service, "client") ?? service.name;
+      originalName = service.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service);

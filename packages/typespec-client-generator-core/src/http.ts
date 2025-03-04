@@ -697,7 +697,8 @@ function getCollectionFormat(
     const headerOptions = getHeaderFieldOptions(program, type);
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     if (headerOptions.format) {
-      return headerOptions.format; // eslint-disable-line @typescript-eslint/no-deprecated
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      return headerOptions.format;
     } else if (typeof headerOptions.explode === "boolean" || $.array.is(type.type)) {
       return headerOptions.explode ? "multi" : "csv";
     }
