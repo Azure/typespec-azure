@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.52.0
+
+### Features
+
+- [#2257](https://github.com/Azure/typespec-azure/pull/2257) Adds support for `@header` explode field
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+### Bug Fixes
+
+- [#2208](https://github.com/Azure/typespec-azure/pull/2208) Make sure to keep orphan models
+
+
 ## 0.51.3
 
 ### Bug Fixes

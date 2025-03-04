@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.52.0
+
+### Features
+
+- [#2257](https://github.com/Azure/typespec-azure/pull/2257) Adds support for `@header` explode field
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+
 ## 0.51.0
 
 ### Bug Fixes
