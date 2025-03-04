@@ -40,19 +40,19 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       @doc("Widget resource")
       model Widget {
         @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         id?: string;
       
         @doc("The name of the resource")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name?: string;
       
         @doc("The type of the resource.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         type?: string;
       
         @doc("Azure Resource Manager metadata containing createdBy and modifiedBy information.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         systemData?: Foundations.SystemData;
 
         properties? : WidgetProperties;

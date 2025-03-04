@@ -7,7 +7,7 @@ namespace Azure.ResourceManager.CommonTypes;
 @added(Versions.v5)
 model ManagedOnBehalfOfConfiguration {
   /** Managed-On-Behalf-Of broker resources */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   moboBrokerResources?: MoboBrokerResource[];
 }
 

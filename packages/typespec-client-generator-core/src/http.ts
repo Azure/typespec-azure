@@ -10,6 +10,7 @@ import {
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
@@ -698,13 +699,18 @@ function getCollectionFormat(
   type: ModelProperty,
 ): CollectionFormat | undefined {
   const program = context.program;
-  /* eslint-disable @typescript-eslint/no-deprecated */
-  const tspCollectionFormat = (
-    isQueryParam(program, type)
-      ? getQueryParamOptions(program, type)
-      : isHeader(program, type)
-        ? getHeaderFieldOptions(program, type)
-        : undefined
-  )?.format;
-  return tspCollectionFormat;
+  if (isHeader(program, type)) {
+    const headerOptions = getHeaderFieldOptions(program, type);
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    if (headerOptions.format) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      return headerOptions.format;
+    } else if (typeof headerOptions.explode === "boolean" || $.array.is(type.type)) {
+      return headerOptions.explode ? "multi" : "csv";
+    }
+  } else if (isQueryParam(program, type)) {
+    /* eslint-disable @typescript-eslint/no-deprecated */
+    return getQueryParamOptions(program, type)?.format;
+  }
+  return;
 }
