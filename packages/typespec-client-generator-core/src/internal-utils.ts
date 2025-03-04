@@ -5,6 +5,7 @@ import {
   Diagnostic,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
+  getLocationContext,
   getNamespaceFullName,
   getVisibilityForClass,
   Interface,
