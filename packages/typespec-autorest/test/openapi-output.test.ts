@@ -864,6 +864,21 @@ describe("identifiers decorator", () => {
     );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
+
+  it("ignores id property for x-ms-identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        id: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
+  });
   it("uses identifiers decorator for properties", async () => {
     const oapi = await openApiFor(
       `
