@@ -695,8 +695,9 @@ function getCollectionFormat(
   const program = context.program;
   if (isHeader(program, type)) {
     const headerOptions = getHeaderFieldOptions(program, type);
-
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     if (headerOptions.format) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       return headerOptions.format;
     } else if (typeof headerOptions.explode === "boolean" || $.array.is(type.type)) {
       return headerOptions.explode ? "multi" : "csv";
