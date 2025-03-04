@@ -293,8 +293,19 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
  */
 export function listClients(context: TCGCContext): SdkClient[] {
   if (context.__rawClients) return context.__rawClients;
+  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
 
-  const explicitClients = [...listScopedDecoratorData(context, clientKey)];
+  const explicitClients = [];
+  for (const ns of serviceNamespaces) {
+    if (getScopedDecoratorData(context, clientKey, ns)) {
+      explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
+    }
+    for (const i of ns.interfaces.values()) {
+      if (getScopedDecoratorData(context, clientKey, i)) {
+        explicitClients.push(getScopedDecoratorData(context, clientKey, i));
+      }
+    }
+  }
   if (explicitClients.length > 0) {
     context.__rawClients = explicitClients;
     if (context.__rawClients.some((client) => isArm(client.service))) {
@@ -304,8 +315,6 @@ export function listClients(context: TCGCContext): SdkClient[] {
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
-  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
-
   context.__rawClients = serviceNamespaces.map((service) => {
     let originalName = service.name;
     const clientNameOverride = getClientNameOverride(context, service);

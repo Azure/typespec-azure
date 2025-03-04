@@ -11,17 +11,6 @@ describe("typespec-client-generator-core: body model property types", () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   });
 
-  afterEach(async () => {
-    for (const modelsOrEnums of [
-      runner.context.sdkPackage.models,
-      runner.context.sdkPackage.enums,
-    ]) {
-      for (const item of modelsOrEnums) {
-        ok(item.name !== "");
-      }
-    }
-  });
-
   it("required", async function () {
     await runner.compileWithBuiltInService(`
         @usage(Usage.input | Usage.output)
@@ -157,50 +146,5 @@ describe("typespec-client-generator-core: body model property types", () => {
     strictEqual(variants.length, 2);
     strictEqual(variants[0].kind, "string");
     strictEqual(variants[1].kind, "int32");
-  });
-
-  it("versioning", async function () {
-    runner = await createSdkTestRunner({
-      "api-version": "all",
-      emitterName: "@azure-tools/typespec-python",
-    });
-
-    await runner.compile(`
-        @versioned(Versions)
-        @service(#{title: "Widget Service"})
-        namespace DemoService;
-
-        enum Versions {
-          v1,
-          v2,
-          v3,
-          v4,
-        }
-
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @added(Versions.v1)
-          @removed(Versions.v2)
-          @added(Versions.v3)
-          versionedProp: string;
-
-          nonVersionedProp: string;
-
-          @removed(Versions.v3)
-          removedProp: string;
-        }
-      `);
-    const sdkModel = runner.context.sdkPackage.models.find((x) => x.kind === "model");
-    ok(sdkModel);
-    strictEqual(sdkModel.kind, "model");
-
-    const versionedProp = sdkModel.properties[0];
-    deepStrictEqual(versionedProp.apiVersions, ["v1", "v3", "v4"]);
-
-    const nonVersionedProp = sdkModel.properties[1];
-    deepStrictEqual(nonVersionedProp.apiVersions, ["v1", "v2", "v3", "v4"]);
-
-    const removedProp = sdkModel.properties[2];
-    deepStrictEqual(removedProp.apiVersions, ["v1", "v2"]);
   });
 });

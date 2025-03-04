@@ -13,6 +13,7 @@ import {
   isNullType,
   isService,
   isVoidType,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -653,21 +654,22 @@ function getVersioningMutator(
 
 function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const allApiVersions = getVersions(context.program, globalNamespace)[1]
+  const service = listServices(context.program)[0];
+  if (!service) return globalNamespace;
+  const allApiVersions = getVersions(context.program, service.type)[1]
     ?.getVersions()
     .map((x) => x.value);
   if (!allApiVersions) return globalNamespace;
 
   const apiVersion = getValidApiVersion(context, allApiVersions);
   if (apiVersion === undefined) return globalNamespace;
-
-  const mutator = getVersioningMutator(context, globalNamespace, apiVersion);
+  const mutator = getVersioningMutator(context, service.type, apiVersion);
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;
 }
 
-function listAllUserDefinedNamespaces(
+export function listAllUserDefinedNamespaces(
   context: TCGCContext,
   namespace: Namespace,
   retval?: Namespace[],
@@ -685,6 +687,15 @@ function listAllUserDefinedNamespaces(
   return retval;
 }
 
+export function getRootGlobalNamespace(context: TCGCContext): Namespace {
+  let globalNamespace = context.globalNamespace;
+  if (!globalNamespace) {
+    globalNamespace = handleVersioningMutationForGlobalNamespace(context);
+    context.globalNamespace = globalNamespace;
+  }
+  return globalNamespace;
+}
+
 /**
  * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
  * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
@@ -697,10 +708,7 @@ function listAllUserDefinedNamespaces(
  */
 export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
   const serviceNamespaces: Namespace[] = [];
-  let globalNamespace = context.globalNamespace;
-  if (!globalNamespace) {
-    globalNamespace = handleVersioningMutationForGlobalNamespace(context);
-  }
+  const globalNamespace = getRootGlobalNamespace(context);
   for (const ns of listAllUserDefinedNamespaces(context, globalNamespace)) {
     if (isService(context.program, ns)) {
       serviceNamespaces.push(ns);
