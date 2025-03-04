@@ -94,6 +94,7 @@ import {
   isStringType,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
+  isType,
   isVoidType,
   joinPaths,
   navigateTypesInNamespace,
@@ -2133,7 +2134,15 @@ export async function getOpenAPIForService(
     }
     if (extensions) {
       for (const key of extensions.keys()) {
-        emitObject[key] = extensions.get(key);
+        const value = extensions.get(key);
+        if (isType(value)) {
+          emitObject[key] = getSchemaForType(value, {
+            ignoreMetadataAnnotations: false,
+            visibility: Visibility.All,
+          });
+        } else {
+          emitObject[key] = extensions.get(key);
+        }
       }
     }
   }

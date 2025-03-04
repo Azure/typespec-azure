@@ -829,6 +829,80 @@ describe("typespec-autorest: extension decorator", () => {
     strictEqual(oapi.parameters.PetId["x-parameter-extension"], "foobaz");
   });
 
+  it("emits schemas for Types", async () => {
+    const oapi = await openApiFor(`
+    @extension("x-model-expression", { name: string })
+    @extension("x-array", string[])
+    @extension("x-model-template", Collection<string>)
+    @extension("x-string-literal", typeof "hi")
+    model Foo {}
+    model Collection<Item> {
+      size: int32;
+      item: Item[];
+    }
+    `);
+    const Foo = oapi.definitions.Foo;
+    ok(Foo);
+    deepStrictEqual(Foo["x-model-expression"], {
+      type: "object",
+      required: ["name"],
+      properties: {
+        name: {
+          type: "string",
+        },
+      },
+    });
+    deepStrictEqual(Foo["x-array"], {
+      items: { type: "string" },
+      type: "array",
+    });
+    deepStrictEqual(Foo["x-model-template"], {
+      properties: {
+        item: {
+          items: {
+            type: "string",
+          },
+          type: "array",
+        },
+        size: {
+          format: "int32",
+          type: "integer",
+        },
+      },
+      required: ["size", "item"],
+      type: "object",
+    });
+    deepStrictEqual(Foo["x-string-literal"], {
+      type: "string",
+      enum: ["hi"],
+      "x-ms-enum": {
+        modelAsString: false,
+      },
+    });
+  });
+
+  it("emits raw data for Values", async () => {
+    const oapi = await openApiFor(`
+    @extension("x-object-value", #{ name: "TypeSpec" })
+    @extension("x-tuple", #[ 1 ])
+    @extension("x-string-literal", "hi")
+    model Foo {}
+    model Collection<Item> {
+      size: int32;
+      item: Item[];
+    }
+    
+    model Thing {
+      name: string;
+    }
+    `);
+    const Foo = oapi.definitions.Foo;
+    ok(Foo);
+    deepStrictEqual(Foo["x-object-value"], { name: "TypeSpec" });
+    deepStrictEqual(Foo["x-tuple"], [1]);
+    deepStrictEqual(Foo["x-string-literal"], "hi");
+  });
+
   it("support x-ms-identifiers with null array ", async () => {
     const oapi = await openApiFor(
       `
