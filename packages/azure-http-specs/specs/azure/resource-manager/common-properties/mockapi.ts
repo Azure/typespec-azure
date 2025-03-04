@@ -137,15 +137,16 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_get = passOnCode(404, {
       resourceName: "confidential",
       "api-version": "2023-12-01-preview",
     },
-    status: 404
+    status: 404,
   },
   response: {
     status: 404,
     body: json({
-      "error": {
-        "code": "ResourceNotFound",
-        "message": "The Resource 'Azure.ResourceManager.CommonProperties/confidentialResources/confidential' under resource group 'test-rg' was not found."
-      }
+      error: {
+        code: "ResourceNotFound",
+        message:
+          "The Resource 'Azure.ResourceManager.CommonProperties/confidentialResources/confidential' under resource group 'test-rg' was not found.",
+      },
     }),
   },
   kind: "MockApiDefinition",
@@ -159,7 +160,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnC
       properties: {
         username: "my_username",
         password: "my_password",
-      }
+      },
     },
     params: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
@@ -167,16 +168,17 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnC
       resourceName: "confidential",
       "api-version": "2023-12-01-preview",
     },
-    status: 403
+    status: 403,
   },
   response: {
     status: 403,
     body: json({
-      "code": "AuthorizationFailed",
-      "message": "Your account or service principal doesn't have sufficient access to complete the operation.",
-      "innererror": {
-        "exceptiontype": "general"
-      }
+      code: "AuthorizationFailed",
+      message:
+        "Your account or service principal doesn't have sufficient access to complete the operation.",
+      innererror: {
+        exceptiontype: "general",
+      },
     }),
   },
   kind: "MockApiDefinition",
