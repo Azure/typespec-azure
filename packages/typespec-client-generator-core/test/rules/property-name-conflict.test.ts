@@ -68,7 +68,7 @@ it(`emit warning if @clientName("newName") introduces conflict`, async () => {
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-client-generator-core/property-name-conflict",
-      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`
+      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
     });
 });
 
@@ -81,7 +81,7 @@ it(`emit warning if @clientName("newName", "csharp") introduces conflict`, async
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-client-generator-core/property-name-conflict",
-      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`
+      message: `Property 'foo' having the same name as its enclosing model will cause problems with C# code generation. Consider renaming the property directly or using the @clientName("newName", "csharp") decorator to rename the property for C#.`,
     });
 });
 
