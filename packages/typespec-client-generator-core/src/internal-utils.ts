@@ -621,7 +621,7 @@ export function listAllNamespaces(
 }
 
 export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
-  return listAllNamespaces(context, context.program.getGlobalNamespaceType()).filter((ns) =>
+  return listAllNamespaces(context, getRootGlobalNamespace(context)).filter((ns) =>
     $.type.isUserDefined(ns),
   );
 }
@@ -669,31 +669,6 @@ function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Names
   return subgraph.type;
 }
 
-export function listAllNamespaces(
-  context: TCGCContext,
-  namespace: Namespace,
-  retval?: Namespace[],
-): Namespace[] {
-  if (!retval) {
-    retval = [];
-  }
-  if (retval.includes(namespace)) return retval;
-  retval.push(namespace);
-  for (const ns of namespace.namespaces.values()) {
-    listAllNamespaces(context, ns, retval);
-  }
-  return retval;
-}
-
-export function listAllUserDefinedNamespaces(
-  context: TCGCContext,
-  namespace: Namespace,
-): Namespace[] {
-  return listAllNamespaces(context, namespace).filter(
-    (ns) => getLocationContext(context.program, ns).type === "project",
-  );
-}
-
 export function getRootGlobalNamespace(context: TCGCContext): Namespace {
   let globalNamespace = context.globalNamespace;
   if (!globalNamespace) {
@@ -715,8 +690,7 @@ export function getRootGlobalNamespace(context: TCGCContext): Namespace {
  */
 export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
   const serviceNamespaces: Namespace[] = [];
-  const globalNamespace = getRootGlobalNamespace(context);
-  for (const ns of listAllUserDefinedNamespaces(context, globalNamespace)) {
+  for (const ns of listAllUserDefinedNamespaces(context)) {
     if (isService(context.program, ns)) {
       serviceNamespaces.push(ns);
     }
