@@ -46,6 +46,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  AllScopes,
   TspLiteralType,
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
@@ -171,9 +172,10 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
 export function getLibraryName(
   context: TCGCContext,
   type: Type & { name?: string | symbol },
+  scope?: string | typeof AllScopes,
 ): string {
   // 1. check if there's a client name
-  let emitterSpecificName = getClientNameOverride(context, type);
+  let emitterSpecificName = getClientNameOverride(context, type, scope);
   if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
   // 2. check if there's a specific name for our language with deprecated @projectedName
