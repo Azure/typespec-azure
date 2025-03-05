@@ -300,8 +300,8 @@ describe("typespec-client-generator-core: paged operation", () => {
       strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 1);
       strictEqual(method.operation.responses[0].type?.kind, "model");
       strictEqual(
-        method.pagingMetadata.continuationTokenResponseSegments?.[0],
-        method.operation.responses[0].type.properties[1],
+        method.pagingMetadata.continuationTokenResponseSegments?.[0].__raw,
+        method.operation.responses[0].type.properties[1].__raw,
       );
     });
 
