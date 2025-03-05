@@ -1041,7 +1041,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
-    nameSpace: getClientNamespaceStringHelper(context, client.service)!,
+    nameSpace: getClientNamespaceStringHelper(context, client.service)!, // eslint-disable-line @typescript-eslint/no-deprecated
     namespace: namespace,
     clientNamespace: namespace,
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
@@ -1150,8 +1150,8 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    name: getClientNamespaceString(context)!,
-    rootNamespace: getClientNamespaceString(context)!,
+    name: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
+    rootNamespace: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
