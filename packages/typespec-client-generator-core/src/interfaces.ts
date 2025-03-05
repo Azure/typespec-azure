@@ -64,7 +64,6 @@ export interface TCGCContext {
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
-  namespace?: string;
 }
 
 export interface SdkContext<
@@ -87,7 +86,6 @@ export interface SdkEmitterOptions {
   "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
-  namespace?: string;
 }
 
 // Types for TCGC customization decorators

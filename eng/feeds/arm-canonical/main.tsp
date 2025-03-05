@@ -11,13 +11,13 @@ using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
-/** Microsoft.{{parameters.ServiceNamespace}} Resource Provider management API. */
+/** {{parameters.ServiceNamespace}} Resource Provider management API. */
 @armProviderNamespace
 @service(#{
   title: "Microsoft.{{parameters.ServiceNamespace}} management service",
 })
 @versioned(Microsoft.Contoso.Versions)
-namespace Microsoft.{{parameters.ServiceNamespace}};
+namespace {{parameters.ServiceNamespace}};
 
 /** The available API versions. */
 enum Versions {
