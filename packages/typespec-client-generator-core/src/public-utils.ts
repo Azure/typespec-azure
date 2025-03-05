@@ -47,13 +47,13 @@ import {
 } from "./interfaces.js";
 import {
   TspLiteralType,
-  getAllUserDefinedNamespaces,
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
+  listAllUserDefinedNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -347,7 +347,7 @@ function findContextPath(
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
   // orphan models
-  for (const currNamespace of getAllUserDefinedNamespaces(context)) {
+  for (const currNamespace of listAllUserDefinedNamespaces(context)) {
     for (const model of currNamespace.models.values()) {
       if (
         [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0

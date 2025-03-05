@@ -591,28 +591,26 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   return visibility.size === 0;
 }
 
-export function getAllUserDefinedNamespaces(
+export function listAllNamespaces(
   context: TCGCContext,
-  namespace?: Namespace,
+  namespace: Namespace,
   retval?: Namespace[],
 ): Namespace[] {
   if (!retval) {
     retval = [];
   }
-  if (!namespace) {
-    for (const namespace of context.program.getGlobalNamespaceType().namespaces.values()) {
-      retval = retval.concat(getAllUserDefinedNamespaces(context, namespace));
-    }
-  } else {
-    if (retval.includes(namespace)) return retval;
-    if ($.type.isUserDefined(namespace)) {
-      retval.push(namespace);
-    }
-    for (const subNamespace of namespace.namespaces.values()) {
-      retval = retval.concat(getAllUserDefinedNamespaces(context, subNamespace));
-    }
+  if (retval.includes(namespace)) return retval;
+  retval.push(namespace);
+  for (const ns of namespace.namespaces.values()) {
+    listAllNamespaces(context, ns, retval);
   }
   return retval;
+}
+
+export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
+  return listAllNamespaces(context, context.program.getGlobalNamespaceType()).filter((ns) =>
+    $.type.isUserDefined(ns),
+  );
 }
 
 export function findRootSourceProperty(property: ModelProperty): ModelProperty {

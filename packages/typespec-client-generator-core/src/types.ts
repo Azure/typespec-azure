@@ -89,7 +89,6 @@ import {
 import {
   createGeneratedName,
   filterApiVersionsInEnum,
-  getAllUserDefinedNamespaces,
   getAvailableApiVersions,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
@@ -104,6 +103,7 @@ import {
   isMultipartOperation,
   isNeverOrVoidType,
   isOnClient,
+  listAllUserDefinedNamespaces,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -1967,7 +1967,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  const userDefinedNamespaces = getAllUserDefinedNamespaces(context);
+  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
   for (const currNamespace of userDefinedNamespaces) {
     const namespaces = [currNamespace];
     while (namespaces.length) {
