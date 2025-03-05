@@ -1,4 +1,4 @@
-import { deepEqual, ok } from "assert";
+import { deepEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { openApiFor } from "../test-host.js";
 
@@ -321,4 +321,60 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
     }
 `);
   ok(openApi.definitions.Widget["x-ms-azure-resource"]);
+});
+
+it("excludes properties marked @invisible from the resource payload", async () => {
+  const openApi = await openApiFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Widget resource")
+    model Widget is ProxyResource<WidgetProperties> {
+      ...ResourceNameParameter<Widget, Type=WidgetNameType>;
+    }
+
+    @doc("The properties of a widget")
+    model WidgetProperties {
+      size: int32;
+
+      @invisible(Lifecycle)
+      hiddenProperty: string;
+    }
+
+    @minLength(1)
+    @maxLength(10)
+    @pattern("xxxxxx")
+    scalar WidgetNameType extends string;
+
+    interface Widgets extends Operations {
+      get is ArmResourceRead<Widget>;
+    }
+  `);
+
+  const Widget = openApi.definitions.Widget;
+
+  ok(Widget);
+
+  strictEqual(Widget.type, "object");
+  deepEqual(Widget.properties, {
+    properties: {
+      $ref: "#/definitions/WidgetProperties",
+      description: "The resource-specific properties for this resource.",
+    },
+  });
+
+  const WidgetProperties = openApi.definitions.WidgetProperties;
+
+  deepEqual(WidgetProperties, {
+    type: "object",
+    description: "The properties of a widget",
+    properties: {
+      size: {
+        type: "integer",
+        format: "int32",
+      },
+    },
+    required: ["size"],
+  });
 });
