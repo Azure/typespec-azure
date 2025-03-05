@@ -52,8 +52,8 @@ import {
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
-  listAllUserDefinedNamespaces,
   listAllServiceNamespaces,
+  listAllUserDefinedNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";

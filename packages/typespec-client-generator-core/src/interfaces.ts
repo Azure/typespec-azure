@@ -36,7 +36,8 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   emitterName: string;
   arm?: boolean;
-  globalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
+  getMutatedGlobalNamespace(): Namespace;
+  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;

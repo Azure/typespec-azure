@@ -5,7 +5,6 @@ import {
   Diagnostic,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
-  getLocationContext,
   getNamespaceFullName,
   getVisibilityForClass,
   Interface,
@@ -621,7 +620,7 @@ export function listAllNamespaces(
 }
 
 export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
-  return listAllNamespaces(context, getRootGlobalNamespace(context)).filter((ns) =>
+  return listAllNamespaces(context, context.getMutatedGlobalNamespace()).filter((ns) =>
     $.type.isUserDefined(ns),
   );
 }
@@ -652,7 +651,7 @@ function getVersioningMutator(
   return mutators[0];
 }
 
-function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
+export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
   const service = listServices(context.program)[0];
   if (!service) return globalNamespace;
@@ -667,15 +666,6 @@ function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Names
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;
-}
-
-export function getRootGlobalNamespace(context: TCGCContext): Namespace {
-  let globalNamespace = context.globalNamespace;
-  if (!globalNamespace) {
-    globalNamespace = handleVersioningMutationForGlobalNamespace(context);
-    context.globalNamespace = globalNamespace;
-  }
-  return globalNamespace;
 }
 
 /**

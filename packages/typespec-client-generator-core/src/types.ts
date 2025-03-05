@@ -95,7 +95,6 @@ import {
   getLocationOfOperation,
   getNonNullOptions,
   getNullOption,
-  getRootGlobalNamespace,
   getSdkTypeBaseHelper,
   getTypeDecorators,
   hasNoneVisibility,
@@ -127,7 +126,7 @@ export function getTypeSpecBuiltInType(
   context: TCGCContext,
   kind: IntrinsicScalarName,
 ): SdkBuiltInType {
-  const global = getRootGlobalNamespace(context);
+  const global = context.getMutatedGlobalNamespace();
   const typeSpecNamespace = global.namespaces!.get("TypeSpec");
   const type = typeSpecNamespace!.scalars.get(kind)!;
 
