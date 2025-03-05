@@ -27,7 +27,6 @@ model ConfidentialResourceProperties {
   provisioningState: string;
 
   username: string;
-  password: string;
 }
 
 /**
@@ -137,20 +136,19 @@ interface Error {
     {
       "location": <any string>,
       "properties": {
-        "username": "my_username",
-        "password": "my_password"
+        "username": "00"
       }
     }
     ```
     
-    Expected response status code: 403
+    Expected response status code: 400
     Expected response body:
     ```json
     {
       "error": {
-        "code": "AuthorizationFailed",
-        "message": "Your account or service principal doesn't have sufficient access to complete the operation.",
-        "innerError": {
+        "code": "BadRequest",
+        "message": "Username should not contain only numbers.",
+        "innererror": {
           "exceptiontype": "general"
         }
       }

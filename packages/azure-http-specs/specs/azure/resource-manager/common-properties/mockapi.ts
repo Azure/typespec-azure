@@ -152,14 +152,13 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_get = passOnCode(404, {
   kind: "MockApiDefinition",
 });
 
-Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnCode(403, {
+Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnCode(400, {
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
   method: "put",
   request: {
     body: {
       properties: {
-        username: "my_username",
-        password: "my_password",
+        username: "00",
       },
     },
     params: {
@@ -168,14 +167,14 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnC
       resourceName: "confidential",
       "api-version": "2023-12-01-preview",
     },
-    status: 403,
+    status: 400,
   },
   response: {
-    status: 403,
+    status: 400,
     body: json({
-      code: "AuthorizationFailed",
+      code: "BadRequest",
       message:
-        "Your account or service principal doesn't have sufficient access to complete the operation.",
+        "Username should not contain only numbers.",
       innererror: {
         exceptiontype: "general",
       },
