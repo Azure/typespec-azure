@@ -10,6 +10,7 @@ import {
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
@@ -49,6 +50,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  findRootSourceProperty,
   getAvailableApiVersions,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
@@ -441,14 +443,13 @@ function getSdkHttpResponseAndExceptions(
         : innerResponse.body?.contentTypes[0];
       for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
-        const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
-        addEncodeInfo(context, header, clientType, defaultContentType);
         headers.push({
+          ...diagnostics.pipe(
+            getSdkModelPropertyTypeBase(context, header, httpOperation.operation),
+          ),
           __raw: header,
-          doc: getDoc(context.program, header),
-          summary: getSummary(context.program, header),
+          kind: "responseheader",
           serializedName: getHeaderFieldName(context.program, header),
-          type: clientType,
         });
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -693,25 +694,23 @@ function filterOutUselessPathParameters(
   }
 }
 
-function findRootSourceProperty(property: ModelProperty): ModelProperty {
-  while (property.sourceProperty) {
-    property = property.sourceProperty;
-  }
-  return property;
-}
-
 function getCollectionFormat(
   context: TCGCContext,
   type: ModelProperty,
 ): CollectionFormat | undefined {
   const program = context.program;
-  /* eslint-disable @typescript-eslint/no-deprecated */
-  const tspCollectionFormat = (
-    isQueryParam(program, type)
-      ? getQueryParamOptions(program, type)
-      : isHeader(program, type)
-        ? getHeaderFieldOptions(program, type)
-        : undefined
-  )?.format;
-  return tspCollectionFormat;
+  if (isHeader(program, type)) {
+    const headerOptions = getHeaderFieldOptions(program, type);
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    if (headerOptions.format) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      return headerOptions.format;
+    } else if (typeof headerOptions.explode === "boolean" || $.array.is(type.type)) {
+      return headerOptions.explode ? "multi" : "csv";
+    }
+  } else if (isQueryParam(program, type)) {
+    /* eslint-disable @typescript-eslint/no-deprecated */
+    return getQueryParamOptions(program, type)?.format;
+  }
+  return;
 }

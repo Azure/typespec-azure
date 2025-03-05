@@ -12,7 +12,7 @@ import { createAzureCoreTestRunner, getServiceForVersion } from "./test-host.js"
 describe("typespec-azure-core: service traits", () => {
   const traitServiceCode = `
     @versioned(Versions)
-    @service({ title: "TraitTest" })
+    @service(#{ title: "TraitTest" })
     namespace Microsoft.Test;
 
     enum Versions {

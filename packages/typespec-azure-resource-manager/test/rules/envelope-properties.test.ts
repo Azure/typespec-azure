@@ -29,11 +29,11 @@ describe("typespec-azure-resource-manager: envelope properties rule", () => {
       @armProviderNamespace
       namespace Microsoft.Foo;
       model FooResource is ProxyResource<FooResourceProperties> {
-        @key("foo") @segment("foo") @path @visibility("read")
+        @key("foo") @segment("foo") @path @visibility(Lifecycle.Read)
         name: string;
       }
       model FooResourceProperties {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         bar?: string;
       }
       @armResourceOperations

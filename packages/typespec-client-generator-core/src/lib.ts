@@ -49,6 +49,12 @@ export const $lib = createTypeSpecLibrary({
         default: "Cannot have a union containing only null types.",
       },
     },
+    "union-circular": {
+      severity: "error",
+      messages: {
+        default: "Cannot have a union containing self.",
+      },
+    },
     "union-unsupported": {
       severity: "error",
       messages: {

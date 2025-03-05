@@ -60,8 +60,8 @@ import {
   AllScopes,
   clientNameKey,
   clientNamespaceKey,
+  findRootSourceProperty,
   getValidApiVersion,
-  isAzureCoreTspModel,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -316,7 +316,7 @@ function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
       // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       projectedProgram = context.program = projectProgram(
-        context.originalProgram,
+        context.__originalProgram,
         projectedVersion.projections,
       );
     }
@@ -901,20 +901,7 @@ function collectParams(
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
-        let sourceProp = value;
-        while (sourceProp.sourceProperty) {
-          sourceProp = sourceProp.sourceProperty;
-        }
-        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
-          params.push(value);
-        } else if (!sourceProp.model) {
-          params.push(value);
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(
-            `We are not counting "${sourceProp.name}" as part of a method parameter because it's been added by Azure.Core templates`,
-          );
-        }
+        params.push(findRootSourceProperty(value));
       }
     }
   });

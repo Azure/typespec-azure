@@ -44,7 +44,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -62,7 +62,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -80,7 +80,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -98,7 +98,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -116,7 +116,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -127,7 +127,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("get undefined", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -140,7 +140,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -161,7 +161,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const defaultApiVersion = getDefaultApiVersion(
@@ -186,7 +186,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const defaultApiVersion = getDefaultApiVersion(
@@ -211,7 +211,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         @test namespace MyService {};
       `);
       const defaultApiVersion = getDefaultApiVersion(
@@ -255,7 +255,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
     it("api version in host param", async () => {
       await runner.compile(`
-        @service({
+        @service(#{
           title: "ApiVersion",
         })
         @server(
@@ -284,7 +284,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   describe("getClientNamespaceString", () => {
     it("default to service namespace without client", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace Azure.Pick.Me {};
       `);
       strictEqual(
@@ -300,7 +300,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     it("default to service namespace with client", async () => {
       await runner.compile(`
         @client({name: "MeClient"})
-        @service({})
+        @service
         namespace Azure.Pick.Me {};
       `);
       strictEqual(
@@ -347,7 +347,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     it("package-name override lowercase with dots", async () => {
       await runner.compile(`
         @client({name: "MeClient"})
-        @service({})
+        @service
         namespace Azure.NotMe {};
       `);
       strictEqual(
@@ -384,7 +384,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
 
         @versioned(Versions)
-        @service({})
+        @service
         namespace MyService {};
       `);
       const serviceNamespace = getServiceNamespace();
@@ -1369,7 +1369,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         ok(
           models.find(
             (x) =>
-              x.name === "AB" &&
+              x.name === "AB1" &&
               x.isGeneratedName &&
               x.crossLanguageDefinitionId === "TestService.A.b.anonymous",
           ),
@@ -1590,7 +1590,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       it("anonymous union in response header", async () => {
         const { repeatabilityResult } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model ResponseWithAnonymousUnion {
             @header("Repeatability-Result")
@@ -1618,7 +1618,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       it("anonymous union in request header", async () => {
         const { repeatabilityResult } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model RequestParameterWithAnonymousUnion {
             @header("Repeatability-Result")
@@ -1646,7 +1646,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       it("anonymous union with base type", async () => {
         const { repeatabilityResult } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model RequestParameterWithAnonymousUnion {
             @header("Repeatability-Result")
@@ -1679,7 +1679,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       it("anonymous model naming in multi layer operation group", async () => {
         const { TestModel } = (await runner.compile(`
-        @service({})
+        @service
         namespace MyService {
           namespace Test {
             namespace InnerTest {
@@ -1693,7 +1693,7 @@ describe("typespec-client-generator-core: public-utils", () => {
         }
         `)) as { TestModel: Model };
 
-        runner.context.generatedNames?.clear();
+        runner.context.__generatedNames?.clear();
         const name = getGeneratedName(
           runner.context,
           [...TestModel.properties.values()][0].type as Model,
@@ -1703,7 +1703,7 @@ describe("typespec-client-generator-core: public-utils", () => {
 
       it("anonymous model in response", async () => {
         const { test } = (await runner.compile(`
-        @service({})
+        @service
         namespace MyService {
           @test
           op test(): {@header header: string, prop: string};
@@ -1723,7 +1723,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   describe("getLroMetadata", () => {
     const lroCode = `
     @versioned(Versions)
-    @service({title: "Test Service"})
+    @service(#{title: "Test Service"})
     namespace TestService;
     alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
     NoRepeatableRequests &
@@ -1740,7 +1740,7 @@ describe("typespec-client-generator-core: public-utils", () => {
     @doc("Details about a user.")
     model User {
     @key
-    @visibility("read")
+    @visibility(Lifecycle.Read)
     @doc("The name of user.")
     name: string;
 

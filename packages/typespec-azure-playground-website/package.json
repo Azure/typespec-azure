@@ -70,22 +70,22 @@
     "@typespec/versioning": "workspace:~",
     "@typespec/xml": "workspace:~",
     "@vitejs/plugin-react": "~4.3.4",
-    "es-module-shims": "~2.0.5",
+    "es-module-shims": "~2.0.10",
     "react": "~18.3.1",
     "react-dom": "~18.3.1",
-    "vite": "^6.0.11"
+    "vite": "^6.2.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.1",
-    "@types/node": "~22.10.10",
+    "@playwright/test": "^1.50.1",
+    "@types/node": "~22.13.9",
     "@types/react-dom": "~18.3.0",
     "@typespec/bundler": "workspace:~",
     "@typespec/playground": "workspace:~",
-    "@vitest/coverage-v8": "^3.0.4",
-    "@vitest/ui": "^3.0.3",
+    "@vitest/coverage-v8": "^3.0.7",
+    "@vitest/ui": "^3.0.7",
     "cross-env": "~7.0.3",
     "rimraf": "~6.0.1",
-    "typescript": "~5.7.3",
-    "vitest": "^3.0.5"
+    "typescript": "~5.8.2",
+    "vitest": "^3.0.7"
   }
 }

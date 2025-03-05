@@ -10,9 +10,7 @@ using TypeSpec.Versioning;
 using Azure.ResourceManager;
 using Azure.Core;
 
-@service({
-  title: "Microsoft.OperationsTest",
-})
+@service(#{ title: "Microsoft.OperationsTest" })
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.OperationStatusSample;
