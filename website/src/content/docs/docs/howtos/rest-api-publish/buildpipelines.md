@@ -27,7 +27,7 @@ The following Azure Devops Pipeline tasks can be modified and added to your pipe
 # Install NodeJS
 - task: NodeTool@0
   inputs:
-    versionSpec: "18.x" # Node 18 LTS is recommended.
+    versionSpec: "22.x"
     checkLatest: false
 
 # Install dependencies
