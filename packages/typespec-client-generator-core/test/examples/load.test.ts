@@ -22,7 +22,7 @@ describe("typespec-client-generator-core: load examples", () => {
 
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }
@@ -43,7 +43,7 @@ describe("typespec-client-generator-core: load examples", () => {
 
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }
@@ -59,7 +59,7 @@ describe("typespec-client-generator-core: load examples", () => {
 
   it("no example folder found", async () => {
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }
@@ -73,7 +73,7 @@ describe("typespec-client-generator-core: load examples", () => {
   it("load example without version", async () => {
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }
@@ -90,7 +90,7 @@ describe("typespec-client-generator-core: load examples", () => {
   it("load example with version", async () => {
     await runner.host.addRealTypeSpecFile("./examples/v3/get.json", `${__dirname}/load/get.json`);
     await runner.compile(`
-      @service({})
+      @service
       @versioned(Versions)
       namespace TestClient {
         op get(): string;
@@ -118,7 +118,7 @@ describe("typespec-client-generator-core: load examples", () => {
       `${__dirname}/load/getAnother.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }
@@ -136,7 +136,7 @@ describe("typespec-client-generator-core: load examples", () => {
   it("load example with client customization", async () => {
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }
@@ -144,7 +144,7 @@ describe("typespec-client-generator-core: load examples", () => {
 
     await runner.compileWithCustomization(
       `
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }
@@ -180,7 +180,7 @@ describe("typespec-client-generator-core: load examples", () => {
       `${__dirname}/load/clientNameAnother.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @clientName("renamedNS")
         namespace NS {
@@ -222,7 +222,7 @@ describe("typespec-client-generator-core: load examples", () => {
       `${__dirname}/load/clientNameAnotherOriginal.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         @clientName("renamedNS")
         namespace NS {
@@ -259,7 +259,7 @@ describe("typespec-client-generator-core: load examples", () => {
     await runner.host.addRealTypeSpecFile("./examples/a_b.json", `${__dirname}/load/a_b.json`);
     await runner.host.addRealTypeSpecFile("./examples/a.json", `${__dirname}/load/a.json`);
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): string;
       }

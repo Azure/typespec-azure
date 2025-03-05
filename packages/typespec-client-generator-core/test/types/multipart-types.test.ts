@@ -60,7 +60,7 @@ describe("typespec-client-generator-core: multipart types", () => {
   it("multipart conflicting model usage", async function () {
     await runner.compile(
       `
-        @service({title: "Test Service"}) namespace TestService;
+        @service(#{title: "Test Service"}) namespace TestService;
         model MultiPartRequest {
           id: string;
           profileImage: bytes;
@@ -78,7 +78,7 @@ describe("typespec-client-generator-core: multipart types", () => {
   it("multipart conflicting model usage for only multipart operations", async function () {
     await runner.compile(
       `
-        @service({title: "Test Service"}) namespace TestService;
+        @service(#{title: "Test Service"}) namespace TestService;
         model Address {city: string;}
         model MultiPartRequest {
           address: Address;
@@ -108,7 +108,7 @@ describe("typespec-client-generator-core: multipart types", () => {
   it("multipart conflicting model usage for mixed operations", async function () {
     await runner.compile(
       `
-        @service({title: "Test Service"}) namespace TestService;
+        @service(#{title: "Test Service"}) namespace TestService;
         model Address {city: string;}
         model RegularRequest {
           address: Address;
@@ -225,7 +225,7 @@ describe("typespec-client-generator-core: multipart types", () => {
   it("multipart with encoding bytes raises error", async function () {
     await runner.compile(
       `
-        @service({title: "Test Service"}) namespace TestService;
+        @service(#{title: "Test Service"}) namespace TestService;
         model EncodedBytesMFD {
           @encode("base64")
           pictures: bytes;
@@ -814,7 +814,7 @@ describe("typespec-client-generator-core: multipart types", () => {
   it("multipart in client customization", async () => {
     const testCode = [
       `
-        @service({title: "Test Service"}) namespace TestService;
+        @service(#{title: "Test Service"}) namespace TestService;
         model MultiPartRequest {
           profileImage: bytes;
         }

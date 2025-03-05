@@ -35,7 +35,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Missing identifying properties of objects in the array item, please add @OpenAPI.extension("x-ms-identifiers", [<prop>]) to specify it. If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers",[]).`,
+        message: `Missing identifying properties of objects in the array item, please add @OpenAPI.extension("x-ms-identifiers", #[<prop>]) to specify it. If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers", #[]).`,
       });
   });
 
@@ -64,7 +64,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       .expect(
         `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", ["not-a-prop"])
+          @OpenAPI.extension("x-ms-identifiers", #["not-a-prop"])
           bar: Bar[];
         }
 
@@ -84,7 +84,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       .expect(
         `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", ["customName"])
+          @OpenAPI.extension("x-ms-identifiers", #["customName"])
           bar: Bar[];
         }
 
@@ -101,7 +101,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       .expect(
         `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", ["name"])
+          @OpenAPI.extension("x-ms-identifiers", #["name"])
           bar: Child[];
         }
 
@@ -136,7 +136,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       .expect(
         `
         model Pet {
-          @OpenAPI.extension("x-ms-identifiers", ["food/brand/name"])
+          @OpenAPI.extension("x-ms-identifiers", #["food/brand/name"])
           pet: Dog[];
         }
  
@@ -161,7 +161,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       .expect(
         `
         model Pet {
-          @OpenAPI.extension("x-ms-identifiers", ["/food/brand"])
+          @OpenAPI.extension("x-ms-identifiers", #["/food/brand"])
           pet: Dog[];
         }
  
@@ -236,7 +236,7 @@ describe("typespec-azure-core: no-enum rule", () => {
       .expect(
         `
         model Pet {
-          @OpenAPI.extension("x-ms-identifiers", ["food/brand"])
+          @OpenAPI.extension("x-ms-identifiers", #["food/brand"])
           pet: Dog[];
         }
  

@@ -30,7 +30,7 @@ model ManagedIdentityTrackedResource
 
 @doc("Managed Identity Arm Resource Properties.")
 model ManagedIdentityTrackedResourceProperties {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The status of the last operation.")
   provisioningState: string;
 }

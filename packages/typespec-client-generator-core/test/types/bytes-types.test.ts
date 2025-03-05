@@ -23,7 +23,7 @@ describe("typespec-client-generator-core: bytes types", () => {
   describe("bytes SdkMethodParameter", () => {
     it("should use service operation parameter encoding", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace TestClient {
           op send(@body body: bytes, @header contentType: "application/json; serialization=Avro" | "application/octet-stream"): void;
         }

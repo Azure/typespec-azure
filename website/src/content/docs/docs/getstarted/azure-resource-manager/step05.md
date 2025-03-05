@@ -30,10 +30,7 @@ using Azure.ResourceManager;
 
 /** Contoso Resource Provider management API */
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-  version: "2021-01-01-preview",
-})
+@service(#{ title: "ContosoProviderHubClient", version: "2021-01-01-preview" })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub;

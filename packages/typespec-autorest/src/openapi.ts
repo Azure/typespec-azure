@@ -61,6 +61,7 @@ import {
   getEncode,
   getFormat,
   getKnownValues,
+  getLifecycleVisibilityEnum,
   getMaxItems,
   getMaxLength,
   getMaxValue,
@@ -75,7 +76,7 @@ import {
   getRelativePathFromDirectory,
   getRootLength,
   getSummary,
-  getVisibility,
+  getVisibilityForClass,
   ignoreDiagnostics,
   interpolatePath,
   isArrayModelType,
@@ -102,6 +103,7 @@ import {
   resolvePath,
   serializeValueAsJson,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
@@ -1461,7 +1463,15 @@ export async function getOpenAPIForService(
     name?: string,
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(param, name);
-    let collectionFormat = getHeaderFieldOptions(program, param).format;
+    const headerOptions = getHeaderFieldOptions(program, param);
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    let collectionFormat = headerOptions.format;
+    if (
+      !collectionFormat &&
+      (typeof headerOptions.explode === "boolean" || $.array.is(param.type))
+    ) {
+      collectionFormat = headerOptions.explode ? "multi" : "csv";
+    }
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
       collectionFormat = undefined;
       reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
@@ -2012,17 +2022,24 @@ export async function getOpenAPIForService(
       if (isReadonlyProperty(program, prop)) {
         property.readOnly = true;
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        const vis = getVisibility(program, prop);
-        if (vis) {
+        const lifecycle = getLifecycleVisibilityEnum(program);
+        const vis = getVisibilityForClass(program, prop, lifecycle);
+
+        const { read, create, update } = {
+          read: lifecycle.members.get("Read")!,
+          create: lifecycle.members.get("Create")!,
+          update: lifecycle.members.get("Update")!,
+        };
+
+        if (vis.size !== lifecycle.members.size) {
           const mutability = [];
-          if (vis.includes("read")) {
+          if (vis.has(read)) {
             mutability.push("read");
           }
-          if (vis.includes("update")) {
+          if (vis.has(update)) {
             mutability.push("update");
           }
-          if (vis.includes("create")) {
+          if (vis.has(create)) {
             mutability.push("create");
           }
           if (mutability.length > 0) {
@@ -2064,17 +2081,24 @@ export async function getOpenAPIForService(
   }
 
   function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
-    const sharedVisibilities = ["read", "create", "update", "write"];
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const visibilities = getVisibility(program, prop);
-    if (visibilities) {
+    const sharedVisibilities = ["Read", "Create", "Update"];
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    const visibilities = getVisibilityForClass(program, prop, lifecycle);
+    // If the property does not have default visibility (all Lifecycle modifiers)
+    // then we have to look at the active modifiers to determine if it has any
+    // visibility other than read, create, or update, since those are compatible
+    // with x-ms-mutability.
+    if (visibilities.size !== lifecycle.members.size) {
       for (const visibility of visibilities) {
-        if (!sharedVisibilities.includes(visibility)) {
+        if (!sharedVisibilities.includes(visibility.name)) {
           return false;
         }
       }
     }
-    return true;
+    // Otherwise, the property can be shared if it has default visibility or only
+    // shared visibilities, but not if it is _invisible_. The property is invisible
+    // if it has no active modifiers.
+    return visibilities.size !== 0;
   }
 
   function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
