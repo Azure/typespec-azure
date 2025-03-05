@@ -49,6 +49,8 @@ import {
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
 
+import { $ } from "@typespec/compiler/experimental/typekit";
+
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 export const clientNameKey = createStateSymbol("clientName");
@@ -587,6 +589,28 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   const lifecycle = getLifecycleVisibilityEnum(context.program);
   const visibility = getVisibilityForClass(context.program, type, lifecycle);
   return visibility.size === 0;
+}
+
+export function listAllNamespaces(
+  context: TCGCContext,
+  namespace: Namespace,
+  retval?: Namespace[],
+): Namespace[] {
+  if (!retval) {
+    retval = [];
+  }
+  if (retval.includes(namespace)) return retval;
+  retval.push(namespace);
+  for (const ns of namespace.namespaces.values()) {
+    listAllNamespaces(context, ns, retval);
+  }
+  return retval;
+}
+
+export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
+  return listAllNamespaces(context, context.program.getGlobalNamespaceType()).filter((ns) =>
+    $.type.isUserDefined(ns),
+  );
 }
 
 export function findRootSourceProperty(property: ModelProperty): ModelProperty {
