@@ -12,7 +12,7 @@ export const armResourceProvisioningStateRule = createRule({
   messages: {
     default:
       "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
-    missingValues: paramMessage`The "@knownValues" decorator for provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${"missingValues"}].`,
+    missingValues: paramMessage`provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${"missingValues"}].`,
     missingReadOnlyVisibility: "The provisioningState property must have a single read visibility.",
     mustBeOptional: "The provisioningState property must be optional.",
   },

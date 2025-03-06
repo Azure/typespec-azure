@@ -60,7 +60,6 @@ import {
   getDoc,
   getEncode,
   getFormat,
-  getKnownValues,
   getLifecycleVisibilityEnum,
   getMaxItems,
   getMaxLength,
@@ -70,7 +69,6 @@ import {
   getMinValue,
   getPagingOperation,
   getPattern,
-  getProjectedName,
   getProperty,
   getPropertyType,
   getRelativePathFromDirectory,
@@ -1101,12 +1099,10 @@ export async function getOpenAPIForService(
   }
 
   function getJsonName(type: Type & { name: string }): string {
-    const viaProjection = getProjectedName(program, type, "json");
-
     const encodedName = resolveEncodedName(program, type, "application/json");
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
-    return encodedName === type.name ? (viaProjection ?? type.name) : encodedName;
+    return encodedName === type.name ? type.name : encodedName;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -1855,13 +1851,17 @@ export async function getOpenAPIForService(
     }
   }
 
-  function ifArrayItemContainsIdentifier(program: Program, array: ArrayModelType) {
+  function ifArrayItemContainsIdentifier(
+    program: Program,
+    array: ArrayModelType,
+    armIdentifiers: string[],
+  ) {
     if (array.indexer.value?.kind !== "Model") {
       return true;
     }
     return (
       getExtensions(program, array).has("x-ms-identifiers") ||
-      getProperty(array.indexer.value, "id")
+      (getProperty(array.indexer.value, "id") && armIdentifiers.includes("id"))
     );
   }
 
@@ -2254,16 +2254,6 @@ export async function getOpenAPIForService(
       newTarget["x-ms-secret"] = true;
     }
 
-    if (isString) {
-      const values = getKnownValues(program, typespecType);
-      if (values) {
-        const enumSchema = { ...newTarget, ...getSchemaForEnum(values) };
-        enumSchema["x-ms-enum"]!.modelAsString = true;
-        enumSchema["x-ms-enum"]!.name = (getPropertyType(typespecType) as Model).name;
-        return enumSchema;
-      }
-    }
-
     if (
       typespecType.kind === "ModelProperty" &&
       shouldFlattenProperty(context.tcgcSdkContext, typespecType)
@@ -2432,7 +2422,9 @@ export async function getOpenAPIForService(
       const armIdentifiers = getArmIdentifiers(program, typespecType);
       if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
         array["x-ms-identifiers"] = armIdentifiers;
-      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
+      } else if (
+        !ifArrayItemContainsIdentifier(program, typespecType as any, armIdentifiers ?? [])
+      ) {
         array["x-ms-identifiers"] = [];
       }
 

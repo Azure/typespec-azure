@@ -124,7 +124,8 @@ describe("typespec-autorest: decorators", () => {
         const diagnostics = await runner.diagnose(code, {
           noEmit: false,
           config: resolveVirtualPath("specification/org/service/tspconfig.json"),
-          emitters: {
+          emit: ["@azure-tools/typespec-autorest"],
+          options: {
             [AutorestTestLibrary.name]: {
               ...options,
               "emitter-output-dir": outputDir,

@@ -1,17 +1,11 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import {
-  Model,
-  ModelProperty,
-  Namespace,
-  Operation,
-  ignoreDiagnostics,
-  listServices,
-} from "@typespec/compiler";
+import { Model, ModelProperty, Namespace, Operation, ignoreDiagnostics } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { getHttpOperation, getServers } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkEmitterOptions, UsageFlags } from "../src/interfaces.js";
+import { listAllServiceNamespaces } from "../src/internal-utils.js";
 import {
   getClientNamespaceString,
   getCrossLanguageDefinitionId,
@@ -34,7 +28,7 @@ describe("typespec-client-generator-core: public-utils", () => {
   });
 
   function getServiceNamespace() {
-    return listServices(runner.context.program)[0].type;
+    return listAllServiceNamespaces(runner.context)[0];
   }
   describe("getDefaultApiVersion", () => {
     it("get single", async () => {
@@ -159,7 +153,6 @@ describe("typespec-client-generator-core: public-utils", () => {
           v1_0_1: "1.0.1",
           v1_1_0: "1.1.0",
         }
-
         @versioned(Versions)
         @service
         @test namespace MyService {};

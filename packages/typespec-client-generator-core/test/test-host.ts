@@ -23,6 +23,7 @@ import { SdkTestLibrary } from "../src/testing/index.js";
 export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
   emitterName?: string;
   librariesToAdd?: TypeSpecTestLibrary[];
+  autoImports?: string[];
   autoUsings?: string[];
   packageName?: string;
 }
@@ -51,8 +52,15 @@ export async function createSdkTestRunner(
   if (options.autoUsings) {
     autoUsings = autoUsings.concat(options.autoUsings);
   }
+  let autoImports = host.libraries
+    .filter((x) => x.name !== "@typespec/compiler")
+    .map((x) => x.name);
+  if (options.autoImports) {
+    autoImports = autoImports.concat(options.autoImports);
+  }
   const sdkTestRunner = createTestWrapper(host, {
-    autoUsings: autoUsings,
+    autoImports,
+    autoUsings,
   }) as SdkTestRunner;
 
   sdkTestRunner.host = host;
@@ -267,7 +275,6 @@ export async function createSdkContextTestHelper<
     program: program,
     emitterOutputDir: resolveVirtualPath("tsp-output"),
     options: options,
-    getAssetEmitter: null as any,
   };
   return await createSdkContext(
     emitContext,

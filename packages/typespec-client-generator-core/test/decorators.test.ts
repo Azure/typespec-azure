@@ -1662,18 +1662,15 @@ describe("typespec-client-generator-core: decorators", () => {
         @madeOptional(Versions.v3)
         description?: string;
       }
-
       @added(Versions.v2)
       @removed(Versions.v3)
       model Test {
         prop1: string;
       }
-
       @route("/test")
       @added(Versions.v2)
       @returnTypeChangedFrom(Versions.v3, Test)
       op test(): void | Error;
-
       op list(@query apiVersion: string): Widget[] | Error;
       
       @added(Versions.v2)
