@@ -153,7 +153,7 @@ describe("typespec-client-generator-core: example types", () => {
       `${__dirname}/example-types/getStringFromExtensibleEnum.json`,
     );
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         union TestEnum {
             "one","two","three",string
