@@ -26,7 +26,7 @@ model OrderProperties {
   amount: int32;
 
   @doc("The provisioning state of the product.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: string;
 }
 

@@ -1,9 +1,9 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Enum, Model, Union } from "@typespec/compiler";
+import { Model, Union } from "@typespec/compiler";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
-import { getClientType, getSdkEnum } from "../../src/types.js";
+import { getClientType } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: enum types", () => {
@@ -276,7 +276,7 @@ describe("typespec-client-generator-core: enum types", () => {
 
   it("crossLanguageDefinitionId", async () => {
     await runner.compile(`
-        @service({})
+        @service
         namespace MyService {
           @usage(Usage.input | Usage.output)
           enum Integers {
@@ -300,7 +300,7 @@ describe("typespec-client-generator-core: enum types", () => {
 
   it("enum with deprecated annotation", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         namespace MyService;
         #deprecated "no longer support"
         enum Test {
@@ -316,7 +316,7 @@ describe("typespec-client-generator-core: enum types", () => {
 
   it("orphan enum", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
@@ -338,52 +338,10 @@ describe("typespec-client-generator-core: enum types", () => {
     strictEqual(runner.context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
   });
 
-  it("projected name", async () => {
-    await runner.compileAndDiagnose(`
-        @service({})
-        @test namespace MyService {
-          @test
-          @usage(Usage.input | Usage.output)
-          @projectedName("java", "JavaEnum1")
-          enum Enum1{
-            @projectedName("java", "JavaOne")
-            One: "one",
-            two,
-            three
-          }
-        }
-      `);
-
-    async function helper(emitterName: string, enumName: string, enumValueName: string) {
-      const runner = await createSdkTestRunner({ emitterName });
-      const { Enum1 } = (await runner.compile(`
-        @service({})
-        namespace MyService {
-          #suppress "deprecated" "for testing"
-          @test
-          @usage(Usage.input | Usage.output)
-          @projectedName("java", "JavaEnum1")
-          enum Enum1{
-            #suppress "deprecated" "for testing"
-            @projectedName("java", "JavaOne")
-            One: "one",
-            two,
-            three
-          }
-        }
-      `)) as { Enum1: Enum };
-      const enum1 = getSdkEnum(runner.context, Enum1);
-      strictEqual(enum1.name, enumName);
-      strictEqual(enum1.values[0].name, enumValueName);
-    }
-    await helper("@azure-tools/typespec-csharp", "Enum1", "One");
-    await helper("@azure-tools/typespec-java", "JavaEnum1", "JavaOne");
-  });
-
   it("union as enum rename", async () => {
     const { TestUnion } = (await runner.compileWithCustomization(
       `
-        @service({})
+        @service
         namespace N {
           @test
           union TestUnion{
@@ -415,7 +373,7 @@ describe("typespec-client-generator-core: enum types", () => {
   it("union as enum with hierarchy", async () => {
     const { Test } = (await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           @test
           union Test{
@@ -468,7 +426,7 @@ describe("typespec-client-generator-core: enum types", () => {
     });
     const { Foo } = (await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           @test
           union Foo {
@@ -502,7 +460,7 @@ describe("typespec-client-generator-core: enum types", () => {
     });
     const { Test } = (await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           @test
           union Test{
@@ -574,7 +532,7 @@ describe("typespec-client-generator-core: enum types", () => {
   it("anonymous union as enum with hierarchy", async () => {
     const { Test } = (await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           enum LR {
             left,
@@ -624,7 +582,7 @@ describe("typespec-client-generator-core: enum types", () => {
     });
     const { Test } = (await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           enum LR {
             left,
@@ -780,7 +738,7 @@ describe("typespec-client-generator-core: enum types", () => {
   it("usage propagation for enum value", async () => {
     await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           enum LR {
             left,
@@ -813,7 +771,7 @@ describe("typespec-client-generator-core: enum types", () => {
   it("spread and union as enum", async () => {
     await runner.compile(
       `
-        @service({})
+        @service
         namespace N {
           union StringExtensibleNamedUnion {
             string,

@@ -106,7 +106,7 @@ describe("typespec-client-generator-core: responses", () => {
     await runner.compileWithBuiltInService(
       `
       model Widget {
-        @visibility("read", "update")
+        @visibility(Lifecycle.Read, Lifecycle.Update)
         @path
         id: string;
 

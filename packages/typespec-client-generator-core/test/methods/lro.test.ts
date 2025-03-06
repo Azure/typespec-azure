@@ -20,7 +20,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
       runner.compileWithVersionedService = async function (code) {
         return await baseCompile(
           `
-        @service({})
+        @service
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
@@ -48,7 +48,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         @resource("users")
         model User {
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
 
           role: string;
@@ -118,7 +118,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         @resource("users")
         model User {
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
 
           role: string;
@@ -171,7 +171,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         @resource("users")
         model User {
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
 
           role: string;
@@ -258,7 +258,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         model GenerationResponse is global.Azure.Core.Foundations.OperationStatus<GenerationResult>;
         // fix warning in Azure.Core.Foundations.OperationStatus
-        @@visibility(global.Azure.Core.Foundations.OperationStatus.id, "read");
+        @@visibility(global.Azure.Core.Foundations.OperationStatus.id, Lifecycle.Read);
 
         model GenerationResult {
           @doc("The data.")
@@ -359,11 +359,11 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         @resource("resources")
         model Resource {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           id: string;
 
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
 
           description?: string;
@@ -374,7 +374,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         model OperationDetails {
           @doc("Operation ID")
           @key
-          @visibility("read", "create")
+          @visibility(Lifecycle.Read, Lifecycle.Create)
           id: uuid;
 
           status: Azure.Core.Foundations.OperationState;
@@ -425,7 +425,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         @resource("analyze/jobs")
         model JobState {
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           jobId: uuid;
 
           status: LroStatus;
@@ -501,7 +501,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         @resource("analyze/jobs")
         model JobState {
           @key
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           jobId: uuid;
 
           status: LroStatus;
@@ -579,7 +579,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
     it("LRO defined in different namespace", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @versioned(Versions)
         namespace TestClient {
           enum Versions {
@@ -789,7 +789,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         return await baseCompile(
           `
         @armProviderNamespace
-        @service({})
+        @service
         @versioned(Versions)
         namespace TestClient;
         enum Versions {

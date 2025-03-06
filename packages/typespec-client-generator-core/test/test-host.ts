@@ -97,7 +97,7 @@ export async function createSdkTestRunner(
   // compile with dummy service definition
   sdkTestRunner.compileWithBuiltInService = async (code) => {
     const result = await baseCompile(
-      `@service({title: "Test Service"}) namespace TestService;
+      `@service(#{title: "Test Service"}) namespace TestService;
     ${code}`,
       {
         noEmit: true,
@@ -138,7 +138,7 @@ export async function createSdkTestRunner(
       `
     @armProviderNamespace("My.Service")
     @server("http://localhost:3000", "endpoint")
-    @service({title: "My.Service"})
+    @service(#{title: "My.Service"})
     @versioned(Versions)
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
@@ -267,7 +267,6 @@ export async function createSdkContextTestHelper<
     program: program,
     emitterOutputDir: resolveVirtualPath("tsp-output"),
     options: options,
-    getAssetEmitter: null as any,
   };
   return await createSdkContext(
     emitContext,

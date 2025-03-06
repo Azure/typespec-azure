@@ -5,7 +5,6 @@ import {
   getDoc,
   getNamespaceFullName,
   getPagingOperation,
-  getService,
   getSummary,
   isList,
   Model,
@@ -698,12 +697,7 @@ function getClientDefaultApiVersion(
   if (context.apiVersion && !["latest", "all"].includes(context.apiVersion)) {
     return context.apiVersion;
   }
-  let defaultVersion = getDefaultApiVersion(context, client.service)?.value;
-  if (!defaultVersion) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    defaultVersion = getService(context.program, client.service)?.version;
-  }
-  return defaultVersion;
+  return getDefaultApiVersion(context, client.service)?.value;
 }
 
 function getSdkInitializationType(

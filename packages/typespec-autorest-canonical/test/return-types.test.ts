@@ -495,7 +495,7 @@ it("using @body ignore any metadata property underneath", async () => {
 });
 
 describe("response model resolving to no property in the body produce no body", () => {
-  it.each(["{}", "{@header prop: string}", `{@visibility("none") prop: string}`])(
+  it.each(["{}", "{@header prop: string}", `{@invisible(Lifecycle) prop: string}`])(
     "%s",
     async (body) => {
       const res = await openApiFor(`op test(): ${body};`);

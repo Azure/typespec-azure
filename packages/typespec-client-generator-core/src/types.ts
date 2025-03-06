@@ -23,9 +23,7 @@ import {
   getDiscriminator,
   getDoc,
   getEncode,
-  getKnownValues,
   getLifecycleVisibilityEnum,
-  getLocationContext,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -104,6 +102,7 @@ import {
   isMultipartOperation,
   isNeverOrVoidType,
   isOnClient,
+  listAllUserDefinedNamespaces,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -1230,14 +1229,10 @@ export function getSdkModelPropertyTypeBase(
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
   const alternateType = getAlternateType(context, type);
-  let propertyType = diagnostics.pipe(
+  const propertyType = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
   );
   diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, propertyType));
-  const knownValues = getKnownValues(context.program, type);
-  if (knownValues) {
-    propertyType = diagnostics.pipe(getSdkEnumWithDiagnostics(context, knownValues, operation));
-  }
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   return diagnostics.wrap({
@@ -1967,16 +1962,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
   }
   // update for orphan models/enums/unions
-  const allNamespaces = [...context.program.getGlobalNamespaceType().namespaces.values()].filter(
-    (x) => getLocationContext(context.program, x).type === "project",
-  );
-  // make sure we also include all client namespaces as well
-  for (const client of listClients(context)) {
-    if (!allNamespaces.includes(client.service)) {
-      allNamespaces.push(client.service);
-    }
-  }
-  for (const currNamespace of allNamespaces) {
+  const userDefinedNamespaces = listAllUserDefinedNamespaces(context);
+  for (const currNamespace of userDefinedNamespaces) {
     const namespaces = [currNamespace];
     while (namespaces.length) {
       const namespace = namespaces.pop()!;

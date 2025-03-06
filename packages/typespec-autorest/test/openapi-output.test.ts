@@ -561,27 +561,6 @@ describe("typespec-autorest: operations", () => {
     strictEqual(res.paths["/"].get.deprecated, true);
   });
 
-  it(`@projectedName("client", <>) updates the operationId (LEGACY)`, async () => {
-    const res = await openApiFor(`
-      @service namespace MyService;
-      #suppress "deprecated" "for testing"
-      @route("/op-only") @projectedName("client", "clientCall") op serviceName(): void;
-
-      #suppress "deprecated" "for testing"
-      @projectedName("client", "ClientInterfaceName") 
-      interface ServiceInterfaceName {
-        @route("/interface-only") same(): void;
-        #suppress "deprecated" "for testing"
-        @route("/interface-and-op") @projectedName("client", "clientCall") serviceName(): void;
-      }
-     
-      `);
-
-    strictEqual(res.paths["/op-only"].get.operationId, "ClientCall");
-    strictEqual(res.paths["/interface-only"].get.operationId, "ClientInterfaceName_Same");
-    strictEqual(res.paths["/interface-and-op"].get.operationId, "ClientInterfaceName_ClientCall");
-  });
-
   it(`@clientName(<>) updates the operationId`, async () => {
     const res = await openApiFor(`
       @service namespace MyService;
@@ -749,27 +728,6 @@ describe("typespec-autorest: enums", () => {
           },
         ],
       },
-    });
-  });
-
-  it("defines known values (modelAsString enums)", async () => {
-    const res = await oapiForModel(
-      "PetType",
-      `
-      enum KnownPetType {
-        Dog, Cat
-      }
-
-      #suppress "deprecated" "for testing"
-      @knownValues(KnownPetType)
-      scalar PetType extends string;
-      `,
-    );
-    ok(res.isRef);
-    deepStrictEqual(res.defs.PetType, {
-      type: "string",
-      enum: ["Dog", "Cat"],
-      "x-ms-enum": { name: "PetType", modelAsString: true },
     });
   });
 
@@ -1072,9 +1030,7 @@ describe("typespec-azure: identifiers decorator", () => {
 describe("typespec-autorest: multipart formData", () => {
   it("expands model into formData parameters", async () => {
     const oapi = await openApiFor(`
-    @service({
-      name: "Widget",
-    })
+    @service
     namespace Widget;
 
     @doc("A widget.")

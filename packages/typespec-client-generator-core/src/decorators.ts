@@ -19,7 +19,6 @@ import {
   Union,
   getDiscriminator,
   getNamespaceFullName,
-  getProjectedName,
   ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
@@ -203,13 +202,6 @@ export const $client: ClientDecorator = (
     explicitService?.kind === "Namespace"
       ? explicitService
       : (findClientService(context.program, target) ?? (target as any));
-  if (!name.endsWith("Client")) {
-    reportDiagnostic(context.program, {
-      code: "client-name",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-  }
 
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
@@ -379,7 +371,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
+      originalName = service.type.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service.type);
@@ -763,7 +755,7 @@ export const $access: AccessDecorator = (
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
-      code: "access",
+      code: "invalid-access",
       format: {},
       target: entity,
     });

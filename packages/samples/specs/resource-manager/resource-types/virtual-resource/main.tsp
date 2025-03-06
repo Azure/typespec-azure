@@ -17,9 +17,7 @@ using Azure.ResourceManager;
  * an Azure Resource Manager Resource
  */
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-})
+@service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
@@ -76,7 +74,7 @@ model EmployeeProperties {
   profile?: bytes;
 
   /** The status of the last operation. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
