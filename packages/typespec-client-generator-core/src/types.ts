@@ -46,7 +46,6 @@ import {
   isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
-import { isStream } from "@typespec/streams";
 import {
   getAccessOverride,
   getAlternateType,
@@ -1647,8 +1646,6 @@ function updateTypesFromOperation(
     if (isNeverOrVoidType(param.type)) continue;
     // if it is a body model, skip
     if (httpOperation.parameters.body?.property === param) continue;
-    // if it is a stream model, skip
-    if (param.type.kind === "Model" && isStream(program, param.type)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
     if (generateConvenient) {
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
