@@ -15,7 +15,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("two sub-clients", async () => {
       await runner.compile(`
         @server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace Foo {
           @route("/bar")
           namespace Bar {
@@ -67,7 +67,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("separate defined clients and operation groups", async () => {
       await runner.compile(`
         @server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace Service {
           model BarResponse {
             prop: string;
@@ -141,7 +141,7 @@ describe("typespec-client-generator-core: namespaces", () => {
 
     it("complicated namespaces", async () => {
       await runner.compile(`
-        @service({})
+        @service
         @route("/a")
         namespace A {
           interface AG {
@@ -201,7 +201,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("restructure client hierarchy with renaming of client name and client namespace name", async () => {
       await runner.compileWithCustomization(
         `
-        @service({
+        @service(#{
           title: "Pet Store",
         })
         namespace PetStore;
@@ -245,7 +245,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("restructure client with namespace flag", async () => {
       await runner.compile(
         `
-        @service({
+        @service(#{
           title: "Pet Store",
         })
         namespace PetStore;
@@ -272,7 +272,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("replace single-segment namespace with multi-segment namespace", async () => {
       await runner.compile(`
         @server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace Foo {
           op get(): string;
         }
@@ -300,7 +300,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("two sub-clients with namespace flag", async () => {
       await runner.compile(`
         @server("http://localhost:3000", "endpoint")
-        @service({})
+        @service
         namespace Foo {
           @route("/bar")
           namespace Bar {
@@ -348,7 +348,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("restructure client with namespace flag", async () => {
       await runner.compile(
         `
-        @service({
+        @service(#{
           title: "Pet Store",
         })
         namespace PetStore;
@@ -405,7 +405,7 @@ describe("typespec-client-generator-core: namespaces", () => {
     it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
       await runner.compileWithCustomization(
         `
-      @service({
+      @service(#{
         title: "Pet Store",
       })
       namespace PetStore;
@@ -460,7 +460,7 @@ describe("typespec-client-generator-core: namespaces", () => {
 
     it("complicated nested namespaces", async () => {
       await runner.compile(`
-      @service({})
+      @service
       @route("/a")
       namespace A {
         interface AG {
@@ -502,7 +502,7 @@ describe("typespec-client-generator-core: namespaces", () => {
   it("customization with models from original namespace", async () => {
     await runner.compileWithCustomization(
       `
-      @service({})
+      @service
       namespace Original {
         model MyModel {
           prop: string;

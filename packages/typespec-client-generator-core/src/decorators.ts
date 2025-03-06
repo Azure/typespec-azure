@@ -1134,11 +1134,11 @@ export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
+  const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
+  if (override) return override;
   if (context.namespace) {
     return context.namespace;
   }
-  const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  if (override) return override;
   if (!entity.namespace) {
     return "";
   }
