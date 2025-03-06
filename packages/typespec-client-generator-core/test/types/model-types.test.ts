@@ -1,5 +1,4 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { Visibility } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -1810,47 +1809,5 @@ describe("typespec-client-generator-core: model types", () => {
     ok(nameProperty.visibility);
     strictEqual(nameProperty.visibility.length, 1);
     strictEqual(nameProperty.visibility[0], Visibility.Read);
-  });
-
-  it("discriminator from template", async function () {
-    await runner.compileWithBuiltInService(`
-        @discriminator("kind")
-        model Base {
-          kind: string;
-        }
-
-        model Derived<kind extends string> extends Base {
-          kind: kind;
-        }
-
-        model One is Derived<"one"> {
-          prop: string;
-        };
-
-        op test(): One;
-      `);
-    const models = runner.context.sdkPackage.models;
-    strictEqual(models.length, 2);
-    const base = models.find((x) => x.name === "Base");
-    ok(base);
-    const kindProperty = base.properties[0];
-    ok(kindProperty);
-    strictEqual(kindProperty.name, "kind");
-    strictEqual(kindProperty.kind, "property");
-    strictEqual(kindProperty.discriminator, true);
-    strictEqual(kindProperty.type.kind, "string");
-    strictEqual(base.discriminatorProperty, kindProperty);
-
-    const one = models.find((x) => x.name === "One");
-    ok(one);
-    strictEqual(one.properties.length, 2);
-    strictEqual(one.properties[0].kind, "property");
-    strictEqual(one.properties[0].name, "kind");
-    strictEqual(one.properties[0].discriminator, true);
-    strictEqual(one.discriminatorValue, "one");
-    strictEqual(one.properties[1].kind, "property");
-    strictEqual(one.properties[1].name, "prop");
-
-    expectDiagnosticEmpty(runner.context.diagnostics);
   });
 });

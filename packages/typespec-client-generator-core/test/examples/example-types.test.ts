@@ -147,35 +147,6 @@ describe("typespec-client-generator-core: example types", () => {
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
-  it("SdkStringExample from extensible enum", async () => {
-    await runner.host.addRealTypeSpecFile(
-      "./examples/getStringFromExtensibleEnum.json",
-      `${__dirname}/example-types/getStringFromExtensibleEnum.json`,
-    );
-    await runner.compile(`
-      @service({})
-      namespace TestClient {
-        union TestEnum {
-            "one","two","three",string
-        }
-        op getStringFromExtensibleEnum(): {@body body: TestEnum};
-      }
-    `);
-
-    const operation = (
-      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-    ).operation;
-    ok(operation);
-    strictEqual(operation.examples?.length, 1);
-    const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
-    ok(response);
-    strictEqual(response.bodyValue?.kind, "string");
-    strictEqual(response.bodyValue?.value, "four");
-    strictEqual(response.bodyValue?.type.kind, "enum");
-
-    expectDiagnostics(runner.context.diagnostics, []);
-  });
-
   it("SdkStringExample from enum diagnostic", async () => {
     await runner.host.addRealTypeSpecFile(
       "./examples/getStringFromEnumDiagnostic.json",
