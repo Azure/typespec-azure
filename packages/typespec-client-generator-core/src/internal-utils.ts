@@ -663,7 +663,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const apiVersion = getValidApiVersion(context, allApiVersions);
   if (apiVersion === undefined) return globalNamespace;
 
-  const mutator = getVersioningMutator(context, globalNamespace, apiVersion);
+  const mutator = getVersioningMutator(context, service.type, apiVersion);
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;
