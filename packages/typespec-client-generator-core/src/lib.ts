@@ -27,13 +27,13 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "union-null": {
-      severity: "error",
+      severity: "warning",
       messages: {
         default: "Cannot have a union containing only null types.",
       },
     },
     "union-circular": {
-      severity: "error",
+      severity: "warning",
       messages: {
         default: "Cannot have a union containing self.",
       },
@@ -53,8 +53,7 @@ export const $lib = createTypeSpecLibrary({
     "conflicting-multipart-model-usage": {
       severity: "error",
       messages: {
-        default: "Invalid encoding",
-        wrongType: paramMessage`Model '${"modelName"}' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model ${"modelName"}FormData' extends ${"modelName"} {}`,
+        default: paramMessage`Model '${"modelName"}' cannot be used as both multipart/form-data input and regular body input. You can create a separate model with name 'model ${"modelName"}FormData' extends ${"modelName"} {}`,
       },
     },
     "discriminator-not-constant": {
@@ -76,7 +75,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "encoding-multipart-bytes": {
-      severity: "error",
+      severity: "warning",
       messages: {
         default:
           "Encoding should not be applied to bytes content in a multipart request. This is semi-incompatible with how multipart works in HTTP.",

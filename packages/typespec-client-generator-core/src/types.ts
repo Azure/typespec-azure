@@ -30,6 +30,7 @@ import {
   isArrayModelType,
   isErrorModel,
   isNeverType,
+  isTemplateDeclaration,
   resolveEncodedName,
 } from "@typespec/compiler";
 import {
@@ -44,6 +45,7 @@ import {
   isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
+import { isStream } from "@typespec/streams";
 import {
   getAccessOverride,
   getAlternateType,
@@ -509,12 +511,12 @@ export function getSdkUnionWithDiagnostics(
     const nullOption = getNullOption(type);
 
     if (nonNullOptions.length === 0) {
-      // union with only `null`, report diagnostic and return empty union
+      // union with only `null`, report diagnostic and fall back to empty union
       diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
     } else if (checkUnionCircular(type)) {
-      // union with circular ref, report diagnostic and return empty union
+      // union with circular ref, report diagnostic and fall back to empty union
       diagnostics.add(createDiagnostic({ code: "union-circular", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
@@ -691,11 +693,13 @@ function addDiscriminatorToModelType(
       const property = model.properties[i];
       if (property.kind === "property" && property.__raw?.name === discriminator.propertyName) {
         discriminatorType = property.type;
+        break;
       }
     }
 
     let discriminatorProperty;
     for (const childModel of type.derivedModels) {
+      if (isTemplateDeclaration(childModel)) continue;
       const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel));
       for (const property of childModelSdkType.properties) {
         if (property.kind === "property") {
@@ -1641,6 +1645,8 @@ function updateTypesFromOperation(
     if (isNeverOrVoidType(param.type)) continue;
     // if it is a body model, skip
     if (httpOperation.parameters.body?.property === param) continue;
+    // if it is a stream model, skip
+    if (param.type.kind === "Model" && isStream(program, param.type)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
     if (generateConvenient) {
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
@@ -1858,6 +1864,10 @@ function handleServiceOrphanType(
   type: Model | Enum | Union,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  // skip template types
+  if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) {
+    return diagnostics.wrap(undefined);
+  }
   const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
   diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.None, sdkType));
   // add serialization options to model type
