@@ -1132,7 +1132,7 @@ export const $clientNamespace: ClientNamespaceDecorator = (
 };
 
 /**
- * Returns the client namespace for a given entitiy. The order of operations is as follows:
+ * Returns the client namespace for a given entity. The order of operations is as follows:
  *
  * 1. if `@clientNamespace` is applied to the entity, this wins out.
  *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
