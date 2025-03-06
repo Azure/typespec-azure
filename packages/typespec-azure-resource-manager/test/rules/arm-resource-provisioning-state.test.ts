@@ -104,9 +104,6 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
               provisioningState?: State;
             }
     
-            enum StateKV {Succeeded, Failed, Canceled}
-            #suppress "deprecated" "for testing"
-            @knownValues(StateKV)
             scalar State extends string;
           `,
       )
@@ -229,7 +226,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
           )
           .toEmitDiagnostics({
             code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
-            message: `The "@knownValues" decorator for provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${omit}].`,
+            message: `provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${omit}].`,
           });
       });
     });
