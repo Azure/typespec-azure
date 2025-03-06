@@ -2496,7 +2496,7 @@ importers:
         specifier: workspace:~
         version: link:../../core/packages/compiler
       dotenv:
-        specifier: ~16.4.7
+        specifier: ^16.4.7
         version: 16.4.7
       typescript:
         specifier: ~5.8.2
