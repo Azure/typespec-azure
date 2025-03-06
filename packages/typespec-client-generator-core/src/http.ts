@@ -4,7 +4,6 @@ import {
   ModelProperty,
   Operation,
   Type,
-  compilerAssert,
   createDiagnosticCollector,
   getDoc,
   getSummary,
@@ -66,7 +65,6 @@ import {
   twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -203,6 +201,7 @@ function getSdkHttpParameters(
       };
     }
     if (retval.bodyParam) {
+      addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
       retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
         getCorrespondingMethodParams(
           context,
@@ -211,11 +210,8 @@ function getSdkHttpParameters(
           retval.bodyParam,
         ),
       );
-
-      addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
-
-      // map stream request body type to bytes
       if (getStreamMetadata(context.program, httpOperation.parameters)) {
+        // map stream request body type to bytes
         retval.bodyParam.type = diagnostics.pipe(
           getStreamAsBytes(context, retval.bodyParam.type.__raw!),
         );
@@ -285,7 +281,7 @@ function createContentTypeOrAcceptHeader(
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (isMediaTypeJson(bodyObject.contentTypes[0]) || name === "accept")
+    (/json/.test(bodyObject.contentTypes[0]) || name === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
@@ -320,26 +316,16 @@ function addContentTypeInfoToBodyParam(
   const diagnostics = createDiagnosticCollector();
   const tspBody = httpOperation.parameters.body;
   if (!tspBody) return diagnostics.diagnostics;
-  const contentTypes = tspBody.contentTypes;
-  compilerAssert(contentTypes.length > 0, "contentTypes should not be empty"); // this should be http lib bug
+  let contentTypes = tspBody.contentTypes;
+  if (contentTypes.length === 0) {
+    contentTypes = ["application/json"];
+  }
   const defaultContentType = contentTypes.includes("application/json")
     ? "application/json"
     : contentTypes[0];
   bodyParam.contentTypes = contentTypes;
   bodyParam.defaultContentType = defaultContentType;
   diagnostics.pipe(addEncodeInfo(context, bodyParam.__raw!, bodyParam.type, defaultContentType));
-  // set the correct encode for body parameter of method according to the content-type
-  if (bodyParam.correspondingMethodParams.length === 1) {
-    const methodBodyParam = bodyParam.correspondingMethodParams[0];
-    diagnostics.pipe(
-      addEncodeInfo(
-        context,
-        methodBodyParam.__raw!,
-        methodBodyParam.type,
-        bodyParam.defaultContentType,
-      ),
-    );
-  }
   return diagnostics.diagnostics;
 }
 
@@ -400,8 +386,8 @@ export function getSdkHttpParameter(
       ...base,
       kind: "body",
       serializedName: param.name === "" ? "body" : getWireName(context, param),
-      contentTypes: ["application/json"],
-      defaultContentType: "application/json",
+      contentTypes: ["application/json"], // will update when we get to the operation level
+      defaultContentType: "application/json", // will update when we get to the operation level
       optional: param.optional,
       correspondingMethodParams,
     });
