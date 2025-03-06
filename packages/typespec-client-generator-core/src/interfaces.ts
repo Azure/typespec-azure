@@ -38,7 +38,7 @@ export interface TCGCContext {
   arm?: boolean;
   getMutatedGlobalNamespace(): Namespace;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
-  namespace?: string;
+  namespaceFlag?: string;
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
