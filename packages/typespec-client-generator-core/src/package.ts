@@ -260,6 +260,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         nextLinkSegments,
         continuationTokenParameterSegments,
         continuationTokenResponseSegments,
+        pageItemsSegments: baseServiceMethod.response.resultSegments,
       },
     });
   }
@@ -347,6 +348,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             ),
           )
         : undefined,
+      pageItemsSegments: baseServiceMethod.response.resultSegments,
     },
   });
 }
