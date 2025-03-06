@@ -13,19 +13,6 @@ describe("typespec-autorest: info", () => {
     strictEqual(res.info.title, "My Service");
   });
 
-  it("set the service version with @service", async () => {
-    const res = await openApiFor(
-      `
-      #suppress "deprecated" "For test"
-      @service(#{
-        version: "1.2.3-test"
-      })
-      namespace Foo {}
-      `,
-    );
-    strictEqual(res.info.version, "1.2.3-test");
-  });
-
   it("set the service description with @doc", async () => {
     const res = await openApiFor(
       `
