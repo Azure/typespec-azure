@@ -1131,16 +1131,29 @@ export const $clientNamespace: ClientNamespaceDecorator = (
   setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
 };
 
+/**
+ * Returns the client namespace for a given entitiy. The order of operations is as follows:
+ *
+ * 1. if `@clientNamespace` is applied to the entity, this wins out.
+ *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
+ * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace
+ * 3. We return the namespace of the entity retrieved from the original spec
+ * @param context
+ * @param entity
+ * @returns
+ */
 export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
+    // if @clientNamespace is applied to the entity, this wins out
     const userDefinedNamespace = listAllUserDefinedNamespaces(context).find((x) =>
       override.includes(x.name),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
+      // we still make sure to replace the root of the client namespace with the flag (if the flag exists)
       return override.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return override;
