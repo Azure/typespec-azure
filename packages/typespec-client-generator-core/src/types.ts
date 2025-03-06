@@ -1229,7 +1229,7 @@ export function getSdkModelPropertyTypeBase(
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
   const alternateType = getAlternateType(context, type);
-  let propertyType = diagnostics.pipe(
+  const propertyType = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
   );
   diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, propertyType));
