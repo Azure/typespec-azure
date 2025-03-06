@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Enum, Model, Union } from "@typespec/compiler";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
 import { getClientType, getSdkEnum } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -11,6 +11,16 @@ describe("typespec-client-generator-core: enum types", () => {
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+  });
+  afterEach(async () => {
+    for (const modelsOrEnums of [
+      runner.context.sdkPackage.models,
+      runner.context.sdkPackage.enums,
+    ]) {
+      for (const item of modelsOrEnums) {
+        ok(item.name !== "");
+      }
+    }
   });
   it("string extensible", async function () {
     await runner.compileWithBuiltInService(`
