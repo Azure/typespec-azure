@@ -59,6 +59,7 @@ import {
   findRootSourceProperty,
   listAllNamespaces,
   listAllServiceNamespaces,
+  listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -1135,9 +1136,17 @@ export function getClientNamespace(
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  if (override) return override;
-  if (context.namespace) {
-    return context.namespace;
+  if (override) {
+    const userDefinedNamespace = listAllUserDefinedNamespaces(context).find((x) =>
+      override.includes(x.name),
+    );
+    if (userDefinedNamespace && context.namespaceFlag) {
+      return override.replace(userDefinedNamespace.name, context.namespaceFlag);
+    }
+    return override;
+  }
+  if (context.namespaceFlag) {
+    return context.namespaceFlag;
   }
   if (!entity.namespace) {
     return "";
@@ -1149,8 +1158,8 @@ export function getClientNamespace(
 }
 
 function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
-  if (context.namespace) {
-    return context.namespace;
+  if (context.namespaceFlag) {
+    return context.namespaceFlag;
   }
   const segments = [];
   let current: Namespace | undefined = namespace;

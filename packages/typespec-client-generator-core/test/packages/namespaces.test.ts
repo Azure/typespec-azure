@@ -431,7 +431,7 @@ describe("typespec-client-generator-core: namespaces", () => {
         name: "PetActionClient",
         service: PetStore
       })
-      @clientNamespace("PetStoreRenamed.SubNamespace") // use @clientNamespace to specify the namespace of the client
+      @clientNamespace("PetStore.SubNamespace") // use @clientNamespace to specify the namespace of the client
       interface Client2 {
         pet is PetStore.pet
       }
@@ -444,18 +444,22 @@ describe("typespec-client-generator-core: namespaces", () => {
       ).sdkPackage;
       const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
       ok(foodClient);
-      strictEqual(foodClient.clientNamespace, "PetStoreFlagRenamed");
+      strictEqual(foodClient.namespace, "PetStoreFlagRenamed");
       const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
       ok(petActionClient);
-      strictEqual(petActionClient.clientNamespace, "PetStoreFlagRenamed");
+      strictEqual(petActionClient.namespace, "PetStoreFlagRenamed.SubNamespace");
 
       strictEqual(sdkPackage.namespaces.length, 1);
       const petStoreFlagRenamedNamespace = sdkPackage.namespaces[0];
       strictEqual(petStoreFlagRenamedNamespace.fullName, "PetStoreFlagRenamed");
-      strictEqual(petStoreFlagRenamedNamespace.clients.length, 2);
+      strictEqual(petStoreFlagRenamedNamespace.clients.length, 1);
       ok(petStoreFlagRenamedNamespace.clients.find((x) => x.name === "FoodClient"));
-      ok(petStoreFlagRenamedNamespace.clients.find((x) => x.name === "PetActionClient"));
-      strictEqual(petStoreFlagRenamedNamespace.namespaces.length, 0);
+      strictEqual(petStoreFlagRenamedNamespace.namespaces.length, 1);
+      const subNamespace = petStoreFlagRenamedNamespace.namespaces[0];
+      strictEqual(subNamespace.fullName, "PetStoreFlagRenamed.SubNamespace");
+      strictEqual(subNamespace.clients.length, 1);
+      ok(subNamespace.clients.find((x) => x.name === "PetActionClient"));
+      strictEqual(subNamespace.namespaces.length, 0);
     });
 
     it("complicated nested namespaces", async () => {
