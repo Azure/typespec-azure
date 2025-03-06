@@ -1,5 +1,10 @@
 import { ignoreDiagnostics, Interface, Namespace, Operation } from "@typespec/compiler";
-import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import {
+  createLinterRuleTester,
+  expectDiagnosticEmpty,
+  expectDiagnostics,
+  LinterRuleTester,
+} from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -11,13 +16,20 @@ import {
 } from "../../src/decorators.js";
 import { SdkOperationGroup } from "../../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
+import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: client related", () => {
   let runner: SdkTestRunner;
+  let tester: LinterRuleTester;
 
   beforeEach(async () => {
     runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+    tester = createLinterRuleTester(
+      runner,
+      requireClientSuffixRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
   });
 
   describe("@client", () => {
@@ -61,27 +73,39 @@ describe("typespec-client-generator-core: client related", () => {
     });
 
     it("emit diagnostic if the client namespace doesn't ends with client", async () => {
-      const diagnostics = await runner.diagnose(`
+      await tester
+        .expect(
+          `
         @client
         @service
         @test namespace MyService;
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/client-name",
-      });
+      `,
+        )
+        .toEmitDiagnostics([
+          {
+            code: "@azure-tools/typespec-client-generator-core/require-client-suffix",
+            severity: "warning",
+            message: `Client name "MyService" must end with Client. Use @client({name: "...Client"}`,
+          },
+        ]);
     });
 
     it("emit diagnostic if the client explicit name doesn't ends with Client", async () => {
-      const diagnostics = await runner.diagnose(`
+      await tester
+        .expect(
+          `
         @client({name: "MySDK"})
         @service
         @test namespace MyService;
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/client-name",
-      });
+      `,
+        )
+        .toEmitDiagnostics([
+          {
+            code: "@azure-tools/typespec-client-generator-core/require-client-suffix",
+            severity: "warning",
+            message: `Client name "MySDK" must end with Client. Use @client({name: "...Client"}`,
+          },
+        ]);
     });
 
     it("@client with scope", async () => {

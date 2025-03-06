@@ -5,7 +5,6 @@ import {
 import {
   getFriendlyName,
   getLifecycleVisibilityEnum,
-  getProjectedName,
   getVisibilityForClass,
   isGlobalNamespace,
   isService,
@@ -28,9 +27,8 @@ export interface AutorestEmitterContext {
 }
 
 export function getClientName(context: AutorestEmitterContext, type: Type & { name: string }) {
-  const viaProjection = getProjectedName(context.program, type, "client");
   const clientName = getClientNameOverride(context.tcgcSdkContext, type);
-  return clientName ?? viaProjection ?? type.name;
+  return clientName ?? type.name;
 }
 /**
  * Determines whether a type will be inlined in OpenAPI rather than defined

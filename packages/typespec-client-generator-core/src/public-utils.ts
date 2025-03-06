@@ -44,6 +44,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  AllScopes,
   TspLiteralType,
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,

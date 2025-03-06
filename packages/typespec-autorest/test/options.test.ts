@@ -21,7 +21,8 @@ async function openapiWithOptions(
 
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
-    emitters: { "@azure-tools/typespec-autorest": { ...options, "output-file": outPath } },
+    emit: ["@azure-tools/typespec-autorest"],
+    options: { "@azure-tools/typespec-autorest": { ...options, "output-file": outPath } },
   });
 
   expectDiagnosticEmpty(diagnostics.filter((x) => x.code !== "@typespec/http/no-service-found"));
@@ -42,7 +43,8 @@ describe("typespec-autorest: options", () => {
 
       const diagnostics = await runner.diagnose(code, {
         noEmit: false,
-        emitters: { "@azure-tools/typespec-autorest": { ...options, "output-file": outPath } },
+        emit: ["@azure-tools/typespec-autorest"],
+        options: { "@azure-tools/typespec-autorest": { ...options, "output-file": outPath } },
       });
 
       expectDiagnosticEmpty(
@@ -105,7 +107,8 @@ describe("typespec-autorest: options", () => {
         op test(): void;`,
         {
           noEmit: false,
-          emitters: {
+          emit: ["@azure-tools/typespec-autorest"],
+          options: {
             "@azure-tools/typespec-autorest": { "emitter-output-dir": emitterOutputDir },
           },
         },
@@ -120,8 +123,9 @@ describe("typespec-autorest: options", () => {
         op test(): void;`,
         {
           noEmit: false,
-          outputPath: "./my-output",
-          emitters: {
+          outputDir: "./my-output",
+          emit: ["@azure-tools/typespec-autorest"],
+          options: {
             "@azure-tools/typespec-autorest": {
               "emitter-output-dir": emitterOutputDir,
             },
@@ -145,8 +149,9 @@ op test(): void;
       `,
         {
           noEmit: false,
-          outputPath: "./my-output",
-          emitters: {
+          outputDir: "./my-output",
+          emit: ["@azure-tools/typespec-autorest"],
+          options: {
             "@azure-tools/typespec-autorest": {
               "emitter-output-dir": emitterOutputDir,
             },
@@ -175,8 +180,9 @@ op test(): void;
       `,
         {
           noEmit: false,
-          outputPath: "./my-output",
-          emitters: {
+          outputDir: "./my-output",
+          emit: ["@azure-tools/typespec-autorest"],
+          options: {
             "@azure-tools/typespec-autorest": {
               "emitter-output-dir": emitterOutputDir,
               "azure-resource-provider-folder": "./arm-folder",

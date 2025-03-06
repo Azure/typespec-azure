@@ -20,15 +20,14 @@ it("emits correct paths for tenant resources", async () => {
 
       @doc("The properties of a widget")
       model WidgetProperties {
-        #suppress "deprecated" "for testing"
         @doc("The spin of the widget")
-        @knownValues(SpinValues)
-        spin?: string;
+        spin?: SpinValues;
       }
       
       enum SpinValues {
         up,
         down,
+        string,
       }
       
       interface Widgets extends TenantResourceOperations<Widget, WidgetProperties> {
@@ -109,15 +108,14 @@ it("emits correct paths for checkLocalName endpoints", async () => {
 
           @doc("The properties of a widget")
           model WidgetProperties {
-            #suppress "deprecated" "for testing"
             @doc("The spin of the widget")
-            @knownValues(SpinValues)
-            spin?: string;
+            spin?: SpinValues;
           }
       
           enum SpinValues {
             up,
             down,
+            string,
           }
 
           interface Widgets extends Operations {
@@ -154,14 +152,13 @@ it("emits correct paths for ArmResourceHead operation", async () => {
         }
         @doc("The properties of a widget")
         model WidgetProperties {
-          #suppress "deprecated" "for testing"
           @doc("The spin of the widget")
-          @knownValues(SpinValues)
-          spin?: string;
+          spin?: SpinValues;
         }
         enum SpinValues {
           up,
           down,
+          string,
         }
         interface Widgets extends Operations {
           checkExist is ArmResourceCheckExistence<Widget>;
