@@ -16,7 +16,6 @@ import {
   Operation,
   PagingOperation,
   Program,
-  ProjectedProgram,
   Type,
   Union,
 } from "@typespec/compiler";
@@ -37,6 +36,8 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   emitterName: string;
   arm?: boolean;
+  getMutatedGlobalNamespace(): Namespace;
+  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
@@ -58,9 +59,6 @@ export interface TCGCContext {
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
