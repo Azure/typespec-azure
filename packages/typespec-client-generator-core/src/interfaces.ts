@@ -843,6 +843,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   continuationTokenParameterSegments?: SdkModelPropertyType[];
   /** Segments to indicate how to get continuation token value from response. */
   continuationTokenResponseSegments?: SdkModelPropertyType[];
+  /** Segments to indicate how to get page items from response. */
+  pageItemsSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
@@ -910,7 +912,7 @@ export interface SdkLroServiceFinalResponse {
    * @deprecated This property will be removed in future releases. Use `resultSegments` for synthesized property information.
    */
   resultPath?: string;
-  /** An array of properties to fetch {result} from the {envelopeResult} model. Note that this property is available only in some LRO patterns. */
+  /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
 }
 
