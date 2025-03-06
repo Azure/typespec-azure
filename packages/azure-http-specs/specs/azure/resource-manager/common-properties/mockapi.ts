@@ -173,8 +173,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnC
     status: 400,
     body: json({
       code: "BadRequest",
-      message:
-        "Username should not contain only numbers.",
+      message: "Username should not contain only numbers.",
       innererror: {
         exceptiontype: "general",
       },
