@@ -267,7 +267,6 @@ export async function createSdkContextTestHelper<
     program: program,
     emitterOutputDir: resolveVirtualPath("tsp-output"),
     options: options,
-    getAssetEmitter: null as any,
   };
   return await createSdkContext(
     emitContext,

@@ -60,7 +60,6 @@ import {
   getDoc,
   getEncode,
   getFormat,
-  getKnownValues,
   getLifecycleVisibilityEnum,
   getMaxItems,
   getMaxLength,
@@ -70,7 +69,6 @@ import {
   getMinValue,
   getPagingOperation,
   getPattern,
-  getProjectedName,
   getProperty,
   getPropertyType,
   getRelativePathFromDirectory,
@@ -1101,12 +1099,10 @@ export async function getOpenAPIForService(
   }
 
   function getJsonName(type: Type & { name: string }): string {
-    const viaProjection = getProjectedName(program, type, "json");
-
     const encodedName = resolveEncodedName(program, type, "application/json");
     // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
     // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
-    return encodedName === type.name ? (viaProjection ?? type.name) : encodedName;
+    return encodedName === type.name ? type.name : encodedName;
   }
 
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
@@ -2252,16 +2248,6 @@ export async function getOpenAPIForService(
     if (isSecret(program, typespecType)) {
       newTarget.format = "password";
       newTarget["x-ms-secret"] = true;
-    }
-
-    if (isString) {
-      const values = getKnownValues(program, typespecType);
-      if (values) {
-        const enumSchema = { ...newTarget, ...getSchemaForEnum(values) };
-        enumSchema["x-ms-enum"]!.modelAsString = true;
-        enumSchema["x-ms-enum"]!.name = (getPropertyType(typespecType) as Model).name;
-        return enumSchema;
-      }
     }
 
     if (

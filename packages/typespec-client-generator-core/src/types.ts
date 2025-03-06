@@ -23,7 +23,6 @@ import {
   getDiscriminator,
   getDoc,
   getEncode,
-  getKnownValues,
   getLifecycleVisibilityEnum,
   getSummary,
   getVisibilityForClass,
@@ -1234,10 +1233,6 @@ export function getSdkModelPropertyTypeBase(
     getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
   );
   diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, propertyType));
-  const knownValues = getKnownValues(context.program, type);
-  if (knownValues) {
-    propertyType = diagnostics.pipe(getSdkEnumWithDiagnostics(context, knownValues, operation));
-  }
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   return diagnostics.wrap({
