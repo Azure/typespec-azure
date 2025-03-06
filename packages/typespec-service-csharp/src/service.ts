@@ -301,10 +301,8 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
       const [typeName, typeDefault] = this.#findPropertyType(property);
       const doc = getDoc(this.emitter.getProgram(), property);
       //const attributes = getAttributes(this.emitter.getProgram(), property);
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      const defaultValue = property.default
-        ? // eslint-disable-next-line @typescript-eslint/no-deprecated
-          code`${this.emitter.emitType(property.default)}`
+      const defaultValue = property.defaultValue
+        ? code`${this.emitter.emitType(property.defaultValue as any)}`
         : typeDefault;
       return this.emitter.result.rawCode(code`
       ${doc ? `${formatComment(doc)}` : ""}
@@ -530,10 +528,8 @@ export async function $onEmit(context: EmitContext<CSharpServiceEmitterOptions>)
         NameCasingType.Parameter,
       );
       const [emittedType, emittedDefault] = this.#findPropertyType(parameter);
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      const defaultValue = parameter.default
-        ? // eslint-disable-next-line @typescript-eslint/no-deprecated
-          code`${this.emitter.emitType(parameter.default)}`
+      const defaultValue = parameter.defaultValue
+        ? code`${this.emitter.emitType(parameter.defaultValue as any)}`
         : emittedDefault;
       return this.emitter.result.rawCode(
         code`${emittedType} ${emittedName}${defaultValue === undefined ? "" : ` = ${defaultValue}`}`,

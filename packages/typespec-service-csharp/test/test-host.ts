@@ -34,7 +34,8 @@ export async function createCSharpServiceEmitterTestRunner(
       "TypeSpec.Versioning",
     ],
     compilerOptions: {
-      emitters: {
+      emit: [CSharpServiceEmitterTestLibrary.name],
+      options: {
         [CSharpServiceEmitterTestLibrary.name]: emitterOptions as any,
       },
       noEmit: false,
