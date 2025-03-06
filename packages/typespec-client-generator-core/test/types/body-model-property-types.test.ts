@@ -100,23 +100,19 @@ describe("typespec-client-generator-core: body model property types", () => {
         @versioned(Versions)
         @service(#{title: "Widget Service"})
         namespace DemoService;
-
         enum Versions {
           v1,
           v2,
           v3,
           v4,
         }
-
         @usage(Usage.input | Usage.output)
         model Test {
           @added(Versions.v1)
           @removed(Versions.v2)
           @added(Versions.v3)
           versionedProp: string;
-
           nonVersionedProp: string;
-
           @removed(Versions.v3)
           removedProp: string;
         }
