@@ -648,6 +648,34 @@ describe("typespec-client-generator-core: enum types", () => {
     );
   });
 
+  it("versioned enums with all", async () => {
+    runner = await createSdkTestRunner({
+      "api-version": "all",
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    await runner.compile(
+      `
+        @versioned(Versions)
+        @service()
+        namespace DemoService;
+        enum Versions {
+          v1,
+          v2,
+        }
+      `,
+    );
+    const enums = runner.context.sdkPackage.enums;
+    strictEqual(enums.length, 1);
+    strictEqual(enums[0].name, "Versions");
+    strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
+    strictEqual(enums[0].usage, UsageFlags.ApiVersionEnum);
+    deepStrictEqual(
+      enums[0].values.map((x) => x.value),
+      ["v1", "v2"],
+    );
+  });
+
   it("versioned enums with latest", async () => {
     runner = await createSdkTestRunner({
       "api-version": "latest",

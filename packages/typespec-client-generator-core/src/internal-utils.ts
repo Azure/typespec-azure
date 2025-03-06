@@ -5,7 +5,6 @@ import {
   Diagnostic,
   getDeprecationDetails,
   getLifecycleVisibilityEnum,
-  getLocationContext,
   getNamespaceFullName,
   getVisibilityForClass,
   Interface,
@@ -659,7 +658,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const allApiVersions = getVersions(context.program, service.type)[1]
     ?.getVersions()
     .map((x) => x.value);
-  if (!allApiVersions) return globalNamespace;
+  if (!allApiVersions || context.apiVersion === "all") return globalNamespace;
 
   const apiVersion = getValidApiVersion(context, allApiVersions);
   if (apiVersion === undefined) return globalNamespace;
