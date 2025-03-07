@@ -800,6 +800,59 @@ maxpagesize=3
 }
 ```
 
+### Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/confidentialResources/confidential",
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": <any string>,
+  "properties": {
+    "username": "00"
+  }
+}
+```
+
+Expected response status code: 400
+Expected response body:
+
+```json
+{
+  "error": {
+    "code": "BadRequest",
+    "message": "Username should not contain only numbers.",
+    "innererror": {
+      "exceptiontype": "general"
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_CommonProperties_Error_getForPredefinedError
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/confidentialResources/confidential",
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response status code: 404
+Expected response body:
+
+```json
+{
+  "error": {
+    "code": "ResourceNotFound",
+    "message": "The Resource 'Azure.ResourceManager.CommonProperties/confidentialResources/confidential' under resource group 'test-rg' was not found."
+  }
+}
+```
+
 ### Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSystemAssigned
 
 - Endpoint: `put https://management.azure.com`
