@@ -1132,6 +1132,29 @@ export const $clientNamespace: ClientNamespaceDecorator = (
 };
 
 /**
+ * Find the shortest namespace that overlaps with the override string.
+ * @param override
+ * @param userDefinedNamespaces
+ * @returns
+ */
+function findShortestNamespaceOverlap(
+  override: string,
+  userDefinedNamespaces: Namespace[],
+): Namespace | undefined {
+  let shortestNamespace: Namespace | undefined = undefined;
+
+  for (const namespace of userDefinedNamespaces) {
+    if (override.includes(namespace.name)) {
+      if (!shortestNamespace || namespace.name.length < shortestNamespace.name.length) {
+        shortestNamespace = namespace;
+      }
+    }
+  }
+
+  return shortestNamespace;
+}
+
+/**
  * Returns the client namespace for a given entity. The order of operations is as follows:
  *
  * 1. if `@clientNamespace` is applied to the entity, this wins out.
@@ -1148,9 +1171,10 @@ export function getClientNamespace(
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
-    // if @clientNamespace is applied to the entity, this wins out
-    const userDefinedNamespace = listAllUserDefinedNamespaces(context).find((x) =>
-      override.includes(x.name),
+    // if `@clientNamespace` is applied to the entity, this wins out
+    const userDefinedNamespace = findShortestNamespaceOverlap(
+      override,
+      listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
       // we still make sure to replace the root of the client namespace with the flag (if the flag exists)
@@ -1171,9 +1195,6 @@ export function getClientNamespace(
 }
 
 function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
-  if (context.namespaceFlag) {
-    return context.namespaceFlag;
-  }
   const segments = [];
   let current: Namespace | undefined = namespace;
   while (current && current.name !== "") {

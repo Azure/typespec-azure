@@ -110,7 +110,7 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
  * @returns
  */
 export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  return getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]); // eslint-disable-line @typescript-eslint/no-deprecated
+  return getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]);
 }
 
 /**

@@ -99,8 +99,6 @@ export function parseEmitterName(
 }
 
 /**
- * @deprecated Use `.namespaces` from sdkContext.sdkPackage instead
- *
  * @param context
  * @param namespace If we know explicitly the namespace of the client, pass this in
  * @returns The name of the namespace
