@@ -67,6 +67,10 @@ options:
 
 **Type:** `string`
 
+### `namespace`
+
+**Type:** `string`
+
 ## Usage
 
 Add the following in `tspconfig.yaml`:

@@ -59,6 +59,7 @@ import {
   findRootSourceProperty,
   listAllNamespaces,
   listAllServiceNamespaces,
+  listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -1130,12 +1131,60 @@ export const $clientNamespace: ClientNamespaceDecorator = (
   setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
 };
 
+/**
+ * Find the shortest namespace that overlaps with the override string.
+ * @param override
+ * @param userDefinedNamespaces
+ * @returns
+ */
+function findShortestNamespaceOverlap(
+  override: string,
+  userDefinedNamespaces: Namespace[],
+): Namespace | undefined {
+  let shortestNamespace: Namespace | undefined = undefined;
+
+  for (const namespace of userDefinedNamespaces) {
+    if (override.includes(namespace.name)) {
+      if (!shortestNamespace || namespace.name.length < shortestNamespace.name.length) {
+        shortestNamespace = namespace;
+      }
+    }
+  }
+
+  return shortestNamespace;
+}
+
+/**
+ * Returns the client namespace for a given entity. The order of operations is as follows:
+ *
+ * 1. if `@clientNamespace` is applied to the entity, this wins out.
+ *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
+ * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace
+ * 3. We return the namespace of the entity retrieved from the original spec
+ * @param context
+ * @param entity
+ * @returns
+ */
 export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  if (override) return override;
+  if (override) {
+    // if `@clientNamespace` is applied to the entity, this wins out
+    const userDefinedNamespace = findShortestNamespaceOverlap(
+      override,
+      listAllUserDefinedNamespaces(context),
+    );
+    if (userDefinedNamespace && context.namespaceFlag) {
+      // we still make sure to replace the root of the client namespace with the flag (if the flag exists)
+      return override.replace(userDefinedNamespace.name, context.namespaceFlag);
+    }
+    return override;
+  }
+  if (context.namespaceFlag) {
+    return context.namespaceFlag;
+  }
   if (!entity.namespace) {
     return "";
   }
