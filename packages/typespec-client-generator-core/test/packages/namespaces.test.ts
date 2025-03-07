@@ -462,6 +462,39 @@ describe("typespec-client-generator-core: namespaces", () => {
       strictEqual(subNamespace.namespaces.length, 0);
     });
 
+    it("restructure client hierarchy with namespace flag and nested client namespace", async () => {
+      await runner.compile(
+        `
+        @clientNamespace("PetStore.CustomNamespace")
+        @service
+        namespace PetStore {
+          namespace Models {
+            model Model1 {}
+          }
+          namespace Operations {
+            interface Client {
+              op feed(): void;
+            }
+          }
+        }
+      `,
+      );
+      const sdkPackage = (
+        await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+          namespace: "PetStoreFlagRenamed",
+        })
+      ).sdkPackage;
+      strictEqual(sdkPackage.namespaces.length, 1);
+      const petStoreFlagRenamedNamespace = sdkPackage.namespaces[0];
+      strictEqual(petStoreFlagRenamedNamespace.fullName, "PetStoreFlagRenamed");
+      strictEqual(petStoreFlagRenamedNamespace.namespaces.length, 1);
+      const customNamespace = petStoreFlagRenamedNamespace.namespaces[0];
+      strictEqual(customNamespace.fullName, "PetStoreFlagRenamed.CustomNamespace");
+      strictEqual(customNamespace.clients.length, 1);
+      const client = customNamespace.clients[0];
+      strictEqual(client.namespace, "PetStoreFlagRenamed.CustomNamespace");
+    });
+
     it("complicated nested namespaces", async () => {
       await runner.compile(`
       @service
