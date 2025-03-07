@@ -2423,7 +2423,7 @@ importers:
   eng/feeds:
     devDependencies:
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       vitest:
         specifier: ^3.0.7
@@ -2432,38 +2432,38 @@ importers:
   packages/azure-http-specs:
     dependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/spec-api':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/spec-api
       '@typespec/spector':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/spector
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       '@typespec/xml':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/xml
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/multer':
         specifier: ^1.4.10
@@ -2472,10 +2472,10 @@ importers:
         specifier: ~22.13.9
         version: 22.13.9
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi3
       concurrently:
         specifier: ^9.1.2
@@ -2490,7 +2490,7 @@ importers:
   packages/e2e-tests:
     devDependencies:
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       dotenv:
         specifier: ^16.4.7
@@ -2502,47 +2502,47 @@ importers:
   packages/samples:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-azure-rulesets':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi3
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
     devDependencies:
       '@types/node':
         specifier: ~22.13.9
         version: 22.13.9
       '@typespec/internal-build-utils':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/internal-build-utils
       '@typespec/samples':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/samples
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2569,40 +2569,40 @@ importers:
   packages/typespec-autorest:
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~22.13.9
         version: 22.13.9
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/json-schema':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/json-schema
       '@typespec/library-linter':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2629,40 +2629,40 @@ importers:
   packages/typespec-autorest-canonical:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~22.13.9
         version: 22.13.9
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2692,25 +2692,25 @@ importers:
         specifier: ~22.13.9
         version: 22.13.9
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2734,58 +2734,58 @@ importers:
   packages/typespec-azure-playground-website:
     dependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-azure-rulesets':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@18.3.18)(react@18.3.1)
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/events':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/events
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/json-schema':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/json-schema
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/openapi3':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi3
       '@typespec/protobuf':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/protobuf
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/sse':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/sse
       '@typespec/streams':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/streams
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       '@typespec/xml':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/xml
       '@vitejs/plugin-react':
         specifier: ~4.3.4
@@ -2813,10 +2813,10 @@ importers:
         specifier: ~18.3.0
         version: 18.3.5(@types/react@18.3.18)
       '@typespec/bundler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/bundler
       '@typespec/playground':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/playground
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2840,40 +2840,40 @@ importers:
   packages/typespec-azure-portal-core:
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~22.13.9
         version: 22.13.9
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2904,7 +2904,7 @@ importers:
         version: 8.0.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@types/node':
         specifier: ~22.13.9
@@ -2913,25 +2913,25 @@ importers:
         specifier: ^0.0.33
         version: 0.0.33
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/tspd':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/tspd
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2955,22 +2955,22 @@ importers:
   packages/typespec-azure-rulesets:
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~22.13.9
         version: 22.13.9
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/tspd':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/tspd
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -2997,7 +2997,7 @@ importers:
   packages/typespec-client-generator-core:
     dependencies:
       '@typespec/versioning':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/versioning
       change-case:
         specifier: ~5.4.4
@@ -3010,10 +3010,10 @@ importers:
         version: 2.7.0
     devDependencies:
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../typespec-azure-resource-manager
       '@types/node':
         specifier: ~22.13.9
@@ -3022,37 +3022,37 @@ importers:
         specifier: ^0.0.33
         version: 0.0.33
       '@typespec/compiler':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/compiler
       '@typespec/events':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/events
       '@typespec/http':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/http
       '@typespec/library-linter':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/library-linter
       '@typespec/openapi':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/openapi
       '@typespec/prettier-plugin-typespec':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/prettier-plugin-typespec
       '@typespec/rest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/rest
       '@typespec/sse':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/sse
       '@typespec/streams':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/streams
       '@typespec/tspd':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/tspd
       '@typespec/xml':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../../core/packages/xml
       '@vitest/coverage-v8':
         specifier: ^3.0.7
@@ -3094,7 +3094,7 @@ importers:
         specifier: ~9.60.0
         version: 9.60.0(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
       '@typespec/playground':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../core/packages/playground
       astro:
         specifier: ^5.4.2
@@ -3116,28 +3116,28 @@ importers:
         version: 5.8.2
     devDependencies:
       '@azure-tools/typespec-autorest':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-autorest
       '@azure-tools/typespec-autorest-canonical':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-autorest-canonical
       '@azure-tools/typespec-azure-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-azure-core
       '@azure-tools/typespec-azure-playground-website':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-azure-playground-website
       '@azure-tools/typespec-azure-portal-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-azure-portal-core
       '@azure-tools/typespec-azure-resource-manager':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-azure-resource-manager
       '@azure-tools/typespec-azure-rulesets':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-azure-rulesets
       '@azure-tools/typespec-client-generator-core':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../packages/typespec-client-generator-core
       '@types/hast':
         specifier: ^3.0.4
@@ -3152,13 +3152,13 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@typespec/astro-utils':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../core/packages/astro-utils
       '@typespec/internal-build-utils':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../core/packages/internal-build-utils
       '@typespec/spec-dashboard':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../core/packages/spec-dashboard
       astro-expressive-code:
         specifier: ^0.40.2
@@ -8680,8 +8680,8 @@ packages:
   expressive-code@0.40.2:
     resolution: {integrity: sha512-1zIda2rB0qiDZACawzw2rbdBQiWHBT56uBctS+ezFe5XMAaFaHLnnSYND/Kd+dVzO9HfCXRDpzH3d+3fvOWRcw==}
 
-  exsolve@1.0.2:
-    resolution: {integrity: sha512-ZEcIMbthn2zeX4/wD/DLxDUjuCltHXT8Htvm/JFlTkdYgWh2+HGppgwwNUnIVxzxP7yJOPtuBAec0dLx6lVY8w==}
+  exsolve@1.0.1:
+    resolution: {integrity: sha512-Smf0iQtkQVJLaph8r/qS8C8SWfQkaq9Q/dFcD44MLbJj6DNhlWefVuaS21SjfqOsBbjVlKtbCj6L9ekXK6EZUg==}
 
   extend-shallow@2.0.1:
     resolution: {integrity: sha512-zCnTtlxNoAiDc3gqY2aYAWFx7XWWiasuF2K8Me5WbN8otHKTUKBwjPtNpRs/rbUZm7KxWAaNj7P1a/p52GbVug==}
@@ -20867,7 +20867,7 @@ snapshots:
       '@expressive-code/plugin-shiki': 0.40.2
       '@expressive-code/plugin-text-markers': 0.40.2
 
-  exsolve@1.0.2: {}
+  exsolve@1.0.1: {}
 
   extend-shallow@2.0.1:
     dependencies:
@@ -23732,7 +23732,7 @@ snapshots:
   pkg-types@2.1.0:
     dependencies:
       confbox: 0.2.1
-      exsolve: 1.0.2
+      exsolve: 1.0.1
       pathe: 2.0.3
 
   playwright-core@1.50.1: {}
