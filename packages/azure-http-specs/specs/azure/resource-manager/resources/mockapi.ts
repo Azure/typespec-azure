@@ -8,7 +8,7 @@ const LOCATION_EXPECTED = "eastus";
 const SUBSCRIPTION_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}`;
 const RESOURCE_GROUP_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`;
 const RESOURCE_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`;
-const TENANT_SCOPE_RUI = "";
+const TENANT_SCOPE_URI = "";
 const validTopLevelResource = {
   id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`,
   name: "top",
@@ -194,7 +194,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     method: "get",
     request: {
       params: {
-        resourceUri: TENANT_SCOPE_RUI,
+        resourceUri: TENANT_SCOPE_URI,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
@@ -271,7 +271,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     method: "put",
     request: {
       params: {
-        resourceUri: TENANT_SCOPE_RUI,
+        resourceUri: TENANT_SCOPE_URI,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
@@ -376,7 +376,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     method: "patch",
     request: {
       params: {
-        resourceUri: TENANT_SCOPE_RUI,
+        resourceUri: TENANT_SCOPE_URI,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
@@ -469,7 +469,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     method: "delete",
     request: {
       params: {
-        resourceUri: TENANT_SCOPE_RUI,
+        resourceUri: TENANT_SCOPE_URI,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
@@ -536,7 +536,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = pass
     method: "get",
     request: {
       params: {
-        resourceUri: TENANT_SCOPE_RUI,
+        resourceUri: TENANT_SCOPE_URI,
         "api-version": "2023-12-01-preview",
       },
     },
