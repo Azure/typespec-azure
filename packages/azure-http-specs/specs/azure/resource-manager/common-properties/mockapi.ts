@@ -127,7 +127,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
     kind: "MockApiDefinition",
   });
 
-Scenarios.Azure_ResourceManager_CommonProperties_Error_get = passOnCode(404, {
+Scenarios.Azure_ResourceManager_CommonProperties_Error_getForPredefinedError = passOnCode(404, {
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
   method: "get",
   request: {
@@ -152,7 +152,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_get = passOnCode(404, {
   kind: "MockApiDefinition",
 });
 
-Scenarios.Azure_ResourceManager_CommonProperties_Error_createOrReplace = passOnCode(400, {
+Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError = passOnCode(400, {
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
   method: "put",
   request: {

@@ -124,7 +124,7 @@ interface Error {
     }
     ```
     """)
-  get is ArmResourceRead<ConfidentialResource>;
+  getForPredefinedError is ArmResourceRead<ConfidentialResource>;
 
   @scenario
   @scenarioDoc("""
@@ -155,5 +155,8 @@ interface Error {
     }
     ```
     """)
-  createOrReplace is ArmResourceCreateOrReplaceSync<ConfidentialResource, Error = CloudError>;
+  createForUserDefinedError is ArmResourceCreateOrReplaceSync<
+    ConfidentialResource,
+    Error = CloudError
+  >;
 }

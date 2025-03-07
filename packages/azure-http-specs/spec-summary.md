@@ -800,7 +800,7 @@ maxpagesize=3
 }
 ```
 
-### Azure_ResourceManager_CommonProperties_Error_createOrReplace
+### Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
 
 - Endpoint: `put https://management.azure.com`
 
@@ -833,7 +833,7 @@ Expected response body:
 }
 ```
 
-### Azure_ResourceManager_CommonProperties_Error_get
+### Azure_ResourceManager_CommonProperties_Error_getForPredefinedError
 
 - Endpoint: `get https://management.azure.com`
 
