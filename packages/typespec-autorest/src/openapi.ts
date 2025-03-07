@@ -466,8 +466,7 @@ export async function getOpenAPIForService(
         prop.type.kind === "Scalar" &&
         ignoreDiagnostics(
           program.checker.isTypeAssignableTo(
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            prop.type.projectionBase ?? prop.type,
+            prop.type,
             program.checker.getStdType("url"),
             prop.type,
           ),
@@ -759,8 +758,7 @@ export async function getOpenAPIForService(
   }
 
   function isBytes(type: Type) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const baseType = type.projectionBase ?? type;
+    const baseType = type;
     return ignoreDiagnostics(
       program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type),
     );
@@ -1106,8 +1104,6 @@ export async function getOpenAPIForService(
 
   function getJsonName(type: Type & { name: string }): string {
     const encodedName = resolveEncodedName(program, type, "application/json");
-    // Pick the value set via `encodedName` or default back to the legacy projection otherwise.
-    // `resolveEncodedName` will return the original name if no @encodedName so we have to do that check
     return encodedName === type.name ? type.name : encodedName;
   }
 
