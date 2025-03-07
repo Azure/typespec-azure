@@ -127,9 +127,11 @@ Expected response body:
   - `post /azure/client-generator-core/usage/inputToInputOutput`
   - `post /azure/client-generator-core/usage/outputToInputOutput`
   - `post /azure/client-generator-core/usage/modelInReadOnlyProperty`
+  - `post /azure/client-generator-core/usage/orphanModelSerializable`
 
-This scenario contains two public operations. Both should be generated and exported.
-The models are override to roundtrip, so they should be generated and exported as well.
+This scenario contains 4 public operations. All should be generated and exported.
+'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
+The other models are override to roundtrip, so they should be generated and exported as well.
 
 ### Azure_Core_Basic_createOrReplace
 
