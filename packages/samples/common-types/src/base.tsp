@@ -7,9 +7,7 @@ import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/comm
 using Versioning;
 using Http;
 
-@service({
-  title: "Common types",
-})
+@service(#{ title: "Common types" })
 namespace Azure.ResourceManager.CommonTypes {
   @route("dummy") op dummy(): void;
 }

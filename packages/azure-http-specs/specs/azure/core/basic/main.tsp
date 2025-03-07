@@ -39,7 +39,7 @@ alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalReq
 model User {
   @key
   @doc("The user's id.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: int32;
 
   @doc("The user's name.")
@@ -56,7 +56,7 @@ model User {
 model UserOrder {
   @key
   @doc("The user's id.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: int32;
 
   @doc("The user's id.")

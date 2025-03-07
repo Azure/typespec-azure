@@ -9,9 +9,7 @@ using TypeSpec.Rest;
 using TypeSpec.Versioning;
 using Azure.ResourceManager;
 
-@service({
-  title: "Microsoft.PrivateLinkTest",
-})
+@service(#{ title: "Microsoft.PrivateLinkTest" })
 @versioned(Microsoft.PrivateLinkTest.Versions)
 @armProviderNamespace
 namespace Microsoft.PrivateLinkTest;
@@ -48,15 +46,15 @@ interface TrackedOperations
 @doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties {
   @doc("The status of the last operation performed on this resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
-  @visibility("create", "read")
+  @visibility(Lifecycle.Create, Lifecycle.Read)
   @doc("Name of the resource")
   displayName?: string = "default";
 
   /** The private endpoints exposed by this resource */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   endpoints?: PrivateEndpoint[];
 }
 

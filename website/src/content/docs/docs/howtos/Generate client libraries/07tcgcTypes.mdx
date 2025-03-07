@@ -14,9 +14,7 @@ import "@typespec/http";
 using TypeSpec.Http;
 
 @useAuth(ApiKeyAuth<ApiKeyLocation.header, "api-key">)
-@service({
-  title: "Contoso Widget Manager",
-})
+@service(#{ title: "Contoso Widget Manager" })
 @server(
   "{endpoint}/widget",
   "Contoso Widget APIs",

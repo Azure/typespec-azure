@@ -8,14 +8,12 @@ import {
   DiagnosticCollector,
   Enum,
   EnumMember,
-  getKnownValues,
   getNamespaceFullName,
   getTypeName,
   ignoreDiagnostics,
   IntrinsicType,
   isKey,
   isNeverType,
-  isStringType,
   isTemplateDeclarationOrInstance,
   isVoidType,
   Model,
@@ -443,13 +441,6 @@ export function getLongRunningStates(
   program: Program,
   entity: Enum | Model | Scalar | ModelProperty,
 ): LongRunningStates | undefined {
-  // Is the type a string with known values?
-  if (isStringType(program, entity)) {
-    // Check the known values enum for LRO states
-    const knownValues = getKnownValues(program, entity as Scalar);
-    return knownValues ? getLongRunningStates(program, knownValues) : undefined;
-  }
-
   // Otherwise just check the type itself
   return program.stateMap(AzureCoreStateKeys.lroStatus).get(entity);
 }

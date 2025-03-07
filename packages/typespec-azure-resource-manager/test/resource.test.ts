@@ -81,7 +81,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("allows overriding armProviderNamespace", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test"})
+      @service(#{title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test {
@@ -129,7 +129,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about ProxyResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test"})
+      @service(#{title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test;
@@ -730,7 +730,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         /** Employee properties */
         model EmployeeProperties {
           /** The status of the last operation. */
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: ProvisioningState;
         }
       
@@ -761,7 +761,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         model Person {
           /** The parent name */
           @path
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @segment("parents")
           @key
           name: string;
@@ -846,7 +846,7 @@ it("recognizes resource with customResource identifier", async () => {
       /** Employee properties */
       model EmployeeProperties {
         /** The status of the last operation. */
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ProvisioningState;
       }
     

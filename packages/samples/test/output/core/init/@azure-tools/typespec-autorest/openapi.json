@@ -1,0 +1,308 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Widget Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "Widgets"
+    }
+  ],
+  "paths": {
+    "/widgets": {
+      "get": {
+        "operationId": "Widgets_List",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "List widgets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Widget"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "Widgets_Create",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Create a widget",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WidgetCreate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/widgets/{id}": {
+      "get": {
+        "operationId": "Widgets_Read",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Read widgets",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "Widgets_Update",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Update a widget",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Widget.id"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WidgetUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Widgets_Delete",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Delete a widget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/widgets/{id}/analyze": {
+      "post": {
+        "operationId": "Widgets_Analyze",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Analyze a widget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
+    },
+    "Widget": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-ms-mutability": [
+            "read",
+            "update"
+          ]
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "color": {
+          "type": "string",
+          "enum": [
+            "red",
+            "blue"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "weight",
+        "color"
+      ]
+    },
+    "WidgetCreate": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "color": {
+          "type": "string",
+          "enum": [
+            "red",
+            "blue"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "weight",
+        "color"
+      ]
+    },
+    "WidgetUpdate": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "color": {
+          "type": "string",
+          "enum": [
+            "red",
+            "blue"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "Widget.id": {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    }
+  }
+}

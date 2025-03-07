@@ -37,7 +37,7 @@ alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalReq
 @doc("Details about a user.")
 model User {
   @key
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The name of user.")
   name: string;
 

@@ -19,14 +19,14 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "build": ""
   },
   "devDependencies": {
     "@typespec/compiler": "workspace:~",
-    "dotenv": "~16.4.7",
-    "typescript": "~5.7.3"
+    "dotenv": "^16.4.7",
+    "typescript": "~5.8.2"
   }
 }

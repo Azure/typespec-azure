@@ -40,11 +40,11 @@ model ManagedServiceIdentityV4Property {
 )
 model ManagedServiceIdentityV4 {
   /** The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
 
   /** The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   tenantId?: uuid;
 
   /** The type of managed identity assigned to this resource. */

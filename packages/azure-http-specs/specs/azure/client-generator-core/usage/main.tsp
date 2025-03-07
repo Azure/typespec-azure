@@ -63,7 +63,7 @@ namespace ModelInOperation {
   }
 
   model RoundTripModel {
-    @visibility("read")
+    @visibility(Lifecycle.Read)
     result: ResultModel;
   }
 

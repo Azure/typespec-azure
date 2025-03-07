@@ -12,7 +12,7 @@ describe("typespec-client-generator-core: namespaces", () => {
   it("two sub-clients", async () => {
     await runner.compile(`
       @server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace Foo {
         @route("/bar")
         namespace Bar {
@@ -64,7 +64,7 @@ describe("typespec-client-generator-core: namespaces", () => {
   it("separate defined clients and operation groups", async () => {
     await runner.compile(`
       @server("http://localhost:3000", "endpoint")
-      @service({})
+      @service
       namespace Service {
         model BarResponse {
           prop: string;
@@ -138,7 +138,7 @@ describe("typespec-client-generator-core: namespaces", () => {
 
   it("complicated namespaces", async () => {
     await runner.compile(`
-      @service({})
+      @service
       @route("/a")
       namespace A {
         interface AG {
@@ -198,7 +198,7 @@ describe("typespec-client-generator-core: namespaces", () => {
   it("restructure client hierarchy with renaming of client name and client namespace name", async () => {
     await runner.compileWithCustomization(
       `
-      @service({
+      @service(#{
         title: "Pet Store",
       })
       namespace PetStore;
@@ -233,9 +233,9 @@ describe("typespec-client-generator-core: namespaces", () => {
     const sdkPackage = runner.context.sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
     const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
     ok(petActionClient);
-    strictEqual(petActionClient.clientNamespace, "PetStoreRenamed.SubNamespace");
+    strictEqual(petActionClient.namespace, "PetStoreRenamed.SubNamespace");
   });
 });

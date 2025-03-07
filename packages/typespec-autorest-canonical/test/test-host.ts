@@ -48,7 +48,8 @@ export async function createAutorestCanonicalTestRunner(
       "Azure.ClientGenerator.Core",
     ],
     compilerOptions: {
-      emitters: { [AutorestCanonicalTestLibrary.name]: { ...emitterOptions } },
+      emit: ["@azure-tools/typespec-autorest-canonical"],
+      options: { [AutorestCanonicalTestLibrary.name]: { ...emitterOptions } },
       miscOptions: { "disable-linter": true },
     },
   });
@@ -77,7 +78,8 @@ export async function openApiFor(code: string, options: AutorestCanonicalEmitter
   const runner = await createAutorestCanonicalTestRunner();
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
-    emitters: {
+    emit: ["@azure-tools/typespec-autorest-canonical"],
+    options: {
       [AutorestCanonicalTestLibrary.name]: {
         ...options,
         "emitter-output-dir": resolveVirtualPath("tsp-output"),
@@ -101,7 +103,8 @@ export async function diagnoseOpenApiFor(
 ) {
   const runner = await createAutorestCanonicalTestRunner();
   return await runner.diagnose(code, {
-    emitters: {
+    emit: ["@azure-tools/typespec-autorest-canonical"],
+    options: {
       "@azure-tools/typespec-autorest-canonical": options as any,
     },
   });
@@ -110,7 +113,7 @@ export async function diagnoseOpenApiFor(
 export async function oapiForModel(name: string, modelDef: string) {
   const oapi = await openApiFor(`
     ${modelDef};
-    @service({title: "Testing model"})
+    @service(#{title: "Testing model"})
     @route("/")
     namespace root {
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."

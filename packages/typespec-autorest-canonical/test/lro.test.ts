@@ -16,7 +16,7 @@ it("includes x-ms-long-running-operation", async () => {
         }
       ]>
     )
-    @service({
+    @service(#{
       title: "Contoso Widget Manager",
     })
     @server(
@@ -42,7 +42,7 @@ it("includes x-ms-long-running-operation", async () => {
     model Widget {
       @key("widgetName")
       @doc(".")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
       @doc(".")
       manufacturerId: string;      

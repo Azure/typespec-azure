@@ -11,9 +11,7 @@ using Azure.ResourceManager;
 
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-})
+@service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
@@ -37,7 +35,7 @@ model RoleAssignmentProperties {
   profile?: bytes;
 
   /** The status of the last operation. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 

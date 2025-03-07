@@ -66,7 +66,7 @@ describe("typespec-autorest: primitives", () => {
       it("reports nonspecific scalar for " + test[0], async () => {
         const res = await diagnoseOpenApiFor(
           `
-          @service({title: "Testing model"})
+          @service(#{title: "Testing model"})
           @route("/")
           namespace root {
             #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."

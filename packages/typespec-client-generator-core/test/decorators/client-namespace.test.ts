@@ -21,7 +21,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(): Test;
       `,
       );
-      strictEqual(runner.context.sdkPackage.models[0].clientNamespace, "TestService");
+      strictEqual(runner.context.sdkPackage.models[0].namespace, "TestService");
     });
 
     it("namespace on enum", async () => {
@@ -34,7 +34,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(): Test;
       `,
       );
-      strictEqual(runner.context.sdkPackage.enums[0].clientNamespace, "TestService");
+      strictEqual(runner.context.sdkPackage.enums[0].namespace, "TestService");
     });
 
     it("namespace on union", async () => {
@@ -47,7 +47,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(param: Test): void;
       `,
       );
-      strictEqual(runner.context.sdkPackage.unions[0].clientNamespace, "TestService");
+      strictEqual(runner.context.sdkPackage.unions[0].namespace, "TestService");
     });
 
     it("namespace on union as enum", async () => {
@@ -60,7 +60,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(param: Test): void;
       `,
       );
-      strictEqual(runner.context.sdkPackage.enums[0].clientNamespace, "TestService");
+      strictEqual(runner.context.sdkPackage.enums[0].namespace, "TestService");
     });
 
     it("namespace on union with null", async () => {
@@ -73,7 +73,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(param: Test): void;
       `,
       );
-      strictEqual(runner.context.sdkPackage.unions[0].clientNamespace, "TestService");
+      strictEqual(runner.context.sdkPackage.unions[0].namespace, "TestService");
     });
 
     it("namespace on namespace", async () => {
@@ -87,7 +87,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
         (
           runner.context.sdkPackage.clients[0].methods[0]
             .response as SdkClientType<SdkServiceOperation>
-        ).clientNamespace,
+        ).namespace,
         "TestService.Inner",
       );
     });
@@ -103,7 +103,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
         (
           runner.context.sdkPackage.clients[0].methods[0]
             .response as SdkClientType<SdkServiceOperation>
-        ).clientNamespace,
+        ).namespace,
         "TestService",
       );
     });
@@ -121,7 +121,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(): Test;
       `,
       );
-      strictEqual(runner.context.sdkPackage.models[0].clientNamespace, "MyNamespace");
+      strictEqual(runner.context.sdkPackage.models[0].namespace, "MyNamespace");
     });
 
     it("namespace override on enum", async () => {
@@ -135,7 +135,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(): Test;
       `,
       );
-      strictEqual(runner.context.sdkPackage.enums[0].clientNamespace, "MyNamespace");
+      strictEqual(runner.context.sdkPackage.enums[0].namespace, "MyNamespace");
     });
 
     it("namespace override on union", async () => {
@@ -149,7 +149,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(param: Test): void;
       `,
       );
-      strictEqual(runner.context.sdkPackage.unions[0].clientNamespace, "MyNamespace");
+      strictEqual(runner.context.sdkPackage.unions[0].namespace, "MyNamespace");
     });
 
     it("namespace override on union as enum", async () => {
@@ -163,7 +163,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(param: Test): void;
       `,
       );
-      strictEqual(runner.context.sdkPackage.enums[0].clientNamespace, "MyNamespace");
+      strictEqual(runner.context.sdkPackage.enums[0].namespace, "MyNamespace");
     });
 
     it("namespace override on union with null", async () => {
@@ -177,7 +177,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       op test(param: Test): void;
       `,
       );
-      strictEqual(runner.context.sdkPackage.unions[0].clientNamespace, "MyNamespace");
+      strictEqual(runner.context.sdkPackage.unions[0].namespace, "MyNamespace");
     });
 
     it("namespace override on namespace", async () => {
@@ -193,7 +193,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
         (
           runner.context.sdkPackage.clients[0].methods[0]
             .response as SdkClientType<SdkServiceOperation>
-        ).clientNamespace,
+        ).namespace,
         "MyNamespace",
       );
     });
@@ -211,7 +211,7 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
         (
           runner.context.sdkPackage.clients[0].methods[0]
             .response as SdkClientType<SdkServiceOperation>
-        ).clientNamespace,
+        ).namespace,
         "MyNamespace",
       );
     });
@@ -236,12 +236,12 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
       @@clientNamespace(Inner, "MyNamespace");
       `,
       );
-      strictEqual(runner.context.sdkPackage.clients[0].clientNamespace, "TestService"); // root namespace
+      strictEqual(runner.context.sdkPackage.clients[0].namespace, "TestService"); // root namespace
       strictEqual(
         (
           runner.context.sdkPackage.clients[0].methods[0]
             .response as SdkClientType<SdkServiceOperation>
-        ).clientNamespace,
+        ).namespace,
         "MyNamespace",
       ); // Inner namespace with override
       strictEqual(
@@ -250,11 +250,11 @@ describe("typespec-client-generator-core: @clientNamespace", () => {
             runner.context.sdkPackage.clients[0].methods[0]
               .response as SdkClientType<SdkServiceOperation>
           ).methods[0].response as SdkClientType<SdkServiceOperation>
-        ).clientNamespace,
+        ).namespace,
         "MyNamespace.Test",
       ); // Test namespace affected by Inner namespace override
-      strictEqual(runner.context.sdkPackage.models[0].clientNamespace, "MyNamespace");
-      strictEqual(runner.context.sdkPackage.models[1].clientNamespace, "MyNamespace.Test");
+      strictEqual(runner.context.sdkPackage.models[0].namespace, "MyNamespace");
+      strictEqual(runner.context.sdkPackage.models[1].namespace, "MyNamespace.Test");
     });
   });
 });

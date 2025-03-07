@@ -18,7 +18,7 @@ describe("typespec-autorest: Long-running Operations", () => {
           }
         ]>
       )
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @server(
@@ -44,7 +44,7 @@ describe("typespec-autorest: Long-running Operations", () => {
       model Widget {
         @key("widgetName")
         @doc(".")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
         @doc(".")
         manufacturerId: string;

@@ -2,6 +2,7 @@ import { getAllProperties } from "@azure-tools/typespec-azure-core";
 import {
   $tag,
   ArrayModelType,
+  getProperty as compilerGetProperty,
   DecoratorContext,
   getKeyName,
   getTags,
@@ -426,6 +427,10 @@ export function getArmIdentifiers(program: Program, entity: ArrayModelType): str
       } else if (getKeyName(program, property)) {
         result.push(property.name);
       }
+    }
+
+    if (!result.includes("id") && compilerGetProperty(value, "id") !== undefined) {
+      result.push("id");
     }
   }
 

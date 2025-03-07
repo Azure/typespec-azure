@@ -1,0 +1,41 @@
+---
+title: 0.52.0 March 2025
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+:::caution
+TypeSpec core contains deprecations
+:::
+
+<LinkCard
+  title="TypeSpec Core 0.66"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2025-03-04"
+/>
+
+## Features
+
+### @azure-tools/typespec-autorest
+
+- [#2257](https://github.com/Azure/typespec-azure/pull/2257) Adds support for `@header` explode field
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+### @azure-tools/typespec-azure-core
+
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2257](https://github.com/Azure/typespec-azure/pull/2257) Adds support for `@header` explode field
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+## Bug Fixes
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2208](https://github.com/Azure/typespec-azure/pull/2208) Make sure to keep orphan models

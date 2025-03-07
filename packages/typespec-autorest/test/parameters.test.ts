@@ -174,10 +174,27 @@ describe("query parameters", () => {
 });
 
 describe("header parameters", () => {
-  it("create a header param of array type", async () => {
+  it("create a header param of array type via legacy format", async () => {
     const res = await openApiFor(
       `
-      op test(@header({format: "csv"}) arg1: string[]): void;
+      #suppress "deprecated" "Legacy format"
+      op test(@header(#{format: "csv"}) arg1: string[]): void;
+      `,
+    );
+    deepStrictEqual(res.paths["/"].get.parameters[0], {
+      in: "header",
+      name: "arg1",
+      required: true,
+      type: "array",
+      items: { type: "string" },
+      collectionFormat: "csv",
+    });
+  });
+
+  it("create a header param of array", async () => {
+    const res = await openApiFor(
+      `
+      op test(@header arg1: string[]): void;
       `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {
@@ -345,7 +362,7 @@ describe("body parameters", () => {
   });
 
   describe("request parameters resolving to no property in the body produce no body", () => {
-    it.each(["()", "(@header prop: string)", `(@visibility("none") prop: string)`])(
+    it.each(["()", "(@header prop: string)", `(@invisible(Lifecycle) prop: string)`])(
       "%s",
       async (params) => {
         const res = await openApiFor(`op test${params}: void;`);

@@ -129,22 +129,22 @@ model StandardListQueryParameters {
 
 @doc("Provides the 'If-*' headers to enable conditional (cached) responses")
 model ConditionalRequestHeaders {
-  @visibility("read", "query", "create", "update", "delete")
+  @visibility(Lifecycle.Read, Lifecycle.Query, Lifecycle.Create, Lifecycle.Update, Lifecycle.Delete)
   @header("If-Match")
   @doc("The request should only proceed if an entity matches this string.")
   ifMatch?: string;
 
-  @visibility("read", "query", "create", "update", "delete")
+  @visibility(Lifecycle.Read, Lifecycle.Query, Lifecycle.Create, Lifecycle.Update, Lifecycle.Delete)
   @header("If-None-Match")
   @doc("The request should only proceed if no entity matches this string.")
   ifNoneMatch?: string;
 
-  @visibility("read", "query", "create", "update", "delete")
+  @visibility(Lifecycle.Read, Lifecycle.Query, Lifecycle.Create, Lifecycle.Update, Lifecycle.Delete)
   @header("If-Unmodified-Since")
   @doc("The request should only proceed if the entity was not modified after this time.")
   ifUnmodifiedSince?: utcDateTime;
 
-  @visibility("read", "query", "create", "update", "delete")
+  @visibility(Lifecycle.Read, Lifecycle.Query, Lifecycle.Create, Lifecycle.Update, Lifecycle.Delete)
   @header("If-Modified-Since")
   @doc("The request should only proceed if the entity was modified after this time.")
   ifModifiedSince?: utcDateTime;
@@ -155,7 +155,7 @@ model ConditionalRequestHeaders {
   into responses and item models to convey the ETag when it cannot simply conveyed in a header.
   """)
 model EtagProperty {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The entity tag for this resource.")
   etag: eTag;
 }
@@ -163,7 +163,7 @@ model EtagProperty {
 @doc("Provides the 'ETag' header to enable conditional (cached) requests")
 model EtagResponseEnvelope {
   @header("ETag")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The entity tag for the response.")
   etagHeader?: string;
 }
@@ -172,12 +172,12 @@ model EtagResponseEnvelope {
 
 @doc("Provides the 'Repeatability-*' headers to enable repeatable requests.")
 model RepeatabilityRequestHeaders {
-  @visibility("create", "update", "delete")
+  @visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Delete)
   @header("Repeatability-Request-ID")
   @doc("An opaque, globally-unique, client-generated string identifier for the request.")
   repeatabilityRequestId?: string;
 
-  @visibility("create", "update", "delete")
+  @visibility(Lifecycle.Create, Lifecycle.Update, Lifecycle.Delete)
   @doc("Specifies the date and time at which the request was first created.")
   @header("Repeatability-First-Sent")
   repeatabilityFirstSent?: utcDateTime;
@@ -185,7 +185,7 @@ model RepeatabilityRequestHeaders {
 
 @doc("Provides the 'Repeatability-*' headers to enable repeatable requests.")
 model RepeatabilityResponseHeaders {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @header("Repeatability-Result")
   @doc("Indicates whether the repeatable request was accepted or rejected.")
   repeatabilityResult?: RepeatabilityResult;
@@ -214,7 +214,7 @@ model ClientRequestIdHeader {
 
 @doc("Provides the 'x-ms-request-id' header to enable request correlation in responses.")
 model RequestIdResponseHeader {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @header("x-ms-request-id")
   @doc("An opaque, globally-unique, server-generated string identifier for the request.")
   requestId?: uuid;

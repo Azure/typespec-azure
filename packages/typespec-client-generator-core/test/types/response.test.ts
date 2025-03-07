@@ -20,7 +20,7 @@ describe("typespec-client-generator-core: responses", () => {
   });
   it("content type shall be included in response headers", async () => {
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): OkResponse & {@header("Content-Type") contentType: string; @bodyRoot body: bytes};
       }
@@ -38,7 +38,7 @@ describe("typespec-client-generator-core: responses", () => {
 
   it("description shall be included in response", async () => {
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         op get(): Test;
 

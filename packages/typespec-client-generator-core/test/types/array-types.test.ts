@@ -21,7 +21,7 @@ describe("typespec-client-generator-core: array types", () => {
   });
   it("use model is to represent array", async () => {
     await runner.compile(`
-      @service({})
+      @service
       namespace TestClient {
         model TestModel {
           prop: string;
@@ -55,7 +55,7 @@ describe("typespec-client-generator-core: array types", () => {
       emitterName: "@azure-tools/typespec-java",
     });
     await runner.compileWithBuiltInAzureCoreService(`
-      @service({})
+      @service
       namespace TestClient {
         model ModelWithEmbeddingVector {
           prop: EmbeddingVector<int32>;
@@ -81,7 +81,7 @@ describe("typespec-client-generator-core: array types", () => {
       emitterName: "@azure-tools/typespec-java",
     });
     await runner.compileWithBuiltInAzureCoreService(`
-      @service({})
+      @service
       namespace TestClient {
         alias MyEmbeddingVector = EmbeddingVector<int32>;
 

@@ -1,13 +1,7 @@
-import {
-  Enum,
-  Model,
-  createRule,
-  getProperty,
-  getVisibility,
-  paramMessage,
-} from "@typespec/compiler";
+import { Enum, Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
 
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
+import { isReadonlyProperty } from "@typespec/openapi";
 import { getArmResource } from "../resource.js";
 import { getSourceProperty } from "./utils.js";
 
@@ -18,7 +12,7 @@ export const armResourceProvisioningStateRule = createRule({
   messages: {
     default:
       "The RP-specific property model in the 'properties' property of this resource must contain a 'provisioningState property.  The property type should be an enum or a union of string values, and it must specify known state values 'Succeeded', 'Failed', and 'Canceled'.",
-    missingValues: paramMessage`The "@knownValues" decorator for provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${"missingValues"}].`,
+    missingValues: paramMessage`provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${"missingValues"}].`,
     missingReadOnlyVisibility: "The provisioningState property must have a single read visibility.",
     mustBeOptional: "The provisioningState property must be optional.",
   },
@@ -108,11 +102,7 @@ export const armResourceProvisioningStateRule = createRule({
           }
 
           // validate it must has a read only visibility
-          // eslint-disable-next-line @typescript-eslint/no-deprecated
-          const visibilities = getVisibility(context.program, provisioning);
-          if (
-            !(visibilities !== undefined && visibilities.length === 1 && visibilities[0] === "read")
-          ) {
+          if (!isReadonlyProperty(context.program, provisioning)) {
             context.reportDiagnostic({
               messageId: "missingReadOnlyVisibility",
               target: provisioning,

@@ -4,8 +4,7 @@ import { execSync } from "child_process";
 import dotenv from "dotenv";
 import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "fs";
 import path, { dirname, join, resolve } from "path";
-import { fileURLToPath, pathToFileURL } from "url";
-import { parseArgs } from "util";
+import { fileURLToPath } from "url";
 import { repoRoot, run } from "../../eng/scripts/helpers.js";
 
 const e2eTestDir = join(repoRoot, "packages/e2e-tests");
@@ -15,22 +14,13 @@ loadDotenv();
 
 function main() {
   printInfo();
-  const args = parseArgs({
-    args: process.argv.slice(2),
-    options: {
-      "local-cadl-ranch": {
-        type: "string",
-      },
-    },
-  });
-  args.values["local-cadl-ranch"] = args.values["local-cadl-ranch"] ?? process.env.LOCAL_CADL_RANCH;
   const packages = getPackagesPath();
 
   console.log("Check cli is working");
   runTypeSpec(["--help"], { cwd: e2eTestDir });
   console.log("Cli is working");
 
-  testCadlRanch(packages, args);
+  testAzureHttpSpecs(packages);
 }
 main();
 
@@ -60,6 +50,9 @@ function getPackagesPath() {
     "@azure-tools/typespec-client-generator-core": resolveLocalPackage(
       "packages/typespec-client-generator-core",
     ),
+    "@azure-tools/azure-http-specs": resolveLocalPackage("packages/azure-http-specs"),
+    "@typespec/http-specs": resolveLocalPackage("core/packages/http-specs"),
+    "@typespec/spector": resolveLocalPackage("core/packages/spector"),
   };
 }
 
@@ -71,7 +64,6 @@ function runTypeSpec(args, options) {
   } catch (err) {
     console.error(err.output.toString());
     console.error(`Compile failed in directory: ${options.cwd}`);
-    console.error(`Cadl Ranch Repository: https://github.com/Azure/cadl-ranch`);
     process.exit(1);
   }
 }
@@ -90,34 +82,8 @@ function updatePackageJson(wsDir, value) {
   console.log("Installed  dependencies");
 }
 
-function getCadlRanchDependencies(originalPackageJson, localCadlRanch) {
-  if (localCadlRanch) {
-    console.log(`Using local cadl ranch "${localCadlRanch}`);
-    return {
-      "@azure-tools/cadl-ranch-specs": pathToFileURL(
-        resolve(localCadlRanch, "packages/cadl-ranch-specs"),
-      ).href,
-      "@azure-tools/cadl-ranch-expect": pathToFileURL(
-        resolve(repoRoot, localCadlRanch, "packages/cadl-ranch-expect"),
-      ).href,
-    };
-  } else {
-    const version = originalPackageJson.dependencies["@azure-tools/cadl-ranch-specs"];
-    console.log(`Using configured cadl ranch version "${version}`);
-    return {
-      "@azure-tools/cadl-ranch-specs": version,
-    };
-  }
-}
-
-function testCadlRanch(packages, args) {
-  const localCadlRanch = args.values["local-cadl-ranch"];
-  if (!localCadlRanch) {
-    console.log("Running e2e tests in CI mode.");
-  } else {
-    console.log(`Running e2e tests with local cadl-ranch at: ${localCadlRanch}`);
-  }
-  const testDir = join(e2eTestDir, "cadl-ranch-specs");
+function testAzureHttpSpecs(packages) {
+  const testDir = join(e2eTestDir, "azure-http-specs");
   const wsDir = join(testDir, "temp");
 
   rmSync(wsDir, { recursive: true, force: true });
@@ -130,8 +96,6 @@ function testCadlRanch(packages, args) {
 
   console.log("Generating package.json for basic-current");
   const originalPackageJson = readPackageJson(testDir);
-  const cadlRanchSpecsVersion = originalPackageJson.dependencies["@azure-tools/cadl-ranch-specs"];
-  console.log(`Version of cadl ranch specs used: ${cadlRanchSpecsVersion}`);
 
   const packageJson = {
     ...originalPackageJson,
@@ -148,6 +112,9 @@ function testCadlRanch(packages, args) {
         packages["@azure-tools/typespec-azure-resource-manager"],
       "@azure-tools/typespec-client-generator-core":
         packages["@azure-tools/typespec-client-generator-core"],
+      "@azure-tools/azure-http-specs": packages["@azure-tools/azure-http-specs"],
+      "@typespec/http-specs": packages["@typespec/http-specs"],
+      "@typespec/spector": packages["@typespec/spector"],
     },
   };
 
@@ -157,14 +124,15 @@ function testCadlRanch(packages, args) {
     ...packageJson,
     dependencies: {
       ...packageJson.dependencies,
-      ...getCadlRanchDependencies(originalPackageJson, localCadlRanch),
     },
   };
   updatePackageJson(wsDir, updatedPackageJson);
 
-  const specsFolder = join(wsDir, "node_modules", "@azure-tools", "cadl-ranch-specs", "http");
+  const coreSpecsFolder = join(wsDir, "node_modules", "@typespec", "http-specs", "specs");
+  const azureSpecsFolder = join(wsDir, "node_modules", "@azure-tools", "azure-http-specs", "specs");
   const wsSpecsFolder = join(wsDir, "specs");
-  cpSync(specsFolder, wsSpecsFolder, { recursive: true });
+  cpSync(coreSpecsFolder, wsSpecsFolder, { recursive: true });
+  cpSync(azureSpecsFolder, wsSpecsFolder, { recursive: true });
   const specs = getMainTspFiles(wsSpecsFolder);
   console.log("Found specs: ", specs);
 

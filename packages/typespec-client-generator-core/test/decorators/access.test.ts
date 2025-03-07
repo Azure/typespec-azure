@@ -16,7 +16,7 @@ describe("typespec-client-generator-core: @access", () => {
     it("should inherit access from parent namespace", async () => {
       const { Test } = (await runner.compile(`
           @access(Access.public)
-          @service({title: "Test Service"}) namespace TestService;
+          @service(#{title: "Test Service"}) namespace TestService;
           @test
           model Test {
             prop: string;
@@ -30,7 +30,7 @@ describe("typespec-client-generator-core: @access", () => {
     it("should tag anonymous models with default access", async () => {
       const { Test, prop } = (await runner.compile(`
           @access(Access.public)
-          @service({title: "Test Service"}) namespace TestService;
+          @service(#{title: "Test Service"}) namespace TestService;
           @test
           model Test {
             @test
@@ -49,7 +49,7 @@ describe("typespec-client-generator-core: @access", () => {
     it("should tag as internal anonymous models with default access", async () => {
       const { Test, prop } = (await runner.compile(`
           @access(Access.internal)
-          @service({title: "Test Service"}) namespace TestService;
+          @service(#{title: "Test Service"}) namespace TestService;
           @test
           model Test {
             @test
@@ -68,7 +68,7 @@ describe("typespec-client-generator-core: @access", () => {
     it("should honor the granular override over the namespace one", async () => {
       const { Test } = (await runner.compile(`
           @access(Access.public)
-          @service({title: "Test Service"}) namespace TestService;
+          @service(#{title: "Test Service"}) namespace TestService;
           @access(Access.internal)
           @test
           model Test {
@@ -83,7 +83,7 @@ describe("typespec-client-generator-core: @access", () => {
     it("locally mark an operation as internal", async () => {
       const { test } = (await runner.compile(`
           @access(Access.public)
-          @service({title: "Test Service"}) namespace TestService;
+          @service(#{title: "Test Service"}) namespace TestService;
           @test
           @access(Access.internal)
           op test(): void;
@@ -96,7 +96,7 @@ describe("typespec-client-generator-core: @access", () => {
     it("locally mark an operation as public", async () => {
       const { test } = (await runner.compile(`
           @access(Access.public)
-          @service({title: "Test Service"}) namespace TestService;
+          @service(#{title: "Test Service"}) namespace TestService;
           @test
           op test(): void;
         `)) as { test: Operation };
@@ -108,7 +108,7 @@ describe("typespec-client-generator-core: @access", () => {
     it("mark an operation as internal through the namespace", async () => {
       const { test } = (await runner.compile(`
           @access(Access.internal)
-          @service({title: "Test Service"}) namespace TestService;
+          @service(#{title: "Test Service"}) namespace TestService;
           @test
           op test(): void;
         `)) as { test: Operation };
@@ -133,7 +133,7 @@ describe("typespec-client-generator-core: @access", () => {
 
   it("model access calculated by operation", async () => {
     const { Test, func } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Test {
@@ -155,7 +155,7 @@ describe("typespec-client-generator-core: @access", () => {
 
   it("override calculated model with public access", async () => {
     const { Test, func } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @access(Access.public)
@@ -178,7 +178,7 @@ describe("typespec-client-generator-core: @access", () => {
 
   it("override calculated model with internal access", async () => {
     const { Test, func } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @access(Access.internal) // This is an incorrect usage. We will have linter to ban.
@@ -198,7 +198,7 @@ describe("typespec-client-generator-core: @access", () => {
 
   it("access propagation", async () => {
     const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @discriminator("kind")
           @test
@@ -251,7 +251,7 @@ describe("typespec-client-generator-core: @access", () => {
   it("complicated access propagation", async () => {
     const { Test1, Test2, Test3, Test4, Test5, Test6, func1, func2, func3, func4, func5 } =
       (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Test1 {
@@ -354,7 +354,7 @@ describe("typespec-client-generator-core: @access", () => {
       func3,
       func4,
     } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @discriminator("kind")
           @test
@@ -497,7 +497,7 @@ describe("typespec-client-generator-core: @access", () => {
       func7,
       func8,
     } = (await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           model Test1 {

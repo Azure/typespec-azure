@@ -25,7 +25,7 @@ model LocationResourceProperties {
   description?: string;
 
   /** The status of the last operation. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 

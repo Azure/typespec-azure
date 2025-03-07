@@ -18,7 +18,7 @@ namespace Azure.ResourceManager.Resources;
 model NestedProxyResource is ProxyResource<NestedProxyResourceProperties> {
   @key("nextedProxyResourceName")
   @doc("Name of the nested resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   @segment("nestedProxyResources")
   @pattern("^[A-Za-z0-9]([A-Za-z0-9-_.]{0,62}[A-Za-z0-9])?$")
@@ -27,7 +27,7 @@ model NestedProxyResource is ProxyResource<NestedProxyResourceProperties> {
 
 @doc("Nested Proxy Resource Properties.")
 model NestedProxyResourceProperties {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("Provisioning State of the nested child Resource")
   provisioningState?: ProvisioningState;
 

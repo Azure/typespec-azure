@@ -1,6 +1,5 @@
 import {
   $key,
-  $visibility,
   DecoratorContext,
   Interface,
   Model,
@@ -10,8 +9,12 @@ import {
   StringLiteral,
   Tuple,
   Type,
+  addVisibilityModifiers,
+  clearVisibilityModifiersForClass,
   getKeyName,
+  getLifecycleVisibilityEnum,
   getTypeName,
+  sealVisibilityModifiers,
 } from "@typespec/compiler";
 import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
@@ -304,7 +307,10 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   }
 
   // Set the name property to be read only
-  context.call($visibility, nameProperty, "read");
+  const Lifecycle = getLifecycleVisibilityEnum(program);
+  clearVisibilityModifiersForClass(program, nameProperty, Lifecycle, context);
+  addVisibilityModifiers(program, nameProperty, [Lifecycle.members.get("Read")!], context);
+  sealVisibilityModifiers(program, nameProperty, Lifecycle);
 
   const keyName = getKeyName(program, nameProperty);
   if (!keyName) {

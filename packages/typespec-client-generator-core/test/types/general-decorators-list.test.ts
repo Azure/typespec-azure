@@ -90,7 +90,8 @@ describe("typespec-client-generator-core: general decorators list", () => {
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
-  it("decorator arg type not supported", async function () {
+  // This is not valid anymore as its getting value objects
+  it.skip("decorator arg type not supported", async function () {
     runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@service"] });
 
     await runner.compileWithBuiltInService(`

@@ -6,7 +6,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
   it("set a basic server", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("https://example.com", "Main server")
       namespace MyService {}
       `,
@@ -19,7 +19,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
   it("set a server with base url parameter", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("{endpoint}/v2", "Regional account endpoint", {endpoint: url})
       namespace MyService {}
       `,
@@ -44,7 +44,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
   it("set a server with parameters", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("https://{account}.{region}.example.com", "Regional account endpoint", {region: string, account: string})
       namespace MyService {}
       `,
@@ -63,7 +63,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
   it("set a server with parameters with defaults", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("https://{account}.{region}.example.com", "Regional account endpoint", {
         region?: string = "westus", 
         account?: string = "default",
@@ -85,7 +85,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
   it("set a server with parameters with doc", async () => {
     const res = await openApiFor(
       `
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("https://{region}.example.com", "Regional account endpoint", {
         @doc("Region name")
         region: string,
@@ -107,7 +107,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
     const res = await openApiFor(
       `
       enum Region { westus, eastus }
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("https://{region}.example.com", "Regional account endpoint", {
         region: Region, 
       })
@@ -135,7 +135,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
     const res = await openApiFor(
       `
       enum Region {  }
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("https://{region}.example.com", "Regional account endpoint", {
         region: "westus", 
       })
@@ -163,7 +163,7 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
     const res = await openApiFor(
       `
       enum Region {  }
-      @service({title: "My service"})
+      @service(#{title: "My service"})
       @server("https://{region}.example.com", "Regional account endpoint", {
         region: "westus" | "eastus", 
       })

@@ -27,7 +27,7 @@ describe("typespec-client-generator-core: package", () => {
       });
       await runnerWithPackageName.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace Not.My.Package.Name;
       `);
 
@@ -36,7 +36,7 @@ describe("typespec-client-generator-core: package", () => {
     it("from namespace", async () => {
       await runner.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace My.Package.Name;
       `);
 
@@ -48,7 +48,7 @@ describe("typespec-client-generator-core: package", () => {
     it("basic namespace", async () => {
       await runner.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace My.Namespace;
       `);
 
@@ -58,11 +58,11 @@ describe("typespec-client-generator-core: package", () => {
     it("nested namespaces", async () => {
       await runner.compile(`
         @client({name: "MyClient"})
-        @service({})
+        @service
         namespace My.Namespace {};
 
         @client({name: "MySecondClient"})
-        @service({})
+        @service
         namespace My.Namespace.Sub {};
       `);
 
@@ -73,7 +73,7 @@ describe("typespec-client-generator-core: package", () => {
   describe("Vanilla Widget Service", () => {
     async function compileVanillaWidgetService(runner: SdkTestRunner, code: string) {
       return await runner.compile(`
-      @service({
+      @service(#{
         title: "Widget Service",
       })
       @versioned(Versions)
@@ -85,7 +85,7 @@ describe("typespec-client-generator-core: package", () => {
       }
 
       model Widget {
-        @visibility("read", "update")
+        @visibility(Lifecycle.Read, Lifecycle.Update)
         @path
         id: string;
 
@@ -360,7 +360,7 @@ describe("typespec-client-generator-core: package", () => {
         }
       ]>
     )
-    @service({
+    @service(#{
       title: "Contoso Widget Manager",
     })
     @server(
@@ -409,7 +409,7 @@ describe("typespec-client-generator-core: package", () => {
     model Widget {
       @key("widgetName")
       @doc("The widget name.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
 
       @doc("The widget color.")
@@ -468,7 +468,7 @@ describe("typespec-client-generator-core: package", () => {
     model WidgetPart {
       @key("widgetPartName")
       @doc("The name of the part.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
 
       @doc("The ID to use for reordering the part.")
@@ -493,7 +493,7 @@ describe("typespec-client-generator-core: package", () => {
     model WidgetAnalytics {
       @key("analyticsId")
       @doc("The identifier for the analytics object.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       id: string;
 
       @doc("The number of uses of the widget.")
@@ -508,7 +508,7 @@ describe("typespec-client-generator-core: package", () => {
     model Manufacturer {
       @key("manufacturerId")
       @doc("The manufacturer's unique ID.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       id: string;
 
       @doc("The manufacturer's name.")
@@ -813,6 +813,11 @@ describe("typespec-client-generator-core: package", () => {
       strictEqual(methodResponse.kind, "method");
       strictEqual(methodResponse.type, widgetModel);
       strictEqual(createOrUpdate.response.resultPath, "result");
+      strictEqual(createOrUpdate.response.resultSegments?.length, 1);
+      strictEqual(
+        createOrUpdate.response.resultSegments[0],
+        createOrUpdate.lroMetadata.finalResponse?.envelopeResult.properties[3],
+      );
     });
     it("lro delete", async () => {
       const runnerWithCore = await createSdkTestRunner({
@@ -1045,7 +1050,7 @@ describe("typespec-client-generator-core: package", () => {
           }
         }
         
-        @service({})
+        @service
         @versioned(Versions)
         namespace Test {
           enum Versions {
@@ -1084,7 +1089,7 @@ describe("typespec-client-generator-core: package", () => {
       });
       await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
         model MyProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @doc("Display name of the Azure Extended Zone.")
           displayName: string;
         }
@@ -1130,7 +1135,7 @@ describe("typespec-client-generator-core: package", () => {
           }
         }
         
-        @service({})
+        @service
         @versioned(Versions)
         namespace Test {
           enum Versions {
@@ -1220,7 +1225,7 @@ describe("typespec-client-generator-core: package", () => {
       await runnerWithCore.compile(`
         @versioned(MyVersions)
         @server("http://localhost:3000", "endpoint")
-        @service({name: "Service"})
+        @service
         namespace My.Service;
 
         enum MyVersions {
@@ -1251,7 +1256,7 @@ describe("typespec-client-generator-core: package", () => {
           @path
           @segment("operationStatuses")
           id: Azure.Core.uuid;
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name?: string;
         }
       `);

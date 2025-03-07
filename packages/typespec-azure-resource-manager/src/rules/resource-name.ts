@@ -4,10 +4,10 @@ import {
   SemanticNodeListener,
   createRule,
   getProperty,
-  getVisibility,
 } from "@typespec/compiler";
 import * as http from "@typespec/http";
 
+import { isReadonlyProperty } from "@typespec/openapi";
 import { getArmResources } from "../resource.js";
 
 /**
@@ -44,13 +44,9 @@ export const resourceNameRule = createRule({
         }
 
         function checkResourceName(nameProp: ModelProperty) {
-          // eslint-disable-next-line @typescript-eslint/no-deprecated
-          const visibilities = getVisibility(context.program, nameProp);
-          return (
-            !http.isPathParam(context.program, nameProp) ||
-            !visibilities ||
-            visibilities.length !== 1 ||
-            visibilities[0] !== "read"
+          return !(
+            http.isPathParam(context.program, nameProp) &&
+            isReadonlyProperty(context.program, nameProp)
           );
         }
 

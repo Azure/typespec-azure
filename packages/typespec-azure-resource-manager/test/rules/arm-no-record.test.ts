@@ -31,7 +31,7 @@ model Widget is ProxyResource<WidgetProperties> {
   @key("widgetName")
   @segment("widgets")
   @path
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 }
 `;

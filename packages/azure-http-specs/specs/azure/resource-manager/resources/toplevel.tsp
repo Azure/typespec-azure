@@ -25,7 +25,7 @@ model TopLevelTrackedResource is TrackedResource<TopLevelTrackedResourceProperti
 
 @doc("Top Level Arm Resource Properties.")
 model TopLevelTrackedResourceProperties {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The status of the last operation.")
   provisioningState?: ProvisioningState;
 

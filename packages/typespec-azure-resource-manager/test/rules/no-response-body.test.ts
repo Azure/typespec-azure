@@ -175,7 +175,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
 
           @armResourceOperations
           interface Images {
-            @parameterVisibility
+            @patch(#{ implicitOptionality: false })
             update is SampleTemplate<
               Image,
               Response =  (ArmAcceptedLroResponse<LroHeaders = Azure.Core.Foundations.RetryAfterHeader &

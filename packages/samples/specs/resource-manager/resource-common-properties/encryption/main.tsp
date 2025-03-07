@@ -11,9 +11,7 @@ using Azure.ResourceManager;
 using Azure.Core;
 
 @armProviderNamespace("Contoso.CustomerManagedKeyExample")
-@service({
-  title: "Contoso.CustomerManagedKeyExample",
-})
+@service(#{ title: "Contoso.CustomerManagedKeyExample" })
 @versioned(Versions)
 @doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
 namespace Microsoft.UpdateTests;
@@ -41,11 +39,11 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
 @doc("Widget Resource Properties.")
 model WidgetResourceProperties {
   @doc("The widget color.")
-  @visibility("create", "read")
+  @visibility(Lifecycle.Create, Lifecycle.Read)
   color: string;
 
   /** Provisioning state */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
   ...EncryptionProperty;

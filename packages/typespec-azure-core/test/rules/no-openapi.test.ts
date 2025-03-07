@@ -51,7 +51,7 @@ describe("@extension", () => {
     await tester
       .expect(
         `model foo {
-          @OpenAPI.extension("x-ms-identifiers", ["prop"])
+          @OpenAPI.extension("x-ms-identifiers", #["prop"])
           items: Bar;
         }
         model Bar { prop: string;}`,

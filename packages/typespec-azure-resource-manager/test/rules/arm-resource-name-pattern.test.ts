@@ -39,7 +39,7 @@ it("Emits a warning for an ARM resource that doesn't specify `@pattern` on the n
         @key("roleName")
         @segment("roles")
         @path
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
     `,
@@ -107,7 +107,7 @@ it("Does not emit a warning for an ARM resource that specifies `@pattern` on the
       @segment("roles")
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @path
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
     }`,
     )

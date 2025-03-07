@@ -38,7 +38,7 @@ interface Tracked2Operations {
 @doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties2 {
   @doc("The status of the last operation performed on this resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
   @doc("Name of the resource")

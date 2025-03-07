@@ -16,7 +16,7 @@ using Azure.Core;
     }
   ]>
 )
-@service({
+@service(#{
   title: "Azure.Contoso service",
 })
 @versioned(Azure.Contoso.Versions)

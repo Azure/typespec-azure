@@ -307,7 +307,7 @@ describe("typespec-client-generator-core: @override", () => {
       `
       namespace My.Customizations;
 
-      op templateOp(params: My.Service.Params): My.Service.Params;
+      op templateOp(params: My.Service.Params, ...Azure.Core.Foundations.ApiVersionParameter): My.Service.Params;
 
       @@override(My.Service.templateOp, My.Customizations.templateOp);
       `,

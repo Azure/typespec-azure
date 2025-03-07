@@ -34,7 +34,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: FooProvisioningState;
         }
 
@@ -58,7 +58,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: FooProvisioningState;
         }
 
@@ -100,13 +100,10 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
             }
     
             model FooProperties {
-              @visibility("read")
+              @visibility(Lifecycle.Read)
               provisioningState?: State;
             }
     
-            enum StateKV {Succeeded, Failed, Canceled}
-            #suppress "deprecated" "for testing"
-            @knownValues(StateKV)
             scalar State extends string;
           `,
       )
@@ -128,7 +125,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: string;
         }
       `,
@@ -151,7 +148,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState: ResourceProvisioningState;
         }
       `,
@@ -194,7 +191,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
         }
 
         model FooProperties {
-          @visibility("read", "update")          
+          @visibility(Lifecycle.Read, Lifecycle.Update)          
           provisioningState?: ResourceProvisioningState;
         }
       `,
@@ -218,7 +215,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
               }
       
               model FooProperties {
-                @visibility("read")
+                @visibility(Lifecycle.Read)
                 provisioningState?: FooProvisioningState;
               }
 
@@ -229,7 +226,7 @@ describe("typespec-azure-resource-manager: arm resource provisioning state rule"
           )
           .toEmitDiagnostics({
             code: "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state",
-            message: `The "@knownValues" decorator for provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${omit}].`,
+            message: `provisioningState, must reference an enum with 'Succeeded', 'Failed', 'Canceled' values. The enum is missing the values: [${omit}].`,
           });
       });
     });

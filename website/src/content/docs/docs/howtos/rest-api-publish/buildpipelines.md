@@ -15,7 +15,7 @@ This doc will help you get started with using TypeSpec in your build pipelines i
 
 In order to build TypeSpec in your build pipeline, you will need to ensure that the following are available or are automatically installed by your project:
 
-1. NodeJS 18.x LTS (Recommended)
+1. NodeJS 22.x LTS (Recommended)
 2. TypeSpec compilation tools (via npm package)
 
 ## Azure DevOps Pipelines
@@ -27,7 +27,7 @@ The following Azure Devops Pipeline tasks can be modified and added to your pipe
 # Install NodeJS
 - task: NodeTool@0
   inputs:
-    versionSpec: "18.x" # Node 18 LTS is recommended.
+    versionSpec: "22.x"
     checkLatest: false
 
 # Install dependencies

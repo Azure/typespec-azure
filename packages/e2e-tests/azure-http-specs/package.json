@@ -1,0 +1,5 @@
+{
+  "name": "@azure-tools/typespec-e2e-azure-http-specs",
+  "type": "module",
+  "private": true
+}

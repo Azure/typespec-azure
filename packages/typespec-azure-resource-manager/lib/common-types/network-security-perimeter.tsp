@@ -139,7 +139,7 @@ model NetworkSecurityPerimeter {
   perimeterGuid?: uuid;
 
   /** Location of the network security perimeter */
-  @visibility("read", "create")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
   location?: string;
 }
 
@@ -152,12 +152,12 @@ model NetworkSecurityPerimeterConfiguration extends ProxyResource {
 /** Network security configuration properties. */
 @added(Versions.v5)
 model NetworkSecurityPerimeterConfigurationProperties {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: NetworkSecurityPerimeterConfigurationProvisioningState;
 
   /** List of provisioning issues, if any */
-  @visibility("read")
-  @OpenAPI.extension("x-ms-identifiers", [])
+  @visibility(Lifecycle.Read)
+  @OpenAPI.extension("x-ms-identifiers", #[])
   provisioningIssues?: ProvisioningIssue[];
 
   networkSecurityPerimeter?: NetworkSecurityPerimeter;
@@ -169,10 +169,10 @@ model NetworkSecurityPerimeterConfigurationProperties {
 @added(Versions.v5)
 model ProvisioningIssue {
   /** Name of the issue */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name?: string;
 
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   properties?: ProvisioningIssueProperties;
 }
 
@@ -180,24 +180,24 @@ model ProvisioningIssue {
 @added(Versions.v5)
 model ProvisioningIssueProperties {
   /** Type of issue */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   issueType?: IssueType;
 
   /** Severity of the issue. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   severity?: Severity;
 
   /** Description of the issue */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   description?: string;
 
   /** Fully qualified resource IDs of suggested resources that can be associated to the network security perimeter (NSP) to remediate the issue. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   suggestedResourceIds?: Azure.Core.armResourceIdentifier[];
 
   /** Access rules that can be added to the network security profile (NSP) to remediate the issue. */
-  @visibility("read")
-  @OpenAPI.extension("x-ms-identifiers", [])
+  @visibility(Lifecycle.Read)
+  @OpenAPI.extension("x-ms-identifiers", #[])
   suggestedAccessRules?: AccessRule[];
 }
 
@@ -220,7 +220,7 @@ model NetworkSecurityProfile {
   accessRulesVersion?: int32;
 
   /** List of Access Rules */
-  @OpenAPI.extension("x-ms-identifiers", ["name"])
+  @OpenAPI.extension("x-ms-identifiers", #["name"])
   accessRules?: AccessRule[];
 
   /** Current diagnostic settings version */

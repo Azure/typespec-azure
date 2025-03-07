@@ -451,7 +451,7 @@ function getSdkTypeExample(
           return diagnostics.wrap(undefined);
         }
       case "enum":
-        if (type.values.some((v) => v.value === example)) {
+        if (type.values.some((v) => v.value === example) || !type.isFixed) {
           return getSdkBaseTypeExample(
             typeof example as "string" | "number",
             type,

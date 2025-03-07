@@ -103,7 +103,7 @@ async function openApiForProducesConsumes(
   const apiDoc: string[] = createAdlFromConfig(configuration);
 
   const input = apiDoc.join("\n");
-  const openApi = await openApiFor(`@service({title: "Test"}) namespace Test; ${input}`);
+  const openApi = await openApiFor(`@service(#{title: "Test"}) namespace Test; ${input}`);
   const output = {
     globalProduces: openApi.produces as string[],
     globalConsumes: openApi.consumes,
