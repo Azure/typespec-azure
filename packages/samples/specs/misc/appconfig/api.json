@@ -185,8 +185,7 @@
                 "locked",
                 "etag"
               ]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {
@@ -273,8 +272,7 @@
                 "locked",
                 "etag"
               ]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {
@@ -364,8 +362,7 @@
                 "locked",
                 "etag"
               ]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {
@@ -639,8 +636,7 @@
                 "locked",
                 "etag"
               ]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {
@@ -722,8 +718,7 @@
             "items": {
               "type": "string",
               "enum": ["name"]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {
@@ -795,8 +790,7 @@
             "items": {
               "type": "string",
               "enum": ["name"]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {
@@ -1033,8 +1027,7 @@
                 "locked",
                 "etag"
               ]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {
@@ -1121,8 +1114,7 @@
                 "locked",
                 "etag"
               ]
-            },
-            "collectionFormat": "csv"
+            }
           }
         ],
         "responses": {

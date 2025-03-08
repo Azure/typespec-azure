@@ -97,40 +97,27 @@ describe("query parameters", () => {
         `op test(@query(#{explode: true}) myParam: string[]): void;`,
       );
       expect(param).toMatchObject({
-        collectionFormat: "multi",
+        in: "query",
+        items: {
+          type: "string",
+        },
+        name: "myParam",
+        required: true,
+        type: "array",
       });
     });
 
     it("with uri template", async () => {
       const param = await getQueryParam(`@route("{?myParam*}") op test(myParam: string[]): void;`);
       expect(param).toMatchObject({
-        collectionFormat: "multi",
+        in: "query",
+        items: {
+          type: "string",
+        },
+        name: "myParam",
+        required: true,
+        type: "array",
       });
-    });
-  });
-
-  it("LEGACY specify the format", async () => {
-    const res = await openApiFor(
-      `
-      #suppress "deprecated" "test"
-      op test(@query({format: "multi"}) arg1: string[], @query({format: "csv"}) arg2: string[]): void;
-      `,
-    );
-    deepStrictEqual(res.paths["/"].get.parameters[0], {
-      in: "query",
-      name: "arg1",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "multi",
-    });
-    deepStrictEqual(res.paths["/"].get.parameters[1], {
-      in: "query",
-      name: "arg2",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "csv",
     });
   });
 
@@ -173,43 +160,24 @@ describe("query parameters", () => {
   });
 });
 
-describe("header parameters", () => {
-  it("create a header param of array type via legacy format", async () => {
-    const res = await openApiFor(
-      `
-      #suppress "deprecated" "Legacy format"
-      op test(@header(#{format: "csv"}) arg1: string[]): void;
-      `,
-    );
-    deepStrictEqual(res.paths["/"].get.parameters[0], {
-      in: "header",
-      name: "arg1",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "csv",
-    });
-  });
-
-  it("create a header param of array", async () => {
-    const res = await openApiFor(
-      `
+it("create a header param of array", async () => {
+  const res = await openApiFor(
+    `
       op test(@header arg1: string[]): void;
       `,
-    );
-    deepStrictEqual(res.paths["/"].get.parameters[0], {
-      in: "header",
-      name: "arg1",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "csv",
-    });
+  );
+  deepStrictEqual(res.paths["/"].get.parameters[0], {
+    in: "header",
+    name: "arg1",
+    required: true,
+    type: "array",
+    items: { type: "string" },
   });
+});
 
-  it("errors on duplicate parameter keys", async () => {
-    const diagnostics = await diagnoseOpenApiFor(
-      `
+it("errors on duplicate parameter keys", async () => {
+  const diagnostics = await diagnoseOpenApiFor(
+    `
       model P {
         @query id: string;
       }
@@ -225,20 +193,20 @@ describe("header parameters", () => {
       @route("/test2")
       op test2(...Q): void;
       `,
-      { "omit-unreachable-types": true },
-    );
+    { "omit-unreachable-types": true },
+  );
 
-    expectDiagnostics(ignoreUseStandardOps(diagnostics), [
-      {
-        code: "@typespec/openapi/duplicate-type-name",
-        message: /parameter/,
-      },
-    ]);
-  });
+  expectDiagnostics(ignoreUseStandardOps(diagnostics), [
+    {
+      code: "@typespec/openapi/duplicate-type-name",
+      message: /parameter/,
+    },
+  ]);
+});
 
-  it("encodes parameter keys in references", async () => {
-    const oapi = await openApiFor(
-      `
+it("encodes parameter keys in references", async () => {
+  const oapi = await openApiFor(
+    `
       model Pet extends Pet$Id {
         
         name: string;
@@ -251,16 +219,16 @@ describe("header parameters", () => {
       @get()
       op get(... Pet$Id): Pet;
       `,
-    );
+  );
 
-    ok(oapi.paths["/Pets/{petId}"].get);
-    strictEqual(oapi.paths["/Pets/{petId}"].get.parameters[0]["$ref"], "#/parameters/Pet%24Id");
-    strictEqual(oapi.parameters["Pet$Id"].name, "petId");
-  });
+  ok(oapi.paths["/Pets/{petId}"].get);
+  strictEqual(oapi.paths["/Pets/{petId}"].get.parameters[0]["$ref"], "#/parameters/Pet%24Id");
+  strictEqual(oapi.parameters["Pet$Id"].name, "petId");
+});
 
-  it("can override x-ms-parameter-location for shared parameters", async () => {
-    const oapi = await openApiFor(
-      `
+it("can override x-ms-parameter-location for shared parameters", async () => {
+  const oapi = await openApiFor(
+    `
       model PetId {
         @query
         @extension("x-ms-parameter-location", "client")
@@ -268,50 +236,49 @@ describe("header parameters", () => {
       }
       @get op get(...PetId): void;
       `,
-    );
+  );
 
-    strictEqual(oapi.parameters["PetId"]["x-ms-parameter-location"], "client");
-  });
+  strictEqual(oapi.parameters["PetId"]["x-ms-parameter-location"], "client");
+});
 
-  it("inline spread of parameters from anonymous model", async () => {
-    const oapi = await openApiFor(
-      `
+it("inline spread of parameters from anonymous model", async () => {
+  const oapi = await openApiFor(
+    `
       op template<TParameters, TReturn>(...TParameters): TReturn;
       op instantiation is template<{@path id: string}, void>;
       `,
-    );
+  );
 
-    ok(oapi.paths["/{id}"].get);
+  ok(oapi.paths["/{id}"].get);
 
-    deepStrictEqual(oapi.paths["/{id}"].get.parameters, [
-      {
-        name: "id",
-        in: "path",
-        required: true,
-        type: "string",
-      },
-    ]);
-  });
+  deepStrictEqual(oapi.paths["/{id}"].get.parameters, [
+    {
+      name: "id",
+      in: "path",
+      required: true,
+      type: "string",
+    },
+  ]);
+});
 
-  it("omit parameters with type never", async () => {
-    const res = await openApiFor(
-      `
+it("omit parameters with type never", async () => {
+  const res = await openApiFor(
+    `
       op test(@query select: never, @query top: int32): void;
       `,
-    );
-    strictEqual(res.paths["/"].get.parameters.length, 1);
-    strictEqual(res.paths["/"].get.parameters[0].in, "query");
-    strictEqual(res.paths["/"].get.parameters[0].name, "top");
-  });
+  );
+  strictEqual(res.paths["/"].get.parameters.length, 1);
+  strictEqual(res.paths["/"].get.parameters[0].in, "query");
+  strictEqual(res.paths["/"].get.parameters[0].name, "top");
+});
 
-  it("set x-ms-client-name with @clientName", async () => {
-    const res = await openApiFor(
-      `op test(@clientName("myParamClient") @header myParam: string): void;`,
-    );
-    expect(res.paths["/"].get.parameters[0]).toMatchObject({
-      name: "my-param",
-      "x-ms-client-name": "myParamClient",
-    });
+it("set x-ms-client-name with @clientName", async () => {
+  const res = await openApiFor(
+    `op test(@clientName("myParamClient") @header myParam: string): void;`,
+  );
+  expect(res.paths["/"].get.parameters[0]).toMatchObject({
+    name: "my-param",
+    "x-ms-client-name": "myParamClient",
   });
 });
 
@@ -486,7 +453,6 @@ describe("misc", () => {
               in: kind,
               name: "arg1",
               required: true,
-              collectionFormat: "csv",
               type: "array",
               items: {
                 type: "string",

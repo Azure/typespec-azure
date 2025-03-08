@@ -174,8 +174,7 @@
                 "name": "KeyField",
                 "modelAsString": true
               }
-            },
-            "collectionFormat": "multi"
+            }
           }
         ],
         "responses": {
@@ -243,8 +242,7 @@
                 "name": "KeyField",
                 "modelAsString": true
               }
-            },
-            "collectionFormat": "multi"
+            }
           }
         ],
         "responses": {
@@ -311,8 +309,7 @@
                 "name": "KeyField",
                 "modelAsString": true
               }
-            },
-            "collectionFormat": "multi"
+            }
           }
         ],
         "responses": {
@@ -682,8 +679,7 @@
                 "name": "LabelField",
                 "modelAsString": true
               }
-            },
-            "collectionFormat": "multi"
+            }
           }
         ],
         "responses": {
@@ -852,8 +848,7 @@
                 "name": "KeyField",
                 "modelAsString": true
               }
-            },
-            "collectionFormat": "multi"
+            }
           },
           {
             "name": "label",

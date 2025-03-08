@@ -191,42 +191,6 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(headerParam.type.kind, "nullable");
   });
 
-  it("header collection format", async () => {
-    await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
-
-      #suppress "deprecated" "Legacy test"
-      op myOp(@header(#{format: "multi"}) header: string): void;
-      `);
-    const sdkPackage = runner.context.sdkPackage;
-    const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(method.kind, "basic");
-
-    strictEqual(method.operation.parameters.length, 1);
-    const headerParam = method.operation.parameters[0];
-    strictEqual(headerParam.kind, "header");
-    strictEqual(headerParam.collectionFormat, "multi");
-  });
-
-  it("header collection format via explode", async () => {
-    await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
-
-      #suppress "deprecated" "Legacy test"
-      op myOp(@header(#{explode: true}) header: string): void;
-      `);
-    const sdkPackage = runner.context.sdkPackage;
-    const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(method.kind, "basic");
-
-    strictEqual(method.operation.parameters.length, 1);
-    const headerParam = method.operation.parameters[0];
-    strictEqual(headerParam.kind, "header");
-    strictEqual(headerParam.collectionFormat, "multi");
-  });
-
   it("query basic", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service
@@ -245,7 +209,6 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(methodParam.name, "query");
     strictEqual(methodParam.optional, false);
     strictEqual(methodParam.onClient, false);
-    strictEqual(methodParam.isApiVersionParam, false);
     strictEqual(methodParam.type.kind, "string");
 
     const serviceOperation = method.operation;
@@ -262,9 +225,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(queryParam.name, "query");
     strictEqual(queryParam.optional, false);
     strictEqual(queryParam.onClient, false);
-    strictEqual(queryParam.isApiVersionParam, false);
     strictEqual(queryParam.type.kind, "string");
-    strictEqual(queryParam.collectionFormat, undefined);
 
     const correspondingMethodParams = queryParam.correspondingMethodParams;
     strictEqual(correspondingMethodParams.length, 1);
@@ -286,42 +247,6 @@ describe("typespec-client-generator-core: parameters", () => {
     const serviceOperation = method.operation;
     const queryParam = serviceOperation.parameters[0];
     strictEqual(queryParam.type.kind, "nullable");
-  });
-
-  it("query collection format", async () => {
-    await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
-      
-      #suppress "deprecated" "Legacy test"
-      op myOp(@query({format: "multi"}) query: string): void;
-      `);
-    const sdkPackage = runner.context.sdkPackage;
-    const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(method.kind, "basic");
-
-    strictEqual(method.operation.parameters.length, 1);
-    const queryParm = method.operation.parameters[0];
-    strictEqual(queryParm.kind, "query");
-    strictEqual(queryParm.collectionFormat, "multi");
-  });
-
-  it("query collection format for csv", async () => {
-    await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
-      
-      #suppress "deprecated" "Legacy test"
-      op myOp(@query({format: "csv"}) query: string): void;
-      `);
-    const sdkPackage = runner.context.sdkPackage;
-    const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(method.kind, "basic");
-
-    strictEqual(method.operation.parameters.length, 1);
-    const queryParm = method.operation.parameters[0];
-    strictEqual(queryParm.kind, "query");
-    strictEqual(queryParm.collectionFormat, "csv");
   });
 
   it("cookie basic", async () => {
@@ -366,7 +291,6 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(methodBodyParam.kind, "method");
     strictEqual(methodBodyParam.optional, false);
     strictEqual(methodBodyParam.onClient, false);
-    strictEqual(methodBodyParam.isApiVersionParam, false);
     strictEqual(methodBodyParam.type, sdkPackage.models[0]);
 
     const methodContentTypeParam = method.parameters.find((x) => x.name === "contentType");

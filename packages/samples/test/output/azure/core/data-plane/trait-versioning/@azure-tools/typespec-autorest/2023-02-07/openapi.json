@@ -1354,7 +1354,6 @@
       "items": {
         "type": "string"
       },
-      "collectionFormat": "multi",
       "x-ms-parameter-location": "method"
     },
     "Azure.Core.SkipQueryParameter": {
