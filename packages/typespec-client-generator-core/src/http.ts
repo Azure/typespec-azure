@@ -11,7 +11,6 @@ import {
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
@@ -19,10 +18,8 @@ import {
   HttpOperationQueryParameter,
   getCookieParamOptions,
   getHeaderFieldName,
-  getHeaderFieldOptions,
   getPathParamName,
   getQueryParamName,
-  getQueryParamOptions,
   isBody,
   isCookieParam,
   isHeader,
@@ -33,7 +30,6 @@ import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
 import { getParamAlias } from "./decorators.js";
 import {
-  CollectionFormat,
   SdkBodyParameter,
   SdkCookieParameter,
   SdkHeaderParameter,
@@ -404,7 +400,6 @@ export function getSdkHttpParameter(
   const headerQueryBase = {
     ...base,
     optional: param.optional,
-    collectionFormat: getCollectionFormat(context, param),
     correspondingMethodParams,
   };
   if (isQueryParam(context.program, param) || location === "query") {
@@ -713,25 +708,4 @@ function filterOutUselessPathParameters(
       i--;
     }
   }
-}
-
-function getCollectionFormat(
-  context: TCGCContext,
-  type: ModelProperty,
-): CollectionFormat | undefined {
-  const program = context.program;
-  if (isHeader(program, type)) {
-    const headerOptions = getHeaderFieldOptions(program, type);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    if (headerOptions.format) {
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      return headerOptions.format;
-    } else if (typeof headerOptions.explode === "boolean" || $.array.is(type.type)) {
-      return headerOptions.explode ? "multi" : "csv";
-    }
-  } else if (isQueryParam(program, type)) {
-    /* eslint-disable @typescript-eslint/no-deprecated */
-    return getQueryParamOptions(program, type)?.format;
-  }
-  return;
 }

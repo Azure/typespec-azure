@@ -101,7 +101,6 @@ import {
   resolvePath,
   serializeValueAsJson,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
@@ -121,7 +120,6 @@ import {
   Visibility,
   createMetadataInfo,
   getAuthentication,
-  getHeaderFieldOptions,
   getHttpService,
   getServers,
   getStatusCodeDescription,
@@ -1401,32 +1399,14 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getQueryCollectionFormat(param: HttpOperationQueryParameter): string | undefined {
-    if (param.explode) {
-      return "multi";
-    }
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = param.format;
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param.param });
-    }
-
-    return collectionFormat;
-  }
   function getOpenAPI2QueryParameter(
     param: HttpOperationQueryParameter,
     schemaContext: SchemaContext,
   ): OpenAPI2QueryParameter {
     const base = getOpenAPI2ParameterBase(param.param, param.name);
-    const collectionFormat = getQueryCollectionFormat(param);
     const schema = getSimpleParameterSchema(param.param, schemaContext, base.name);
     return {
       in: "query",
-      collectionFormat:
-        collectionFormat === "csv" && schema.items === undefined // If csv
-          ? undefined
-          : (collectionFormat as any),
       default: param.param.defaultValue && getDefaultValue(param.param.defaultValue, param.param),
       ...base,
       ...schema,
@@ -1459,24 +1439,10 @@ export async function getOpenAPIForService(
     name?: string,
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(param, name);
-    const headerOptions = getHeaderFieldOptions(program, param);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = headerOptions.format;
-    if (
-      !collectionFormat &&
-      (typeof headerOptions.explode === "boolean" || $.array.is(param.type))
-    ) {
-      collectionFormat = headerOptions.explode ? "multi" : "csv";
-    }
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: param });
-    }
     return {
       in: "header",
       default: param.defaultValue && getDefaultValue(param.defaultValue, param),
       ...base,
-      collectionFormat: collectionFormat as any,
       ...getSimpleParameterSchema(param, schemaContext, base.name),
     };
   }

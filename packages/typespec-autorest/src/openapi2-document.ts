@@ -387,7 +387,6 @@ export interface OpenAPI2QueryParameter extends OpenAPI2ParameterBase {
   name: string;
   in: "query";
   type: "string" | "number" | "integer" | "boolean" | "array";
-  collectionFormat?: "csv" | "ssv" | "tsv" | "pipes" | "multi";
   allowEmptyValue?: boolean;
   description?: string;
   required?: boolean;
