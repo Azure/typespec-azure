@@ -1406,7 +1406,6 @@ export async function getOpenAPIForService(
   ): OpenAPI2QueryParameter {
     const property = httpProp.property;
     const base = getOpenAPI2ParameterBase(property, httpProp.options.name);
-    const collectionFormat = getQueryCollectionFormat(httpProp);
     const schema = getSimpleParameterSchema(property, schemaContext, base.name);
     return {
       in: "query",
@@ -1442,7 +1441,7 @@ export async function getOpenAPIForService(
     schemaContext: SchemaContext,
     name?: string,
   ): OpenAPI2HeaderParameter {
-    const base = getOpenAPI2ParameterBase(param, name);
+    const base = getOpenAPI2ParameterBase(prop, name);
     return {
       in: "header",
       default: prop.defaultValue && getDefaultValue(prop.defaultValue, prop),
