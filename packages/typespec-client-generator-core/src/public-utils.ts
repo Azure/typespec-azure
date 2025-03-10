@@ -315,10 +315,7 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  if (!context.__generatedNames) {
-    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>();
-  }
-  const generatedName = context.__generatedNames.get(type);
+  const generatedName = context.__generatedNames?.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -642,13 +639,7 @@ function buildNameFromContextPaths(
   while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
-  if (context.__generatedNames) {
-    context.__generatedNames.set(type, createName);
-  } else {
-    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>([
-      [type, createName],
-    ]);
-  }
+  context.__generatedNames!.set(type, createName);
   return createName;
 }
 
@@ -660,7 +651,7 @@ export function getHttpOperationWithCache(
     return context.__httpOperationCache.get(operation)!;
   }
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
-  context.__httpOperationCache?.set(operation, httpOperation);
+  context.__httpOperationCache!.set(operation, httpOperation);
   return httpOperation;
 }
 

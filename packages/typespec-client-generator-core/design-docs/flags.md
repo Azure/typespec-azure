@@ -18,8 +18,8 @@ Specifies the directory where the emitter will look for example files. If the fl
 
 ## 5. `namespace`
 
-If you want to override the namespaces set in the spec. In the process of adding, see [this](https://github.com/Azure/typespec-azure/pull/2161) PR. Affects the values in `SdkPackage.namespaces`.
+Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.
 
 ## 6. `api-version`
 
-Use this flag if you would like to generate the sdk only for a specific version. Default value is `all`. Also accepts values `latest` and `all`.
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.

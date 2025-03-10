@@ -37,19 +37,17 @@ export interface TCGCContext {
   emitterName: string;
   arm?: boolean;
   getMutatedGlobalNamespace(): Namespace;
-  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
-  namespaceFlag?: string;
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
-  packageName?: string;
-  flattenUnionAsEnum?: boolean;
-  apiVersion?: string;
   examplesDir?: string;
+  namespaceFlag?: string;
+  apiVersion?: string;
 
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
+  flattenUnionAsEnum?: boolean;
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
@@ -61,8 +59,8 @@ export interface TCGCContext {
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
-  __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
+  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
 }
 
 export interface SdkContext<
