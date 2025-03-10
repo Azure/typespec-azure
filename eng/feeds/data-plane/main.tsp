@@ -16,7 +16,7 @@ using Azure.Core;
     }
   ]>
 )
-@service({
+@service(#{
   title: "{{parameters.ServiceNamespace}} service",
 })
 @versioned({{parameters.ServiceNamespace}}.Versions)

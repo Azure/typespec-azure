@@ -127,9 +127,11 @@ Expected response body:
   - `post /azure/client-generator-core/usage/inputToInputOutput`
   - `post /azure/client-generator-core/usage/outputToInputOutput`
   - `post /azure/client-generator-core/usage/modelInReadOnlyProperty`
+  - `post /azure/client-generator-core/usage/orphanModelSerializable`
 
-This scenario contains two public operations. Both should be generated and exported.
-The models are override to roundtrip, so they should be generated and exported as well.
+This scenario contains 4 public operations. All should be generated and exported.
+'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
+The other models are override to roundtrip, so they should be generated and exported as well.
 
 ### Azure_Core_Basic_createOrReplace
 
@@ -797,6 +799,59 @@ maxpagesize=3
       "name": "user8"
     }
   ]
+}
+```
+
+### Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/confidentialResources/confidential",
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": <any string>,
+  "properties": {
+    "username": "00"
+  }
+}
+```
+
+Expected response status code: 400
+Expected response body:
+
+```json
+{
+  "error": {
+    "code": "BadRequest",
+    "message": "Username should not contain only numbers.",
+    "innererror": {
+      "exceptiontype": "general"
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_CommonProperties_Error_getForPredefinedError
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.CommonProperties/confidentialResources/confidential",
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response status code: 404
+Expected response body:
+
+```json
+{
+  "error": {
+    "code": "ResourceNotFound",
+    "message": "The Resource 'Azure.ResourceManager.CommonProperties/confidentialResources/confidential' under resource group 'test-rg' was not found."
+  }
 }
 ```
 

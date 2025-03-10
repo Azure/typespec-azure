@@ -1,4 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { Visibility } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -17,7 +18,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("basic", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InputModel {
             prop: string
@@ -38,7 +39,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("models in Record", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InnerModel {
             prop: string
@@ -59,7 +60,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("models in Array", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InnerModel {
             prop: string
@@ -80,7 +81,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("embedded models", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model InnerModel {
             prop: string
@@ -105,7 +106,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("base model", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService {
           model BaseModel {
             prop: string
@@ -476,7 +477,7 @@ describe("typespec-client-generator-core: model types", () => {
   it("request/response header with enum value", async () => {
     await runner.compileWithBuiltInService(`
       model RepeatableResponse {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @header("Repeatability-Result")
         repeatabilityResult?: "accepted" | "rejected";
       }
@@ -766,7 +767,7 @@ describe("typespec-client-generator-core: model types", () => {
       model User {
         @key
         @doc("The user's id.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         id: int32;
 
         @doc("The user's name.")
@@ -781,7 +782,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(models[0].name, "User");
     strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-    for (const [type, sdkType] of runner.context.referencedTypeMap?.entries() ?? []) {
+    for (const [type, sdkType] of runner.context.__referencedTypeCache?.entries() ?? []) {
       if (isAzureCoreTspModel(type)) {
         ok(sdkType.usage !== UsageFlags.None);
       }
@@ -800,7 +801,7 @@ describe("typespec-client-generator-core: model types", () => {
         model User {
           @key
           @doc("The user's id.")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           id: int32;
 
           @doc("The user's name.")
@@ -834,7 +835,7 @@ describe("typespec-client-generator-core: model types", () => {
       model User {
         @key
         @doc("The user's name.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
 
@@ -863,7 +864,7 @@ describe("typespec-client-generator-core: model types", () => {
       model User {
         @key
         @doc("The user's name.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
 
@@ -921,7 +922,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("no models filter core", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService { }
       `);
     const models = runner.context.sdkPackage.models;
@@ -930,7 +931,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("no models don't filter core", async () => {
     await runner.compile(`
-        @service({})
+        @service
         @test namespace MyService { }
       `);
     const models = runner.context.sdkPackage.models;
@@ -989,7 +990,7 @@ describe("typespec-client-generator-core: model types", () => {
         }
       
         model RoundTripModel {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           result: ResultModel;
         }
       
@@ -1057,7 +1058,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(fish?.properties[0].kind, "property");
     strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-    const salmon = Array.from(runner.context.referencedTypeMap?.values() ?? []).find(
+    const salmon = Array.from(runner.context.__referencedTypeCache?.values() ?? []).find(
       (x) => x.kind === "model" && x.name === "Salmon",
     ) as SdkModelType;
     strictEqual(salmon?.serializationOptions.json, undefined);
@@ -1116,7 +1117,7 @@ describe("typespec-client-generator-core: model types", () => {
     strictEqual(fish?.properties[0].kind, "property");
     strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-    const types = Array.from(runner.context.referencedTypeMap?.values() ?? []);
+    const types = Array.from(runner.context.__referencedTypeCache?.values() ?? []);
 
     const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
     strictEqual(shark?.serializationOptions.json, undefined);
@@ -1378,7 +1379,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("additionalProperties usage", async () => {
     await runner.compileWithBuiltInService(`
-        @service({})
+        @service
         namespace MyService {
           model AdditionalPropertiesModel extends Record<Test> {
           }
@@ -1462,7 +1463,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("crossLanguageDefinitionId", async () => {
     await runner.compile(`
-        @service({})
+        @service
         namespace MyService {
           @usage(Usage.input)
           model InputModel {}
@@ -1524,7 +1525,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("model with deprecated annotation", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         namespace MyService;
         #deprecated "no longer support"
         model Test {
@@ -1541,7 +1542,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("orphan model", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
@@ -1560,7 +1561,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("model with client hierarchy", async () => {
     await runner.compile(`
-        @service({})
+        @service
         namespace Test1Client {
           model T1 {
             prop: string;
@@ -1656,7 +1657,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("never or void property", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         @test namespace MyService {
           @test
           @usage(Usage.input | Usage.output)
@@ -1675,7 +1676,7 @@ describe("typespec-client-generator-core: model types", () => {
 
   it("xml usage", async () => {
     await runner.compileAndDiagnose(`
-        @service({})
+        @service
         namespace MyService {
           model RoundTrip {
             prop: string;
@@ -1792,7 +1793,7 @@ describe("typespec-client-generator-core: model types", () => {
   it("header property on body root model visibility", async function () {
     await runner.compileWithBuiltInService(`
         model InputModel {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @header("x-name")
           name: string;
         }
@@ -1809,5 +1810,47 @@ describe("typespec-client-generator-core: model types", () => {
     ok(nameProperty.visibility);
     strictEqual(nameProperty.visibility.length, 1);
     strictEqual(nameProperty.visibility[0], Visibility.Read);
+  });
+
+  it("discriminator from template", async function () {
+    await runner.compileWithBuiltInService(`
+        @discriminator("kind")
+        model Base {
+          kind: string;
+        }
+
+        model Derived<kind extends string> extends Base {
+          kind: kind;
+        }
+
+        model One is Derived<"one"> {
+          prop: string;
+        };
+
+        op test(): One;
+      `);
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 2);
+    const base = models.find((x) => x.name === "Base");
+    ok(base);
+    const kindProperty = base.properties[0];
+    ok(kindProperty);
+    strictEqual(kindProperty.name, "kind");
+    strictEqual(kindProperty.kind, "property");
+    strictEqual(kindProperty.discriminator, true);
+    strictEqual(kindProperty.type.kind, "string");
+    strictEqual(base.discriminatorProperty, kindProperty);
+
+    const one = models.find((x) => x.name === "One");
+    ok(one);
+    strictEqual(one.properties.length, 2);
+    strictEqual(one.properties[0].kind, "property");
+    strictEqual(one.properties[0].name, "kind");
+    strictEqual(one.properties[0].discriminator, true);
+    strictEqual(one.discriminatorValue, "one");
+    strictEqual(one.properties[1].kind, "property");
+    strictEqual(one.properties[1].name, "prop");
+
+    expectDiagnosticEmpty(runner.context.diagnostics);
   });
 });

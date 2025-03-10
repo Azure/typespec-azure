@@ -27,7 +27,6 @@ import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-for
 import { preventFormatRule } from "./rules/prevent-format.js";
 import { preventRestLibraryInterfaces } from "./rules/prevent-rest-library.js";
 import { preventUnknownType } from "./rules/prevent-unknown.js";
-import { propertyNameRule } from "./rules/property-naming.js";
 import { bodyArrayRule } from "./rules/request-body-array.js";
 import { requireDocumentation } from "./rules/require-docs.js";
 import { requireKeyVisibility } from "./rules/require-key-visibility.js";
@@ -63,7 +62,6 @@ const rules = [
   noMultipleDiscriminatorRule,
   preventRestLibraryInterfaces,
   preventUnknownType,
-  propertyNameRule,
   badRecordTypeRule,
   requireDocumentation,
   requireKeyVisibility,

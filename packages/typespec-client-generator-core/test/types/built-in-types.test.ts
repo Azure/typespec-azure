@@ -141,6 +141,19 @@ describe("typespec-client-generator-core: built-in types", () => {
     strictEqual(sdkType.kind, "unknown");
   });
 
+  it("null", async function () {
+    await runner.compileWithBuiltInService(
+      `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        prop: null;
+      }
+    `,
+    );
+    const sdkType = getSdkTypeHelper(runner);
+    strictEqual(sdkType.kind, "unknown");
+  });
+
   it("bytes", async function () {
     await runner.compileWithBuiltInService(
       `
@@ -275,7 +288,7 @@ describe("typespec-client-generator-core: built-in types", () => {
     model User {
       @key
       @doc("The user's name.")
-      @visibility("read")
+      @visibility(Lifecycle.Read)
       name: string;
 
       ...Azure.Core.EtagProperty;

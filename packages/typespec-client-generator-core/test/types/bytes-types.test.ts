@@ -23,9 +23,9 @@ describe("typespec-client-generator-core: bytes types", () => {
   describe("bytes SdkMethodParameter", () => {
     it("should use service operation parameter encoding", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace TestClient {
-          op send(@body body: bytes, @header contentType: "application/json; serialization=Avro" | "application/octet-stream"): void;
+          op send(@body body: bytes, @header contentType: "application/octet-stream"): void;
         }
       `);
       const client = runner.context.sdkPackage.clients[0];
@@ -38,7 +38,7 @@ describe("typespec-client-generator-core: bytes types", () => {
       strictEqual(param.type.kind, "bytes");
       strictEqual(param.type.name, "bytes");
       // this is from SdkHttpServiceOperationParameter
-      strictEqual(param.type.encode, "base64");
+      strictEqual(param.type.encode, "bytes");
       strictEqual(method.kind, "basic");
       const serviceBodyParam = (method as SdkBasicServiceMethod<SdkHttpOperation>).operation
         .bodyParam;

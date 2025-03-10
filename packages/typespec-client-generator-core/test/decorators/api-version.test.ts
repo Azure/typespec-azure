@@ -12,7 +12,7 @@ describe("@apiVersion", () => {
   describe("@apiVersion", () => {
     it("override parameter to be api version", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace MyService;
         op get(
             @apiVersion
@@ -35,7 +35,7 @@ describe("@apiVersion", () => {
 
     it("override api version param defaults to latest api version", async () => {
       await runner.compile(`
-        @service({
+        @service(#{
           title: "Contoso Widget Manager",
         })
         @versioned(Contoso.WidgetManager.Versions)
@@ -74,7 +74,7 @@ describe("@apiVersion", () => {
 
     it("override parameter to not be api version", async () => {
       await runner.compile(`
-        @service({})
+        @service
         namespace MyService;
         op get(
           @apiVersion(false)

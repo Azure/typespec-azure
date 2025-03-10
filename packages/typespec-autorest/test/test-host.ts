@@ -50,7 +50,8 @@ export async function createAutorestTestRunner(
       "Azure.ClientGenerator.Core",
     ],
     compilerOptions: {
-      emitters: { [AutorestTestLibrary.name]: { ...emitterOptions } },
+      emit: ["@azure-tools/typespec-autorest"],
+      options: { [AutorestTestLibrary.name]: { ...emitterOptions } },
       miscOptions: { "disable-linter": true },
     },
   });
@@ -87,7 +88,8 @@ export async function compileOpenAPI(
   const runner = await createAutorestTestRunner(options.host);
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
-    emitters: {
+    emit: ["@azure-tools/typespec-autorest"],
+    options: {
       [AutorestTestLibrary.name]: {
         ...options.options,
         "emitter-output-dir": resolveVirtualPath("tsp-output"),
@@ -108,7 +110,8 @@ export async function compileVersionedOpenAPI<K extends string>(
   const runner = await createAutorestTestRunner(options.host);
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
-    emitters: {
+    emit: ["@azure-tools/typespec-autorest"],
+    options: {
       [AutorestTestLibrary.name]: {
         ...options.options,
         "emitter-output-dir": resolveVirtualPath("tsp-output"),
@@ -143,7 +146,8 @@ export async function openApiFor(
 export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterOptions = {}) {
   const runner = await createAutorestTestRunner();
   return await runner.diagnose(code, {
-    emitters: {
+    emit: ["@azure-tools/typespec-autorest"],
+    options: {
       "@azure-tools/typespec-autorest": options as any,
     },
   });
@@ -152,7 +156,7 @@ export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterO
 export async function oapiForModel(name: string, modelDef: string) {
   const oapi = await compileOpenAPI(`
     ${modelDef};
-    @service({title: "Testing model"})
+    @service(#{title: "Testing model"})
     @route("/")
     namespace root {
       #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."

@@ -47,8 +47,7 @@ export const nonBreakingVersioningRule = createRule({
 
       if (
         getMadeOptionalOn(context.program, modelProperty) !== undefined &&
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        modelProperty.default === undefined
+        modelProperty.defaultValue === undefined
       ) {
         context.reportDiagnostic({
           messageId: "optionalNoDefault",

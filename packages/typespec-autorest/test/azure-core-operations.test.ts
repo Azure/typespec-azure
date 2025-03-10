@@ -14,7 +14,7 @@ using Azure.Core.Traits;
     }
   ]>
 )
-@service({
+@service(#{
   title: "Contoso Widget Manager",
 })
 @server(
@@ -48,11 +48,11 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
         model Widget {
           @key("widgetName")
           @doc("The widget name.")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           name: string;
         
           @doc("modality")
-          @visibility("create", "read")
+          @visibility(Lifecycle.Create, Lifecycle.Read)
           modality: string;
         
           @doc("The widget color.")
@@ -76,11 +76,11 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       model Widget {
         @key("widgetName")
         @doc("The widget name.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       
         @doc("modality")
-        @visibility("create", "read")
+        @visibility(Lifecycle.Create, Lifecycle.Read)
         modality: string;
       
         @doc("The widget color.")

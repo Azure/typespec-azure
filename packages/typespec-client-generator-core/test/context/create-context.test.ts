@@ -19,7 +19,7 @@ describe("createSdkContext", () => {
 
   it("multiple call with versioning", async () => {
     const tsp = `
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       @versioned(Contoso.WidgetManager.Versions)
@@ -52,7 +52,7 @@ describe("createSdkContext", () => {
   it("export TCGC output from emitter", async () => {
     await runner.compile(
       `
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       namespace Contoso.WidgetManager;
@@ -86,7 +86,7 @@ describe("createSdkContext", () => {
     await runner.compile(
       `
       @armProviderNamespace
-      @service({
+      @service(#{
         title: "ContosoProviderHubClient",
       })
       @versioned(Versions)
@@ -118,7 +118,7 @@ describe("createSdkContext", () => {
         profile?: bytes;
 
         /** The status of the last operation. */
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ProvisioningState;
       }
 
@@ -200,7 +200,7 @@ describe("createSdkContext", () => {
   it("export TCGC output with emitter name from emitter", async () => {
     await runner.compile(
       `
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       namespace Contoso.WidgetManager;
@@ -234,7 +234,7 @@ describe("createSdkContext", () => {
     );
 
     await runner.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       namespace Contoso.WidgetManager;
@@ -257,7 +257,7 @@ describe("createSdkContext", () => {
     );
 
     await runner.compile(`
-      @service({
+      @service(#{
         title: "Contoso Widget Manager",
       })
       namespace Contoso.WidgetManager;

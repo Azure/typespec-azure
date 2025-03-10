@@ -19,7 +19,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
   ])("supports replacing scalar types", (source: string, alternate: string) => {
     it("in global", async () => {
       await runner.compile(`
-          @service({})
+          @service
           namespace MyService {
             scalar source extends ${source};
           
@@ -43,7 +43,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
 
     it("of model property", async () => {
       await runner.compile(`
-          @service({})
+          @service
           namespace MyService {
             model Model1 {
               prop: ${source};
@@ -65,7 +65,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
 
     it("of operation parameters", async () => {
       await runner.compile(`
-          @service({})
+          @service
           namespace MyService {
             @route("/func1")
             op func1(@alternateType(${alternate}) param: ${source}): void;
@@ -89,7 +89,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
     (sourceEncode?: string, alternateEncode?: string) => {
       it("if @alternateType is declared in global", async () => {
         await runner.compile(`
-          @service({})
+          @service
           namespace MyService {
             ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
             scalar source extends string;
@@ -127,7 +127,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
 
       it("if @alternateType is declared inline", async () => {
         await runner.compile(`
-          @service({})
+          @service
           namespace MyService {
             ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
             scalar source extends string;
@@ -170,7 +170,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
     ["timemillis", "int64"],
   ])("supports custom scalar types", async (alternate: string, base: string) => {
     await runner.compile(`
-          @service({})
+          @service
           namespace MyService {
             scalar ${alternate} extends ${base};
 
@@ -197,7 +197,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
     ["java,go", false],
   ])("supports scope", async (scope: string, shouldReplace: boolean) => {
     await runner.compile(`
-          @service({})
+          @service
           namespace MyService {
             @route("/func1")
             op func1(@alternateType(string, "${scope}") param: utcDateTime): void;
@@ -215,7 +215,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
     (source: string) => {
       it("of model properties", async () => {
         const diagnostics = await runner.diagnose(`
-          @service({})
+          @service
           namespace MyService {
             model Model1{};
             alias Union1 = string | int32;
@@ -237,7 +237,7 @@ describe("typespec-client-generator-core: @alternateType", () => {
 
       it("of operation parameters", async () => {
         const diagnostics = await runner.diagnose(`
-          @service({})
+          @service
           namespace MyService {
             model Model1{};
             alias Union1 = string | int32;
