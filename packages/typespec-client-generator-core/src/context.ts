@@ -3,6 +3,7 @@ import {
   EmitContext,
   emitFile,
   ModelProperty,
+  Namespace,
   Operation,
   Program,
   resolvePath,
@@ -24,7 +25,7 @@ import {
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
-import { parseEmitterName } from "./internal-utils.js";
+import { handleVersioningMutationForGlobalNamespace, parseEmitterName } from "./internal-utils.js";
 import { getSdkPackage } from "./package.js";
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
@@ -34,6 +35,14 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     emitterName: diagnostics.pipe(
       parseEmitterName(program, emitterName ?? program.emitters[0]?.metadata?.name),
     ),
+    getMutatedGlobalNamespace(): Namespace {
+      let globalNamespace = this.__mutatedGlobalNamespace;
+      if (!globalNamespace) {
+        globalNamespace = handleVersioningMutationForGlobalNamespace(this);
+        this.__mutatedGlobalNamespace = globalNamespace;
+      }
+      return globalNamespace;
+    },
     diagnostics: diagnostics.diagnostics,
     __originalProgram: program,
     __clientToParameters: new Map(),
@@ -94,6 +103,7 @@ export async function createSdkContext<
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
+    namespaceFlag: context.options["namespace"],
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {

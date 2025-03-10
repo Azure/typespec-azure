@@ -659,7 +659,6 @@ describe("typespec-client-generator-core: enum types", () => {
         @versioned(Versions)
         @service()
         namespace DemoService;
-
         enum Versions {
           v1,
           v2,
