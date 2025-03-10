@@ -8,6 +8,9 @@ const LOCATION_EXPECTED = "eastus";
 const SUBSCRIPTION_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}`;
 const RESOURCE_GROUP_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`;
 const RESOURCE_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`;
+const SPLIT_SUBSCRIPTION_SCOPE_URI = `subscriptions/${SUBSCRIPTION_ID_EXPECTED}`;
+const SPLIT_RESOURCE_GROUP_SCOPE_URI = `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`;
+const SPLIT_RESOURCE_SCOPE_URI = `subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`;
 const TENANT_SCOPE_URI = "";
 const EXTENSION_RESOURCE_NAME = "extension";
 const validTopLevelResource = {
@@ -185,7 +188,17 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     validResourceGroupExtensionsResource,
   ),
   createExtensionGetMockApiDefinition(
+    SPLIT_RESOURCE_GROUP_SCOPE_URI,
+    EXTENSION_RESOURCE_NAME,
+    validResourceGroupExtensionsResource,
+  ),
+  createExtensionGetMockApiDefinition(
     SUBSCRIPTION_SCOPE_URI,
+    EXTENSION_RESOURCE_NAME,
+    validSubscriptionExtensionsResource,
+  ),
+  createExtensionGetMockApiDefinition(
+    SPLIT_SUBSCRIPTION_SCOPE_URI,
     EXTENSION_RESOURCE_NAME,
     validSubscriptionExtensionsResource,
   ),
@@ -196,6 +209,11 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
   ),
   createExtensionGetMockApiDefinition(
     RESOURCE_SCOPE_URI,
+    EXTENSION_RESOURCE_NAME,
+    validResourceExtensionsResource,
+  ),
+  createExtensionGetMockApiDefinition(
+    SPLIT_RESOURCE_SCOPE_URI,
     EXTENSION_RESOURCE_NAME,
     validResourceExtensionsResource,
   ),
@@ -233,7 +251,17 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     validResourceGroupExtensionsResource,
   ),
   createExtensionCreateMockApiDefinition(
+    SPLIT_RESOURCE_GROUP_SCOPE_URI,
+    EXTENSION_RESOURCE_NAME,
+    validResourceGroupExtensionsResource,
+  ),
+  createExtensionCreateMockApiDefinition(
     SUBSCRIPTION_SCOPE_URI,
+    EXTENSION_RESOURCE_NAME,
+    validSubscriptionExtensionsResource,
+  ),
+  createExtensionCreateMockApiDefinition(
+    SPLIT_SUBSCRIPTION_SCOPE_URI,
     EXTENSION_RESOURCE_NAME,
     validSubscriptionExtensionsResource,
   ),
@@ -244,6 +272,11 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
   ),
   createExtensionCreateMockApiDefinition(
     RESOURCE_SCOPE_URI,
+    EXTENSION_RESOURCE_NAME,
+    validResourceExtensionsResource,
+  ),
+  createExtensionCreateMockApiDefinition(
+    SPLIT_RESOURCE_SCOPE_URI,
     EXTENSION_RESOURCE_NAME,
     validResourceExtensionsResource,
   ),
@@ -328,9 +361,12 @@ function createExtensionDeleteMockApiDefinition(
 
 Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuccess([
   createExtensionDeleteMockApiDefinition(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME),
+  createExtensionDeleteMockApiDefinition(SPLIT_RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME),
   createExtensionDeleteMockApiDefinition(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME),
+  createExtensionDeleteMockApiDefinition(SPLIT_SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME),
   createExtensionDeleteMockApiDefinition(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME),
   createExtensionDeleteMockApiDefinition(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME),
+  createExtensionDeleteMockApiDefinition(SPLIT_RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME),
 ]);
 
 function createExtensionListByScopeMockApiDefinition(
@@ -361,11 +397,23 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = pass
     validResourceGroupExtensionsResource,
   ),
   createExtensionListByScopeMockApiDefinition(
+    SPLIT_RESOURCE_GROUP_SCOPE_URI,
+    validResourceGroupExtensionsResource,
+  ),
+  createExtensionListByScopeMockApiDefinition(
     SUBSCRIPTION_SCOPE_URI,
+    validSubscriptionExtensionsResource,
+  ),
+  createExtensionListByScopeMockApiDefinition(
+    SPLIT_SUBSCRIPTION_SCOPE_URI,
     validSubscriptionExtensionsResource,
   ),
   createExtensionListByScopeMockApiDefinition(TENANT_SCOPE_URI, validTenantExtensionsResource),
   createExtensionListByScopeMockApiDefinition(RESOURCE_SCOPE_URI, validResourceExtensionsResource),
+  createExtensionListByScopeMockApiDefinition(
+    SPLIT_RESOURCE_SCOPE_URI,
+    validResourceExtensionsResource,
+  ),
 ]);
 
 // location resource
