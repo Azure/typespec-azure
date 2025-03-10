@@ -150,7 +150,7 @@ async function exportTCGCOutput(context: SdkContext) {
 
 export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
   if (!context.program.compilerOptions.noEmit) {
-    const sdkContext = await createSdkContext(context);
-    await exportTCGCOutput(sdkContext);
+    const sdkContext = await createSdkContext(context, undefined, { exportTCGCoutput: true });
+    context.program.reportDiagnostics(sdkContext.diagnostics);
   }
 }
