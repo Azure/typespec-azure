@@ -1,11 +1,5 @@
-import {
-  Diagnostic,
-  listServices,
-  Model,
-  Namespace,
-  Program,
-  projectProgram,
-} from "@typespec/compiler";
+import { Diagnostic, listServices, Model, Namespace, Program } from "@typespec/compiler";
+import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
 import { BasicTestRunner, createTestHost, createTestWrapper } from "@typespec/compiler/testing";
 import {
   getAllHttpServices,
@@ -17,8 +11,9 @@ import {
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
-import { buildVersionProjections } from "@typespec/versioning";
+import { getVersioningMutators } from "@typespec/versioning";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
+import { strictEqual } from "assert";
 import { AzureCoreTestLibrary } from "../src/testing/index.js";
 
 export async function createAzureCoreTestHost() {
@@ -118,12 +113,19 @@ export async function getSimplifiedOperations(
 
 export function getServiceForVersion(program: Program, version: string): Namespace {
   const services = listServices(program);
-  const versions = buildVersionProjections(program, services[0].type);
-  const versionRecord = versions.find((v) => v.version === version);
+  const result = getVersioningMutators(program, services[0].type);
+  strictEqual(result?.kind, "versioned");
+  const snapshot = result.snapshots.find(
+    (v) => v.version.value === version || v.version.name === version,
+  );
 
-  if (versionRecord) {
-    const projectedProgram = projectProgram(program, versionRecord.projections);
-    return projectedProgram.projector.projectedTypes.get(services[0].type) as Namespace;
+  if (snapshot) {
+    const subgraph = unsafe_mutateSubgraphWithNamespace(
+      program,
+      [snapshot.mutator],
+      services[0].type,
+    );
+    return subgraph.type as Namespace;
   }
 
   throw new Error(`Version '${version}' not found!`);

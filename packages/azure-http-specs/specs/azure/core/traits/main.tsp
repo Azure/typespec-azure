@@ -21,7 +21,7 @@ using Spector;
   }
 )
 @versioned(Versions)
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.trait", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.traits", "java")
 namespace _Specs_.Azure.Core.Traits;
 
 @doc("Service versions")

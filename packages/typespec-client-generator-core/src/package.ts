@@ -74,6 +74,7 @@ import {
   getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
+  listAllServiceNamespaces,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -1150,8 +1151,8 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    name: getClientNamespaceString(context)!,
-    rootNamespace: getClientNamespaceString(context)!,
+    name: getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]) || "",
+    rootNamespace: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),

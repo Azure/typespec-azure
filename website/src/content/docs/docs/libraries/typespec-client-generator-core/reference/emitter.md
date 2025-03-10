@@ -60,3 +60,7 @@ options:
 ### `emitter-name`
 
 **Type:** `string`
+
+### `namespace`
+
+**Type:** `string`

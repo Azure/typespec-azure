@@ -38,6 +38,7 @@ export interface TCGCContext {
   arm?: boolean;
   getMutatedGlobalNamespace(): Namespace;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
+  namespaceFlag?: string;
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
@@ -84,6 +85,7 @@ export interface SdkEmitterOptions {
   "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
+  namespace?: string;
 }
 
 // Types for TCGC customization decorators
@@ -948,6 +950,9 @@ export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   name: string;
+  /**
+   * @deprecated Look at `.namespaces` instead
+   */
   rootNamespace: string;
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];

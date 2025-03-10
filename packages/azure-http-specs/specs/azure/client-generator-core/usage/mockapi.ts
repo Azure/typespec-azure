@@ -36,4 +36,18 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
     },
     kind: "MockApiDefinition",
   },
+  {
+    uri: "/azure/client-generator-core/usage/orphanModelSerializable",
+    method: "put",
+    request: {
+      body: {
+        name: "name",
+        desc: "desc",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
 ]);

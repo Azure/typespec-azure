@@ -102,6 +102,7 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
 }
 
 /**
+ * @deprecated Access namespace information by iterating through `sdkPackage.namespaces` instead
  * Get the client's namespace for generation. If package-name is passed in config, we return
  * that value as our namespace. Otherwise, we default to the TypeSpec service namespace.
  * @param program

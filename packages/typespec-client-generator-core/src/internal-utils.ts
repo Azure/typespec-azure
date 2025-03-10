@@ -99,7 +99,6 @@ export function parseEmitterName(
 }
 
 /**
- *
  * @param context
  * @param namespace If we know explicitly the namespace of the client, pass this in
  * @returns The name of the namespace
