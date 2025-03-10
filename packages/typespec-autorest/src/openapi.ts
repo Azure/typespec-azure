@@ -2597,7 +2597,7 @@ export async function getOpenAPIForService(
   ): [OpenAPI2SecurityScheme, string[]] | undefined {
     switch (auth.type) {
       case "http":
-        if (auth.scheme !== "basic") {
+        if (auth.scheme.toLowerCase() !== "basic") {
           reportDiagnostic(program, {
             code: "unsupported-http-auth-scheme",
             target: serviceNamespace,
