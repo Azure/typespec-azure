@@ -97,7 +97,7 @@ public PagedIterable<User> listWithPage();
 ## Using continuation token to indicate how to get the next page
 
 A continuation token is a string returned by a paging operation, which is used as a parameter value for the paging operation to get the next page.
-If the response does not return continuation token, it should be the last page.
+If the response does not return a continuation token, it indicates the last page of results.
 Continuation token should be annotated in one of the request parameter with `@continuationToken`, as well as response model with `@continuationToken`.
 
 1. Continuation token in query parameter and response body.
