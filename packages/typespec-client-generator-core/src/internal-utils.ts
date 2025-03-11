@@ -107,7 +107,7 @@ export function getClientNamespaceStringHelper(
   context: TCGCContext,
   namespace?: Namespace,
 ): string | undefined {
-  let packageName = context.packageName;
+  let packageName = context.packageName; // eslint-disable-line @typescript-eslint/no-deprecated
   if (packageName) {
     packageName = packageName
       .replace(/-/g, ".")
