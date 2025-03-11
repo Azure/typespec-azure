@@ -228,6 +228,13 @@ export const $lib = createTypeSpecLibrary({
         default: `Api version must be a string or a string enum`,
       },
     },
+    "invalid-encode-for-collection-format": {
+      severity: "warning",
+      messages: {
+        default:
+          "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
+      },
+    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,

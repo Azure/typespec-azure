@@ -24,13 +24,11 @@ import {
   getClientNameOverride,
   getIsApiVersion,
   listClients,
-  listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
   SdkBodyModelPropertyType,
   SdkBodyParameter,
-  SdkClientType,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
@@ -39,7 +37,6 @@ import {
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
-  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -54,6 +51,7 @@ import {
   isHttpBodySpread,
   listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
+  listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -355,17 +353,12 @@ function findContextPath(
         return result;
       }
     }
-    const ogs = listOperationGroups(context, client);
-    while (ogs.length) {
-      const operationGroup = ogs.pop();
-      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
+    for (const og of listRawSubClients(context, client)) {
+      for (const operation of listOperationsInOperationGroup(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
         }
-      }
-      if (operationGroup?.subOperationGroups) {
-        ogs.push(...operationGroup.subOperationGroups);
       }
     }
   }
@@ -663,28 +656,6 @@ export function getHttpOperationExamples(
   operation: HttpOperation,
 ): SdkHttpOperationExample[] {
   return context.__httpOperationExamples?.get(operation) ?? [];
-}
-
-/**
- * Get all the sub clients from current client.
- *
- * @param client
- * @param listNestedClients determine if nested clients should be listed
- * @returns
- */
-export function listSubClients<TServiceOperation extends SdkServiceOperation>(
-  client: SdkClientType<TServiceOperation>,
-  listNestedClients: boolean = false,
-): SdkClientType<TServiceOperation>[] {
-  const subClients: SdkClientType<TServiceOperation>[] = client.methods
-    .filter((c) => c.kind === "clientaccessor")
-    .map((c) => c.response as SdkClientType<TServiceOperation>);
-  if (listNestedClients) {
-    for (const subClient of [...subClients]) {
-      subClients.push(...listSubClients(subClient, listNestedClients));
-    }
-  }
-  return subClients;
 }
 
 export function isAzureCoreModel(t: SdkType): boolean {

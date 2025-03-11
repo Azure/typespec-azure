@@ -1,3 +1,4 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ignoreDiagnostics, Interface, Namespace, Operation } from "@typespec/compiler";
 import {
   createLinterRuleTester,
@@ -1441,6 +1442,58 @@ describe("typespec-client-generator-core: client related", () => {
         listOperationsInOperationGroup(runner.context, b).map((x) => x.name),
         ["x", "y"],
       );
+    });
+
+    it("triple-nested with core and versioning", async () => {
+      const runnerWithCore = await createSdkTestRunner({
+        librariesToAdd: [AzureCoreTestLibrary],
+        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+        emitterName: "@azure-tools/typespec-java",
+      });
+      await runnerWithCore.compile(
+        `
+      @service
+      @versioned(StorageVersions)
+      @clientName("BlobServiceClient")
+      namespace Storage.Blob {
+        enum StorageVersions {
+          @doc("The 2025-01-05 version of the Azure.Storage.Blob service.")
+          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+          v2025_01_05: "2025-01-05",
+        }
+
+        op ServiceOperation<
+          TParams extends TypeSpec.Reflection.Model = {},
+          TResponse extends TypeSpec.Reflection.Model = {}
+        > is Foundations.Operation<
+          TParams,
+          TResponse
+        >;
+
+        @route("storage/blob") op storageBlob is ServiceOperation;
+        @clientName("ContainerClient")
+        namespace Container {
+          @route("storage/blob/container") op storageBlobContainer is ServiceOperation;
+          @clientName("BlobClient")
+          namespace Blob {
+            @route("storage/blob/container/blob") op storageBlobContainerBlob is ServiceOperation;
+          }
+        }        
+      }
+      `,
+      );
+
+      const sdkPackage = runnerWithCore.context.sdkPackage;
+      const containerClient = sdkPackage.clients[0].methods[1].response;
+      strictEqual(containerClient.kind, "client");
+      const blobClient = containerClient.methods[1].response;
+      strictEqual(blobClient.kind, "client");
+      const apiVersionParam = blobClient.clientInitialization.parameters.find(
+        (x) => x.name === "apiVersion",
+      );
+      ok(apiVersionParam);
+      deepStrictEqual(apiVersionParam.apiVersions, ["2025-01-05"]);
+      strictEqual(apiVersionParam.clientDefaultValue, "2025-01-05");
     });
   });
 });
