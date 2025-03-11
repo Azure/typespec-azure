@@ -44,7 +44,6 @@ import {
   Scalar,
   StringLiteral,
   StringTemplate,
-  SyntaxKind,
   Type,
   TypeNameOptions,
   Union,
@@ -101,6 +100,7 @@ import {
   resolvePath,
   serializeValueAsJson,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
