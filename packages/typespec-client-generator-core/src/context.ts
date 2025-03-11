@@ -99,6 +99,10 @@ export async function createSdkContext<
     context.program,
     emitterName ?? context.options["emitter-name"],
   );
+  let flattenUnionAsEnum = options?.flattenUnionAsEnum;
+  if (flattenUnionAsEnum === undefined) {
+    flattenUnionAsEnum = context.options["flatten-union-as-enum"] ?? true;
+  }
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
     emitContext: context,
@@ -112,8 +116,7 @@ export async function createSdkContext<
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
-    flattenUnionAsEnum:
-      (options?.flattenUnionAsEnum || context.options["flatten-union-as-enum"]) ?? true,
+    flattenUnionAsEnum,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
