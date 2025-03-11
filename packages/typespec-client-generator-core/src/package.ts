@@ -75,6 +75,7 @@ import {
   isNeverOrVoidType,
   isSubscriptionId,
   listAllServiceNamespaces,
+  listRawSubClients,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -1078,11 +1079,11 @@ function addDefaultClientParameters<
     .get(client.__raw.type)
     ?.find((x) => x.kind === "apiVersion");
   if (!apiVersionParam) {
-    for (const operationGroup of listOperationGroups(context, client.__raw)) {
+    for (const sc of listRawSubClients(context, client.__raw)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
       apiVersionParam = context.__clientToParameters
-        .get(operationGroup.type)
+        .get(sc.type)
         ?.find((x) => x.kind === "apiVersion");
       if (apiVersionParam) break;
     }
@@ -1094,11 +1095,9 @@ function addDefaultClientParameters<
     .get(client.__raw.type)
     ?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
-    for (const operationGroup of listOperationGroups(context, client.__raw)) {
+    for (const sc of listRawSubClients(context, client.__raw)) {
       // if any sub operation groups have an subId param, the top level needs it as well
-      subId = context.__clientToParameters
-        .get(operationGroup.type)
-        ?.find((x) => isSubscriptionId(context, x));
+      subId = context.__clientToParameters.get(sc.type)?.find((x) => isSubscriptionId(context, x));
       if (subId) break;
     }
   }
@@ -1125,18 +1124,18 @@ function populateApiVersionInformation(context: TCGCContext): void {
       client.type,
       getClientDefaultApiVersion(context, client),
     );
-    for (const og of listOperationGroups(context, client)) {
-      clientApiVersions = resolveVersions(context.program, og.service)
+    for (const sc of listRawSubClients(context, client)) {
+      clientApiVersions = resolveVersions(context.program, sc.service)
         .filter((x) => x.rootVersion)
         .map((x) => x.rootVersion!.value);
       context.__tspTypeToApiVersions.set(
-        og.type,
-        filterApiVersionsWithDecorators(context, og.type, clientApiVersions),
+        sc.type,
+        filterApiVersionsWithDecorators(context, sc.type, clientApiVersions),
       );
 
       context.__clientToApiVersionClientDefaultValue.set(
-        og.type,
-        getClientDefaultApiVersion(context, og),
+        sc.type,
+        getClientDefaultApiVersion(context, sc),
       );
     }
   }
