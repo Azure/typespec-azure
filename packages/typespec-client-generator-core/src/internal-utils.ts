@@ -41,7 +41,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getParamAlias, listOperationGroups } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -49,6 +49,7 @@ import {
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
+  SdkOperationGroup,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -700,4 +701,23 @@ export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
     }
   }
   return serviceNamespaces;
+}
+
+export function listRawSubClients(
+  context: TCGCContext,
+  client: SdkOperationGroup | SdkClient,
+  retval?: (SdkOperationGroup | SdkClient)[],
+): (SdkOperationGroup | SdkClient)[] {
+  if (retval === undefined) {
+    retval = [];
+  }
+  if (retval.includes(client)) return retval;
+  if (client.kind === "SdkOperationGroup") {
+    retval.push(client);
+  }
+
+  for (const operationGroup of listOperationGroups(context, client)) {
+    listRawSubClients(context, operationGroup, retval);
+  }
+  return retval;
 }
