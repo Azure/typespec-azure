@@ -721,13 +721,12 @@ function getCollectionFormat(
 ): CollectionFormat | undefined {
   const program = context.program;
   if (isHeader(program, type)) {
-    const headerOptions = getHeaderFieldOptions(program, type);
     if ($.array.is(type.type)) {
-      return headerOptions.explode ? "multi" : "csv";
+      return getHeaderFieldOptions(program, type).explode ? "multi" : "csv";
     }
   } else if (isQueryParam(program, type)) {
     if ($.array.is(type.type)) {
-      return getQueryParamOptions(program, type)?.explode ? "multi" : "csv";
+      return getQueryParamOptions(program, type).explode ? "multi" : "csv";
     }
   }
   return;
