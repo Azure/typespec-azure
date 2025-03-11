@@ -9,7 +9,7 @@
     "docs/spec.html": true,
     "**/bin/**": true,
     "**/node_modules/**": true,
-    "core/packages/http-client-*/**": true,
+    "core/packages/http-client-*/**": true
   },
   "files.exclude": {
     "**/common/temp/**": true,
