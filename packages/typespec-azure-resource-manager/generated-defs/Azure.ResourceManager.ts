@@ -251,12 +251,6 @@ export type ArmCommonTypesVersionDecorator = (
 export type ArmVirtualResourceDecorator = (context: DecoratorContext, target: Model) => void;
 
 /**
- *  This decorator is used on resources that do not satisfy the definition of a resource
- *  but need to be identified as such.
- */
-export type CustomAzureResourceDecorator = (context: DecoratorContext, target: Model) => void;
-
-/**
  * This decorator sets the base type of the given resource.
  *
  * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
@@ -267,21 +261,23 @@ export type ResourceBaseTypeDecorator = (
   baseType: Type,
 ) => void;
 
+/**
+ * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
+ * The properties that are used as identifiers for the object needs to be provided as a list of strings.
+ *
+ * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
+ * @example
+ * ```typespec
+ * model Pet {
+ *  @identifiers(#["size"])
+ *  dog: Dog;
+ * }
+ * ```
+ */
 export type IdentifiersDecorator = (
   context: DecoratorContext,
-  target: ModelProperty,
-  properties: string[],
-) => void;
-
-/**
- *  * Specify an external reference that should be used when emitting this type.
- *  *  @param jsonRef - External reference(e.g. "../../common.json#/definitions/Foo")
- *
- */
-export type ExternalTypeRefDecorator = (
-  context: DecoratorContext,
-  entity: Model | ModelProperty,
-  jsonRef: string,
+  entity: ModelProperty,
+  properties: readonly string[],
 ) => void;
 
 export type AzureResourceManagerDecorators = {
@@ -307,9 +303,4 @@ export type AzureResourceManagerDecorators = {
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
   identifiers: IdentifiersDecorator;
-};
-
-export type AzureResourceManagerLegacyDecorators = {
-  customAzureResource: CustomAzureResourceDecorator;
-  externalTypeRef: ExternalTypeRefDecorator;
 };
