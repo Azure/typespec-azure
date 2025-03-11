@@ -40,6 +40,10 @@ export interface TCGCContext {
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
+  /**
+   * @deprecated Use `namespaceFlag` instead.
+   */
+  packageName?: string;
   examplesDir?: string;
   namespaceFlag?: string;
   apiVersion?: string;
