@@ -629,7 +629,7 @@ components:
       description: Specifies the date and time at which the request was first created.
       schema:
         type: string
-        format: date-time
+        format: http-date
     Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId:
       name: Repeatability-Request-ID
       in: header

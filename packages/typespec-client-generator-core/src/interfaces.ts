@@ -14,8 +14,8 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  PagingOperation,
   Program,
-  ProjectedProgram,
   Type,
   Union,
 } from "@typespec/compiler";
@@ -33,32 +33,35 @@ import { TspLiteralType } from "./internal-utils.js";
 
 export interface TCGCContext {
   program: Program;
+  diagnostics: readonly Diagnostic[];
   emitterName: string;
+  arm?: boolean;
+  getMutatedGlobalNamespace(): Namespace;
+  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
+  namespaceFlag?: string;
+
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
   packageName?: string;
   flattenUnionAsEnum?: boolean;
-  arm?: boolean;
-  referencedTypeMap: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
-  referencedPropertyMap: Map<ModelProperty, SdkModelPropertyType>;
-  generatedNames?: Map<Union | Model | TspLiteralType, string>;
-  httpOperationCache: Map<Operation, HttpOperation>;
-  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
-  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
-  knownScalars?: Record<string, SdkBuiltInKinds>;
-  diagnostics: readonly Diagnostic[];
-  __rawClients?: SdkClient[];
   apiVersion?: string;
-  // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  __service_projection?: Map<Namespace, [Namespace, ProjectedProgram | undefined]>;
-  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
-  originalProgram: Program;
   examplesDir?: string;
+
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
+
+  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
+  __generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  __httpOperationCache: Map<Operation, HttpOperation>;
+  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
+  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
+  __knownScalars?: Record<string, SdkBuiltInKinds>;
+  __rawClients?: SdkClient[];
+  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
+  __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
 }
 
@@ -82,6 +85,7 @@ export interface SdkEmitterOptions {
   "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
+  namespace?: string;
 }
 
 // Types for TCGC customization decorators
@@ -177,7 +181,14 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   name: string;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   doc?: string;
   summary?: string;
   /**
@@ -223,11 +234,12 @@ export type SdkType =
   | SdkCredentialType
   | SdkEndpointType;
 
-export interface SdkBuiltInType extends SdkTypeBase {
-  kind: SdkBuiltInKinds;
+export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
+  extends SdkTypeBase {
+  kind: TKind;
   encode?: string;
   name: string;
-  baseType?: SdkBuiltInType;
+  baseType?: SdkBuiltInType<TKind>;
   crossLanguageDefinitionId: string;
 }
 
@@ -382,17 +394,32 @@ export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   name: string;
   isGeneratedName: boolean;
+  crossLanguageDefinitionId: string;
   type: SdkType;
   usage: UsageFlags;
   access: AccessFlags;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
@@ -404,17 +431,18 @@ export interface SdkEnumType extends SdkTypeBase {
   isUnionAsEnum: boolean;
 }
 
-export interface SdkEnumValueType extends SdkTypeBase {
+export interface SdkEnumValueType<TValueType extends SdkTypeBase = SdkBuiltInType>
+  extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
   value: string | number;
   enumType: SdkEnumType;
-  valueType: SdkBuiltInType;
+  valueType: TValueType;
 }
 
 export interface SdkConstantType extends SdkTypeBase {
   kind: "constant";
-  value: string | number | boolean | null;
+  value: string | number | boolean;
   valueType: SdkBuiltInType;
   name: string;
   isGeneratedName: boolean;
@@ -423,7 +451,14 @@ export interface SdkConstantType extends SdkTypeBase {
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   kind: "union";
   variantTypes: TValueType[];
   crossLanguageDefinitionId: string;
@@ -436,7 +471,14 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
-  clientNamespace: string; // fully qualified namespace
+  /**
+   * @deprecated Use `namespace` instead.
+   */
+  clientNamespace: string;
+  /**
+   * Full qualified namespace.
+   */
+  namespace: string;
   access: AccessFlags;
   usage: UsageFlags;
   additionalProperties?: SdkType;
@@ -472,9 +514,10 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase extends DecoratedType {
+export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
+  extends DecoratedType {
   __raw?: ModelProperty;
-  type: SdkType;
+  type: TType;
   name: string;
   isGeneratedName: boolean;
   doc?: string;
@@ -482,6 +525,9 @@ export interface SdkModelPropertyTypeBase extends DecoratedType {
   apiVersions: string[];
   onClient: boolean;
   clientDefaultValue?: unknown;
+  /**
+   * @deprecated This property is deprecated. See if the kind is `apiVersion` instead
+   */
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
@@ -531,33 +577,45 @@ export interface XmlSerializationOptions {
   };
 }
 
-export interface SdkEndpointParameter extends SdkModelPropertyTypeBase {
+export interface SdkEndpointParameter
+  extends SdkModelPropertyTypeBase<SdkEndpointType | SdkUnionType<SdkEndpointType>> {
   kind: "endpoint";
   urlEncode: boolean;
   onClient: true;
-  type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   /**
    * @deprecated This property is deprecated. Use `type.templateArguments[x].serializedName` or `type.variantTypes[x].templateArguments[x].serializedName` instead.
    */
   serializedName?: string;
 }
 
-export interface SdkCredentialParameter extends SdkModelPropertyTypeBase {
+export interface SdkApiVersionParameter
+  extends SdkModelPropertyTypeBase<
+    SdkBuiltInType<"string"> | SdkEnumValueType<SdkBuiltInType<"string">>
+  > {
+  kind: "apiVersion";
+  onClient: true;
+  type: SdkBuiltInType<"string"> | SdkEnumValueType<SdkBuiltInType<"string">>;
+  isApiVersionParam: true;
+}
+
+export interface SdkCredentialParameter
+  extends SdkModelPropertyTypeBase<SdkCredentialType | SdkUnionType<SdkCredentialType>> {
   kind: "credential";
-  type: SdkCredentialType | SdkUnionType<SdkCredentialType>;
   onClient: true;
 }
 
-export type SdkModelPropertyType =
-  | SdkBodyModelPropertyType
-  | SdkParameter
+export type SdkModelPropertyType<TType extends SdkTypeBase = SdkType> =
+  | SdkBodyModelPropertyType<TType>
+  | SdkParameter<TType>
   | SdkEndpointParameter
   | SdkCredentialParameter
-  | SdkQueryParameter
-  | SdkPathParameter
-  | SdkBodyParameter
-  | SdkHeaderParameter
-  | SdkCookieParameter;
+  | SdkApiVersionParameter
+  | SdkQueryParameter<TType>
+  | SdkPathParameter<TType>
+  | SdkBodyParameter<TType>
+  | SdkHeaderParameter<TType>
+  | SdkCookieParameter<TType>
+  | SdkServiceResponseHeader<TType>;
 
 export interface MultipartOptions {
   name: string;
@@ -573,7 +631,8 @@ export interface MultipartOptions {
   defaultContentTypes: string[];
 }
 
-export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
+export interface SdkBodyModelPropertyType<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "property";
   discriminator: boolean;
   /**
@@ -594,14 +653,16 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
-export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
+export interface SdkHeaderParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
+export interface SdkQueryParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
@@ -609,7 +670,8 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   explode: boolean;
 }
 
-export interface SdkPathParameter extends SdkModelPropertyTypeBase {
+export interface SdkPathParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "path";
   /**
    * @deprecated This property is deprecated. Use `allowReserved` instead.
@@ -624,13 +686,15 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
+export interface SdkCookieParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "cookie";
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
+export interface SdkBodyParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "body";
   serializedName: string;
   optional: boolean;
@@ -646,25 +710,27 @@ export type SdkHttpParameter =
   | SdkHeaderParameter
   | SdkCookieParameter;
 
-export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
+export interface SdkMethodParameter<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   kind: "method";
 }
 
-export interface SdkServiceResponseHeader {
+export interface SdkServiceResponseHeader<TType extends SdkTypeBase = SdkType>
+  extends SdkModelPropertyTypeBase<TType> {
   __raw: ModelProperty;
+  kind: "responseheader";
   serializedName: string;
-  type: SdkType;
-  doc?: string;
-  summary?: string;
 }
 
 export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
-  resultPath?: string; // if exists, tells you how to get from the service response to the method response.
   /**
-   * An array of properties to fetch {result} from the {response} model. Note that this property is available only in some LRO patterns.
-   * Temporarily this is not enabled for paging now.
+   * @deprecated Use `resultSegments` instead.
+   */
+  resultPath?: string;
+  /**
+   * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
   resultSegments?: SdkModelPropertyType[];
 }
@@ -693,7 +759,11 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
 
 interface SdkServiceOperationBase {}
 
-export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
+export type SdkParameter<TType extends SdkTypeBase = SdkType> =
+  | SdkEndpointParameter
+  | SdkCredentialParameter
+  | SdkApiVersionParameter
+  | SdkMethodParameter<TType>;
 
 export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;
@@ -742,17 +812,44 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
   kind: "basic";
 }
 
-interface SdkPagingServiceMethodOptions {
+interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
+  /**
+   * @deprecated Use `pagingMetadata.__raw` instead.
+   */
   __raw_paged_metadata?: PagedResultMetadata;
+  /**
+   * @deprecated Use `pagingMetadata.nextLinkSegments` instead.
+   */
   nextLinkPath?: string;
+  /**
+   * @deprecated Use `pagingMetadata.nextLinkOperation` instead.
+   */
   nextLinkOperation?: SdkServiceOperation;
-  continuationTokenParameter?: SdkMethodParameter;
+  pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
+}
+
+/**
+ * Paging operation metadata.
+ */
+export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
+  /** Paging metadata from TypeSpec core library. */
+  __raw?: PagedResultMetadata | PagingOperation;
+
+  /** Segments to indicate how to get next page link value from response. */
+  nextLinkSegments?: SdkModelPropertyType[];
+  /** Method used to get next page. If not defined, use the initial method. */
+  nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** Segments to indicate how to set continuation token for next page request. */
+  continuationTokenParameterSegments?: SdkModelPropertyType[];
+  /** Segments to indicate how to get continuation token value from response. */
   continuationTokenResponseSegments?: SdkModelPropertyType[];
+  /** Segments to indicate how to get page items from response. */
+  pageItemsSegments?: SdkModelPropertyType[];
 }
 
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "paging";
 }
 
@@ -815,7 +912,7 @@ export interface SdkLroServiceFinalResponse {
    * @deprecated This property will be removed in future releases. Use `resultSegments` for synthesized property information.
    */
   resultPath?: string;
-  /** An array of properties to fetch {result} from the {envelopeResult} model. Note that this property is available only in some LRO patterns. */
+  /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
 }
 
@@ -828,7 +925,7 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
-    SdkPagingServiceMethodOptions {
+    SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "lropaging";
 }
 
@@ -853,6 +950,9 @@ export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   name: string;
+  /**
+   * @deprecated Look at `.namespaces` instead
+   */
   rootNamespace: string;
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];

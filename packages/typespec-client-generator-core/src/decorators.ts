@@ -19,15 +19,11 @@ import {
   Union,
   getDiscriminator,
   getNamespaceFullName,
-  getProjectedName,
   ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  listServices,
-  projectProgram,
 } from "@typespec/compiler";
-import { buildVersionProjections, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -60,8 +56,10 @@ import {
   AllScopes,
   clientNameKey,
   clientNamespaceKey,
-  getValidApiVersion,
-  isAzureCoreTspModel,
+  findRootSourceProperty,
+  listAllNamespaces,
+  listAllServiceNamespaces,
+  listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
@@ -203,13 +201,6 @@ export const $client: ClientDecorator = (
     explicitService?.kind === "Namespace"
       ? explicitService
       : (findClientService(context.program, target) ?? (target as any));
-  if (!name.endsWith("Client")) {
-    reportDiagnostic(context.program, {
-      code: "client-name",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-  }
 
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
@@ -288,70 +279,6 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
     listScopedDecoratorData(context, operationGroupKey).length > 0
   );
 }
-
-function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
-  if (!context.__service_projection) {
-    context.__service_projection = new Map();
-  }
-
-  let projectedService;
-  let projectedProgram;
-
-  if (context.__service_projection.has(client.service)) {
-    [projectedService, projectedProgram] = context.__service_projection.get(client.service)!;
-  } else {
-    const allApiVersions = getVersions(context.program, client.service)[1]
-      ?.getVersions()
-      .map((x) => x.value);
-    if (!allApiVersions) return;
-    const apiVersion = getValidApiVersion(context, allApiVersions);
-    if (apiVersion === undefined) return;
-    const versionProjections = buildVersionProjections(context.program, client.service).filter(
-      (v) => apiVersion === v.version,
-    );
-    if (versionProjections.length !== 1)
-      throw new Error("Version projects should only contain one element");
-    const projectedVersion = versionProjections[0];
-    if (projectedVersion.projections.length > 0) {
-      // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      projectedProgram = context.program = projectProgram(
-        context.originalProgram,
-        projectedVersion.projections,
-      );
-    }
-    projectedService = projectedProgram
-      ? (projectedProgram.projector.projectedTypes.get(client.service) as Namespace)
-      : client.service;
-    context.__service_projection.set(client.service, [projectedService, projectedProgram]);
-  }
-
-  if (client.service !== client.type) {
-    client.type = projectedProgram
-      ? (projectedProgram.projector.projectedTypes.get(client.type) as Interface)
-      : client.type;
-  } else {
-    client.type = projectedService;
-  }
-  client.service = projectedService;
-}
-
-function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
-  if (context.apiVersion !== "all") {
-    const projectedClients = [];
-    for (const client of clients) {
-      const projectedClient = { ...client };
-      serviceVersioningProjection(context, projectedClient);
-      // filter client not existed in the current version
-      if ((projectedClient.type as Type).kind !== "Intrinsic") {
-        projectedClients.push(projectedClient);
-      }
-    }
-    return projectedClients;
-  }
-  return clients;
-}
-
 /**
  * List all the clients.
  *
@@ -360,10 +287,21 @@ function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): S
  */
 export function listClients(context: TCGCContext): SdkClient[] {
   if (context.__rawClients) return context.__rawClients;
+  const namespaces: Namespace[] = listAllNamespaces(context, context.getMutatedGlobalNamespace());
 
-  const explicitClients = [...listScopedDecoratorData(context, clientKey)];
+  const explicitClients = [];
+  for (const ns of namespaces) {
+    if (getScopedDecoratorData(context, clientKey, ns)) {
+      explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
+    }
+    for (const i of ns.interfaces.values()) {
+      if (getScopedDecoratorData(context, clientKey, i)) {
+        explicitClients.push(getScopedDecoratorData(context, clientKey, i));
+      }
+    }
+  }
   if (explicitClients.length > 0) {
-    context.__rawClients = getClientsWithVersioning(context, explicitClients);
+    context.__rawClients = explicitClients;
     if (context.__rawClients.some((client) => isArm(client.service))) {
       context.arm = true;
     }
@@ -371,28 +309,26 @@ export function listClients(context: TCGCContext): SdkClient[] {
   }
 
   // if there is no explicit client, we will treat namespaces with service decorator as clients
-  const services = listServices(context.program);
+  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
 
-  const clients: SdkClient[] = services.map((service) => {
-    let originalName = service.type.name;
-    const clientNameOverride = getClientNameOverride(context, service.type);
+  context.__rawClients = serviceNamespaces.map((service) => {
+    let originalName = service.name;
+    const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
+      originalName = service.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-    context.arm = isArm(service.type);
+    context.arm = isArm(service);
     return {
       kind: "SdkClient",
       name: clientName,
-      service: service.type,
-      type: service.type,
-      crossLanguageDefinitionId: getNamespaceFullName(service.type),
+      service: service,
+      type: service,
+      crossLanguageDefinitionId: getNamespaceFullName(service),
     };
   });
-
-  context.__rawClients = getClientsWithVersioning(context, clients);
   return context.__rawClients;
 }
 
@@ -763,7 +699,7 @@ export const $access: AccessDecorator = (
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
-      code: "access",
+      code: "invalid-access",
       format: {},
       target: entity,
     });
@@ -901,20 +837,7 @@ function collectParams(
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
-        let sourceProp = value;
-        while (sourceProp.sourceProperty) {
-          sourceProp = sourceProp.sourceProperty;
-        }
-        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
-          params.push(value);
-        } else if (!sourceProp.model) {
-          params.push(value);
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(
-            `We are not counting "${sourceProp.name}" as part of a method parameter because it's been added by Azure.Core templates`,
-          );
-        }
+        params.push(findRootSourceProperty(value));
       }
     }
   });
@@ -1208,12 +1131,60 @@ export const $clientNamespace: ClientNamespaceDecorator = (
   setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
 };
 
+/**
+ * Find the shortest namespace that overlaps with the override string.
+ * @param override
+ * @param userDefinedNamespaces
+ * @returns
+ */
+function findShortestNamespaceOverlap(
+  override: string,
+  userDefinedNamespaces: Namespace[],
+): Namespace | undefined {
+  let shortestNamespace: Namespace | undefined = undefined;
+
+  for (const namespace of userDefinedNamespaces) {
+    if (override.includes(namespace.name)) {
+      if (!shortestNamespace || namespace.name.length < shortestNamespace.name.length) {
+        shortestNamespace = namespace;
+      }
+    }
+  }
+
+  return shortestNamespace;
+}
+
+/**
+ * Returns the client namespace for a given entity. The order of operations is as follows:
+ *
+ * 1. if `@clientNamespace` is applied to the entity, this wins out.
+ *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
+ * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace
+ * 3. We return the namespace of the entity retrieved from the original spec
+ * @param context
+ * @param entity
+ * @returns
+ */
 export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  if (override) return override;
+  if (override) {
+    // if `@clientNamespace` is applied to the entity, this wins out
+    const userDefinedNamespace = findShortestNamespaceOverlap(
+      override,
+      listAllUserDefinedNamespaces(context),
+    );
+    if (userDefinedNamespace && context.namespaceFlag) {
+      // we still make sure to replace the root of the client namespace with the flag (if the flag exists)
+      return override.replace(userDefinedNamespace.name, context.namespaceFlag);
+    }
+    return override;
+  }
+  if (context.namespaceFlag) {
+    return context.namespaceFlag;
+  }
   if (!entity.namespace) {
     return "";
   }

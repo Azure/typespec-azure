@@ -4,12 +4,14 @@ import {
   ModelProperty,
   Operation,
   Type,
+  compilerAssert,
   createDiagnosticCollector,
   getDoc,
   getSummary,
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
@@ -27,6 +29,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
+import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
 import { getParamAlias } from "./decorators.js";
 import {
@@ -49,10 +52,12 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  findRootSourceProperty,
   getAvailableApiVersions,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
+  getStreamAsBytes,
   getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
@@ -62,6 +67,7 @@ import {
   twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { isMediaTypeJson } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -142,7 +148,6 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
   if (tspBody) {
-    // explicit @body and @bodyRoot
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
@@ -183,7 +188,7 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
-        serializedName: "body",
+        serializedName: "",
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
@@ -199,7 +204,6 @@ function getSdkHttpParameters(
       };
     }
     if (retval.bodyParam) {
-      addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
       retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
         getCorrespondingMethodParams(
           context,
@@ -208,6 +212,16 @@ function getSdkHttpParameters(
           retval.bodyParam,
         ),
       );
+
+      addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
+
+      // map stream request body type to bytes
+      if (getStreamMetadata(context.program, httpOperation.parameters)) {
+        retval.bodyParam.type = diagnostics.pipe(
+          getStreamAsBytes(context, retval.bodyParam.type.__raw!),
+        );
+        retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
+      }
     }
   }
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
@@ -272,7 +286,7 @@ function createContentTypeOrAcceptHeader(
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (/json/.test(bodyObject.contentTypes[0]) || name === "accept")
+    (isMediaTypeJson(bodyObject.contentTypes[0]) || name === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
@@ -307,16 +321,26 @@ function addContentTypeInfoToBodyParam(
   const diagnostics = createDiagnosticCollector();
   const tspBody = httpOperation.parameters.body;
   if (!tspBody) return diagnostics.diagnostics;
-  let contentTypes = tspBody.contentTypes;
-  if (contentTypes.length === 0) {
-    contentTypes = ["application/json"];
-  }
+  const contentTypes = tspBody.contentTypes;
+  compilerAssert(contentTypes.length > 0, "contentTypes should not be empty"); // this should be http lib bug
   const defaultContentType = contentTypes.includes("application/json")
     ? "application/json"
     : contentTypes[0];
   bodyParam.contentTypes = contentTypes;
   bodyParam.defaultContentType = defaultContentType;
   diagnostics.pipe(addEncodeInfo(context, bodyParam.__raw!, bodyParam.type, defaultContentType));
+  // set the correct encode for body parameter of method according to the content-type
+  if (bodyParam.correspondingMethodParams.length === 1) {
+    const methodBodyParam = bodyParam.correspondingMethodParams[0];
+    diagnostics.pipe(
+      addEncodeInfo(
+        context,
+        methodBodyParam.__raw!,
+        methodBodyParam.type,
+        bodyParam.defaultContentType,
+      ),
+    );
+  }
   return diagnostics.diagnostics;
 }
 
@@ -343,13 +367,7 @@ export function getSdkHttpParameter(
   if (isPathParam(context.program, param) || location === "path") {
     // we don't url encode if the type can be assigned to url
     const urlEncode = !ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(
-        // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        param.type.projectionBase ?? param.type,
-        program.checker.getStdType("url"),
-        param.type,
-      ),
+      program.checker.isTypeAssignableTo(param.type, program.checker.getStdType("url"), param.type),
     );
     return diagnostics.wrap({
       ...base,
@@ -377,8 +395,8 @@ export function getSdkHttpParameter(
       ...base,
       kind: "body",
       serializedName: param.name === "" ? "body" : getWireName(context, param),
-      contentTypes: ["application/json"], // will update when we get to the operation level
-      defaultContentType: "application/json", // will update when we get to the operation level
+      contentTypes: ["application/json"],
+      defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams,
     });
@@ -441,14 +459,13 @@ function getSdkHttpResponseAndExceptions(
         : innerResponse.body?.contentTypes[0];
       for (const header of getHttpOperationResponseHeaders(innerResponse)) {
         if (isNeverOrVoidType(header.type)) continue;
-        const clientType = diagnostics.pipe(getClientTypeWithDiagnostics(context, header.type));
-        addEncodeInfo(context, header, clientType, defaultContentType);
         headers.push({
+          ...diagnostics.pipe(
+            getSdkModelPropertyTypeBase(context, header, httpOperation.operation),
+          ),
           __raw: header,
-          doc: getDoc(context.program, header),
-          summary: getSummary(context.program, header),
+          kind: "responseheader",
           serializedName: getHeaderFieldName(context.program, header),
-          type: clientType,
         });
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
@@ -472,11 +489,16 @@ function getSdkHttpResponseAndExceptions(
           innerResponse.body.type.kind === "Model"
             ? getEffectivePayloadType(context, innerResponse.body.type)
             : innerResponse.body.type;
-        type = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-        );
-        if (innerResponse.body.property) {
-          addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+        if (getStreamMetadata(context.program, innerResponse)) {
+          // map stream response body type to bytes
+          type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
+        } else {
+          type = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+          );
+          if (innerResponse.body.property) {
+            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+          }
         }
       }
     }
@@ -543,7 +565,7 @@ export function getCorrespondingMethodParams(
   }
 
   // 2. To see if the service parameter is api version parameter that has been elevated to client.
-  if (serviceParam.isApiVersionParam && serviceParam.onClient) {
+  if (isApiVersion(context, serviceParam) && serviceParam.onClient) {
     const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
     if (!existingApiVersion) {
       diagnostics.add(
@@ -693,25 +715,23 @@ function filterOutUselessPathParameters(
   }
 }
 
-function findRootSourceProperty(property: ModelProperty): ModelProperty {
-  while (property.sourceProperty) {
-    property = property.sourceProperty;
-  }
-  return property;
-}
-
 function getCollectionFormat(
   context: TCGCContext,
   type: ModelProperty,
 ): CollectionFormat | undefined {
   const program = context.program;
-  /* eslint-disable @typescript-eslint/no-deprecated */
-  const tspCollectionFormat = (
-    isQueryParam(program, type)
-      ? getQueryParamOptions(program, type)
-      : isHeader(program, type)
-        ? getHeaderFieldOptions(program, type)
-        : undefined
-  )?.format;
-  return tspCollectionFormat;
+  if (isHeader(program, type)) {
+    const headerOptions = getHeaderFieldOptions(program, type);
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    if (headerOptions.format) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      return headerOptions.format;
+    } else if (typeof headerOptions.explode === "boolean" || $.array.is(type.type)) {
+      return headerOptions.explode ? "multi" : "csv";
+    }
+  } else if (isQueryParam(program, type)) {
+    /* eslint-disable @typescript-eslint/no-deprecated */
+    return getQueryParamOptions(program, type)?.format;
+  }
+  return;
 }

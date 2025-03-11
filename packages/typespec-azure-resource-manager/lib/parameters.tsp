@@ -145,7 +145,7 @@ alias TenantInstanceParameters<Resource extends Foundations.Resource> = Resource
 model SubscriptionActionScope {
   @doc("Symbolic name of scope")
   @path
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @key
   @segment("subscription")
   name: string;
@@ -159,7 +159,7 @@ model SubscriptionActionScope {
 model TenantActionScope {
   @doc("Symbolic name of scope")
   @path
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @key
   @segment("tenant")
   name: string;

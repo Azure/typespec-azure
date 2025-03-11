@@ -276,7 +276,7 @@ op ArmTagsPatchAsync<
 >;
 
 /**
- * @dev A long-running resource update using the items from the resource marked with visibility "update"
+ * @dev A long-running resource update using the items from the resource marked with Lifecycle.Update visibility
  * @template Resource the resource being patched
  * @template Properties The model type of the resource properties
  * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -349,7 +349,7 @@ op ArmTagsPatchSync<
 > is ArmCustomPatchSync<Resource, TagsUpdateModel<Resource>, BaseParameters, Parameters>;
 
 /**
- * @dev A resource update using the items from the resource marked with visibility "update"
+ * @dev A resource update using the items from the resource marked with Lifecycle.Update visibility
  * @template Resource the resource being patched
  * @template Properties The model type of the resource properties
  * @template BaseParameters Optional. Allows overriding the operation parameters
@@ -720,7 +720,7 @@ op ArmProviderActionSync<
 
   /** The request body */
   @bodyRoot body: Request,
-): Response | ErrorResponse;
+): Response | Error;
 
 /**
  * @dev A long-running provider action.
@@ -754,4 +754,4 @@ op ArmProviderActionAsync<
 
   /** The request body */
   @bodyRoot body: Request,
-): ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response | ErrorResponse;
+): ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response | Error;
