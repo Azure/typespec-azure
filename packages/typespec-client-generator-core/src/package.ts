@@ -196,21 +196,34 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     let nextLinkPath = undefined;
     let nextLinkSegments = undefined;
     if (pagingOperation.output.nextLink) {
-      nextLinkPath = getPropertyPathFromModel(
-        context,
-        responseType?.__raw,
-        (p) =>
-          p.kind === "ModelProperty" &&
-          findRootSourceProperty(p) ===
-            findRootSourceProperty(pagingOperation.output.nextLink!.property),
-      );
-      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
-        responseType,
-        (p) =>
-          p.__raw?.kind === "ModelProperty" &&
-          findRootSourceProperty(p.__raw) ===
-            findRootSourceProperty(pagingOperation.output.nextLink!.property),
-      );
+      if (isHeader(context.program, pagingOperation.output.nextLink.property)) {
+        nextLinkSegments = baseServiceMethod.operation.responses
+          .map((r) => r.headers)
+          .flat()
+          .filter(
+            (h) =>
+              h.__raw?.kind === "ModelProperty" &&
+              findRootSourceProperty(h.__raw) ===
+                findRootSourceProperty(pagingOperation.output.nextLink!.property),
+          );
+        nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
+      } else {
+        nextLinkPath = getPropertyPathFromModel(
+          context,
+          responseType?.__raw,
+          (p) =>
+            p.kind === "ModelProperty" &&
+            findRootSourceProperty(p) ===
+              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+        );
+        nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+          responseType,
+          (p) =>
+            p.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(p.__raw) ===
+              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+        );
+      }
     }
 
     let continuationTokenParameterSegments = undefined;
@@ -312,15 +325,28 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   let nextLinkPath = undefined;
   let nextLinkSegments = undefined;
   if (pagedMetadata.nextLinkProperty) {
-    nextLinkPath = getPropertyPathFromSegment(
-      context,
-      pagedMetadata.modelType,
-      pagedMetadata?.nextLinkSegments,
-    );
-    nextLinkSegments = getPropertySegmentsFromModelOrParameters(
-      responseType,
-      (p) => p.__raw === pagedMetadata.nextLinkProperty,
-    );
+    if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
+      nextLinkSegments = baseServiceMethod.operation.responses
+        .map((r) => r.headers)
+        .flat()
+        .filter(
+          (h) =>
+            h.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(h.__raw) ===
+              findRootSourceProperty(pagedMetadata.nextLinkProperty!),
+        );
+      nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
+    } else {
+      nextLinkPath = getPropertyPathFromSegment(
+        context,
+        pagedMetadata.modelType,
+        pagedMetadata?.nextLinkSegments,
+      );
+      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+        responseType,
+        (p) => p.__raw === pagedMetadata.nextLinkProperty,
+      );
+    }
   }
 
   return diagnostics.wrap({
