@@ -46,6 +46,8 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   apiVersion?: string;
   examplesDir?: string;
+  getApiVersionsForType(type: Type): string[];
+  setApiVersionsForType(type: Type, apiVersions: string[]): void;
 
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;

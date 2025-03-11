@@ -43,6 +43,19 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
       }
       return globalNamespace;
     },
+    getApiVersionsForType(type): string[] {
+      return this.__tspTypeToApiVersions.get(type) ?? [];
+    },
+    setApiVersionsForType(type, apiVersions: string[]): void {
+      const existingApiVersions = this.__tspTypeToApiVersions.get(type) ?? [];
+      const mergedApiVersions = [...existingApiVersions];
+      for (const apiVersion of apiVersions) {
+        if (!mergedApiVersions.includes(apiVersion)) {
+          mergedApiVersions.push(apiVersion);
+        }
+      }
+      this.__tspTypeToApiVersions.set(type, mergedApiVersions);
+    },
     diagnostics: diagnostics.diagnostics,
     __originalProgram: program,
     __clientToParameters: new Map(),
