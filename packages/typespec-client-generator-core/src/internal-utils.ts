@@ -1,5 +1,6 @@
 import {
   BooleanLiteral,
+  compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
@@ -9,7 +10,9 @@ import {
   Interface,
   isNeverType,
   isNullType,
+  isService,
   isVoidType,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -23,12 +26,21 @@ import {
   Value,
 } from "@typespec/compiler";
 import {
+  unsafe_mutateSubgraphWithNamespace,
+  unsafe_MutatorWithNamespace,
+} from "@typespec/compiler/experimental";
+import {
   HttpOperation,
   HttpOperationBody,
   HttpOperationMultipartBody,
   HttpOperationResponseContent,
 } from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
+import {
+  getAddedOnVersions,
+  getRemovedOnVersions,
+  getVersioningMutators,
+  getVersions,
+} from "@typespec/versioning";
 import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
@@ -48,6 +60,8 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
+
+import { $ } from "@typespec/compiler/experimental/typekit";
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -85,7 +99,6 @@ export function parseEmitterName(
 }
 
 /**
- *
  * @param context
  * @param namespace If we know explicitly the namespace of the client, pass this in
  * @returns The name of the namespace
@@ -589,9 +602,102 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   return visibility.size === 0;
 }
 
+export function listAllNamespaces(
+  context: TCGCContext,
+  namespace: Namespace,
+  retval?: Namespace[],
+): Namespace[] {
+  if (!retval) {
+    retval = [];
+  }
+  if (retval.includes(namespace)) return retval;
+  retval.push(namespace);
+  for (const ns of namespace.namespaces.values()) {
+    listAllNamespaces(context, ns, retval);
+  }
+  return retval;
+}
+
+export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
+  return listAllNamespaces(context, context.getMutatedGlobalNamespace()).filter((ns) =>
+    $.type.isUserDefined(ns),
+  );
+}
+
 export function findRootSourceProperty(property: ModelProperty): ModelProperty {
   while (property.sourceProperty) {
     property = property.sourceProperty;
   }
   return property;
+}
+
+export function getStreamAsBytes(
+  context: TCGCContext,
+  type: Type,
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const unknownType: SdkBuiltInType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "bytes")),
+    name: "bytes",
+    encode: "bytes",
+    crossLanguageDefinitionId: "",
+  };
+  return diagnostics.wrap(unknownType);
+}
+
+function getVersioningMutator(
+  context: TCGCContext,
+  service: Namespace,
+  apiVersion: string,
+): unsafe_MutatorWithNamespace {
+  const versionMutator = getVersioningMutators(context.program, service);
+  compilerAssert(
+    versionMutator !== undefined && versionMutator.kind !== "transient",
+    "Versioning service should not get undefined or transient versioning mutator",
+  );
+
+  const mutators = versionMutator.snapshots
+    .filter((snapshot) => apiVersion === snapshot.version.value)
+    .map((x) => x.mutator);
+  compilerAssert(mutators.length === 1, "One api version should not get multiple mutators");
+
+  return mutators[0];
+}
+
+export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
+  const globalNamespace = context.program.getGlobalNamespaceType();
+  const service = listServices(context.program)[0];
+  if (!service) return globalNamespace;
+  const allApiVersions = getVersions(context.program, service.type)[1]
+    ?.getVersions()
+    .map((x) => x.value);
+  if (!allApiVersions || context.apiVersion === "all") return globalNamespace;
+
+  const apiVersion = getValidApiVersion(context, allApiVersions);
+  if (apiVersion === undefined) return globalNamespace;
+
+  const mutator = getVersioningMutator(context, service.type, apiVersion);
+  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
+  compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
+  return subgraph.type;
+}
+
+/**
+ * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
+ * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
+ * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
+ * instead to list all of the services in the global namespace.
+ *
+ * See https://github.com/microsoft/typespec/issues/6247
+ *
+ * @param context
+ */
+export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
+  const serviceNamespaces: Namespace[] = [];
+  for (const ns of listAllUserDefinedNamespaces(context)) {
+    if (isService(context.program, ns)) {
+      serviceNamespaces.push(ns);
+    }
+  }
+  return serviceNamespaces;
 }

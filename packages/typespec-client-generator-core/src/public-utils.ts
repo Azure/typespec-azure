@@ -13,9 +13,7 @@ import {
   getEffectiveModelType,
   getFriendlyName,
   getNamespaceFullName,
-  getProjectedName,
   ignoreDiagnostics,
-  listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
@@ -46,6 +44,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  AllScopes,
   TspLiteralType,
   getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
@@ -53,6 +52,8 @@ import {
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
+  listAllServiceNamespaces,
+  listAllUserDefinedNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -101,6 +102,7 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
 }
 
 /**
+ * @deprecated Access namespace information by iterating through `sdkPackage.namespaces` instead
  * Get the client's namespace for generation. If package-name is passed in config, we return
  * that value as our namespace. Otherwise, we default to the TypeSpec service namespace.
  * @param program
@@ -108,7 +110,7 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
  * @returns
  */
 export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type);
+  return getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]);
 }
 
 /**
@@ -170,18 +172,11 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
 export function getLibraryName(
   context: TCGCContext,
   type: Type & { name?: string | symbol },
+  scope?: string | typeof AllScopes,
 ): string {
   // 1. check if there's a client name
-  let emitterSpecificName = getClientNameOverride(context, type);
+  const emitterSpecificName = getClientNameOverride(context, type, scope);
   if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
-
-  // 2. check if there's a specific name for our language with deprecated @projectedName
-  emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
-  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
-
-  // 3. check if there's a client name with deprecated @projectedName
-  const clientSpecificName = getProjectedName(context.program, type, "client");
-  if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
 
   // 4. check if there's a friendly name, if so return friendly name
   const friendlyName = getFriendlyName(context.program, type);
@@ -219,11 +214,9 @@ export function getLibraryName(
  * @returns
  */
 export function getWireName(context: TCGCContext, type: Type & { name: string }) {
-  // 1. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
-  // 2. Check if there's deprecated language projection
-  return getProjectedName(context.program, type, "json") ?? type.name;
+  return type.name;
 }
 
 /**
@@ -295,14 +288,14 @@ export function getCrossLanguageDefinitionId(
  */
 export function getCrossLanguagePackageId(context: TCGCContext): [string, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const services = listServices(context.program);
-  if (services.length === 0) return diagnostics.wrap("");
-  const serviceNamespace = getNamespaceFullName(services[0].type);
-  if (services.length > 1) {
+  const serviceNamespaces = listAllServiceNamespaces(context);
+  if (serviceNamespaces.length === 0) return diagnostics.wrap("");
+  const serviceNamespace = getNamespaceFullName(serviceNamespaces[0]);
+  if (serviceNamespaces.length > 1) {
     diagnostics.add(
       createDiagnostic({
         code: "multiple-services",
-        target: services[0].type,
+        target: serviceNamespaces[0],
         format: {
           service: serviceNamespace,
         },
@@ -345,20 +338,20 @@ function findContextPath(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
-  for (const client of listClients(context)) {
-    // orphan models
-    if (client.service) {
-      for (const model of client.service.models.values()) {
-        if (
-          [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
-        )
-          continue;
-        const result = getContextPath(context, model, type);
-        if (result.length > 0) {
-          return result;
-        }
+  // orphan models
+  for (const currNamespace of listAllUserDefinedNamespaces(context)) {
+    for (const model of currNamespace.models.values()) {
+      if (
+        [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+      )
+        continue;
+      const result = getContextPath(context, model, type);
+      if (result.length > 0) {
+        return result;
       }
     }
+  }
+  for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {

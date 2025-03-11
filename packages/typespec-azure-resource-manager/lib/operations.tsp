@@ -720,7 +720,7 @@ op ArmProviderActionSync<
 
   /** The request body */
   @bodyRoot body: Request,
-): Response | ErrorResponse;
+): Response | Error;
 
 /**
  * @dev A long-running provider action.
@@ -754,4 +754,4 @@ op ArmProviderActionAsync<
 
   /** The request body */
   @bodyRoot body: Request,
-): ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response | ErrorResponse;
+): ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response | Error;

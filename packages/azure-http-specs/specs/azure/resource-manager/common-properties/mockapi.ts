@@ -1,4 +1,4 @@
-import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { json, passOnCode, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -126,3 +126,58 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
     },
     kind: "MockApiDefinition",
   });
+
+Scenarios.Azure_ResourceManager_CommonProperties_Error_getForPredefinedError = passOnCode(404, {
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
+  method: "get",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      resourceName: "confidential",
+      "api-version": "2023-12-01-preview",
+    },
+    status: 404,
+  },
+  response: {
+    status: 404,
+    body: json({
+      error: {
+        code: "ResourceNotFound",
+        message:
+          "The Resource 'Azure.ResourceManager.CommonProperties/confidentialResources/confidential' under resource group 'test-rg' was not found.",
+      },
+    }),
+  },
+  kind: "MockApiDefinition",
+});
+
+Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError = passOnCode(400, {
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
+  method: "put",
+  request: {
+    body: {
+      properties: {
+        username: "00",
+      },
+    },
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      resourceName: "confidential",
+      "api-version": "2023-12-01-preview",
+    },
+    status: 400,
+  },
+  response: {
+    status: 400,
+    body: json({
+      code: "BadRequest",
+      message: "Username should not contain only numbers.",
+      innererror: {
+        exceptiontype: "general",
+      },
+    }),
+  },
+  kind: "MockApiDefinition",
+});

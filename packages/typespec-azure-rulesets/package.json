@@ -24,7 +24,7 @@
     ".": "./dist/src/index.js"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
@@ -43,18 +43,18 @@
     "!dist/test/**"
   ],
   "peerDependencies": {
-    "@azure-tools/typespec-azure-core": "workspace:~",
-    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
-    "@azure-tools/typespec-client-generator-core": "workspace:~",
-    "@typespec/compiler": "workspace:~"
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@typespec/compiler": "workspace:^"
   },
   "devDependencies": {
-    "@azure-tools/typespec-azure-core": "workspace:~",
-    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
-    "@azure-tools/typespec-client-generator-core": "workspace:~",
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "~22.13.9",
-    "@typespec/compiler": "workspace:~",
-    "@typespec/tspd": "workspace:~",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/tspd": "workspace:^",
     "@vitest/coverage-v8": "^3.0.7",
     "@vitest/ui": "^3.0.7",
     "c8": "^10.1.3",
