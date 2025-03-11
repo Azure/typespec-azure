@@ -106,7 +106,7 @@ export async function createSdkContext<
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
     packageName: context.options["package-name"],
-    examplesDir: context.options["examples-dir"] ?? context.options["examples-directory"],
+    examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],

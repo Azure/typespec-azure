@@ -55,10 +55,6 @@ options:
 
 **Type:** `string`
 
-### `examples-directory`
-
-**Type:** `string`
-
 ### `examples-dir`
 
 **Type:** `string`

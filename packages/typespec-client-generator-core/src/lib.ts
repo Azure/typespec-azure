@@ -7,10 +7,12 @@ const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
   properties: {
     "generate-protocol-methods": { type: "boolean", nullable: true },
     "generate-convenience-methods": { type: "boolean", nullable: true },
+    /**
+     * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
+     */
     "package-name": { type: "string", nullable: true },
     "flatten-union-as-enum": { type: "boolean", nullable: true },
     "api-version": { type: "string", nullable: true },
-    "examples-directory": { type: "string", nullable: true },
     "examples-dir": { type: "string", nullable: true },
     "emitter-name": { type: "string", nullable: true },
     namespace: { type: "string", nullable: true },

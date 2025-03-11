@@ -78,13 +78,12 @@ export interface SdkContext<
 export interface SdkEmitterOptions {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
+  /**
+   * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
+   */
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
-  /**
-   * @deprecated Use `examples-dir` instead.
-   */
-  "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
   namespace?: string;
