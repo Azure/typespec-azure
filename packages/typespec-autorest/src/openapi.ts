@@ -1416,10 +1416,27 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getQueryCollectionFormat(
-    httpProp: HttpProperty & { kind: "query" },
-  ): string | undefined {
-    return httpProp.options.explode ? "multi" : "csv";
+  function getCollectionFormat(
+    type: ModelProperty,
+    explode?: boolean,
+  ): "csv" | "ssv" | "pipes" | "multi" | undefined {
+    if ($.array.is(type.type)) {
+      if (explode) {
+        return "multi";
+      }
+      const encode = getEncode(context.program, type);
+      if (encode) {
+        if (encode?.encoding === "ArrayEncoding.pipeDelimited") {
+          return "pipes";
+        }
+        if (encode?.encoding === "ArrayEncoding.spaceDelimited") {
+          return "ssv";
+        }
+        reportDiagnostic(program, { code: "invalid-multi-collection-format", target: type });
+      }
+      return "csv";
+    }
+    return undefined;
   }
 
   function getOpenAPI2QueryParameter(
@@ -1428,14 +1445,11 @@ export async function getOpenAPIForService(
   ): OpenAPI2QueryParameter {
     const property = httpProp.property;
     const base = getOpenAPI2ParameterBase(property, httpProp.options.name);
-    const collectionFormat = getQueryCollectionFormat(httpProp);
+    const collectionFormat = getCollectionFormat(httpProp.property, httpProp.options.explode);
     const schema = getSimpleParameterSchema(property, schemaContext, base.name);
     return {
       in: "query",
-      collectionFormat:
-        collectionFormat === "csv" && schema.items === undefined // If csv
-          ? undefined
-          : (collectionFormat as any),
+      collectionFormat,
       default: property.defaultValue && getDefaultValue(property.defaultValue, property),
       ...base,
       ...schema,
@@ -1470,14 +1484,7 @@ export async function getOpenAPIForService(
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(prop, name);
     const headerOptions = getHeaderFieldOptions(program, prop);
-    let collectionFormat;
-    if (typeof headerOptions.explode === "boolean" || $.array.is(prop.type)) {
-      collectionFormat = headerOptions.explode ? "multi" : "csv";
-    }
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: prop });
-    }
+    const collectionFormat = getCollectionFormat(prop, headerOptions.explode);
     return {
       in: "header",
       default: prop.defaultValue && getDefaultValue(prop.defaultValue, prop),
