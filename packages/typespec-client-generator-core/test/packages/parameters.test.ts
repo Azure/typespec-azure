@@ -1,5 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -196,7 +197,6 @@ describe("typespec-client-generator-core: parameters", () => {
       @service
       namespace My.Service;
 
-      #suppress "deprecated" "Legacy test"
       op myOp(@header(#{explode: true}) header: string[]): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
@@ -214,7 +214,6 @@ describe("typespec-client-generator-core: parameters", () => {
       @service
       namespace My.Service;
 
-      #suppress "deprecated" "Legacy test"
       op myOp(@header header: string[]): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
@@ -242,6 +241,62 @@ describe("typespec-client-generator-core: parameters", () => {
     const headerParam = method.operation.parameters[0];
     strictEqual(headerParam.kind, "header");
     strictEqual(headerParam.collectionFormat, undefined);
+  });
+
+  it("header collection format via encode: ArrayEncoding.pipeDelimited on array", async () => {
+    await runner.compile(`
+      @service
+      namespace My.Service;
+
+      op myOp(@header @encode(ArrayEncoding.pipeDelimited) header: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const headerParam = method.operation.parameters[0];
+    strictEqual(headerParam.kind, "header");
+    strictEqual(headerParam.collectionFormat, "pipes");
+  });
+
+  it("header collection format via encode: ArrayEncoding.spaceDelimited on array", async () => {
+    await runner.compile(`
+      @service
+      namespace My.Service;
+
+      op myOp(@header @encode(ArrayEncoding.spaceDelimited) header: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const headerParam = method.operation.parameters[0];
+    strictEqual(headerParam.kind, "header");
+    strictEqual(headerParam.collectionFormat, "ssv");
+  });
+
+  it("header collection format wrong encode", async () => {
+    await runner.compile(`
+      @service
+      namespace My.Service;
+
+      op myOp(@header @encode("tsv") header: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const headerParam = method.operation.parameters[0];
+    strictEqual(headerParam.kind, "header");
+    strictEqual(headerParam.collectionFormat, "csv");
+
+    expectDiagnostics(runner.context.diagnostics, [
+      { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
+      { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
+    ]); // the duplication is because the header is proceed both in method level and operation level, need to be optimized later
   });
 
   it("query basic", async () => {
@@ -310,7 +365,6 @@ describe("typespec-client-generator-core: parameters", () => {
       @service
       namespace My.Service;
       
-      #suppress "deprecated" "Legacy test"
       op myOp(@query(#{explode: true}) query: string): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
@@ -328,7 +382,6 @@ describe("typespec-client-generator-core: parameters", () => {
       @service
       namespace My.Service;
       
-      #suppress "deprecated" "Legacy test"
       op myOp(@query query: string[]): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
@@ -346,7 +399,6 @@ describe("typespec-client-generator-core: parameters", () => {
       @service
       namespace My.Service;
       
-      #suppress "deprecated" "Legacy test"
       op myOp(@query(#{explode: true}) query: string[]): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
@@ -357,6 +409,62 @@ describe("typespec-client-generator-core: parameters", () => {
     const queryParm = method.operation.parameters[0];
     strictEqual(queryParm.kind, "query");
     strictEqual(queryParm.collectionFormat, "multi");
+  });
+
+  it("query collection format for csv via encode: ArrayEncoding.pipeDelimited on array", async () => {
+    await runner.compile(`
+      @service
+      namespace My.Service;
+      
+      op myOp(@query @encode(ArrayEncoding.pipeDelimited) query: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const queryParm = method.operation.parameters[0];
+    strictEqual(queryParm.kind, "query");
+    strictEqual(queryParm.collectionFormat, "pipes");
+  });
+
+  it("query collection format for csv via encode: ArrayEncoding.spaceDelimited on array", async () => {
+    await runner.compile(`
+      @service
+      namespace My.Service;
+      
+      op myOp(@query @encode(ArrayEncoding.spaceDelimited) query: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const queryParm = method.operation.parameters[0];
+    strictEqual(queryParm.kind, "query");
+    strictEqual(queryParm.collectionFormat, "ssv");
+  });
+
+  it("query collection format wrong encode", async () => {
+    await runner.compile(`
+      @service
+      namespace My.Service;
+
+      op myOp(@query @encode("tsv") query: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const queryParm = method.operation.parameters[0];
+    strictEqual(queryParm.kind, "query");
+    strictEqual(queryParm.collectionFormat, "csv");
+
+    expectDiagnostics(runner.context.diagnostics, [
+      { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
+      { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
+    ]); // the duplication is because the header is proceed both in method level and operation level, need to be optimized later
   });
 
   it("cookie basic", async () => {

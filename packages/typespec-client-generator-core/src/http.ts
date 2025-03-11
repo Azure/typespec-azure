@@ -7,6 +7,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   getDoc,
+  getEncode,
   getSummary,
   ignoreDiagnostics,
   isErrorModel,
@@ -404,7 +405,7 @@ export function getSdkHttpParameter(
   const headerQueryBase = {
     ...base,
     optional: param.optional,
-    collectionFormat: getCollectionFormat(context, param),
+    collectionFormat: diagnostics.pipe(getCollectionFormat(context, param)),
     correspondingMethodParams,
   };
   if (isQueryParam(context.program, param) || location === "query") {
@@ -718,16 +719,47 @@ function filterOutUselessPathParameters(
 function getCollectionFormat(
   context: TCGCContext,
   type: ModelProperty,
-): CollectionFormat | undefined {
+): [CollectionFormat | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const program = context.program;
   if (isHeader(program, type)) {
-    if ($.array.is(type.type)) {
-      return getHeaderFieldOptions(program, type).explode ? "multi" : "csv";
-    }
+    return getFormatFromExplodeOrEncode(
+      context,
+      type,
+      getHeaderFieldOptions(program, type).explode,
+    );
   } else if (isQueryParam(program, type)) {
-    if ($.array.is(type.type)) {
-      return getQueryParamOptions(program, type).explode ? "multi" : "csv";
-    }
+    return getFormatFromExplodeOrEncode(context, type, getQueryParamOptions(program, type).explode);
   }
-  return;
+  return diagnostics.wrap(undefined);
+}
+
+function getFormatFromExplodeOrEncode(
+  context: TCGCContext,
+  type: ModelProperty,
+  explode?: boolean,
+): [CollectionFormat | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if ($.array.is(type.type)) {
+    if (explode) {
+      return diagnostics.wrap("multi");
+    }
+    const encode = getEncode(context.program, type);
+    if (encode) {
+      if (encode?.encoding === "ArrayEncoding.pipeDelimited") {
+        return diagnostics.wrap("pipes");
+      }
+      if (encode?.encoding === "ArrayEncoding.spaceDelimited") {
+        return diagnostics.wrap("ssv");
+      }
+      diagnostics.add(
+        createDiagnostic({
+          code: "invalid-encode-for-collection-format",
+          target: type,
+        }),
+      );
+    }
+    return diagnostics.wrap("csv");
+  }
+  return diagnostics.wrap(undefined);
 }
