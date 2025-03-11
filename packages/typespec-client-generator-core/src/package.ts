@@ -78,6 +78,7 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getLicenseInfo } from "./license.js";
 import {
   getClientNamespaceString,
   getCrossLanguageDefinitionId,
@@ -1161,6 +1162,7 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
     ),
     crossLanguagePackageId,
     namespaces: [],
+    licenseInfo: getLicenseInfo(context),
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);

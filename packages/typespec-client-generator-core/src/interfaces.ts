@@ -46,6 +46,10 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   apiVersion?: string;
   examplesDir?: string;
+  licenseName?: string;
+  licenseLink?: string;
+  licenseCompany?: string;
+  licenseDescription?: string;
 
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
@@ -86,6 +90,10 @@ export interface SdkEmitterOptions {
   "examples-dir"?: string;
   "emitter-name"?: string;
   namespace?: string;
+  "license-name"?: string;
+  "license-link"?: string;
+  "license-company"?: string;
+  "license-description"?: string;
 }
 
 // Types for TCGC customization decorators
@@ -960,6 +968,14 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
   namespaces: SdkNamespace<TServiceOperation>[];
+  licenseInfo?: LicenseInfo;
+}
+
+export interface LicenseInfo {
+  name: string;
+  link: string;
+  company: string;
+  description: string;
 }
 
 export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
