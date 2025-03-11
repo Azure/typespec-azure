@@ -21,6 +21,7 @@
   "tspMain": "lib/azure-core.tsp",
   "exports": {
     ".": {
+      "typespec": "./lib/azure-core.tsp",
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
     },
