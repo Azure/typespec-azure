@@ -191,13 +191,13 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(headerParam.type.kind, "nullable");
   });
 
-  it("header collection format", async () => {
+  it("header collection format via explode:true on array", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service
       namespace My.Service;
 
       #suppress "deprecated" "Legacy test"
-      op myOp(@header(#{format: "multi"}) header: string): void;
+      op myOp(@header(#{explode: true}) header: string[]): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
@@ -209,12 +209,29 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(headerParam.collectionFormat, "multi");
   });
 
-  it("header collection format via explode", async () => {
+  it("header collection format via explode:false on array", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service
       namespace My.Service;
 
       #suppress "deprecated" "Legacy test"
+      op myOp(@header header: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const headerParam = method.operation.parameters[0];
+    strictEqual(headerParam.kind, "header");
+    strictEqual(headerParam.collectionFormat, "csv");
+  });
+
+  it("header collection format via explode:true on non-array", async () => {
+    await runner.compile(`@server("http://localhost:3000", "endpoint")
+      @service
+      namespace My.Service;
+
       op myOp(@header(#{explode: true}) header: string): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
@@ -224,7 +241,7 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(method.operation.parameters.length, 1);
     const headerParam = method.operation.parameters[0];
     strictEqual(headerParam.kind, "header");
-    strictEqual(headerParam.collectionFormat, "multi");
+    strictEqual(headerParam.collectionFormat, undefined);
   });
 
   it("query basic", async () => {
@@ -288,13 +305,13 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(queryParam.type.kind, "nullable");
   });
 
-  it("query collection format", async () => {
+  it("query collection format via explode:true on non-array", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service
       namespace My.Service;
       
       #suppress "deprecated" "Legacy test"
-      op myOp(@query({format: "multi"}) query: string): void;
+      op myOp(@query(#{explode: true}) query: string): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
@@ -303,16 +320,16 @@ describe("typespec-client-generator-core: parameters", () => {
     strictEqual(method.operation.parameters.length, 1);
     const queryParm = method.operation.parameters[0];
     strictEqual(queryParm.kind, "query");
-    strictEqual(queryParm.collectionFormat, "multi");
+    strictEqual(queryParm.collectionFormat, undefined);
   });
 
-  it("query collection format for csv", async () => {
+  it("query collection format for csv via explode:false on array", async () => {
     await runner.compile(`@server("http://localhost:3000", "endpoint")
       @service
       namespace My.Service;
       
       #suppress "deprecated" "Legacy test"
-      op myOp(@query({format: "csv"}) query: string): void;
+      op myOp(@query query: string[]): void;
       `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
@@ -322,6 +339,24 @@ describe("typespec-client-generator-core: parameters", () => {
     const queryParm = method.operation.parameters[0];
     strictEqual(queryParm.kind, "query");
     strictEqual(queryParm.collectionFormat, "csv");
+  });
+
+  it("query collection format for csv via explode:true on array", async () => {
+    await runner.compile(`@server("http://localhost:3000", "endpoint")
+      @service
+      namespace My.Service;
+      
+      #suppress "deprecated" "Legacy test"
+      op myOp(@query(#{explode: true}) query: string[]): void;
+      `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.kind, "basic");
+
+    strictEqual(method.operation.parameters.length, 1);
+    const queryParm = method.operation.parameters[0];
+    strictEqual(queryParm.kind, "query");
+    strictEqual(queryParm.collectionFormat, "multi");
   });
 
   it("cookie basic", async () => {

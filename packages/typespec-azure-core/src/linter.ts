@@ -12,6 +12,7 @@ import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
 import { noExplicitRoutesResourceOps } from "./rules/no-explicit-routes-resource-ops.js";
 import { noGenericNumericRule } from "./rules/no-generic-numeric.js";
+import { noHeaderExplodeRule } from "./rules/no-header-explode.js";
 import { noMultipleDiscriminatorRule } from "./rules/no-multiple-discriminator.js";
 import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
@@ -23,7 +24,6 @@ import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
-import { preferCsvCollectionFormatRule } from "./rules/prefer-csv-collection-format.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
 import { preventRestLibraryInterfaces } from "./rules/prevent-rest-library.js";
 import { preventUnknownType } from "./rules/prevent-unknown.js";
@@ -57,7 +57,7 @@ const rules = [
   noResponseBodyRule,
   noRpcPathParamsRule,
   noOpenAPIRule,
-  preferCsvCollectionFormatRule,
+  noHeaderExplodeRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,
   preventRestLibraryInterfaces,

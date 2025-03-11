@@ -109,31 +109,6 @@ describe("query parameters", () => {
     });
   });
 
-  it("LEGACY specify the format", async () => {
-    const res = await openApiFor(
-      `
-      #suppress "deprecated" "test"
-      op test(@query({format: "multi"}) arg1: string[], @query({format: "csv"}) arg2: string[]): void;
-      `,
-    );
-    deepStrictEqual(res.paths["/"].get.parameters[0], {
-      in: "query",
-      name: "arg1",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "multi",
-    });
-    deepStrictEqual(res.paths["/"].get.parameters[1], {
-      in: "query",
-      name: "arg2",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "csv",
-    });
-  });
-
   it("create a query param that is a model property", async () => {
     const res = await openApiFor(
       `
@@ -177,8 +152,7 @@ describe("header parameters", () => {
   it("create a header param of array type via legacy format", async () => {
     const res = await openApiFor(
       `
-      #suppress "deprecated" "Legacy format"
-      op test(@header(#{format: "csv"}) arg1: string[]): void;
+      op test(@header arg1: string[]): void;
       `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {

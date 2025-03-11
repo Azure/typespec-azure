@@ -22,7 +22,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,
-    "@azure-tools/typespec-azure-core/prefer-csv-collection-format": true,
     "@azure-tools/typespec-azure-core/no-format": true,
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
@@ -37,6 +36,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-private-usage": true,
     "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/no-query-explode": true,
+    "@azure-tools/typespec-azure-core/no-header-explode": true,
 
     // Azure core not enable - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/no-response-body": false,
