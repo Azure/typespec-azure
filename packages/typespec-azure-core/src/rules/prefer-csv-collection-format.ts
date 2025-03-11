@@ -4,10 +4,11 @@ import { isExcludedCoreType } from "./utils.js";
 
 export const preferCsvCollectionFormatRule = createRule({
   name: "prefer-csv-collection-format",
-  description: `It is recommended to use "csv" for collection format of parameters.`,
+  description:
+    "It is recommended to not to use `explode:true` for collection format of parameters.",
   severity: "warning",
   messages: {
-    default: `It is recommended to use "csv" for collection format of parameters.`,
+    default: "It is recommended to use `explode:true` for collection format of parameters.",
   },
   create(context) {
     return {
@@ -15,8 +16,7 @@ export const preferCsvCollectionFormatRule = createRule({
         if (isExcludedCoreType(context.program, property)) return;
 
         const headerOptions = getHeaderFieldOptions(context.program, property);
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        if (headerOptions?.format !== undefined && headerOptions?.format !== "csv") {
+        if (headerOptions?.explode === true) {
           context.reportDiagnostic({
             target: property,
           });

@@ -1419,21 +1419,9 @@ export async function getOpenAPIForService(
   function getQueryCollectionFormat(
     httpProp: HttpProperty & { kind: "query" },
   ): string | undefined {
-    if (httpProp.options.explode) {
-      return "multi";
-    }
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = httpProp.options.format;
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, {
-        code: "invalid-multi-collection-format",
-        target: httpProp.property,
-      });
-    }
-
-    return collectionFormat;
+    return httpProp.options.explode ? "multi" : "csv";
   }
+
   function getOpenAPI2QueryParameter(
     httpProp: HttpProperty & { kind: "query" },
     schemaContext: SchemaContext,
@@ -1482,12 +1470,8 @@ export async function getOpenAPIForService(
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(prop, name);
     const headerOptions = getHeaderFieldOptions(program, prop);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = headerOptions.format;
-    if (
-      !collectionFormat &&
-      (typeof headerOptions.explode === "boolean" || $.array.is(prop.type))
-    ) {
+    let collectionFormat;
+    if (typeof headerOptions.explode === "boolean" || $.array.is(prop.type)) {
       collectionFormat = headerOptions.explode ? "multi" : "csv";
     }
     if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
