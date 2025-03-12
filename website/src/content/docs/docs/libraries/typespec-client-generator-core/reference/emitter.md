@@ -61,6 +61,22 @@ options:
 
 **Type:** `string`
 
+### `license-name`
+
+**Type:** `string`
+
+### `license-company`
+
+**Type:** `string`
+
+### `license-link`
+
+**Type:** `string`
+
+### `license-description`
+
+**Type:** `string`
+
 ### `namespace`
 
 **Type:** `string`
