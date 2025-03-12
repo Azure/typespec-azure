@@ -1,17 +1,20 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  InitializedByFlags,
+  SdkClientType,
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,
   SdkEndpointType,
+  SdkHttpOperation,
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("client", () => {
+describe("client-params", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
@@ -486,301 +489,6 @@ describe("client", () => {
     strictEqual(endpointTemplateArg.clientDefaultValue, "http://localhost:3000");
   });
 
-  it("single with core", async () => {
-    const runnerWithCore = await createSdkTestRunner({
-      librariesToAdd: [AzureCoreTestLibrary],
-      autoUsings: ["Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithCore.compile(`
-        @versioned(MyVersions)
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service;
-
-        @doc("The version of the API.")
-        enum MyVersions {
-          @doc("The version 2022-12-01-preview.")
-          @useDependency(Versions.v1_0_Preview_2)
-          v2022_12_01_preview: "2022-12-01-preview",
-        }
-
-        @resource("users")
-        @doc("Details about a user.")
-        model User {
-          @key
-          @doc("The user's id.")
-          @visibility(Lifecycle.Read)
-          id: int32;
-
-          @doc("The user's name.")
-          name: string;
-        }
-
-        alias ServiceTraits = Traits.SupportsRepeatableRequests & Traits.SupportsConditionalRequests & Traits.SupportsClientRequestId;
-
-        alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
-
-        op delete is Operations.ResourceDelete<User>;
-      `);
-    const sdkPackage = runnerWithCore.context.sdkPackage;
-    strictEqual(sdkPackage.clients.length, 1);
-    const client = sdkPackage.clients[0];
-    strictEqual(client.name, "ServiceClient");
-    strictEqual(client.crossLanguageDefinitionId, "My.Service");
-    strictEqual(client.clientInitialization.parameters.length, 3);
-    strictEqual(client.apiVersions.length, 1);
-    strictEqual(client.apiVersions[0], "2022-12-01-preview");
-
-    const endpointParam = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
-    ok(endpointParam);
-    strictEqual(endpointParam.name, "endpoint");
-    strictEqual(endpointParam.kind, "endpoint");
-    strictEqual(endpointParam.optional, false);
-    strictEqual(endpointParam.onClient, true);
-    strictEqual(endpointParam.type.kind, "endpoint");
-    strictEqual(endpointParam.type.serverUrl, "{endpoint}");
-
-    strictEqual(endpointParam.type.templateArguments.length, 1);
-    const endpointTemplateArg = endpointParam.type.templateArguments[0];
-    strictEqual(endpointTemplateArg.name, "endpoint");
-    strictEqual(endpointTemplateArg.onClient, true);
-    strictEqual(endpointTemplateArg.optional, false);
-    strictEqual(endpointTemplateArg.kind, "path");
-    strictEqual(endpointTemplateArg.clientDefaultValue, "http://localhost:3000");
-
-    const apiVersionParam = client.clientInitialization.parameters.filter(
-      (p) => p.isApiVersionParam,
-    )[0];
-    strictEqual(apiVersionParam.name, "apiVersion");
-    strictEqual(apiVersionParam.onClient, true);
-    strictEqual(apiVersionParam.optional, false);
-    strictEqual(apiVersionParam.kind, "apiVersion");
-    strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
-  });
-
-  it("multiple with core", async () => {
-    const runnerWithCore = await createSdkTestRunner({
-      librariesToAdd: [AzureCoreTestLibrary],
-      autoUsings: ["Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithCore.compile(`
-        @versioned(MyVersions)
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service;
-
-        @doc("The version of the API.")
-        enum MyVersions {
-          @doc("The version 2022-12-01-preview.")
-          @useDependency(Versions.v1_0_Preview_2)
-          v2022_12_01_preview: "2022-12-01-preview",
-          @doc("The version 2022-12-01.")
-          @useDependency(Versions.v1_0_Preview_2)
-          v2022_12_01: "2022-12-01",
-        }
-
-        @resource("users")
-        @doc("Details about a user.")
-        model User {
-          @key
-          @doc("The user's id.")
-          @visibility(Lifecycle.Read)
-          id: int32;
-
-          @doc("The user's name.")
-          name: string;
-        }
-
-        alias ServiceTraits = Traits.SupportsRepeatableRequests & Traits.SupportsConditionalRequests & Traits.SupportsClientRequestId;
-
-        alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
-        op get is Operations.ResourceRead<User>;
-
-        op delete is Operations.ResourceDelete<User>;
-      `);
-    const sdkPackage = runnerWithCore.context.sdkPackage;
-    strictEqual(sdkPackage.clients.length, 1);
-    const client = sdkPackage.clients[0];
-    strictEqual(client.name, "ServiceClient");
-    strictEqual(client.crossLanguageDefinitionId, "My.Service");
-    strictEqual(client.clientInitialization.parameters.length, 3);
-    strictEqual(client.apiVersions.length, 2);
-    deepStrictEqual(client.apiVersions, ["2022-12-01-preview", "2022-12-01"]);
-
-    const endpointParam = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
-    ok(endpointParam);
-    strictEqual(endpointParam.type.kind, "endpoint");
-    strictEqual(endpointParam.type.serverUrl, "{endpoint}");
-    strictEqual(endpointParam.type.templateArguments.length, 1);
-    const templateArg = endpointParam.type.templateArguments[0];
-    strictEqual(templateArg.kind, "path");
-    strictEqual(templateArg.name, "endpoint");
-    strictEqual(templateArg.onClient, true);
-    strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
-
-    const apiVersionParam = client.clientInitialization.parameters.filter(
-      (p) => p.isApiVersionParam,
-    )[0];
-    strictEqual(apiVersionParam.name, "apiVersion");
-    strictEqual(apiVersionParam.onClient, true);
-    strictEqual(apiVersionParam.optional, false);
-    strictEqual(apiVersionParam.kind, "apiVersion");
-    strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01");
-  });
-
-  it("namespace", async () => {
-    const runnerWithCore = await createSdkTestRunner({
-      librariesToAdd: [AzureCoreTestLibrary],
-      autoUsings: ["Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithCore.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service.One {};
-
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service.Two {};
-      `);
-    const sdkPackage = runnerWithCore.context.sdkPackage;
-    strictEqual(sdkPackage.clients.length, 2);
-    const clientOne = sdkPackage.clients.filter((c) => c.name === "OneClient")[0];
-    strictEqual(clientOne.nameSpace, "My.Service.One");
-
-    const clientTwo = sdkPackage.clients.filter((c) => c.name === "TwoClient")[0];
-    strictEqual(clientTwo.nameSpace, "My.Service.Two");
-  });
-
-  it("operationGroup", async () => {
-    await runner.compileWithBuiltInService(`
-        @operationGroup
-        namespace MyOperationGroup {
-          op func(): void;
-        }
-      `);
-    const sdkPackage = runner.context.sdkPackage;
-    strictEqual(sdkPackage.clients.length, 1);
-
-    const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-    ok(mainClient);
-    ok(mainClient.children);
-    const operationGroup = mainClient.children[0];
-    ok(operationGroup);
-    strictEqual(operationGroup.parent, mainClient);
-
-    strictEqual(mainClient.methods.length, 1);
-    strictEqual(mainClient.clientInitialization.parameters.length, 1);
-    strictEqual(mainClient.clientInitialization.parameters[0].name, "endpoint");
-    strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
-
-    const clientAccessor = mainClient.methods[0];
-    strictEqual(clientAccessor.kind, "clientaccessor");
-    strictEqual(clientAccessor.access, "internal");
-    strictEqual(clientAccessor.name, "getMyOperationGroup");
-    strictEqual(clientAccessor.parameters.length, 0);
-    strictEqual(clientAccessor.response, operationGroup);
-    strictEqual(
-      clientAccessor.crossLanguageDefinitionId,
-      "TestService.MyOperationGroup.getMyOperationGroup",
-    );
-
-    strictEqual(operationGroup.clientInitialization.parameters.length, 1);
-    strictEqual(operationGroup.clientInitialization.initializedBy, InitializedByFlags.Parent);
-    strictEqual(operationGroup.methods.length, 1);
-    strictEqual(operationGroup.methods[0].name, "func");
-    strictEqual(
-      operationGroup.methods[0].crossLanguageDefinitionId,
-      "TestService.MyOperationGroup.func",
-    );
-    strictEqual(operationGroup.crossLanguageDefinitionId, "TestService.MyOperationGroup");
-  });
-
-  it("operationGroup2", async () => {
-    await runner.compileWithBuiltInService(`
-        namespace Foo {
-          interface Bar {
-            @route("/one")
-            one(): void;
-          }
-        }
-        interface Bar {
-          @route("/two")
-          two(): void;
-        }
-      `);
-    const sdkPackage = runner.context.sdkPackage;
-    strictEqual(sdkPackage.clients.length, 1);
-
-    const mainClient = sdkPackage.clients[0];
-    strictEqual(mainClient.children?.length, 2);
-    const fooClient = mainClient.children.find((m) => m.name === "Foo");
-    strictEqual(fooClient?.children?.length, 1);
-    const fooBarClient = fooClient.children.find((m) => m.name === "Bar");
-    const barClient = mainClient.children.find((m) => m.name === "Bar");
-    ok(fooBarClient && barClient);
-    strictEqual(fooClient.parent, mainClient);
-    strictEqual(fooBarClient.parent, fooClient);
-    strictEqual(barClient.parent, mainClient);
-
-    strictEqual(mainClient.methods.length, 2);
-    ok(mainClient.clientInitialization);
-    strictEqual(mainClient.clientInitialization.parameters.length, 1);
-    strictEqual(mainClient.clientInitialization.parameters[0].name, "endpoint");
-    strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
-
-    const fooAccessor = mainClient.methods[0];
-    strictEqual(fooAccessor.kind, "clientaccessor");
-    strictEqual(fooAccessor.crossLanguageDefinitionId, "TestService.Foo.getFoo");
-    strictEqual(fooAccessor.access, "internal");
-    strictEqual(fooAccessor.name, "getFoo");
-    strictEqual(fooAccessor.parameters.length, 0);
-    strictEqual(fooAccessor.response, fooClient);
-
-    const barAccessor = mainClient.methods[1];
-    strictEqual(barAccessor.kind, "clientaccessor");
-    strictEqual(barAccessor.access, "internal");
-    strictEqual(barAccessor.name, "getBar");
-    strictEqual(barAccessor.crossLanguageDefinitionId, "TestService.Bar.getBar");
-    strictEqual(barAccessor.parameters.length, 0);
-    strictEqual(barAccessor.response, barClient);
-
-    strictEqual(fooClient.clientInitialization.parameters.length, 1);
-    strictEqual(fooClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
-    strictEqual(fooClient.methods.length, 1);
-    strictEqual(fooClient.crossLanguageDefinitionId, "TestService.Foo");
-
-    const fooBarAccessor = fooClient.methods[0];
-    strictEqual(fooBarAccessor.kind, "clientaccessor");
-    strictEqual(fooBarAccessor.crossLanguageDefinitionId, "TestService.Foo.Bar.getBar");
-    strictEqual(fooBarAccessor.access, "internal");
-    strictEqual(fooBarAccessor.name, "getBar");
-    strictEqual(fooBarAccessor.parameters.length, 0);
-    strictEqual(fooBarAccessor.response, fooBarClient);
-
-    strictEqual(fooBarClient.clientInitialization.parameters.length, 1);
-    strictEqual(fooBarClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
-    strictEqual(fooBarClient.crossLanguageDefinitionId, "TestService.Foo.Bar");
-    strictEqual(fooBarClient.methods.length, 1);
-    strictEqual(fooBarClient.methods[0].kind, "basic");
-    strictEqual(fooBarClient.methods[0].name, "one");
-    strictEqual(fooBarClient.methods[0].crossLanguageDefinitionId, "TestService.Foo.Bar.one");
-
-    strictEqual(barClient.clientInitialization.parameters.length, 1);
-    strictEqual(barClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
-    strictEqual(barClient.crossLanguageDefinitionId, "TestService.Bar");
-    strictEqual(barClient.methods.length, 1);
-    strictEqual(barClient.methods[0].kind, "basic");
-    strictEqual(barClient.methods[0].name, "two");
-    strictEqual(barClient.methods[0].crossLanguageDefinitionId, "TestService.Bar.two");
-  });
-
   function getServiceNoDefaultApiVersion(op: string) {
     return `
     @server(
@@ -1056,5 +764,50 @@ describe("client", () => {
     strictEqual(clientTemplateArg.optional, false);
     strictEqual(clientTemplateArg.onClient, true);
     strictEqual(clientTemplateArg.clientDefaultValue, "default");
+  });
+
+  it("client level signatures by default", async () => {
+    const runnerWithArm = await createSdkTestRunner({
+      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
+      model MyProperties {
+        @visibility(Lifecycle.Read)
+        @doc("Display name of the Azure Extended Zone.")
+        displayName: string;
+      }
+
+      @subscriptionResource
+      model MyModel is ProxyResource<MyProperties> {
+        @key("extendedZoneName")
+        @segment("extendedZones")
+        @path
+        name: string;
+      }
+
+      namespace MyClient {
+        interface Operations extends Azure.ResourceManager.Operations {}
+
+        @armResourceOperations
+        interface MyInterface {
+          get is ArmResourceRead<MyModel>;
+        }
+      }
+    `);
+
+    const sdkPackage = runnerWithArm.context.sdkPackage;
+    const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
+      ?.response as SdkClientType<SdkHttpOperation>;
+    for (const p of client.initialization.properties) {
+      ok(p.onClient);
+    }
+    deepStrictEqual(client.initialization.properties.map((x) => x.name).sort(), [
+      "apiVersion",
+      "credential",
+      "endpoint",
+      "subscriptionId",
+    ]);
   });
 });

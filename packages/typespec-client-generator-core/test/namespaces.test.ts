@@ -1,8 +1,8 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkEmitterOptions } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "../test-host.js";
+import { SdkEmitterOptions } from "../src/interfaces.js";
+import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 describe("namespaces", () => {
   let runner: SdkTestRunner;
@@ -12,6 +12,28 @@ describe("namespaces", () => {
   });
 
   describe("no namespace flag", () => {
+    it("basic namespace", async () => {
+      await runner.compile(`
+        @client({name: "MyClient"})
+        @service
+        namespace My.Namespace;
+      `);
+
+      strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
+    });
+    it("nested namespaces", async () => {
+      await runner.compile(`
+        @client({name: "MyClient"})
+        @service
+        namespace My.Namespace {};
+
+        @client({name: "MySecondClient"})
+        @service
+        namespace My.Namespace.Sub {};
+      `);
+
+      strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
+    });
     it("two sub-clients", async () => {
       await runner.compile(`
         @server("http://localhost:3000", "endpoint")

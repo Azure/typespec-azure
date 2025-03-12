@@ -10,7 +10,7 @@ import {
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getServiceMethodOfClient } from "./utils.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 describe("spread", () => {
   let runner: SdkTestRunner;

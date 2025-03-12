@@ -2,7 +2,7 @@ import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getServiceMethodOfClient } from "./utils.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 describe("responses", () => {
   let runner: SdkTestRunner;

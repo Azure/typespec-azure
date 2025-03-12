@@ -4,7 +4,7 @@ import { StreamsTestLibrary } from "@typespec/streams/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getServiceMethodOfClient } from "./utils.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 describe("streams", () => {
   let runner: SdkTestRunner;

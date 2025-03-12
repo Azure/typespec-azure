@@ -5,10 +5,10 @@ import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { parse } from "yaml";
-import { createSdkContext } from "../../src/context.js";
-import { listClients } from "../../src/decorators.js";
-import { SdkTestLibrary } from "../../src/testing/index.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { createSdkContext } from "../src/context.js";
+import { listClients } from "../src/decorators.js";
+import { SdkTestLibrary } from "../src/testing/index.js";
+import { createSdkTestRunner, SdkTestRunner } from "./test-host.js";
 
 describe("createSdkContext", () => {
   let runner: SdkTestRunner;

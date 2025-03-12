@@ -8,7 +8,7 @@ import {
   getPropertySegmentsFromModelOrParameters,
 } from "../../src/package.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getServiceMethodOfClient } from "./utils.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 describe("paged operation", () => {
   let runner: SdkTestRunner;

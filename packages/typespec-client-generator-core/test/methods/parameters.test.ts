@@ -12,7 +12,7 @@ import {
   SdkServiceMethod,
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getServiceMethodOfClient, getServiceWithDefaultApiVersion } from "./utils.js";
+import { getServiceMethodOfClient, getServiceWithDefaultApiVersion } from "../utils.js";
 
 describe("parameters", () => {
   let runner: SdkTestRunner;
@@ -1327,5 +1327,31 @@ describe("parameters", () => {
         ["apiVersion", "subscriptionId", "resourceGroupName", "contentType", "accept"],
       );
     });
+  });
+  it("isOverride false", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(): void;
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.isOverride, false);
+  });
+
+  it("isOverride true", async () => {
+    await runner.compileWithBuiltInService(`
+      model TestOptions {
+        @query a: string;
+        @query b: string;
+      }
+
+      op test(...TestOptions): void;
+
+      op testOverride(options: TestOptions): void;
+
+      @@override(test, testOverride);
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.isOverride, true);
   });
 });
