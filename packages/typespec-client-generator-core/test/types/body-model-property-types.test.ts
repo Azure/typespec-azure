@@ -4,7 +4,7 @@ import { isReadOnly } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkBodyModelPropertyTypeHelper } from "./utils.js";
 
-describe("typespec-client-generator-core: body model property types", () => {
+describe("body model property types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

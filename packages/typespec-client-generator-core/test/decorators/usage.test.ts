@@ -6,7 +6,7 @@ import { getUsage } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: @usage", () => {
+describe("@usage", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

@@ -4,7 +4,7 @@ import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
 
-describe("typespec-client-generator-core: responses", () => {
+describe("responses", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

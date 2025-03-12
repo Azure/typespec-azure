@@ -14,7 +14,7 @@ import {
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient, getServiceWithDefaultApiVersion } from "./utils.js";
 
-describe("typespec-client-generator-core: parameters", () => {
+describe("parameters", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

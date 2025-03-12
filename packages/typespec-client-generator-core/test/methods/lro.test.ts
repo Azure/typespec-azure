@@ -7,7 +7,7 @@ import { assert, beforeEach, describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
 import { createSdkTestRunner, hasFlag, SdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: long running operation metadata", () => {
+describe("long running operation metadata", () => {
   let runner: SdkTestRunner;
 
   describe("data plane LRO templates", () => {

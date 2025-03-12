@@ -3,7 +3,7 @@ import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: serialization options", () => {
+describe("serialization options", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

@@ -4,7 +4,7 @@ import { beforeEach, describe, it } from "vitest";
 import { SdkEmitterOptions } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: namespaces", () => {
+describe("namespaces", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

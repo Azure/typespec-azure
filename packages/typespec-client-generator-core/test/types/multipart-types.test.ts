@@ -9,7 +9,7 @@ import {
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: multipart types", () => {
+describe("multipart types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

@@ -3,7 +3,7 @@ import { ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: array types", () => {
+describe("array types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

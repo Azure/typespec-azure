@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkBasicServiceMethod, SdkBuiltInType, SdkHttpOperation } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: bytes types", () => {
+describe("bytes types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

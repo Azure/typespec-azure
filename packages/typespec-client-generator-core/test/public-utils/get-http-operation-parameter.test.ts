@@ -10,7 +10,7 @@ import { getHttpOperationParameter } from "../../src/public-utils.js";
 import { getServiceMethodOfClient } from "../packages/utils.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: public-utils getHttpOperationParameter", () => {
+describe("public-utils getHttpOperationParameter", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

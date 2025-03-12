@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-describe("typespec-client-generator-core: date-time types", () => {
+describe("date-time types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

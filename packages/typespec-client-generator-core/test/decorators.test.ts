@@ -21,7 +21,7 @@ import {
 import { getAllModels } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
-describe("typespec-client-generator-core: decorators", () => {
+describe("decorators", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

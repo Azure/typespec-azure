@@ -13,7 +13,7 @@ import {
 import { isAzureCoreModel } from "../src/public-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
-describe("typespec-client-generator-core: package", () => {
+describe("package", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

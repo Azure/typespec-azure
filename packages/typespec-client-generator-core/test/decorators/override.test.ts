@@ -5,7 +5,7 @@ import { beforeEach, describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: @override", () => {
+describe("@override", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

@@ -5,7 +5,7 @@ import { SdkArrayType, SdkMethodResponse, UsageFlags } from "../../src/interface
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-describe("typespec-client-generator-core: union types", () => {
+describe("union types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

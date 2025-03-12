@@ -4,7 +4,7 @@ import { beforeEach, describe, it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: http operation examples", () => {
+describe("http operation examples", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

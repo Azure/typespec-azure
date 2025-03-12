@@ -2,7 +2,7 @@ import { ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: tuple types", () => {
+describe("tuple types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

@@ -9,7 +9,7 @@ import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: model types", () => {
+describe("model types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

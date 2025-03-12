@@ -10,7 +10,7 @@ import {
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "./utils.js";
 
-describe("typespec-client-generator-core: paged operation", () => {
+describe("paged operation", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

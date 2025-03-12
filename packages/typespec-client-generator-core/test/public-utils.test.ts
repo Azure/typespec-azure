@@ -20,7 +20,7 @@ import {
 import { getAllModels, getSdkUnion } from "../src/types.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
-describe("typespec-client-generator-core: public-utils", () => {
+describe("public-utils", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

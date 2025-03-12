@@ -2,7 +2,7 @@ import { ok, strictEqual } from "assert";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: doc and summary", () => {
+describe("doc and summary", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

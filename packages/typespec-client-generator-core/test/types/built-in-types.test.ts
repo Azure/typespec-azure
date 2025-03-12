@@ -6,7 +6,7 @@ import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-describe("typespec-client-generator-core: built-in types", () => {
+describe("built-in types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

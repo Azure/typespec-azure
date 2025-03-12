@@ -4,7 +4,7 @@ import { beforeEach, describe, it } from "vitest";
 import { InitializedByFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: @clientInitialization", () => {
+describe("@clientInitialization", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

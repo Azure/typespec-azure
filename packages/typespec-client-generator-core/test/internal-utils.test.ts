@@ -4,7 +4,7 @@ import { beforeEach, describe, it } from "vitest";
 import { getValueTypeValue } from "../src/internal-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
-describe("typespec-client-generator-core: internal-utils", () => {
+describe("internal-utils", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

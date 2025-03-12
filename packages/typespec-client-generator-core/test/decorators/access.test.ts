@@ -5,7 +5,7 @@ import { beforeEach, describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: @access", () => {
+describe("@access", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

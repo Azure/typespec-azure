@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, it } from "vitest";
 import { SdkEnumValueType } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: general decorators list", () => {
+describe("general decorators list", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {

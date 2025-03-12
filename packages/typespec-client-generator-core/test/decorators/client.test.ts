@@ -20,7 +20,7 @@ import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../s
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: client related", () => {
+describe("client related", () => {
   let runner: SdkTestRunner;
   let tester: LinterRuleTester;
 

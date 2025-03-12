@@ -6,7 +6,7 @@ import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/i
 import { getClientType } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-describe("typespec-client-generator-core: enum types", () => {
+describe("enum types", () => {
   let runner: SdkTestRunner;
 
   beforeEach(async () => {
