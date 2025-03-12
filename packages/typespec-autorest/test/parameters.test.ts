@@ -478,7 +478,7 @@ describe("content type parameter", () => {
       ): void;
       `,
     );
-    strictEqual(res.paths["/"].post.consumes, undefined);
+    deepStrictEqual(res.paths["/"].post.consumes, ["text/plain"]);
   });
 });
 
