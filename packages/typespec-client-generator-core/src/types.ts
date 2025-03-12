@@ -1962,6 +1962,23 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       const additionalApiVersions = getAdditionalApiVersions(context, client.service);
       if (additionalApiVersions) {
         // add additional api versions to the enum
+        for (const member of additionalApiVersions.members.values()) {
+          sdkVersionsEnum.values.push(
+            diagnostics.pipe(getSdkEnumValueWithDiagnostics(context, sdkVersionsEnum, member)),
+          );
+        }
+        // sort the enum values by order. Not the most perfect, since we might mess up
+        // existing api version order, but this is an edge case and we are ultimately
+        // adding in api versions that weren't defined in the @versioned enum
+        sdkVersionsEnum.values.sort((a, b) => {
+          if (typeof a.value === "string" && typeof b.value === "string") {
+            return a.value.localeCompare(b.value);
+          } else if (typeof a.value === "number" && typeof b.value === "number") {
+            return a.value - b.value;
+          } else {
+            return 0;
+          }
+        });
       }
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
