@@ -693,7 +693,7 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: ModelProperty | Model | Enum | Operation | Union | Namespace,
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
@@ -710,10 +710,12 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: ModelProperty | Model | Enum | Operation | Union | Namespace,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
-
+  if (entity.kind === "ModelProperty") {
+    return accessOverride;
+  }
   if (!accessOverride && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }

@@ -534,6 +534,7 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   optional: boolean;
   crossLanguageDefinitionId: string;
   visibility?: Visibility[];
+  access: AccessFlags;
 }
 
 /**

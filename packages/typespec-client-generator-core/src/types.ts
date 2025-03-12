@@ -784,6 +784,7 @@ function addDiscriminatorToModelType(
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
       decorators: [],
+      access: "public",
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -1221,6 +1222,7 @@ export function getSdkCredentialParameter(
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
+    access: "public",
   };
 }
 
@@ -1239,6 +1241,10 @@ export function getSdkModelPropertyTypeBase(
   diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, propertyType));
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
+  const accessOverride = getAccessOverride(context, type);
+  if (accessOverride) {
+    diagnostics.pipe(updateUsageOrAccess(context, accessOverride, propertyType));
+  }
   return diagnostics.wrap({
     __raw: type,
     doc: getDoc(context.program, type),
@@ -1257,6 +1263,7 @@ export function getSdkModelPropertyTypeBase(
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     visibility: getSdkVisibility(context, type),
+    access: accessOverride ?? "public", // revisiting as well in operations
   });
 }
 
@@ -1498,7 +1505,7 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
-function updateUsageOrAccess(
+export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
   type?: SdkType,
@@ -1626,7 +1633,15 @@ function updateUsageOrAccess(
     if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
       continue;
     }
-    diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+    // by default, we set property access value to parent. If there's an override though, we override.
+    let propertyAccess = value;
+    if (property.__raw) {
+      const propertyAccessOverride = getAccessOverride(context, property.__raw);
+      if (propertyAccessOverride) {
+        propertyAccess = propertyAccessOverride;
+      }
+    }
+    diagnostics.pipe(updateUsageOrAccess(context, propertyAccess, property.type, options));
     options.ignoreSubTypeStack.pop();
   }
   return diagnostics.wrap(undefined);

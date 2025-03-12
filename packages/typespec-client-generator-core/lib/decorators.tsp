@@ -343,7 +343,7 @@ enum Access {
  * ```
  */
 extern dec access(
-  target: Model | Operation | Enum | Union | Namespace,
+  target: ModelProperty | Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
   scope?: valueof string
 );
