@@ -53,7 +53,6 @@ import {
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
-  listOperationGroups,
   listOperationsInOperationGroup,
   shouldFlattenProperty,
   shouldGenerateConvenient,
@@ -105,6 +104,7 @@ import {
   isNeverOrVoidType,
   isOnClient,
   listAllUserDefinedNamespaces,
+  listRawSubClients,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -1941,15 +1941,10 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       // operations on a client
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
-    const ogs = listOperationGroups(context, client);
-    while (ogs.length) {
-      const operationGroup = ogs.pop();
-      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
+    for (const sc of listRawSubClients(context, client)) {
+      for (const operation of listOperationsInOperationGroup(context, sc)) {
         // operations on operation groups
         diagnostics.pipe(updateTypesFromOperation(context, operation));
-      }
-      if (operationGroup?.subOperationGroups) {
-        ogs.push(...operationGroup.subOperationGroups);
       }
     }
     // server parameters

@@ -21,7 +21,9 @@
   "main": "dist/src/index.js",
   "tspMain": "dist/src/index.js",
   "exports": {
-    ".": "./dist/src/index.js"
+    ".": {
+      "import": "./dist/src/index.js"
+    }
   },
   "engines": {
     "node": ">=20.0.0"

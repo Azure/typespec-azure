@@ -36,7 +36,6 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   emitterName: string;
   arm?: boolean;
-  getMutatedGlobalNamespace(): Namespace;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   namespaceFlag?: string;
 
@@ -67,6 +66,10 @@ export interface TCGCContext {
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
   __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
+
+  getMutatedGlobalNamespace(): Namespace;
+  getApiVersionsForType(type: Type): string[];
+  setApiVersionsForType(type: Type, apiVersions: string[]): void;
 }
 
 export interface SdkContext<

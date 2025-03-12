@@ -27,6 +27,15 @@
   "type": "module",
   "main": "dist/src/index.js",
   "tspMain": "lib/main.tsp",
+  "exports": {
+    ".": {
+      "typespec": "./lib/main.tsp",
+      "default": "./dist/src/index.js"
+    },
+    "./testing": {
+      "default": "./dist/src/testing/index.js"
+    }
+  },
   "peerDependencies": {
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@typespec/compiler": "workspace:^"
@@ -50,15 +59,5 @@
     "source-map-support": "~0.5.21",
     "typescript": "~5.8.2",
     "vitest": "^3.0.7"
-  },
-  "exports": {
-    ".": {
-      "default": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
-    },
-    "./testing": {
-      "default": "./dist/src/testing/index.js",
-      "types": "./dist/src/testing/index.d.ts"
-    }
   }
 }

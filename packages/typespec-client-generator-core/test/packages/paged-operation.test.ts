@@ -53,6 +53,42 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
   });
 
+  it("azure paged result with next link in header", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(): ListTestResult;
+      @pagedResult
+      model ListTestResult {
+        @items
+        @clientName("values")
+        tests: Test[];
+        @nextLink
+        @clientName("nextLink")
+        @header
+        next: string;
+      }
+      model Test {
+        id: string;
+      }
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "paging");
+    strictEqual(method.nextLinkPath, "nextLink");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(
+      method.pagingMetadata.nextLinkSegments[0],
+      method.operation.responses[0].headers[0],
+    );
+
+    const response = method.response;
+    strictEqual(response.kind, "method");
+    strictEqual(response.resultPath, "values");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+  });
+
   it("normal paged result", async () => {
     await runner.compileWithBuiltInService(`
       @list
@@ -74,6 +110,40 @@ describe("typespec-client-generator-core: paged operation", () => {
     strictEqual(method.nextLinkPath, "next");
     strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
     strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+
+    const response = method.response;
+    strictEqual(response.kind, "method");
+    strictEqual(response.resultPath, "tests");
+    strictEqual(response.resultSegments?.length, 1);
+    strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+    strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+  });
+
+  it("normal paged result with next link in header", async () => {
+    await runner.compileWithBuiltInService(`
+      @list
+      op test(): ListTestResult;
+      model ListTestResult {
+        @pageItems
+        tests: Test[];
+        @header
+        @TypeSpec.nextLink
+        next: string;
+      }
+      model Test {
+        id: string;
+      }
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    const method = getServiceMethodOfClient(sdkPackage);
+    strictEqual(method.name, "test");
+    strictEqual(method.kind, "paging");
+    strictEqual(method.nextLinkPath, "next");
+    strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+    strictEqual(
+      method.pagingMetadata.nextLinkSegments[0],
+      method.operation.responses[0].headers[0],
+    );
 
     const response = method.response;
     strictEqual(response.kind, "method");

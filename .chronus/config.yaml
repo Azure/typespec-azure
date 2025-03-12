@@ -50,3 +50,4 @@ ignore:
 changedFiles:
   - "!**/*.md"
   - "!**/*.test.ts"
+  - "!**/*.e2e.ts"

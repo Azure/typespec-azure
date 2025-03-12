@@ -41,7 +41,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getParamAlias, listOperationGroups } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -49,6 +49,7 @@ import {
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
+  SdkOperationGroup,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -180,11 +181,6 @@ export function filterApiVersionsWithDecorators(
   return retval;
 }
 
-function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]): string[] {
-  const union = Array.from(new Set([...a, ...b]));
-  return apiVersions.filter((item) => union.includes(item));
-}
-
 /**
  *
  * @param context
@@ -199,7 +195,7 @@ export function getAvailableApiVersions(
 ): string[] {
   let wrapperApiVersions: string[] = [];
   if (wrapper) {
-    wrapperApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
+    wrapperApiVersions = context.getApiVersionsForType(wrapper);
   }
 
   const allApiVersions =
@@ -211,16 +207,11 @@ export function getAvailableApiVersions(
   if (!apiVersions) return [];
   const explicitlyDecorated = filterApiVersionsWithDecorators(context, type, apiVersions);
   if (explicitlyDecorated.length) {
-    context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
+    context.setApiVersionsForType(type, explicitlyDecorated);
     return explicitlyDecorated;
   }
-  // we take the union of all of the api versions that the type is available on
-  // if it's called multiple times with diff wrappers, we want to make sure we have
-  // all of the possible api versions listed
-  const existing = context.__tspTypeToApiVersions.get(type) || [];
-  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
-  context.__tspTypeToApiVersions.set(type, retval);
-  return retval;
+  context.setApiVersionsForType(type, wrapperApiVersions);
+  return context.getApiVersionsForType(type);
 }
 
 /**
@@ -700,4 +691,23 @@ export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
     }
   }
   return serviceNamespaces;
+}
+
+export function listRawSubClients(
+  context: TCGCContext,
+  client: SdkOperationGroup | SdkClient,
+  retval?: (SdkOperationGroup | SdkClient)[],
+): (SdkOperationGroup | SdkClient)[] {
+  if (retval === undefined) {
+    retval = [];
+  }
+  if (retval.includes(client)) return retval;
+  if (client.kind === "SdkOperationGroup") {
+    retval.push(client);
+  }
+
+  for (const operationGroup of listOperationGroups(context, client)) {
+    listRawSubClients(context, operationGroup, retval);
+  }
+  return retval;
 }

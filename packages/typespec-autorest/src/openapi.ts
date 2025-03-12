@@ -1200,6 +1200,7 @@ export async function getOpenAPIForService(
         part.body.type,
         { visibility, ignoreMetadataAnnotations: false },
         partName,
+        part.body.type,
       );
       if (schema) {
         if (part.multi) {
@@ -1252,6 +1253,7 @@ export async function getOpenAPIForService(
     type: Type,
     schemaContext: SchemaContext,
     paramName: string,
+    target: DiagnosticTarget,
     multipart?: boolean,
   ): PrimitiveItems | undefined {
     const fullSchema = getSchemaForType(type, schemaContext);
@@ -1274,6 +1276,7 @@ export async function getOpenAPIForService(
     type: Type,
     schemaContext: SchemaContext,
     paramName: string,
+    target: DiagnosticTarget,
   ): PrimitiveItems | undefined {
     if (isBytes(type)) {
       return { type: "file" };
@@ -1284,7 +1287,13 @@ export async function getOpenAPIForService(
       if (isBytes(elementType)) {
         return { type: "array", items: { type: "string", format: "binary" } };
       }
-      const schema = getSchemaForPrimitiveItems(elementType, schemaContext, paramName, true);
+      const schema = getSchemaForPrimitiveItems(
+        elementType,
+        schemaContext,
+        paramName,
+        target,
+        true,
+      );
       if (schema === undefined) {
         return undefined;
       }
@@ -1296,7 +1305,7 @@ export async function getOpenAPIForService(
         items: schema,
       };
     } else {
-      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, true);
+      const schema = getSchemaForPrimitiveItems(type, schemaContext, paramName, target, true);
 
       if (schema === undefined) {
         return undefined;
@@ -1367,7 +1376,7 @@ export async function getOpenAPIForService(
     const result = {
       in: "formData",
       ...base,
-      ...(getFormDataSchema(param.type, schemaContext, base.name) as any),
+      ...(getFormDataSchema(param.type, schemaContext, base.name, param) as any),
       default: param.defaultValue && getDefaultValue(param.defaultValue, param),
     };
 
@@ -1391,49 +1400,56 @@ export async function getOpenAPIForService(
     "type" | "items"
   > {
     if (param.type.kind === "Model" && isArrayModelType(program, param.type)) {
-      const itemSchema = getSchemaForPrimitiveItems(param.type.indexer.value, schemaContext, name);
+      const itemSchema = getSchemaForPrimitiveItems(
+        param.type.indexer.value,
+        schemaContext,
+        name,
+        param,
+      );
       const schema = itemSchema && {
         ...itemSchema,
       };
       delete (schema as any).description;
       return { type: "array", items: schema };
     } else {
-      return getSchemaForPrimitiveItems(param.type, schemaContext, name) as any;
+      return getSchemaForPrimitiveItems(param.type, schemaContext, name, param) as any;
     }
   }
 
-  function getQueryCollectionFormat(
-    httpProp: HttpProperty & { kind: "query" },
-  ): string | undefined {
-    if (httpProp.options.explode) {
-      return "multi";
+  function getCollectionFormat(
+    type: ModelProperty,
+    explode?: boolean,
+  ): "csv" | "ssv" | "pipes" | "multi" | undefined {
+    if ($.array.is(type.type)) {
+      if (explode) {
+        return "multi";
+      }
+      const encode = getEncode(context.program, type);
+      if (encode) {
+        if (encode?.encoding === "ArrayEncoding.pipeDelimited") {
+          return "pipes";
+        }
+        if (encode?.encoding === "ArrayEncoding.spaceDelimited") {
+          return "ssv";
+        }
+        reportDiagnostic(program, { code: "invalid-multi-collection-format", target: type });
+      }
+      return "csv";
     }
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = httpProp.options.format;
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, {
-        code: "invalid-multi-collection-format",
-        target: httpProp.property,
-      });
-    }
-
-    return collectionFormat;
+    return undefined;
   }
+
   function getOpenAPI2QueryParameter(
     httpProp: HttpProperty & { kind: "query" },
     schemaContext: SchemaContext,
   ): OpenAPI2QueryParameter {
     const property = httpProp.property;
     const base = getOpenAPI2ParameterBase(property, httpProp.options.name);
-    const collectionFormat = getQueryCollectionFormat(httpProp);
+    const collectionFormat = getCollectionFormat(httpProp.property, httpProp.options.explode);
     const schema = getSimpleParameterSchema(property, schemaContext, base.name);
     return {
       in: "query",
-      collectionFormat:
-        collectionFormat === "csv" && schema.items === undefined // If csv
-          ? undefined
-          : (collectionFormat as any),
+      collectionFormat,
       default: property.defaultValue && getDefaultValue(property.defaultValue, property),
       ...base,
       ...schema,
@@ -1468,18 +1484,7 @@ export async function getOpenAPIForService(
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(prop, name);
     const headerOptions = getHeaderFieldOptions(program, prop);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = headerOptions.format;
-    if (
-      !collectionFormat &&
-      (typeof headerOptions.explode === "boolean" || $.array.is(prop.type))
-    ) {
-      collectionFormat = headerOptions.explode ? "multi" : "csv";
-    }
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: prop });
-    }
+    const collectionFormat = getCollectionFormat(prop, headerOptions.explode);
     return {
       in: "header",
       default: prop.defaultValue && getDefaultValue(prop.defaultValue, prop),
@@ -2583,7 +2588,7 @@ export async function getOpenAPIForService(
   ): [OpenAPI2SecurityScheme, string[]] | undefined {
     switch (auth.type) {
       case "http":
-        if (auth.scheme !== "basic") {
+        if (auth.scheme.toLowerCase() !== "basic") {
           reportDiagnostic(program, {
             code: "unsupported-http-auth-scheme",
             target: serviceNamespace,

@@ -23,7 +23,6 @@ import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
-  CustomAzureResourceDecorator,
   ExtensionResourceDecorator,
   IdentifiersDecorator,
   LocationResourceDecorator,
@@ -33,6 +32,7 @@ import {
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
+import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import { ArmResourceOperations, resolveResourceOperations } from "./operations.js";
@@ -380,7 +380,7 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
 export const $identifiers: IdentifiersDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  properties: string[],
+  properties: readonly string[],
 ) => {
   const { program } = context;
   const { type } = entity;
