@@ -1159,10 +1159,10 @@ function findShortestNamespaceOverlap(
 /**
  * Returns the client namespace for a given entity. The order of operations is as follows:
  *
- * 1. if `@clientNamespace` is applied to the entity, this wins out.
+ * 1. If `@clientNamespace` is applied to the entity, this wins out.
  *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
- * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace
- * 3. We return the namespace of the entity retrieved from the original spec
+ * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace.
+ * 3. We return the namespace of the entity retrieved from the original spec.
  * @param context
  * @param entity
  * @returns

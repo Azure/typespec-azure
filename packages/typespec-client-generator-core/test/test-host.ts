@@ -282,7 +282,3 @@ export async function createSdkContextTestHelper<
     sdkContextOption,
   );
 }
-
-export function hasFlag<T extends number>(value: T, flag: T): boolean {
-  return (value & flag) !== 0;
-}

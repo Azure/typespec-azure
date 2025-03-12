@@ -83,7 +83,6 @@ import {
   SdkUnionType,
   TCGCContext,
   UsageFlags,
-  getKnownScalars,
   isSdkIntKind,
 } from "./interfaces.js";
 import {
@@ -1058,9 +1057,6 @@ export function getClientTypeWithDiagnostics(
   type: Type,
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
-  if (!context.__knownScalars) {
-    context.__knownScalars = getKnownScalars();
-  }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
   switch (type.kind) {
@@ -1493,7 +1489,7 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
   ) {
     return;
   }
-  context.__referencedTypeCache?.set(type, sdkType);
+  context.__referencedTypeCache!.set(type, sdkType);
 }
 
 interface PropagationOptions {
