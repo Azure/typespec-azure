@@ -1,14 +1,9 @@
 import { Model } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getCrossLanguageDefinitionId, getPropertyNames } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { createSdkTestRunner } from "../test-host.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
 it("property language projected name", async () => {
   async function helper(emitterName: string, expectedLibraryName: string) {
     const runner = await createSdkTestRunner({ emitterName });
