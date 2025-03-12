@@ -68,7 +68,7 @@ import {
   twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson } from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -277,7 +277,10 @@ function createContentTypeOrAcceptHeader(
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
-  // for contentType, we treat it as a constant IFF there's one value and it's application/json.
+  // for contentType, we treat it as a constant IFF there's one value and it's one of:
+  //  - application/json
+  //  - text/plain
+  //  - application/octet-stream
   // this is to prevent a breaking change when a service adds more content types in the future.
   // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
   //
@@ -287,7 +290,10 @@ function createContentTypeOrAcceptHeader(
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (isMediaTypeJson(bodyObject.contentTypes[0]) || name === "accept")
+    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
+      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
+      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
+      name === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
