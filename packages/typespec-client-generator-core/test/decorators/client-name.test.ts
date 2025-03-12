@@ -13,25 +13,25 @@ beforeEach(async () => {
 
 it("carry over", async () => {
   const { Test1, Test2, func1, func2 } = (await runner.compile(`
-          @service
-          @test namespace MyService {
-            @test
-            @clientName("Test1Rename")
-            model Test1{}
-  
-            @test
-            model Test2 is Test1{}
-  
-            @test
-            @route("/func1")
-            @clientName("func1Rename")
-            op func1(): void;
-  
-            @test
-            @route("/func2")
-            op func2 is func1;
-          }
-        `)) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+  @service
+  @test namespace MyService {
+    @test
+    @clientName("Test1Rename")
+    model Test1{}
+
+    @test
+    model Test2 is Test1{}
+
+    @test
+    @route("/func1")
+    @clientName("func1Rename")
+    op func1(): void;
+
+    @test
+    @route("/func2")
+    op func2 is func1;
+      }
+    `)) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
 
   strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
   strictEqual(getClientNameOverride(runner.context, Test2), undefined);
@@ -42,29 +42,29 @@ it("carry over", async () => {
 it("augment carry over", async () => {
   const { Test1, Test2, func1, func2 } = (await runner.compileWithCustomization(
     `
-          @service
-          @test namespace MyService {
-            @test
-            model Test1{}
-  
-            @test
-            model Test2 is Test1{}
-  
-            @test
-            @route("/func1")
-            op func1(): void;
-  
-            @test
-            @route("/func2")
-            op func2 is func1;
-          }
-        `,
+      @service
+      @test namespace MyService {
+        @test
+        model Test1{}
+
+        @test
+        model Test2 is Test1{}
+
+        @test
+        @route("/func1")
+        op func1(): void;
+
+        @test
+        @route("/func2")
+        op func2 is func1;
+      }
+    `,
     `
-          namespace Customizations;
-  
-          @@clientName(MyService.Test1, "Test1Rename");
-          @@clientName(MyService.func1, "func1Rename");
-        `,
+      namespace Customizations;
+
+      @@clientName(MyService.Test1, "Test1Rename");
+      @@clientName(MyService.func1, "func1Rename");
+    `,
   )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
 
   strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
@@ -75,22 +75,22 @@ it("augment carry over", async () => {
 
 it("@clientName with scope of versioning", async () => {
   const testCode = `
-          @service(#{
-            title: "Contoso Widget Manager",
-          })
-          @versioned(Contoso.WidgetManager.Versions)
-          namespace Contoso.WidgetManager;
-          
-          enum Versions {
-            v1,
-            v2,
-          }
-          
-          @clientName("TestJava", "java")
-          @clientName("TestCSharp", "csharp")
-          model Test {}
-          op test(@body body: Test): void;
-        `;
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+    }
+    
+    @clientName("TestJava", "java")
+    @clientName("TestCSharp", "csharp")
+    model Test {}
+    op test(@body body: Test): void;
+  `;
 
   // java
   {
@@ -116,28 +116,28 @@ it("@clientName with scope of versioning", async () => {
 
 it("augmented @clientName with scope of versioning", async () => {
   const testCode = `
-          @service(#{
-            title: "Contoso Widget Manager",
-          })
-          @versioned(Contoso.WidgetManager.Versions)
-          namespace Contoso.WidgetManager;
-          
-          enum Versions {
-            v1,
-            v2,
-          }
-          
-          
-          model Test {}
-          op test(@body body: Test): void;
-        `;
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+    }
+    
+    
+    model Test {}
+    op test(@body body: Test): void;
+  `;
 
   const customization = `
-          namespace Customizations;
-  
-          @@clientName(Contoso.WidgetManager.Test, "TestCSharp", "csharp");
-          @@clientName(Contoso.WidgetManager.Test, "TestJava", "java");
-        `;
+    namespace Customizations;
+
+    @@clientName(Contoso.WidgetManager.Test, "TestCSharp", "csharp");
+    @@clientName(Contoso.WidgetManager.Test, "TestJava", "java");
+  `;
 
   // java
   {
@@ -163,42 +163,42 @@ it("augmented @clientName with scope of versioning", async () => {
 
 it("decorator on template parameter", async function () {
   await runner.compileAndDiagnose(`
-          @service
-          namespace MyService;
-          
-          model ResourceBody<Resource> {
-            @body
-            resource: Resource;
-          }
-          
-          @post
-          op do<Resource extends {}>(...ResourceBody<Resource>): void;
-          
-          @@clientName(ResourceBody.resource, "body");
-          
-          model Test {
-            id: string;
-            prop: string;
-          }
-          
-          op test is do<Test>;
-          
-        `);
+    @service
+    namespace MyService;
+    
+    model ResourceBody<Resource> {
+      @body
+      resource: Resource;
+    }
+    
+    @post
+    op do<Resource extends {}>(...ResourceBody<Resource>): void;
+    
+    @@clientName(ResourceBody.resource, "body");
+    
+    model Test {
+      id: string;
+      prop: string;
+    }
+    
+    op test is do<Test>;
+    
+  `);
 
   strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
 });
 
 it("empty client name", async () => {
   const diagnostics = await runner.diagnose(`
-          @service
-          namespace MyService;
-          
-          @clientName(" ")
-          model Test {
-            id: string;
-            prop: string;
-          }
-        `);
+    @service
+    namespace MyService;
+    
+    @clientName(" ")
+    model Test {
+      id: string;
+      prop: string;
+    }
+  `);
 
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/empty-client-name",
@@ -208,19 +208,19 @@ it("empty client name", async () => {
 it("duplicate model client name with a random language scope", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-        
-        @clientName("Test", "random")
-        model Widget {
-          @key
-          id: int32;
-        }
-  
-        model Test {
-          prop1: string;
-        }
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+    
+    @clientName("Test", "random")
+    model Widget {
+      @key
+      id: int32;
+    }
+
+    model Test {
+      prop1: string;
+    }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -239,19 +239,19 @@ it("duplicate model client name with a random language scope", async () => {
 it("duplicate model, enum, union client name with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-          
-        @clientName("B")
-        enum A {
-          one
-        }
-  
-        model B {}
-  
-        @clientName("B")
-        union C {}
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+      
+    @clientName("B")
+    enum A {
+      one
+    }
+
+    model B {}
+
+    @clientName("B")
+    union C {}
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -274,16 +274,16 @@ it("duplicate model, enum, union client name with all language scopes", async ()
 it("duplicate operation with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-          
-        @clientName("b")
-        @route("/a")
-        op a(): void;
-  
-        @route("/b")
-        op b(): void;
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+      
+    @clientName("b")
+    @route("/a")
+    op a(): void;
+
+    @route("/b")
+    op b(): void;
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -302,18 +302,18 @@ it("duplicate operation with all language scopes", async () => {
 it("duplicate operation in interface with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-        
-        interface C {
-          @clientName("b")
-          @route("/a")
-          op a(): void;
-  
-          @route("/b")
-          op b(): void;
-        }
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+    
+    interface C {
+      @clientName("b")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+    }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -332,14 +332,14 @@ it("duplicate operation in interface with all language scopes", async () => {
 it("duplicate scalar with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-          
-        @clientName("b")
-        scalar a extends string;
-  
-        scalar b extends string;
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+      
+    @clientName("b")
+    scalar a extends string;
+
+    scalar b extends string;
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -358,18 +358,18 @@ it("duplicate scalar with all language scopes", async () => {
 it("duplicate interface with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-  
-        @clientName("B")
-        @route("/a")
-        interface A {
-        }
-  
-        @route("/b")
-        interface B {
-        }
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+
+    @clientName("B")
+    @route("/a")
+    interface A {
+    }
+
+    @route("/b")
+    interface B {
+    }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -388,15 +388,15 @@ it("duplicate interface with all language scopes", async () => {
 it("duplicate model property with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-  
-        model A {
-          @clientName("prop2")
-          prop1: string;
-          prop2: string;
-        }
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+
+    model A {
+      @clientName("prop2")
+      prop1: string;
+      prop2: string;
+    }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -415,15 +415,15 @@ it("duplicate model property with all language scopes", async () => {
 it("duplicate enum member with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-  
-        enum A {
-          @clientName("two")
-          one,
-          two
-        }
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+
+    enum A {
+      @clientName("two")
+      one,
+      two
+    }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -442,15 +442,15 @@ it("duplicate enum member with all language scopes", async () => {
 it("duplicate union variant with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-          @service
-          namespace Contoso.WidgetManager;
-  
-          union Foo { 
-            @clientName("b")
-            a: {}, 
-            b: {} 
-          }
-        `,
+      @service
+      namespace Contoso.WidgetManager;
+
+      union Foo { 
+        @clientName("b")
+        a: {}, 
+        b: {} 
+      }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -469,13 +469,13 @@ it("duplicate union variant with all language scopes", async () => {
 it("duplicate namespace with all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-          @service
-          namespace A{
-            namespace B {}
-            @clientName("B")
-            namespace C {}
-          }
-        `,
+      @service
+      namespace A{
+        namespace B {}
+        @clientName("B")
+        namespace C {}
+      }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -494,21 +494,21 @@ it("duplicate namespace with all language scopes", async () => {
 it("duplicate enum and model within nested namespace for all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-          @service
-          namespace A{
-            namespace B {
-              @clientName("B")
-              enum A {
-                one
-              }
-  
-              model B {}
-            }
-  
-            @clientName("B")
-            model A {}
+      @service
+      namespace A{
+        namespace B {
+          @clientName("B")
+          enum A {
+            one
           }
-        `,
+
+          model B {}
+        }
+
+        @clientName("B")
+        model A {}
+      }
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -527,11 +527,11 @@ it("duplicate enum and model within nested namespace for all language scopes", a
 it("duplicate model with model only generation for all language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-          model Foo {}
-  
-          @clientName("Foo")
-          model Bar {}
-        `,
+      model Foo {}
+
+      @clientName("Foo")
+      model Bar {}
+    `,
   );
 
   expectDiagnostics(diagnostics, [
@@ -550,20 +550,20 @@ it("duplicate model with model only generation for all language scopes", async (
 it("duplicate model client name with multiple language scopes", async () => {
   const diagnostics = await runner.diagnose(
     `
-        @service
-        namespace Contoso.WidgetManager;
-        
-        @clientName("Test", "csharp,python,java")
-        model Widget {
-          @key
-          id: int32;
-        }
-  
-        @clientName("Widget", "java")
-        model Test {
-          prop1: string;
-        }
-        `,
+    @service
+    namespace Contoso.WidgetManager;
+    
+    @clientName("Test", "csharp,python,java")
+    model Widget {
+      @key
+      id: int32;
+    }
+
+    @clientName("Widget", "java")
+    model Test {
+      prop1: string;
+    }
+    `,
   );
 
   expectDiagnostics(diagnostics, [

@@ -14,22 +14,22 @@ beforeEach(async () => {
 it("basic", async () => {
   await runner.compileWithCustomization(
     `
-      @service
-      namespace MyService;
-      model Params {
-        foo: string;
-        bar: string;
-      }
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+    }
 
-      op func(...Params): void;
-      `,
+    op func(...Params): void;
+    `,
     `
-      namespace MyCustomizations;
+    namespace MyCustomizations;
 
-      op func(params: MyService.Params): void;
+    op func(params: MyService.Params): void;
 
-      @@override(MyService.func, MyCustomizations.func);
-      `,
+    @@override(MyService.func, MyCustomizations.func);
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
 
@@ -57,23 +57,23 @@ it("basic", async () => {
 
 it("basic with scope", async () => {
   const mainCode = `
-      @service
-      namespace MyService;
-      model Params {
-        foo: string;
-        bar: string;
-      }
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+    }
 
-      op func(...Params): void;
-      `;
+    op func(...Params): void;
+    `;
 
   const customizationCode = `
-      namespace MyCustomizations;
+    namespace MyCustomizations;
 
-      op func(params: MyService.Params): void;
+    op func(params: MyService.Params): void;
 
-      @@override(MyService.func, MyCustomizations.func, "csharp");
-      `;
+    @@override(MyService.func, MyCustomizations.func, "csharp");
+    `;
   await runner.compileWithCustomization(mainCode, customizationCode);
   // runner has python scope, so shouldn't be overridden
 
@@ -142,28 +142,28 @@ it("basic with scope", async () => {
 
 it("regrouping", async () => {
   const mainCode = `
-      @service
-      namespace MyService;
-      model Params {
-        foo: string;
-        bar: string;
-        fooBar: string;
-      }
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+      fooBar: string;
+    }
 
-      op func(...Params): void;
-      `;
+    op func(...Params): void;
+    `;
 
   const customizationCode = `
-      namespace MyCustomizations;
+    namespace MyCustomizations;
 
-      model ParamsCustomized {
-        ...PickProperties<MyService.Params, "foo" | "bar">;
-      }
+    model ParamsCustomized {
+      ...PickProperties<MyService.Params, "foo" | "bar">;
+    }
 
-      op func(params: MyCustomizations.ParamsCustomized, ...PickProperties<MyService.Params, "fooBar">): void;
+    op func(params: MyCustomizations.ParamsCustomized, ...PickProperties<MyService.Params, "fooBar">): void;
 
-      @@override(MyService.func, MyCustomizations.func);
-      `;
+    @@override(MyService.func, MyCustomizations.func);
+    `;
   await runner.compileWithCustomization(mainCode, customizationCode);
   // runner has python scope, so shouldn't be overridden
 
@@ -205,28 +205,28 @@ it("regrouping", async () => {
 
 it("params mismatch", async () => {
   const mainCode = `
-      @service
-      namespace MyService;
-      model Params {
-        foo: string;
-        bar: string;
-      }
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+    }
 
-      op func(...Params): void;
-      `;
+    op func(...Params): void;
+    `;
 
   const customizationCode = `
-      namespace MyCustomizations;
+    namespace MyCustomizations;
 
-      model ParamsCustomized {
-        foo: string;
-        bar: string;
-      }
+    model ParamsCustomized {
+      foo: string;
+      bar: string;
+    }
 
-      op func(params: MyCustomizations.ParamsCustomized): void;
+    op func(params: MyCustomizations.ParamsCustomized): void;
 
-      @@override(MyService.func, MyCustomizations.func);
-      `;
+    @@override(MyService.func, MyCustomizations.func);
+    `;
   const diagnostics = (
     await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
   )[1];
@@ -238,22 +238,22 @@ it("params mismatch", async () => {
 it("recursive params", async () => {
   await runner.compileWithCustomization(
     `
-      @service
-      namespace MyService;
-      model Params {
-        foo: string;
-        params: Params[];
-      }
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      params: Params[];
+    }
 
-      op func(...Params): void;
-      `,
+    op func(...Params): void;
+    `,
     `
-      namespace MyCustomizations;
+    namespace MyCustomizations;
 
-      op func(input: MyService.Params): void;
+    op func(input: MyService.Params): void;
 
-      @@override(MyService.func, MyCustomizations.func);
-      `,
+    @@override(MyService.func, MyCustomizations.func);
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
 
@@ -287,29 +287,29 @@ it("core template", async () => {
   });
   await runnerWithCore.compileWithCustomization(
     `
-      @useDependency(Versions.v1_0_Preview_2)
-      @server("http://localhost:3000", "endpoint")
-      @service()
-      namespace My.Service;
+    @useDependency(Versions.v1_0_Preview_2)
+    @server("http://localhost:3000", "endpoint")
+    @service()
+    namespace My.Service;
 
-      model Params {
-        foo: string;
-        params: Params[];
-      }
+    model Params {
+      foo: string;
+      params: Params[];
+    }
 
-      @route("/template")
-      op templateOp is Azure.Core.RpcOperation<
-        Params,
-        Params
-      >;
-      `,
+    @route("/template")
+    op templateOp is Azure.Core.RpcOperation<
+      Params,
+      Params
+    >;
+    `,
     `
-      namespace My.Customizations;
+    namespace My.Customizations;
 
-      op templateOp(params: My.Service.Params, ...Azure.Core.Foundations.ApiVersionParameter): My.Service.Params;
+    op templateOp(params: My.Service.Params, ...Azure.Core.Foundations.ApiVersionParameter): My.Service.Params;
 
-      @@override(My.Service.templateOp, My.Customizations.templateOp);
-      `,
+    @@override(My.Service.templateOp, My.Customizations.templateOp);
+    `,
   );
   const sdkPackage = runnerWithCore.context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];

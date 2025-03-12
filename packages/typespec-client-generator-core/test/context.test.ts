@@ -18,20 +18,20 @@ beforeEach(async () => {
 
 it("multiple call with versioning", async () => {
   const tsp = `
-      @service(#{
-        title: "Contoso Widget Manager",
-      })
-      @versioned(Contoso.WidgetManager.Versions)
-      namespace Contoso.WidgetManager;
-      
-      enum Versions {
-        v1,
-      }
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+    }
 
-      @client({name: "TestClient"})
-      @test
-      interface Test {}
-    `;
+    @client({name: "TestClient"})
+    @test
+    interface Test {}
+  `;
 
   const runnerWithVersion = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-python",
@@ -51,15 +51,15 @@ it("multiple call with versioning", async () => {
 it("export TCGC output from emitter", async () => {
   await runner.compile(
     `
-      @service(#{
-        title: "Contoso Widget Manager",
-      })
-      namespace Contoso.WidgetManager;
-      
-      @usage(Usage.input)
-      model Test{
-      }
-    `,
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    namespace Contoso.WidgetManager;
+    
+    @usage(Usage.input)
+    model Test{
+    }
+  `,
     {
       noEmit: false,
       emit: [SdkTestLibrary.name],

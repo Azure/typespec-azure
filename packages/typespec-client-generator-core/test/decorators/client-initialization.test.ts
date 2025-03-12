@@ -520,30 +520,30 @@ it("redefine client structure", async () => {
       op uploadBlob(@path containerName: string, @path blobName: string): void;
       `,
     `
-      namespace MyCustomizations {
-        model ContainerClientInitialization {
+    namespace MyCustomizations {
+      model ContainerClientInitialization {
+        containerName: string;
+      }
+      @client({service: MyService})
+      @clientInitialization({parameters: ContainerClientInitialization})
+      namespace ContainerClient {
+        op upload is MyService.uploadContainer;
+
+
+        model BlobClientInitialization {
           containerName: string;
+          blobName: string;
         }
+
         @client({service: MyService})
-        @clientInitialization({parameters: ContainerClientInitialization})
-        namespace ContainerClient {
-          op upload is MyService.uploadContainer;
-
-
-          model BlobClientInitialization {
-            containerName: string;
-            blobName: string;
-          }
-
-          @client({service: MyService})
-          @clientInitialization({parameters: BlobClientInitialization})
-          namespace BlobClient {
-            op upload is MyService.uploadBlob;
-          }
+        @clientInitialization({parameters: BlobClientInitialization})
+        namespace BlobClient {
+          op upload is MyService.uploadBlob;
         }
       }
-      
-      `,
+    }
+    
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 2);
@@ -629,22 +629,22 @@ it("redefine client structure", async () => {
 it("@paramAlias", async () => {
   await runner.compileWithCustomization(
     `
-      @service
-      namespace MyService;
+    @service
+    namespace MyService;
 
-      op download(@path blob: string): void;
-      op upload(@path blobName: string): void;
-      `,
+    op download(@path blob: string): void;
+    op upload(@path blobName: string): void;
+    `,
     `
-      namespace MyCustomizations;
+    namespace MyCustomizations;
 
-      model MyClientInitialization {
-        @paramAlias("blob")
-        blobName: string;
-      }
+    model MyClientInitialization {
+      @paramAlias("blob")
+      blobName: string;
+    }
 
-      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
-      `,
+    @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
@@ -699,27 +699,27 @@ it("@paramAlias", async () => {
 it("sub client initialized individually", async () => {
   await runner.compileWithBuiltInService(
     `
-      model clientInitModel
-      {
-          p1: string;
-      }
+    model clientInitModel
+    {
+        p1: string;
+    }
 
-      @route("/bump")
-      @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually | InitializedBy.parent})
-      interface bumpParameter {
-          @route("/op1")
-          @doc("bump parameter")
-          @post
-          @convenientAPI(true)
-          op op1(@path p1: string, @query q1: string): void;
+    @route("/bump")
+    @clientInitialization({parameters: clientInitModel, initializedBy: InitializedBy.individually | InitializedBy.parent})
+    interface bumpParameter {
+        @route("/op1")
+        @doc("bump parameter")
+        @post
+        @convenientAPI(true)
+        op op1(@path p1: string, @query q1: string): void;
 
-          @route("/op2")
-          @doc("bump parameter")
-          @post
-          @convenientAPI(true)
-          op op2(@path p1: string): void;
-      }
-      `,
+        @route("/op2")
+        @doc("bump parameter")
+        @post
+        @convenientAPI(true)
+        op op2(@path p1: string): void;
+    }
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const clientAccessor = sdkPackage.clients[0].methods[0];
@@ -736,10 +736,10 @@ it("sub client initialized individually", async () => {
 
 it("wrong initializedBy value type", async () => {
   const diagnostics = await runner.diagnose(`
-      @clientInitialization({initializedBy: 4})
-      namespace Test {
-      }
-    `);
+    @clientInitialization({initializedBy: 4})
+    namespace Test {
+    }
+  `);
 
   expectDiagnostics(diagnostics, {
     code: "invalid-argument",

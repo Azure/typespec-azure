@@ -11,14 +11,14 @@ beforeEach(async () => {
 });
 it("get single", async () => {
   await runner.compile(`
-      enum Versions {
-        v2022_01_01: "2022-01-01",
-      }
+    enum Versions {
+      v2022_01_01: "2022-01-01",
+    }
 
-      @versioned(Versions)
-      @service
-      namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   const defaultApiVersion = getDefaultApiVersion(runner.context, serviceNamespace);
   ok(defaultApiVersion);

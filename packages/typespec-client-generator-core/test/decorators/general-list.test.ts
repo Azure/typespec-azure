@@ -22,13 +22,13 @@ it("no arg", async function () {
   runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@error"] });
 
   await runner.compileWithBuiltInService(`
-      @error
-      model Blob {
-        id: string;
-      }
+    @error
+    model Blob {
+      id: string;
+    }
 
-      op test(): Blob;
-    `);
+    op test(): Blob;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -43,13 +43,13 @@ it("basic arg type", async function () {
   );
 
   await runner.compileWithBuiltInService(`
-      model Blob {
-        @clientName("ID")
-        id: string;
-      }
+    model Blob {
+      @clientName("ID")
+      id: string;
+    }
 
-      op test(): Blob;
-    `);
+    op test(): Blob;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -68,13 +68,13 @@ it("enum member arg type", async function () {
   runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@encode"] });
 
   await runner.compileWithBuiltInService(`
-      model Blob {
-        @encode(BytesKnownEncoding.base64url)
-        value: bytes;
-      }
+    model Blob {
+      @encode(BytesKnownEncoding.base64url)
+      value: bytes;
+    }
 
-      op test(): Blob;
-    `);
+    op test(): Blob;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -91,8 +91,8 @@ it.skip("decorator arg type not supported", async function () {
   runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@service"] });
 
   await runner.compileWithBuiltInService(`
-      op test(): void;
-    `);
+    op test(): void;
+  `);
 
   deepStrictEqual(runner.context.sdkPackage.clients[0].decorators, [
     {
@@ -112,10 +112,10 @@ it("multiple same decorators", async function () {
   );
 
   await runner.compileWithBuiltInService(`
-      @clientName("testForPython", "python")
-      @clientName("testForJava", "java")
-      op test(): void;
-    `);
+    @clientName("testForPython", "python")
+    @clientName("testForJava", "java")
+    op test(): void;
+  `);
 
   deepStrictEqual(runner.context.sdkPackage.clients[0].methods[0].decorators, [
     {

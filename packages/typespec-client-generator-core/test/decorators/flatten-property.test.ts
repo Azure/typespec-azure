@@ -12,19 +12,19 @@ beforeEach(async () => {
 
 it("marks a model property to be flattened with suppression of deprecation warning", async () => {
   await runner.compileWithBuiltInService(`
-          model Model1{
-            #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
-            @flattenProperty
-            child: Model2;
-          }
-  
-          @test
-          model Model2{}
-  
-          @test
-          @route("/func1")
-          op func1(@body body: Model1): void;
-        `);
+    model Model1{
+      #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+      @flattenProperty
+      child: Model2;
+    }
+
+    @test
+    model Model2{}
+
+    @test
+    @route("/func1")
+    op func1(@body body: Model1): void;
+  `);
   const models = getAllModels(runner.context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
@@ -37,21 +37,21 @@ it("marks a model property to be flattened with suppression of deprecation warni
 
 it("doesn't mark a un-flattened model property", async () => {
   await runner.compile(`
-          @service
-          @test namespace MyService {
-            @test
-            model Model1{
-              child: Model2;
-            }
-  
-            @test
-            model Model2{}
-  
-            @test
-            @route("/func1")
-            op func1(@body body: Model1): void;
-          }
-        `);
+    @service
+    @test namespace MyService {
+      @test
+      model Model1{
+        child: Model2;
+      }
+
+      @test
+      model Model2{}
+
+      @test
+      @route("/func1")
+      op func1(@body body: Model1): void;
+    }
+  `);
   const models = getAllModels(runner.context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
@@ -64,22 +64,22 @@ it("doesn't mark a un-flattened model property", async () => {
 
 it("throws deprecation warning if not suppressed", async () => {
   const diagnostics = await runner.diagnose(`
-          @service
-          @test namespace MyService {
-            @test
-            model Model1{
-              @flattenProperty
-              child: Model2;
-            }
-  
-            @test
-            model Model2{}
-  
-            @test
-            @route("/func1")
-            op func1(@body body: Model1): void;
-          }
-        `);
+    @service
+    @test namespace MyService {
+      @test
+      model Model1{
+        @flattenProperty
+        child: Model2;
+      }
+
+      @test
+      model Model2{}
+
+      @test
+      @route("/func1")
+      op func1(@body body: Model1): void;
+    }
+  `);
 
   expectDiagnostics(diagnostics, {
     code: "deprecated",
@@ -88,22 +88,22 @@ it("throws deprecation warning if not suppressed", async () => {
 
 it("throws error when used on other targets", async () => {
   const diagnostics = await runner.diagnose(`
-          @service
-          @test namespace MyService {
-            @test
-            @flattenProperty
-            model Model1{
-              child: Model2;
-            }
-  
-            @test
-            model Model2{}
-  
-            @test
-            @route("/func1")
-            op func1(@body body: Model1): void;
-          }
-        `);
+    @service
+    @test namespace MyService {
+      @test
+      @flattenProperty
+      model Model1{
+        child: Model2;
+      }
+
+      @test
+      model Model2{}
+
+      @test
+      @route("/func1")
+      op func1(@body body: Model1): void;
+    }
+  `);
 
   expectDiagnostics(diagnostics, {
     code: "decorator-wrong-target",
@@ -112,22 +112,22 @@ it("throws error when used on other targets", async () => {
 
 it("throws error when used on a polymorphism type", async () => {
   const diagnostics = await runner.diagnose(`
-          @service
-          @test namespace MyService {
-            #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
-            @test
-            model Model1{
-              @flattenProperty
-              child: Model2;
-            }
-  
-            @test
-            @discriminator("kind")
-            model Model2{
-              kind: string;
-            }
-          }
-        `);
+    @service
+    @test namespace MyService {
+      #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
+      @test
+      model Model1{
+        @flattenProperty
+        child: Model2;
+      }
+
+      @test
+      @discriminator("kind")
+      model Model2{
+        kind: string;
+      }
+    }
+  `);
 
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/flatten-polymorphism",

@@ -22,11 +22,11 @@ afterEach(async () => {
 it("primitive union", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: string | int32;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        name: string | int32;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "union");
@@ -45,11 +45,11 @@ it("primitive union", async function () {
 
 it("nullable", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: float32 | null;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: float32 | null;
+    }
+  `);
 
   const nullableType = getSdkTypeHelper(runner);
   strictEqual(nullableType.kind, "nullable");
@@ -67,11 +67,11 @@ it("nullable", async function () {
 
 it("nullable with more types", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: string | float32 | null;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: string | float32 | null;
+    }
+  `);
 
   const nullableType = getSdkTypeHelper(runner);
   strictEqual(nullableType.kind, "nullable");
@@ -92,11 +92,11 @@ it("nullable with more types", async function () {
 
 it("record with nullable", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: Record<float32 | null>;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: Record<float32 | null>;
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "dict");
@@ -114,11 +114,11 @@ it("record with nullable", async function () {
 
 it("record with nullable with more types", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: Record<string | float32 | null>;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: Record<string | float32 | null>;
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "dict");
@@ -141,11 +141,11 @@ it("record with nullable with more types", async function () {
 
 it("array with nullable", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: (float32 | null)[];
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: (float32 | null)[];
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "array");
@@ -163,11 +163,11 @@ it("array with nullable", async function () {
 
 it("array with nullable with more types", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: (string | float32 | null)[];
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: (string | float32 | null)[];
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "array");
@@ -189,22 +189,22 @@ it("array with nullable with more types", async function () {
 
 it("additional property is nullable", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model TestExtends extends Record<string|null> {
-          name: string;
-        }
+    @usage(Usage.input | Usage.output)
+    model TestExtends extends Record<string|null> {
+      name: string;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model TestIs is Record<string|null> {
-          name: string;
-        }
+    @usage(Usage.input | Usage.output)
+    model TestIs is Record<string|null> {
+      name: string;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model TestSpread {
-          name: string;
-          ...Record<string|null>
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model TestSpread {
+      name: string;
+      ...Record<string|null>
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
@@ -266,22 +266,22 @@ it("additional property is nullable", async function () {
 
 it("additional property nullable with more types", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model TestExtends extends Record<string|float32|null> {
-          name: string;
-        }
+    @usage(Usage.input | Usage.output)
+    model TestExtends extends Record<string|float32|null> {
+      name: string;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model TestIs is Record<string|float32|null> {
-          name: string;
-        }
+    @usage(Usage.input | Usage.output)
+    model TestIs is Record<string|float32|null> {
+      name: string;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model TestSpread {
-          name: string;
-          ...Record<string|float32|null>
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model TestSpread {
+      name: string;
+      ...Record<string|float32|null>
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
@@ -362,11 +362,11 @@ it("additional property nullable with more types", async function () {
 
 it("model with simple union property", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model ModelWithSimpleUnionProperty {
-        prop: int32 | int32[];
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model ModelWithSimpleUnionProperty {
+      prop: int32 | int32[];
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "union");
@@ -385,29 +385,29 @@ it("model with simple union property", async function () {
 
 it("model with named union", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model BaseModel {
-        name: string;
-      }
-      @usage(Usage.input | Usage.output)
-      model Model1 extends BaseModel {
-        prop1: int32;
-      }
-      @usage(Usage.input | Usage.output)
-      model Model2 extends BaseModel {
-        prop2: int32;
-      }
-      @usage(Usage.input | Usage.output)
-      union MyNamedUnion {
-        one: Model1,
-        two: Model2,
-      }
+    @usage(Usage.input | Usage.output)
+    model BaseModel {
+      name: string;
+    }
+    @usage(Usage.input | Usage.output)
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    union MyNamedUnion {
+      one: Model1,
+      two: Model2,
+    }
 
-      @usage(Usage.input | Usage.output)
-      model ModelWithNamedUnionProperty {
-        prop: MyNamedUnion;
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model ModelWithNamedUnionProperty {
+      prop: MyNamedUnion;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 4);
@@ -443,30 +443,30 @@ it("model with named union", async function () {
 
 it("model with nullable named union", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model BaseModel {
-        name: string;
-      }
-      @usage(Usage.input | Usage.output)
-      model Model1 extends BaseModel {
-        prop1: int32;
-      }
-      @usage(Usage.input | Usage.output)
-      model Model2 extends BaseModel {
-        prop2: int32;
-      }
-      @usage(Usage.input | Usage.output)
-      union MyNamedUnion {
-        one: Model1,
-        two: Model2,
-        null,
-      }
+    @usage(Usage.input | Usage.output)
+    model BaseModel {
+      name: string;
+    }
+    @usage(Usage.input | Usage.output)
+    model Model1 extends BaseModel {
+      prop1: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    model Model2 extends BaseModel {
+      prop2: int32;
+    }
+    @usage(Usage.input | Usage.output)
+    union MyNamedUnion {
+      one: Model1,
+      two: Model2,
+      null,
+    }
 
-      @usage(Usage.input | Usage.output)
-      model ModelWithNamedUnionProperty {
-        prop: MyNamedUnion;
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model ModelWithNamedUnionProperty {
+      prop: MyNamedUnion;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 4);
@@ -506,14 +506,14 @@ it("model with nullable named union", async function () {
 
 it("model with nullable enum property", async function () {
   await runner.compileWithBuiltInService(`
-      enum PetKind {
-        dog, cat, bird
-      }
-      @usage(Usage.input | Usage.output)
-      model Home {
-        pet: PetKind | null;
-      }
-      `);
+    enum PetKind {
+      dog, cat, bird
+    }
+    @usage(Usage.input | Usage.output)
+    model Home {
+      pet: PetKind | null;
+    }
+  `);
 
   const nullableType = getSdkTypeHelper(runner);
   strictEqual(nullableType.kind, "nullable");
@@ -534,11 +534,11 @@ it("model with nullable enum property", async function () {
 
 it("model with nullable union as enum", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model Home {
-        pet: "dog" | "cat" | "bird" | string | null;
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Home {
+      pet: "dog" | "cat" | "bird" | string | null;
+    }
+  `);
 
   const nullableType = getSdkTypeHelper(runner);
   strictEqual(nullableType.kind, "nullable");
@@ -561,16 +561,16 @@ it("model with nullable union as enum", async function () {
 
 it("model with nullable model property", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model PropertyModel {
-        internalProp: string;
-      }
+    @usage(Usage.input | Usage.output)
+    model PropertyModel {
+      internalProp: string;
+    }
 
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: PropertyModel | null;
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: PropertyModel | null;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -593,16 +593,16 @@ it("model with nullable model property", async function () {
 
 it("nullable union with anonymous model ref self", async function () {
   await runner.compileWithBuiltInService(`
-      union A {
-        null,
-        {
-          code?: string,
-          message?: string,
-          propA?: A,
-        },
-      }
-      op post(@body body: A): { @body body: A }; 
-    `);
+    union A {
+      null,
+      {
+        code?: string,
+        message?: string,
+        propA?: A,
+      },
+    }
+    op post(@body body: A): { @body body: A }; 
+  `);
 
   const models = runner.context.sdkPackage.models;
   const unions = runner.context.sdkPackage.unions;
@@ -633,16 +633,16 @@ it("nullable union with anonymous model ref self", async function () {
 
 it("nullable union circular", async function () {
   await runner.compileAndDiagnose(`
-      @service
-      namespace Test {
-        union Test {
-          null,
-          Test,
-        }
-
-        op test(test: Test): void;
+    @service
+    namespace Test {
+      union Test {
+        null,
+        Test,
       }
-    `);
+
+      op test(test: Test): void;
+    }
+  `);
 
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/union-circular",
@@ -651,26 +651,26 @@ it("nullable union circular", async function () {
 
 it("complicated union circular", async function () {
   await runner.compileAndDiagnose(`
-      @service
-      namespace Test {
-        union A {
-          "A",
-          B,
-        }
-        
-        union B {
-          "B",
-          C,
-        }
-
-        union C {
-          "C",
-          A,
-        }
-
-        op test(test: A): void;
+    @service
+    namespace Test {
+      union A {
+        "A",
+        B,
       }
-    `);
+      
+      union B {
+        "B",
+        C,
+      }
+
+      union C {
+        "C",
+        A,
+      }
+
+      op test(test: A): void;
+    }
+  `);
 
   const diagnostic = {
     code: "@azure-tools/typespec-client-generator-core/union-circular",
@@ -681,21 +681,21 @@ it("complicated union circular", async function () {
 
 it("mix types", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model ModelType {
-        name: string;
-      }
+    @usage(Usage.input | Usage.output)
+    model ModelType {
+      name: string;
+    }
 
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: "none" | "auto" | ModelType;
-      }
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: "none" | "auto" | ModelType;
+    }
 
-      @usage(Usage.input | Usage.output)
-      model TestNullable {
-        prop: "none" | "auto" | ModelType | null;
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model TestNullable {
+      prop: "none" | "auto" | ModelType | null;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
@@ -745,31 +745,31 @@ it("mix types", async function () {
 
 it("usage", async function () {
   await runner.compileWithBuiltInService(`
-      union UnionAsEnum {
-        "A",
-        "B",
-        string,
-      }
+    union UnionAsEnum {
+      "A",
+      "B",
+      string,
+    }
 
-      model Foo {
-        prop: string;
-      }
+    model Foo {
+      prop: string;
+    }
 
-      union NullableUnion {
-        Foo,
-        null
-      }
+    union NullableUnion {
+      Foo,
+      null
+    }
 
-      model Bar {
-        prop1: UnionAsEnum;
-        prop2: NullableUnion;
-      }
+    model Bar {
+      prop1: UnionAsEnum;
+      prop2: NullableUnion;
+    }
 
-      @access(Access.internal)
-      op func(
-        @body body: Bar
-      ): void;
-      `);
+    @access(Access.internal)
+    op func(
+      @body body: Bar
+    ): void;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -794,37 +794,37 @@ it("usage", async function () {
 
 it("usage override", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      @access(Access.public)
-      union UnionAsEnum {
-        "A",
-        "B",
-        string,
-      }
+    @usage(Usage.input | Usage.output)
+    @access(Access.public)
+    union UnionAsEnum {
+      "A",
+      "B",
+      string,
+    }
 
-      @usage(Usage.input | Usage.output)
-      @access(Access.public)
-      model Foo {
-        prop: string;
-      }
+    @usage(Usage.input | Usage.output)
+    @access(Access.public)
+    model Foo {
+      prop: string;
+    }
 
-      @usage(Usage.input | Usage.output)
-      @access(Access.public)
-      union NullableUnion {
-        Foo,
-        null
-      }
+    @usage(Usage.input | Usage.output)
+    @access(Access.public)
+    union NullableUnion {
+      Foo,
+      null
+    }
 
-      model Bar {
-        prop1: UnionAsEnum;
-        prop2: NullableUnion;
-      }
+    model Bar {
+      prop1: UnionAsEnum;
+      prop2: NullableUnion;
+    }
 
-      @access(Access.internal)
-      op func(
-        @body body: Bar
-      ): void;
-      `);
+    @access(Access.internal)
+    op func(
+      @body body: Bar
+    ): void;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -848,21 +848,21 @@ it("usage override", async function () {
 
 it("usage override for orphan union as enum", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      union UnionAsEnum {
-        "A",
-        "B",
-        string,
-      }
+    @usage(Usage.input | Usage.output)
+    union UnionAsEnum {
+      "A",
+      "B",
+      string,
+    }
 
-      @usage(Usage.input | Usage.output)
-      @access(Access.internal)
-      union UnionAsEnumInternal {
-        "A",
-        "B",
-        string,
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    @access(Access.internal)
+    union UnionAsEnumInternal {
+      "A",
+      "B",
+      string,
+    }
+  `);
 
   const enums = runner.context.sdkPackage.enums;
   strictEqual(enums.length, 2);
@@ -879,15 +879,15 @@ it("usage override for orphan union as enum", async function () {
 it("union with only one literal", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: TestUnion;
-        }
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: TestUnion;
+    }
 
-        union TestUnion {
-          "A"
-        }
-      `,
+    union TestUnion {
+      "A"
+    }
+  `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "enum");

@@ -20,15 +20,15 @@ beforeEach(async () => {
 
 it("plain model with no decorators", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
+    @service
+    namespace My.Service;
 
-        model Input {
-          key: string;
-        }
+    model Input {
+      key: string;
+    }
 
-        op myOp(...Input): void;
-        `);
+    op myOp(...Input): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -69,15 +69,15 @@ it("plain model with no decorators", async () => {
 
 it("alias with no decorators", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
+    @service
+    namespace My.Service;
 
-        alias BodyParameter = {
-          name: string;
-        };
+    alias BodyParameter = {
+      name: string;
+    };
 
-        op myOp(...BodyParameter): void;
-        `);
+    op myOp(...BodyParameter): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -118,37 +118,37 @@ it("alias with no decorators", async () => {
 
 it("rest template spreading of multiple models", async () => {
   await runner.compile(`
-      @service(#{
-        title: "Pet Store Service",
-      })
-      namespace PetStore;
-      using TypeSpec.Rest.Resource;
+    @service(#{
+      title: "Pet Store Service",
+    })
+    namespace PetStore;
+    using TypeSpec.Rest.Resource;
 
-      @error
-      model PetStoreError {
-        code: int32;
-        message: string;
-      }
+    @error
+    model PetStoreError {
+      code: int32;
+      message: string;
+    }
 
-      @resource("pets")
-      model Pet {
-        @key("petId")
-        id: int32;
-      }
+    @resource("pets")
+    model Pet {
+      @key("petId")
+      id: int32;
+    }
 
-      @resource("checkups")
-      model Checkup {
-        @key("checkupId")
-        id: int32;
+    @resource("checkups")
+    model Checkup {
+      @key("checkupId")
+      id: int32;
 
-        vetName: string;
-        notes: string;
-      }
+      vetName: string;
+      notes: string;
+    }
 
-      interface PetCheckups
-        extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
-          ExtensionResourceList<Checkup, Pet, PetStoreError> {}
-      `);
+    interface PetCheckups
+      extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
+        ExtensionResourceList<Checkup, Pet, PetStoreError> {}
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 4);
   deepStrictEqual(
@@ -194,61 +194,61 @@ it("multi layer template with discriminated model spread", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
-        @versioned(MyVersions)
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service;
-        
-        alias ServiceTraits = NoRepeatableRequests &
-          NoConditionalRequests &
-          NoClientRequestId;
+    @versioned(MyVersions)
+    @server("http://localhost:3000", "endpoint")
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
+    @service
+    namespace My.Service;
+    
+    alias ServiceTraits = NoRepeatableRequests &
+      NoConditionalRequests &
+      NoClientRequestId;
 
-        alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+    alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
-        @doc("The version of the API.")
-        enum MyVersions {
-          @doc("The version 2022-12-01-preview.")
-          @useDependency(Versions.v1_0_Preview_2)
-          v2022_12_01_preview: "2022-12-01-preview",
-        }
+    @doc("The version of the API.")
+    enum MyVersions {
+      @doc("The version 2022-12-01-preview.")
+      @useDependency(Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
 
-        @discriminator("kind")
-        @resource("dataConnections")
-        model DataConnection {
-          id?: string;
+    @discriminator("kind")
+    @resource("dataConnections")
+    model DataConnection {
+      id?: string;
 
-          @key("dataConnectionName")
-          @visibility(Lifecycle.Read)
-          name: string;
+      @key("dataConnectionName")
+      @visibility(Lifecycle.Read)
+      name: string;
 
-          @visibility(Lifecycle.Read)
-          createdDate?: utcDateTime;
+      @visibility(Lifecycle.Read)
+      createdDate?: utcDateTime;
 
-          frequencyOffset?: int32;
-        }
+      frequencyOffset?: int32;
+    }
 
-        @discriminator("kind")
-        model DataConnectionData {
-          name?: string;
-          frequencyOffset?: int32;
-        }
+    @discriminator("kind")
+    model DataConnectionData {
+      name?: string;
+      frequencyOffset?: int32;
+    }
 
-        interface DataConnections {
+    interface DataConnections {
 
-          getDataConnection is Operations.ResourceRead<DataConnection>;
+      getDataConnection is Operations.ResourceRead<DataConnection>;
 
-          @createsOrReplacesResource(DataConnection)
-          @put
-          createOrReplaceDataConnection is Foundations.ResourceOperation<
-            DataConnection,
-            DataConnectionData,
-            DataConnection
-          >;
+      @createsOrReplacesResource(DataConnection)
+      @put
+      createOrReplaceDataConnection is Foundations.ResourceOperation<
+        DataConnection,
+        DataConnectionData,
+        DataConnection
+      >;
 
-          deleteDataConnection is Operations.ResourceDelete<DataConnection>;
-        }
-      `);
+      deleteDataConnection is Operations.ResourceDelete<DataConnection>;
+    }
+  `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   const nonCoreModels = sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(nonCoreModels.length, 2);
@@ -301,16 +301,16 @@ it("multi layer template with discriminated model spread", async () => {
 
 it("model with @body decorator", async () => {
   await runner.compileWithBuiltInService(`
-        model Shelf {
-          name: string;
-          theme?: string;
-        }
-        model CreateShelfRequest {
-          @body
-          body: Shelf;
-        }
-        op createShelf(...CreateShelfRequest): Shelf;
-        `);
+    model Shelf {
+      name: string;
+      theme?: string;
+    }
+    model CreateShelfRequest {
+      @body
+      body: Shelf;
+    }
+    op createShelf(...CreateShelfRequest): Shelf;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -359,13 +359,13 @@ it("model with @body decorator", async () => {
 it("formdata model without body decorator in spread model", async () => {
   await runner.compileWithBuiltInService(`
 
-      model DocumentTranslateContent {
-        @header contentType: "multipart/form-data";
-        document: bytes;
-      }
-      alias Intersected = DocumentTranslateContent & {};
-      op test(...Intersected): void;
-      `);
+    model DocumentTranslateContent {
+      @header contentType: "multipart/form-data";
+      document: bytes;
+    }
+    alias Intersected = DocumentTranslateContent & {};
+    op test(...Intersected): void;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const documentMethodParam = method.parameters.find((x) => x.name === "document");
   ok(documentMethodParam);
@@ -387,8 +387,8 @@ it("formdata model without body decorator in spread model", async () => {
 
 it("anonymous model with @body should not be spread", async () => {
   await runner.compileWithBuiltInService(`
-        op test(@body body: {prop: string}): void;
-        `);
+    op test(@body body: {prop: string}): void;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -429,11 +429,11 @@ it("anonymous model with @body should not be spread", async () => {
 
 it("anonymous model from spread with @bodyRoot should not be spread", async () => {
   await runner.compileWithBuiltInService(`
-        model Test {
-          prop: string;
-        }
-        op test(@bodyRoot body: {...Test}): void;
-        `);
+    model Test {
+      prop: string;
+    }
+    op test(@bodyRoot body: {...Test}): void;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -474,10 +474,10 @@ it("anonymous model from spread with @bodyRoot should not be spread", async () =
 
 it("implicit spread", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-        op myOp(a: string, b: string): void;
-        `);
+    @service
+    namespace My.Service;
+    op myOp(a: string, b: string): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -520,10 +520,10 @@ it("implicit spread", async () => {
 
 it("implicit spread with metadata", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-        op myOp(@header a: string, b: string): void;
-        `);
+    @service
+    namespace My.Service;
+    op myOp(@header a: string, b: string): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -575,14 +575,14 @@ it("implicit spread with metadata", async () => {
 
 it("explicit spread", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-        model Test {
-          a: string;
-          b: string;
-        }
-        op myOp(...Test): void;
-        `);
+    @service
+    namespace My.Service;
+    model Test {
+      a: string;
+      b: string;
+    }
+    op myOp(...Test): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -625,15 +625,15 @@ it("explicit spread", async () => {
 
 it("explicit spread with metadata", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-        model Test {
-          @header
-          a: string;
-          b: string;
-        }
-        op myOp(...Test): void;
-        `);
+    @service
+    namespace My.Service;
+    model Test {
+      @header
+      a: string;
+      b: string;
+    }
+    op myOp(...Test): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -685,18 +685,18 @@ it("explicit spread with metadata", async () => {
 
 it("explicit multiple spread", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-        model Test1 {
-          a: string;
-          
-        }
+    @service
+    namespace My.Service;
+    model Test1 {
+      a: string;
+      
+    }
 
-        model Test2 {
-          b: string;
-        }
-        op myOp(...Test1, ...Test2): void;
-        `);
+    model Test2 {
+      b: string;
+    }
+    op myOp(...Test1, ...Test2): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -739,17 +739,17 @@ it("explicit multiple spread", async () => {
 
 it("explicit multiple spread with metadata", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-        model Test1 {
-          @header
-          a: string;
-        }
-        model Test2 {
-          b: string;
-        }
-        op myOp(...Test1, ...Test2): void;
-        `);
+    @service
+    namespace My.Service;
+    model Test1 {
+      @header
+      a: string;
+    }
+    model Test2 {
+      b: string;
+    }
+    op myOp(...Test1, ...Test2): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -801,15 +801,15 @@ it("explicit multiple spread with metadata", async () => {
 
 it("spread idempotent", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-          alias FooAlias = {
-              @path id: string;
-              @doc("name of the Foo")
-              name: string;
-          };
-          op test(...FooAlias): void;
-        `);
+    @service
+    namespace My.Service;
+    alias FooAlias = {
+        @path id: string;
+        @doc("name of the Foo")
+        name: string;
+    };
+    op test(...FooAlias): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(runner.context);
@@ -820,13 +820,13 @@ it("spread idempotent", async () => {
 
 it("model used as simple spread", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-          model Test {
-            prop: string;
-          }
-          op test(...Test): void;
-        `);
+    @service
+    namespace My.Service;
+      model Test {
+        prop: string;
+      }
+      op test(...Test): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(runner.context);
@@ -838,13 +838,13 @@ it("model used as simple spread", async () => {
 
 it("model used as simple spread and output", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-          model Test {
-            prop: string;
-          }
-          op test(...Test): Test;
-        `);
+    @service
+    namespace My.Service;
+      model Test {
+        prop: string;
+      }
+      op test(...Test): Test;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(runner.context);
@@ -856,16 +856,16 @@ it("model used as simple spread and output", async () => {
 
 it("model used as simple spread and other operation's output", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-          model Test {
-            prop: string;
-          }
-          op test(...Test): void;
+    @service
+    namespace My.Service;
+      model Test {
+        prop: string;
+      }
+      op test(...Test): void;
 
-          @route("/another")
-          op another(): Test;
-        `);
+      @route("/another")
+      op another(): Test;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(runner.context);
@@ -877,16 +877,16 @@ it("model used as simple spread and other operation's output", async () => {
 
 it("model used as simple spread and other operation's input", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
-          model Test {
-            prop: string;
-          }
-          op test(...Test): void;
+    @service
+    namespace My.Service;
+      model Test {
+        prop: string;
+      }
+      op test(...Test): void;
 
-          @route("/another")
-          op another(@body body: Test): void;
-        `);
+      @route("/another")
+      op another(@body body: Test): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(runner.context);
@@ -898,35 +898,35 @@ it("model used as simple spread and other operation's input", async () => {
 
 it("model used as simple spread with versioning", async () => {
   await runner.compile(`
-      @server("http://localhost:3000", "endpoint")
-      @service
-      @versioned(ServiceApiVersions)
-      namespace My.Service;
-      
-      enum ServiceApiVersions {
-        v2022_06_01_preview: "2022-06-01-preview",
-      }
-      
-      model Test {
-        name: string;
-      }
-      
-      model Ref {
-        prop: Test;
-      }
-      
-      @route("modelref1")
-      @post
-      op ref1(...Test): void;
-
-      @route("modelref2")
-      @post
-      op ref2(@header header: string, ...Test): void;
+    @server("http://localhost:3000", "endpoint")
+    @service
+    @versioned(ServiceApiVersions)
+    namespace My.Service;
     
-      @route("modelref3")
-      @post
-      op ref3(@body body: Ref): void;
-    `);
+    enum ServiceApiVersions {
+      v2022_06_01_preview: "2022-06-01-preview",
+    }
+    
+    model Test {
+      name: string;
+    }
+    
+    model Ref {
+      prop: Test;
+    }
+    
+    @route("modelref1")
+    @post
+    op ref1(...Test): void;
+
+    @route("modelref2")
+    @post
+    op ref2(@header header: string, ...Test): void;
+  
+    @route("modelref3")
+    @post
+    op ref3(@body body: Ref): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   getAllModels(runner.context);

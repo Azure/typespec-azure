@@ -13,48 +13,48 @@ beforeEach(async () => {
 describe("no namespace flag", () => {
   it("basic namespace", async () => {
     await runner.compile(`
-        @client({name: "MyClient"})
-        @service
-        namespace My.Namespace;
-      `);
+      @client({name: "MyClient"})
+      @service
+      namespace My.Namespace;
+    `);
 
     strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
   });
   it("nested namespaces", async () => {
     await runner.compile(`
-        @client({name: "MyClient"})
-        @service
-        namespace My.Namespace {};
+      @client({name: "MyClient"})
+      @service
+      namespace My.Namespace {};
 
-        @client({name: "MySecondClient"})
-        @service
-        namespace My.Namespace.Sub {};
-      `);
+      @client({name: "MySecondClient"})
+      @service
+      namespace My.Namespace.Sub {};
+    `);
 
     strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
   });
   it("two sub-clients", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Foo {
-          @route("/bar")
-          namespace Bar {
-            model BarResponse {
-              prop: string;
-            }
-            op get(): BarResponse;
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Foo {
+        @route("/bar")
+        namespace Bar {
+          model BarResponse {
+            prop: string;
           }
-  
-          @route("/baz")
-          namespace Baz {
-            model BazResponse {
-              prop: string;
-            }
-            op get(): BazResponse;
-          }
+          op get(): BarResponse;
         }
-      `);
+
+        @route("/baz")
+        namespace Baz {
+          model BazResponse {
+            prop: string;
+          }
+          op get(): BazResponse;
+        }
+      }
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
     const fooNamespace = sdkPackage.namespaces.find((x) => x.name === "Foo");
@@ -87,40 +87,40 @@ describe("no namespace flag", () => {
 
   it("separate defined clients and operation groups", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Service {
-          model BarResponse {
-            prop: string;
-          }
-  
-          @route("/bar")
-          op getBar(): BarResponse;
-  
-          model BazResponse {
-            prop: string;
-          }
-  
-          @route("/baz")
-          op getBaz(): BazResponse;
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Service {
+        model BarResponse {
+          prop: string;
         }
-        
-        @client({
-          name: "FooClient",
-          service: Service,
-        })
-        namespace Foo {
-          @operationGroup
-          namespace Bar {
-            op get is Service.getBar;
-          }
-  
-          @operationGroup
-          namespace Baz {
-            op get is Service.getBaz;
-          }
+
+        @route("/bar")
+        op getBar(): BarResponse;
+
+        model BazResponse {
+          prop: string;
         }
-      `);
+
+        @route("/baz")
+        op getBaz(): BazResponse;
+      }
+      
+      @client({
+        name: "FooClient",
+        service: Service,
+      })
+      namespace Foo {
+        @operationGroup
+        namespace Bar {
+          op get is Service.getBar;
+        }
+
+        @operationGroup
+        namespace Baz {
+          op get is Service.getBaz;
+        }
+      }
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
 
@@ -162,24 +162,24 @@ describe("no namespace flag", () => {
 
   it("complicated namespaces", async () => {
     await runner.compile(`
-        @service
-        @route("/a")
-        namespace A {
-          interface AG {
+      @service
+      @route("/a")
+      namespace A {
+        interface AG {
+        }
+        namespace AA {
+          interface AAG {
           }
-          namespace AA {
-            interface AAG {
+          namespace AAA{};
+          namespace AAB{
+            interface AABGroup1 {
             }
-            namespace AAA{};
-            namespace AAB{
-              interface AABGroup1 {
-              }
-              interface AABGroup2 {
-              }
+            interface AABGroup2 {
             }
           }
         }
-      `);
+      }
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
     const aNamespace = sdkPackage.namespaces.find((x) => x.name === "A");
@@ -292,12 +292,12 @@ describe("no namespace flag", () => {
 describe("namespace config flag", () => {
   it("replace single-segment namespace with multi-segment namespace", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Foo {
-          op get(): string;
-        }
-      `);
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Foo {
+        op get(): string;
+      }
+    `);
 
     const sdkPackage = (
       await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
@@ -320,26 +320,26 @@ describe("namespace config flag", () => {
   });
   it("two sub-clients with namespace flag", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Foo {
-          @route("/bar")
-          namespace Bar {
-            model BarResponse {
-              prop: string;
-            }
-            op get(): BarResponse;
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Foo {
+        @route("/bar")
+        namespace Bar {
+          model BarResponse {
+            prop: string;
           }
-  
-          @route("/baz")
-          namespace Baz {
-            model BazResponse {
-              prop: string;
-            }
-            op get(): BazResponse;
-          }
+          op get(): BarResponse;
         }
-      `);
+
+        @route("/baz")
+        namespace Baz {
+          model BazResponse {
+            prop: string;
+          }
+          op get(): BazResponse;
+        }
+      }
+    `);
     const sdkPackage = (
       await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
         namespace: "FooRenamed",

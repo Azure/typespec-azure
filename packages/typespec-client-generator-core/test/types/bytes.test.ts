@@ -19,11 +19,11 @@ afterEach(async () => {
 describe("bytes SdkMethodParameter", () => {
   it("should use service operation parameter encoding", async () => {
     await runner.compile(`
-        @service
-        namespace TestClient {
-          op send(@body body: bytes, @header contentType: "application/octet-stream"): void;
-        }
-      `);
+      @service
+      namespace TestClient {
+        op send(@body body: bytes, @header contentType: "application/octet-stream"): void;
+      }
+    `);
     const client = runner.context.sdkPackage.clients[0];
     ok(client);
     const method = client.methods[0];

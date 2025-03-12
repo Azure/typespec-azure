@@ -23,12 +23,12 @@ it("getHttpOperationExamples", async () => {
     `${__dirname}/helper/getTwo.json`,
   );
   const { get } = await runner.compile(`
-      @service
-      namespace TestClient {
-        @test
-        op get(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      @test
+      op get(): string;
+    }
+  `);
 
   const examples = getHttpOperationExamples(
     runner.context,
