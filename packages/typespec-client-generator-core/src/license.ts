@@ -5,7 +5,9 @@ export const licenseMap: { [key: string]: LicenseInfo } = {
     name: "MIT License",
     link: "https://mit-license.org",
     company: "",
-    description: `Copyright © <company>\n
+    header: `Copyright (c) <company>. All rights reserved.\n
+Licensed under the MIT License.`,
+    description: `Copyright (c) <company>\n
 \n
 Permission is hereby granted, free of charge, to any person obtaining a copy\n
 of this software and associated documentation files (the “Software”), to deal\n
@@ -29,7 +31,9 @@ THE SOFTWARE.\n`,
     name: "Apache License 2.0",
     link: "https://www.apache.org/licenses/LICENSE-2.0",
     company: "",
-    description: `Copyright © <company>\n
+    header: `Copyright (c) <company>. All rights reserved.\n
+Licensed under the Apache License, Version 2.0.`,
+    description: `Copyright (c) <company>\n
 \n
 Licensed under the Apache License, Version 2.0 (the "License");\n
 you may not use this file except in compliance with the License.\n
@@ -47,7 +51,9 @@ limitations under the License.\n`,
     name: "BSD 3-Clause License",
     link: "https://opensource.org/licenses/BSD-3-Clause",
     company: "",
-    description: `Copyright © <company>\n
+    header: `Copyright (c) <company>. All rights reserved.\n
+Licensed under the BSD 3-Clause License.`,
+    description: `Copyright (c) <company>\n
 \n
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n
 \n
@@ -68,7 +74,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     name: "MPL 2.0",
     link: "https://www.mozilla.org/en-US/MPL/2.0/",
     company: "",
-    description: `Copyright © <company>\n
+    header: `Copyright (c) <company>. All rights reserved.\n
+Licensed under the Mozilla Public License, v. 2.0.`,
+    description: `Copyright (c) <company>\n
 \n
 This Source Code Form is subject to the terms of the Mozilla Public\n
 License, v. 2.0. If a copy of the MPL was not distributed with this\n
@@ -78,7 +86,9 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.\n`,
     name: "GPL-3.0",
     link: "https://www.gnu.org/licenses/gpl-3.0.html",
     company: "",
-    description: `Copyright © <company>\n
+    header: `Copyright (c) <company>. All rights reserved.\n
+Licensed under the version 3 of the GNU General Public License.`,
+    description: `Copyright (c) <company>\n
 \n
 This program is free software: you can redistribute it and/or modify\n
 it under the terms of the GNU General Public License as published by\n
@@ -97,7 +107,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.\n`,
     name: "LGPL-3.0",
     link: "https://www.gnu.org/licenses/lgpl-3.0.html",
     company: "",
-    description: `Copyright © <company>\n
+    header: `Copyright (c) <company>. All rights reserved.\n
+Licensed under the version 3 of the GNU Lesser General Public License.`,
+    description: `Copyright (c) <company>\n
 \n
 This program is free software: you can redistribute it and/or modify\n
 it under the terms of the GNU Lesser General Public License as published by\n
@@ -115,25 +127,32 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.\n`,
 };
 
 export function getLicenseInfo(context: TCGCContext): LicenseInfo | undefined {
-  if (!context.licenseName || context.licenseName.trim() === "") {
+  if (!context.license) {
     return undefined;
   }
 
-  // if user set the `license-description` in `tspconfig.yaml`, tcgc will not use the build-in license template
-  if (context.licenseDescription || !Object.keys(licenseMap).includes(context.licenseName)) {
+  // if license name is not preset in TCGC, we will use user's config
+  if (!Object.keys(licenseMap).includes(context.license.name)) {
     return {
-      name: context.licenseName,
-      link: context.licenseLink ?? "",
-      company: context.licenseCompany ?? "",
-      description: context.licenseDescription ?? "",
+      name: context.license.name,
+      company: context.license.company ?? "",
+      link: context.license.link ?? "",
+      header: context.license.header ?? "",
+      description: context.license.description ?? "",
     };
   }
 
-  const licenseInfo = licenseMap[context.licenseName];
+  // use preset license info if no user customization
+  const licenseInfo = licenseMap[context.license.name];
   return {
     name: licenseInfo.name,
-    link: licenseInfo.link,
-    company: context.licenseCompany ?? "",
-    description: licenseInfo.description.replace("<company>", context.licenseCompany ?? ""),
+    company: context.license.company ?? "",
+    link: context.license.link ?? licenseInfo.link,
+    header:
+      context.license.header ??
+      licenseInfo.header.replace("<company>", context.license.company ?? ""),
+    description:
+      context.license.description ??
+      licenseInfo.description.replace("<company>", context.license.company ?? ""),
   };
 }

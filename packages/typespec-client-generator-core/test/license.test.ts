@@ -24,7 +24,7 @@ describe("typespec-client-generator-core: license", () => {
   it("mit license without company name", async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-python",
-      "license-name": "MIT License",
+      license: { name: "MIT License" },
     });
 
     await runner.compile(`
@@ -35,8 +35,9 @@ describe("typespec-client-generator-core: license", () => {
 
     const licenseInfo = runner.context.sdkPackage.licenseInfo;
     strictEqual(licenseInfo?.name, licenseMap["MIT License"].name);
-    strictEqual(licenseInfo?.link, licenseMap["MIT License"].link);
     strictEqual(licenseInfo?.company, "");
+    strictEqual(licenseInfo?.link, licenseMap["MIT License"].link);
+    strictEqual(licenseInfo?.header, licenseMap["MIT License"].header.replace("<company>", ""));
     strictEqual(
       licenseInfo?.description,
       licenseMap["MIT License"].description.replace("<company>", ""),
@@ -46,8 +47,7 @@ describe("typespec-client-generator-core: license", () => {
   it("mit license with company name", async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-python",
-      "license-name": "MIT License",
-      "license-company": "Microsoft Cooperation",
+      license: { name: "MIT License", company: "Microsoft Cooperation" },
     });
 
     await runner.compile(`
@@ -58,22 +58,60 @@ describe("typespec-client-generator-core: license", () => {
 
     const licenseInfo = runner.context.sdkPackage.licenseInfo;
     strictEqual(licenseInfo?.name, licenseMap["MIT License"].name);
-    strictEqual(licenseInfo?.link, licenseMap["MIT License"].link);
     strictEqual(licenseInfo?.company, "Microsoft Cooperation");
+    strictEqual(licenseInfo?.link, licenseMap["MIT License"].link);
+    strictEqual(
+      licenseInfo?.header,
+      licenseMap["MIT License"].header.replace("<company>", "Microsoft Cooperation"),
+    );
     strictEqual(
       licenseInfo?.description,
       licenseMap["MIT License"].description.replace("<company>", "Microsoft Cooperation"),
     );
-    strictEqual(licenseInfo?.description.startsWith("Copyright © Microsoft Cooperation"), true);
+    strictEqual(licenseInfo?.description.startsWith("Copyright (c) Microsoft Cooperation"), true);
   });
 
-  it("customize license", async () => {
+  it("mit license with some customization", async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-python",
-      "license-name": "Test License",
-      "license-link": "https://example.com",
-      "license-company": "Microsoft Cooperation",
-      "license-description": "Copyright Microsoft Cooperation",
+      license: {
+        name: "MIT License",
+        header: `Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.`,
+      },
+    });
+
+    await runner.compile(`
+      @service
+      namespace MyService {
+      }
+    `);
+
+    const licenseInfo = runner.context.sdkPackage.licenseInfo;
+    strictEqual(licenseInfo?.name, licenseMap["MIT License"].name);
+    strictEqual(licenseInfo?.company, "");
+    strictEqual(licenseInfo?.link, licenseMap["MIT License"].link);
+    strictEqual(
+      licenseInfo?.header,
+      `Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.`,
+    );
+    strictEqual(
+      licenseInfo?.description,
+      licenseMap["MIT License"].description.replace("<company>", ""),
+    );
+  });
+
+  it("fully customize license", async () => {
+    runner = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+      license: {
+        name: "Test License",
+        company: "Microsoft Cooperation",
+        link: "https://example.com",
+        header: "Copyright Microsoft Cooperation",
+        description: "Copyright Microsoft Cooperation",
+      },
     });
 
     await runner.compile(`
@@ -84,8 +122,9 @@ describe("typespec-client-generator-core: license", () => {
 
     const licenseInfo = runner.context.sdkPackage.licenseInfo;
     strictEqual(licenseInfo?.name, "Test License");
-    strictEqual(licenseInfo?.link, "https://example.com");
     strictEqual(licenseInfo?.company, "Microsoft Cooperation");
+    strictEqual(licenseInfo?.link, "https://example.com");
+    strictEqual(licenseInfo?.header, "Copyright Microsoft Cooperation");
     strictEqual(licenseInfo?.description, "Copyright Microsoft Cooperation");
   });
 });

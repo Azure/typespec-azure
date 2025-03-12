@@ -46,10 +46,13 @@ export interface TCGCContext {
   examplesDir?: string;
   namespaceFlag?: string;
   apiVersion?: string;
-  licenseName?: string;
-  licenseLink?: string;
-  licenseCompany?: string;
-  licenseDescription?: string;
+  license?: {
+    name: string;
+    company?: string;
+    header?: string;
+    link?: string;
+    description?: string;
+  };
 
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
@@ -83,6 +86,7 @@ export interface SdkContext<
 }
 
 export interface SdkEmitterOptions {
+  "emitter-name"?: string;
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
   /**
@@ -92,12 +96,14 @@ export interface SdkEmitterOptions {
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
   "examples-dir"?: string;
-  "emitter-name"?: string;
   namespace?: string;
-  "license-name"?: string;
-  "license-link"?: string;
-  "license-company"?: string;
-  "license-description"?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
 }
 
 // Types for TCGC customization decorators
@@ -977,8 +983,9 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
 
 export interface LicenseInfo {
   name: string;
-  link: string;
   company: string;
+  link: string;
+  header: string;
   description: string;
 }
 
