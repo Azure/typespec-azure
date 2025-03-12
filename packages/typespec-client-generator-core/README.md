@@ -55,31 +55,11 @@ options:
 
 **Type:** `string`
 
-### `examples-directory`
-
-**Type:** `string`
-
 ### `examples-dir`
 
 **Type:** `string`
 
 ### `emitter-name`
-
-**Type:** `string`
-
-### `license-name`
-
-**Type:** `string`
-
-### `license-company`
-
-**Type:** `string`
-
-### `license-link`
-
-**Type:** `string`
-
-### `license-description`
 
 **Type:** `string`
 
