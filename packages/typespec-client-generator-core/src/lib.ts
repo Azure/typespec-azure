@@ -55,11 +55,33 @@ const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
       nullable: true,
       required: ["name"],
       properties: {
-        name: { type: "string", nullable: false },
-        company: { type: "string", nullable: true },
-        link: { type: "string", nullable: true },
-        header: { type: "string", nullable: true },
-        description: { type: "string", nullable: true },
+        name: {
+          type: "string",
+          nullable: false,
+          description:
+            "License name. The config is required. Predefined license are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually.",
+        },
+        company: {
+          type: "string",
+          nullable: true,
+          description: "License company name. It will be used in copyright sentences.",
+        },
+        link: {
+          type: "string",
+          nullable: true,
+          description: "License link.",
+        },
+        header: {
+          type: "string",
+          nullable: true,
+          description:
+            "License header. It will be used in the header comment of generated client code.",
+        },
+        description: {
+          type: "string",
+          nullable: true,
+          description: "License description. The full license text.",
+        },
       },
       description: "License information for the generated client code.",
     },
