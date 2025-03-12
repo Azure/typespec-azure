@@ -3,22 +3,21 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { resolveVirtualPath } from "@typespec/compiler/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { parse } from "yaml";
 import { createSdkContext } from "../src/context.js";
 import { listClients } from "../src/decorators.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 import { createSdkTestRunner, SdkTestRunner } from "./test-host.js";
 
-describe("createSdkContext", () => {
-  let runner: SdkTestRunner;
+let runner: SdkTestRunner;
 
-  beforeEach(async () => {
-    runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-  });
+beforeEach(async () => {
+  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+});
 
-  it("multiple call with versioning", async () => {
-    const tsp = `
+it("multiple call with versioning", async () => {
+  const tsp = `
       @service(#{
         title: "Contoso Widget Manager",
       })
@@ -34,24 +33,24 @@ describe("createSdkContext", () => {
       interface Test {}
     `;
 
-    const runnerWithVersion = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-    });
-
-    await runnerWithVersion.compile(tsp);
-    let clients = listClients(runnerWithVersion.context);
-    strictEqual(clients.length, 1);
-    ok(clients[0].type);
-
-    const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
-    clients = listClients(newSdkContext);
-    strictEqual(clients.length, 1);
-    ok(clients[0].type);
+  const runnerWithVersion = await createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-python",
   });
 
-  it("export TCGC output from emitter", async () => {
-    await runner.compile(
-      `
+  await runnerWithVersion.compile(tsp);
+  let clients = listClients(runnerWithVersion.context);
+  strictEqual(clients.length, 1);
+  ok(clients[0].type);
+
+  const newSdkContext = await createSdkContext(runnerWithVersion.context.emitContext);
+  clients = listClients(newSdkContext);
+  strictEqual(clients.length, 1);
+  ok(clients[0].type);
+});
+
+it("export TCGC output from emitter", async () => {
+  await runner.compile(
+    `
       @service(#{
         title: "Contoso Widget Manager",
       })
@@ -61,30 +60,30 @@ describe("createSdkContext", () => {
       model Test{
       }
     `,
-      {
-        noEmit: false,
-        emit: [SdkTestLibrary.name],
-        options: {
-          [SdkTestLibrary.name]: { "emitter-output-dir": resolveVirtualPath("tsp-output") },
-        },
+    {
+      noEmit: false,
+      emit: [SdkTestLibrary.name],
+      options: {
+        [SdkTestLibrary.name]: { "emitter-output-dir": resolveVirtualPath("tsp-output") },
       },
-    );
+    },
+  );
 
-    const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    ok(output);
-    const codeModel = parse(output);
-    strictEqual(codeModel["models"][0]["name"], "Test");
+  const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
+  ok(output);
+  const codeModel = parse(output);
+  strictEqual(codeModel["models"][0]["name"], "Test");
+});
+
+it("export complex TCGC output from emitter", async () => {
+  runner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-python",
   });
 
-  it("export complex TCGC output from emitter", async () => {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-python",
-    });
-
-    await runner.compile(
-      `
+  await runner.compile(
+    `
       @armProviderNamespace
       @service(#{
         title: "ContosoProviderHubClient",
@@ -182,24 +181,24 @@ describe("createSdkContext", () => {
         checkExistence is ArmResourceCheckExistence<Employee>;
       }
     `,
-      {
-        noEmit: false,
-        emit: [SdkTestLibrary.name],
-        options: {
-          [SdkTestLibrary.name]: { "emitter-output-dir": resolveVirtualPath("tsp-output") },
-        },
+    {
+      noEmit: false,
+      emit: [SdkTestLibrary.name],
+      options: {
+        [SdkTestLibrary.name]: { "emitter-output-dir": resolveVirtualPath("tsp-output") },
       },
-    );
+    },
+  );
 
-    const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    ok(output);
-    const codeModel = parse(output, { maxAliasCount: -1 });
-    strictEqual(codeModel["clients"][0]["name"], "ContosoProviderHubClient");
-  });
+  const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
+  ok(output);
+  const codeModel = parse(output, { maxAliasCount: -1 });
+  strictEqual(codeModel["clients"][0]["name"], "ContosoProviderHubClient");
+});
 
-  it("export TCGC output with emitter name from emitter", async () => {
-    await runner.compile(
-      `
+it("export TCGC output with emitter name from emitter", async () => {
+  await runner.compile(
+    `
       @service(#{
         title: "Contoso Widget Manager",
       })
@@ -209,31 +208,31 @@ describe("createSdkContext", () => {
       model Test{
       }
     `,
-      {
-        noEmit: false,
-        emit: [SdkTestLibrary.name],
-        options: {
-          [SdkTestLibrary.name]: {
-            "emitter-output-dir": resolveVirtualPath("tsp-output"),
-            "emitter-name": "@azure-tools/typespec-csharp",
-          },
+    {
+      noEmit: false,
+      emit: [SdkTestLibrary.name],
+      options: {
+        [SdkTestLibrary.name]: {
+          "emitter-output-dir": resolveVirtualPath("tsp-output"),
+          "emitter-name": "@azure-tools/typespec-csharp",
         },
       },
-    );
+    },
+  );
 
-    const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    ok(output);
-    const codeModel = parse(output);
-    strictEqual(codeModel["models"][0]["name"], "Test");
-  });
+  const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
+  ok(output);
+  const codeModel = parse(output);
+  strictEqual(codeModel["models"][0]["name"], "Test");
+});
 
-  it("export TCGC output from context", async () => {
-    runner = await createSdkTestRunner(
-      { emitterName: "@azure-tools/typespec-python" },
-      { exportTCGCoutput: true },
-    );
+it("export TCGC output from context", async () => {
+  runner = await createSdkTestRunner(
+    { emitterName: "@azure-tools/typespec-python" },
+    { exportTCGCoutput: true },
+  );
 
-    await runner.compile(`
+  await runner.compile(`
       @service(#{
         title: "Contoso Widget Manager",
       })
@@ -244,19 +243,19 @@ describe("createSdkContext", () => {
       }
     `);
 
-    const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    ok(output);
-    const codeModel = parse(output);
-    strictEqual(codeModel["models"][0]["name"], "Test");
-  });
+  const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
+  ok(output);
+  const codeModel = parse(output);
+  strictEqual(codeModel["models"][0]["name"], "Test");
+});
 
-  it("export TCGC output with emitter name from context", async () => {
-    runner = await createSdkTestRunner(
-      { emitterName: "@azure-tools/typespec-python" },
-      { exportTCGCoutput: true },
-    );
+it("export TCGC output with emitter name from context", async () => {
+  runner = await createSdkTestRunner(
+    { emitterName: "@azure-tools/typespec-python" },
+    { exportTCGCoutput: true },
+  );
 
-    await runner.compile(`
+  await runner.compile(`
       @service(#{
         title: "Contoso Widget Manager",
       })
@@ -267,9 +266,8 @@ describe("createSdkContext", () => {
       }
     `);
 
-    const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
-    ok(output);
-    const codeModel = parse(output);
-    strictEqual(codeModel["models"][0]["name"], "Test");
-  });
+  const output = runner.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
+  ok(output);
+  const codeModel = parse(output);
+  strictEqual(codeModel["models"][0]["name"], "Test");
 });

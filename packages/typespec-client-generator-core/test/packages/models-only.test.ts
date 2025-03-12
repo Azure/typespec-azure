@@ -1,16 +1,15 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
-describe("models only", () => {
-  let runner: SdkTestRunner;
+let runner: SdkTestRunner;
 
-  beforeEach(async () => {
-    runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-  });
-  it("models only package", async () => {
-    await runner.compile(`
+beforeEach(async () => {
+  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+});
+it("models only package", async () => {
+  await runner.compile(`
       @usage(Usage.input | Usage.output)
       namespace EventGridClient {
         model CloudEvent {
@@ -18,19 +17,19 @@ describe("models only", () => {
         }
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
-    strictEqual(sdkPackage.models.length, 1);
-    strictEqual(sdkPackage.models[0].name, "CloudEvent");
-    strictEqual(sdkPackage.clients.length, 0);
-  });
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 1);
+  strictEqual(sdkPackage.models[0].name, "CloudEvent");
+  strictEqual(sdkPackage.clients.length, 0);
+});
 
-  it("with azure and versioning decorators", async () => {
-    const runnerWithCore = await createSdkTestRunner({
-      librariesToAdd: [AzureCoreTestLibrary],
-      autoUsings: ["Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithCore.compile(`
+it("with azure and versioning decorators", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
       @usage(Usage.input | Usage.output)
       @versioned(ServiceApiVersions)
       namespace EventGridClient {
@@ -62,24 +61,23 @@ describe("models only", () => {
         }
       }
     `);
-    const sdkPackage = runnerWithCore.context.sdkPackage;
-    strictEqual(sdkPackage.models.length, 2);
-    const cloudEventModel = sdkPackage.models.find((x) => x.name === "CloudEvent");
-    ok(cloudEventModel);
-    strictEqual(cloudEventModel.properties.length, 1);
-    const idProperty = cloudEventModel.properties[0];
-    strictEqual(idProperty.name, "id");
-    strictEqual(idProperty.kind, "property");
-    deepStrictEqual(idProperty.apiVersions, ["2018-01-01", "2024-01-01"]);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 2);
+  const cloudEventModel = sdkPackage.models.find((x) => x.name === "CloudEvent");
+  ok(cloudEventModel);
+  strictEqual(cloudEventModel.properties.length, 1);
+  const idProperty = cloudEventModel.properties[0];
+  strictEqual(idProperty.name, "id");
+  strictEqual(idProperty.kind, "property");
+  deepStrictEqual(idProperty.apiVersions, ["2018-01-01", "2024-01-01"]);
 
-    const healthcareEventDataModel = sdkPackage.models.find(
-      (x) => x.name === "HealthcareFhirResourceCreatedEventData",
-    );
-    ok(healthcareEventDataModel);
-    strictEqual(healthcareEventDataModel.properties.length, 1);
-    const resourceVersionIdProperty = healthcareEventDataModel.properties[0];
-    strictEqual(resourceVersionIdProperty.name, "resourceVersionId");
-    strictEqual(resourceVersionIdProperty.kind, "property");
-    deepStrictEqual(resourceVersionIdProperty.apiVersions, ["2024-01-01"]);
-  });
+  const healthcareEventDataModel = sdkPackage.models.find(
+    (x) => x.name === "HealthcareFhirResourceCreatedEventData",
+  );
+  ok(healthcareEventDataModel);
+  strictEqual(healthcareEventDataModel.properties.length, 1);
+  const resourceVersionIdProperty = healthcareEventDataModel.properties[0];
+  strictEqual(resourceVersionIdProperty.name, "resourceVersionId");
+  strictEqual(resourceVersionIdProperty.kind, "property");
+  deepStrictEqual(resourceVersionIdProperty.apiVersions, ["2024-01-01"]);
 });
