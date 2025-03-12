@@ -420,10 +420,12 @@ describe("enum types", () => {
   });
 
   it("union as enum with hierarchy without flatten", async () => {
-    runner = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      "flatten-union-as-enum": false,
-    });
+    runner = await createSdkTestRunner(
+      {
+        emitterName: "@azure-tools/typespec-python",
+      },
+      { flattenUnionAsEnum: false },
+    );
     const { Foo } = (await runner.compile(
       `
         @service
@@ -454,10 +456,12 @@ describe("enum types", () => {
   });
 
   it("nullable union as enum with hierarchy without flatten", async () => {
-    runner = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      "flatten-union-as-enum": false,
-    });
+    runner = await createSdkTestRunner(
+      {
+        emitterName: "@azure-tools/typespec-python",
+      },
+      { flattenUnionAsEnum: false },
+    );
     const { Test } = (await runner.compile(
       `
         @service
@@ -576,10 +580,12 @@ describe("enum types", () => {
   });
 
   it("anonymous union as enum with hierarchy without flatten", async () => {
-    runner = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      "flatten-union-as-enum": false,
-    });
+    runner = await createSdkTestRunner(
+      {
+        emitterName: "@azure-tools/typespec-python",
+      },
+      { flattenUnionAsEnum: false },
+    );
     const { Test } = (await runner.compile(
       `
         @service

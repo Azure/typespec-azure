@@ -17,7 +17,7 @@ describe("load examples", () => {
   it("example config", async () => {
     runner = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-java",
-      "examples-directory": `./examples`,
+      "examples-dir": `./examples`,
     });
 
     await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
