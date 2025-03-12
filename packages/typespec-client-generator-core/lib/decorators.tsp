@@ -607,3 +607,25 @@ extern dec scope(target: Operation, scope?: valueof string);
  * ```
  */
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
+
+/**
+ * Add additional api versions that are possible for the client to use. Only adds these api versions to the exposed API version enum.
+ * Use if you want to generate an accurate API version enum, while not having to actually annotate the entire spec with versioning decorators,
+ * since we won't be using the versioning information on the generation side.
+ *
+ * @example
+ * ```typespec
+ * // main.tsp
+ * @versioned(Versions)
+ * namespace Contoso {
+ *  enum Versions { v4, v5 }
+ * }
+ *
+ * //client.tsp
+ * 
+ * enum AdditionalApiVersions { v1, v2, v3 }
+ * 
+ * @@additionalApiVersions(Contoso, AdditionalApiVersions)
+ * ```
+ */
+extern dec additionalApiVersions(target: Namespace, value: Enum, scope?: valueof string);

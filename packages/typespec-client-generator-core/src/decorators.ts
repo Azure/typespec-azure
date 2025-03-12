@@ -26,6 +26,7 @@ import {
 } from "@typespec/compiler";
 import {
   AccessDecorator,
+  AdditionalApiVersionsDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
   ClientDecorator,
@@ -1243,4 +1244,44 @@ function IsInScope(context: TCGCContext, entity: Operation): boolean {
     return false;
   }
   return true;
+}
+
+const additionalApiVersionsKey = createStateSymbol("additionalApiVersions");
+
+/**
+ * Add additional api versions that are possible for the client to use.
+ *
+ * @param context
+ * @param target Service namespace that has these additional api versions
+ * @param value Enum with the additional api versions
+ * @param scope
+ */
+export const $additionalApiVersions: AdditionalApiVersionsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  value: Enum,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(
+    context,
+    $additionalApiVersions,
+    additionalApiVersionsKey,
+    target,
+    value,
+    scope,
+  );
+};
+
+/**
+ * Get the additional api versions that are possible for the client to use.
+ *
+ * @param context
+ * @param target
+ * @returns
+ */
+export function getAdditionalApiVersions(
+  context: TCGCContext,
+  target: Namespace,
+): Enum | undefined {
+  return getScopedDecoratorData(context, additionalApiVersionsKey, target);
 }

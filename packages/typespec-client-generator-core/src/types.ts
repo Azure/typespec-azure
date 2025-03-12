@@ -48,6 +48,7 @@ import {
 import { isStream } from "@typespec/streams";
 import {
   getAccessOverride,
+  getAdditionalApiVersions,
   getAlternateType,
   getClientNamespace,
   getOverriddenClientMethod,
@@ -1958,6 +1959,10 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       const sdkVersionsEnum = diagnostics.pipe(
         getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
       );
+      const additionalApiVersions = getAdditionalApiVersions(context, client.service);
+      if (additionalApiVersions) {
+        // add additional api versions to the enum
+      }
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
