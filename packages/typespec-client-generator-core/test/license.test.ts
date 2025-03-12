@@ -76,8 +76,8 @@ describe("typespec-client-generator-core: license", () => {
       emitterName: "@azure-tools/typespec-python",
       license: {
         name: "MIT License",
-        header: `Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.`,
+        header: `Copyright (c) Microsoft Corporation. All rights reserved.\n
+Licensed under the MIT License. See LICENSE in the project root for license information.`,
       },
     });
 
@@ -93,8 +93,8 @@ describe("typespec-client-generator-core: license", () => {
     strictEqual(licenseInfo?.link, licenseMap["MIT License"].link);
     strictEqual(
       licenseInfo?.header,
-      `Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.`,
+      `Copyright (c) Microsoft Corporation. All rights reserved.\n
+Licensed under the MIT License. See LICENSE in the project root for license information.`,
     );
     strictEqual(
       licenseInfo?.description,
