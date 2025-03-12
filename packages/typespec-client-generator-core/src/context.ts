@@ -43,14 +43,6 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     emitterName: diagnostics.pipe(
       parseEmitterName(program, emitterName ?? program.emitters[0]?.metadata?.name),
     ),
-    getMutatedGlobalNamespace(): Namespace {
-      let globalNamespace = this.__mutatedGlobalNamespace;
-      if (!globalNamespace) {
-        globalNamespace = handleVersioningMutationForGlobalNamespace(this);
-        this.__mutatedGlobalNamespace = globalNamespace;
-      }
-      return globalNamespace;
-    },
 
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
@@ -68,6 +60,28 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     __knownScalars: getKnownScalars(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
+
+    getMutatedGlobalNamespace(): Namespace {
+      let globalNamespace = this.__mutatedGlobalNamespace;
+      if (!globalNamespace) {
+        globalNamespace = handleVersioningMutationForGlobalNamespace(this);
+        this.__mutatedGlobalNamespace = globalNamespace;
+      }
+      return globalNamespace;
+    },
+    getApiVersionsForType(type): string[] {
+      return this.__tspTypeToApiVersions.get(type) ?? [];
+    },
+    setApiVersionsForType(type, apiVersions: string[]): void {
+      const existingApiVersions = this.__tspTypeToApiVersions.get(type) ?? [];
+      const mergedApiVersions = [...existingApiVersions];
+      for (const apiVersion of apiVersions) {
+        if (!mergedApiVersions.includes(apiVersion)) {
+          mergedApiVersions.push(apiVersion);
+        }
+      }
+      this.__tspTypeToApiVersions.set(type, mergedApiVersions);
+    },
   };
 }
 
