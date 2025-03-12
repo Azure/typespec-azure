@@ -36,15 +36,16 @@ export interface TCGCContext {
   diagnostics: readonly Diagnostic[];
   emitterName: string;
   arm?: boolean;
-  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
-  namespaceFlag?: string;
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
+  /**
+   * @deprecated Use `namespaceFlag` instead.
+   */
   packageName?: string;
-  flattenUnionAsEnum?: boolean;
-  apiVersion?: string;
   examplesDir?: string;
+  namespaceFlag?: string;
+  apiVersion?: string;
   licenseName?: string;
   licenseLink?: string;
   licenseCompany?: string;
@@ -53,6 +54,7 @@ export interface TCGCContext {
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
+  flattenUnionAsEnum?: boolean;
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
@@ -64,8 +66,8 @@ export interface TCGCContext {
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
   __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
-  __originalProgram: Program;
   __pagedResultSet: Set<SdkType>;
+  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
@@ -83,13 +85,12 @@ export interface SdkContext<
 export interface SdkEmitterOptions {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
+  /**
+   * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
+   */
   "package-name"?: string;
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
-  /**
-   * @deprecated Use `examples-dir` instead.
-   */
-  "examples-directory"?: string;
   "examples-dir"?: string;
   "emitter-name"?: string;
   namespace?: string;
