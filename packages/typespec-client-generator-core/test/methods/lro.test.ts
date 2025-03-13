@@ -2,24 +2,26 @@ import { FinalStateValue } from "@azure-tools/typespec-azure-core";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
-import { createSdkTestRunner, hasFlag, SdkTestRunner } from "../test-host.js";
+import { isAzureCoreModel } from "../../src/public-utils.js";
+import { getAllModels } from "../../src/types.js";
+import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { hasFlag } from "../utils.js";
 
-describe("typespec-client-generator-core: long running operation metadata", () => {
-  let runner: SdkTestRunner;
+let runner: SdkTestRunner;
 
-  describe("data plane LRO templates", () => {
-    beforeEach(async () => {
-      runner = await createSdkTestRunner({
-        librariesToAdd: [AzureCoreTestLibrary],
-        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-      });
-      const baseCompile = runner.compile;
-      runner.compileWithVersionedService = async function (code) {
-        return await baseCompile(
-          `
+describe("data plane LRO templates", () => {
+  beforeEach(async () => {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+    });
+    const baseCompile = runner.compile;
+    runner.compileWithVersionedService = async function (code) {
+      return await baseCompile(
+        `
         @service
         @versioned(Versions)
         namespace TestClient;
@@ -34,17 +36,17 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           NoRepeatableRequests &
           NoClientRequestId>;
         ${code}`,
-          {
-            noEmit: true,
-          },
-        );
-      };
-    });
+        {
+          noEmit: true,
+        },
+      );
+    };
+  });
 
-    /** https://github.com/Azure/cadl-ranch/blob/6272003539d6e7d16bacfd846090520d70279dbd/packages/cadl-ranch-specs/http/azure/core/lro/standard/main.tsp#L124 */
-    describe("standard LRO template: Azure.Core.ResourceOperations", () => {
-      it("LongRunningResourceCreateOrReplace", async () => {
-        await runner.compileWithVersionedService(`
+  /** https://github.com/Azure/cadl-ranch/blob/6272003539d6e7d16bacfd846090520d70279dbd/packages/cadl-ranch-specs/http/azure/core/lro/standard/main.tsp#L124 */
+  describe("standard LRO template: Azure.Core.ResourceOperations", () => {
+    it("LongRunningResourceCreateOrReplace", async () => {
+      await runner.compileWithVersionedService(`
         @resource("users")
         model User {
           @key
@@ -57,64 +59,64 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         op createOrReplace is ResourceOperations.LongRunningResourceCreateOrReplace<User>;
     `);
 
-        const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "User");
-        ok(roundtripModel);
+      const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "User");
+      ok(roundtripModel);
 
-        const methods = runner.context.sdkPackage.clients[0].methods;
-        strictEqual(methods.length, 1);
-        const method = methods[0];
-        strictEqual(method.kind, "lro");
-        strictEqual(method.name, "createOrReplace");
-        assert.include(
-          method.parameters.map((m) => m.type),
-          roundtripModel,
-        );
-        const initialResponse = method.response.type;
-        ok(initialResponse);
-        strictEqual(initialResponse.kind, "model");
-        assert.isTrue(
-          hasFlag(initialResponse.usage, UsageFlags.LroInitial),
-          "the response of a lro method should have the usage of LroInitial",
-        );
-        strictEqual(initialResponse.serializationOptions.json?.name, "User");
+      const methods = runner.context.sdkPackage.clients[0].methods;
+      strictEqual(methods.length, 1);
+      const method = methods[0];
+      strictEqual(method.kind, "lro");
+      strictEqual(method.name, "createOrReplace");
+      assert.include(
+        method.parameters.map((m) => m.type),
+        roundtripModel,
+      );
+      const initialResponse = method.response.type;
+      ok(initialResponse);
+      strictEqual(initialResponse.kind, "model");
+      assert.isTrue(
+        hasFlag(initialResponse.usage, UsageFlags.LroInitial),
+        "the response of a lro method should have the usage of LroInitial",
+      );
+      strictEqual(initialResponse.serializationOptions.json?.name, "User");
 
-        const metadata = method.lroMetadata;
-        ok(metadata);
-        strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
-        assert.isUndefined(metadata.finalStep);
+      const metadata = method.lroMetadata;
+      ok(metadata);
+      strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
+      assert.isUndefined(metadata.finalStep);
 
-        const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusError",
-        );
-        ok(pollingModel);
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-          "polling model should have the usage of LroPolling",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Output),
-          "polling model should not be output",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Input),
-          "polling model should not be input",
-        );
-        strictEqual(pollingModel.serializationOptions.json?.name, "OperationStatus");
-        strictEqual(metadata.pollingStep.responseBody, pollingModel);
+      const pollingModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "OperationStatusError",
+      );
+      ok(pollingModel);
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+        "polling model should have the usage of LroPolling",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Output),
+        "polling model should not be output",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Input),
+        "polling model should not be input",
+      );
+      strictEqual(pollingModel.serializationOptions.json?.name, "OperationStatus");
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
-        strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
-        strictEqual(metadata.finalResponse?.result, roundtripModel);
-        assert.isTrue(
-          hasFlag(roundtripModel.usage, UsageFlags.LroFinalEnvelope),
-          "roundtrip model should have the usage of LroFinalEnvelope",
-        );
-        strictEqual(roundtripModel.serializationOptions.json?.name, "User");
-        assert.isUndefined(metadata.finalResponse?.resultPath);
-        assert.isUndefined(metadata.finalResponse?.resultSegments);
-      });
+      strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
+      strictEqual(metadata.finalResponse?.result, roundtripModel);
+      assert.isTrue(
+        hasFlag(roundtripModel.usage, UsageFlags.LroFinalEnvelope),
+        "roundtrip model should have the usage of LroFinalEnvelope",
+      );
+      strictEqual(roundtripModel.serializationOptions.json?.name, "User");
+      assert.isUndefined(metadata.finalResponse?.resultPath);
+      assert.isUndefined(metadata.finalResponse?.resultSegments);
+    });
 
-      it("LongRunningResourceDelete", async () => {
-        await runner.compileWithVersionedService(`
+    it("LongRunningResourceDelete", async () => {
+      await runner.compileWithVersionedService(`
         @resource("users")
         model User {
           @key
@@ -127,47 +129,47 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         op delete is ResourceOperations.LongRunningResourceDelete<User>;
     `);
 
-        const methods = runner.context.sdkPackage.clients[0].methods;
-        strictEqual(methods.length, 1);
-        const method = methods[0];
-        strictEqual(method.kind, "lro");
-        strictEqual(method.name, "delete");
-        assert.notInclude(
-          method.operation.parameters.map((m) => m.kind),
-          "body",
-        );
+      const methods = runner.context.sdkPackage.clients[0].methods;
+      strictEqual(methods.length, 1);
+      const method = methods[0];
+      strictEqual(method.kind, "lro");
+      strictEqual(method.name, "delete");
+      assert.notInclude(
+        method.operation.parameters.map((m) => m.kind),
+        "body",
+      );
 
-        const initialResponse = method.response.type;
-        strictEqual(initialResponse, undefined);
+      const initialResponse = method.response.type;
+      strictEqual(initialResponse, undefined);
 
-        const metadata = method.lroMetadata;
-        ok(metadata);
-        strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        strictEqual(metadata.finalStep?.kind, "noPollingResult");
+      const metadata = method.lroMetadata;
+      ok(metadata);
+      strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
+      strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
-        const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusError",
-        );
-        ok(pollingModel);
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-          "polling model should have the usage of LroPolling",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Output),
-          "polling model should not be output",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Input),
-          "polling model should not be input",
-        );
-        strictEqual(metadata.pollingStep.responseBody, pollingModel);
+      const pollingModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "OperationStatusError",
+      );
+      ok(pollingModel);
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+        "polling model should have the usage of LroPolling",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Output),
+        "polling model should not be output",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Input),
+        "polling model should not be input",
+      );
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
-        assert.isUndefined(metadata.finalResponse);
-      });
+      assert.isUndefined(metadata.finalResponse);
+    });
 
-      it("LongRunningResourceAction", async () => {
-        await runner.compileWithVersionedService(`
+    it("LongRunningResourceAction", async () => {
+      await runner.compileWithVersionedService(`
         @resource("users")
         model User {
           @key
@@ -189,68 +191,68 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
     `);
 
-        const methods = runner.context.sdkPackage.clients[0].methods;
-        strictEqual(methods.length, 1);
-        const method = methods[0];
-        strictEqual(method.kind, "lro");
-        strictEqual(method.name, "export");
-        assert.include(
-          method.parameters.map((m) => m.name),
-          "format",
-        );
+      const methods = runner.context.sdkPackage.clients[0].methods;
+      strictEqual(methods.length, 1);
+      const method = methods[0];
+      strictEqual(method.kind, "lro");
+      strictEqual(method.name, "export");
+      assert.include(
+        method.parameters.map((m) => m.name),
+        "format",
+      );
 
-        const initialResponse = method.response.type;
-        ok(initialResponse);
-        strictEqual(initialResponse.kind, "model");
-        assert.isTrue(
-          hasFlag(initialResponse.usage, UsageFlags.LroInitial),
-          "the response of a lro method should have the usage of LroInitial",
-        );
+      const initialResponse = method.response.type;
+      ok(initialResponse);
+      strictEqual(initialResponse.kind, "model");
+      assert.isTrue(
+        hasFlag(initialResponse.usage, UsageFlags.LroInitial),
+        "the response of a lro method should have the usage of LroInitial",
+      );
 
-        const metadata = method.lroMetadata;
-        ok(metadata);
-        strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
+      const metadata = method.lroMetadata;
+      ok(metadata);
+      strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
+      strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
 
-        const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusExportedUserError",
-        );
-        ok(pollingModel);
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-          "polling model should have the usage of LroPolling",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Output),
-          "polling model should not be output",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Input),
-          "polling model should not be input",
-        );
-        strictEqual(metadata.pollingStep.responseBody, pollingModel);
+      const pollingModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "OperationStatusExportedUserError",
+      );
+      ok(pollingModel);
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+        "polling model should have the usage of LroPolling",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Output),
+        "polling model should not be output",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Input),
+        "polling model should not be input",
+      );
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
-        const returnModel = runner.context.sdkPackage.models.find((m) => m.name === "ExportedUser");
-        ok(returnModel);
+      const returnModel = runner.context.sdkPackage.models.find((m) => m.name === "ExportedUser");
+      ok(returnModel);
 
-        strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
-        strictEqual(metadata.finalResponse?.result, returnModel);
-        strictEqual(metadata.finalResponse?.resultPath, "result");
-        // find the property
-        const resultProperty = pollingModel.properties.find((p) => p.name === "result");
-        ok(metadata.finalResponse?.resultSegments);
-        strictEqual(metadata.finalResponse?.resultSegments[0], resultProperty);
+      strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
+      strictEqual(metadata.finalResponse?.result, returnModel);
+      strictEqual(metadata.finalResponse?.resultPath, "result");
+      // find the property
+      const resultProperty = pollingModel.properties.find((p) => p.name === "result");
+      ok(metadata.finalResponse?.resultSegments);
+      strictEqual(metadata.finalResponse?.resultSegments[0], resultProperty);
 
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
-          "the polling model here is also the final envelope model, it should have the usage of LroFinalEnvelope",
-        );
-      });
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
+        "the polling model here is also the final envelope model, it should have the usage of LroFinalEnvelope",
+      );
     });
+  });
 
-    describe("RPC LRO templates", () => {
-      it("LongRunningRpcOperation", async () => {
-        await runner.compileWithVersionedService(`
+  describe("RPC LRO templates", () => {
+    it("LongRunningRpcOperation", async () => {
+      await runner.compileWithVersionedService(`
         model GenerationOptions {
           @doc("Prompt.")
           prompt: string;
@@ -279,72 +281,72 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         };
     `);
 
-        const inputModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "GenerationOptions",
-        );
-        ok(inputModel);
+      const inputModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "GenerationOptions",
+      );
+      ok(inputModel);
 
-        const methods = runner.context.sdkPackage.clients[0].methods;
-        strictEqual(methods.length, 1);
-        const method = methods[0];
-        strictEqual(method.kind, "lro");
-        strictEqual(method.name, "longRunningRpc");
-        assert.include(
-          method.parameters.map((m) => m.type),
-          inputModel,
-        );
+      const methods = runner.context.sdkPackage.clients[0].methods;
+      strictEqual(methods.length, 1);
+      const method = methods[0];
+      strictEqual(method.kind, "lro");
+      strictEqual(method.name, "longRunningRpc");
+      assert.include(
+        method.parameters.map((m) => m.type),
+        inputModel,
+      );
 
-        const initialResponse = method.response.type;
-        ok(initialResponse);
-        strictEqual(initialResponse.kind, "model");
-        assert.isTrue(
-          hasFlag(initialResponse.usage, UsageFlags.LroInitial),
-          "the response of a lro method should have the usage of LroInitial",
-        );
+      const initialResponse = method.response.type;
+      ok(initialResponse);
+      strictEqual(initialResponse.kind, "model");
+      assert.isTrue(
+        hasFlag(initialResponse.usage, UsageFlags.LroInitial),
+        "the response of a lro method should have the usage of LroInitial",
+      );
 
-        const metadata = method.lroMetadata;
-        ok(metadata);
-        strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
+      const metadata = method.lroMetadata;
+      ok(metadata);
+      strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
+      strictEqual(metadata.finalStep?.kind, "pollingSuccessProperty");
 
-        const pollingModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationStatusGenerationResultError",
-        );
-        ok(pollingModel);
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-          "polling model should have the usage of LroPolling",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Output),
-          "polling model should not be output",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Input),
-          "polling model should not be input",
-        );
-        strictEqual(metadata.pollingStep.responseBody, pollingModel);
+      const pollingModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "OperationStatusGenerationResultError",
+      );
+      ok(pollingModel);
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+        "polling model should have the usage of LroPolling",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Output),
+        "polling model should not be output",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Input),
+        "polling model should not be input",
+      );
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
-        const returnModel = runner.context.sdkPackage.models.find(
-          (m) => m.name === "GenerationResult",
-        );
-        ok(returnModel);
-        strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
-        strictEqual(metadata.finalResponse?.result, returnModel);
-        strictEqual(metadata.finalResponse?.resultPath, "result");
-        // find the property
-        const resultProperty = pollingModel.properties.find((p) => p.name === "result");
-        ok(metadata.finalResponse?.resultSegments);
-        strictEqual(metadata.finalResponse?.resultSegments[0], resultProperty);
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
-          "the polling model here is also the final envelope model, it should have the usage of LroFinalEnvelope",
-        );
-      });
+      const returnModel = runner.context.sdkPackage.models.find(
+        (m) => m.name === "GenerationResult",
+      );
+      ok(returnModel);
+      strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
+      strictEqual(metadata.finalResponse?.result, returnModel);
+      strictEqual(metadata.finalResponse?.resultPath, "result");
+      // find the property
+      const resultProperty = pollingModel.properties.find((p) => p.name === "result");
+      ok(metadata.finalResponse?.resultSegments);
+      strictEqual(metadata.finalResponse?.resultSegments[0], resultProperty);
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroFinalEnvelope),
+        "the polling model here is also the final envelope model, it should have the usage of LroFinalEnvelope",
+      );
     });
-    describe("Custom LRO", () => {
-      it("@lroResult with client name and/or encoded name", async () => {
-        await runner.compileWithBuiltInAzureCoreService(`
+  });
+  describe("Custom LRO", () => {
+    it("@lroResult with client name and/or encoded name", async () => {
+      await runner.compileWithBuiltInAzureCoreService(`
         op CustomLongRunningOperation<
           TParams extends TypeSpec.Reflection.Model,
           TResponse extends TypeSpec.Reflection.Model
@@ -400,28 +402,26 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         }
         `);
 
-        const client = runner.context.sdkPackage.clients[0];
-        const method = client.methods[0];
-        strictEqual(method.kind, "clientaccessor");
-        const resourceOpClient = method.response;
-        const lroMethod = resourceOpClient.methods[0];
-        strictEqual(lroMethod.kind, "lro");
-        const lroMetadata = lroMethod.lroMetadata;
-        ok(lroMetadata);
-        strictEqual(lroMetadata.finalResponse?.resultPath, "result"); // this is showing the typespec name, which is neither client name nor wire name
-        // find the model
-        const envelopeResult = runner.context.sdkPackage.models.find(
-          (m) => m.name === "OperationDetails",
-        );
-        const resultProperty = envelopeResult?.properties.find(
-          (p) => p.name === "longRunningResult",
-        );
-        ok(lroMetadata.finalResponse?.resultSegments);
-        strictEqual(resultProperty, lroMetadata.finalResponse?.resultSegments[0]);
-      });
+      const client = runner.context.sdkPackage.clients[0];
+      const method = client.methods[0];
+      strictEqual(method.kind, "clientaccessor");
+      const resourceOpClient = method.response;
+      const lroMethod = resourceOpClient.methods[0];
+      strictEqual(lroMethod.kind, "lro");
+      const lroMetadata = lroMethod.lroMetadata;
+      ok(lroMetadata);
+      strictEqual(lroMetadata.finalResponse?.resultPath, "result"); // this is showing the typespec name, which is neither client name nor wire name
+      // find the model
+      const envelopeResult = runner.context.sdkPackage.models.find(
+        (m) => m.name === "OperationDetails",
+      );
+      const resultProperty = envelopeResult?.properties.find((p) => p.name === "longRunningResult");
+      ok(lroMetadata.finalResponse?.resultSegments);
+      strictEqual(resultProperty, lroMetadata.finalResponse?.resultSegments[0]);
+    });
 
-      it("@pollingOperation", async () => {
-        await runner.compileWithVersionedService(`
+    it("@pollingOperation", async () => {
+      await runner.compileWithVersionedService(`
         @resource("analyze/jobs")
         model JobState {
           @key
@@ -458,46 +458,46 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         >;
     `);
 
-        const methods = runner.context.sdkPackage.clients[0].methods;
-        strictEqual(methods.length, 2);
-        const method = methods.find((m) => m.name === "analyze");
-        ok(method);
-        strictEqual(method.kind, "lro");
+      const methods = runner.context.sdkPackage.clients[0].methods;
+      strictEqual(methods.length, 2);
+      const method = methods.find((m) => m.name === "analyze");
+      ok(method);
+      strictEqual(method.kind, "lro");
 
-        assert.include(
-          method.parameters.map((m) => m.name),
-          "format",
-        );
+      assert.include(
+        method.parameters.map((m) => m.name),
+        "format",
+      );
 
-        const initialResponse = method.response.type;
-        assert.isUndefined(initialResponse);
+      const initialResponse = method.response.type;
+      assert.isUndefined(initialResponse);
 
-        const metadata = method.lroMetadata;
-        ok(metadata);
-        strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
-        strictEqual(metadata.finalStep?.kind, "noPollingResult");
+      const metadata = method.lroMetadata;
+      ok(metadata);
+      strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
+      strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
-        const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
-        ok(pollingModel);
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-          "polling model should have the usage of LroPolling",
-        );
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.Output),
-          "this polling model has output usage because there is a polling operation returning it",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Input),
-          "polling model should not be input",
-        );
-        strictEqual(metadata.pollingStep.responseBody, pollingModel);
+      const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
+      ok(pollingModel);
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+        "polling model should have the usage of LroPolling",
+      );
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.Output),
+        "this polling model has output usage because there is a polling operation returning it",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Input),
+        "polling model should not be input",
+      );
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
-        assert.isUndefined(metadata.finalResponse);
-      });
+      assert.isUndefined(metadata.finalResponse);
+    });
 
-      it("@pollingLocation", async () => {
-        await runner.compileWithVersionedService(`
+    it("@pollingLocation", async () => {
+      await runner.compileWithVersionedService(`
         @resource("analyze/jobs")
         model JobState {
           @key
@@ -538,47 +538,47 @@ describe("typespec-client-generator-core: long running operation metadata", () =
         >;
     `);
 
-        const methods = runner.context.sdkPackage.clients[0].methods;
-        strictEqual(methods.length, 2);
-        const method = methods.find((m) => m.name === "analyze");
-        ok(method);
-        strictEqual(method.kind, "lro");
+      const methods = runner.context.sdkPackage.clients[0].methods;
+      strictEqual(methods.length, 2);
+      const method = methods.find((m) => m.name === "analyze");
+      ok(method);
+      strictEqual(method.kind, "lro");
 
-        assert.include(
-          method.parameters.map((m) => m.name),
-          "format",
-        );
+      assert.include(
+        method.parameters.map((m) => m.name),
+        "format",
+      );
 
-        const initialResponse = method.response.type;
-        assert.isUndefined(initialResponse);
+      const initialResponse = method.response.type;
+      assert.isUndefined(initialResponse);
 
-        const metadata = method.lroMetadata;
-        ok(metadata);
-        strictEqual(metadata.finalStateVia, FinalStateValue.location);
-        strictEqual(metadata.finalStep?.kind, "noPollingResult");
+      const metadata = method.lroMetadata;
+      ok(metadata);
+      strictEqual(metadata.finalStateVia, FinalStateValue.location);
+      strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
-        const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
-        ok(pollingModel);
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-          "polling model should have the usage of LroPolling",
-        );
-        assert.isTrue(
-          hasFlag(pollingModel.usage, UsageFlags.Output),
-          "this polling model has output usage because there is a polling operation returning it",
-        );
-        assert.isFalse(
-          hasFlag(pollingModel.usage, UsageFlags.Input),
-          "polling model should not be input",
-        );
-        strictEqual(metadata.pollingStep.responseBody, pollingModel);
+      const pollingModel = runner.context.sdkPackage.models.find((m) => m.name === "JobState");
+      ok(pollingModel);
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+        "polling model should have the usage of LroPolling",
+      );
+      assert.isTrue(
+        hasFlag(pollingModel.usage, UsageFlags.Output),
+        "this polling model has output usage because there is a polling operation returning it",
+      );
+      assert.isFalse(
+        hasFlag(pollingModel.usage, UsageFlags.Input),
+        "polling model should not be input",
+      );
+      strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
-        assert.isUndefined(metadata.finalResponse);
-      });
+      assert.isUndefined(metadata.finalResponse);
     });
+  });
 
-    it("LRO defined in different namespace", async () => {
-      await runner.compile(`
+  it("LRO defined in different namespace", async () => {
+    await runner.compile(`
         @service
         @versioned(Versions)
         namespace TestClient {
@@ -610,41 +610,41 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           @get
           op poll(): TestClient.PollResponse;
         }`);
-      const method = runner.context.sdkPackage.clients[0].methods.find(
-        (m) => m.name === "longRunning",
-      );
-      ok(method);
-      strictEqual(method.kind, "lro");
+    const method = runner.context.sdkPackage.clients[0].methods.find(
+      (m) => m.name === "longRunning",
+    );
+    ok(method);
+    strictEqual(method.kind, "lro");
 
-      const initialResponse = method.response.type;
-      assert.isUndefined(initialResponse);
+    const initialResponse = method.response.type;
+    assert.isUndefined(initialResponse);
 
-      const metadata = method.lroMetadata;
-      ok(metadata);
-      const pollingModel = metadata.pollingStep.responseBody;
-      ok(pollingModel);
-      assert.isTrue(
-        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-        "polling model should have the usage of LroPolling",
-      );
-      assert.isFalse(
-        hasFlag(pollingModel.usage, UsageFlags.Output),
-        "polling model should not be output",
-      );
-      assert.isFalse(
-        hasFlag(pollingModel.usage, UsageFlags.Input),
-        "polling model should not be input",
-      );
+    const metadata = method.lroMetadata;
+    ok(metadata);
+    const pollingModel = metadata.pollingStep.responseBody;
+    ok(pollingModel);
+    assert.isTrue(
+      hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+      "polling model should have the usage of LroPolling",
+    );
+    assert.isFalse(
+      hasFlag(pollingModel.usage, UsageFlags.Output),
+      "polling model should not be output",
+    );
+    assert.isFalse(
+      hasFlag(pollingModel.usage, UsageFlags.Input),
+      "polling model should not be input",
+    );
+  });
+
+  it("LRO final envelope result correctly marked when only used in ignored polling operation", async () => {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+      emitterName: "@azure-tools/typespec-java",
     });
-
-    it("LRO final envelope result correctly marked when only used in ignored polling operation", async () => {
-      const runnerWithCore = await createSdkTestRunner({
-        librariesToAdd: [AzureCoreTestLibrary],
-        autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-        emitterName: "@azure-tools/typespec-java",
-      });
-      await runnerWithCore.compileWithCustomization(
-        `
+    await runnerWithCore.compileWithCustomization(
+      `
         @useDependency(Versions.v1_0_Preview_2)
         @server("http://localhost:3000", "endpoint")
         @service()
@@ -759,7 +759,7 @@ describe("typespec-client-generator-core: long running operation metadata", () =
             AnalyzeOperation
           >;
           `,
-        `
+      `
           namespace ClientCustomizations;
           @client({
             name: "DocumentIntelligenceClient",
@@ -769,25 +769,25 @@ describe("typespec-client-generator-core: long running operation metadata", () =
             analyzeDocument is DocumentIntelligence.analyzeDocument;
           }
           `,
-      );
-      const models = runnerWithCore.context.sdkPackage.models;
-      strictEqual(models.length, 4);
-      const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
-      ok(analyzeOperationModel);
-      strictEqual(analyzeOperationModel.usage, UsageFlags.LroFinalEnvelope | UsageFlags.LroPolling);
-    });
+    );
+    const models = runnerWithCore.context.sdkPackage.models;
+    strictEqual(models.length, 4);
+    const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
+    ok(analyzeOperationModel);
+    strictEqual(analyzeOperationModel.usage, UsageFlags.LroFinalEnvelope | UsageFlags.LroPolling);
   });
+});
 
-  describe("Arm LRO templates", () => {
-    beforeEach(async () => {
-      runner = await createSdkTestRunner({
-        librariesToAdd: [AzureCoreTestLibrary, AzureResourceManagerTestLibrary, OpenAPITestLibrary],
-        autoUsings: ["Azure.Core", "Azure.Core.Traits", "Azure.ResourceManager"],
-      });
-      const baseCompile = runner.compile;
-      runner.compileWithVersionedService = async function (code) {
-        return await baseCompile(
-          `
+describe("Arm LRO templates", () => {
+  beforeEach(async () => {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary, AzureResourceManagerTestLibrary, OpenAPITestLibrary],
+      autoUsings: ["Azure.Core", "Azure.Core.Traits", "Azure.ResourceManager"],
+    });
+    const baseCompile = runner.compile;
+    runner.compileWithVersionedService = async function (code) {
+      return await baseCompile(
+        `
         @armProviderNamespace
         @service
         @versioned(Versions)
@@ -798,15 +798,15 @@ describe("typespec-client-generator-core: long running operation metadata", () =
           v1: "v1",
         }
         ${code}`,
-          {
-            noEmit: true,
-          },
-        );
-      };
-    });
+        {
+          noEmit: true,
+        },
+      );
+    };
+  });
 
-    it("ArmResourceCreateOrReplaceAsync", async () => {
-      await runner.compileWithVersionedService(`
+  it("ArmResourceCreateOrReplaceAsync", async () => {
+    await runner.compileWithVersionedService(`
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
@@ -817,70 +817,70 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         op createOrReplace is ArmResourceCreateOrReplaceAsync<Employee>;
     `);
-      const methods = runner.context.sdkPackage.clients[0].methods;
-      strictEqual(methods.length, 1);
-      const method = methods[0];
-      strictEqual(method.kind, "lro");
-      strictEqual(method.name, "createOrReplace");
-      assert.include(
-        method.parameters.map((m) => m.name),
-        "employeeName",
-      );
-      assert.include(
-        method.parameters.map((m) => m.name),
-        "resource",
-      );
+    const methods = runner.context.sdkPackage.clients[0].methods;
+    strictEqual(methods.length, 1);
+    const method = methods[0];
+    strictEqual(method.kind, "lro");
+    strictEqual(method.name, "createOrReplace");
+    assert.include(
+      method.parameters.map((m) => m.name),
+      "employeeName",
+    );
+    assert.include(
+      method.parameters.map((m) => m.name),
+      "resource",
+    );
 
-      const initialResponse = method.response.type;
-      ok(initialResponse);
-      strictEqual(initialResponse.kind, "model");
-      assert.isTrue(
-        hasFlag(initialResponse.usage, UsageFlags.LroInitial),
-        "the response of a lro method should have the usage of LroInitial",
-      );
+    const initialResponse = method.response.type;
+    ok(initialResponse);
+    strictEqual(initialResponse.kind, "model");
+    assert.isTrue(
+      hasFlag(initialResponse.usage, UsageFlags.LroInitial),
+      "the response of a lro method should have the usage of LroInitial",
+    );
 
-      const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "Employee");
-      ok(roundtripModel);
-      strictEqual(
-        initialResponse,
-        roundtripModel,
-        "in this case the initial response is the same as the final",
-      );
-      assert.include(
-        method.parameters.map((m) => m.type),
-        roundtripModel,
-      );
-      // validate the model should be roundtrip here
-      assert.isTrue(
-        hasFlag(roundtripModel.usage, UsageFlags.Input | UsageFlags.Output),
-        "model should be input and output",
-      );
-      strictEqual(roundtripModel.serializationOptions.json?.name, "Employee");
+    const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "Employee");
+    ok(roundtripModel);
+    strictEqual(
+      initialResponse,
+      roundtripModel,
+      "in this case the initial response is the same as the final",
+    );
+    assert.include(
+      method.parameters.map((m) => m.type),
+      roundtripModel,
+    );
+    // validate the model should be roundtrip here
+    assert.isTrue(
+      hasFlag(roundtripModel.usage, UsageFlags.Input | UsageFlags.Output),
+      "model should be input and output",
+    );
+    strictEqual(roundtripModel.serializationOptions.json?.name, "Employee");
 
-      const metadata = method.lroMetadata;
-      ok(metadata);
-      strictEqual(metadata.finalStateVia, FinalStateValue.azureAsyncOperation);
-      strictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    const metadata = method.lroMetadata;
+    ok(metadata);
+    strictEqual(metadata.finalStateVia, FinalStateValue.azureAsyncOperation);
+    strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
-      // ARM LRO core types are different
-      const pollingModel = runner.context.sdkPackage.models.find(
-        (m) => m.name === "ArmOperationStatusResourceProvisioningState",
-      );
-      ok(pollingModel);
-      strictEqual(metadata.pollingStep.responseBody, pollingModel);
-      assert.isTrue(
-        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-        "polling model should have the usage of LroPolling",
-      );
+    // ARM LRO core types are different
+    const pollingModel = runner.context.sdkPackage.models.find(
+      (m) => m.name === "ArmOperationStatusResourceProvisioningState",
+    );
+    ok(pollingModel);
+    strictEqual(metadata.pollingStep.responseBody, pollingModel);
+    assert.isTrue(
+      hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+      "polling model should have the usage of LroPolling",
+    );
 
-      strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
-      strictEqual(metadata.finalResponse?.result, roundtripModel);
-      assert.isUndefined(metadata.finalResponse.resultPath);
-      assert.isUndefined(metadata.finalResponse.resultSegments);
-    });
+    strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
+    strictEqual(metadata.finalResponse?.result, roundtripModel);
+    assert.isUndefined(metadata.finalResponse.resultPath);
+    assert.isUndefined(metadata.finalResponse.resultSegments);
+  });
 
-    it("ArmResourceDeleteWithoutOkAsync", async () => {
-      await runner.compileWithVersionedService(`
+  it("ArmResourceDeleteWithoutOkAsync", async () => {
+    await runner.compileWithVersionedService(`
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
@@ -891,54 +891,54 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         op delete is ArmResourceDeleteWithoutOkAsync<Employee>;
     `);
-      const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "Employee");
-      assert.isUndefined(roundtripModel);
-      const methods = runner.context.sdkPackage.clients[0].methods;
-      strictEqual(methods.length, 1);
-      const method = methods[0];
-      strictEqual(method.kind, "lro");
-      strictEqual(method.name, "delete");
-      assert.include(
-        method.parameters.map((m) => m.name),
-        "employeeName",
-      );
-      assert.notInclude(
-        method.parameters.map((m) => m.name),
-        "resource",
-      );
+    const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "Employee");
+    assert.isUndefined(roundtripModel);
+    const methods = runner.context.sdkPackage.clients[0].methods;
+    strictEqual(methods.length, 1);
+    const method = methods[0];
+    strictEqual(method.kind, "lro");
+    strictEqual(method.name, "delete");
+    assert.include(
+      method.parameters.map((m) => m.name),
+      "employeeName",
+    );
+    assert.notInclude(
+      method.parameters.map((m) => m.name),
+      "resource",
+    );
 
-      const initialResponse = method.response.type;
-      assert.isUndefined(initialResponse);
+    const initialResponse = method.response.type;
+    assert.isUndefined(initialResponse);
 
-      const metadata = method.lroMetadata;
-      ok(metadata);
-      strictEqual(metadata.finalStateVia, FinalStateValue.location);
-      strictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    const metadata = method.lroMetadata;
+    ok(metadata);
+    strictEqual(metadata.finalStateVia, FinalStateValue.location);
+    strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
-      // ARM LRO core types are different
-      const pollingModel = runner.context.sdkPackage.models.find(
-        (m) => m.name === "ArmOperationStatusResourceProvisioningState",
-      );
-      ok(pollingModel);
-      strictEqual(metadata.pollingStep.responseBody, pollingModel);
-      assert.isTrue(
-        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-        "polling model should have the usage of LroPolling",
-      );
-      assert.isFalse(
-        hasFlag(pollingModel.usage, UsageFlags.Output),
-        "polling model should not be output",
-      );
-      assert.isFalse(
-        hasFlag(pollingModel.usage, UsageFlags.Input),
-        "polling model should not be input",
-      );
+    // ARM LRO core types are different
+    const pollingModel = runner.context.sdkPackage.models.find(
+      (m) => m.name === "ArmOperationStatusResourceProvisioningState",
+    );
+    ok(pollingModel);
+    strictEqual(metadata.pollingStep.responseBody, pollingModel);
+    assert.isTrue(
+      hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+      "polling model should have the usage of LroPolling",
+    );
+    assert.isFalse(
+      hasFlag(pollingModel.usage, UsageFlags.Output),
+      "polling model should not be output",
+    );
+    assert.isFalse(
+      hasFlag(pollingModel.usage, UsageFlags.Input),
+      "polling model should not be input",
+    );
 
-      assert.isUndefined(metadata.finalResponse);
-    });
+    assert.isUndefined(metadata.finalResponse);
+  });
 
-    it("ArmResourceActionAsync", async () => {
-      await runner.compileWithVersionedService(`
+  it("ArmResourceActionAsync", async () => {
+    await runner.compileWithVersionedService(`
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
         }
@@ -950,48 +950,177 @@ describe("typespec-client-generator-core: long running operation metadata", () =
 
         op actionAsync is ArmResourceActionAsync<Employee, void, void>;
     `);
-      const methods = runner.context.sdkPackage.clients[0].methods;
-      strictEqual(methods.length, 1);
-      const method = methods[0];
-      strictEqual(method.kind, "lro");
-      strictEqual(method.name, "actionAsync");
-      assert.include(
-        method.parameters.map((m) => m.name),
-        "employeeName",
-      );
+    const methods = runner.context.sdkPackage.clients[0].methods;
+    strictEqual(methods.length, 1);
+    const method = methods[0];
+    strictEqual(method.kind, "lro");
+    strictEqual(method.name, "actionAsync");
+    assert.include(
+      method.parameters.map((m) => m.name),
+      "employeeName",
+    );
 
-      const initialResponse = method.response.type;
-      assert.isUndefined(initialResponse);
+    const initialResponse = method.response.type;
+    assert.isUndefined(initialResponse);
 
-      const metadata = method.lroMetadata;
-      ok(metadata);
-      strictEqual(metadata.finalStateVia, FinalStateValue.location);
-      strictEqual(metadata.finalStep?.kind, "finalOperationLink");
+    const metadata = method.lroMetadata;
+    ok(metadata);
+    strictEqual(metadata.finalStateVia, FinalStateValue.location);
+    strictEqual(metadata.finalStep?.kind, "finalOperationLink");
 
-      // ARM LRO core types are different
-      const pollingModel = runner.context.sdkPackage.models.find(
-        (m) => m.name === "ArmOperationStatusResourceProvisioningState",
-      );
-      ok(pollingModel);
-      strictEqual(metadata.pollingStep.responseBody, pollingModel);
-      assert.isTrue(
-        hasFlag(pollingModel.usage, UsageFlags.LroPolling),
-        "polling model should have the usage of LroPolling",
-      );
-      assert.isFalse(
-        hasFlag(pollingModel.usage, UsageFlags.Output),
-        "polling model should not be output",
-      );
-      assert.isFalse(
-        hasFlag(pollingModel.usage, UsageFlags.Input),
-        "polling model should not be input",
-      );
-      strictEqual(
-        metadata.pollingStep.responseBody?.name,
-        "ArmOperationStatusResourceProvisioningState",
-      );
+    // ARM LRO core types are different
+    const pollingModel = runner.context.sdkPackage.models.find(
+      (m) => m.name === "ArmOperationStatusResourceProvisioningState",
+    );
+    ok(pollingModel);
+    strictEqual(metadata.pollingStep.responseBody, pollingModel);
+    assert.isTrue(
+      hasFlag(pollingModel.usage, UsageFlags.LroPolling),
+      "polling model should have the usage of LroPolling",
+    );
+    assert.isFalse(
+      hasFlag(pollingModel.usage, UsageFlags.Output),
+      "polling model should not be output",
+    );
+    assert.isFalse(
+      hasFlag(pollingModel.usage, UsageFlags.Input),
+      "polling model should not be input",
+    );
+    strictEqual(
+      metadata.pollingStep.responseBody?.name,
+      "ArmOperationStatusResourceProvisioningState",
+    );
 
-      assert.isUndefined(metadata.finalResponse);
+    assert.isUndefined(metadata.finalResponse);
+  });
+});
+it("customized lro delete", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
+      @versioned(MyVersions)
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace My.Service;
+
+      enum MyVersions {
+        @useDependency(Versions.v1_0_Preview_2)
+        v1: "v1",
+      }
+
+      op delete(): {
+        ...AcceptedResponse,
+        @header("Location")
+        @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>)
+        @Azure.Core.finalLocation(void)
+        location?: string;
+      };
+
+      @Azure.Core.lroStatus
+      union ResourceProvisioningState {
+        Succeeded: "Succeeded",
+        Failed: "Failed",
+        Canceled: "Canceled",
+        string,
+      }
+
+      model ArmOperationStatus {
+        @Azure.Core.lroStatus
+        status: ResourceProvisioningState;
+        @key
+        @path
+        @segment("operationStatuses")
+        id: Azure.Core.uuid;
+        @visibility(Lifecycle.Read)
+        name?: string;
+      }
+    `);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 1);
+  strictEqual(sdkPackage.enums.length, 2);
+});
+describe("getLroMetadata", () => {
+  const lroCode = `
+    @versioned(Versions)
+    @service(#{title: "Test Service"})
+    namespace TestService;
+    alias ResourceOperations = Azure.Core.ResourceOperations<NoConditionalRequests &
+    NoRepeatableRequests &
+    NoClientRequestId>;
+
+    @doc("The API version.")
+    enum Versions {
+      @doc("The 2022-12-01-preview version.")
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
+
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+    @key
+    @visibility(Lifecycle.Read)
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The role of user")
+    role: string;
+    }
+
+    @doc("The parameters for exporting a user.")
+    model UserExportParams {
+    @query
+    @doc("The format of the data.")
+    format: string;
+    }
+
+    @doc("The exported user data.")
+    model ExportedUser {
+    @doc("The name of user.")
+    name: string;
+
+    @doc("The exported URI.")
+    resourceUri: string;
+    }
+
+    op export is ResourceOperations.LongRunningResourceAction<User, UserExportParams, ExportedUser>;
+  `;
+  it("filter-out-core-models true", async () => {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+      emitterName: "@azure-tools/typespec-java",
     });
+    await runnerWithCore.compile(lroCode);
+    const models = runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
+    strictEqual(models.length, 1);
+    deepStrictEqual(models[0].name, "ExportedUser");
+  });
+  it("filter-out-core-models false", async () => {
+    const runnerWithCore = await createSdkTestRunner({
+      librariesToAdd: [AzureCoreTestLibrary],
+      autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithCore.compile(lroCode);
+    const models = getAllModels(runnerWithCore.context);
+    strictEqual(models.length, 8);
+    // there should only be one non-core model
+    deepStrictEqual(
+      models.map((x) => x.name).sort(),
+      [
+        "ResourceOperationStatusUserExportedUserError",
+        "OperationState",
+        "Error",
+        "InnerError",
+        "ExportedUser",
+        "ErrorResponse",
+        "OperationStatusExportedUserError",
+        "Versions",
+      ].sort(),
+    );
   });
 });
