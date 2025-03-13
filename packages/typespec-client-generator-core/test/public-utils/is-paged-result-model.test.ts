@@ -17,21 +17,21 @@ it("normal paged model", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      @pagedResult
-      model TestResult {
-        @items
-        value: Test[];
+    @pagedResult
+    model TestResult {
+      @items
+      value: Test[];
 
-        @nextLink
-        nextLink?: url;
-      }
+      @nextLink
+      nextLink?: url;
+    }
 
-      model Test {
-        prop: string;
-      }
+    model Test {
+      prop: string;
+    }
 
-      op test(): TestResult;
-    `);
+    op test(): TestResult;
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   ok(
@@ -46,14 +46,14 @@ it("template paged model", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      model TestResult is Page<Test>;
+    model TestResult is Page<Test>;
 
-      model Test {
-        prop: string;
-      }
+    model Test {
+      prop: string;
+    }
 
-      op test(): TestResult;
-    `);
+    op test(): TestResult;
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   ok(
@@ -68,12 +68,12 @@ it("another usage of template paged model", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      model Test {
-        prop: string;
-      }
+    model Test {
+      prop: string;
+    }
 
-      op test(): Page<Test>;
-    `);
+    op test(): Page<Test>;
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   ok(
@@ -88,14 +88,14 @@ it("paged model use template list", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      model Test {
-        prop: string;
-      }
+    model Test {
+      prop: string;
+    }
 
-      op testTemplate<T extends {}>(): Page<T>;
+    op testTemplate<T extends {}>(): Page<T>;
 
-      op test is testTemplate<Test>;
-    `);
+    op test is testTemplate<Test>;
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   ok(

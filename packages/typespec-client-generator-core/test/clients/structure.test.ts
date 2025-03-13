@@ -16,17 +16,17 @@ beforeEach(async () => {
 it("normal client", async () => {
   await runner.compile(
     `
-      @service(#{
-        title: "Pet Store",
-      })
-      namespace PetStore;
+    @service(#{
+      title: "Pet Store",
+    })
+    namespace PetStore;
 
-      @route("/feed")
-      op feed(): void;
+    @route("/feed")
+    op feed(): void;
 
-      @route("/pet")
-      op pet(): void;
-      `,
+    @route("/pet")
+    op pet(): void;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -49,33 +49,33 @@ it("arm client with operation groups", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithArm.compile(`
-      @armProviderNamespace("My.Service")
-      @server("http://localhost:3000", "endpoint")
-      @service(#{title: "My.Service"})
-      @versioned(Versions)
-      @armCommonTypesVersion(CommonTypes.Versions.v5)
-      namespace My.Service;
+    @armProviderNamespace("My.Service")
+    @server("http://localhost:3000", "endpoint")
+    @service(#{title: "My.Service"})
+    @versioned(Versions)
+    @armCommonTypesVersion(CommonTypes.Versions.v5)
+    namespace My.Service;
 
-      /** Api versions */
-      enum Versions {
-        /** 2024-04-01-preview api version */
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        V2024_04_01_PREVIEW: "2024-04-01-preview",
-      }
+    /** Api versions */
+    enum Versions {
+      /** 2024-04-01-preview api version */
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      V2024_04_01_PREVIEW: "2024-04-01-preview",
+    }
 
-      model TestTrackedResource is TrackedResource<TestTrackedResourceProperties> {
-        ...ResourceNameParameter<TestTrackedResource>;
-      }
+    model TestTrackedResource is TrackedResource<TestTrackedResourceProperties> {
+      ...ResourceNameParameter<TestTrackedResource>;
+    }
 
-      model TestTrackedResourceProperties {
-        description?: string;
-      }
+    model TestTrackedResourceProperties {
+      description?: string;
+    }
 
-      @armResourceOperations
-      interface Tests {
-        get is ArmResourceRead<TestTrackedResource>;
-      }
-    `);
+    @armResourceOperations
+    interface Tests {
+      get is ArmResourceRead<TestTrackedResource>;
+    }
+  `);
 
   const sdkPackage = runnerWithArm.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -105,38 +105,38 @@ it("arm client with operation groups", async () => {
 it("client with sub clients", async () => {
   await runner.compile(
     `
-      @service(#{
-        title: "Pet Store",
-      })
-      namespace PetStore;
+    @service(#{
+      title: "Pet Store",
+    })
+    namespace PetStore;
 
-      @route("/pets")
-      namespace Pets {
-        @route("/dogs")
-        interface Dogs {
-          @route("/feed")
-          feed(): void;
-          @route("/pet")
-          pet(): void;
-        }
-
-        @route("/cats")
-        interface Cats {
-          @route("/feed")
-          op feed(): void;
-          @route("/pet")
-          op pet(): void;
-        }
+    @route("/pets")
+    namespace Pets {
+      @route("/dogs")
+      interface Dogs {
+        @route("/feed")
+        feed(): void;
+        @route("/pet")
+        pet(): void;
       }
 
-      @route("/actions")
-      interface Actions {
-        @route("/open")
-        open(): void;
-        @route("/close")
-        close(): void;
+      @route("/cats")
+      interface Cats {
+        @route("/feed")
+        op feed(): void;
+        @route("/pet")
+        op pet(): void;
       }
-      `,
+    }
+
+    @route("/actions")
+    interface Actions {
+      @route("/open")
+      open(): void;
+      @route("/close")
+      close(): void;
+    }
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -187,50 +187,50 @@ it("client with sub clients", async () => {
 it("client with sub client and sub client has extra initialization paramters", async () => {
   await runner.compileWithCustomization(
     `
-      @service(#{
-        title: "Azure AI Face API",
-      })
-      namespace Face;
+    @service(#{
+      title: "Azure AI Face API",
+    })
+    namespace Face;
 
-      @route("/largefacelists")
-      interface FaceListOperations {
-        op getLargeFaceList(@query largeFaceListId: string): void;
-      }
+    @route("/largefacelists")
+    interface FaceListOperations {
+      op getLargeFaceList(@query largeFaceListId: string): void;
+    }
 
-      @route("/largepersongroups")
-      interface PersonGroupOperations {
-        op getLargePersonGroup(@query largePersonGroupId: string): void;
-      }
-      `,
+    @route("/largepersongroups")
+    interface PersonGroupOperations {
+      op getLargePersonGroup(@query largePersonGroupId: string): void;
+    }
+    `,
     `
-      @client(
-        {
-          name: "FaceAdministrationClient",
-          service: Face,
-        }
-      )
-      namespace FaceAdministrationClient {
-        model LargeFaceListClientOptions {
-          largeFaceListId: string;
-        }
-
-        model LargePersonGroupClientOptions {
-          largePersonGroupId: string;
-        }
-
-        @operationGroup
-        @clientInitialization(LargeFaceListClientOptions)
-        interface LargeFaceList {
-          get is Face.FaceListOperations.getLargeFaceList;
-        }
-
-        @operationGroup
-        @clientInitialization(LargePersonGroupClientOptions)
-        interface LargePersonGroup {
-          get is Face.PersonGroupOperations.getLargePersonGroup;
-        }
+    @client(
+      {
+        name: "FaceAdministrationClient",
+        service: Face,
       }
-      `,
+    )
+    namespace FaceAdministrationClient {
+      model LargeFaceListClientOptions {
+        largeFaceListId: string;
+      }
+
+      model LargePersonGroupClientOptions {
+        largePersonGroupId: string;
+      }
+
+      @operationGroup
+      @clientInitialization(LargeFaceListClientOptions)
+      interface LargeFaceList {
+        get is Face.FaceListOperations.getLargeFaceList;
+      }
+
+      @operationGroup
+      @clientInitialization(LargePersonGroupClientOptions)
+      interface LargePersonGroup {
+        get is Face.PersonGroupOperations.getLargePersonGroup;
+      }
+    }
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -266,40 +266,40 @@ it("client with sub client and sub client has extra initialization paramters", a
 it("client with sub client and sub client can also be initialized individually", async () => {
   await runner.compileWithCustomization(
     `
-      @service(#{
-        title: "Pet Store",
-      })
-      namespace PetStore;
+    @service(#{
+      title: "Pet Store",
+    })
+    namespace PetStore;
 
-      @route("/pets")
-      namespace Pets {
-        @route("/feed")
-        op feed(): void;
-        @route("/pet")
-        op pet(): void;
-      }
+    @route("/pets")
+    namespace Pets {
+      @route("/feed")
+      op feed(): void;
+      @route("/pet")
+      op pet(): void;
+    }
 
-      @route("/actions")
-      namespace Actions {
-        @route("/open")
-        op open(): void;
-        @route("/close")
-        op close(): void;
-      }
-      `,
+    @route("/actions")
+    namespace Actions {
+      @route("/open")
+      op open(): void;
+      @route("/close")
+      op close(): void;
+    }
+    `,
     `
-      @@clientInitialization(PetStore.Pets,
-        {
-          initializedBy: InitializedBy.individually | InitializedBy.parent,
-        }
-      );
+    @@clientInitialization(PetStore.Pets,
+      {
+        initializedBy: InitializedBy.individually | InitializedBy.parent,
+      }
+    );
 
-      @@clientInitialization(PetStore.Actions,
-        {
-          initializedBy: InitializedBy.individually | InitializedBy.parent,
-        }
-      );
-      `,
+    @@clientInitialization(PetStore.Actions,
+      {
+        initializedBy: InitializedBy.individually | InitializedBy.parent,
+      }
+    );
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -339,27 +339,27 @@ it("client with sub client and sub client can also be initialized individually",
 it("client with sub client and sub client can also be initialized individually with extra paramters", async () => {
   await runner.compileWithCustomization(
     `
-      @service
-      namespace ContainerClient {
-        interface Blob {
-          @route("/blob")
-          op download(@path containerName: string, @path blobName: string): void;
-        }
+    @service
+    namespace ContainerClient {
+      interface Blob {
+        @route("/blob")
+        op download(@path containerName: string, @path blobName: string): void;
       }
-      `,
+    }
+    `,
     `
-      model ContainerClientInitialization {
-        containerName: string
-      };
+    model ContainerClientInitialization {
+      containerName: string
+    };
 
-      model BlobClientInitialization {
-        containerName: string,
-        blobName: string
-      };
+    model BlobClientInitialization {
+      containerName: string,
+      blobName: string
+    };
 
-      @@clientInitialization(ContainerClient, {parameters: ContainerClientInitialization});
-      @@clientInitialization(ContainerClient.Blob, {parameters: BlobClientInitialization, initializedBy: InitializedBy.individually | InitializedBy.parent});
-      `,
+    @@clientInitialization(ContainerClient, {parameters: ContainerClientInitialization});
+    @@clientInitialization(ContainerClient.Blob, {parameters: BlobClientInitialization, initializedBy: InitializedBy.individually | InitializedBy.parent});
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -411,12 +411,12 @@ it("first level client could not be initialized by parent", async () => {
 it("sub client could not only be initialized individually", async () => {
   await runner.compileWithBuiltInService(
     `
-      @route("/bump")
-      @clientInitialization({initializedBy: InitializedBy.individually})
-      interface SubClient {
-          op test(): void;
-      }
-      `,
+    @route("/bump")
+    @clientInitialization({initializedBy: InitializedBy.individually})
+    interface SubClient {
+        op test(): void;
+    }
+    `,
   );
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
@@ -431,37 +431,37 @@ it("single with core", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
-        @versioned(MyVersions)
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service;
+    @versioned(MyVersions)
+    @server("http://localhost:3000", "endpoint")
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
+    @service
+    namespace My.Service;
 
-        @doc("The version of the API.")
-        enum MyVersions {
-          @doc("The version 2022-12-01-preview.")
-          @useDependency(Versions.v1_0_Preview_2)
-          v2022_12_01_preview: "2022-12-01-preview",
-        }
+    @doc("The version of the API.")
+    enum MyVersions {
+      @doc("The version 2022-12-01-preview.")
+      @useDependency(Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+    }
 
-        @resource("users")
-        @doc("Details about a user.")
-        model User {
-          @key
-          @doc("The user's id.")
-          @visibility(Lifecycle.Read)
-          id: int32;
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+      @key
+      @doc("The user's id.")
+      @visibility(Lifecycle.Read)
+      id: int32;
 
-          @doc("The user's name.")
-          name: string;
-        }
+      @doc("The user's name.")
+      name: string;
+    }
 
-        alias ServiceTraits = Traits.SupportsRepeatableRequests & Traits.SupportsConditionalRequests & Traits.SupportsClientRequestId;
+    alias ServiceTraits = Traits.SupportsRepeatableRequests & Traits.SupportsConditionalRequests & Traits.SupportsClientRequestId;
 
-        alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+    alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
-        op delete is Operations.ResourceDelete<User>;
-      `);
+    op delete is Operations.ResourceDelete<User>;
+  `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -505,41 +505,41 @@ it("multiple with core", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
-        @versioned(MyVersions)
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service;
+    @versioned(MyVersions)
+    @server("http://localhost:3000", "endpoint")
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
+    @service
+    namespace My.Service;
 
-        @doc("The version of the API.")
-        enum MyVersions {
-          @doc("The version 2022-12-01-preview.")
-          @useDependency(Versions.v1_0_Preview_2)
-          v2022_12_01_preview: "2022-12-01-preview",
-          @doc("The version 2022-12-01.")
-          @useDependency(Versions.v1_0_Preview_2)
-          v2022_12_01: "2022-12-01",
-        }
+    @doc("The version of the API.")
+    enum MyVersions {
+      @doc("The version 2022-12-01-preview.")
+      @useDependency(Versions.v1_0_Preview_2)
+      v2022_12_01_preview: "2022-12-01-preview",
+      @doc("The version 2022-12-01.")
+      @useDependency(Versions.v1_0_Preview_2)
+      v2022_12_01: "2022-12-01",
+    }
 
-        @resource("users")
-        @doc("Details about a user.")
-        model User {
-          @key
-          @doc("The user's id.")
-          @visibility(Lifecycle.Read)
-          id: int32;
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+      @key
+      @doc("The user's id.")
+      @visibility(Lifecycle.Read)
+      id: int32;
 
-          @doc("The user's name.")
-          name: string;
-        }
+      @doc("The user's name.")
+      name: string;
+    }
 
-        alias ServiceTraits = Traits.SupportsRepeatableRequests & Traits.SupportsConditionalRequests & Traits.SupportsClientRequestId;
+    alias ServiceTraits = Traits.SupportsRepeatableRequests & Traits.SupportsConditionalRequests & Traits.SupportsClientRequestId;
 
-        alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
-        op get is Operations.ResourceRead<User>;
+    alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+    op get is Operations.ResourceRead<User>;
 
-        op delete is Operations.ResourceDelete<User>;
-      `);
+    op delete is Operations.ResourceDelete<User>;
+  `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -577,16 +577,16 @@ it("namespace", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service.One {};
+    @server("http://localhost:3000", "endpoint")
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
+    @service
+    namespace My.Service.One {};
 
-        @server("http://localhost:3000", "endpoint")
-        @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-        @service
-        namespace My.Service.Two {};
-      `);
+    @server("http://localhost:3000", "endpoint")
+    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
+    @service
+    namespace My.Service.Two {};
+  `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 2);
   const clientOne = sdkPackage.clients.filter((c) => c.name === "OneClient")[0];
@@ -598,11 +598,11 @@ it("namespace", async () => {
 
 it("operationGroup", async () => {
   await runner.compileWithBuiltInService(`
-        @operationGroup
-        namespace MyOperationGroup {
-          op func(): void;
-        }
-      `);
+    @operationGroup
+    namespace MyOperationGroup {
+      op func(): void;
+    }
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -642,17 +642,17 @@ it("operationGroup", async () => {
 
 it("operationGroup2", async () => {
   await runner.compileWithBuiltInService(`
-        namespace Foo {
-          interface Bar {
-            @route("/one")
-            one(): void;
-          }
-        }
-        interface Bar {
-          @route("/two")
-          two(): void;
-        }
-      `);
+    namespace Foo {
+      interface Bar {
+        @route("/one")
+        one(): void;
+      }
+    }
+    interface Bar {
+      @route("/two")
+      two(): void;
+    }
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 

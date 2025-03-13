@@ -14,13 +14,13 @@ beforeEach(async () => {
 describe("namespace access override", () => {
   it("should inherit access from parent namespace", async () => {
     const { Test } = (await runner.compile(`
-          @access(Access.public)
-          @service(#{title: "Test Service"}) namespace TestService;
-          @test
-          model Test {
-            prop: string;
-          }
-        `)) as { Test: Operation };
+      @access(Access.public)
+      @service(#{title: "Test Service"}) namespace TestService;
+      @test
+      model Test {
+        prop: string;
+      }
+    `)) as { Test: Operation };
 
     const actual = getAccess(runner.context, Test);
     strictEqual(actual, "public");
@@ -28,16 +28,16 @@ describe("namespace access override", () => {
 
   it("should tag anonymous models with default access", async () => {
     const { Test, prop } = (await runner.compile(`
-          @access(Access.public)
-          @service(#{title: "Test Service"}) namespace TestService;
-          @test
-          model Test {
-            @test
-            prop: {
-               foo: string;
-            }
-          }
-        `)) as { Test: Operation; prop: ModelProperty };
+      @access(Access.public)
+      @service(#{title: "Test Service"}) namespace TestService;
+      @test
+      model Test {
+        @test
+        prop: {
+            foo: string;
+        }
+      }
+    `)) as { Test: Operation; prop: ModelProperty };
 
     const actual = getAccess(runner.context, Test);
     const actualAnonymous = getAccess(runner.context, prop.type as Model);
@@ -47,16 +47,16 @@ describe("namespace access override", () => {
 
   it("should tag as internal anonymous models with default access", async () => {
     const { Test, prop } = (await runner.compile(`
-          @access(Access.internal)
-          @service(#{title: "Test Service"}) namespace TestService;
-          @test
-          model Test {
-            @test
-            prop: {
-               foo: string;
-            }
-          }
-        `)) as { Test: Operation; prop: ModelProperty };
+      @access(Access.internal)
+      @service(#{title: "Test Service"}) namespace TestService;
+      @test
+      model Test {
+        @test
+        prop: {
+            foo: string;
+        }
+      }
+    `)) as { Test: Operation; prop: ModelProperty };
 
     const actual = getAccess(runner.context, Test);
     const actualAnonymous = getAccess(runner.context, prop.type as Model);
@@ -66,14 +66,14 @@ describe("namespace access override", () => {
 
   it("should honor the granular override over the namespace one", async () => {
     const { Test } = (await runner.compile(`
-          @access(Access.public)
-          @service(#{title: "Test Service"}) namespace TestService;
-          @access(Access.internal)
-          @test
-          model Test {
-            prop: string;
-          }
-        `)) as { Test: Operation };
+      @access(Access.public)
+      @service(#{title: "Test Service"}) namespace TestService;
+      @access(Access.internal)
+      @test
+      model Test {
+        prop: string;
+      }
+    `)) as { Test: Operation };
 
     const actual = getAccess(runner.context, Test);
     strictEqual(actual, "internal");
@@ -81,12 +81,12 @@ describe("namespace access override", () => {
 
   it("locally mark an operation as internal", async () => {
     const { test } = (await runner.compile(`
-          @access(Access.public)
-          @service(#{title: "Test Service"}) namespace TestService;
-          @test
-          @access(Access.internal)
-          op test(): void;
-        `)) as { test: Operation };
+      @access(Access.public)
+      @service(#{title: "Test Service"}) namespace TestService;
+      @test
+      @access(Access.internal)
+      op test(): void;
+    `)) as { test: Operation };
 
     const actual = getAccess(runner.context, test);
     strictEqual(actual, "internal");
@@ -94,11 +94,11 @@ describe("namespace access override", () => {
 
   it("locally mark an operation as public", async () => {
     const { test } = (await runner.compile(`
-          @access(Access.public)
-          @service(#{title: "Test Service"}) namespace TestService;
-          @test
-          op test(): void;
-        `)) as { test: Operation };
+      @access(Access.public)
+      @service(#{title: "Test Service"}) namespace TestService;
+      @test
+      op test(): void;
+    `)) as { test: Operation };
 
     const actual = getAccess(runner.context, test);
     strictEqual(actual, "public");
@@ -106,11 +106,11 @@ describe("namespace access override", () => {
 
   it("mark an operation as internal through the namespace", async () => {
     const { test } = (await runner.compile(`
-          @access(Access.internal)
-          @service(#{title: "Test Service"}) namespace TestService;
-          @test
-          op test(): void;
-        `)) as { test: Operation };
+      @access(Access.internal)
+      @service(#{title: "Test Service"}) namespace TestService;
+      @test
+      op test(): void;
+    `)) as { test: Operation };
 
     const actual = getAccess(runner.context, test);
     strictEqual(actual, "internal");
@@ -119,12 +119,12 @@ describe("namespace access override", () => {
 
 it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
   const { test, Test } = (await runner.compile(`
-        @test
-        model Test{}
+    @test
+    model Test{}
 
-        @test
-        op test(): void;
-      `)) as { test: Operation; Test: Model };
+    @test
+    op test(): void;
+  `)) as { test: Operation; Test: Model };
 
   strictEqual(getAccess(runner.context, test), "public");
   strictEqual(getAccess(runner.context, Test), "public");
@@ -132,19 +132,19 @@ it("default calculated value of operation is undefined, default value of calcula
 
 it("model access calculated by operation", async () => {
   const { Test, func } = (await runner.compile(`
-        @service
-        @test namespace MyService {
-          @test
-          model Test {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          op func(
-            @body body: Test
-          ): void;
-        }
-      `)) as { Test: Model; func: Operation };
+    @service
+    @test namespace MyService {
+      @test
+      model Test {
+        prop: string;
+      }
+      @test
+      @access(Access.internal)
+      op func(
+        @body body: Test
+      ): void;
+    }
+  `)) as { Test: Model; func: Operation };
 
   let actual = getAccess(runner.context, Test);
   strictEqual(actual, "internal");
@@ -154,20 +154,20 @@ it("model access calculated by operation", async () => {
 
 it("override calculated model with public access", async () => {
   const { Test, func } = (await runner.compile(`
-        @service
-        @test namespace MyService {
-          @test
-          @access(Access.public)
-          model Test {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          op func(
-            @body body: Test
-          ): void;
-        }
-      `)) as { Test: Model; func: Operation };
+    @service
+    @test namespace MyService {
+      @test
+      @access(Access.public)
+      model Test {
+        prop: string;
+      }
+      @test
+      @access(Access.internal)
+      op func(
+        @body body: Test
+      ): void;
+    }
+  `)) as { Test: Model; func: Operation };
 
   let actual = getAccess(runner.context, Test);
   strictEqual(actual, "public");
@@ -177,19 +177,19 @@ it("override calculated model with public access", async () => {
 
 it("override calculated model with internal access", async () => {
   const { Test, func } = (await runner.compile(`
-        @service
-        @test namespace MyService {
-          @test
-          @access(Access.internal) // This is an incorrect usage. We will have linter to ban.
-          model Test {
-            prop: string;
-          }
-          @test
-          op func(
-            @body body: Test
-          ): void;
-        }
-        `)) as { Test: Model; func: Operation };
+    @service
+    @test namespace MyService {
+      @test
+      @access(Access.internal) // This is an incorrect usage. We will have linter to ban.
+      model Test {
+        prop: string;
+      }
+      @test
+      op func(
+        @body body: Test
+      ): void;
+    }
+    `)) as { Test: Model; func: Operation };
 
   strictEqual(getAccess(runner.context, Test), "internal");
   strictEqual(getAccess(runner.context, func), "public");
@@ -197,43 +197,43 @@ it("override calculated model with internal access", async () => {
 
 it("access propagation", async () => {
   const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
-        @service
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
+    @service
+    @test namespace MyService {
+      @discriminator("kind")
+      @test
+      model Fish {
+        age: int32;
+      }
 
-          @discriminator("sharktype")
-          @test
-          model Shark extends Fish {
-            kind: "shark";
-            origin: Origin;
-          }
+      @discriminator("sharktype")
+      @test
+      model Shark extends Fish {
+        kind: "shark";
+        origin: Origin;
+      }
 
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-          }
+      @test
+      model Salmon extends Fish {
+        kind: "salmon";
+      }
 
-          @test
-          model SawShark extends Shark {
-            sharktype: "saw";
-          }
+      @test
+      model SawShark extends Shark {
+        sharktype: "saw";
+      }
 
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
+      @test
+      model Origin {
+        country: string;
+        city: string;
+        manufacture: string;
+      }
 
-          @get
-          @access(Access.internal)
-          op getModel(): Fish;
-        }
-      `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
+      @get
+      @access(Access.internal)
+      op getModel(): Fish;
+    }
+  `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
 
   let actual = getAccess(runner.context, Fish);
   strictEqual(actual, "internal");
@@ -250,64 +250,64 @@ it("access propagation", async () => {
 it("complicated access propagation", async () => {
   const { Test1, Test2, Test3, Test4, Test5, Test6, func1, func2, func3, func4, func5 } =
     (await runner.compile(`
-        @service
-        @test namespace MyService {
-          @test
-          model Test1 {
-            prop: Test2;
-          }
-          @test
-          model Test2 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Test1
-          ): void;
-
-          @test
-          model Test3 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func2")
-          op func2(
-            @body body: Test3
-          ): void;
-          @test
-          @route("/func3")
-          op func3(
-            @body body: Test3
-          ): void;
-
-          @test
-          model Test4 {
-            prop: Test5;
-          }
-          @test
-          model Test5 {
-            prop: Test6;
-          }
-          @test
-          model Test6 {
-            prop: string;
-          }
-          @test
-          @access(Access.internal)
-          @route("/func4")
-          op func4(
-            @body body: Test4
-          ): void;
-          @test
-          @route("/func5")
-          op func5(
-            @body body: Test6
-          ): void;
+      @service
+      @test namespace MyService {
+        @test
+        model Test1 {
+          prop: Test2;
         }
-      `)) as {
+        @test
+        model Test2 {
+          prop: string;
+        }
+        @test
+        @access(Access.internal)
+        @route("/func1")
+        op func1(
+          @body body: Test1
+        ): void;
+
+        @test
+        model Test3 {
+          prop: string;
+        }
+        @test
+        @access(Access.internal)
+        @route("/func2")
+        op func2(
+          @body body: Test3
+        ): void;
+        @test
+        @route("/func3")
+        op func3(
+          @body body: Test3
+        ): void;
+
+        @test
+        model Test4 {
+          prop: Test5;
+        }
+        @test
+        model Test5 {
+          prop: Test6;
+        }
+        @test
+        model Test6 {
+          prop: string;
+        }
+        @test
+        @access(Access.internal)
+        @route("/func4")
+        op func4(
+          @body body: Test4
+        ): void;
+        @test
+        @route("/func5")
+        op func5(
+          @body body: Test6
+        ): void;
+      }
+    `)) as {
       Test1: Model;
       Test2: Model;
       Test3: Model;
@@ -353,98 +353,98 @@ it("access propagation for properties, base models and sub models", async () => 
     func3,
     func4,
   } = (await runner.compile(`
-        @service
-        @test namespace MyService {
-          @discriminator("kind")
-          @test
-          model Fish {
-            age: int32;
-          }
+    @service
+    @test namespace MyService {
+      @discriminator("kind")
+      @test
+      model Fish {
+        age: int32;
+      }
 
-          @test
-          model Origin {
-            country: string;
-            city: string;
-            manufacture: string;
-          }
+      @test
+      model Origin {
+        country: string;
+        city: string;
+        manufacture: string;
+      }
 
-          @test
-          model Salmon extends Fish {
-            kind: "salmon";
-            origin: Origin;
-          }
+      @test
+      model Salmon extends Fish {
+        kind: "salmon";
+        origin: Origin;
+      }
 
-          @test
-          model BaseModel {
-            base: string;
-          }
+      @test
+      model BaseModel {
+        base: string;
+      }
 
-          @test
-          model ModelA extends BaseModel {
-            prop1: ModelB;
-            prop2: ModelC[];
-            prop3: Record<ModelD>;
-            prop4: EnumA;
-            prop5: ModelE | ModelF;
-          }
+      @test
+      model ModelA extends BaseModel {
+        prop1: ModelB;
+        prop2: ModelC[];
+        prop3: Record<ModelD>;
+        prop4: EnumA;
+        prop5: ModelE | ModelF;
+      }
 
-          @test
-          model ModelB {
-            prop: string;
-          }
+      @test
+      model ModelB {
+        prop: string;
+      }
 
-          @test
-          model ModelC {
-            prop: string;
-          }
+      @test
+      model ModelC {
+        prop: string;
+      }
 
-          @test
-          model ModelD {
-            prop: string;
-          }
+      @test
+      model ModelD {
+        prop: string;
+      }
 
-          @test
-          model ModelE {
-            prop: string;
-          }
+      @test
+      model ModelE {
+        prop: string;
+      }
 
-          @test
-          model ModelF {
-            prop: string;
-          }
+      @test
+      model ModelF {
+        prop: string;
+      }
 
-          @test
-          enum EnumA {
-            one,
-            two,
-            three,
-          }
+      @test
+      enum EnumA {
+        one,
+        two,
+        three,
+      }
 
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Fish
-          ): void;
-          @test
-          @route("/func2")
-          op func2(
-            @body body: Fish
-          ): void;
+      @test
+      @access(Access.internal)
+      @route("/func1")
+      op func1(
+        @body body: Fish
+      ): void;
+      @test
+      @route("/func2")
+      op func2(
+        @body body: Fish
+      ): void;
 
-          @test
-          @access(Access.internal)
-          @route("/func3")
-          op func3(
-            @body body: ModelA
-          ): void;
-          @test
-          @route("/func4")
-          op func4(
-            @body body: ModelA
-          ): void;
-        }
-      `)) as {
+      @test
+      @access(Access.internal)
+      @route("/func3")
+      op func3(
+        @body body: ModelA
+      ): void;
+      @test
+      @route("/func4")
+      op func4(
+        @body body: ModelA
+      ): void;
+    }
+  `)) as {
     Fish: Model;
     Salmon: Model;
     Origin: Model;
@@ -496,75 +496,75 @@ it("access propagation with override", async () => {
     func7,
     func8,
   } = (await runner.compile(`
-        @service
-        @test namespace MyService {
-          @test
-          model Test1 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func1")
-          op func1(
-            @body body: Test1
-          ): void;
-
-          @test
-          model Test2 {
-          }
-          @test
-          @route("/func2")
-          op func2(
-            @body body: Test2
-          ): void;
-
-          @test
-          model Test3 {
-          }
-          @test
-          @access(Access.public)
-          @route("/func3")
-          op func3(
-            @body body: Test3
-          ): void;
-
-
-          @test
-          model Test4 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func4")
-          op func4(
-            @body body: Test4
-          ): void;
-          @test
-          @route("/func5")
-          op func5(
-            @body body: Test4
-          ): void;
-
-          @test
-          model Test5 {
-          }
-          @test
-          @access(Access.internal)
-          @route("/func6")
-          op func6(
-            @body body: Test5
-          ): void;
-          @test
-          @route("/func7")
-          op func7(
-            @body body: Test5
-          ): void;
-          @test
-          @access(Access.public)
-          @route("/func8")
-          op func8(
-            @body body: Test5
-          ): void;
+      @service
+      @test namespace MyService {
+        @test
+        model Test1 {
         }
-      `)) as {
+        @test
+        @access(Access.internal)
+        @route("/func1")
+        op func1(
+          @body body: Test1
+        ): void;
+
+        @test
+        model Test2 {
+        }
+        @test
+        @route("/func2")
+        op func2(
+          @body body: Test2
+        ): void;
+
+        @test
+        model Test3 {
+        }
+        @test
+        @access(Access.public)
+        @route("/func3")
+        op func3(
+          @body body: Test3
+        ): void;
+
+
+        @test
+        model Test4 {
+        }
+        @test
+        @access(Access.internal)
+        @route("/func4")
+        op func4(
+          @body body: Test4
+        ): void;
+        @test
+        @route("/func5")
+        op func5(
+          @body body: Test4
+        ): void;
+
+        @test
+        model Test5 {
+        }
+        @test
+        @access(Access.internal)
+        @route("/func6")
+        op func6(
+          @body body: Test5
+        ): void;
+        @test
+        @route("/func7")
+        op func7(
+          @body body: Test5
+        ): void;
+        @test
+        @access(Access.public)
+        @route("/func8")
+        op func8(
+          @body body: Test5
+        ): void;
+      }
+    `)) as {
     Test1: Model;
     Test2: Model;
     Test3: Model;
@@ -599,32 +599,32 @@ it("access propagation with override", async () => {
 it("access propagation with nullable", async () => {
   await runner.compileWithBuiltInService(
     `
-        model RunStep {
-          id: string;
-          lastError: RunStepError | null;
-        }
+    model RunStep {
+      id: string;
+      lastError: RunStepError | null;
+    }
 
-        model RunStepError {
-          code: string;
-          message: string;
-        }
+    model RunStepError {
+      code: string;
+      message: string;
+    }
 
-        @get
-        @route("/threads/{threadId}/runs/{runId}/steps/{stepId}")
-        op getRunStep(
-          @path threadId: string,
-          @path runId: string,
-          @path stepId: string,
-        ): RunStep;
+    @get
+    @route("/threads/{threadId}/runs/{runId}/steps/{stepId}")
+    op getRunStep(
+      @path threadId: string,
+      @path runId: string,
+      @path stepId: string,
+    ): RunStep;
 
-        @get
-        @route("/threads/{threadId}/runs/{runId}/steps")
-        op listRunSteps(
-          @path threadId: string,
-          @path runId: string,
-        ): RunStep[];
-        @@access(listRunSteps, Access.internal);
-        `,
+    @get
+    @route("/threads/{threadId}/runs/{runId}/steps")
+    op listRunSteps(
+      @path threadId: string,
+      @path runId: string,
+    ): RunStep[];
+    @@access(listRunSteps, Access.internal);
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -635,11 +635,11 @@ it("access propagation with nullable", async () => {
 it("access conflict from operation", async () => {
   await runner.compileWithBuiltInService(
     `
-        @access(Access.internal)
-        model A {}
+    @access(Access.internal)
+    model A {}
 
-        op test(@body body: A): void;
-        `,
+    op test(@body body: A): void;
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -652,15 +652,15 @@ it("access conflict from operation", async () => {
 it("access conflict from propagation", async () => {
   await runner.compileWithBuiltInService(
     `
-        model A {
-          prop: B;
-        }
+    model A {
+      prop: B;
+    }
 
-        @access(Access.internal)
-        model B {}
+    @access(Access.internal)
+    model B {}
 
-        op test(@body body: A): void;
-        `,
+    op test(@body body: A): void;
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -674,20 +674,20 @@ it("access conflict from propagation", async () => {
 it("access conflict from other override", async () => {
   await runner.compileWithBuiltInService(
     `
-        model A {
-          prop: B;
-        }
+    model A {
+      prop: B;
+    }
 
-        model B {}
+    model B {}
 
-        @access(Access.internal)
-        @usage(Usage.input)
-        model C {
-          prop: B;
-        }
+    @access(Access.internal)
+    @usage(Usage.input)
+    model C {
+      prop: B;
+    }
 
-        op test(@body body: A): void;
-        `,
+    op test(@body body: A): void;
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
@@ -702,24 +702,24 @@ it("access conflict from other override", async () => {
 it("access conflict from multiple override", async () => {
   await runner.compileWithBuiltInService(
     `
-        model A {
-          x: X;
-        }
+    model A {
+      x: X;
+    }
 
-        model B {
-          x: X;
-        }
+    model B {
+      x: X;
+    }
 
-        @access(Access.internal)
-        model X {
-        }
+    @access(Access.internal)
+    model X {
+    }
 
-        @access(Access.internal)
-        op one(...B): B;
+    @access(Access.internal)
+    op one(...B): B;
 
-        @access(Access.internal)
-        op two(): B;
-        `,
+    @access(Access.internal)
+    op two(): B;
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -737,19 +737,19 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
   );
   await runner.compileWithBuiltInService(
     `
-        model BaseClassThatsPruned {
-          id: int32;
-        }
-        model DerivedOne extends BaseClassThatsPruned {
-          name: string;
-          prop: UsedByProperty;
-        }
-        model UsedByProperty {
-          prop: string;
-        }
-        @@usage(DerivedOne, Usage.output);
-        @@access(DerivedOne, Access.public);
-      `,
+    model BaseClassThatsPruned {
+      id: int32;
+    }
+    model DerivedOne extends BaseClassThatsPruned {
+      name: string;
+      prop: UsedByProperty;
+    }
+    model UsedByProperty {
+      prop: string;
+    }
+    @@usage(DerivedOne, Usage.output);
+    @@access(DerivedOne, Access.public);
+  `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -796,24 +796,24 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
   );
   await runner.compileWithBuiltInService(
     `
-        model BaseClassThatsPruned {
-          id: int32;
-          foo: UsedByBaseProperty;
-        }
-        model DerivedOne extends BaseClassThatsPruned {
-          name: string;
-          prop: UsedByProperty;
-        }
-        model UsedByProperty {
-          prop: string;
-        }
-        model UsedByBaseProperty {
-          prop: string;
-        }
+    model BaseClassThatsPruned {
+      id: int32;
+      foo: UsedByBaseProperty;
+    }
+    model DerivedOne extends BaseClassThatsPruned {
+      name: string;
+      prop: UsedByProperty;
+    }
+    model UsedByProperty {
+      prop: string;
+    }
+    model UsedByBaseProperty {
+      prop: string;
+    }
 
-        @access(Access.internal)
-        op test(): DerivedOne;
-      `,
+    @access(Access.internal)
+    op test(): DerivedOne;
+  `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
@@ -832,35 +832,35 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
   );
   await runner.compileWithBuiltInService(
     `
-        @discriminator("kind")
-        model Fish {
-          age: int32;
-        }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-        @discriminator("sharktype")
-        model Shark extends Fish {
-          kind: "shark";
-          origin: Origin;
-        }
+    @discriminator("sharktype")
+    model Shark extends Fish {
+      kind: "shark";
+      origin: Origin;
+    }
 
-        model Salmon extends Fish {
-          kind: "salmon";
-        }
+    model Salmon extends Fish {
+      kind: "salmon";
+    }
 
-        model SawShark extends Shark {
-          sharktype: "saw";
-        }
+    model SawShark extends Shark {
+      sharktype: "saw";
+    }
 
-        model Origin {
-          country: string;
-          city: string;
-          manufacture: string;
-        }
+    model Origin {
+      country: string;
+      city: string;
+      manufacture: string;
+    }
 
-        @get
-        @access(Access.internal)
-        op getModel(): Fish;
-      `,
+    @get
+    @access(Access.internal)
+    op getModel(): Fish;
+  `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 5);
@@ -874,4 +874,79 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
   strictEqual(models[3].name, "SawShark");
   strictEqual(models[4].access, "internal");
   strictEqual(models[4].name, "Salmon");
+});
+
+describe("model property access", () => {
+  it("normal model property", async () => {
+    await runner.compileWithBuiltInService(`
+      model Test {
+        prop: string;
+      }
+
+      op test(@body body: Test): void;
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models[0].properties[0].access, "public");
+  });
+
+  it("normal parameter", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(a: string): void;
+    `);
+
+    const parameters = runner.context.sdkPackage.clients[0].methods[0].parameters;
+    strictEqual(parameters[0].access, "public");
+  });
+
+  it("model property with override", async () => {
+    await runner.compileWithBuiltInService(`
+      model Test {
+        @access(Access.internal)
+        prop: string;
+      }
+
+      op test(@body body: Test): void;
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models[0].properties[0].access, "internal");
+  });
+
+  it("parameter with override", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(@access(Access.internal) a: string): void;
+    `);
+
+    const parameters = runner.context.sdkPackage.clients[0].methods[0].parameters;
+    strictEqual(parameters[0].access, "internal");
+  });
+
+  it("model property with override propagation", async () => {
+    await runner.compileWithBuiltInService(`
+      model Foo {
+        @access(Access.internal)
+        foo: Bar;
+
+        @access(Access.internal)
+        baz: Baz;
+      }
+
+      model Bar {
+        prop: string;
+      }
+
+      model Baz {
+        prop: string
+      }
+
+      op test(@body body: Foo): Baz;
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models[0].properties[0].access, "internal");
+    strictEqual(models[0].properties[1].access, "internal");
+    strictEqual(models[1].access, "internal");
+    strictEqual(models[2].access, "public");
+  });
 });

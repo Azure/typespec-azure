@@ -18,11 +18,11 @@ afterEach(async () => {
 it("default", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          prop: utcDateTime;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        prop: utcDateTime;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "utcDateTime");
@@ -49,12 +49,12 @@ it("rfc3339", async function () {
 it("rfc7231", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @encode(DateTimeKnownEncoding.rfc7231)
-          prop: utcDateTime;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(DateTimeKnownEncoding.rfc7231)
+        prop: utcDateTime;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "utcDateTime");
@@ -66,11 +66,11 @@ it("rfc7231", async function () {
 it.skip("unixTimestamp32", async () => {
   await runner.compileWithBuiltInService(
     `
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: unixTimestamp32;
-      }
-      `,
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: unixTimestamp32;
+    }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "utcDateTime");
@@ -83,12 +83,12 @@ it.skip("unixTimestamp32", async () => {
 it("unixTimestamp", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @encode(DateTimeKnownEncoding.unixTimestamp, int64)
-          value: utcDateTime;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(DateTimeKnownEncoding.unixTimestamp, int64)
+        value: utcDateTime;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "utcDateTime");
@@ -99,18 +99,18 @@ it("unixTimestamp", async function () {
 it("encode propagation", async function () {
   await runner.compileWithBuiltInService(
     `
-        @doc("doc")
-        @summary("title")
-        @encode(DateTimeKnownEncoding.unixTimestamp, int64)
-        scalar unixTimestampDatetime extends utcDateTime;
+      @doc("doc")
+      @summary("title")
+      @encode(DateTimeKnownEncoding.unixTimestamp, int64)
+      scalar unixTimestampDatetime extends utcDateTime;
 
-        scalar extraLayerDateTime extends unixTimestampDatetime;
+      scalar extraLayerDateTime extends unixTimestampDatetime;
 
-        @usage(Usage.input | Usage.output)
-        model Test {
-          value: extraLayerDateTime;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        value: extraLayerDateTime;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "utcDateTime");
@@ -133,12 +133,12 @@ it("encode propagation", async function () {
 it("nullable unixTimestamp", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @encode(DateTimeKnownEncoding.unixTimestamp, int64)
-          value: utcDateTime | null;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(DateTimeKnownEncoding.unixTimestamp, int64)
+        value: utcDateTime | null;
+      }
+    `,
   );
   const nullableType = getSdkTypeHelper(runner);
   strictEqual(nullableType.kind, "nullable");
@@ -152,16 +152,16 @@ it("nullable unixTimestamp", async function () {
 it("unixTimestamp array", async function () {
   await runner.compileWithBuiltInService(
     `
-        @doc("doc")
-        @summary("title")
-        @encode(DateTimeKnownEncoding.unixTimestamp, int64)
-        scalar unixTimestampDateTime extends utcDateTime;
+      @doc("doc")
+      @summary("title")
+      @encode(DateTimeKnownEncoding.unixTimestamp, int64)
+      scalar unixTimestampDateTime extends utcDateTime;
 
-        @usage(Usage.input | Usage.output)
-        model Test {
-          value: unixTimestampDateTime[];
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        value: unixTimestampDateTime[];
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "array");

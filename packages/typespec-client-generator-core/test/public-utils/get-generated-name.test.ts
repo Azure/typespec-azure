@@ -38,8 +38,8 @@ describe("simple anonymous model", () => {
 
   it("should handle anonymous model in both body and response", async () => {
     await runner.compileWithBuiltInService(`
-        op test(@body body: {name: string}): {name: string};
-      `);
+      op test(@body body: {name: string}): {name: string};
+    `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -62,13 +62,13 @@ describe("simple anonymous model", () => {
 
   it("should handle anonymous model used by operation response's model", async () => {
     await runner.compileWithBuiltInService(`
-        model A {
-          pForA: {
-            name: string;
-          };
-        }
-        op test(): A;
-      `);
+      model A {
+        pForA: {
+          name: string;
+        };
+      }
+      op test(): A;
+    `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -703,7 +703,7 @@ describe("corner case", () => {
 
         op test(): ResponseWithAnonymousUnion;
       }
-      `)) as { repeatabilityResult: ModelProperty };
+    `)) as { repeatabilityResult: ModelProperty };
 
     strictEqual(repeatabilityResult.type.kind, "Union");
     const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
@@ -731,7 +731,7 @@ describe("corner case", () => {
 
         op test(...RequestParameterWithAnonymousUnion): void;
       }
-      `)) as { repeatabilityResult: ModelProperty };
+    `)) as { repeatabilityResult: ModelProperty };
 
     strictEqual(repeatabilityResult.type.kind, "Union");
     const unionEnum = getSdkUnion(runner.context, repeatabilityResult.type);
@@ -759,7 +759,7 @@ describe("corner case", () => {
 
         op test(...RequestParameterWithAnonymousUnion): void;
       }
-      `)) as { repeatabilityResult: ModelProperty };
+    `)) as { repeatabilityResult: ModelProperty };
 
     strictEqual(repeatabilityResult.type.kind, "Union");
     const stringType = getSdkUnion(runner.context, repeatabilityResult.type);
@@ -792,7 +792,7 @@ describe("corner case", () => {
           }
         }
       }
-      `)) as { TestModel: Model };
+    `)) as { TestModel: Model };
 
     runner.context.__generatedNames?.clear();
     const name = getGeneratedName(
@@ -809,7 +809,7 @@ describe("corner case", () => {
         @test
         op test(): {@header header: string, prop: string};
       }
-      `)) as { test: Operation };
+    `)) as { test: Operation };
 
     const httpOperation = getHttpOperationWithCache(runner.context, test);
     const name = getGeneratedName(

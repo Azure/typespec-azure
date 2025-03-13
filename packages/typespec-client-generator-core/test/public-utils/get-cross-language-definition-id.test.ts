@@ -16,19 +16,19 @@ it("parameter's crossLanguageDefinitionId", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      alias ServiceTraits = SupportsRepeatableRequests &
-      SupportsConditionalRequests &
-      SupportsClientRequestId;
-      
-      @route("service-status")
-      op getServiceStatus is RpcOperation<
-        {},
-        {
-          statusString: string;
-        },
-        ServiceTraits
-      >;
-    `);
+    alias ServiceTraits = SupportsRepeatableRequests &
+    SupportsConditionalRequests &
+    SupportsClientRequestId;
+    
+    @route("service-status")
+    op getServiceStatus is RpcOperation<
+      {},
+      {
+        statusString: string;
+      },
+      ServiceTraits
+    >;
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(
@@ -67,26 +67,26 @@ it("endpoint's crossLanguageDefinitionId", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compile(`
-      @service(#{
-        title: "Contoso Widget Manager",
-      })
-      @server(
-        "{url}/widget",
-        "Contoso Widget APIs",
-        {
-          url: string,
-        }
-      )
-      @versioned(Contoso.WidgetManager.Versions)
-      namespace Contoso.WidgetManager;
-
-      enum Versions {
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        "2022-08-30",
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @server(
+      "{url}/widget",
+      "Contoso Widget APIs",
+      {
+        url: string,
       }
+    )
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
 
-      op test(): void;
-    `);
+    enum Versions {
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      "2022-08-30",
+    }
+
+    op test(): void;
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   const initialization = sdkPackage.clients[0].initialization;

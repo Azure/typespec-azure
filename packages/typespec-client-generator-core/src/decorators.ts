@@ -58,13 +58,12 @@ import {
   clientNamespaceKey,
   findRootSourceProperty,
   listAllNamespaces,
-  listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { getLibraryName, listAllServiceNamespaces } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -693,7 +692,7 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
@@ -710,20 +709,23 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
-  if (!accessOverride && entity.namespace) {
+  if (!accessOverride && entity.kind !== "ModelProperty" && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }
 
   return accessOverride;
 }
 
-export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+export function getAccess(
+  context: TCGCContext,
+  entity: Model | Enum | Operation | Union | ModelProperty,
+) {
   const override = getAccessOverride(context, entity);
-  if (override || entity.kind === "Operation") {
+  if (override || entity.kind === "Operation" || entity.kind === "ModelProperty") {
     return override || "public";
   }
 
