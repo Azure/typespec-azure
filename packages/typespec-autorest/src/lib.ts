@@ -239,6 +239,9 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-autorest",
+  capabilities: {
+    dryRun: true,
+  },
   diagnostics: {
     "duplicate-body-types": {
       severity: "error",
