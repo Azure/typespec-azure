@@ -1,7 +1,6 @@
 ---
 changeKind: internal
 packages:
-  - "@azure-tools/azure-http-specs"
   - "@azure-tools/typespec-autorest-canonical"
   - "@azure-tools/typespec-autorest"
   - "@azure-tools/typespec-azure-core"
