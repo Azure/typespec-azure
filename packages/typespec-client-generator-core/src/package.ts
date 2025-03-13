@@ -15,7 +15,6 @@ import { getServers, HttpServer, isHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
-  getAccessOverride,
   getClientInitialization,
   getClientInitializationOptions,
   getClientNamespace,
@@ -97,7 +96,6 @@ import {
   getSdkModelWithDiagnostics,
   getTypeSpecBuiltInType,
   handleAllTypes,
-  updateUsageOrAccess,
 } from "./types.js";
 
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
@@ -643,14 +641,10 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
 
   const override = getOverriddenClientMethod(context, operation);
   const params = (override ?? operation).parameters.properties.values();
-  const operationAccess = getAccess(context, operation) ?? "public";
 
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
-    const methodAccess = getAccessOverride(context, param) ?? operationAccess;
-    sdkMethodParam.access = methodAccess;
-    updateUsageOrAccess(context, methodAccess, sdkMethodParam.type);
     if (sdkMethodParam.onClient) {
       const operationLocation = getLocationOfOperation(operation);
       if (isApiVersion(context, param)) {
@@ -682,7 +676,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     __raw: operation,
     kind: "basic",
     name,
-    access: operationAccess,
+    access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
     doc: getDoc(context.program, operation),
     summary: getSummary(context.program, operation),

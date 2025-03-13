@@ -47,6 +47,7 @@ import {
 } from "@typespec/http";
 import { isStream } from "@typespec/streams";
 import {
+  getAccess,
   getAccessOverride,
   getAlternateType,
   getClientNamespace,
@@ -1237,10 +1238,6 @@ export function getSdkModelPropertyTypeBase(
   diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, propertyType));
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
-  const accessOverride = getAccessOverride(context, type);
-  if (accessOverride) {
-    diagnostics.pipe(updateUsageOrAccess(context, accessOverride, propertyType));
-  }
   return diagnostics.wrap({
     __raw: type,
     doc: getDoc(context.program, type),
@@ -1259,7 +1256,7 @@ export function getSdkModelPropertyTypeBase(
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     visibility: getSdkVisibility(context, type),
-    access: accessOverride ?? "public", // revisiting as well in operations
+    access: getAccess(context, type),
   });
 }
 
@@ -1629,15 +1626,19 @@ export function updateUsageOrAccess(
     if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
       continue;
     }
-    // by default, we set property access value to parent. If there's an override though, we override.
-    let propertyAccess = value;
-    if (property.__raw) {
-      const propertyAccessOverride = getAccessOverride(context, property.__raw);
-      if (propertyAccessOverride) {
-        propertyAccess = propertyAccessOverride;
+    if (typeof value === "number") {
+      diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+    } else {
+      // by default, we set property access value to parent. If there's an override though, we override.
+      let propertyAccess = value;
+      if (property.__raw) {
+        const propertyAccessOverride = getAccessOverride(context, property.__raw);
+        if (propertyAccessOverride) {
+          propertyAccess = propertyAccessOverride;
+        }
       }
+      diagnostics.pipe(updateUsageOrAccess(context, propertyAccess, property.type, options));
     }
-    diagnostics.pipe(updateUsageOrAccess(context, propertyAccess, property.type, options));
     options.ignoreSubTypeStack.pop();
   }
   return diagnostics.wrap(undefined);
