@@ -24,7 +24,7 @@ model DurationModel {
   Expected request body:
   ```json
   {
-    "input": "1.2:59:59.5000000"
+    "input": "1.02:59:59.5000000"
   }
   ```
   """)
