@@ -875,3 +875,78 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
   strictEqual(models[4].access, "internal");
   strictEqual(models[4].name, "Salmon");
 });
+
+describe("model property access", () => {
+  it("normal model property", async () => {
+    await runner.compileWithBuiltInService(`
+      model Test {
+        prop: string;
+      }
+
+      op test(@body body: Test): void;
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models[0].properties[0].access, "public");
+  });
+
+  it("normal parameter", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(a: string): void;
+    `);
+
+    const parameters = runner.context.sdkPackage.clients[0].methods[0].parameters;
+    strictEqual(parameters[0].access, "public");
+  });
+
+  it("model property with override", async () => {
+    await runner.compileWithBuiltInService(`
+      model Test {
+        @access(Access.internal)
+        prop: string;
+      }
+
+      op test(@body body: Test): void;
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models[0].properties[0].access, "internal");
+  });
+
+  it("parameter with override", async () => {
+    await runner.compileWithBuiltInService(`
+      op test(@access(Access.internal) a: string): void;
+    `);
+
+    const parameters = runner.context.sdkPackage.clients[0].methods[0].parameters;
+    strictEqual(parameters[0].access, "internal");
+  });
+
+  it("model property with override propagation", async () => {
+    await runner.compileWithBuiltInService(`
+      model Foo {
+        @access(Access.internal)
+        foo: Bar;
+
+        @access(Access.internal)
+        baz: Baz;
+      }
+
+      model Bar {
+        prop: string;
+      }
+
+      model Baz {
+        prop: string
+      }
+
+      op test(@body body: Foo): Baz;
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models[0].properties[0].access, "internal");
+    strictEqual(models[0].properties[1].access, "internal");
+    strictEqual(models[1].access, "internal");
+    strictEqual(models[2].access, "public");
+  });
+});
