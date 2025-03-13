@@ -154,7 +154,8 @@ async function exportTCGCOutput(context: SdkContext) {
           return undefined; // skip keys starting with "__" from the output
         }
         if (k === "scheme") {
-          return undefined; // remove credential schema
+          const { model, ...rest } = v;
+          return rest; // remove credential schema's model property
         }
         if (k === "rawExample") {
           return undefined; // remove raw example
