@@ -16,10 +16,10 @@ async function convenientAPITestHelper(
   globalValue: boolean,
 ): Promise<void> {
   const testCode = `
-            @convenientAPI(${convenientValue})
-            @test
-            op test(): void;
-          `;
+    @convenientAPI(${convenientValue})
+    @test
+    op test(): void;
+  `;
   const { test } = await runner.compileWithBuiltInService(testCode);
 
   const actual = shouldGenerateConvenient(
@@ -53,10 +53,10 @@ describe("@convenientAPI", () => {
 
   it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
     const { test } = await runner.compileWithBuiltInService(`
-          @convenientAPI
-          @test
-          op test(): void;
-        `);
+      @convenientAPI
+      @test
+      op test(): void;
+    `);
 
     const actual = shouldGenerateConvenient(
       await createSdkContextTestHelper(runner.program, {
@@ -76,11 +76,11 @@ describe("@convenientAPI", () => {
 describe("@protocolAPI and @convenientAPI with scope", () => {
   it("mark an operation as protocolAPI false for csharp and convenientAPI false for java, pass in default sdkContext", async () => {
     const testCode = `
-          @protocolAPI(false, "csharp")
-          @convenientAPI(false, "java")
-          @test
-          op test(): void;
-        `;
+      @protocolAPI(false, "csharp")
+      @convenientAPI(false, "java")
+      @test
+      op test(): void;
+    `;
 
     // java should get protocolAPI=true and convenientAPI=false
     {

@@ -15,10 +15,10 @@ async function protocolAPITestHelper(
   globalValue: boolean,
 ): Promise<void> {
   const testCode = `
-          @protocolAPI(${protocolValue})
-          @test
-          op test(): void;
-        `;
+    @protocolAPI(${protocolValue})
+    @test
+    op test(): void;
+  `;
   const { test } = await runner.compileWithBuiltInService(testCode);
 
   const actual = shouldGenerateProtocol(

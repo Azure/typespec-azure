@@ -10,13 +10,13 @@ beforeEach(async () => {
 });
 it("models only package", async () => {
   await runner.compile(`
-      @usage(Usage.input | Usage.output)
-      namespace EventGridClient {
-        model CloudEvent {
-          id: string;
-        }
+    @usage(Usage.input | Usage.output)
+    namespace EventGridClient {
+      model CloudEvent {
+        id: string;
       }
-    `);
+    }
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.models[0].name, "CloudEvent");
@@ -30,37 +30,37 @@ it("with azure and versioning decorators", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
-      @usage(Usage.input | Usage.output)
-      @versioned(ServiceApiVersions)
-      namespace EventGridClient {
-        enum ServiceApiVersions {
-          @useDependency(Versions.v1_0_Preview_2)
-          v2018_01_01: "2018-01-01",
-          @useDependency(Versions.v1_0_Preview_2)
-          v2024_01_01: "2024-01-01",
-        }
-        /**
-         * CloudEvent comments
-         */
-        model CloudEvent {
-          /**
-           * id comments
-           */
-          id: string;
-        }
-  
-        /**
-         * Healthcare comments
-         */
-        model HealthcareFhirResourceCreatedEventData {
-          /**
-           * resourceVersionId comments
-           */
-          @added(ServiceApiVersions.v2024_01_01)
-          resourceVersionId: int64;
-        }
+    @usage(Usage.input | Usage.output)
+    @versioned(ServiceApiVersions)
+    namespace EventGridClient {
+      enum ServiceApiVersions {
+        @useDependency(Versions.v1_0_Preview_2)
+        v2018_01_01: "2018-01-01",
+        @useDependency(Versions.v1_0_Preview_2)
+        v2024_01_01: "2024-01-01",
       }
-    `);
+      /**
+       * CloudEvent comments
+       */
+      model CloudEvent {
+        /**
+         * id comments
+         */
+        id: string;
+      }
+
+      /**
+       * Healthcare comments
+       */
+      model HealthcareFhirResourceCreatedEventData {
+        /**
+         * resourceVersionId comments
+         */
+        @added(ServiceApiVersions.v2024_01_01)
+        resourceVersionId: int64;
+      }
+    }
+  `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   const cloudEventModel = sdkPackage.models.find((x) => x.name === "CloudEvent");

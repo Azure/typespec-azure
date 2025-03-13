@@ -11,12 +11,12 @@ beforeEach(async () => {
 
 it("default input json serialization option", async function () {
   await runner.compileWithBuiltInService(`
-      model Blob {
-        id: string;
-      }
+    model Blob {
+      id: string;
+    }
 
-      op test(@body body: Blob): void;
-    `);
+    op test(@body body: Blob): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].serializationOptions.json?.name, "Blob");
@@ -26,12 +26,12 @@ it("default input json serialization option", async function () {
 
 it("default output json serialization option", async function () {
   await runner.compileWithBuiltInService(`
-      model Blob {
-        id: string;
-      }
+    model Blob {
+      id: string;
+    }
 
-      op test(): Blob;
-    `);
+    op test(): Blob;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].serializationOptions.json?.name, "Blob");
@@ -41,13 +41,13 @@ it("default output json serialization option", async function () {
 
 it("json serialization with @encodedName", async () => {
   await runner.compileWithBuiltInService(`
-      model Blob {
-        @encodedName("application/json", "newId")
-        id: string;
-      }
+    model Blob {
+      @encodedName("application/json", "newId")
+      id: string;
+    }
 
-      op test(): Blob;
-    `);
+    op test(): Blob;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].serializationOptions.json?.name, "Blob");
@@ -62,12 +62,12 @@ it("@attribute", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      model Blob {
-        @attribute id: string;
-      }
+    model Blob {
+      @attribute id: string;
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Blob};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Blob};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -85,14 +85,14 @@ it("@name", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @name("XmlBook")
-      model Book {
-        @name("XmlId") id: string;
-        content: string;
-      }
+    @name("XmlBook")
+    model Book {
+      @name("XmlId") id: string;
+      content: string;
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Book};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Book};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -109,17 +109,17 @@ it("@ns", async function () {
   });
 
   await runner.compileWithBuiltInService(`
+    @ns("https://example.com/ns1", "ns1")
+    model Foo {
       @ns("https://example.com/ns1", "ns1")
-      model Foo {
-        @ns("https://example.com/ns1", "ns1")
-        bar1: string;
-      
-        @ns("https://example.com/ns2", "ns2")
-        bar2: string;
-      }
+      bar1: string;
+    
+      @ns("https://example.com/ns2", "ns2")
+      bar2: string;
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -147,23 +147,23 @@ it("@nsDeclarations", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @Xml.nsDeclarations
-      enum Namespaces {
-        ns1: "https://example.com/ns1",
-        ns2: "https://example.com/ns2",
-      }
-      
+    @Xml.nsDeclarations
+    enum Namespaces {
+      ns1: "https://example.com/ns1",
+      ns2: "https://example.com/ns2",
+    }
+    
+    @Xml.ns(Namespaces.ns1)
+    model Foo {
       @Xml.ns(Namespaces.ns1)
-      model Foo {
-        @Xml.ns(Namespaces.ns1)
-        bar1: string;
-      
-        @Xml.ns(Namespaces.ns2)
-        bar2: string;
-      }
+      bar1: string;
+    
+      @Xml.ns(Namespaces.ns2)
+      bar2: string;
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -188,12 +188,12 @@ it("@unwrapped", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      model Pet {
-        @unwrapped tags: string[];
-      }
+    model Pet {
+      @unwrapped tags: string[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -209,14 +209,14 @@ it("array of primitive types unwrapped", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @Xml.unwrapped
-        tags: string[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @Xml.unwrapped
+      tags: string[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -235,15 +235,15 @@ it("array of primitive types unwrapped with rename", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @Xml.unwrapped
-        @encodedName("application/xml", "ItemsTags")
-        tags: string[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @Xml.unwrapped
+      @encodedName("application/xml", "ItemsTags")
+      tags: string[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -262,13 +262,13 @@ it("array of primitive types wrapped", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        tags: string[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      tags: string[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -287,14 +287,14 @@ it("array of primitive types wrapped with rename", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @encodedName("application/xml", "ItemsTags")
-        tags: string[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @encodedName("application/xml", "ItemsTags")
+      tags: string[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -313,16 +313,16 @@ it("array of scalar types unwrapped", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      scalar tag extends string;
+    scalar tag extends string;
 
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @Xml.unwrapped
-        tags: tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @Xml.unwrapped
+      tags: tag[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -341,17 +341,17 @@ it("array of scalar types unwrapped with rename", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      scalar tag extends string;
+    scalar tag extends string;
 
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @Xml.unwrapped
-        @encodedName("application/xml", "ItemsTags")
-        tags: tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @Xml.unwrapped
+      @encodedName("application/xml", "ItemsTags")
+      tags: tag[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -370,15 +370,15 @@ it("array of scalar types wrapped", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      scalar tag extends string;
+    scalar tag extends string;
 
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        tags: tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      tags: tag[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -397,17 +397,17 @@ it("array of scalar types wrapped with rename", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "ItemsName")
-      scalar tag extends string;
+    @encodedName("application/xml", "ItemsName")
+    scalar tag extends string;
 
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @encodedName("application/xml", "ItemsTags")
-        tags: tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @encodedName("application/xml", "ItemsTags")
+      tags: tag[];
+    }
 
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -426,19 +426,19 @@ it("array of complex type unwrapped", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @Xml.unwrapped
-        tags: Tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @Xml.unwrapped
+      tags: Tag[];
+    }
 
-      @encodedName("application/xml", "XmlTag")
-      model Tag {
-        name: string;
-      }
-        
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    @encodedName("application/xml", "XmlTag")
+    model Tag {
+      name: string;
+    }
+      
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -457,20 +457,20 @@ it("array of complex type unwrapped with rename", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @Xml.unwrapped
-        @encodedName("application/xml", "ItemsTag")
-        tags: Tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @Xml.unwrapped
+      @encodedName("application/xml", "ItemsTag")
+      tags: Tag[];
+    }
 
-      @encodedName("application/xml", "XmlTag")
-      model Tag {
-        name: string;
-      }
-        
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    @encodedName("application/xml", "XmlTag")
+    model Tag {
+      name: string;
+    }
+      
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -489,17 +489,17 @@ it("array of complex type wrapped", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        tags: Tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      tags: Tag[];
+    }
 
-      model Tag {
-        name: string;
-      }
-        
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    model Tag {
+      name: string;
+    }
+      
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -518,19 +518,19 @@ it("array of complex type wrapped with rename", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlPet")
-      model Pet {
-        @encodedName("application/xml", "ItemsTags")
-        tags: Tag[];
-      }
+    @encodedName("application/xml", "XmlPet")
+    model Pet {
+      @encodedName("application/xml", "ItemsTags")
+      tags: Tag[];
+    }
 
-      @encodedName("application/xml", "XmlTag")
-      model Tag {
-        name: string;
-      }
-        
-      op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
-    `);
+    @encodedName("application/xml", "XmlTag")
+    model Tag {
+      name: string;
+    }
+      
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -549,13 +549,13 @@ it("orphan model with xml serialization", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      @encodedName("application/xml", "XmlTag")
-      model Tag {
-        @Xml.name("XmlName")
-        name: string;
-      }
-    `);
+    @usage(Usage.input | Usage.output)
+    @encodedName("application/xml", "XmlTag")
+    model Tag {
+      @Xml.name("XmlName")
+      name: string;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -572,12 +572,12 @@ it("orphan model with json serialization", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model Tag {
-        @encodedName("application/json", "rename")
-        name: string;
-      }
-    `);
+    @usage(Usage.input | Usage.output)
+    model Tag {
+      @encodedName("application/json", "rename")
+      name: string;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -593,11 +593,11 @@ it("@unwrapped for string property", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      model BlobName {
-        @unwrapped content: string;
-      }
-    `);
+    @usage(Usage.input | Usage.output)
+    model BlobName {
+      @unwrapped content: string;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -614,14 +614,14 @@ it("different xml content type", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      @encodedName("application/xml", "XmlTag")
-      model Tag {
-        @Xml.name("XmlName")
-        name: string;
-      }
+    @encodedName("application/xml", "XmlTag")
+    model Tag {
+      @Xml.name("XmlName")
+      name: string;
+    }
 
-      op test(): {@header("content-type") contentType: "text/xml; charset=utf-8"; @body body: Tag};
-    `);
+    op test(): {@header("content-type") contentType: "text/xml; charset=utf-8"; @body body: Tag};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -638,13 +638,13 @@ it("different json content type", async function () {
   });
 
   await runner.compileWithBuiltInService(`
-      model Tag {
-        @encodedName("application/json", "rename")
-        name: string;
-      }
+    model Tag {
+      @encodedName("application/json", "rename")
+      name: string;
+    }
 
-      op test(): {@header("content-type") contentType: "application/json; serialization=json"; @body body: Tag};
-    `);
+    op test(): {@header("content-type") contentType: "application/json; serialization=json"; @body body: Tag};
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);

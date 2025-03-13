@@ -17,11 +17,11 @@ afterEach(async () => {
 });
 it("string", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          prop: "json";
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: "json";
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "constant");
@@ -32,11 +32,11 @@ it("string", async function () {
 });
 it("boolean", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @test prop: true;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      @test prop: true;
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "constant");
@@ -47,11 +47,11 @@ it("boolean", async function () {
 });
 it("number", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @test prop: 4;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      @test prop: 4;
+    }
+  `);
 
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "constant");

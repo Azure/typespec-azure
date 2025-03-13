@@ -19,11 +19,11 @@ it("simple case", async () => {
     `${__dirname}/http-operation-examples/simple.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op simple(): void;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op simple(): void;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -50,21 +50,21 @@ it("parameters", async () => {
     `${__dirname}/http-operation-examples/parameters.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @route("/{b}")
-        op parameters(
-          @header a: string,
-          @path b: string,
-          @query c: string,
-          @body d: string,
-          @header testHeader: string,
-          @clientName("renameQuery")
-          @query testQuery: string,
-          @path("renamePath") testPath: string,
-        ): void;
-      }
-    `);
+    @service
+    namespace TestClient {
+      @route("/{b}")
+      op parameters(
+        @header a: string,
+        @path b: string,
+        @query c: string,
+        @body d: string,
+        @header testHeader: string,
+        @clientName("renameQuery")
+        @query testQuery: string,
+        @path("renamePath") testPath: string,
+      ): void;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -114,13 +114,13 @@ it("body with encoded name", async () => {
     `${__dirname}/http-operation-examples/bodyWithEncodedName.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op encodedname(
-          @body @encodedName("application/json", "b") body: string,
-        ): void;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op encodedname(
+        @body @encodedName("application/json", "b") body: string,
+      ): void;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -146,11 +146,11 @@ it("body fallback", async () => {
     `${__dirname}/http-operation-examples/bodyFallback.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op bodyTest(prop: string): void;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op bodyTest(prop: string): void;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -177,17 +177,17 @@ it("parameters diagnostic", async () => {
     `${__dirname}/http-operation-examples/parametersDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @route("/{b}")
-        op parametersDiagnostic(
-          @header a: string,
-          @path b: string,
-          @query c: string,
-          @body d: string,
-        ): void;
-      }
-    `);
+    @service
+    namespace TestClient {
+      @route("/{b}")
+      op parametersDiagnostic(
+        @header a: string,
+        @path b: string,
+        @query c: string,
+        @body d: string,
+      ): void;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -212,21 +212,21 @@ it("responses", async () => {
     `${__dirname}/http-operation-examples/responses.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op responses(): {
-          @statusCode
-          code: 200,
-          @body
-          body: string
-        } | {
-          @statusCode
-          code: 201,
-          @header
-          test: string
-        };
-      }
-    `);
+    @service
+    namespace TestClient {
+      op responses(): {
+        @statusCode
+        code: 200,
+        @body
+        body: string
+      } | {
+        @statusCode
+        code: 201,
+        @header
+        test: string
+      };
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -274,21 +274,21 @@ it("responses diagnostic", async () => {
     `${__dirname}/http-operation-examples/responsesDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op responsesDiagnostic(): {
-          @statusCode
-          code: 200,
-          @body
-          body: string
-        } | {
-          @statusCode
-          code: 201,
-          @header
-          test: string
-        };
-      }
-    `);
+    @service
+    namespace TestClient {
+      op responsesDiagnostic(): {
+        @statusCode
+        code: 200,
+        @body
+        body: string
+      } | {
+        @statusCode
+        code: 201,
+        @header
+        test: string
+      };
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>

@@ -17,19 +17,19 @@ beforeEach(async () => {
 
 it("basic", async () => {
   await runner.compile(`
-        @service
-        @test namespace MyService {
-          model InputModel {
-            prop: string
-          }
+    @service
+    @test namespace MyService {
+      model InputModel {
+        prop: string
+      }
 
-          model OutputModel {
-            prop: string
-          }
+      model OutputModel {
+        prop: string
+      }
 
-          op test(@body input: InputModel): OutputModel;
-        }
-      `);
+      op test(@body input: InputModel): OutputModel;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -38,15 +38,15 @@ it("basic", async () => {
 
 it("models in Record", async () => {
   await runner.compile(`
-        @service
-        @test namespace MyService {
-          model InnerModel {
-            prop: string
-          }
+    @service
+    @test namespace MyService {
+      model InnerModel {
+        prop: string
+      }
 
-          op test(@body input: Record<InnerModel>): void;
-        }
-      `);
+      op test(@body input: Record<InnerModel>): void;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const modelNames = models.map((model) => model.name).sort();
@@ -59,15 +59,15 @@ it("models in Record", async () => {
 
 it("models in Array", async () => {
   await runner.compile(`
-        @service
-        @test namespace MyService {
-          model InnerModel {
-            prop: string
-          }
+    @service
+    @test namespace MyService {
+      model InnerModel {
+        prop: string
+      }
 
-          op test(@body input: InnerModel[]): void;
-        }
-      `);
+      op test(@body input: InnerModel[]): void;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const modelNames = models.map((model) => model.name).sort();
@@ -80,19 +80,19 @@ it("models in Array", async () => {
 
 it("embedded models", async () => {
   await runner.compile(`
-        @service
-        @test namespace MyService {
-          model InnerModel {
-            prop: string
-          }
+    @service
+    @test namespace MyService {
+      model InnerModel {
+        prop: string
+      }
 
-          model InputModel {
-            prop: InnerModel
-          }
+      model InputModel {
+        prop: InnerModel
+      }
 
-          op test(@body input: InputModel): void;
-        }
-      `);
+      op test(@body input: InputModel): void;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -105,19 +105,19 @@ it("embedded models", async () => {
 
 it("base model", async () => {
   await runner.compile(`
-        @service
-        @test namespace MyService {
-          model BaseModel {
-            prop: string
-          }
+    @service
+    @test namespace MyService {
+      model BaseModel {
+        prop: string
+      }
 
-          model InputModel extends BaseModel {
-            prop2: string
-          }
+      model InputModel extends BaseModel {
+        prop2: string
+      }
 
-          op test(@body input: InputModel): void;
-        }
-      `);
+      op test(@body input: InputModel): void;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -130,16 +130,16 @@ it("base model", async () => {
 
 it("derived model", async () => {
   await runner.compileWithBuiltInService(`
-      model InputModel {
-        prop: string
-      }
+    model InputModel {
+      prop: string
+    }
 
-      model DerivedModel extends InputModel {
-        prop2: string
-      }
+    model DerivedModel extends InputModel {
+      prop2: string
+    }
 
-      op test(@body input: DerivedModel): void;
-      `);
+    op test(@body input: DerivedModel): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -152,12 +152,12 @@ it("derived model", async () => {
 
 it("recursive model", async () => {
   await runner.compileWithBuiltInService(`
-      model RecursiveModel {
-        prop: RecursiveModel
-      }
-        
-      op test(@body input: RecursiveModel): RecursiveModel;
-    `);
+    model RecursiveModel {
+      prop: RecursiveModel
+    }
+      
+    op test(@body input: RecursiveModel): RecursiveModel;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const recursiveModel = models[0];
@@ -176,34 +176,34 @@ it("recursive model", async () => {
 
 it("discriminator model", async () => {
   await runner.compileWithBuiltInService(`
-      @discriminator("kind")
-      model Fish {
-        age: int32;
-      }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-      @discriminator("sharktype")
-      model Shark extends Fish {
-        kind: "shark";
-      }
+    @discriminator("sharktype")
+    model Shark extends Fish {
+      kind: "shark";
+    }
 
-      model Salmon extends Fish {
-        kind: "salmon";
-        friends?: Fish[];
-        hate?: Record<Fish>;
-        partner?: Fish;
-      }
+    model Salmon extends Fish {
+      kind: "salmon";
+      friends?: Fish[];
+      hate?: Record<Fish>;
+      partner?: Fish;
+    }
 
-      model SawShark extends Shark {
-        sharktype: "saw";
-      }
+    model SawShark extends Shark {
+      sharktype: "saw";
+    }
 
-      model GoblinShark extends Shark {
-        sharktype: "goblin";
-      }
+    model GoblinShark extends Shark {
+      sharktype: "goblin";
+    }
 
-      @get
-      op getModel(): Fish;
-      `);
+    @get
+    op getModel(): Fish;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 5);
   const fish = models.find((x) => x.name === "Fish");
@@ -237,21 +237,21 @@ it("discriminator model", async () => {
 
 it("handle derived model with discriminator first", async () => {
   await runner.compileWithBuiltInService(`
-      model Salmon extends Fish {
-        kind: "salmon";
-        friends?: Fish[];
-        hate?: Record<Fish>;
-        partner?: Fish;
-      }
+    model Salmon extends Fish {
+      kind: "salmon";
+      friends?: Fish[];
+      hate?: Record<Fish>;
+      partner?: Fish;
+    }
 
-      @discriminator("kind")
-      model Fish {
-        age: int32;
-      }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-      @get
-      op getSalmon(): Salmon;
-      `);
+    @get
+    op getSalmon(): Salmon;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const fish = models.find((x) => x.name === "Fish");
@@ -285,14 +285,14 @@ it("handle derived model with discriminator first", async () => {
 
 it("single discriminated model", async () => {
   await runner.compileWithBuiltInService(`
-      @discriminator("kind")
-      model Fish {
-        age: int32;
-      }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-      @get
-      op getModel(): Fish;
-      `);
+    @get
+    op getModel(): Fish;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const fish = models.find((x) => x.name === "Fish");
@@ -312,24 +312,24 @@ it("single discriminated model", async () => {
 
 it("enum discriminator model", async () => {
   await runner.compileWithBuiltInService(`
-      enum DogKind {
-        Golden: "golden",
-      }
+    enum DogKind {
+      Golden: "golden",
+    }
 
-      @discriminator("kind")
-      model Dog {
-        kind: DogKind;
-        weight: int32;
-      }
+    @discriminator("kind")
+    model Dog {
+      kind: DogKind;
+      weight: int32;
+    }
 
-      model Golden extends Dog {
-        kind: DogKind.Golden;
-      }
+    model Golden extends Dog {
+      kind: DogKind.Golden;
+    }
 
-      @route("/extensible-enum")
-      @get
-      op getExtensibleModel(): Dog;
-      `);
+    @route("/extensible-enum")
+    @get
+    op getExtensibleModel(): Dog;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
 
@@ -363,15 +363,15 @@ it("enum discriminator model", async () => {
 it("anonymous model contains template", async () => {
   await runner.compileWithBuiltInService(`
 
-      model Name {
-        name: string;
-      }
-      model ModelTemplate<T> {
-        prop: T
-      }
+    model Name {
+      name: string;
+    }
+    model ModelTemplate<T> {
+      prop: T
+    }
 
-      op test(): {prop: ModelTemplate<Name>};
-      `);
+    op test(): {prop: ModelTemplate<Name>};
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const modelNames = models.map((model) => model.name).sort();
@@ -380,18 +380,18 @@ it("anonymous model contains template", async () => {
 
 it("union to extensible enum values", async () => {
   await runner.compileWithBuiltInService(`
-      union PetKind {
-        @doc("Cat")
-        Cat: "cat",
-        @doc("Dog")
-        Dog: "dog",
-        string,
-      }
+    union PetKind {
+      @doc("Cat")
+      Cat: "cat",
+      @doc("Dog")
+      Dog: "dog",
+      string,
+    }
 
-      @route("/extensible-enum")
-      @put
-      op putPet(@body petKind: PetKind): void;
-      `);
+    @route("/extensible-enum")
+    @put
+    op putPet(@body petKind: PetKind): void;
+  `);
   strictEqual(runner.context.sdkPackage.enums.length, 1);
   const petKind = runner.context.sdkPackage.enums[0];
   strictEqual(petKind.name, "PetKind");
@@ -422,17 +422,17 @@ it("union to extensible enum values", async () => {
 
 it("template variable of anonymous union", async () => {
   await runner.compileWithBuiltInService(`
-      interface GetAndSend<Type> {
-        get(): {
-          prop: Type;
-        };
-      
-        send(prop: Type): void;
-      }
-      
-      @route("/string-extensible")
-      interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
-      `);
+    interface GetAndSend<Type> {
+      get(): {
+        prop: Type;
+      };
+    
+      send(prop: Type): void;
+    }
+    
+    @route("/string-extensible")
+    interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   strictEqual(sdkPackage.enums.length, 1);
@@ -450,14 +450,14 @@ it("template variable of anonymous union", async () => {
 
 it("property of anonymous union as enum", async () => {
   await runner.compileWithBuiltInService(`
-      model Pet {
-        kind: string | "cat" | "dog";
-      }
+    model Pet {
+      kind: string | "cat" | "dog";
+    }
 
-      @route("/extensible-enum")
-      @put
-      op putPet(@body pet: Pet): void;
-      `);
+    @route("/extensible-enum")
+    @put
+    op putPet(@body pet: Pet): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const pet = models.find((x) => x.name === "Pet");
@@ -473,13 +473,13 @@ it("property of anonymous union as enum", async () => {
 
 it("request/response header with enum value", async () => {
   await runner.compileWithBuiltInService(`
-      model RepeatableResponse {
-        @visibility(Lifecycle.Read)
-        @header("Repeatability-Result")
-        repeatabilityResult?: "accepted" | "rejected";
-      }
-      op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
-      `);
+    model RepeatableResponse {
+      @visibility(Lifecycle.Read)
+      @header("Repeatability-Result")
+      repeatabilityResult?: "accepted" | "rejected";
+    }
+    op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 0);
   strictEqual(sdkPackage.enums.length, 2);
@@ -497,23 +497,23 @@ it("request/response header with enum value", async () => {
 
 it("enum discriminator model without base discriminator property", async () => {
   await runner.compileWithBuiltInService(`
-      enum DogKind {
-        Golden: "golden",
-      }
+    enum DogKind {
+      Golden: "golden",
+    }
 
-      @discriminator("kind")
-      model Dog {
-        weight: int32;
-      }
+    @discriminator("kind")
+    model Dog {
+      weight: int32;
+    }
 
-      model Golden extends Dog {
-        kind: DogKind.Golden;
-      }
+    model Golden extends Dog {
+      kind: DogKind.Golden;
+    }
 
-      @route("/extensible-enum")
-      @get
-      op getExtensibleModel(): Dog;
-      `);
+    @route("/extensible-enum")
+    @get
+    op getExtensibleModel(): Dog;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
 
@@ -544,35 +544,35 @@ it("enum discriminator model without base discriminator property", async () => {
 
 it("discriminator", async () => {
   await runner.compileWithBuiltInService(`
-      @discriminator("kind")
-      model Fish {
-        age: int32;
-      }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-      @discriminator("sharktype")
-      model Shark extends Fish {
-        kind: "shark";
-        sharktype: string;
-      }
+    @discriminator("sharktype")
+    model Shark extends Fish {
+      kind: "shark";
+      sharktype: string;
+    }
 
-      model Salmon extends Fish {
-        kind: "salmon";
-        friends?: Fish[];
-        hate?: Record<Fish>;
-        partner?: Fish;
-      }
+    model Salmon extends Fish {
+      kind: "salmon";
+      friends?: Fish[];
+      hate?: Record<Fish>;
+      partner?: Fish;
+    }
 
-      model SawShark extends Shark {
-        sharktype: "saw";
-      }
+    model SawShark extends Shark {
+      sharktype: "saw";
+    }
 
-      model GoblinShark extends Shark {
-        sharktype: "goblin";
-      }
+    model GoblinShark extends Shark {
+      sharktype: "goblin";
+    }
 
-      @get
-      op getModel(): Fish;
-      `);
+    @get
+    op getModel(): Fish;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 5);
   const shark = models.find((x) => x.name === "Shark");
@@ -587,30 +587,30 @@ it("discriminator", async () => {
 
 it("union discriminator", async () => {
   await runner.compileWithBuiltInService(`
-      union KindType {
-        string,
-        shark: "shark",
-        salmon: "salmon"
-      };
+    union KindType {
+      string,
+      shark: "shark",
+      salmon: "salmon"
+    };
 
-      @discriminator("kind")
-      model Fish {
-        age: int32;
-      }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-      model Shark extends Fish {
-        kind: KindType.shark;
-        hasFin: boolean;
-      }
+    model Shark extends Fish {
+      kind: KindType.shark;
+      hasFin: boolean;
+    }
 
-      model Salmon extends Fish {
-        kind: KindType.salmon;
-        norweigan: boolean;
-      }
+    model Salmon extends Fish {
+      kind: KindType.salmon;
+      norweigan: boolean;
+    }
 
-      @get
-      op getModel(): Fish;
-      `);
+    @get
+    op getModel(): Fish;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const fish = models.find((x) => x.name === "Fish");
@@ -641,31 +641,31 @@ it("union discriminator", async () => {
 
 it("string discriminator map to enum value", async () => {
   await runner.compileWithBuiltInService(`
-      union KindType {
-        string,
-        shark: "shark",
-        salmon: "salmon"
-      };
+    union KindType {
+      string,
+      shark: "shark",
+      salmon: "salmon"
+    };
 
-      @discriminator("kind")
-      model Fish {
-        kind: KindType;
-        age: int32;
-      }
+    @discriminator("kind")
+    model Fish {
+      kind: KindType;
+      age: int32;
+    }
 
-      model Shark extends Fish {
-        kind: "shark";
-        hasFin: boolean;
-      }
+    model Shark extends Fish {
+      kind: "shark";
+      hasFin: boolean;
+    }
 
-      model Salmon extends Fish {
-        kind: "salmon";
-        norweigan: boolean;
-      }
+    model Salmon extends Fish {
+      kind: "salmon";
+      norweigan: boolean;
+    }
 
-      @get
-      op getModel(): Fish;
-      `);
+    @get
+    op getModel(): Fish;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const fish = models.find((x) => x.name === "Fish");
@@ -696,24 +696,24 @@ it("string discriminator map to enum value", async () => {
 
 it("discriminator rename", async () => {
   await runner.compileWithBuiltInService(`
-      @discriminator("kind")
-      model Fish {
-        @clientName("type")
-        @encodedName("application/json", "@data.kind")
-        kind: string;
-        age: int32;
-      }
+    @discriminator("kind")
+    model Fish {
+      @clientName("type")
+      @encodedName("application/json", "@data.kind")
+      kind: string;
+      age: int32;
+    }
 
-      model Salmon extends Fish {
-        kind: "salmon";
-        friends?: Fish[];
-        hate?: Record<Fish>;
-        partner?: Fish;
-      }
+    model Salmon extends Fish {
+      kind: "salmon";
+      friends?: Fish[];
+      hate?: Record<Fish>;
+      partner?: Fish;
+    }
 
-      @get
-      op getModel(): Fish;
-      `);
+    @get
+    op getModel(): Fish;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const fish = models.find((x) => x.name === "Fish");
@@ -731,16 +731,16 @@ it("discriminator rename", async () => {
 
 it("discriminator with encodedName", async () => {
   await runner.compileWithBuiltInService(`
-      @discriminator("odataType")
-      model CharFilter {
-        @encodedName("application/json", "@odata.type")
-        odataType: string;
-        name: string;
-      }
+    @discriminator("odataType")
+    model CharFilter {
+      @encodedName("application/json", "@odata.type")
+      odataType: string;
+      name: string;
+    }
 
-      @get
-      op getModel(): CharFilter;
-    `);
+    @get
+    op getModel(): CharFilter;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const discriminatorProperty = models[0].discriminatorProperty;
@@ -757,21 +757,21 @@ it("filterOutCoreModels true", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      @resource("users")
-      @doc("Details about a user.")
-      model User {
-        @key
-        @doc("The user's id.")
-        @visibility(Lifecycle.Read)
-        id: int32;
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+      @key
+      @doc("The user's id.")
+      @visibility(Lifecycle.Read)
+      id: int32;
 
-        @doc("The user's name.")
-        name: string;
-      }
+      @doc("The user's name.")
+      name: string;
+    }
 
-      @doc("Creates or updates a User")
-      op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
-      `);
+    @doc("Creates or updates a User")
+    op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
+  `);
   const models = runner.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "User");
@@ -791,21 +791,21 @@ it("filterOutCoreModels false", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-        @resource("users")
-        @doc("Details about a user.")
-        model User {
-          @key
-          @doc("The user's id.")
-          @visibility(Lifecycle.Read)
-          id: int32;
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+      @key
+      @doc("The user's id.")
+      @visibility(Lifecycle.Read)
+      id: int32;
 
-          @doc("The user's name.")
-          name: string;
-        }
+      @doc("The user's name.")
+      name: string;
+    }
 
-        @doc("Creates or updates a User")
-        op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
-      `);
+    @doc("Creates or updates a User")
+    op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
+  `);
   const models = runner.context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
   strictEqual(models.length, 4);
   strictEqual(models[0].name, "Error");
@@ -825,22 +825,22 @@ it("lro core filterOutCoreModels true", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      @resource("users")
-      @doc("Details about a user.")
-      model User {
-        @key
-        @doc("The user's name.")
-        @visibility(Lifecycle.Read)
-        name: string;
-      }
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+      @key
+      @doc("The user's name.")
+      @visibility(Lifecycle.Read)
+      name: string;
+    }
 
-      @doc("Gets status.")
-      op getStatus is StandardResourceOperations.GetResourceOperationStatus<User>;
+    @doc("Gets status.")
+    op getStatus is StandardResourceOperations.GetResourceOperationStatus<User>;
 
-      @doc("Polls status.")
-      @pollingOperation(My.Service.getStatus)
-      op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
-      `);
+    @doc("Polls status.")
+    @pollingOperation(My.Service.getStatus)
+    op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
+  `);
   const models = runner.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "User");
@@ -854,22 +854,22 @@ it("lro core filterOutCoreModels false", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      @resource("users")
-      @doc("Details about a user.")
-      model User {
-        @key
-        @doc("The user's name.")
-        @visibility(Lifecycle.Read)
-        name: string;
-      }
+    @resource("users")
+    @doc("Details about a user.")
+    model User {
+      @key
+      @doc("The user's name.")
+      @visibility(Lifecycle.Read)
+      name: string;
+    }
 
-      @doc("Gets status.")
-      op getStatus is StandardResourceOperations.GetResourceOperationStatus<User>;
+    @doc("Gets status.")
+    op getStatus is StandardResourceOperations.GetResourceOperationStatus<User>;
 
-      @doc("Polls status.")
-      @pollingOperation(My.Service.getStatus)
-      op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
-      `);
+    @doc("Polls status.")
+    @pollingOperation(My.Service.getStatus)
+    op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
+  `);
   const models = runner.context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
   strictEqual(models.length, 5);
   strictEqual(models[0].name, "Error");
@@ -893,11 +893,11 @@ it("model with core property", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compileWithBuiltInAzureCoreService(`
-      @usage(Usage.input)
-      model MyError {
-        innerError: Azure.Core.Foundations.Error;
-      }
-      `);
+    @usage(Usage.input)
+    model MyError {
+      innerError: Azure.Core.Foundations.Error;
+    }
+  `);
   const models = runnerWithCore.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const myError = models.find((x) => x.name === "MyError");
@@ -926,20 +926,20 @@ it("no models filter core", async () => {
 
 it("no models don't filter core", async () => {
   await runner.compile(`
-        @service
-        @test namespace MyService { }
-      `);
+    @service
+    @test namespace MyService { }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 0);
 });
 
 it("input usage", async () => {
   await runner.compileWithBuiltInService(`
-        model InputModel {
-          prop: string
-        }
-        op operation(@body input: InputModel): void;
-      `);
+    model InputModel {
+      prop: string
+    }
+    op operation(@body input: InputModel): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
@@ -964,11 +964,11 @@ it("output usage", async () => {
 
 it("roundtrip usage", async () => {
   await runner.compileWithBuiltInService(`
-        model RoundtripModel {
-          prop: string
-        }
-        op operation(@body input: RoundtripModel): RoundtripModel;
-      `);
+    model RoundtripModel {
+      prop: string
+    }
+    op operation(@body input: RoundtripModel): RoundtripModel;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
@@ -980,21 +980,21 @@ it("roundtrip usage", async () => {
 
 it("readonly usage", async () => {
   await runner.compileWithBuiltInService(`
-        model ResultModel {
-          name: string;
-        }
-      
-        model RoundTripModel {
-          @visibility(Lifecycle.Read)
-          result: ResultModel;
-        }
-      
-        @route("/modelInReadOnlyProperty")
-        @put
-        op modelInReadOnlyProperty(@body body: RoundTripModel): {
-          @body body: RoundTripModel;
-        };
-      `);
+    model ResultModel {
+      name: string;
+    }
+
+    model RoundTripModel {
+      @visibility(Lifecycle.Read)
+      result: ResultModel;
+    }
+
+    @route("/modelInReadOnlyProperty")
+    @put
+    op modelInReadOnlyProperty(@body body: RoundTripModel): {
+      @body body: RoundTripModel;
+    };
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(
@@ -1009,32 +1009,32 @@ it("readonly usage", async () => {
 
 it("propagation", async () => {
   await runner.compileWithBuiltInService(`
-        @discriminator("kind")
-        model Fish {
-          age: int32;
-        }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-        @discriminator("sharktype")
-        model Shark extends Fish {
-          kind: "shark";
-        }
+    @discriminator("sharktype")
+    model Shark extends Fish {
+      kind: "shark";
+    }
 
-        model Salmon extends Fish {
-          kind: "salmon";
-          friends?: Fish[];
-          hate?: Record<Fish>;
-          partner?: Fish;
-        }
+    model Salmon extends Fish {
+      kind: "salmon";
+      friends?: Fish[];
+      hate?: Record<Fish>;
+      partner?: Fish;
+    }
 
-        model SawShark extends Shark {
-          sharktype: "saw";
-        }
+    model SawShark extends Shark {
+      sharktype: "saw";
+    }
 
-        model GoblinShark extends Shark {
-          sharktype: "goblin";
-        }
-        op operation(@body input: Shark): Shark;
-      `);
+    model GoblinShark extends Shark {
+      sharktype: "goblin";
+    }
+    op operation(@body input: Shark): Shark;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 4);
   for (const model of models) {
@@ -1073,29 +1073,29 @@ it("propagation", async () => {
 
 it("propagation from subtype", async () => {
   await runner.compileWithBuiltInService(`
-        @discriminator("kind")
-        model Fish {
-          age: int32;
-        }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
 
-        @discriminator("sharktype")
-        model Shark extends Fish {
-          kind: "shark";
-        }
+    @discriminator("sharktype")
+    model Shark extends Fish {
+      kind: "shark";
+    }
 
-        model Salmon extends Fish {
-          kind: "salmon";
-        }
+    model Salmon extends Fish {
+      kind: "salmon";
+    }
 
-        model SawShark extends Shark {
-          sharktype: "saw";
-        }
+    model SawShark extends Shark {
+      sharktype: "saw";
+    }
 
-        model GoblinShark extends Shark {
-          sharktype: "goblin";
-        }
-        op operation(@body input: Salmon): Salmon;
-      `);
+    model GoblinShark extends Shark {
+      sharktype: "goblin";
+    }
+    op operation(@body input: Salmon): Salmon;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   for (const model of models) {
@@ -1136,36 +1136,36 @@ it("propagation from subtype", async () => {
 
 it("propagation from subtype of type with another discriminated property", async () => {
   await runner.compileWithBuiltInService(`
-        @discriminator("kind")
-        model Fish {
-          age: int32;
-          food: Food;
-        }
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+      food: Food;
+    }
 
-        @discriminator("sharktype")
-        model Shark extends Fish {
-          kind: "shark";
-        }
+    @discriminator("sharktype")
+    model Shark extends Fish {
+      kind: "shark";
+    }
 
-        @discriminator("kind")
-        model Food {
-          kind: string;
-        }
+    @discriminator("kind")
+    model Food {
+      kind: string;
+    }
 
-        model Salmon extends Fish {
-          kind: "salmon";
-          friends?: Fish[];
-        }
+    model Salmon extends Fish {
+      kind: "salmon";
+      friends?: Fish[];
+    }
 
-        model Fruit extends Food {
-          kind: "fruit";
-        }
+    model Fruit extends Food {
+      kind: "fruit";
+    }
 
-        model Meet extends Food {
-          kind: "meet";
-        }
-        op operation(@body input: Salmon): Salmon;
-      `);
+    model Meet extends Food {
+      kind: "meet";
+    }
+    op operation(@body input: Salmon): Salmon;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 6);
   for (const model of models) {
@@ -1213,14 +1213,14 @@ it("propagation from subtype of type with another discriminated property", async
 
 it("unnamed model", async () => {
   await runner.compileWithBuiltInService(`
-        model Test {
-          prop1: {innerProp1: string};
-          prop2: {innerProp2: string};
-        }
-        op func(
-          @body body: Test
-        ): void;
-      `);
+    model Test {
+      prop1: {innerProp1: string};
+      prop2: {innerProp2: string};
+    }
+    op func(
+      @body body: Test
+    ): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const propreties: string[] = [];
@@ -1235,14 +1235,14 @@ it("unnamed model", async () => {
 
 it("model access transitive closure", async () => {
   await runner.compileWithBuiltInService(`
-        model Test {
-          prop: string;
-        }
-        @access(Access.internal)
-        op func(
-          @body body: Test
-        ): void;
-      `);
+    model Test {
+      prop: string;
+    }
+    @access(Access.internal)
+    op func(
+      @body body: Test
+    ): void;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1251,56 +1251,56 @@ it("model access transitive closure", async () => {
 
 it("complicated access transitive closure", async () => {
   await runner.compileWithBuiltInService(`
-        model Test1 {
-          prop: Test2;
-        }
-        model Test2 {
-          prop: string;
-        }
-        @access(Access.internal)
-        @route("/func1")
-        op func1(
-          @body body: Test1
-        ): void;
+    model Test1 {
+      prop: Test2;
+    }
+    model Test2 {
+      prop: string;
+    }
+    @access(Access.internal)
+    @route("/func1")
+    op func1(
+      @body body: Test1
+    ): void;
 
-        model Test3 {
-          prop: string;
-        }
+    model Test3 {
+      prop: string;
+    }
 
-        @access(Access.internal)
-        @route("/func2")
-        op func2(
-          @body body: Test3
-        ): void;
+    @access(Access.internal)
+    @route("/func2")
+    op func2(
+      @body body: Test3
+    ): void;
 
-        @route("/func3")
-        op func3(
-          @body body: Test3
-        ): void;
+    @route("/func3")
+    op func3(
+      @body body: Test3
+    ): void;
 
-        model Test4 {
-          prop: Test5;
-        }
+    model Test4 {
+      prop: Test5;
+    }
 
-        model Test5 {
-          prop: Test6;
-        }
+    model Test5 {
+      prop: Test6;
+    }
 
-        model Test6 {
-          prop: string;
-        }
+    model Test6 {
+      prop: string;
+    }
 
-        @access(Access.internal)
-        @route("/func4")
-        op func4(
-          @body body: Test4
-        ): void;
+    @access(Access.internal)
+    @route("/func4")
+    op func4(
+      @body body: Test4
+    ): void;
 
-        @route("/func5")
-        op func5(
-          @body body: Test6
-        ): void;
-      `);
+    @route("/func5")
+    op func5(
+      @body body: Test6
+    ): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 6);
 
@@ -1331,24 +1331,24 @@ it("complicated access transitive closure", async () => {
 
 it("additionalProperties of same type", async () => {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model AdditionalPropertiesModel extends Record<string> {
-          prop: string;
-        }
-        @usage(Usage.input | Usage.output)
-        model AdditionalPropertiesModel2 is Record<unknown> {
-          prop: string;
-        }
-        @usage(Usage.input | Usage.output)
-        model AdditionalPropertiesModel3 {
-          prop: string;
-          ...Record<string>;
-        }
-        @usage(Usage.input | Usage.output)
-        model NoAdditionalPropertiesModel {
-          prop: string;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model AdditionalPropertiesModel extends Record<string> {
+      prop: string;
+    }
+    @usage(Usage.input | Usage.output)
+    model AdditionalPropertiesModel2 is Record<unknown> {
+      prop: string;
+    }
+    @usage(Usage.input | Usage.output)
+    model AdditionalPropertiesModel3 {
+      prop: string;
+      ...Record<string>;
+    }
+    @usage(Usage.input | Usage.output)
+    model NoAdditionalPropertiesModel {
+      prop: string;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 4);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
@@ -1372,30 +1372,30 @@ it("additionalProperties of same type", async () => {
 
 it("additionalProperties usage", async () => {
   await runner.compileWithBuiltInService(`
-        @service
-        namespace MyService {
-          model AdditionalPropertiesModel extends Record<Test> {
-          }
-  
-          model AdditionalPropertiesModel2 is Record<Test> {
-          }
+    @service
+    namespace MyService {
+      model AdditionalPropertiesModel extends Record<Test> {
+      }
 
-          model AdditionalPropertiesModel3 {
-            ...Record<Test2>;
-          }
+      model AdditionalPropertiesModel2 is Record<Test> {
+      }
 
-          model Test {
-          }
+      model AdditionalPropertiesModel3 {
+        ...Record<Test2>;
+      }
 
-          model Test2 {
-          }
+      model Test {
+      }
 
-          @route("test")
-          op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
-          @route("test2")
-          op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
-        }
-      `);
+      model Test2 {
+      }
+
+      @route("test")
+      op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
+      @route("test2")
+      op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 5);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
@@ -1429,18 +1429,18 @@ it("additionalProperties usage", async () => {
 
 it("additionalProperties of different types", async () => {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model AdditionalPropertiesModel {
-          prop: string;
-          ...Record<float32>;
-        }
+    @usage(Usage.input | Usage.output)
+    model AdditionalPropertiesModel {
+      prop: string;
+      ...Record<float32>;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model AdditionalPropertiesModel2 {
-          prop: string;
-          ...Record<boolean | float32>;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model AdditionalPropertiesModel2 {
+      prop: string;
+      ...Record<boolean | float32>;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
@@ -1456,15 +1456,15 @@ it("additionalProperties of different types", async () => {
 
 it("crossLanguageDefinitionId", async () => {
   await runner.compile(`
-        @service
-        namespace MyService {
-          @usage(Usage.input)
-          model InputModel {}
+    @service
+    namespace MyService {
+      @usage(Usage.input)
+      model InputModel {}
 
-          @usage(Usage.output)
-          model OutputModel {}
-        }
-      `);
+      @usage(Usage.output)
+      model OutputModel {}
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const inputModel = models.find((x) => x.name === "InputModel");
@@ -1477,36 +1477,36 @@ it("crossLanguageDefinitionId", async () => {
 
 it("template model", async () => {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Catalog is TrackedResource<CatalogProperties> {
-          @pattern("^[A-Za-z0-9_-]{1,50}$")
-          @key("catalogName")
-          @segment("catalogs")
-          name: string;
-        }
+    @usage(Usage.input | Usage.output)
+    model Catalog is TrackedResource<CatalogProperties> {
+      @pattern("^[A-Za-z0-9_-]{1,50}$")
+      @key("catalogName")
+      @segment("catalogs")
+      name: string;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model CatalogProperties {
-          test?: string;
-        }
+    @usage(Usage.input | Usage.output)
+    model CatalogProperties {
+      test?: string;
+    }
 
-        model TrackedResource<TProperties extends {}> {
-          properties?: TProperties;
-        }
+    model TrackedResource<TProperties extends {}> {
+      properties?: TProperties;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model Deployment is TrackedResource<DeploymentProperties> {
-          @key("deploymentName")
-          @segment("deployments")
-          name: string;
-        }
+    @usage(Usage.input | Usage.output)
+    model Deployment is TrackedResource<DeploymentProperties> {
+      @key("deploymentName")
+      @segment("deployments")
+      name: string;
+    }
 
-        @usage(Usage.input | Usage.output)
-        model DeploymentProperties {
-          deploymentId?: string;
-          deploymentDateUtc?: utcDateTime;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model DeploymentProperties {
+      deploymentId?: string;
+      deploymentDateUtc?: utcDateTime;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 4);
   const catalog = models.find((x) => x.name === "Catalog");
@@ -1518,15 +1518,15 @@ it("template model", async () => {
 
 it("model with deprecated annotation", async () => {
   await runner.compileAndDiagnose(`
-        @service
-        namespace MyService;
-        #deprecated "no longer support"
-        model Test {
-        }
-        op func(
-          @body body: Test
-        ): void;
-      `);
+    @service
+    namespace MyService;
+    #deprecated "no longer support"
+    model Test {
+    }
+    op func(
+      @body body: Test
+    ): void;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1535,15 +1535,15 @@ it("model with deprecated annotation", async () => {
 
 it("orphan model", async () => {
   await runner.compileAndDiagnose(`
-        @service
-        @test namespace MyService {
-          @test
-          @usage(Usage.input | Usage.output)
-          model Model1{}
+    @service
+    @test namespace MyService {
+      @test
+      @usage(Usage.input | Usage.output)
+      model Model1{}
 
-          model Model2{}
-        }
-      `);
+      model Model2{}
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1554,43 +1554,43 @@ it("orphan model", async () => {
 
 it("model with client hierarchy", async () => {
   await runner.compile(`
-        @service
-        namespace Test1Client {
-          model T1 {
-            prop: string;
-          }
-          model T2 {
-            prop: string;
-          }
-          @route("/b")
-          namespace B {
-            op x(): void;
+    @service
+    namespace Test1Client {
+      model T1 {
+        prop: string;
+      }
+      model T2 {
+        prop: string;
+      }
+      @route("/b")
+      namespace B {
+        op x(): void;
 
-            @route("/c")
-            interface C {
-              op y(): T1;
-            }
-
-            @route("/d")
-            namespace D {
-              op z(@body body: T2): void;
-            }
-          }
+        @route("/c")
+        interface C {
+          op y(): T1;
         }
-      `);
+
+        @route("/d")
+        namespace D {
+          op z(@body body: T2): void;
+        }
+      }
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
 });
 
 it("error model", async () => {
   await runner.compileWithBuiltInService(`
-        @error
-        model ApiError {
-          code: string;
-        }
+    @error
+    model ApiError {
+      code: string;
+    }
 
-        op test(): ApiError;
-      `);
+    op test(): ApiError;
+  `);
   const models = getAllModels(runner.context);
   strictEqual(models.length, 1);
   const model = models[0];
@@ -1600,34 +1600,34 @@ it("error model", async () => {
 
 it("error model inheritance", async () => {
   await runner.compileWithBuiltInService(`
-        model ValidResponse {
-          prop: string;
-        };
+    model ValidResponse {
+      prop: string;
+    };
 
-        @error
-        model ApiError {
-          code: string
-        };
+    @error
+    model ApiError {
+      code: string
+    };
 
-        model FourHundredError extends ApiError {
-          @statusCode
-          @minValue(400)
-          @maxValue(499)
-          statusCode: int32;
-        };
-        model FourZeroFourError extends FourHundredError {
-          @statusCode
-          statusCode: 404;
-        };
-        model FiveHundredError extends ApiError {
-          @statusCode
-          @minValue(500)
-          @maxValue(599)
-          statusCode: int32;
-        };
+    model FourHundredError extends ApiError {
+      @statusCode
+      @minValue(400)
+      @maxValue(499)
+      statusCode: int32;
+    };
+    model FourZeroFourError extends FourHundredError {
+      @statusCode
+      statusCode: 404;
+    };
+    model FiveHundredError extends ApiError {
+      @statusCode
+      @minValue(500)
+      @maxValue(599)
+      statusCode: int32;
+    };
 
-        op test(): ValidResponse | FourZeroFourError | FiveHundredError;
-      `);
+    op test(): ValidResponse | FourZeroFourError | FiveHundredError;
+  `);
   const models = getAllModels(runner.context);
   strictEqual(models.length, 5);
   const errorModels = models.filter((x) => x.kind === "model" && (x.usage & UsageFlags.Error) > 0);
@@ -1646,16 +1646,16 @@ it("error model inheritance", async () => {
 
 it("never or void property", async () => {
   await runner.compileAndDiagnose(`
-        @service
-        @test namespace MyService {
-          @test
-          @usage(Usage.input | Usage.output)
-          model Test{
-            prop1: never;
-            prop2: void;
-          }
-        }
-      `);
+    @service
+    @test namespace MyService {
+      @test
+      @usage(Usage.input | Usage.output)
+      model Test{
+        prop1: never;
+        prop2: void;
+      }
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1665,23 +1665,23 @@ it("never or void property", async () => {
 
 it("xml usage", async () => {
   await runner.compileAndDiagnose(`
-        @service
-        namespace MyService {
-          model RoundTrip {
-            prop: string;
-          }
+    @service
+    namespace MyService {
+      model RoundTrip {
+        prop: string;
+      }
 
-          model Input {
-            prop: string;
-          }
+      model Input {
+        prop: string;
+      }
 
-          @route("/test1")
-          op test1(@header("content-type") contentType: "application/xml", @body body: RoundTrip): RoundTrip;
-          
-          @route("/test2")
-          op test2(@header("content-type") contentType: "application/xml", @body body: Input): void;
-        }
-      `);
+      @route("/test1")
+      op test1(@header("content-type") contentType: "application/xml", @body body: RoundTrip): RoundTrip;
+      
+      @route("/test2")
+      op test2(@header("content-type") contentType: "application/xml", @body body: Input): void;
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -1699,18 +1699,18 @@ it("xml usage", async () => {
 
 it("check bodyParam for @multipartBody", async function () {
   await runner.compileWithBuiltInService(`
-        model Address {
-          city: string;
-        }
-        model MultiPartRequest{
-          id?: HttpPart<string>;
-          profileImage: HttpPart<bytes>;
-          address: HttpPart<Address>;
-          picture: HttpPart<File>;
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model Address {
+      city: string;
+    }
+    model MultiPartRequest{
+      id?: HttpPart<string>;
+      profileImage: HttpPart<bytes>;
+      address: HttpPart<Address>;
+      picture: HttpPart<File>;
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const formDataMethod = runner.context.sdkPackage.clients[0].methods[0];
   strictEqual(formDataMethod.kind, "basic");
   strictEqual(formDataMethod.name, "upload");
@@ -1748,12 +1748,12 @@ it("check bodyParam for @multipartBody", async function () {
 
 it("check multipartOptions for property of base model", async function () {
   await runner.compileWithBuiltInService(`
-      model MultiPartRequest{
-          fileProperty: HttpPart<File>;
-      }
-      @post
-      op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-      `);
+    model MultiPartRequest{
+        fileProperty: HttpPart<File>;
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   const fileModel = models.find((x) => x.name === "File");
   ok(fileModel);
@@ -1766,14 +1766,14 @@ it("check multipartOptions for property of base model", async function () {
 
 it("remove property with none visibility", async function () {
   await runner.compileWithBuiltInService(`
-      model Test{
-          prop: string;
-          @invisible(Lifecycle)
-          nonProp: string;
-      }
-      @post
-      op do(@body body: Test): void;
-      `);
+    model Test{
+        prop: string;
+        @invisible(Lifecycle)
+        nonProp: string;
+    }
+    @post
+    op do(@body body: Test): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].properties.length, 1);
@@ -1781,13 +1781,13 @@ it("remove property with none visibility", async function () {
 
 it("header property on body root model visibility", async function () {
   await runner.compileWithBuiltInService(`
-        model InputModel {
-          @visibility(Lifecycle.Read)
-          @header("x-name")
-          name: string;
-        }
-        op foo(@bodyRoot body: InputModel): void;
-        `);
+    model InputModel {
+      @visibility(Lifecycle.Read)
+      @header("x-name")
+      name: string;
+    }
+    op foo(@bodyRoot body: InputModel): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   const inputModel = sdkPackage.models[0];
@@ -1803,21 +1803,21 @@ it("header property on body root model visibility", async function () {
 
 it("discriminator from template", async function () {
   await runner.compileWithBuiltInService(`
-        @discriminator("kind")
-        model Base {
-          kind: string;
-        }
+    @discriminator("kind")
+    model Base {
+      kind: string;
+    }
 
-        model Derived<kind extends string> extends Base {
-          kind: kind;
-        }
+    model Derived<kind extends string> extends Base {
+      kind: kind;
+    }
 
-        model One is Derived<"one"> {
-          prop: string;
-        };
+    model One is Derived<"one"> {
+      prop: string;
+    };
 
-        op test(): One;
-      `);
+    op test(): One;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const base = models.find((x) => x.name === "Base");

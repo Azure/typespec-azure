@@ -21,11 +21,11 @@ afterEach(async () => {
 it("string", async function () {
   await runner.compileWithBuiltInService(
     `
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: string;
-      }
-      `,
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: string;
+    }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "string");
@@ -383,7 +383,7 @@ it("integer scalar encoded as string", async function () {
       model Test {
         value: int32EncodedAsString;
       }
-      `,
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "int32");

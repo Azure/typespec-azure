@@ -225,50 +225,50 @@ it("basic v3 version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
 
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
 
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
 
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
@@ -323,50 +323,50 @@ it("basic v2 version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
 
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
 
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
 
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
@@ -424,50 +424,50 @@ it("basic v1 version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
 
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
 
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
 
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
 `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
@@ -513,47 +513,47 @@ it("basic all version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
 `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
@@ -615,7 +615,7 @@ it("define own api version param", async () => {
     }
 
     op getPet(...ApiVersionParam): void;
-    `);
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.operation.parameters.length, 1);
@@ -629,24 +629,24 @@ it("define own api version param", async () => {
 
 it("default api version for interface extends", async () => {
   await runner.compile(`
-      namespace Azure.ResourceManager {
-        interface Operations {
-          @get
-          list(@query "api-version": string): void;
-        }
+    namespace Azure.ResourceManager {
+      interface Operations {
+        @get
+        list(@query "api-version": string): void;
       }
-      
-      @service
-      @versioned(Versions)
-      namespace Test {
-        enum Versions {
-          v1,
-          v2,
-        }
-      
-        interface Operations extends Azure.ResourceManager.Operations {}
-      }      
-    `);
+    }
+    
+    @service
+    @versioned(Versions)
+    namespace Test {
+      enum Versions {
+        v1,
+        v2,
+      }
+    
+      interface Operations extends Azure.ResourceManager.Operations {}
+    }      
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
@@ -667,24 +667,24 @@ it("default api version for interface extends", async () => {
 
 it("default api version for operation is", async () => {
   await runner.compile(`
-      namespace Azure.ResourceManager {
-        interface Operations {
-          @get
-          list(@query "api-version": string): void;
-        }
+    namespace Azure.ResourceManager {
+      interface Operations {
+        @get
+        list(@query "api-version": string): void;
       }
-      
-      @service
-      @versioned(Versions)
-      namespace Test {
-        enum Versions {
-          v1,
-          v2,
-        }
-      
-        op list is Azure.ResourceManager.Operations.list;
-      }      
-    `);
+    }
+    
+    @service
+    @versioned(Versions)
+    namespace Test {
+      enum Versions {
+        v1,
+        v2,
+      }
+    
+      op list is Azure.ResourceManager.Operations.list;
+    }      
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
@@ -707,7 +707,7 @@ it("add method", async () => {
     @post
     @added(Versions.v2)
     op v2(@header headerV2: string): void;
-    `);
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
@@ -731,7 +731,7 @@ it("add parameter", async () => {
     @route("/v1")
     @post
     op v1(@added(Versions.v2) @header headerV2: string): void;
-    `);
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);

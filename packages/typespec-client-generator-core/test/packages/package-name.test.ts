@@ -12,19 +12,19 @@ it("as config option", async () => {
     "package-name": "My.Package.Name",
   });
   await runnerWithPackageName.compile(`
-      @client({name: "MyClient"})
-      @service
-      namespace Not.My.Package.Name;
-    `);
+    @client({name: "MyClient"})
+    @service
+    namespace Not.My.Package.Name;
+  `);
 
   strictEqual(runnerWithPackageName.context.sdkPackage.name, "My.Package.Name");
 });
 it("from namespace", async () => {
   await runner.compile(`
-      @client({name: "MyClient"})
-      @service
-      namespace My.Package.Name;
-    `);
+    @client({name: "MyClient"})
+    @service
+    namespace My.Package.Name;
+  `);
 
   strictEqual(runner.context.sdkPackage.name, "My.Package.Name");
 });
