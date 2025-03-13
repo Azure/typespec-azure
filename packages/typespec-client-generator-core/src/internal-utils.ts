@@ -10,7 +10,6 @@ import {
   Interface,
   isNeverType,
   isNullType,
-  isService,
   isVoidType,
   listServices,
   Model,
@@ -671,26 +670,6 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;
-}
-
-/**
- * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
- * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
- * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
- * instead to list all of the services in the global namespace.
- *
- * See https://github.com/microsoft/typespec/issues/6247
- *
- * @param context
- */
-export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
-  const serviceNamespaces: Namespace[] = [];
-  for (const ns of listAllUserDefinedNamespaces(context)) {
-    if (isService(context.program, ns)) {
-      serviceNamespaces.push(ns);
-    }
-  }
-  return serviceNamespaces;
 }
 
 export function listRawSubClients(
