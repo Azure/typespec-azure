@@ -74,7 +74,6 @@ import {
   getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
-  listAllServiceNamespaces,
   listRawSubClients,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -87,6 +86,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   isApiVersion,
+  listAllServiceNamespaces,
 } from "./public-utils.js";
 import {
   getAllReferencedTypes,
