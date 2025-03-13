@@ -30,6 +30,4 @@ model DurationModel {
   """)
 @put
 @route("/duration-constant")
-op durationConstant(
-  @body body: DurationModel
-): NoContentResponse;
+op durationConstant(@body body: DurationModel): NoContentResponse;
