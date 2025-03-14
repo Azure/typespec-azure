@@ -679,7 +679,7 @@ export function listRawSubClients(
   const retval: SdkOperationGroup[] = [];
   const queue: SdkOperationGroup[] = listOperationGroups(context, client);
   while (queue.length > 0) {
-    const operationGroup = queue.shift()!;
+    const operationGroup = queue.pop()!;
     retval.push(operationGroup);
     if (operationGroup.subOperationGroups) {
       queue.push(...operationGroup.subOperationGroups);
