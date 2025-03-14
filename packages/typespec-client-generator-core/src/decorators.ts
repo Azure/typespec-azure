@@ -113,12 +113,13 @@ function setScopedDecoratorData(
   const targetEntry = context.program.stateMap(key).get(target);
   // if no scope specified, then set with the new value
   if (!scope) {
-    if (targetEntry && targetEntry.hasOwnProperty(AllScopes)) {
+    if (targetEntry && targetEntry[AllScopes]) {
       targetEntry[AllScopes] = value;
-    }
-    else{
+    } else {
       const newObject = Object.fromEntries([[AllScopes, value]]);
-      context.program.stateMap(key).set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+      context.program
+        .stateMap(key)
+        .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
     }
     return;
   }
