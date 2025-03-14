@@ -79,3 +79,6 @@ core/packages/http-client-python/
 
 .gitattributes
 CODEOWNERS
+
+# Temp only remove when this pr is merged https://github.com/microsoft/typespec/pull/6451
+packages/typespec-client-generator-core/lib/decorators.tsp
