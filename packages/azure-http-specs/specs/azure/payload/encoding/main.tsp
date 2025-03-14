@@ -14,6 +14,8 @@ using Spector;
   """)
 namespace _Specs_.Azure.Payload.Encoding;
 
+@@clientNamespace(_Specs_.Azure.Payload.Encoding, "azure.payload.encoding", "java");
+
 model DurationModel {
   @encode("duration-constant")
   input: duration;
