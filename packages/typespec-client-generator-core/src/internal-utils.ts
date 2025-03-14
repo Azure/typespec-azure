@@ -675,18 +675,15 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
 export function listRawSubClients(
   context: TCGCContext,
   client: SdkOperationGroup | SdkClient,
-  retval?: (SdkOperationGroup | SdkClient)[],
-): (SdkOperationGroup | SdkClient)[] {
-  if (retval === undefined) {
-    retval = [];
-  }
-  if (retval.includes(client)) return retval;
-  if (client.kind === "SdkOperationGroup") {
-    retval.push(client);
-  }
-
-  for (const operationGroup of listOperationGroups(context, client)) {
-    listRawSubClients(context, operationGroup, retval);
+): SdkOperationGroup[] {
+  const retval: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = listOperationGroups(context, client);
+  while (queue.length > 0) {
+    const operationGroup = queue.shift()!;
+    retval.push(operationGroup);
+    if (operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
+    }
   }
   return retval;
 }
