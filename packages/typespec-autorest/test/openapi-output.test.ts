@@ -587,11 +587,11 @@ describe("typespec-autorest: request", () => {
         @post op read(@body body: bytes): {};
       `);
       const operation = res.paths["/"].post;
-      deepStrictEqual(operation.consumes, undefined);
+      deepStrictEqual(operation.consumes, ["application/octet-stream"]);
       const requestBody = operation.parameters[0];
       ok(requestBody);
       strictEqual(requestBody.schema.type, "string");
-      strictEqual(requestBody.schema.format, "byte");
+      strictEqual(requestBody.schema.format, "binary");
     });
 
     it("bytes request should respect @header contentType", async () => {

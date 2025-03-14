@@ -46,6 +46,10 @@
       "put": {
         "operationId": "bool_putFalse",
         "description": "Set Boolean value false",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "value",
@@ -79,6 +83,10 @@
       "get": {
         "operationId": "bool_getInvalid",
         "description": "Get invalid Boolean value",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -100,6 +108,10 @@
       "get": {
         "operationId": "bool_getNull",
         "description": "Get null Boolean value",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
