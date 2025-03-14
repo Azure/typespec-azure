@@ -14,6 +14,7 @@ import {
   getFriendlyName,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isService,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
@@ -49,7 +50,6 @@ import {
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
-  listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
   listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
@@ -313,10 +313,7 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  if (!context.__generatedNames) {
-    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>();
-  }
-  const generatedName = context.__generatedNames.get(type);
+  const generatedName = context.__generatedNames?.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -635,13 +632,7 @@ function buildNameFromContextPaths(
   while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
-  if (context.__generatedNames) {
-    context.__generatedNames.set(type, createName);
-  } else {
-    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>([
-      [type, createName],
-    ]);
-  }
+  context.__generatedNames!.set(type, createName);
   return createName;
 }
 
@@ -653,7 +644,7 @@ export function getHttpOperationWithCache(
     return context.__httpOperationCache.get(operation)!;
   }
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
-  context.__httpOperationCache?.set(operation, httpOperation);
+  context.__httpOperationCache!.set(operation, httpOperation);
   return httpOperation;
 }
 
@@ -725,4 +716,24 @@ export function getHttpOperationParameter(
     }
   }
   return undefined;
+}
+
+/**
+ * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
+ * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
+ * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
+ * instead to list all of the services in the global namespace.
+ *
+ * See https://github.com/microsoft/typespec/issues/6247
+ *
+ * @param context
+ */
+export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
+  const serviceNamespaces: Namespace[] = [];
+  for (const ns of listAllUserDefinedNamespaces(context)) {
+    if (isService(context.program, ns)) {
+      serviceNamespaces.push(ns);
+    }
+  }
+  return serviceNamespaces;
 }

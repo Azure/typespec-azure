@@ -31,13 +31,16 @@
           "String Operations"
         ],
         "description": "Get value that is base64 encoded",
+        "produces": [
+          "application/octet-stream",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
             "description": "The request has succeeded.",
             "schema": {
-              "type": "string",
-              "format": "byte"
+              "type": "file"
             }
           },
           "default": {
@@ -54,6 +57,9 @@
           "String Operations"
         ],
         "description": "Put value that is base64 encoded",
+        "consumes": [
+          "application/octet-stream"
+        ],
         "parameters": [
           {
             "name": "value",
@@ -61,7 +67,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "byte"
+              "format": "binary"
             }
           }
         ],

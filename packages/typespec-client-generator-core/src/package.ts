@@ -74,7 +74,6 @@ import {
   getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
-  listAllServiceNamespaces,
   listRawSubClients,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -87,6 +86,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   isApiVersion,
+  listAllServiceNamespaces,
 } from "./public-utils.js";
 import {
   getAllReferencedTypes,
@@ -743,7 +743,7 @@ function getSdkInitializationType(
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
       namespace,
       clientNamespace: namespace,
-      apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+      apiVersions: context.getApiVersionsForType(client.type),
       decorators: [],
       serializationOptions: {},
     };
@@ -941,9 +941,10 @@ function getEndpointTypeFromSingleServer<
         correspondingMethodParams: [],
         type: getTypeSpecBuiltInType(context, "string"),
         isApiVersionParam: false,
-        apiVersions: context.__tspTypeToApiVersions.get(client.__raw.type)!,
+        apiVersions: context.getApiVersionsForType(client.__raw.type),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
         decorators: [],
+        access: "public",
       },
     ],
     decorators: [],
@@ -1046,11 +1047,12 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     doc: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: context.__tspTypeToApiVersions.get(rawClient.type)!,
+    apiVersions: context.getApiVersionsForType(rawClient.type),
     optional: false,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
     decorators: [],
+    access: "public",
   });
 }
 
@@ -1068,7 +1070,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     doc: getDoc(context.program, client.type),
     summary: getSummary(context.program, client.type),
     methods: [],
-    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+    apiVersions: context.getApiVersionsForType(client.type),
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
     namespace: namespace,
     clientNamespace: namespace,
@@ -1141,7 +1143,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
     let clientApiVersions = resolveVersions(context.program, client.service)
       .filter((x) => x.rootVersion)
       .map((x) => x.rootVersion!.value);
-    context.__tspTypeToApiVersions.set(
+    context.setApiVersionsForType(
       client.type,
       filterApiVersionsWithDecorators(context, client.type, clientApiVersions),
     );
@@ -1154,7 +1156,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
       clientApiVersions = resolveVersions(context.program, sc.service)
         .filter((x) => x.rootVersion)
         .map((x) => x.rootVersion!.value);
-      context.__tspTypeToApiVersions.set(
+      context.setApiVersionsForType(
         sc.type,
         filterApiVersionsWithDecorators(context, sc.type, clientApiVersions),
       );

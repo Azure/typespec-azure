@@ -55,13 +55,12 @@ import {
   clientNamespaceKey,
   findRootSourceProperty,
   listAllNamespaces,
-  listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { getLibraryName, listAllServiceNamespaces } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -690,7 +689,7 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
@@ -707,20 +706,23 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
-  if (!accessOverride && entity.namespace) {
+  if (!accessOverride && entity.kind !== "ModelProperty" && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }
 
   return accessOverride;
 }
 
-export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+export function getAccess(
+  context: TCGCContext,
+  entity: Model | Enum | Operation | Union | ModelProperty,
+) {
   const override = getAccessOverride(context, entity);
-  if (override || entity.kind === "Operation") {
+  if (override || entity.kind === "Operation" || entity.kind === "ModelProperty") {
     return override || "public";
   }
 
@@ -1155,10 +1157,10 @@ function findShortestNamespaceOverlap(
 /**
  * Returns the client namespace for a given entity. The order of operations is as follows:
  *
- * 1. if `@clientNamespace` is applied to the entity, this wins out.
+ * 1. If `@clientNamespace` is applied to the entity, this wins out.
  *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
- * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace
- * 3. We return the namespace of the entity retrieved from the original spec
+ * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace.
+ * 3. We return the namespace of the entity retrieved from the original spec.
  * @param context
  * @param entity
  * @returns

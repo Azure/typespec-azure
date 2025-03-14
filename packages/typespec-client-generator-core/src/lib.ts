@@ -7,10 +7,12 @@ const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
   properties: {
     "generate-protocol-methods": { type: "boolean", nullable: true },
     "generate-convenience-methods": { type: "boolean", nullable: true },
+    /**
+     * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
+     */
     "package-name": { type: "string", nullable: true },
     "flatten-union-as-enum": { type: "boolean", nullable: true },
     "api-version": { type: "string", nullable: true },
-    "examples-directory": { type: "string", nullable: true },
     "examples-dir": { type: "string", nullable: true },
     "emitter-name": { type: "string", nullable: true },
     namespace: { type: "string", nullable: true },
@@ -233,6 +235,13 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
+      },
+    },
+    "no-discriminated-unions": {
+      severity: "error",
+      messages: {
+        default:
+          "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
       },
     },
   },
