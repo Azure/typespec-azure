@@ -116,12 +116,12 @@ namespace SharedModelInOperation {
   @route("/public")
   @get
   @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
-  op public(@query name: string): SharedModel;
+  op `public`(@query name: string): SharedModel;
 
   @route("/internal")
   @get
   @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.internal)
-  op internal(@query name: string): SharedModel;
+  op `internal`(@query name: string): SharedModel;
 }
 
 @route("/relativeModelInOperation")
