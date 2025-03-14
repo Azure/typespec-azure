@@ -110,13 +110,19 @@ function setScopedDecoratorData(
   value: unknown,
   scope?: LanguageScopes,
 ) {
+  const targetEntry = context.program.stateMap(key).get(target);
   // if no scope specified, then set with the new value
   if (!scope) {
-    context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
+    if (targetEntry && targetEntry.hasOwnProperty(AllScopes)) {
+      targetEntry[AllScopes] = value;
+    }
+    else{
+      const newObject = Object.fromEntries([[AllScopes, value]]);
+      context.program.stateMap(key).set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+    }
     return;
   }
 
-  const targetEntry = context.program.stateMap(key).get(target);
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
