@@ -1,7 +1,5 @@
 import {
-  AugmentDecoratorStatementNode,
   DecoratorContext,
-  DecoratorExpressionNode,
   DecoratorFunction,
   Enum,
   EnumMember,
@@ -9,12 +7,10 @@ import {
   Model,
   ModelProperty,
   Namespace,
-  Node,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   getDiscriminator,
@@ -24,6 +20,7 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
+import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -789,19 +786,20 @@ export const $clientName: ClientNameDecorator = (
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
   if (entity.kind === "Model" || entity.kind === "Operation") {
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+    const target = context.decoratorTarget as Node;
+    if (target.kind === SyntaxKind.AugmentDecoratorStatement) {
       if (
-        ignoreDiagnostics(
-          context.program.checker.resolveTypeReference(
-            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType,
-          ),
+        (
+          ignoreDiagnostics(
+            (context.program.checker as any).resolveTypeReference(target.targetType),
+          ) as any
         )?.node !== entity.node
       ) {
         return;
       }
     }
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
-      if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+    if (target.kind === SyntaxKind.DecoratorExpression) {
+      if (target.parent !== entity.node) {
         return;
       }
     }

@@ -1,11 +1,11 @@
 import {
-  SyntaxKind,
   createRule,
   getDiscriminator,
   getTypeName,
   isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 export const compositionOverInheritanceRule = createRule({
   name: "composition-over-inheritance",
