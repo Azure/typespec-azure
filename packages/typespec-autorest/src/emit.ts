@@ -224,7 +224,7 @@ async function emitAllServiceAtAllVersions(
   options: ResolvedAutorestEmitterOptions,
 ) {
   const services = await getAllServicesAtAllVersions(program, options);
-  if (program.compilerOptions.noEmit || program.hasError()) {
+  if (program.compilerOptions.dryRun || program.hasError()) {
     return;
   }
   for (const serviceRecord of services) {
