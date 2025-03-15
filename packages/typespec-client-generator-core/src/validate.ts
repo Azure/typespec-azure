@@ -1,6 +1,4 @@
 import {
-  AugmentDecoratorStatementNode,
-  DecoratorExpressionNode,
   Enum,
   EnumMember,
   Interface,
@@ -10,11 +8,15 @@ import {
   Operation,
   Program,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+import {
+  AugmentDecoratorStatementNode,
+  DecoratorExpressionNode,
+  SyntaxKind,
+} from "@typespec/compiler/ast";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { createTCGCContext } from "./context.js";
 import { getClientNameOverride } from "./decorators.js";

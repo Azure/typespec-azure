@@ -11,10 +11,10 @@ import {
   Program,
   Scalar,
   SourceLocation,
-  SyntaxKind,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 type DeclarableType =
   | Namespace

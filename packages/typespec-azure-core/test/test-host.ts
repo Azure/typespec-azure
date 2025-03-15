@@ -6,7 +6,6 @@ import {
   HttpOperation,
   HttpOperationParameter,
   HttpVerb,
-  RouteResolutionOptions,
 } from "@typespec/http";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
@@ -61,11 +60,10 @@ export async function createAzureCoreTestRunner(
 
 export async function getOperations(
   code: string,
-  routeOptions?: RouteResolutionOptions,
 ): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
   const runner = await createAzureCoreTestRunner();
   await runner.compileAndDiagnose(code, { noEmit: true });
-  const [services] = getAllHttpServices(runner.program, routeOptions);
+  const [services] = getAllHttpServices(runner.program);
   return [services[0].operations, runner.program.diagnostics, runner];
 }
 
@@ -85,9 +83,8 @@ export interface SimpleHttpOperation {
 
 export async function getSimplifiedOperations(
   code: string,
-  routeOptions?: RouteResolutionOptions,
 ): Promise<[SimpleHttpOperation[], readonly Diagnostic[]]> {
-  const [routes, diagnostics] = await getOperations(code, routeOptions);
+  const [routes, diagnostics] = await getOperations(code);
 
   const details = routes.map((r) => {
     return {

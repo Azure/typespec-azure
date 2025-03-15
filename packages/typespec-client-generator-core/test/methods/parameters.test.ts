@@ -744,7 +744,7 @@ describe("content type", () => {
     strictEqual(methodParam.onClient, false);
     strictEqual(methodParam.isApiVersionParam, false);
     strictEqual(methodParam.type.kind, "constant");
-    strictEqual(methodParam.type.value, "application/json");
+    strictEqual(methodParam.type.value, "text/plain");
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.parameters.length, 1);
@@ -824,7 +824,7 @@ describe("content type", () => {
     strictEqual(methodParam.onClient, false);
     strictEqual(methodParam.isApiVersionParam, false);
     strictEqual(methodParam.type.kind, "constant");
-    strictEqual(methodParam.type.value, "application/json");
+    strictEqual(methodParam.type.value, "text/plain");
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.parameters.length, 1);
