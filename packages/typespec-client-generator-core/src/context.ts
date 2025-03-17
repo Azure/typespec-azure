@@ -127,6 +127,7 @@ export async function createSdkContext<
     examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
+    license: context.options["license"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
