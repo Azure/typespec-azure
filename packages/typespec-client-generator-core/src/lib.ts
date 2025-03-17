@@ -3,7 +3,7 @@ import { SdkEmitterOptions } from "./interfaces.js";
 
 export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
   type: "object",
-  additionalProperties: true,
+  additionalProperties: false,
   properties: {
     "emitter-name": {
       type: "string",
