@@ -1,0 +1,73 @@
+---
+title: License
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This page explains how the license info is generated in the client code.
+
+## Azure license
+
+For Azure scenarios, client code will always use the MIT license, and put the license info in the header of the generated code or in a separate file depending on the language.
+
+For example, this is the license comment in the generated code of Java client:
+
+```java
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+```
+
+This is the `LICENSE` file of Python client lib:
+
+```text
+Copyright (c) Microsoft Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.`,
+```
+
+## Unbranded license
+
+For unbranded scenarios, client code will have no license info if there is no license config in `tspconfig.yaml`.
+Spec authors can set the license info with the `license` config in the `tspconfig.yaml`:
+
+```yaml
+license:
+  name: <License name. We have built in "MIT License", "Apache License 2.0", "BSD 3-Clause License", "MPL 2.0", "GPL-3.0" and "LGPL-3.0". For other licenses, you need to set the link, header and description manually.>
+  company: <Company name used in copyright>
+  link: <License link>
+  header: <License header in the generated code>
+  description: <License description in the separated license file>
+```
+
+For example, if you config the license like the following, you will get the same license info as Azure scenarios:
+
+```yaml
+emit:
+  - "@azure-tools/typespec-python"
+  - "@azure-tools/typespec-java"
+options:
+  "@azure-tools/typespec-python":
+    license:
+      name: "MIT License"
+      company: "Microsoft Corporation"
+  "@azure-tools/typespec-java":
+    license:
+      name: "MIT License"
+      company: "Microsoft Corporation"
+```
