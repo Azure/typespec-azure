@@ -1,5 +1,21 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.8
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Features
+
+- [#2318](https://github.com/Azure/typespec-azure/pull/2318) Add orphanModelSerializable operation to verify the JSON serialization of an orphan model
+- [#2300](https://github.com/Azure/typespec-azure/pull/2300) azure-http-specs, add ARM Exception test case
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+
 ## 0.1.0-alpha.7
 
 ### Features

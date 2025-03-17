@@ -1,9 +1,9 @@
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import { SdkEmitterOptions } from "./interfaces.js";
 
-const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
+export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
   type: "object",
-  additionalProperties: true,
+  additionalProperties: false,
   properties: {
     "emitter-name": {
       type: "string",
@@ -315,7 +315,7 @@ export const $lib = createTypeSpecLibrary({
     },
   },
   emitter: {
-    options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,
+    options: SdkEmitterOptionsSchema,
   },
 });
 
