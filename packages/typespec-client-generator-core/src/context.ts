@@ -127,6 +127,7 @@ export async function createSdkContext<
     examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
+    license: context.options["license"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
@@ -154,7 +155,8 @@ async function exportTCGCOutput(context: SdkContext) {
           return undefined; // skip keys starting with "__" from the output
         }
         if (k === "scheme") {
-          return undefined; // remove credential schema
+          const { model, ...rest } = v;
+          return rest; // remove credential schema's model property
         }
         if (k === "rawExample") {
           return undefined; // remove raw example

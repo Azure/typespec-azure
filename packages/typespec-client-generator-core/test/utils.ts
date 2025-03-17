@@ -5,7 +5,7 @@ import {
   SdkPackage,
   SdkServiceMethod,
 } from "../src/interfaces.js";
-import { listAllServiceNamespaces } from "../src/internal-utils.js";
+import { listAllServiceNamespaces } from "../src/public-utils.js";
 import { SdkTestRunner } from "./test-host.js";
 
 export function hasFlag<T extends number>(value: T, flag: T): boolean {

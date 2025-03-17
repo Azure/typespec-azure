@@ -17,16 +17,16 @@ afterEach(async () => {
 });
 it("use model is to represent array", async () => {
   await runner.compile(`
-      @service
-      namespace TestClient {
-        model TestModel {
-          prop: string;
-        }
-        model TestArray is TestModel[];
-
-        op get(): TestArray;
+    @service
+    namespace TestClient {
+      model TestModel {
+        prop: string;
       }
-    `);
+      model TestArray is TestModel[];
+
+      op get(): TestArray;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -51,15 +51,15 @@ it("EmbeddingVector from azure-core", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      @service
-      namespace TestClient {
-        model ModelWithEmbeddingVector {
-          prop: EmbeddingVector<int32>;
-        }
-
-        op get(): ModelWithEmbeddingVector;
+    @service
+    namespace TestClient {
+      model ModelWithEmbeddingVector {
+        prop: EmbeddingVector<int32>;
       }
-    `);
+
+      op get(): ModelWithEmbeddingVector;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -77,17 +77,17 @@ it("alias of EmbeddingVector", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      @service
-      namespace TestClient {
-        alias MyEmbeddingVector = EmbeddingVector<int32>;
+    @service
+    namespace TestClient {
+      alias MyEmbeddingVector = EmbeddingVector<int32>;
 
-        model ModelWithEmbeddingVector {
-          prop: MyEmbeddingVector;
-        }
-
-        op get(): ModelWithEmbeddingVector;
+      model ModelWithEmbeddingVector {
+        prop: MyEmbeddingVector;
       }
-    `);
+
+      op get(): ModelWithEmbeddingVector;
+    }
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];

@@ -19,11 +19,11 @@ it("SdkStringExample", async () => {
     `${__dirname}/example-types/getString.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getString(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getString(): string;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -45,11 +45,11 @@ it("SdkStringExample diagnostic", async () => {
     `${__dirname}/example-types/getStringDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getStringDiagnostic(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getStringDiagnostic(): string;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -71,11 +71,11 @@ it("SdkStringExample from constant", async () => {
     `${__dirname}/example-types/getStringFromConstant.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getStringFromConstant(): "test";
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getStringFromConstant(): "test";
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -97,11 +97,11 @@ it("SdkStringExample from constant diagnostic", async () => {
     `${__dirname}/example-types/getStringFromConstantDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getStringFromConstantDiagnostic(): "test";
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getStringFromConstantDiagnostic(): "test";
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -123,14 +123,14 @@ it("SdkStringExample from enum", async () => {
     `${__dirname}/example-types/getStringFromEnum.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        enum TestEnum {
-            one,two,three
-        }
-        op getStringFromEnum(): TestEnum;
+    @service
+    namespace TestClient {
+      enum TestEnum {
+          one,two,three
       }
-    `);
+      op getStringFromEnum(): TestEnum;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -152,14 +152,14 @@ it("SdkStringExample from extensible enum", async () => {
     `${__dirname}/example-types/getStringFromExtensibleEnum.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        union TestEnum {
-            "one","two","three",string
-        }
-        op getStringFromExtensibleEnum(): {@body body: TestEnum};
+    @service
+    namespace TestClient {
+      union TestEnum {
+          "one","two","three",string
       }
-    `);
+      op getStringFromExtensibleEnum(): {@body body: TestEnum};
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -181,14 +181,14 @@ it("SdkStringExample from enum diagnostic", async () => {
     `${__dirname}/example-types/getStringFromEnumDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        enum TestEnum {
-            one,two,three
-        }
-        op getStringFromEnumDiagnostic(): TestEnum;
+    @service
+    namespace TestClient {
+      enum TestEnum {
+          one,two,three
       }
-    `);
+      op getStringFromEnumDiagnostic(): TestEnum;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -210,14 +210,14 @@ it("SdkStringExample from enum value", async () => {
     `${__dirname}/example-types/getStringFromEnumValue.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        enum TestEnum {
-            one,two,three
-        }
-        op getStringFromEnumValue(): TestEnum.one;
+    @service
+    namespace TestClient {
+      enum TestEnum {
+          one,two,three
       }
-    `);
+      op getStringFromEnumValue(): TestEnum.one;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -239,14 +239,14 @@ it("SdkStringExample from enum value diagnostic", async () => {
     `${__dirname}/example-types/getStringFromEnumValueDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        enum TestEnum {
-            one,two,three
-        }
-        op getStringFromEnumValueDiagnostic(): TestEnum.one;
+    @service
+    namespace TestClient {
+      enum TestEnum {
+          one,two,three
       }
-    `);
+      op getStringFromEnumValueDiagnostic(): TestEnum.one;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -268,11 +268,11 @@ it("SdkStringExample from datetime", async () => {
     `${__dirname}/example-types/getStringFromDataTime.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getStringFromDataTime(): utcDateTime;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getStringFromDataTime(): utcDateTime;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -295,11 +295,11 @@ it("SdkStringExample from duration", async () => {
     `${__dirname}/example-types/getStringFromDuration.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getStringFromDuration(): duration;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getStringFromDuration(): duration;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -322,11 +322,11 @@ it("SdkNumberExample", async () => {
     `${__dirname}/example-types/getNumber.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getNumber(): float32;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getNumber(): float32;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -348,11 +348,11 @@ it("SdkNumberExample diagnostic", async () => {
     `${__dirname}/example-types/getNumberDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getNumberDiagnostic(): float32;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getNumberDiagnostic(): float32;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -374,14 +374,14 @@ it("SdkNumberExample from datetime", async () => {
     `${__dirname}/example-types/getNumberFromDateTime.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @encode(DateTimeKnownEncoding.unixTimestamp, int64)
-        scalar timestamp extends utcDateTime;
+    @service
+    namespace TestClient {
+      @encode(DateTimeKnownEncoding.unixTimestamp, int64)
+      scalar timestamp extends utcDateTime;
 
-        op getNumberFromDateTime(): timestamp;
-      }
-    `);
+      op getNumberFromDateTime(): timestamp;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -404,14 +404,14 @@ it("SdkNumberExample from duration", async () => {
     `${__dirname}/example-types/getNumberFromDuration.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @encode(DurationKnownEncoding.seconds, float)
-        scalar delta extends duration;
+    @service
+    namespace TestClient {
+      @encode(DurationKnownEncoding.seconds, float)
+      scalar delta extends duration;
 
-        op getNumberFromDuration(): delta;
-      }
-    `);
+      op getNumberFromDuration(): delta;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -434,11 +434,11 @@ it("SdkBooleanExample", async () => {
     `${__dirname}/example-types/getBoolean.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getBoolean(): boolean;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getBoolean(): boolean;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -460,11 +460,11 @@ it("SdkBooleanExample diagnostic", async () => {
     `${__dirname}/example-types/getBooleanDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getBooleanDiagnostic(): boolean;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getBooleanDiagnostic(): boolean;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -486,11 +486,11 @@ it("SdkNullExample", async () => {
     `${__dirname}/example-types/getNull.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getNull(): {@body body: string | null};
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getNull(): {@body body: string | null};
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -513,11 +513,11 @@ it("SdkAnyExample", async () => {
     `${__dirname}/example-types/getAny.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getAny(): unknown;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getAny(): unknown;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -538,11 +538,11 @@ it("SdkUnionExample", async () => {
     `${__dirname}/example-types/getUnion.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getUnion(): {@body body: string | int32};
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getUnion(): {@body body: string | int32};
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -562,11 +562,11 @@ it("SdkArrayExample", async () => {
     `${__dirname}/example-types/getArray.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getArray(): string[];
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getArray(): string[];
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -598,11 +598,11 @@ it("SdkArrayExample diagnostic", async () => {
     `${__dirname}/example-types/getArrayDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getArrayDiagnostic(): string[];
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getArrayDiagnostic(): string[];
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -624,11 +624,11 @@ it("SdkDictionaryExample", async () => {
     `${__dirname}/example-types/getDictionary.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getDictionary(): Record<string>;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getDictionary(): Record<string>;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -660,11 +660,11 @@ it("SdkDictionaryExample diagnostic", async () => {
     `${__dirname}/example-types/getDictionaryDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op getDictionaryDiagnostic(): Record<string>;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op getDictionaryDiagnostic(): Record<string>;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -686,19 +686,19 @@ it("SdkModelExample", async () => {
     `${__dirname}/example-types/getModel.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        model Test {
-          a: string;
-          b: int32;
-          @clientName("renamedProp")
-          prop: string;
-          nullProp?: {};
-        }
-
-        op getModel(): Test;
+    @service
+    namespace TestClient {
+      model Test {
+        a: string;
+        b: int32;
+        @clientName("renamedProp")
+        prop: string;
+        nullProp?: {};
       }
-    `);
+
+      op getModel(): Test;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -732,16 +732,16 @@ it("SdkModelExample diagnostic", async () => {
     `${__dirname}/example-types/getModelDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        model Test {
-          a: string;
-          b: int32;
-        }
-
-        op getModelDiagnostic(): Test;
+    @service
+    namespace TestClient {
+      model Test {
+        a: string;
+        b: int32;
       }
-    `);
+
+      op getModelDiagnostic(): Test;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -760,38 +760,38 @@ it("SdkModelExample from discriminated types", async () => {
     `${__dirname}/example-types/getModelDiscriminator.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @discriminator("kind")
-        model Fish {
-          friends?: Fish[];
-          hate?: Record<Fish>;
-          partner?: Fish;
-        }
-
-        @discriminator("sharktype")
-        model Shark extends Fish {
-          kind: "shark";
-          age: int32;
-        }
-
-        model Salmon extends Fish {
-          kind: "salmon";
-        }
-
-        model SawShark extends Shark {
-          sharktype: "saw";
-          info: string[];
-          prop: int32[];
-        }
-
-        model GoblinShark extends Shark {
-          sharktype: "goblin";
-        }
-
-        op getModelDiscriminator(): Shark;
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        friends?: Fish[];
+        hate?: Record<Fish>;
+        partner?: Fish;
       }
-    `);
+
+      @discriminator("sharktype")
+      model Shark extends Fish {
+        kind: "shark";
+        age: int32;
+      }
+
+      model Salmon extends Fish {
+        kind: "salmon";
+      }
+
+      model SawShark extends Shark {
+        sharktype: "saw";
+        info: string[];
+        prop: int32[];
+      }
+
+      model GoblinShark extends Shark {
+        sharktype: "goblin";
+      }
+
+      op getModelDiscriminator(): Shark;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -860,32 +860,32 @@ it("SdkModelExample from discriminated types diagnostic", async () => {
     `${__dirname}/example-types/getModelDiscriminatorDiagnostic.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @discriminator("kind")
-        model Fish {
-        }
-
-        @discriminator("sharktype")
-        model Shark extends Fish {
-          kind: "shark";
-        }
-
-        model Salmon extends Fish {
-          kind: "salmon";
-        }
-
-        model SawShark extends Shark {
-          sharktype: "saw";
-        }
-
-        model GoblinShark extends Shark {
-          sharktype: "goblin";
-        }
-
-        op getModelDiscriminatorDiagnostic(): Shark;
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
       }
-    `);
+
+      @discriminator("sharktype")
+      model Shark extends Fish {
+        kind: "shark";
+      }
+
+      model Salmon extends Fish {
+        kind: "salmon";
+      }
+
+      model SawShark extends Shark {
+        sharktype: "saw";
+      }
+
+      model GoblinShark extends Shark {
+        sharktype: "goblin";
+      }
+
+      op getModelDiscriminatorDiagnostic(): Shark;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -907,18 +907,18 @@ it("SdkModelExample with additional properties", async () => {
     `${__dirname}/example-types/getModelAdditionalProperties.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        model Test {
-          a: string;
-          b: int32;
-          
-          ...Record<unknown>;
-        }
-
-        op getModelAdditionalProperties(): Test;
+    @service
+    namespace TestClient {
+      model Test {
+        a: string;
+        b: int32;
+        
+        ...Record<unknown>;
       }
-    `);
+
+      op getModelAdditionalProperties(): Test;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -958,18 +958,18 @@ it("SdkModelExample with extra paramters", async () => {
     `${__dirname}/example-types/getModelWithExtraParamter.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        model Test {
-          a: string;
-          b: int32;
-          @header("x-ms-prop")
-          prop: string;
-        }
-
-        op getModelWithExtraParamter(): Test;
+    @service
+    namespace TestClient {
+      model Test {
+        a: string;
+        b: int32;
+        @header("x-ms-prop")
+        prop: string;
       }
-    `);
+
+      op getModelWithExtraParamter(): Test;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>

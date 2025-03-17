@@ -22,11 +22,11 @@ beforeEach(async () => {
 
 it("path basic", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@path path: string): void;
-      `);
+    op myOp(@path path: string): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -70,11 +70,11 @@ it("path basic", async () => {
 
 it("path basic with null", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@path path: string | null): void;
-      `);
+    op myOp(@path path: string | null): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
@@ -87,17 +87,17 @@ it("path basic with null", async () => {
 
 it("path defined in model", async () => {
   await runner.compileWithBuiltInService(`
-      @route("{name}")
-      @put
-      op pathInModel(...NameParameter): void;
+    @route("{name}")
+    @put
+    op pathInModel(...NameParameter): void;
 
-      model NameParameter {
-        @doc("Name parameter")
-        @pattern("^[a-zA-Z0-9-]{3,24}$")
-        @format("UUID")
-        name: string;
-      }
-      `);
+    model NameParameter {
+      @doc("Name parameter")
+      @pattern("^[a-zA-Z0-9-]{3,24}$")
+      @format("UUID")
+      name: string;
+    }
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "pathInModel");
@@ -130,11 +130,11 @@ it("path defined in model", async () => {
 
 it("header basic", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header header: string): void;
-      `);
+    op myOp(@header header: string): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -176,11 +176,11 @@ it("header basic", async () => {
 
 it("header basic with null", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header header: string | null): void;
-      `);
+    op myOp(@header header: string | null): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
@@ -193,11 +193,11 @@ it("header basic with null", async () => {
 
 it("header collection format via explode:true on array", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header(#{explode: true}) header: string[]): void;
-      `);
+    op myOp(@header(#{explode: true}) header: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -210,11 +210,11 @@ it("header collection format via explode:true on array", async () => {
 
 it("header collection format via explode:false on array", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header header: string[]): void;
-      `);
+    op myOp(@header header: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -227,11 +227,11 @@ it("header collection format via explode:false on array", async () => {
 
 it("header collection format via explode:true on non-array", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header(#{explode: true}) header: string): void;
-      `);
+    op myOp(@header(#{explode: true}) header: string): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -244,11 +244,11 @@ it("header collection format via explode:true on non-array", async () => {
 
 it("header collection format via encode: ArrayEncoding.pipeDelimited on array", async () => {
   await runner.compile(`
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header @encode(ArrayEncoding.pipeDelimited) header: string[]): void;
-      `);
+    op myOp(@header @encode(ArrayEncoding.pipeDelimited) header: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -261,11 +261,11 @@ it("header collection format via encode: ArrayEncoding.pipeDelimited on array", 
 
 it("header collection format via encode: ArrayEncoding.spaceDelimited on array", async () => {
   await runner.compile(`
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header @encode(ArrayEncoding.spaceDelimited) header: string[]): void;
-      `);
+    op myOp(@header @encode(ArrayEncoding.spaceDelimited) header: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -278,11 +278,11 @@ it("header collection format via encode: ArrayEncoding.spaceDelimited on array",
 
 it("header collection format wrong encode", async () => {
   await runner.compile(`
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@header @encode("tsv") header: string[]): void;
-      `);
+    op myOp(@header @encode("tsv") header: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -300,11 +300,11 @@ it("header collection format wrong encode", async () => {
 
 it("query basic", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@query query: string): void;
-      `);
+    op myOp(@query query: string): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -344,11 +344,11 @@ it("query basic", async () => {
 
 it("query basic with null", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@query query: string | null): void;
-      `);
+    op myOp(@query query: string | null): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
@@ -361,11 +361,11 @@ it("query basic with null", async () => {
 
 it("query collection format via explode:true on non-array", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
-      
-      op myOp(@query(#{explode: true}) query: string): void;
-      `);
+    @service
+    namespace My.Service;
+    
+    op myOp(@query(#{explode: true}) query: string): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -378,11 +378,11 @@ it("query collection format via explode:true on non-array", async () => {
 
 it("query collection format for csv via explode:false on array", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
-      
-      op myOp(@query query: string[]): void;
-      `);
+    @service
+    namespace My.Service;
+    
+    op myOp(@query query: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -395,11 +395,11 @@ it("query collection format for csv via explode:false on array", async () => {
 
 it("query collection format for csv via explode:true on array", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
-      
-      op myOp(@query(#{explode: true}) query: string[]): void;
-      `);
+    @service
+    namespace My.Service;
+    
+    op myOp(@query(#{explode: true}) query: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -412,11 +412,11 @@ it("query collection format for csv via explode:true on array", async () => {
 
 it("query collection format for csv via encode: ArrayEncoding.pipeDelimited on array", async () => {
   await runner.compile(`
-      @service
-      namespace My.Service;
-      
-      op myOp(@query @encode(ArrayEncoding.pipeDelimited) query: string[]): void;
-      `);
+    @service
+    namespace My.Service;
+    
+    op myOp(@query @encode(ArrayEncoding.pipeDelimited) query: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -429,11 +429,11 @@ it("query collection format for csv via encode: ArrayEncoding.pipeDelimited on a
 
 it("query collection format for csv via encode: ArrayEncoding.spaceDelimited on array", async () => {
   await runner.compile(`
-      @service
-      namespace My.Service;
-      
-      op myOp(@query @encode(ArrayEncoding.spaceDelimited) query: string[]): void;
-      `);
+    @service
+    namespace My.Service;
+    
+    op myOp(@query @encode(ArrayEncoding.spaceDelimited) query: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -446,11 +446,11 @@ it("query collection format for csv via encode: ArrayEncoding.spaceDelimited on 
 
 it("query collection format wrong encode", async () => {
   await runner.compile(`
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@query @encode("tsv") query: string[]): void;
-      `);
+    op myOp(@query @encode("tsv") query: string[]): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -468,11 +468,11 @@ it("query collection format wrong encode", async () => {
 
 it("cookie basic", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @service
+    namespace My.Service;
 
-      op myOp(@cookie(#{name: "token"}) auth: string): void;
-      `);
+    op myOp(@cookie(#{name: "token"}) auth: string): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -486,15 +486,15 @@ it("cookie basic", async () => {
 
 it("body basic", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
+    @service
+    namespace My.Service;
 
-        model Input {
-          key: string;
-        }
+    model Input {
+      key: string;
+    }
 
-        op myOp(@body body: Input): void;
-        `);
+    op myOp(@body body: Input): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
@@ -547,15 +547,15 @@ it("body basic", async () => {
 
 it("body basic with null", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
+    @service
+    namespace My.Service;
 
-        model Input {
-          key: string;
-        }
+    model Input {
+      key: string;
+    }
 
-        op myOp(@body body: Input | null): void;
-        `);
+    op myOp(@body body: Input | null): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodBodyParam = method.parameters.find((x) => x.name === "body");
@@ -569,15 +569,15 @@ it("body basic with null", async () => {
 
 it("body optional", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
+    @service
+    namespace My.Service;
 
-        model Input {
-          key: string;
-        }
+    model Input {
+      key: string;
+    }
 
-        op myOp(@body body?: Input): void;
-        `);
+    op myOp(@body body?: Input): void;
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
@@ -630,17 +630,17 @@ it("body optional", async () => {
 
 it("parameter grouping", async () => {
   await runner.compile(`@server("http://localhost:3000", "endpoint")
-        @service
-        namespace My.Service;
+    @service
+    namespace My.Service;
 
-        model RequestOptions {
-          @header header: string;
-          @query query: string;
-          @body body: string;
-        };
+    model RequestOptions {
+      @header header: string;
+      @query query: string;
+      @body body: string;
+    };
 
-        op myOp(options: RequestOptions): void;
-        `);
+    op myOp(options: RequestOptions): void;
+    `);
 
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
@@ -720,8 +720,8 @@ it("parameter grouping", async () => {
 describe("content type", () => {
   it("content type will be added if not defined and there is body", async () => {
     await runner.compileWithBuiltInService(`
-        @patch op patchNull(@body body: string): void;
-          `);
+      @patch op patchNull(@body body: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -744,7 +744,7 @@ describe("content type", () => {
     strictEqual(methodParam.onClient, false);
     strictEqual(methodParam.isApiVersionParam, false);
     strictEqual(methodParam.type.kind, "constant");
-    strictEqual(methodParam.type.value, "application/json");
+    strictEqual(methodParam.type.value, "text/plain");
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.parameters.length, 1);
@@ -762,11 +762,11 @@ describe("content type", () => {
 
   it("ensure content type is a constant if only one possibility", async () => {
     await runner.compileWithBuiltInService(`
-        model DefaultDatetimeProperty {
-          value: utcDateTime;
-        }
-        @post op default(@body body: DefaultDatetimeProperty): void;
-        `);
+      model DefaultDatetimeProperty {
+        value: utcDateTime;
+      }
+      @post op default(@body body: DefaultDatetimeProperty): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
 
@@ -800,8 +800,8 @@ describe("content type", () => {
 
   it("content type should be optional if body is optional", async () => {
     await runner.compileWithBuiltInService(`
-        @patch op patchNull(@body body?: string): void;
-          `);
+      @patch op patchNull(@body body?: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -824,7 +824,7 @@ describe("content type", () => {
     strictEqual(methodParam.onClient, false);
     strictEqual(methodParam.isApiVersionParam, false);
     strictEqual(methodParam.type.kind, "constant");
-    strictEqual(methodParam.type.value, "application/json");
+    strictEqual(methodParam.type.value, "text/plain");
 
     const serviceOperation = method.operation;
     strictEqual(serviceOperation.parameters.length, 1);
@@ -833,11 +833,11 @@ describe("content type", () => {
 
 it("ensure accept is a constant if only one possibility (json)", async () => {
   await runner.compileWithBuiltInService(`
-      model DefaultDatetimeProperty {
-        value: utcDateTime;
-      }
-      @get op default(): DefaultDatetimeProperty;
-      `);
+    model DefaultDatetimeProperty {
+      value: utcDateTime;
+    }
+    @get op default(): DefaultDatetimeProperty;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
@@ -870,14 +870,14 @@ it("ensure accept is a constant if only one possibility (json)", async () => {
 
 it("ensure accept is a constant if only one possibility (non-json)", async () => {
   await runner.compileWithBuiltInService(`
-      @get op default(): {
-        @header
-        contentType: "image/png";
-    
-        @body
-        value: bytes;
-      };
-      `);
+    @get op default(): {
+      @header
+      contentType: "image/png";
+
+      @body
+      value: bytes;
+    };
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
@@ -916,19 +916,19 @@ it("lro rpc case", async () => {
   });
   await runnerWithCore.compile(
     getServiceWithDefaultApiVersion(`
-        model GenerationOptions {
-          prompt: string;
-        }
-        
-        model GenerationResponse is Azure.Core.Foundations.OperationStatus<GenerationResult>;
-        
-        model GenerationResult {
-          data: string;
-        }
-        
-        @route("/generations:submit")
-        op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
-      `),
+      model GenerationOptions {
+        prompt: string;
+      }
+      
+      model GenerationResponse is Azure.Core.Foundations.OperationStatus<GenerationResult>;
+      
+      model GenerationResult {
+        data: string;
+      }
+      
+      @route("/generations:submit")
+      op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
+    `),
   );
   const sdkPackage = runnerWithCore.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -948,18 +948,18 @@ it("lro rpc case", async () => {
 
 it("never void parameter or response", async () => {
   await runner.compileWithBuiltInService(`
-        op TestTemplate<
-          headerType,
-          queryType,
-          bodyType,
-          responseHeaderType,
-          responseBodyType
-        >(@header h: headerType, @query q: queryType, @body b: bodyType): {
-          @header h: responseHeaderType;
-          @body b: responseBodyType;
-        };
-        op test is TestTemplate<void, void, void, void, void>;
-      `);
+    op TestTemplate<
+      headerType,
+      queryType,
+      bodyType,
+      responseHeaderType,
+      responseBodyType
+    >(@header h: headerType, @query q: queryType, @body b: bodyType): {
+      @header h: responseHeaderType;
+      @body b: responseBodyType;
+    };
+    op test is TestTemplate<void, void, void, void, void>;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.parameters.length, 0);
@@ -974,9 +974,9 @@ it("never void parameter or response", async () => {
 describe("uri template related", () => {
   it("path param: template only", async () => {
     await runner.compileWithBuiltInService(`
-        @route("template-only/{param}")
-        op templateOnly(param: string): void;
-      `);
+      @route("template-only/{param}")
+      op templateOnly(param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template-only/{param}");
@@ -989,9 +989,9 @@ describe("uri template related", () => {
 
   it("path param: explicit", async () => {
     await runner.compileWithBuiltInService(`
-        @route("explicit/{param}")
-        op explicit(@path param: string): void;
-      `);
+      @route("explicit/{param}")
+      op explicit(@path param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/explicit/{param}");
@@ -1004,9 +1004,9 @@ describe("uri template related", () => {
 
   it("path param: annotation only", async () => {
     await runner.compileWithBuiltInService(`
-        @route("annotation-only")
-        op annotationOnly(@path param: string): void;
-      `);
+      @route("annotation-only")
+      op annotationOnly(@path param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation-only/{param}");
@@ -1019,9 +1019,9 @@ describe("uri template related", () => {
 
   it("path param: template only with allowReserved", async () => {
     await runner.compileWithBuiltInService(`
-        @route("template/{+param}")
-        op template(param: string): void;
-      `);
+      @route("template/{+param}")
+      op template(param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template/{param}");
@@ -1034,9 +1034,9 @@ describe("uri template related", () => {
 
   it("path param: annotation with allowReserved", async () => {
     await runner.compileWithBuiltInService(`
-        @route("annotation")
-        op annotation(@path(#{ allowReserved: true }) param: string): void;
-      `);
+      @route("annotation")
+      op annotation(@path(#{ allowReserved: true }) param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation/{param}");
@@ -1049,21 +1049,21 @@ describe("uri template related", () => {
 
   it("path param: explode false with style in template", async () => {
     await runner.compileWithBuiltInService(`
-        @route("simple{param}")
-        op simple(param: string): void;
+      @route("simple{param}")
+      op simple(param: string): void;
 
-        @route("label{.param}")
-        op label(param: string): void;
+      @route("label{.param}")
+      op label(param: string): void;
 
-        @route("path{/param}")
-        op path(param: string): void;
+      @route("path{/param}")
+      op path(param: string): void;
 
-        @route("matrix{;param}")
-        op matrix(param: string): void;
+      @route("matrix{;param}")
+      op matrix(param: string): void;
 
-        @route("fragment{#param}")
-        op fragment(param: string): void;
-      `);
+      @route("fragment{#param}")
+      op fragment(param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1109,21 +1109,21 @@ describe("uri template related", () => {
 
   it("path param: explode true with style in template", async () => {
     await runner.compileWithBuiltInService(`
-        @route("simple{param*}")
-        op simple(param: string): void;
+      @route("simple{param*}")
+      op simple(param: string): void;
 
-        @route("label{.param*}")
-        op label(param: string): void;
+      @route("label{.param*}")
+      op label(param: string): void;
 
-        @route("path{/param*}")
-        op path(param: string): void;
+      @route("path{/param*}")
+      op path(param: string): void;
 
-        @route("matrix{;param*}")
-        op matrix(param: string): void;
+      @route("matrix{;param*}")
+      op matrix(param: string): void;
 
-        @route("fragment{#param*}")
-        op fragment(param: string): void;
-      `);
+      @route("fragment{#param*}")
+      op fragment(param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1169,9 +1169,9 @@ describe("uri template related", () => {
 
   it("query param: template only", async () => {
     await runner.compileWithBuiltInService(`
-        @route("template-only{?param}")
-        op templateOnly(param: string): void;
-      `);
+      @route("template-only{?param}")
+      op templateOnly(param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template-only");
@@ -1183,9 +1183,9 @@ describe("uri template related", () => {
 
   it("query param: explicit", async () => {
     await runner.compileWithBuiltInService(`
-        @route("explicit{?param}")
-        op explicit(@query param: string): void;
-      `);
+      @route("explicit{?param}")
+      op explicit(@query param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/explicit");
@@ -1197,9 +1197,9 @@ describe("uri template related", () => {
 
   it("query param: annotation only", async () => {
     await runner.compileWithBuiltInService(`
-        @route("annotation-only")
-        op annotationOnly(@query param: string): void;
-      `);
+      @route("annotation-only")
+      op annotationOnly(@query param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation-only");
@@ -1211,12 +1211,12 @@ describe("uri template related", () => {
 
   it("query param: explode in template", async () => {
     await runner.compileWithBuiltInService(`
-        @route("no_explode{?param}")
-        op no_explode(param: string): void;
+      @route("no_explode{?param}")
+      op no_explode(param: string): void;
 
-        @route("explode{?param*}")
-        op explode(param: string): void;
-      `);
+      @route("explode{?param*}")
+      op explode(param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1236,8 +1236,8 @@ describe("uri template related", () => {
 
   it("body param: serialized name with encoded name", async () => {
     await runner.compileWithBuiltInService(`
-        op explode(@body @encodedName("application/json", "test") param: string): void;
-      `);
+      op explode(@body @encodedName("application/json", "test") param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1246,8 +1246,8 @@ describe("uri template related", () => {
 
   it("body param: serialized name without encoded name", async () => {
     await runner.compileWithBuiltInService(`
-        op explode(@body param: string): void;
-      `);
+      op explode(@body param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1256,8 +1256,8 @@ describe("uri template related", () => {
 
   it("body param: serialized name of implicit body", async () => {
     await runner.compileWithBuiltInService(`
-        op explode(param: string): void;
-      `);
+      op explode(param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1268,9 +1268,9 @@ describe("uri template related", () => {
 describe("method parameter not used in operation", () => {
   it("autoroute with constant", async () => {
     await runner.compileWithBuiltInService(`
-          @autoRoute
-          op test(@path param: "test"): void;
-        `);
+      @autoRoute
+      op test(@path param: "test"): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.parameters.length, 0);
@@ -1280,9 +1280,9 @@ describe("method parameter not used in operation", () => {
 
   it("normal case with different wire name", async () => {
     await runner.compileWithBuiltInService(`
-          @autoRoute
-          op test(@path("param-wire") param: string): void;
-        `);
+      @autoRoute
+      op test(@path("param-wire") param: string): void;
+    `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.parameters.length, 1);
@@ -1296,20 +1296,20 @@ describe("method parameter not used in operation", () => {
       emitterName: "@azure-tools/typespec-java",
     });
     await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
-        @singleton("default")
-        model SingletonTrackedResource is TrackedResource<SingletonTrackedResourceProperties> {
-          ...ResourceNameParameter<SingletonTrackedResource>;
-        }
+      @singleton("default")
+      model SingletonTrackedResource is TrackedResource<SingletonTrackedResourceProperties> {
+        ...ResourceNameParameter<SingletonTrackedResource>;
+      }
 
-        model SingletonTrackedResourceProperties {
-          description?: string;
-        }
+      model SingletonTrackedResourceProperties {
+        description?: string;
+      }
 
-        @armResourceOperations
-        interface Singleton {
-          createOrUpdate is ArmResourceCreateOrReplaceAsync<SingletonTrackedResource>;
-        }
-      `);
+      @armResourceOperations
+      interface Singleton {
+        createOrUpdate is ArmResourceCreateOrReplaceAsync<SingletonTrackedResource>;
+      }
+    `);
 
     const sdkPackage = runnerWithArm.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
@@ -1325,8 +1325,8 @@ describe("method parameter not used in operation", () => {
 });
 it("isOverride false", async () => {
   await runner.compileWithBuiltInService(`
-      op test(): void;
-    `);
+    op test(): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, false);
@@ -1334,17 +1334,17 @@ it("isOverride false", async () => {
 
 it("isOverride true", async () => {
   await runner.compileWithBuiltInService(`
-      model TestOptions {
-        @query a: string;
-        @query b: string;
-      }
+    model TestOptions {
+      @query a: string;
+      @query b: string;
+    }
 
-      op test(...TestOptions): void;
+    op test(...TestOptions): void;
 
-      op testOverride(options: TestOptions): void;
+    op testOverride(options: TestOptions): void;
 
-      @@override(test, testOverride);
-    `);
+    @@override(test, testOverride);
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, true);

@@ -18,20 +18,20 @@ describe.each([
 ])("supports replacing scalar types", (source: string, alternate: string) => {
   it("in global", async () => {
     await runner.compile(`
-          @service
-          namespace MyService {
-            scalar source extends ${source};
-          
-            model Model1 {
-              prop: source;
-            };
+      @service
+      namespace MyService {
+        scalar source extends ${source};
+      
+        model Model1 {
+          prop: source;
+        };
 
-            @route("/func1")
-            op func1(@body body: Model1): void;
+        @route("/func1")
+        op func1(@body body: Model1): void;
 
-            @@alternateType(source, ${alternate});
-          };
-          `);
+        @@alternateType(source, ${alternate});
+      };
+    `);
 
     const models = getAllModels(runner.context);
     const model1 = models[0];
@@ -42,18 +42,18 @@ describe.each([
 
   it("of model property", async () => {
     await runner.compile(`
-          @service
-          namespace MyService {
-            model Model1 {
-              prop: ${source};
-            };
+      @service
+      namespace MyService {
+        model Model1 {
+          prop: ${source};
+        };
 
-            @route("/func1")
-            op func1(@body body: Model1): void;
+        @route("/func1")
+        op func1(@body body: Model1): void;
 
-            @@alternateType(Model1.prop, ${alternate});
-          };
-          `);
+        @@alternateType(Model1.prop, ${alternate});
+      };
+    `);
 
     const models = getAllModels(runner.context);
     const model1 = models[0];
@@ -64,12 +64,12 @@ describe.each([
 
   it("of operation parameters", async () => {
     await runner.compile(`
-          @service
-          namespace MyService {
-            @route("/func1")
-            op func1(@alternateType(${alternate}) param: ${source}): void;
-          };
-          `);
+      @service
+      namespace MyService {
+        @route("/func1")
+        op func1(@alternateType(${alternate}) param: ${source}): void;
+      };
+      `);
 
     const method = runner.context.sdkPackage.clients[0].methods[0];
     strictEqual(method.name, "func1");
@@ -86,27 +86,27 @@ describe.each([
 ])("always honors @encode of alternate type", (sourceEncode?: string, alternateEncode?: string) => {
   it("if @alternateType is declared in global", async () => {
     await runner.compile(`
-          @service
-          namespace MyService {
-            ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
-            scalar source extends string;
+      @service
+      namespace MyService {
+        ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
+        scalar source extends string;
 
-            ${alternateEncode ? `@encode("${alternateEncode}")` : ""}
-            scalar alternate extends utcDateTime;
-          
-            model Model1 {
-              prop: source;
-            };
+        ${alternateEncode ? `@encode("${alternateEncode}")` : ""}
+        scalar alternate extends utcDateTime;
+      
+        model Model1 {
+          prop: source;
+        };
 
-            @route("/func1")
-            op func1(@body body: Model1): void;
+        @route("/func1")
+        op func1(@body body: Model1): void;
 
-            @route("/func2")
-            op func2(param: source): void;
+        @route("/func2")
+        op func2(param: source): void;
 
-            @@alternateType(source, alternate);
-          };
-          `);
+        @@alternateType(source, alternate);
+      };
+      `);
 
     const models = getAllModels(runner.context);
     const model1 = models[0];
@@ -124,26 +124,26 @@ describe.each([
 
   it("if @alternateType is declared inline", async () => {
     await runner.compile(`
-          @service
-          namespace MyService {
-            ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
-            scalar source extends string;
+      @service
+      namespace MyService {
+        ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
+        scalar source extends string;
 
-            ${alternateEncode ? `@encode("${alternateEncode}")` : ""}
-            scalar alternate extends utcDateTime;
-          
-            model Model1 {
-              @alternateType(alternate)
-              prop: source;
-            };
+        ${alternateEncode ? `@encode("${alternateEncode}")` : ""}
+        scalar alternate extends utcDateTime;
+      
+        model Model1 {
+          @alternateType(alternate)
+          prop: source;
+        };
 
-            @route("/func1")
-            op func1(@body body: Model1): void;
+        @route("/func1")
+        op func1(@body body: Model1): void;
 
-            @route("/func2")
-            op func2(@alternateType(alternate) param: source): void;
-          };
-          `);
+        @route("/func2")
+        op func2(@alternateType(alternate) param: source): void;
+      };
+      `);
 
     const models = getAllModels(runner.context);
     const model1 = models[0];
@@ -166,14 +166,14 @@ it.each([
   ["timemillis", "int64"],
 ])("supports custom scalar types", async (alternate: string, base: string) => {
   await runner.compile(`
-          @service
-          namespace MyService {
-            scalar ${alternate} extends ${base};
+    @service
+    namespace MyService {
+      scalar ${alternate} extends ${base};
 
-            @route("/func1")
-            op func1(@alternateType(${alternate}) param: utcDateTime): void;
-          };
-          `);
+      @route("/func1")
+      op func1(@alternateType(${alternate}) param: utcDateTime): void;
+    };
+    `);
 
   const method = runner.context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "func1");
@@ -193,12 +193,12 @@ it.each([
   ["java,go", false],
 ])("supports scope", async (scope: string, shouldReplace: boolean) => {
   await runner.compile(`
-          @service
-          namespace MyService {
-            @route("/func1")
-            op func1(@alternateType(string, "${scope}") param: utcDateTime): void;
-          };
-          `);
+    @service
+    namespace MyService {
+      @route("/func1")
+      op func1(@alternateType(string, "${scope}") param: utcDateTime): void;
+    };
+    `);
 
   const method = runner.context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "func1");
@@ -211,20 +211,20 @@ describe.each(["null", "Array<string>", "Record<string>", "Model1", "Union1"])(
   (source: string) => {
     it("of model properties", async () => {
       const diagnostics = await runner.diagnose(`
-          @service
-          namespace MyService {
-            model Model1{};
-            alias Union1 = string | int32;
+        @service
+        namespace MyService {
+          model Model1{};
+          alias Union1 = string | int32;
 
-            model Model2 {
-              @alternateType(string)
-              prop: ${source};
-            };
-
-            @route("/func1")
-            op func1(@body param: Model2): void;
+          model Model2 {
+            @alternateType(string)
+            prop: ${source};
           };
-          `);
+
+          @route("/func1")
+          op func1(@body param: Model2): void;
+        };
+        `);
 
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
@@ -233,15 +233,15 @@ describe.each(["null", "Array<string>", "Record<string>", "Model1", "Union1"])(
 
     it("of operation parameters", async () => {
       const diagnostics = await runner.diagnose(`
-          @service
-          namespace MyService {
-            model Model1{};
-            alias Union1 = string | int32;
+        @service
+        namespace MyService {
+          model Model1{};
+          alias Union1 = string | int32;
 
-            @route("/func1")
-            op func1(@alternateType(string) param: ${source}): void;
-          };
-          `);
+          @route("/func1")
+          op func1(@alternateType(string) param: ${source}): void;
+        };
+        `);
 
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",

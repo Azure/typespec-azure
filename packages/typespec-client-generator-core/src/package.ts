@@ -74,11 +74,11 @@ import {
   getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
-  listAllServiceNamespaces,
   listRawSubClients,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getLicenseInfo } from "./license.js";
 import {
   getClientNamespaceString,
   getCrossLanguageDefinitionId,
@@ -87,6 +87,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   isApiVersion,
+  listAllServiceNamespaces,
 } from "./public-utils.js";
 import {
   getAllReferencedTypes,
@@ -944,6 +945,7 @@ function getEndpointTypeFromSingleServer<
         apiVersions: context.getApiVersionsForType(client.__raw.type),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
         decorators: [],
+        access: "public",
       },
     ],
     decorators: [],
@@ -1051,6 +1053,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
     decorators: [],
+    access: "public",
   });
 }
 
@@ -1186,6 +1189,7 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
     ),
     crossLanguagePackageId,
     namespaces: [],
+    licenseInfo: getLicenseInfo(context),
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);

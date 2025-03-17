@@ -25,13 +25,13 @@ afterEach(async () => {
 
 it("multipart form basic", async function () {
   await runner.compileWithBuiltInService(`
-      model MultiPartRequest {
-        id: string;
-        profileImage: bytes;
-      }
+    model MultiPartRequest {
+      id: string;
+      profileImage: bytes;
+    }
 
-      op basic(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-      `);
+    op basic(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -64,7 +64,7 @@ it("multipart conflicting model usage", async function () {
   
         @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
         @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-      `,
+    `,
   );
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
@@ -74,21 +74,21 @@ it("multipart conflicting model usage", async function () {
 it("multipart conflicting model usage for only multipart operations", async function () {
   await runner.compile(
     `
-        @service(#{title: "Test Service"}) namespace TestService;
-        model Address {city: string;}
-        model MultiPartRequest {
-          address: Address;
-          id: string;
-          profileImage: bytes;
-        }
-        
-        @post
-        @route("/basic1") 
-        op basic1(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-        @post
-        @route("/basic2") 
-        op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-      `,
+      @service(#{title: "Test Service"}) namespace TestService;
+      model Address {city: string;}
+      model MultiPartRequest {
+        address: Address;
+        id: string;
+        profileImage: bytes;
+      }
+      
+      @post
+      @route("/basic1") 
+      op basic1(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+      @post
+      @route("/basic2") 
+      op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+    `,
   );
   deepEqual(runner.context.diagnostics.length, 0);
   const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
@@ -104,24 +104,24 @@ it("multipart conflicting model usage for only multipart operations", async func
 it("multipart conflicting model usage for mixed operations", async function () {
   await runner.compile(
     `
-        @service(#{title: "Test Service"}) namespace TestService;
-        model Address {city: string;}
-        model RegularRequest {
-          address: Address;
-        }
-        model MultiPartRequest {
-          address: Address;
-          id: string;
-          profileImage: bytes;
-        }
-        
-        @post
-        @route("/basic1") 
-        op basic1(@body body: RegularRequest): NoContentResponse;
-        @post
-        @route("/basic2") 
-        op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
-      `,
+      @service(#{title: "Test Service"}) namespace TestService;
+      model Address {city: string;}
+      model RegularRequest {
+        address: Address;
+      }
+      model MultiPartRequest {
+        address: Address;
+        id: string;
+        profileImage: bytes;
+      }
+      
+      @post
+      @route("/basic1") 
+      op basic1(@body body: RegularRequest): NoContentResponse;
+      @post
+      @route("/basic2") 
+      op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+    `,
   );
   deepEqual(runner.context.diagnostics.length, 0);
   const address = runner.context.sdkPackage.models.find((x) => x.name === "Address");
@@ -137,17 +137,17 @@ it("multipart conflicting model usage for mixed operations", async function () {
 it("multipart resolving conflicting model usage with spread", async function () {
   await runner.compileWithBuiltInService(
     `
-        model B {
-          doc: bytes
-        }
-        
-        model A {
-          ...B
-        }
-        
-        @put op multipartOperation(@header contentType: "multipart/form-data", ...A): void;
-        @post op normalOperation(...B): void;
-        `,
+      model B {
+        doc: bytes
+      }
+      
+      model A {
+        ...B
+      }
+      
+      @put op multipartOperation(@header contentType: "multipart/form-data", ...A): void;
+      @post op normalOperation(...B): void;
+      `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -175,21 +175,21 @@ it("multipart resolving conflicting model usage with spread", async function () 
 it("multipart with non-formdata model property", async function () {
   await runner.compileWithBuiltInService(
     `
-        model Address {
-          city: string;
-        }
+      model Address {
+        city: string;
+      }
 
-        model AddressFirstAppearance {
-          address: Address;
-        }
+      model AddressFirstAppearance {
+        address: Address;
+      }
 
-        @usage(Usage.input | Usage.output)
-        model AddressSecondAppearance {
-          address: Address;
-        }
-        
-        @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
-        `,
+      @usage(Usage.input | Usage.output)
+      model AddressSecondAppearance {
+        address: Address;
+      }
+      
+      @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
@@ -198,12 +198,12 @@ it("multipart with non-formdata model property", async function () {
 it("multipart with list of bytes", async function () {
   await runner.compileWithBuiltInService(
     `
-        model PictureWrapper {
-          pictures: bytes[];
-        }
-        
-        @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
-        `,
+    model PictureWrapper {
+      pictures: bytes[];
+    }
+    
+    @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -221,14 +221,14 @@ it("multipart with list of bytes", async function () {
 it("multipart with encoding bytes raises error", async function () {
   await runner.compile(
     `
-        @service(#{title: "Test Service"}) namespace TestService;
-        model EncodedBytesMFD {
-          @encode("base64")
-          pictures: bytes;
-        }
-        
-        @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
-        `,
+      @service(#{title: "Test Service"}) namespace TestService;
+      model EncodedBytesMFD {
+        @encode("base64")
+        pictures: bytes;
+      }
+      
+      @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
+      `,
   );
   ok(runner.context.diagnostics?.length);
   expectDiagnostics(runner.context.diagnostics, {
@@ -239,17 +239,17 @@ it("multipart with encoding bytes raises error", async function () {
 it("multipart with reused error model", async function () {
   await runner.compileWithBuiltInService(
     `
-        model PictureWrapper {
-          pictures: bytes[];
-        }
+      model PictureWrapper {
+        pictures: bytes[];
+      }
 
-        model ErrorResponse {
-          errorCode: string;
-        }
-        
-        @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void | ErrorResponse;
-        @post op normalOp(): void | ErrorResponse;
-        `,
+      model ErrorResponse {
+        errorCode: string;
+      }
+      
+      @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void | ErrorResponse;
+      @post op normalOp(): void | ErrorResponse;
+    `,
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -266,27 +266,27 @@ it("multipart with reused error model", async function () {
 
 it("expands model into formData parameters", async function () {
   await runner.compileWithBuiltInService(`
-        @doc("A widget.")
-        model Widget {
-          @key("widgetName")
-          name: string;
-          displayName: string;
-          description: string;
-          color: string;
-        }
+    @doc("A widget.")
+    model Widget {
+      @key("widgetName")
+      name: string;
+      displayName: string;
+      description: string;
+      color: string;
+    }
 
-        model WidgetForm is Widget {
-          @header("content-type")
-          contentType: "multipart/form-data";
-        }
+    model WidgetForm is Widget {
+      @header("content-type")
+      contentType: "multipart/form-data";
+    }
 
-        @route("/widgets")
-        interface Widgets {
-          @route(":upload")
-          @post
-          upload(...WidgetForm): Widget;
-        }
-        `);
+    @route("/widgets")
+    interface Widgets {
+      @route(":upload")
+      @post
+      upload(...WidgetForm): Widget;
+    }
+  `);
   const client = runner.context.sdkPackage.clients[0].methods.find(
     (x) => x.kind === "clientaccessor",
   )?.response as SdkClientType<SdkHttpOperation>;
@@ -329,19 +329,19 @@ it("expands model into formData parameters", async function () {
 
 it("usage doesn't apply to properties of a form data", async function () {
   await runner.compileWithBuiltInService(`
-        model MultiPartRequest {
-          id: string;
-          profileImage: bytes;
-          address: Address;
-        }
+    model MultiPartRequest {
+      id: string;
+      profileImage: bytes;
+      address: Address;
+    }
 
-        model Address {
-          city: string;
-        }
+    model Address {
+      city: string;
+    }
 
-        @post
-        op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
-        `);
+    @post
+    op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -355,16 +355,16 @@ it("usage doesn't apply to properties of a form data", async function () {
 
 it("Json[] and bytes[] in multipart/form-data", async function () {
   await runner.compileWithBuiltInService(`
-        model MultiPartRequest {
-          profileImages: bytes[];
-          addresses: Address[];
-        }
-        model Address {
-          city: string;
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
-        `);
+    model MultiPartRequest {
+      profileImages: bytes[];
+      addresses: Address[];
+    }
+    model Address {
+      city: string;
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -381,17 +381,17 @@ it("Json[] and bytes[] in multipart/form-data", async function () {
 
 it("basic multipart with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model Address {
-          city: string;
-        }
-        model MultiPartRequest{
-          id?: HttpPart<string>;
-          profileImage: HttpPart<bytes>;
-          address: HttpPart<Address>;
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model Address {
+      city: string;
+    }
+    model MultiPartRequest{
+      id?: HttpPart<string>;
+      profileImage: HttpPart<bytes>;
+      address: HttpPart<Address>;
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -433,13 +433,13 @@ it("basic multipart with @multipartBody for model", async function () {
 
 it("File[] of multipart with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model MultiPartRequest{
-            fileArrayOnePart: HttpPart<File[]>;
-            fileArrayMultiParts: HttpPart<File>[];
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model MultiPartRequest{
+        fileArrayOnePart: HttpPart<File[]>;
+        fileArrayMultiParts: HttpPart<File>[];
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -496,16 +496,16 @@ it("File[] of multipart with @multipartBody for model", async function () {
 
 it("File with specific content-type", async function () {
   await runner.compileWithBuiltInService(`
-      model RequiredMetaData extends File {
-        filename: string;
-        contentType: "image/png";
-      }
-      model MultiPartRequest{
-          file: HttpPart<RequiredMetaData>;
-      }
-      @post
-      op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-      `);
+    model RequiredMetaData extends File {
+      filename: string;
+      contentType: "image/png";
+    }
+    model MultiPartRequest{
+        file: HttpPart<RequiredMetaData>;
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
@@ -523,17 +523,17 @@ it("File with specific content-type", async function () {
 
 it("File of multipart with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model RequiredMetaData extends File {
-          filename: string;
-          contentType: string;
-        }
-        model MultiPartRequest{
-            fileOptionalFileName: HttpPart<File>;
-            fileRequiredFileName: HttpPart<RequiredMetaData>;
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model RequiredMetaData extends File {
+      filename: string;
+      contentType: string;
+    }
+    model MultiPartRequest{
+        fileOptionalFileName: HttpPart<File>;
+        fileRequiredFileName: HttpPart<RequiredMetaData>;
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -610,22 +610,22 @@ it("File of multipart with @multipartBody for model", async function () {
 
 it("check 'multi' of multipart with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model Address {
-          city: string;
-        }
-        model MultiPartRequest {
-            stringsOnePart: HttpPart<string[]>;
-            stringsMultiParts: HttpPart<string>[];
-            bytesOnePart: HttpPart<bytes[]>;
-            bytesMultiParts: HttpPart<bytes>[];
-            addressesOnePart: HttpPart<Address[]>;
-            addressesMultiParts: HttpPart<Address>[];
-            filesOnePart: HttpPart<File[]>;
-            filesMultiParts: HttpPart<File>[];
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model Address {
+      city: string;
+    }
+    model MultiPartRequest {
+        stringsOnePart: HttpPart<string[]>;
+        stringsMultiParts: HttpPart<string>[];
+        bytesOnePart: HttpPart<bytes[]>;
+        bytesMultiParts: HttpPart<bytes>[];
+        addressesOnePart: HttpPart<Address[]>;
+        addressesMultiParts: HttpPart<Address>[];
+        filesOnePart: HttpPart<File[]>;
+        filesMultiParts: HttpPart<File>[];
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -640,13 +640,13 @@ it("check 'multi' of multipart with @multipartBody for model", async function ()
 
 it("check returned sdkType of multipart with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model MultiPartRequest {
-            stringsOnePart: HttpPart<string[]>;
-            stringsMultiParts: HttpPart<string>[];
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model MultiPartRequest {
+        stringsOnePart: HttpPart<string[]>;
+        stringsMultiParts: HttpPart<string>[];
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -673,15 +673,15 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
 
 it("check content-type in multipart with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model MultiPartRequest {
-            stringWithoutContentType: HttpPart<string>,
-            stringWithContentType: HttpPart<{@body body: string, @header contentType: "text/html"}>,
-            bytesWithoutContentType: HttpPart<bytes>,
-            bytesWithContentType: HttpPart<{@body body: string, @header contentType: "image/png"}>
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model MultiPartRequest {
+        stringWithoutContentType: HttpPart<string>,
+        stringWithContentType: HttpPart<{@body body: string, @header contentType: "text/html"}>,
+        bytesWithoutContentType: HttpPart<bytes>,
+        bytesWithContentType: HttpPart<{@body body: string, @header contentType: "image/png"}>
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -749,19 +749,19 @@ it("check content-type in multipart with @multipartBody for model", async functi
 
 it("check isFilePart in multipart with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model MultiPartRequest {
-            bytesRaw: HttpPart<bytes>,
-            bytesArrayRaw: HttpPart<bytes>[],
-            fileRaw: HttpPart<File>,
-            fileArrayRaw: HttpPart<File>[],
-            bytesWithBody: HttpPart<{@body body: bytes}>,
-            bytesArrayWithBody: HttpPart<{@body body: bytes}>[],
-            fileWithBody: HttpPart<{@body body: File}>,
-            fileArrayWithBody: HttpPart<{@body body: File}>[],
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model MultiPartRequest {
+        bytesRaw: HttpPart<bytes>,
+        bytesArrayRaw: HttpPart<bytes>[],
+        fileRaw: HttpPart<File>,
+        fileArrayRaw: HttpPart<File>[],
+        bytesWithBody: HttpPart<{@body body: bytes}>,
+        bytesArrayWithBody: HttpPart<{@body body: bytes}>[],
+        fileWithBody: HttpPart<{@body body: File}>,
+        fileArrayWithBody: HttpPart<{@body body: File}>[],
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
@@ -777,12 +777,12 @@ it("check isFilePart in multipart with @multipartBody for model", async function
 
 it("check serialized name with @multipartBody for model", async function () {
   await runner.compileWithBuiltInService(`
-        model MultiPartRequest {
-            name: HttpPart<bytes, #{ name: "serializedName" }>,
-        }
-        @post
-        op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
-        `);
+    model MultiPartRequest {
+        name: HttpPart<bytes, #{ name: "serializedName" }>,
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
   const models = runner.context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
@@ -797,12 +797,12 @@ it("check serialized name with @multipartBody for model", async function () {
 it("multipart in client customization", async () => {
   const testCode = [
     `
-        @service(#{title: "Test Service"}) namespace TestService;
-        model MultiPartRequest {
-          profileImage: bytes;
-        }
-  
-        @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
+      @service(#{title: "Test Service"}) namespace TestService;
+      model MultiPartRequest {
+        profileImage: bytes;
+      }
+
+      @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
     `,
     `
       namespace Customizations;

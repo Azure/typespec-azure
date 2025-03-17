@@ -3,12 +3,11 @@ import {
   ModelProperty,
   Operation,
   Program,
-  SyntaxKind,
   createRule,
   paramMessage,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import { HttpVerb, getOperationVerb } from "@typespec/http";
-
 import {
   getNamespaceName,
   getSourceModel,

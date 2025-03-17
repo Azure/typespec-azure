@@ -1,7 +1,5 @@
 import {
-  AugmentDecoratorStatementNode,
   DecoratorContext,
-  DecoratorExpressionNode,
   DecoratorFunction,
   Enum,
   EnumMember,
@@ -9,12 +7,10 @@ import {
   Model,
   ModelProperty,
   Namespace,
-  Node,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   getDiscriminator,
@@ -24,6 +20,7 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
+import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -58,13 +55,12 @@ import {
   clientNamespaceKey,
   findRootSourceProperty,
   listAllNamespaces,
-  listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { getLibraryName, listAllServiceNamespaces } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -693,7 +689,7 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
@@ -710,20 +706,23 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
-  if (!accessOverride && entity.namespace) {
+  if (!accessOverride && entity.kind !== "ModelProperty" && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }
 
   return accessOverride;
 }
 
-export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+export function getAccess(
+  context: TCGCContext,
+  entity: Model | Enum | Operation | Union | ModelProperty,
+) {
   const override = getAccessOverride(context, entity);
-  if (override || entity.kind === "Operation") {
+  if (override || entity.kind === "Operation" || entity.kind === "ModelProperty") {
     return override || "public";
   }
 
@@ -787,19 +786,20 @@ export const $clientName: ClientNameDecorator = (
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
   if (entity.kind === "Model" || entity.kind === "Operation") {
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+    const target = context.decoratorTarget as Node;
+    if (target.kind === SyntaxKind.AugmentDecoratorStatement) {
       if (
-        ignoreDiagnostics(
-          context.program.checker.resolveTypeReference(
-            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType,
-          ),
+        (
+          ignoreDiagnostics(
+            (context.program.checker as any).resolveTypeReference(target.targetType),
+          ) as any
         )?.node !== entity.node
       ) {
         return;
       }
     }
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
-      if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+    if (target.kind === SyntaxKind.DecoratorExpression) {
+      if (target.parent !== entity.node) {
         return;
       }
     }

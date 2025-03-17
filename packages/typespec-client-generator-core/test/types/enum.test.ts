@@ -20,22 +20,22 @@ afterEach(async () => {
 });
 it("string extensible", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      enum DaysOfWeekExtensibleEnum {
-          Monday,
-          Tuesday,
-          Wednesday,
-          Thursday,
-          Friday,
-          Saturday,
-          Sunday,
-        }
-
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: DaysOfWeekExtensibleEnum
+    @usage(Usage.input | Usage.output)
+    enum DaysOfWeekExtensibleEnum {
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday,
+        Sunday,
       }
-      `);
+
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: DaysOfWeekExtensibleEnum
+    }
+    `);
 
   strictEqual(runner.context.sdkPackage.models.length, 1);
   strictEqual(runner.context.sdkPackage.enums.length, 1);
@@ -65,20 +65,20 @@ it("string extensible", async function () {
 
 it("int extensible", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      enum Integers {
-        one: 1,
-        two: 2,
-        three: 3,
-        four: 4,
-        five: 5,
-      }
+    @usage(Usage.input | Usage.output)
+    enum Integers {
+      one: 1,
+      two: 2,
+      three: 3,
+      four: 4,
+      five: 5,
+    }
 
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: Integers
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: Integers
+    }
+  `);
 
   strictEqual(runner.context.sdkPackage.models.length, 1);
   strictEqual(runner.context.sdkPackage.enums.length, 1);
@@ -101,18 +101,18 @@ it("int extensible", async function () {
 
 it("float extensible", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      enum Floats {
-        a: 1,
-        b: 2.1,
-        c: 3,
-      }
+    @usage(Usage.input | Usage.output)
+    enum Floats {
+      a: 1,
+      b: 2.1,
+      c: 3,
+    }
 
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: Floats
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: Floats
+    }
+  `);
 
   const sdkType = runner.context.sdkPackage.enums[0];
   ok(sdkType);
@@ -134,19 +134,19 @@ it("float extensible", async function () {
 
 it("union as enum float type", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      union Floats {
-        float,
-        a: 1,
-        b: 2,
-        c: 3,
-      }
+    @usage(Usage.input | Usage.output)
+    union Floats {
+      float,
+      a: 1,
+      b: 2,
+      c: 3,
+    }
 
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: Floats
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: Floats
+    }
+  `);
 
   const sdkType = runner.context.sdkPackage.enums[0];
   strictEqual(sdkType.isFixed, false);
@@ -167,24 +167,24 @@ it("union as enum float type", async function () {
 
 it("union of union as enum float type", async function () {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      union BaseEnum {
-        int32,
-        a: 1,
-      }
-      
-      @usage(Usage.input | Usage.output)
-      union ExtendedEnum {
-        BaseEnum,
-        b: 2,
-        c: 3,
-      }
+    @usage(Usage.input | Usage.output)
+    union BaseEnum {
+      int32,
+      a: 1,
+    }
+    
+    @usage(Usage.input | Usage.output)
+    union ExtendedEnum {
+      BaseEnum,
+      b: 2,
+      c: 3,
+    }
 
-      @usage(Usage.input | Usage.output)
-      model Test {
-        prop: ExtendedEnum
-      }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: ExtendedEnum
+    }
+  `);
   const sdkType = runner.context.sdkPackage.enums[0];
   ok(sdkType);
   strictEqual(sdkType.isFixed, false);
@@ -207,27 +207,27 @@ it("string fixed", async function () {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-      #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
-      @doc(".")
-      @fixed
-      @usage(Usage.input | Usage.output)
-      enum DaysOfWeekFixedEnum {
-        @doc("Monday") Monday,
-        @doc("Tuesday") Tuesday,
-        @doc("Wednesday") Wednesday,
-        @doc("Thursday") Thursday,
-        @doc("Friday") Friday,
-        @doc("Saturday") Saturday,
-        @doc("Sunday") Sunday,
-      }
+    #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
+    @doc(".")
+    @fixed
+    @usage(Usage.input | Usage.output)
+    enum DaysOfWeekFixedEnum {
+      @doc("Monday") Monday,
+      @doc("Tuesday") Tuesday,
+      @doc("Wednesday") Wednesday,
+      @doc("Thursday") Thursday,
+      @doc("Friday") Friday,
+      @doc("Saturday") Saturday,
+      @doc("Sunday") Sunday,
+    }
 
+    @doc(".")
+    @usage(Usage.input | Usage.output)
+    model Test {
       @doc(".")
-      @usage(Usage.input | Usage.output)
-      model Test {
-        @doc(".")
-        prop: DaysOfWeekFixedEnum
-      }
-      `);
+      prop: DaysOfWeekFixedEnum
+    }
+  `);
   strictEqual(runner.context.sdkPackage.models.length, 1);
   strictEqual(runner.context.sdkPackage.enums.length, 1);
   const sdkType = runner.context.sdkPackage.enums[0];
@@ -254,41 +254,41 @@ it("string fixed", async function () {
 
 it("enum access transitive closure", async () => {
   await runner.compileWithBuiltInService(`
-        enum Integers {
-          one: 1,
-          two: 2,
-          three: 3,
-          four: 4,
-          five: 5,
-        }
-        @access(Access.internal)
-        op func(
-          @body body: Integers
-        ): void;
-      `);
+    enum Integers {
+      one: 1,
+      two: 2,
+      three: 3,
+      four: 4,
+      five: 5,
+    }
+    @access(Access.internal)
+    op func(
+      @body body: Integers
+    ): void;
+  `);
 
   strictEqual(runner.context.sdkPackage.enums[0].access, "internal");
 });
 
 it("crossLanguageDefinitionId", async () => {
   await runner.compile(`
-        @service
-        namespace MyService {
-          @usage(Usage.input | Usage.output)
-          enum Integers {
-            one: 1,
-            two: 2,
-            three: 3,
-            four: 4,
-            five: 5,
-          }
+    @service
+    namespace MyService {
+      @usage(Usage.input | Usage.output)
+      enum Integers {
+        one: 1,
+        two: 2,
+        three: 3,
+        four: 4,
+        five: 5,
+      }
 
-          @usage(Usage.input | Usage.output)
-          model Test {
-            prop: Integers
-          }
-        }
-      `);
+      @usage(Usage.input | Usage.output)
+      model Test {
+        prop: Integers
+      }
+    }
+  `);
   strictEqual(runner.context.sdkPackage.enums.length, 1);
   const integersEnum = runner.context.sdkPackage.enums[0];
   strictEqual(integersEnum.crossLanguageDefinitionId, "MyService.Integers");
@@ -296,39 +296,39 @@ it("crossLanguageDefinitionId", async () => {
 
 it("enum with deprecated annotation", async () => {
   await runner.compileAndDiagnose(`
-        @service
-        namespace MyService;
-        #deprecated "no longer support"
-        enum Test {
-          test
-        }
-        op func(
-          @body body: Test
-        ): void;
-      `);
+    @service
+    namespace MyService;
+    #deprecated "no longer support"
+    enum Test {
+      test
+    }
+    op func(
+      @body body: Test
+    ): void;
+  `);
 
   strictEqual(runner.context.sdkPackage.enums[0].deprecation, "no longer support");
 });
 
 it("orphan enum", async () => {
   await runner.compileAndDiagnose(`
-        @service
-        @test namespace MyService {
-          @test
-          @usage(Usage.input | Usage.output)
-          enum Enum1{
-            one,
-            two,
-            three
-          }
+    @service
+    @test namespace MyService {
+      @test
+      @usage(Usage.input | Usage.output)
+      enum Enum1{
+        one,
+        two,
+        three
+      }
 
-          enum Enum2{
-            one,
-            two,
-            three
-          }
-        }
-      `);
+      enum Enum2{
+        one,
+        two,
+        three
+      }
+    }
+  `);
 
   strictEqual(runner.context.sdkPackage.enums[0].name, "Enum1");
   strictEqual(runner.context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
@@ -337,24 +337,24 @@ it("orphan enum", async () => {
 it("union as enum rename", async () => {
   const { TestUnion } = (await runner.compileWithCustomization(
     `
-        @service
-        namespace N {
-          @test
-          union TestUnion{
-            @clientName("ARename")
-            "A",
-            "B": "B_v",
-            string
-          }
-          op x(body: TestUnion): void;
+      @service
+      namespace N {
+        @test
+        union TestUnion{
+          @clientName("ARename")
+          "A",
+          "B": "B_v",
+          string
         }
-      `,
+        op x(body: TestUnion): void;
+      }
+    `,
     `
-        namespace Customizations;
+      namespace Customizations;
 
-        @@clientName(N.TestUnion, "TestUnionRename");
-        @@clientName(N.TestUnion.B, "BRename");
-      `,
+      @@clientName(N.TestUnion, "TestUnionRename");
+      @@clientName(N.TestUnion.B, "BRename");
+    `,
   )) as { TestUnion: Union };
 
   const enumType = getClientType(runner.context, TestUnion);
@@ -369,32 +369,32 @@ it("union as enum rename", async () => {
 it("union as enum with hierarchy", async () => {
   const { Test } = (await runner.compile(
     `
-        @service
-        namespace N {
-          @test
-          union Test{
-            A,
-            B,
-            C,
-            null
-          }
-
-          union A {
-            "A1",
-            "A2",
-          }
-
-          union B {
-            "B",
-            string
-          }
-
-          enum C {
-            "C"
-          }
-          op x(body: Test): void;
+      @service
+      namespace N {
+        @test
+        union Test{
+          A,
+          B,
+          C,
+          null
         }
-      `,
+
+        union A {
+          "A1",
+          "A2",
+        }
+
+        union B {
+          "B",
+          string
+        }
+
+        enum C {
+          "C"
+        }
+        op x(body: Test): void;
+      }
+    `,
   )) as { Test: Union };
 
   const nullableType = getClientType(runner.context, Test);
@@ -424,23 +424,23 @@ it("union as enum with hierarchy without flatten", async () => {
   );
   const { Foo } = (await runner.compile(
     `
-        @service
-        namespace N {
-          @test
-          union Foo {
-            "bar",
-            Baz,
-            string,
-          }
-
-          enum Baz {
-            test,
-            foo,
-          }
-
-          op test(@body test: Foo): void;
+      @service
+      namespace N {
+        @test
+        union Foo {
+          "bar",
+          Baz,
+          string,
         }
-      `,
+
+        enum Baz {
+          test,
+          foo,
+        }
+
+        op test(@body test: Foo): void;
+      }
+    `,
   )) as { Foo: Union };
 
   const unionType = getClientType(runner.context, Foo);
@@ -460,32 +460,32 @@ it("nullable union as enum with hierarchy without flatten", async () => {
   );
   const { Test } = (await runner.compile(
     `
-        @service
-        namespace N {
-          @test
-          union Test{
-            A,
-            B,
-            C,
-            null
-          }
-
-          union A {
-            "A1",
-            "A2",
-          }
-
-          union B {
-            "B",
-            string
-          }
-
-          enum C {
-            "C"
-          }
-          op x(body: Test): void;
+      @service
+      namespace N {
+        @test
+        union Test{
+          A,
+          B,
+          C,
+          null
         }
-      `,
+
+        union A {
+          "A1",
+          "A2",
+        }
+
+        union B {
+          "B",
+          string
+        }
+
+        enum C {
+          "C"
+        }
+        op x(body: Test): void;
+      }
+    `,
   )) as { Test: Union };
 
   const nullableType = getClientType(runner.context, Test);
@@ -532,24 +532,24 @@ it("nullable union as enum with hierarchy without flatten", async () => {
 it("anonymous union as enum with hierarchy", async () => {
   const { Test } = (await runner.compile(
     `
-        @service
-        namespace N {
-          enum LR {
-            left,
-            right,
-          }
-          enum UD {
-            up,
-            down,
-          }
-          
-          @test
-          model Test {
-            color: LR | UD;
-          }
-          op read(@body body: Test): void;
-        }
-      `,
+    @service
+    namespace N {
+      enum LR {
+        left,
+        right,
+      }
+      enum UD {
+        up,
+        down,
+      }
+      
+      @test
+      model Test {
+        color: LR | UD;
+      }
+      op read(@body body: Test): void;
+    }
+  `,
   )) as { Test: Model };
 
   const modelType = getClientType(runner.context, Test) as SdkModelType;
@@ -584,24 +584,24 @@ it("anonymous union as enum with hierarchy without flatten", async () => {
   );
   const { Test } = (await runner.compile(
     `
-        @service
-        namespace N {
-          enum LR {
-            left,
-            right,
-          }
-          enum UD {
-            up,
-            down,
-          }
-          
-          @test
-          model Test {
-            color: LR | UD;
-          }
-          op read(@body body: Test): void;
+      @service
+      namespace N {
+        enum LR {
+          left,
+          right,
         }
-      `,
+        enum UD {
+          up,
+          down,
+        }
+        
+        @test
+        model Test {
+          color: LR | UD;
+        }
+        op read(@body body: Test): void;
+      }
+    `,
   )) as { Test: Model };
 
   const modelType = getClientType(runner.context, Test) as SdkModelType;
@@ -629,15 +629,15 @@ it("anonymous union as enum with hierarchy without flatten", async () => {
 it("versioned enums", async () => {
   await runner.compile(
     `
-        @versioned(Versions)
-        @service()
-        namespace DemoService;
+      @versioned(Versions)
+      @service()
+      namespace DemoService;
 
-        enum Versions {
-          v1,
-          v2,
-        }
-      `,
+      enum Versions {
+        v1,
+        v2,
+      }
+    `,
   );
   const enums = runner.context.sdkPackage.enums;
   strictEqual(enums.length, 1);
@@ -658,14 +658,14 @@ it("versioned enums with all", async () => {
 
   await runner.compile(
     `
-        @versioned(Versions)
-        @service()
-        namespace DemoService;
-        enum Versions {
-          v1,
-          v2,
-        }
-      `,
+      @versioned(Versions)
+      @service()
+      namespace DemoService;
+      enum Versions {
+        v1,
+        v2,
+      }
+    `,
   );
   const enums = runner.context.sdkPackage.enums;
   strictEqual(enums.length, 1);
@@ -686,15 +686,15 @@ it("versioned enums with latest", async () => {
 
   await runner.compile(
     `
-        @versioned(Versions)
-        @service()
-        namespace DemoService;
+      @versioned(Versions)
+      @service()
+      namespace DemoService;
 
-        enum Versions {
-          v1,
-          v2,
-        }
-      `,
+      enum Versions {
+        v1,
+        v2,
+      }
+    `,
   );
   const enums = runner.context.sdkPackage.enums;
   strictEqual(enums.length, 1);
@@ -715,15 +715,15 @@ it("versioned enums with specific version", async () => {
 
   await runner.compile(
     `
-        @versioned(Versions)
-        @service()
-        namespace DemoService;
+      @versioned(Versions)
+      @service()
+      namespace DemoService;
 
-        enum Versions {
-          v1,
-          v2,
-        }
-      `,
+      enum Versions {
+        v1,
+        v2,
+      }
+    `,
   );
   const enums = runner.context.sdkPackage.enums;
   strictEqual(enums.length, 1);
@@ -739,25 +739,25 @@ it("versioned enums with specific version", async () => {
 it("usage propagation for enum value", async () => {
   await runner.compile(
     `
-        @service
-        namespace N {
-          enum LR {
-            left,
-            right,
-          }
-          union UD {
-            up: "up",
-            down: "down",
-          }
-          
-          @test
-          model Test {
-            prop1: LR.left;
-            prop2: UD.up;
-          }
-          op read(@body body: Test): void;
+      @service
+      namespace N {
+        enum LR {
+          left,
+          right,
         }
-      `,
+        union UD {
+          up: "up",
+          down: "down",
+        }
+        
+        @test
+        model Test {
+          prop1: LR.left;
+          prop2: UD.up;
+        }
+        op read(@body body: Test): void;
+      }
+    `,
   );
   const enums = runner.context.sdkPackage.enums;
   strictEqual(enums.length, 2);
@@ -772,18 +772,18 @@ it("usage propagation for enum value", async () => {
 it("spread and union as enum", async () => {
   await runner.compile(
     `
-        @service
-        namespace N {
-          union StringExtensibleNamedUnion {
-            string,
-            OptionB: "b",
-            "c",
-          }
-
-          model Test { name: string; }
-          op read(prop1: StringExtensibleNamedUnion; prop2: Test): void;
+      @service
+      namespace N {
+        union StringExtensibleNamedUnion {
+          string,
+          OptionB: "b",
+          "c",
         }
-      `,
+
+        model Test { name: string; }
+        op read(prop1: StringExtensibleNamedUnion; prop2: Test): void;
+      }
+    `,
   );
   const enums = runner.context.sdkPackage.enums;
   strictEqual(enums.length, 1);

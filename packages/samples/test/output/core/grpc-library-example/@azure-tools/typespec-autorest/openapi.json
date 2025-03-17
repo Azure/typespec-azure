@@ -139,6 +139,9 @@
           "LibraryService"
         ],
         "description": "Merges two shelves by adding all books from the shelf named\n`other_shelf_name` to shelf `name`, and deletes\n`other_shelf_name`. Returns the updated shelf.\nThe book ids of the moved books may not be the same as the original books.\nReturns NOT_FOUND if either shelf does not exist.\nThis call is a no-op if the specified shelves are the same.",
+        "consumes": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "$ref": "#/parameters/MergeShelvesRequest.name"
