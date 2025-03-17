@@ -53,6 +53,18 @@ export type ArmResourceIdentifierConfigDecorator = (
 ) => void;
 
 /**
+ * Internal decorator marking a scalar as a next link that requires parameterization before use.
+ *
+ * You most likely don't need to use this decorator since next links that require parameterization are against
+ * guidelines.
+ */
+export type ParameterizedNextLinkConfigDecorator = (
+  context: DecoratorContext,
+  target: Scalar,
+  parameters: Type,
+) => void;
+
+/**
  * Checks the Resource parameter of an operation signature to ensure it's a valid resource type.
  */
 export type NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => void;
@@ -88,6 +100,7 @@ export type AzureCoreFoundationsPrivateDecorators = {
   ensureResourceType: EnsureResourceTypeDecorator;
   embeddingVector: EmbeddingVectorDecorator;
   armResourceIdentifierConfig: ArmResourceIdentifierConfigDecorator;
+  parameterizedNextLinkConfig: ParameterizedNextLinkConfigDecorator;
   needsRoute: NeedsRouteDecorator;
   ensureVerb: EnsureVerbDecorator;
   defaultFinalStateVia: DefaultFinalStateViaDecorator;

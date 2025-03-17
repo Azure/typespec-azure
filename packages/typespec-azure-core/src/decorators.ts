@@ -2,8 +2,10 @@ import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js
 import { getAllProperties } from "./utils.js";
 
 import {
+  compilerAssert,
   createDiagnosticCollector,
   DecoratorContext,
+  DecoratorFunction,
   Diagnostic,
   DiagnosticCollector,
   Enum,
@@ -43,6 +45,7 @@ import {
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
   NeedsRouteDecorator,
+  ParameterizedNextLinkConfigDecorator,
   SpreadCustomParametersDecorator,
   SpreadCustomResponsePropertiesDecorator,
 } from "../generated-defs/Azure.Core.Foundations.Private.js";
@@ -1507,6 +1510,50 @@ export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
   }
 };
 
+function createMarkerDecorator<T extends DecoratorFunction>(
+  validate?: (...args: Parameters<T>) => boolean,
+) {
+  const getParameterizedNextLinkArguments = (program: Program, target: Parameters<T>[1]) =>
+    program.stateMap(AzureCoreStateKeys.parameterizedNextLinkConfig).get(target);
+  const markParameterizedNextLinkConfigTemplate = (program: Program, target: Parameters<T>[1]) => {
+    compilerAssert(
+      target.templateArguments[0].kind === "Tuple" || target.templateArguments[0].kind === "Model",
+      "Using the defined internal scalar parameterizedNextLink will result in a Tuple template argument type",
+    );
+
+    program
+      .stateMap(AzureCoreStateKeys.parameterizedNextLinkConfig)
+      .set(target, target.templateArguments[0].values);
+  };
+
+  const decorator = (...args: Parameters<T>) => {
+    if (validate && !validate(...args)) {
+      return;
+    }
+    const [context, target] = args;
+    markParameterizedNextLinkConfigTemplate(context.program, target);
+  };
+  return [
+    getParameterizedNextLinkArguments,
+    markParameterizedNextLinkConfigTemplate,
+    decorator as T,
+  ] as const;
+}
+
+/** @internal */
+export const [
+  /**
+   * Check if the given property is a @parameterizedNextLinkConfig` property of the paging operation that requires reinjection
+   * @param program Program
+   * @param target Scalar
+   * @param config Type
+   */
+  getParameterizedNextLinkArguments,
+  markParameterizedNextLinkConfigTemplate,
+  /** {@inheritDoc ParameterizedNextLinkConfigDecorator} */
+  parameterizedNextLinkConfigDecorator,
+] = createMarkerDecorator<ParameterizedNextLinkConfigDecorator>();
+
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
   "Foundations.Private",
@@ -1518,4 +1565,5 @@ setTypeSpecNamespace(
   $embeddingVector,
   $armResourceIdentifierConfig,
   $defaultFinalStateVia,
+  parameterizedNextLinkConfigDecorator,
 );
