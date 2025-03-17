@@ -1542,12 +1542,6 @@ function createMarkerDecorator<T extends DecoratorFunction>(
 
 /** @internal */
 export const [
-  /**
-   * Check if the given property is a @parameterizedNextLinkConfig` property of the paging operation that requires reinjection
-   * @param program Program
-   * @param target Scalar
-   * @param config Type
-   */
   getParameterizedNextLinkArguments,
   markParameterizedNextLinkConfigTemplate,
   /** {@inheritDoc ParameterizedNextLinkConfigDecorator} */
