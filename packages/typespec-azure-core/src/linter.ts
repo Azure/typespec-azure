@@ -18,6 +18,7 @@ import { noNullableRule } from "./rules/no-nullable.js";
 import { noOffsetDateTimeRule } from "./rules/no-offsetdatetime.js";
 import { noOpenAPIRule } from "./rules/no-openapi.js";
 import { noPrivateUsage } from "./rules/no-private-usage.js";
+import { noLegacyUsage } from "./rules/no-legacy-usage.js";
 import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
@@ -74,6 +75,7 @@ const rules = [
   requireVersionedRule,
   friendlyNameRule,
   noPrivateUsage,
+  noLegacyUsage,
   noQueryExplodeRule,
 ];
 
