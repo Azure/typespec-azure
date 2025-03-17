@@ -30,6 +30,7 @@ it("multipart form basic", async function () {
       profileImage: bytes;
     }
 
+    #suppress "deprecated" "For test"
     op basic(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
   `);
 
@@ -62,7 +63,9 @@ it("multipart conflicting model usage", async function () {
           profileImage: bytes;
         }
   
+        #suppress "deprecated" "For test"
         @put op jsonUse(@body body: MultiPartRequest): NoContentResponse;
+        #suppress "deprecated" "For test"
         @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
     `,
   );
@@ -84,9 +87,11 @@ it("multipart conflicting model usage for only multipart operations", async func
       
       @post
       @route("/basic1") 
+      #suppress "deprecated" "For test"
       op basic1(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
       @post
       @route("/basic2") 
+      #suppress "deprecated" "For test"
       op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
     `,
   );
@@ -117,9 +122,11 @@ it("multipart conflicting model usage for mixed operations", async function () {
       
       @post
       @route("/basic1") 
+      #suppress "deprecated" "For test"
       op basic1(@body body: RegularRequest): NoContentResponse;
       @post
       @route("/basic2") 
+      #suppress "deprecated" "For test"
       op basic2(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
     `,
   );
@@ -145,7 +152,9 @@ it("multipart resolving conflicting model usage with spread", async function () 
         ...B
       }
       
+      #suppress "deprecated" "For test"
       @put op multipartOperation(@header contentType: "multipart/form-data", ...A): void;
+      #suppress "deprecated" "For test"
       @post op normalOperation(...B): void;
       `,
   );
@@ -188,6 +197,7 @@ it("multipart with non-formdata model property", async function () {
         address: Address;
       }
       
+      #suppress "deprecated" "For test"
       @put op multipartOne(@header contentType: "multipart/form-data", @body body: AddressFirstAppearance): void;
     `,
   );
@@ -202,6 +212,7 @@ it("multipart with list of bytes", async function () {
       pictures: bytes[];
     }
     
+    #suppress "deprecated" "For test"
     @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void;
     `,
   );
@@ -227,6 +238,7 @@ it("multipart with encoding bytes raises error", async function () {
         pictures: bytes;
       }
       
+      #suppress "deprecated" "For test"
       @put op multipartOp(@header contentType: "multipart/form-data", @body body: EncodedBytesMFD): void;
       `,
   );
@@ -247,6 +259,7 @@ it("multipart with reused error model", async function () {
         errorCode: string;
       }
       
+      #suppress "deprecated" "For test"
       @put op multipartOp(@header contentType: "multipart/form-data", @body body: PictureWrapper): void | ErrorResponse;
       @post op normalOp(): void | ErrorResponse;
     `,
@@ -284,6 +297,7 @@ it("expands model into formData parameters", async function () {
     interface Widgets {
       @route(":upload")
       @post
+      #suppress "deprecated" "For test"
       upload(...WidgetForm): Widget;
     }
   `);
@@ -340,6 +354,7 @@ it("usage doesn't apply to properties of a form data", async function () {
     }
 
     @post
+      #suppress "deprecated" "For test"
     op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
   `);
   const models = runner.context.sdkPackage.models;
@@ -363,6 +378,7 @@ it("Json[] and bytes[] in multipart/form-data", async function () {
       city: string;
     }
     @post
+      #suppress "deprecated" "For test"
     op upload(@header contentType: "multipart/form-data", @body body: MultiPartRequest): void;
   `);
   const models = runner.context.sdkPackage.models;
@@ -802,6 +818,7 @@ it("multipart in client customization", async () => {
         profileImage: bytes;
       }
 
+      #suppress "deprecated" "For test"
       @post op multipartUse(@header contentType: "multipart/form-data", @body body: MultiPartRequest): NoContentResponse;
     `,
     `
