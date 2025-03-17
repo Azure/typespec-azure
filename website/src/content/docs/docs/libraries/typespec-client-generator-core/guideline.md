@@ -1,5 +1,5 @@
 ---
-title: Guidele for client emitter
+title: Guideline for client emitter
 ---
 
 This document will guide you on how to use the TypeSpec Client Generator Core (TCGC) in client emitters.
