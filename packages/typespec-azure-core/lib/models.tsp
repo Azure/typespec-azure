@@ -381,10 +381,6 @@ scalar armResourceType extends string;
 scalar armResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierAllowedResource[] = never>
   extends string;
 
-@Azure.Core.Foundations.Private.parameterizedNextLinkConfig(TypeSpec.Reflection.ModelProperty[])
-scalar parameterizedNextLink<ParameterizedParams extends TypeSpec.Reflection.ModelProperty[]>
-  extends url;
-
 // Consider replacing `*`
 union ArmResourceDeploymentScope {
   "tenant",

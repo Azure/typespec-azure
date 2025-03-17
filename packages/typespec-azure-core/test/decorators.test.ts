@@ -891,7 +891,7 @@ describe("typespec-azure-core: decorators", () => {
         model Certificate {}
         model Page {
           @items items: Certificate[];
-          @test @nextLink nextLink: Azure.Core.parameterizedNextLink<[ListCertificateOptions.includePending]>;
+          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
         }
 `)) as { includePending: ModelProperty; nextLink: ModelProperty };
       assert.strictEqual(nextLink.type.kind, "Scalar");
@@ -908,7 +908,7 @@ describe("typespec-azure-core: decorators", () => {
         model Certificate {}
         model Page {
           @items items: Certificate[];
-          @test @nextLink nextLink: Azure.Core.parameterizedNextLink<[
+          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
             ListCertificateOptions.includePending,
             ListCertificateOptions.includeExpired
           ]>;
@@ -925,7 +925,7 @@ describe("typespec-azure-core: decorators", () => {
         model Certificate {}
         model Page {
           @items items: Certificate[];
-          @test @nextLink nextLink: Azure.Core.parameterizedNextLink;
+          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink;
         }
 `);
       expectDiagnostics(diagnostics, {
