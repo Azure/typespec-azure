@@ -722,11 +722,18 @@ Expected response body:
 }
 ```
 
-### Azure_Encode_Duration
+### Azure_Encode_Duration_durationConstant
 
 - Endpoint: `put /azure/encode/duration/duration-constant`
 
 Test case for azure specific encoding. SDK should generate correct serialization format according to the set encoding.
+Expected request body:
+
+```json
+{
+  "input": "1.02:59:59.5000000"
+}
+```
 
 ### Azure_Example_Basic
 

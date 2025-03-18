@@ -8,10 +8,6 @@ using Spector;
 
 @doc("Test for azure related encode decorator.")
 @scenarioService("/azure/encode/duration")
-@scenario
-@scenarioDoc("""
-  Test case for azure specific encoding. SDK should generate correct serialization format according to the set encoding.
-  """)
 namespace _Specs_.Azure.Encode.Duration;
 
 @@clientNamespace(_Specs_.Azure.Encode.Duration, "azure.encode.duration", "java");
@@ -21,8 +17,9 @@ model DurationModel {
   input: duration;
 }
 
-@doc("""
-  Test duration with azure specific encoding.
+@scenario
+@scenarioDoc("""
+  Test case for azure specific encoding. SDK should generate correct serialization format according to the set encoding.
   Expected request body:
   ```json
   {
@@ -30,6 +27,7 @@ model DurationModel {
   }
   ```
   """)
+@doc("Test duration with azure specific encoding.")
 @put
 @route("/duration-constant")
 op durationConstant(@body body: DurationModel): NoContentResponse;
