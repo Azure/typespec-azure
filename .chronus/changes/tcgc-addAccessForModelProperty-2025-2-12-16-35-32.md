@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Extend `@access` to also apply to `ModelProperty`s
+Extend `@access` to also apply to `ModelProperty`s.
