@@ -2,7 +2,7 @@ import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-Scenarios.Azure_Encode_Duration = passOnSuccess([
+Scenarios.Azure_Encode_Duration_durationConstant = passOnSuccess([
   {
     uri: "/azure/encode/duration/duration-constant",
     method: "put",
