@@ -1752,7 +1752,7 @@ function updateTypesFromOperation(
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
         const body =
           innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type)
+            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
             : innerResponse.body.type;
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
