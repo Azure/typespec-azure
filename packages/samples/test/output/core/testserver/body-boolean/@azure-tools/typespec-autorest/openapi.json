@@ -24,6 +24,10 @@
       "get": {
         "operationId": "bool_getFalse",
         "description": "Get true Boolean false",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -49,6 +53,9 @@
         "produces": [
           "text/plain",
           "application/json"
+        ],
+        "consumes": [
+          "text/plain"
         ],
         "parameters": [
           {
@@ -133,6 +140,10 @@
       "get": {
         "operationId": "bool_getTrue",
         "description": "Get true Boolean value",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -155,6 +166,9 @@
       "put": {
         "operationId": "bool_putTrue",
         "description": "Set Boolean value true",
+        "consumes": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "value",
