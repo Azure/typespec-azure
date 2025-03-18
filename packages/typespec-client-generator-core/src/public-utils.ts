@@ -17,7 +17,14 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
+import {
+  HttpOperation,
+  Visibility,
+  getHttpOperation,
+  getHttpPart,
+  isMetadata,
+  isVisible,
+} from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
@@ -112,15 +119,20 @@ export function getClientNamespaceString(context: TCGCContext): string | undefin
 }
 
 /**
- * If the given type is an anonymous model and all of its properties excluding
- * header/query/path/status-code are sourced from a named model, returns that original named model.
- * Otherwise the given type is returned unchanged.
+ * If the given type is an anonymous model, returns a named model with same shape.
+ * The finding logic will ignore all the properties of header/query/path/status-code metadata,
+ * as well as the properties that are not visible in the given visibility if provided.
+ * If the model found is also anonymous, the input type is returned unchanged.
  *
  * @param context
  * @param type
  * @returns
  */
-export function getEffectivePayloadType(context: TCGCContext, type: Model): Model {
+export function getEffectivePayloadType(
+  context: TCGCContext,
+  type: Model,
+  visibility?: Visibility,
+): Model {
   const program = context.program;
 
   // if a type has name, we should resolve the name
@@ -135,7 +147,10 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
   const effective = getEffectiveModelType(
     program,
     type,
-    (t) => !isMetadata(context.program, t) && !hasNoneVisibility(context, t),
+    (t) =>
+      !isMetadata(context.program, t) &&
+      !hasNoneVisibility(context, t) &&
+      (visibility === undefined || isVisible(program, t, visibility)),
   );
   if (effective.name) {
     return effective;

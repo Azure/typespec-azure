@@ -284,6 +284,7 @@ it("multipart case", async () => {
   await runner.compileWithBuiltInService(`
     @route("upload/{name}")
     @post
+    #suppress "deprecated" "For test"
     op uploadFile(
       @path name: string,
       @header contentType: "multipart/form-data",

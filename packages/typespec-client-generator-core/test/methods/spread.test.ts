@@ -364,6 +364,7 @@ it("formdata model without body decorator in spread model", async () => {
       document: bytes;
     }
     alias Intersected = DocumentTranslateContent & {};
+    #suppress "deprecated" "For test"
     op test(...Intersected): void;
   `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
