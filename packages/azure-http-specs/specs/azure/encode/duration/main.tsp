@@ -7,14 +7,14 @@ using global.Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Test for azure related encode decorator.")
-@scenarioService("/azure/payload/encoding")
+@scenarioService("/azure/encode/duration")
 @scenario
 @scenarioDoc("""
   Test case for azure specific encoding. SDK should generate correct serialization format according to the set encoding.
   """)
-namespace _Specs_.Azure.Payload.Encoding;
+namespace _Specs_.Azure.Encode.Duration;
 
-@@clientNamespace(_Specs_.Azure.Payload.Encoding, "azure.payload.encoding", "java");
+@@clientNamespace(_Specs_.Azure.Encode.Duration, "azure.encode.duration", "java");
 
 model DurationModel {
   @encode("duration-constant")

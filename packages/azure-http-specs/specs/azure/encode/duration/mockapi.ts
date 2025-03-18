@@ -2,9 +2,9 @@ import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-Scenarios.Azure_Payload_Encoding = passOnSuccess([
+Scenarios.Azure_Encode_Duration = passOnSuccess([
   {
-    uri: "/azure/payload/encoding/duration-constant",
+    uri: "/azure/encode/duration/duration-constant",
     method: "put",
     request: {
       body: {
