@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkMethodResponse, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -370,4 +370,29 @@ it("description shall be included in response", async () => {
   const responses = Array.from(method.operation.responses.values());
   strictEqual(responses.length, 1);
   strictEqual(responses[0].description, "description on response");
+});
+
+it("response body with non-read visibility", async () => {
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        @visibility(Lifecycle.Create)
+        create: string;
+
+        read: string;
+      }
+
+      op get(): Test;
+    }
+  `);
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.name, "Test");
+  const client = runner.context.sdkPackage.clients[0];
+  ok(client);
+  const method = client.methods[0];
+  ok(method);
+  strictEqual((method.response as SdkMethodResponse).type, model);
 });

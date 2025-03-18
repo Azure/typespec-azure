@@ -18,6 +18,7 @@ import {
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
+  Visibility,
   getCookieParamOptions,
   getHeaderFieldName,
   getHeaderFieldOptions,
@@ -496,7 +497,7 @@ function getSdkHttpResponseAndExceptions(
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body =
           innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type)
+            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
             : innerResponse.body.type;
         if (getStreamMetadata(context.program, innerResponse)) {
           // map stream response body type to bytes

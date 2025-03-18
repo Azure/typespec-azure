@@ -17,7 +17,14 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
+import {
+  HttpOperation,
+  Visibility,
+  getHttpOperation,
+  getHttpPart,
+  isMetadata,
+  isVisible,
+} from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
@@ -120,7 +127,11 @@ export function getClientNamespaceString(context: TCGCContext): string | undefin
  * @param type
  * @returns
  */
-export function getEffectivePayloadType(context: TCGCContext, type: Model): Model {
+export function getEffectivePayloadType(
+  context: TCGCContext,
+  type: Model,
+  visibility?: Visibility,
+): Model {
   const program = context.program;
 
   // if a type has name, we should resolve the name
@@ -135,7 +146,10 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
   const effective = getEffectiveModelType(
     program,
     type,
-    (t) => !isMetadata(context.program, t) && !hasNoneVisibility(context, t),
+    (t) =>
+      !isMetadata(context.program, t) &&
+      !hasNoneVisibility(context, t) &&
+      (visibility === undefined || isVisible(program, t, visibility)),
   );
   if (effective.name) {
     return effective;
