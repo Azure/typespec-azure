@@ -119,9 +119,10 @@ export function getClientNamespaceString(context: TCGCContext): string | undefin
 }
 
 /**
- * If the given type is an anonymous model and all of its properties excluding
- * header/query/path/status-code are sourced from a named model, returns that original named model.
- * Otherwise the given type is returned unchanged.
+ * If the given type is an anonymous model, returns a named model with same shape.
+ * The finding logic will ignore all the properties of header/query/path/status-code metadata,
+ * as well as the properties that are not visible in the given visibility if provided.
+ * If the model found is also anonymous, the input type is returned unchanged.
  *
  * @param context
  * @param type
