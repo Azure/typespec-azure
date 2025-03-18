@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Specific scope decorator should always override all-scopes decorator
+Specific scope decorator should always override all-scopes decorator.
