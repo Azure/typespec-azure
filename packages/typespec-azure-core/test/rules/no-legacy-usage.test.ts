@@ -33,8 +33,7 @@ it("emits a warning diagnostic if using type from Azure.Core.Legacy", async () =
     .toEmitDiagnostics([
       {
         code: "@azure-tools/typespec-azure-core/no-legacy-usage",
-        message:
-          'Referencing elements inside Legacy namespace "Azure.Core.Legacy" is not allowed.',
+        message: 'Referencing elements inside Legacy namespace "Azure.Core.Legacy" is not allowed.',
       },
     ]);
 });
