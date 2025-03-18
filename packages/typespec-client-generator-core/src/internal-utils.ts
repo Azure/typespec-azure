@@ -10,7 +10,6 @@ import {
   Interface,
   isNeverType,
   isNullType,
-  isService,
   isVoidType,
   listServices,
   Model,
@@ -673,41 +672,18 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   return subgraph.type;
 }
 
-/**
- * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
- * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
- * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
- * instead to list all of the services in the global namespace.
- *
- * See https://github.com/microsoft/typespec/issues/6247
- *
- * @param context
- */
-export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
-  const serviceNamespaces: Namespace[] = [];
-  for (const ns of listAllUserDefinedNamespaces(context)) {
-    if (isService(context.program, ns)) {
-      serviceNamespaces.push(ns);
-    }
-  }
-  return serviceNamespaces;
-}
-
 export function listRawSubClients(
   context: TCGCContext,
   client: SdkOperationGroup | SdkClient,
-  retval?: (SdkOperationGroup | SdkClient)[],
-): (SdkOperationGroup | SdkClient)[] {
-  if (retval === undefined) {
-    retval = [];
-  }
-  if (retval.includes(client)) return retval;
-  if (client.kind === "SdkOperationGroup") {
-    retval.push(client);
-  }
-
-  for (const operationGroup of listOperationGroups(context, client)) {
-    listRawSubClients(context, operationGroup, retval);
+): SdkOperationGroup[] {
+  const retval: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = listOperationGroups(context, client);
+  while (queue.length > 0) {
+    const operationGroup = queue.pop()!;
+    retval.push(operationGroup);
+    if (operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
+    }
   }
   return retval;
 }

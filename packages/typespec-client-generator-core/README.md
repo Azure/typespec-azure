@@ -35,13 +35,23 @@ options:
 
 ## Emitter options
 
+### `emitter-name`
+
+**Type:** `string`
+
+Set `emitter-name` to output TCGC code models for specific language's emitter. This flag only work for taking TCGC as an emitter.
+
 ### `generate-protocol-methods`
 
 **Type:** `boolean`
 
+When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@protocolAPI` is not set for an operation. Default value is `true`.
+
 ### `generate-convenience-methods`
 
 **Type:** `boolean`
+
+When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
 ### `package-name`
 
@@ -51,21 +61,29 @@ options:
 
 **Type:** `boolean`
 
-### `api-version`
-
-**Type:** `string`
-
 ### `examples-dir`
 
 **Type:** `string`
 
-### `emitter-name`
-
-**Type:** `string`
+Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
 
 ### `namespace`
 
 **Type:** `string`
+
+Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.
+
+### `api-version`
+
+**Type:** `string`
+
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
+
+### `license`
+
+**Type:** `object`
+
+License information for the generated client code.
 
 ## Usage
 
@@ -114,7 +132,7 @@ Available ruleSets:
 
 #### `@access`
 
-Override access for operations, models and enums.
+Override access for operations, models, enums and model property.
 When setting access for namespaces,
 the access info will be propagated to the models and operations defined in the namespace.
 If the model has an access override, the model override takes precedence.
@@ -127,6 +145,7 @@ parent models, discriminated sub models.
 The override access should not be narrow than the access calculated by operation,
 and different override access should not conflict with each other,
 otherwise a warning will be added to diagnostics list.
+Model property's access will default to public unless there is an override.
 
 ```typespec
 @Azure.ClientGenerator.Core.access(value: EnumMember, scope?: valueof string)
@@ -134,7 +153,7 @@ otherwise a warning will be added to diagnostics list.
 
 ##### Target
 
-`Model | Operation | Enum | Union | Namespace`
+`ModelProperty | Model | Operation | Enum | Union | Namespace`
 
 ##### Parameters
 

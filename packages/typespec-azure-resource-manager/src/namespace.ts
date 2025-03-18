@@ -13,7 +13,8 @@ import {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import * as http from "@typespec/http";
-import { getAuthentication, setAuthentication, setRouteOptionsForNamespace } from "@typespec/http";
+import { getAuthentication, setAuthentication } from "@typespec/http";
+import { unsafe_setRouteOptionsForNamespace as setRouteOptionsForNamespace } from "@typespec/http/experimental";
 import { getResourceTypeForKeyParam } from "@typespec/rest";
 import {
   ArmLibraryNamespaceDecorator,

@@ -478,7 +478,7 @@ describe("content type parameter", () => {
       ): void;
       `,
     );
-    strictEqual(res.paths["/"].post.consumes, undefined);
+    deepStrictEqual(res.paths["/"].post.consumes, ["text/plain"]);
   });
 });
 
@@ -509,29 +509,6 @@ describe("misc", () => {
             enum: ["one", "two"],
             "x-ms-enum": { modelAsString: false, name: "Foo" },
           });
-        });
-
-        it("array of enum is kept inline", async () => {
-          deepStrictEqual(
-            await testParameter(
-              `
-            #suppress "deprecated" "For tests"
-            @${kind}({format: "csv"})`,
-              "Foo[]",
-            ),
-            {
-              in: kind,
-              name: "arg1",
-              required: true,
-              collectionFormat: "csv",
-              type: "array",
-              items: {
-                type: "string",
-                enum: ["one", "two"],
-                "x-ms-enum": { modelAsString: false, name: "Foo" },
-              },
-            },
-          );
         });
 
         it("named union is kept inline", async () => {

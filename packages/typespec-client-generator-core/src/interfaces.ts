@@ -46,6 +46,13 @@ export interface TCGCContext {
   examplesDir?: string;
   namespaceFlag?: string;
   apiVersion?: string;
+  license?: {
+    name: string;
+    company?: string;
+    header?: string;
+    link?: string;
+    description?: string;
+  };
 
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
@@ -79,6 +86,7 @@ export interface SdkContext<
 }
 
 export interface SdkEmitterOptions {
+  "emitter-name"?: string;
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
   /**
@@ -88,8 +96,14 @@ export interface SdkEmitterOptions {
   "flatten-union-as-enum"?: boolean;
   "api-version"?: string;
   "examples-dir"?: string;
-  "emitter-name"?: string;
   namespace?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
 }
 
 // Types for TCGC customization decorators
@@ -536,6 +550,7 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   optional: boolean;
   crossLanguageDefinitionId: string;
   visibility?: Visibility[];
+  access: AccessFlags;
 }
 
 /**
@@ -964,6 +979,15 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
   namespaces: SdkNamespace<TServiceOperation>[];
+  licenseInfo?: LicenseInfo;
+}
+
+export interface LicenseInfo {
+  name: string;
+  company: string;
+  link: string;
+  header: string;
+  description: string;
 }
 
 export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {

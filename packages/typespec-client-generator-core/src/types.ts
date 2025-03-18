@@ -47,6 +47,7 @@ import {
 } from "@typespec/http";
 import { isStream } from "@typespec/streams";
 import {
+  getAccess,
   getAccessOverride,
   getAlternateType,
   getClientNamespace,
@@ -783,6 +784,7 @@ function addDiscriminatorToModelType(
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
       decorators: [],
+      access: "public",
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -1217,6 +1219,7 @@ export function getSdkCredentialParameter(
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
+    access: "public",
   };
 }
 
@@ -1253,6 +1256,7 @@ export function getSdkModelPropertyTypeBase(
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     visibility: getSdkVisibility(context, type),
+    access: getAccess(context, type),
   });
 }
 
@@ -1494,7 +1498,7 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
-function updateUsageOrAccess(
+export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
   type?: SdkType,
@@ -1622,7 +1626,19 @@ function updateUsageOrAccess(
     if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
       continue;
     }
-    diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+    if (typeof value === "number") {
+      diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+    } else {
+      // by default, we set property access value to parent. If there's an override though, we override.
+      let propertyAccess = value;
+      if (property.__raw) {
+        const propertyAccessOverride = getAccessOverride(context, property.__raw);
+        if (propertyAccessOverride) {
+          propertyAccess = propertyAccessOverride;
+        }
+      }
+      diagnostics.pipe(updateUsageOrAccess(context, propertyAccess, property.type, options));
+    }
     options.ignoreSubTypeStack.pop();
   }
   return diagnostics.wrap(undefined);
