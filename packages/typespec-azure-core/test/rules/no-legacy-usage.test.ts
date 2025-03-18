@@ -4,7 +4,7 @@ import {
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { noPrivateUsage } from "../../src/rules/no-private-usage.js";
+import { noLegacyUsage } from "../../src/rules/no-legacy-usage.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 let runner: BasicTestRunner;
@@ -12,7 +12,7 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
-  tester = createLinterRuleTester(runner, noPrivateUsage, "@azure-tools/typespec-azure-core");
+  tester = createLinterRuleTester(runner, noLegacyUsage, "@azure-tools/typespec-azure-core");
 });
 
 it("emits a warning diagnostic if using type from Azure.Core.Legacy", async () => {
