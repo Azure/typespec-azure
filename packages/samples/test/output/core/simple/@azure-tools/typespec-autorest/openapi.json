@@ -23,6 +23,9 @@
     "/alpha/{id}": {
       "get": {
         "operationId": "DoAlpha",
+        "produces": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -44,6 +47,9 @@
     "/beta/{id}": {
       "get": {
         "operationId": "DoBeta",
+        "produces": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "id",

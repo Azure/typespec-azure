@@ -14,6 +14,7 @@ import {
   getFriendlyName,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isService,
   resolveEncodedName,
 } from "@typespec/compiler";
 import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
@@ -24,13 +25,11 @@ import {
   getClientNameOverride,
   getIsApiVersion,
   listClients,
-  listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
   SdkBodyModelPropertyType,
   SdkBodyParameter,
-  SdkClientType,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
@@ -39,7 +38,6 @@ import {
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
-  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -52,8 +50,8 @@ import {
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
-  listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
+  listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -315,10 +313,7 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  if (!context.__generatedNames) {
-    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>();
-  }
-  const generatedName = context.__generatedNames.get(type);
+  const generatedName = context.__generatedNames?.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -358,17 +353,12 @@ function findContextPath(
         return result;
       }
     }
-    const ogs = listOperationGroups(context, client);
-    while (ogs.length) {
-      const operationGroup = ogs.pop();
-      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
+    for (const og of listRawSubClients(context, client)) {
+      for (const operation of listOperationsInOperationGroup(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
         }
-      }
-      if (operationGroup?.subOperationGroups) {
-        ogs.push(...operationGroup.subOperationGroups);
       }
     }
   }
@@ -642,13 +632,7 @@ function buildNameFromContextPaths(
   while (generatedNames.includes(createName)) {
     createName = `${rawCreateName}${duplicateCount++}`;
   }
-  if (context.__generatedNames) {
-    context.__generatedNames.set(type, createName);
-  } else {
-    context.__generatedNames = new Map<Union | Model | TspLiteralType, string>([
-      [type, createName],
-    ]);
-  }
+  context.__generatedNames!.set(type, createName);
   return createName;
 }
 
@@ -660,7 +644,7 @@ export function getHttpOperationWithCache(
     return context.__httpOperationCache.get(operation)!;
   }
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
-  context.__httpOperationCache?.set(operation, httpOperation);
+  context.__httpOperationCache!.set(operation, httpOperation);
   return httpOperation;
 }
 
@@ -672,28 +656,6 @@ export function getHttpOperationExamples(
   operation: HttpOperation,
 ): SdkHttpOperationExample[] {
   return context.__httpOperationExamples?.get(operation) ?? [];
-}
-
-/**
- * Get all the sub clients from current client.
- *
- * @param client
- * @param listNestedClients determine if nested clients should be listed
- * @returns
- */
-export function listSubClients<TServiceOperation extends SdkServiceOperation>(
-  client: SdkClientType<TServiceOperation>,
-  listNestedClients: boolean = false,
-): SdkClientType<TServiceOperation>[] {
-  const subClients: SdkClientType<TServiceOperation>[] = client.methods
-    .filter((c) => c.kind === "clientaccessor")
-    .map((c) => c.response as SdkClientType<TServiceOperation>);
-  if (listNestedClients) {
-    for (const subClient of [...subClients]) {
-      subClients.push(...listSubClients(subClient, listNestedClients));
-    }
-  }
-  return subClients;
 }
 
 export function isAzureCoreModel(t: SdkType): boolean {
@@ -754,4 +716,24 @@ export function getHttpOperationParameter(
     }
   }
   return undefined;
+}
+
+/**
+ * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
+ * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
+ * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
+ * instead to list all of the services in the global namespace.
+ *
+ * See https://github.com/microsoft/typespec/issues/6247
+ *
+ * @param context
+ */
+export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
+  const serviceNamespaces: Namespace[] = [];
+  for (const ns of listAllUserDefinedNamespaces(context)) {
+    if (isService(context.program, ns)) {
+      serviceNamespaces.push(ns);
+    }
+  }
+  return serviceNamespaces;
 }

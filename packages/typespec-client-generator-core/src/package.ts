@@ -74,10 +74,11 @@ import {
   getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
-  listAllServiceNamespaces,
+  listRawSubClients,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getLicenseInfo } from "./license.js";
 import {
   getClientNamespaceString,
   getCrossLanguageDefinitionId,
@@ -86,6 +87,7 @@ import {
   getHttpOperationWithCache,
   getLibraryName,
   isApiVersion,
+  listAllServiceNamespaces,
 } from "./public-utils.js";
 import {
   getAllReferencedTypes,
@@ -195,21 +197,34 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     let nextLinkPath = undefined;
     let nextLinkSegments = undefined;
     if (pagingOperation.output.nextLink) {
-      nextLinkPath = getPropertyPathFromModel(
-        context,
-        responseType?.__raw,
-        (p) =>
-          p.kind === "ModelProperty" &&
-          findRootSourceProperty(p) ===
-            findRootSourceProperty(pagingOperation.output.nextLink!.property),
-      );
-      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
-        responseType,
-        (p) =>
-          p.__raw?.kind === "ModelProperty" &&
-          findRootSourceProperty(p.__raw) ===
-            findRootSourceProperty(pagingOperation.output.nextLink!.property),
-      );
+      if (isHeader(context.program, pagingOperation.output.nextLink.property)) {
+        nextLinkSegments = baseServiceMethod.operation.responses
+          .map((r) => r.headers)
+          .flat()
+          .filter(
+            (h) =>
+              h.__raw?.kind === "ModelProperty" &&
+              findRootSourceProperty(h.__raw) ===
+                findRootSourceProperty(pagingOperation.output.nextLink!.property),
+          );
+        nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
+      } else {
+        nextLinkPath = getPropertyPathFromModel(
+          context,
+          responseType?.__raw,
+          (p) =>
+            p.kind === "ModelProperty" &&
+            findRootSourceProperty(p) ===
+              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+        );
+        nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+          responseType,
+          (p) =>
+            p.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(p.__raw) ===
+              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+        );
+      }
     }
 
     let continuationTokenParameterSegments = undefined;
@@ -311,15 +326,28 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   let nextLinkPath = undefined;
   let nextLinkSegments = undefined;
   if (pagedMetadata.nextLinkProperty) {
-    nextLinkPath = getPropertyPathFromSegment(
-      context,
-      pagedMetadata.modelType,
-      pagedMetadata?.nextLinkSegments,
-    );
-    nextLinkSegments = getPropertySegmentsFromModelOrParameters(
-      responseType,
-      (p) => p.__raw === pagedMetadata.nextLinkProperty,
-    );
+    if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
+      nextLinkSegments = baseServiceMethod.operation.responses
+        .map((r) => r.headers)
+        .flat()
+        .filter(
+          (h) =>
+            h.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(h.__raw) ===
+              findRootSourceProperty(pagedMetadata.nextLinkProperty!),
+        );
+      nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
+    } else {
+      nextLinkPath = getPropertyPathFromSegment(
+        context,
+        pagedMetadata.modelType,
+        pagedMetadata?.nextLinkSegments,
+      );
+      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
+        responseType,
+        (p) => p.__raw === pagedMetadata.nextLinkProperty,
+      );
+    }
   }
 
   return diagnostics.wrap({
@@ -716,7 +744,7 @@ function getSdkInitializationType(
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
       namespace,
       clientNamespace: namespace,
-      apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+      apiVersions: context.getApiVersionsForType(client.type),
       decorators: [],
       serializationOptions: {},
     };
@@ -914,9 +942,10 @@ function getEndpointTypeFromSingleServer<
         correspondingMethodParams: [],
         type: getTypeSpecBuiltInType(context, "string"),
         isApiVersionParam: false,
-        apiVersions: context.__tspTypeToApiVersions.get(client.__raw.type)!,
+        apiVersions: context.getApiVersionsForType(client.__raw.type),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
         decorators: [],
+        access: "public",
       },
     ],
     decorators: [],
@@ -1019,11 +1048,12 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     doc: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: context.__tspTypeToApiVersions.get(rawClient.type)!,
+    apiVersions: context.getApiVersionsForType(rawClient.type),
     optional: false,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
     decorators: [],
+    access: "public",
   });
 }
 
@@ -1041,7 +1071,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     doc: getDoc(context.program, client.type),
     summary: getSummary(context.program, client.type),
     methods: [],
-    apiVersions: context.__tspTypeToApiVersions.get(client.type)!,
+    apiVersions: context.getApiVersionsForType(client.type),
     nameSpace: getClientNamespaceStringHelper(context, client.service)!,
     namespace: namespace,
     clientNamespace: namespace,
@@ -1078,11 +1108,11 @@ function addDefaultClientParameters<
     .get(client.__raw.type)
     ?.find((x) => x.kind === "apiVersion");
   if (!apiVersionParam) {
-    for (const operationGroup of listOperationGroups(context, client.__raw)) {
+    for (const sc of listRawSubClients(context, client.__raw)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
       apiVersionParam = context.__clientToParameters
-        .get(operationGroup.type)
+        .get(sc.type)
         ?.find((x) => x.kind === "apiVersion");
       if (apiVersionParam) break;
     }
@@ -1094,11 +1124,9 @@ function addDefaultClientParameters<
     .get(client.__raw.type)
     ?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
-    for (const operationGroup of listOperationGroups(context, client.__raw)) {
+    for (const sc of listRawSubClients(context, client.__raw)) {
       // if any sub operation groups have an subId param, the top level needs it as well
-      subId = context.__clientToParameters
-        .get(operationGroup.type)
-        ?.find((x) => isSubscriptionId(context, x));
+      subId = context.__clientToParameters.get(sc.type)?.find((x) => isSubscriptionId(context, x));
       if (subId) break;
     }
   }
@@ -1116,7 +1144,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
     let clientApiVersions = resolveVersions(context.program, client.service)
       .filter((x) => x.rootVersion)
       .map((x) => x.rootVersion!.value);
-    context.__tspTypeToApiVersions.set(
+    context.setApiVersionsForType(
       client.type,
       filterApiVersionsWithDecorators(context, client.type, clientApiVersions),
     );
@@ -1125,18 +1153,18 @@ function populateApiVersionInformation(context: TCGCContext): void {
       client.type,
       getClientDefaultApiVersion(context, client),
     );
-    for (const og of listOperationGroups(context, client)) {
-      clientApiVersions = resolveVersions(context.program, og.service)
+    for (const sc of listRawSubClients(context, client)) {
+      clientApiVersions = resolveVersions(context.program, sc.service)
         .filter((x) => x.rootVersion)
         .map((x) => x.rootVersion!.value);
-      context.__tspTypeToApiVersions.set(
-        og.type,
-        filterApiVersionsWithDecorators(context, og.type, clientApiVersions),
+      context.setApiVersionsForType(
+        sc.type,
+        filterApiVersionsWithDecorators(context, sc.type, clientApiVersions),
       );
 
       context.__clientToApiVersionClientDefaultValue.set(
-        og.type,
-        getClientDefaultApiVersion(context, og),
+        sc.type,
+        getClientDefaultApiVersion(context, sc),
       );
     }
   }
@@ -1161,6 +1189,7 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
     ),
     crossLanguagePackageId,
     namespaces: [],
+    licenseInfo: getLicenseInfo(context),
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);

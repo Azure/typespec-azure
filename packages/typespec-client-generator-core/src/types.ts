@@ -47,13 +47,13 @@ import {
 } from "@typespec/http";
 import { isStream } from "@typespec/streams";
 import {
+  getAccess,
   getAccessOverride,
   getAlternateType,
   getClientNamespace,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
-  listOperationGroups,
   listOperationsInOperationGroup,
   shouldFlattenProperty,
   shouldGenerateConvenient,
@@ -84,7 +84,6 @@ import {
   SdkUnionType,
   TCGCContext,
   UsageFlags,
-  getKnownScalars,
   isSdkIntKind,
 } from "./interfaces.js";
 import {
@@ -105,6 +104,7 @@ import {
   isNeverOrVoidType,
   isOnClient,
   listAllUserDefinedNamespaces,
+  listRawSubClients,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -784,6 +784,7 @@ function addDiscriminatorToModelType(
       flatten: false, // discriminator properties can not be flattened
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
       decorators: [],
+      access: "public",
     });
     model.discriminatorProperty = model.properties[0];
   }
@@ -1057,9 +1058,6 @@ export function getClientTypeWithDiagnostics(
   type: Type,
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
-  if (!context.__knownScalars) {
-    context.__knownScalars = getKnownScalars();
-  }
   const diagnostics = createDiagnosticCollector();
   let retval: SdkType | undefined = undefined;
   switch (type.kind) {
@@ -1221,6 +1219,7 @@ export function getSdkCredentialParameter(
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
+    access: "public",
   };
 }
 
@@ -1257,6 +1256,7 @@ export function getSdkModelPropertyTypeBase(
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     visibility: getSdkVisibility(context, type),
+    access: getAccess(context, type),
   });
 }
 
@@ -1486,7 +1486,7 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
   ) {
     return;
   }
-  context.__referencedTypeCache?.set(type, sdkType);
+  context.__referencedTypeCache!.set(type, sdkType);
 }
 
 interface PropagationOptions {
@@ -1498,7 +1498,7 @@ interface PropagationOptions {
   isOverride?: boolean;
 }
 
-function updateUsageOrAccess(
+export function updateUsageOrAccess(
   context: TCGCContext,
   value: UsageFlags | AccessFlags,
   type?: SdkType,
@@ -1626,7 +1626,19 @@ function updateUsageOrAccess(
     if (property.kind === "property" && isReadOnly(property) && value === UsageFlags.Input) {
       continue;
     }
-    diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+    if (typeof value === "number") {
+      diagnostics.pipe(updateUsageOrAccess(context, value, property.type, options));
+    } else {
+      // by default, we set property access value to parent. If there's an override though, we override.
+      let propertyAccess = value;
+      if (property.__raw) {
+        const propertyAccessOverride = getAccessOverride(context, property.__raw);
+        if (propertyAccessOverride) {
+          propertyAccess = propertyAccessOverride;
+        }
+      }
+      diagnostics.pipe(updateUsageOrAccess(context, propertyAccess, property.type, options));
+    }
     options.ignoreSubTypeStack.pop();
   }
   return diagnostics.wrap(undefined);
@@ -1941,15 +1953,10 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       // operations on a client
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
-    const ogs = listOperationGroups(context, client);
-    while (ogs.length) {
-      const operationGroup = ogs.pop();
-      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
+    for (const sc of listRawSubClients(context, client)) {
+      for (const operation of listOperationsInOperationGroup(context, sc)) {
         // operations on operation groups
         diagnostics.pipe(updateTypesFromOperation(context, operation));
-      }
-      if (operationGroup?.subOperationGroups) {
-        ogs.push(...operationGroup.subOperationGroups);
       }
     }
     // server parameters

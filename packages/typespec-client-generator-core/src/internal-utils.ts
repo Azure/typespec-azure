@@ -10,7 +10,6 @@ import {
   Interface,
   isNeverType,
   isNullType,
-  isService,
   isVoidType,
   listServices,
   Model,
@@ -41,7 +40,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getParamAlias, listOperationGroups } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -49,6 +48,7 @@ import {
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
+  SdkOperationGroup,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -107,7 +107,7 @@ export function getClientNamespaceStringHelper(
   context: TCGCContext,
   namespace?: Namespace,
 ): string | undefined {
-  let packageName = context.packageName;
+  let packageName = context.packageName; // eslint-disable-line @typescript-eslint/no-deprecated
   if (packageName) {
     packageName = packageName
       .replace(/-/g, ".")
@@ -180,11 +180,6 @@ export function filterApiVersionsWithDecorators(
   return retval;
 }
 
-function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]): string[] {
-  const union = Array.from(new Set([...a, ...b]));
-  return apiVersions.filter((item) => union.includes(item));
-}
-
 /**
  *
  * @param context
@@ -199,7 +194,7 @@ export function getAvailableApiVersions(
 ): string[] {
   let wrapperApiVersions: string[] = [];
   if (wrapper) {
-    wrapperApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
+    wrapperApiVersions = context.getApiVersionsForType(wrapper);
   }
 
   const allApiVersions =
@@ -211,16 +206,11 @@ export function getAvailableApiVersions(
   if (!apiVersions) return [];
   const explicitlyDecorated = filterApiVersionsWithDecorators(context, type, apiVersions);
   if (explicitlyDecorated.length) {
-    context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
+    context.setApiVersionsForType(type, explicitlyDecorated);
     return explicitlyDecorated;
   }
-  // we take the union of all of the api versions that the type is available on
-  // if it's called multiple times with diff wrappers, we want to make sure we have
-  // all of the possible api versions listed
-  const existing = context.__tspTypeToApiVersions.get(type) || [];
-  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
-  context.__tspTypeToApiVersions.set(type, retval);
-  return retval;
+  context.setApiVersionsForType(type, wrapperApiVersions);
+  return context.getApiVersionsForType(type);
 }
 
 /**
@@ -682,22 +672,18 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   return subgraph.type;
 }
 
-/**
- * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
- * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
- * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
- * instead to list all of the services in the global namespace.
- *
- * See https://github.com/microsoft/typespec/issues/6247
- *
- * @param context
- */
-export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
-  const serviceNamespaces: Namespace[] = [];
-  for (const ns of listAllUserDefinedNamespaces(context)) {
-    if (isService(context.program, ns)) {
-      serviceNamespaces.push(ns);
+export function listRawSubClients(
+  context: TCGCContext,
+  client: SdkOperationGroup | SdkClient,
+): SdkOperationGroup[] {
+  const retval: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = listOperationGroups(context, client);
+  while (queue.length > 0) {
+    const operationGroup = queue.pop()!;
+    retval.push(operationGroup);
+    if (operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
     }
   }
-  return serviceNamespaces;
+  return retval;
 }

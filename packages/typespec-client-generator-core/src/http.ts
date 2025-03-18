@@ -7,6 +7,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   getDoc,
+  getEncode,
   getSummary,
   ignoreDiagnostics,
   isErrorModel,
@@ -67,7 +68,7 @@ import {
   twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { isMediaTypeJson } from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -201,6 +202,7 @@ function getSdkHttpParameters(
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
+        access: "public",
       };
     }
     if (retval.bodyParam) {
@@ -276,7 +278,10 @@ function createContentTypeOrAcceptHeader(
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
-  // for contentType, we treat it as a constant IFF there's one value and it's application/json.
+  // for contentType, we treat it as a constant IFF there's one value and it's one of:
+  //  - application/json
+  //  - text/plain
+  //  - application/octet-stream
   // this is to prevent a breaking change when a service adds more content types in the future.
   // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
   //
@@ -286,7 +291,10 @@ function createContentTypeOrAcceptHeader(
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (isMediaTypeJson(bodyObject.contentTypes[0]) || name === "accept")
+    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
+      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
+      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
+      name === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
@@ -310,6 +318,7 @@ function createContentTypeOrAcceptHeader(
     optional: optional,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
+    access: "public",
   };
 }
 
@@ -404,7 +413,7 @@ export function getSdkHttpParameter(
   const headerQueryBase = {
     ...base,
     optional: param.optional,
-    collectionFormat: getCollectionFormat(context, param),
+    collectionFormat: diagnostics.pipe(getCollectionFormat(context, param)),
     correspondingMethodParams,
   };
   if (isQueryParam(context.program, param) || location === "query") {
@@ -718,20 +727,47 @@ function filterOutUselessPathParameters(
 function getCollectionFormat(
   context: TCGCContext,
   type: ModelProperty,
-): CollectionFormat | undefined {
+): [CollectionFormat | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const program = context.program;
   if (isHeader(program, type)) {
-    const headerOptions = getHeaderFieldOptions(program, type);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    if (headerOptions.format) {
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      return headerOptions.format;
-    } else if (typeof headerOptions.explode === "boolean" || $.array.is(type.type)) {
-      return headerOptions.explode ? "multi" : "csv";
-    }
+    return getFormatFromExplodeOrEncode(
+      context,
+      type,
+      getHeaderFieldOptions(program, type).explode,
+    );
   } else if (isQueryParam(program, type)) {
-    /* eslint-disable @typescript-eslint/no-deprecated */
-    return getQueryParamOptions(program, type)?.format;
+    return getFormatFromExplodeOrEncode(context, type, getQueryParamOptions(program, type).explode);
   }
-  return;
+  return diagnostics.wrap(undefined);
+}
+
+function getFormatFromExplodeOrEncode(
+  context: TCGCContext,
+  type: ModelProperty,
+  explode?: boolean,
+): [CollectionFormat | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if ($.array.is(type.type)) {
+    if (explode) {
+      return diagnostics.wrap("multi");
+    }
+    const encode = getEncode(context.program, type);
+    if (encode) {
+      if (encode?.encoding === "ArrayEncoding.pipeDelimited") {
+        return diagnostics.wrap("pipes");
+      }
+      if (encode?.encoding === "ArrayEncoding.spaceDelimited") {
+        return diagnostics.wrap("ssv");
+      }
+      diagnostics.add(
+        createDiagnostic({
+          code: "invalid-encode-for-collection-format",
+          target: type,
+        }),
+      );
+    }
+    return diagnostics.wrap("csv");
+  }
+  return diagnostics.wrap(undefined);
 }
