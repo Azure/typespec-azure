@@ -1,7 +1,12 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, it } from "vitest";
-import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
+import {
+  SdkBodyModelPropertyType,
+  SdkClientType,
+  SdkHttpOperation,
+  UsageFlags,
+} from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
@@ -132,6 +137,44 @@ it("multipart conflicting model usage for mixed operations", async function () {
   deepEqual(multiPartRequest.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
 });
 
+it("multipart resolving conflicting model usage with spread", async function () {
+  await runner.compileWithBuiltInService(
+    `
+      model B {
+        doc: HttpPart<bytes>
+      }
+      
+      model A {
+        ...B
+      }
+      
+      @put op multipartOperation(@header contentType: "multipart/form-data", @multipartBody body: A): void;
+      @post op normalOperation(...B): void;
+      `,
+  );
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 2);
+  const modelA = models.find((x) => x.name === "A");
+  ok(modelA);
+  strictEqual(modelA.kind, "model");
+  strictEqual(modelA.usage, UsageFlags.MultipartFormData | UsageFlags.Input);
+  strictEqual(modelA.properties.length, 1);
+  const modelAProp = modelA.properties[0];
+  strictEqual(modelAProp.kind, "property");
+
+  ok(modelAProp.serializationOptions.multipart);
+  strictEqual(modelAProp.serializationOptions.multipart.isFilePart, true);
+  strictEqual(modelAProp.multipartOptions, modelAProp.serializationOptions.multipart);
+  strictEqual(modelAProp.isMultipartFileInput, true);
+
+  const modelB = models.find((x) => x.name === "B");
+  ok(modelB);
+  strictEqual(modelB.kind, "model");
+  strictEqual(modelB.usage, UsageFlags.Spread | UsageFlags.Json);
+  strictEqual(modelB.properties.length, 1);
+  strictEqual(modelB.properties[0].type.kind, "bytes");
+});
+
 it("multipart with non-formdata model property", async function () {
   await runner.compileWithBuiltInService(
     `
@@ -207,6 +250,61 @@ it("multipart with reused error model", async function () {
   ok(errorResponse);
   strictEqual(errorResponse.kind, "model");
   ok((errorResponse.usage & UsageFlags.MultipartFormData) === 0);
+});
+
+it("expands model into formData parameters", async function () {
+  await runner.compileWithBuiltInService(`
+    @doc("A widget.")
+    model Widget {
+      @key("widgetName")
+      name: HttpPart<string>;
+      displayName: HttpPart<string>;
+      description: HttpPart<string>;
+      color: HttpPart<string>;
+    }
+    model WidgetForm {
+      @header("content-type")
+      contentType: "multipart/form-data";
+
+      @multipartBody
+      body: Widget;
+    }
+    @route("/widgets")
+    interface Widgets {
+      @route(":upload")
+      @post
+      upload(...WidgetForm): Widget;
+    }
+  `);
+  const client = runner.context.sdkPackage.clients[0].methods.find(
+    (x) => x.kind === "clientaccessor",
+  )?.response as SdkClientType<SdkHttpOperation>;
+  const formDataMethod = client.methods[0];
+  strictEqual(formDataMethod.kind, "basic");
+  strictEqual(formDataMethod.name, "upload");
+  strictEqual(formDataMethod.parameters.length, 3);
+
+  strictEqual(formDataMethod.parameters[0].name, "contentType");
+  strictEqual(formDataMethod.parameters[0].type.kind, "constant");
+  strictEqual(formDataMethod.parameters[0].type.value, "multipart/form-data");
+
+  strictEqual(formDataMethod.parameters[1].name, "body");
+  strictEqual(formDataMethod.parameters[1].type.kind, "model");
+
+  strictEqual(formDataMethod.parameters[2].name, "accept");
+  strictEqual(formDataMethod.parameters[2].type.kind, "constant");
+  strictEqual(formDataMethod.parameters[2].type.value, "application/json");
+
+  const formDataOp = formDataMethod.operation;
+  strictEqual(formDataOp.parameters.length, 2);
+  ok(formDataOp.parameters.find((x) => x.name === "accept" && x.kind === "header"));
+  ok(formDataOp.parameters.find((x) => x.name === "contentType" && x.kind === "header"));
+
+  const formDataBodyParam = formDataOp.bodyParam;
+  ok(formDataBodyParam);
+  strictEqual(formDataBodyParam.type.kind, "model");
+  strictEqual(formDataBodyParam.type.name, "Widget");
+  strictEqual(formDataBodyParam.correspondingMethodParams.length, 1);
 });
 
 it("usage doesn't apply to properties of a form data", async function () {

@@ -280,6 +280,45 @@ it("@bodyRoot case", async () => {
   }
 });
 
+it("multipart case", async () => {
+  await runner.compileWithBuiltInService(`
+    @route("upload/{name}")
+    @post
+    op uploadFile(
+      @path name: string,
+      @header contentType: "multipart/form-data",
+      @multipartBody body: {
+        file_data: HttpPart<bytes>,
+        @visibility(Lifecycle.Read) readOnly: HttpPart<string>,
+        constant: HttpPart<"constant">,
+      },
+    ): OkResponse;
+  `);
+  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const parameters = method.parameters;
+
+  strictEqual(parameters.length, 3);
+
+  for (const param of parameters) {
+    if (param.name === "name") {
+      const httpParam = getHttpOperationParameter(method, param);
+      ok(httpParam);
+      strictEqual(httpParam.kind, "path");
+      strictEqual(httpParam.serializedName, "name");
+    } else if (param.name === "contentType") {
+      const httpParam = getHttpOperationParameter(method, param);
+      ok(httpParam);
+      strictEqual(httpParam.kind, "header");
+      strictEqual(httpParam.serializedName, "content-type");
+    } else if (param.name === "body") {
+      const httpParam = getHttpOperationParameter(method, param);
+      ok(httpParam);
+      strictEqual(httpParam.kind, "body");
+      strictEqual(httpParam.name, "body");
+    }
+  }
+});
+
 it("template case", async () => {
   await runner.compile(`
     @service(#{
