@@ -1,7 +1,7 @@
 ---
-changeKind: fix
+changeKind: internal
 packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Expose `getParameterizedNextLinkParams`
+Expose `getParameterizedNextLinkArguments`
