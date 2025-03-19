@@ -145,13 +145,6 @@ function getUnknownType(context: TCGCContext, type: Type): [SdkBuiltInType, read
   return diagnostics.wrap(unknownType);
 }
 
-function getEncodeHelper(context: TCGCContext, type: Type): string | undefined {
-  if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    return getEncode(context.program, type)?.encoding;
-  }
-  return undefined;
-}
-
 /**
  * Add encoding info onto an sdk type. Since the encoding decorator
  * decorates the ModelProperty, we add the encoding info onto the property's internal
