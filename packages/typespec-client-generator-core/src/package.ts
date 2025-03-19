@@ -1,4 +1,8 @@
-import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core";
+import {
+  getLroMetadata,
+  getPagedResult,
+  getParameterizedNextLinkArguments,
+} from "@azure-tools/typespec-azure-core";
 import {
   createDiagnosticCollector,
   Diagnostic,
@@ -325,6 +329,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
   let nextLinkPath = undefined;
   let nextLinkSegments = undefined;
+  let nextLinkReInjectedParametersSegments = undefined;
   if (pagedMetadata.nextLinkProperty) {
     if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
       nextLinkSegments = baseServiceMethod.operation.responses
@@ -346,6 +351,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       nextLinkSegments = getPropertySegmentsFromModelOrParameters(
         responseType,
         (p) => p.__raw === pagedMetadata.nextLinkProperty,
+      );
+    }
+
+    if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
+      nextLinkReInjectedParametersSegments = (
+        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ||
+        []
+      ).map((t: ModelProperty) =>
+        getPropertySegmentsFromModelOrParameters(
+          baseServiceMethod.parameters,
+          (p) =>
+            p.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+        ),
       );
     }
   }
@@ -376,6 +395,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             ),
           )
         : undefined,
+      nextLinkReInjectedParametersSegments,
       pageItemsSegments: baseServiceMethod.response.resultSegments,
     },
   });
