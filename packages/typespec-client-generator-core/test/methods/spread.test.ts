@@ -356,35 +356,7 @@ it("model with @body decorator", async () => {
   deepStrictEqual(bodyParam.type, shelfModel);
   deepStrictEqual(bodyParam.correspondingMethodParams[0], shelfParameter);
 });
-it("formdata model without body decorator in spread model", async () => {
-  await runner.compileWithBuiltInService(`
 
-    model DocumentTranslateContent {
-      @header contentType: "multipart/form-data";
-      document: bytes;
-    }
-    alias Intersected = DocumentTranslateContent & {};
-    #suppress "deprecated" "For test"
-    op test(...Intersected): void;
-  `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
-  const documentMethodParam = method.parameters.find((x) => x.name === "document");
-  ok(documentMethodParam);
-  strictEqual(documentMethodParam.kind, "method");
-  const op = method.operation;
-  ok(op.bodyParam);
-  strictEqual(op.bodyParam.kind, "body");
-  strictEqual(op.bodyParam.name, "testRequest");
-  deepStrictEqual(op.bodyParam.correspondingMethodParams, [documentMethodParam]);
-
-  const anonymousModel = runner.context.sdkPackage.models[0];
-  strictEqual(anonymousModel.properties.length, 1);
-  strictEqual(anonymousModel.properties[0].kind, "property");
-  strictEqual(anonymousModel.properties[0].isMultipartFileInput, true);
-  ok(anonymousModel.properties[0].multipartOptions);
-  strictEqual(anonymousModel.properties[0].multipartOptions.isFilePart, true);
-  strictEqual(anonymousModel.properties[0].multipartOptions.isMulti, false);
-});
 
 it("anonymous model with @body should not be spread", async () => {
   await runner.compileWithBuiltInService(`

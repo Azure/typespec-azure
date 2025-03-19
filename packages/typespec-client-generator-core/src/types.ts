@@ -1356,32 +1356,6 @@ function updateMultiPartInfo(
       base.serializedName = httpPart?.options?.name; // eslint-disable-line @typescript-eslint/no-deprecated
       base.serializationOptions.multipart.name = httpPart?.options?.name;
     }
-  } else {
-    // common body
-    const httpOperation = getHttpOperationWithCache(context, operation);
-    const operationIsMultipart = Boolean(
-      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data"),
-    );
-    if (operationIsMultipart) {
-      const isBytesInput =
-        base.type.kind === "bytes" ||
-        (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-      // Currently we only recognize bytes and list of bytes as potential file inputs
-      if (isBytesInput && getEncode(context.program, type)) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "encoding-multipart-bytes",
-            target: type,
-          }),
-        );
-      }
-      base.serializationOptions.multipart = {
-        isFilePart: isBytesInput,
-        isMulti: base.type.kind === "array",
-        defaultContentTypes: [],
-        name: base.name,
-      };
-    }
   }
   if (base.serializationOptions.multipart !== undefined) {
     base.isMultipartFileInput = base.serializationOptions.multipart.isFilePart; // eslint-disable-line @typescript-eslint/no-deprecated
