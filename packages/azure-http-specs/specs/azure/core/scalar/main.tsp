@@ -36,14 +36,17 @@ interface AzureLocationScalar {
   @scenarioDoc("Expect to handle a azureLocation value. Mock api will return 'eastus'")
   @get
   @doc("get azureLocation value")
-  get(): azureLocation;
+  get(): {
+    @header contentType: "application/json";
+    @body body: azureLocation;
+  };
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"
   @scenario
   @scenarioDoc("Expect to send a azureLocation value. Mock api expect to receive 'eastus'")
   @put
   @doc("put azureLocation value")
-  put(@body @doc("_") body: azureLocation): void;
+  put(@header contentType: "application/json", @body @doc("_") body: azureLocation): void;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"
   @scenario
@@ -63,7 +66,10 @@ interface AzureLocationScalar {
   @scenarioDoc("Expect to send a model who has an azureLocation property. Mock api expect to receive '{location: eastus}'")
   @post
   @doc("post a model which has azureLocation property")
-  post(@body @doc("_") body: AzureLocationModel): AzureLocationModel;
+  post(
+    @header contentType: "application/json",
+    @body @doc("_") body: AzureLocationModel,
+  ): AzureLocationModel;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"
   @scenario
@@ -74,7 +80,7 @@ interface AzureLocationScalar {
   @post
   @route("/header")
   @doc("azureLocation value header")
-  header(@header @doc("_") region: azureLocation): void;
+  header(@header contentType: "application/json", @header @doc("_") region: azureLocation): void;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"
   @scenario
@@ -85,5 +91,5 @@ interface AzureLocationScalar {
   @post
   @doc("azureLocation value query")
   @route("/query")
-  query(@query @doc("_") region: azureLocation): void;
+  query(@header contentType: "application/json", @query @doc("_") region: azureLocation): void;
 }
