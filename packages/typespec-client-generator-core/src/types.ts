@@ -139,7 +139,7 @@ function getUnknownType(context: TCGCContext, type: Type): [SdkBuiltInType, read
   const unknownType: SdkBuiltInType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "unknown")),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type),
+    encode: undefined,
     crossLanguageDefinitionId: "",
   };
   return diagnostics.wrap(unknownType);
@@ -189,28 +189,28 @@ export function addEncodeInfo(
   if (innerType.kind === "bytes") {
     if (encodeData) {
       innerType.encode = encodeData.encoding as BytesKnownEncoding;
-    } else if (
-      innerType.encode === "bytes" && // the inner type encode is default to bytes, we will use the defaultContentType to determine the encoding
-      (!defaultContentType ||
-        isMediaTypeJson(defaultContentType) ||
-        isMediaTypeXml(defaultContentType) ||
-        isMediaTypeTextPlain(defaultContentType))
-    ) {
+    } else if (type.kind === "Scalar" || !defaultContentType) {
+      // for scalar bytes without specific encode, or no specific content type, fallback to base64
       innerType.encode = "base64";
-    } else if (!innerType.encode) {
+    } else if (
+      !isMediaTypeJson(defaultContentType) &&
+      !isMediaTypeXml(defaultContentType) &&
+      !isMediaTypeTextPlain(defaultContentType)
+    ) {
+      // for model property bytes with specific content type, will change to bytes for non-text content type
       innerType.encode = "bytes";
     }
   }
   if (isSdkIntKind(innerType.kind)) {
     // only integer type is allowed to be encoded as string
-    if (encodeData && "encode" in innerType) {
+    if (encodeData) {
       if (encodeData?.encoding) {
-        innerType.encode = encodeData.encoding;
+        (innerType as any).encode = encodeData.encoding;
       }
       if (encodeData?.type) {
         // if we specify the encoding type in the decorator, we set the `.encode` string
         // to the kind of the encoding type
-        innerType.encode = getSdkBuiltInType(context, encodeData.type).kind;
+        (innerType as any).encode = getSdkBuiltInType(context, encodeData.type).kind;
       }
     }
   }
@@ -253,7 +253,6 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type),
     doc: getDoc(context.program, type),
     summary: getSummary(context.program, type),
     baseType:
