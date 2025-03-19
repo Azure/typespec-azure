@@ -84,11 +84,9 @@ it("multipart conflicting model usage for only multipart operations", async func
       
       @post
       @route("/basic1") 
-      #suppress "deprecated" "For test"
       op basic1(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
       @post
       @route("/basic2") 
-      #suppress "deprecated" "For test"
       op basic2(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
   );
@@ -119,7 +117,6 @@ it("multipart conflicting model usage for mixed operations", async function () {
       
       @post
       @route("/basic1") 
-      #suppress "deprecated" "For test"
       op basic1(@body body: RegularRequest): NoContentResponse;
       @post
       @route("/basic2") 
@@ -191,7 +188,6 @@ it("multipart with non-formdata model property", async function () {
         address: Address;
       }
       
-      #suppress "deprecated" "For test"
       @put op multipartOne(@header contentType: "multipart/form-data", @multipartBody body: AddressFirstAppearance): void;
     `,
   );
@@ -206,7 +202,6 @@ it("multipart with list of bytes", async function () {
       pictures: HttpPart<bytes>[];
     }
     
-    #suppress "deprecated" "For test"
     @put op multipartOp(@header contentType: "multipart/form-data", @multipartBody body: PictureWrapper): void;
     `,
   );
@@ -234,7 +229,6 @@ it("multipart with reused error model", async function () {
         errorCode: string;
       }
       
-      #suppress "deprecated" "For test"
       @put op multipartOp(@header contentType: "multipart/form-data", @multipartBody body: PictureWrapper): void | ErrorResponse;
       @post op normalOp(): void | ErrorResponse;
     `,
@@ -320,7 +314,6 @@ it("usage doesn't apply to properties of a form data", async function () {
     }
 
     @post
-      #suppress "deprecated" "For test"
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
   const models = runner.context.sdkPackage.models;
@@ -344,7 +337,6 @@ it("Json[] and bytes[] in multipart/form-data", async function () {
       city: string;
     }
     @post
-      #suppress "deprecated" "For test"
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
   const models = runner.context.sdkPackage.models;
@@ -784,7 +776,6 @@ it("multipart in client customization", async () => {
         profileImage: HttpPart<bytes>;
       }
 
-      #suppress "deprecated" "For test"
       @post op multipartUse(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
     `
