@@ -651,3 +651,47 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
     [parameters[0], bProperty, bDProperty],
   );
 });
+
+it("next link with re-injected parameters", async () => {
+  await runner.compileWithBuiltInService(`
+    model TestOptions {
+      @query
+      includePending?: boolean;
+
+      @query
+      includeExpired?: boolean;
+    }
+
+    op test(...TestOptions): ListTestResult;
+
+    @pagedResult
+    model ListTestResult {
+      @items
+      values: Test[];
+      @nextLink
+      nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending, TestOptions.includeExpired]>;
+    }
+
+    model Test {
+      id: string;
+    }
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 2);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
+    method.parameters[0],
+  );
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[1].length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkReInjectedParametersSegments[1][0],
+    method.parameters[1],
+  );
+});
