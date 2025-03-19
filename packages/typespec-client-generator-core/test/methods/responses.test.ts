@@ -396,3 +396,20 @@ it("response body with non-read visibility", async () => {
   ok(method);
   strictEqual((method.response as SdkMethodResponse).type, model);
 });
+
+it("response body of scalar with encode", async () => {
+  await runner.compileWithBuiltInService(
+    `
+    @encode(BytesKnownEncoding.base64url)
+    scalar base64urlBytes extends bytes;
+    
+    op get(): {@header contentType: "application/json", @body body: base64urlBytes;};
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const serviceResponse = method.operation.responses[0];
+  deepStrictEqual(serviceResponse.contentTypes, ["application/json"]);
+  strictEqual(serviceResponse.type?.kind, "bytes");
+  strictEqual(serviceResponse.type?.encode, "base64url");
+});

@@ -121,7 +121,7 @@ import {
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
-import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
   context: TCGCContext,
@@ -190,12 +190,14 @@ export function addEncodeInfo(
     if (encodeData) {
       innerType.encode = encodeData.encoding as BytesKnownEncoding;
     } else if (
-      !defaultContentType ||
-      isMediaTypeJson(defaultContentType) ||
-      isMediaTypeXml(defaultContentType)
+      innerType.encode === "bytes" && // the inner type encode is default to bytes, we will use the defaultContentType to determine the encoding
+      (!defaultContentType ||
+        isMediaTypeJson(defaultContentType) ||
+        isMediaTypeXml(defaultContentType) ||
+        isMediaTypeTextPlain(defaultContentType))
     ) {
       innerType.encode = "base64";
-    } else {
+    } else if (!innerType.encode) {
       innerType.encode = "bytes";
     }
   }
