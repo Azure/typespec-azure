@@ -329,7 +329,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
   let nextLinkPath = undefined;
   let nextLinkSegments = undefined;
-  let nextLinkParameterizedArgumentsSegments = undefined;
+  let nextLinkReInjectedParametersSegments = undefined;
   if (pagedMetadata.nextLinkProperty) {
     if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
       nextLinkSegments = baseServiceMethod.operation.responses
@@ -355,7 +355,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     }
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
-      nextLinkParameterizedArgumentsSegments = getParameterizedNextLinkArguments(
+      nextLinkReInjectedParametersSegments = getParameterizedNextLinkArguments(
         context.program,
         pagedMetadata.nextLinkProperty.type,
       ).map((t: ModelProperty) =>
@@ -395,7 +395,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             ),
           )
         : undefined,
-      nextLinkParameterizedArgumentsSegments,
+      nextLinkReInjectedParametersSegments,
       pageItemsSegments: baseServiceMethod.response.resultSegments,
     },
   });

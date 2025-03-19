@@ -653,7 +653,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
 });
 
 it("next link with re-injected parameters", async () => {
-  await runner.compileWithBuiltInService(`
+  await runner.compileWithBuiltInAzureCoreService(`
     model TestOptions {
       @query
       includePending?: boolean;
