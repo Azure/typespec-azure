@@ -35,7 +35,7 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @path
   name: string;
 
-  ...Legacy.ManagedServiceIdentityV4Property; // Or ...ManagedSystemAssignedIdentityProperty;
+  ...Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property; // Or ...ManagedSystemAssignedIdentityProperty;
 }
 
 @doc("Widget Resource Properties.")
