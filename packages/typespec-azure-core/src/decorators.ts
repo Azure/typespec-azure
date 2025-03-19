@@ -1540,13 +1540,14 @@ function createMarkerDecorator<T extends DecoratorFunction>(
   ] as const;
 }
 
-/** @internal */
-export const [
+const [
   getParameterizedNextLinkArguments,
-  markParameterizedNextLinkConfigTemplate,
+  _markParameterizedNextLinkConfigTemplate,
   /** {@inheritDoc ParameterizedNextLinkConfigDecorator} */
   parameterizedNextLinkConfigDecorator,
 ] = createMarkerDecorator<ParameterizedNextLinkConfigDecorator>();
+
+export { getParameterizedNextLinkArguments, parameterizedNextLinkConfigDecorator };
 
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
