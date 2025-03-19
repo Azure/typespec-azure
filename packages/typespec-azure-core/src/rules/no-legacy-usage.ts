@@ -10,21 +10,20 @@ import {
   checkReferenceInDisallowedNamespace,
 } from "./utils.js";
 
-export const noPrivateUsage = createRule({
-  name: "no-private-usage",
-  description: "Verify that elements inside Private namespace are not referenced.",
+export const noLegacyUsage = createRule({
+  name: "no-legacy-usage",
+  description: "Linter warning against using elements from the Legacy namespace",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-private-usage",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-legacy-usage",
   messages: {
-    default: paramMessage`Referencing elements inside Private namespace "${"ns"}" is not allowed.`,
+    default: paramMessage`Referencing elements inside Legacy namespace "${"ns"}" is not allowed.`,
   },
   create(context) {
-    function checkReference(origin: Type, type: Type, target: DiagnosticTarget) {
-      return checkReferenceInDisallowedNamespace(context, origin, type, target, "Private");
-    }
-
     function checkDecorators(type: Type & DecoratedType) {
-      return checkDecoratorsInDisallowedNamespace(context, type, "Private");
+      return checkDecoratorsInDisallowedNamespace(context, type, "Legacy");
+    }
+    function checkReference(origin: Type, type: Type, target: DiagnosticTarget) {
+      return checkReferenceInDisallowedNamespace(context, origin, type, target, "Legacy");
     }
     return {
       model: (model) => {
