@@ -80,7 +80,7 @@ interface AzureLocationScalar {
   @post
   @route("/header")
   @doc("azureLocation value header")
-  header(@header contentType: "application/json", @header @doc("_") region: azureLocation): void;
+  header(@header @doc("_") region: azureLocation): void;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"
   @scenario
@@ -91,5 +91,5 @@ interface AzureLocationScalar {
   @post
   @doc("azureLocation value query")
   @route("/query")
-  query(@header contentType: "application/json", @query @doc("_") region: azureLocation): void;
+  query(@query @doc("_") region: azureLocation): void;
 }
