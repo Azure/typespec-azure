@@ -355,9 +355,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     }
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
-      nextLinkReInjectedParametersSegments = getParameterizedNextLinkArguments(
-        context.program,
-        pagedMetadata.nextLinkProperty.type,
+      nextLinkReInjectedParametersSegments = (
+        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ||
+        []
       ).map((t: ModelProperty) =>
         getPropertySegmentsFromModelOrParameters(
           baseServiceMethod.parameters,
