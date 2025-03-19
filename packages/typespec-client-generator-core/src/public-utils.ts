@@ -191,29 +191,33 @@ export function getLibraryName(
   const emitterSpecificName = getClientNameOverride(context, type, scope);
   if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
-  // 4. check if there's a friendly name, if so return friendly name
+  // 2. check if there's a friendly name, if so return friendly name
   const friendlyName = getFriendlyName(context.program, type);
   if (friendlyName) return friendlyName;
 
-  // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
+  // 3. if type is derived from template and name is the same as template, add template parameters' name as suffix
   if (
     typeof type.name === "string" &&
     type.name !== "" &&
     type.kind === "Model" &&
     type.templateMapper?.args
   ) {
-    return (
+    const generatedName = context.__generatedNames?.get(type);
+    if (generatedName) return generatedName;
+    return resolveDuplicateGenearatedName(
+      context,
+      type,
       type.name +
-      type.templateMapper.args
-        .filter(
-          (arg): arg is Model | Enum =>
-            "kind" in arg &&
-            (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
-            arg.name !== undefined &&
-            arg.name.length > 0,
-        )
-        .map((arg) => pascalCase(arg.name))
-        .join("")
+        type.templateMapper.args
+          .filter(
+            (arg): arg is Model | Enum =>
+              "kind" in arg &&
+              (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
+              arg.name !== undefined &&
+              arg.name.length > 0,
+          )
+          .map((arg) => pascalCase(arg.name))
+          .join(""),
     );
   }
 
@@ -641,6 +645,15 @@ function buildNameFromContextPaths(
     }
   }
   // 3. simplely handle duplication
+  createName = resolveDuplicateGenearatedName(context, type, createName);
+  return createName;
+}
+
+function resolveDuplicateGenearatedName(
+  context: TCGCContext,
+  type: Union | Model | TspLiteralType,
+  createName: string,
+): string {
   let duplicateCount = 1;
   const rawCreateName = createName;
   const generatedNames = [...(context.__generatedNames?.values() ?? [])];
