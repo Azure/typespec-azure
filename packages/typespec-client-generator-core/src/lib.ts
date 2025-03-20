@@ -1,16 +1,10 @@
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
-import { SdkEmitterOptions } from "./interfaces.js";
+import { SdkEmitterOptions, TCGCEmitterOptions } from "./context.js";
 
 export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
   type: "object",
   additionalProperties: false,
   properties: {
-    "emitter-name": {
-      type: "string",
-      nullable: true,
-      description:
-        "Set `emitter-name` to output TCGC code models for specific language's emitter. This flag only work for taking TCGC as an emitter.",
-    },
     "generate-protocol-methods": {
       type: "boolean",
       nullable: true,
@@ -23,14 +17,6 @@ export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
       description:
         "When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.",
     },
-    /**
-     * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
-     */
-    "package-name": { type: "string", nullable: true },
-    /**
-     * @deprecated Use `flattenUnionAsEnum` in `CreateSdkContextOptions` instead.
-     */
-    "flatten-union-as-enum": { type: "boolean", nullable: true },
     "examples-dir": {
       type: "string",
       nullable: true,
@@ -85,6 +71,19 @@ export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
       },
       description: "License information for the generated client code.",
     },
+  },
+};
+
+const TCGCEmitterOptionsSchema: JSONSchemaType<TCGCEmitterOptions> = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    "emitter-name": {
+      type: "string",
+      nullable: true,
+      description: "Set `emitter-name` to output TCGC code models for specific language's emitter.",
+    },
+    ...SdkEmitterOptionsSchema.properties!,
   },
 };
 
@@ -315,7 +314,7 @@ export const $lib = createTypeSpecLibrary({
     },
   },
   emitter: {
-    options: SdkEmitterOptionsSchema,
+    options: TCGCEmitterOptionsSchema,
   },
 });
 

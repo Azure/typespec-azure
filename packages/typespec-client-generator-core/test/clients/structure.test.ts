@@ -590,10 +590,10 @@ it("namespace", async () => {
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 2);
   const clientOne = sdkPackage.clients.filter((c) => c.name === "OneClient")[0];
-  strictEqual(clientOne.nameSpace, "My.Service.One");
+  strictEqual(clientOne.namespace, "My.Service.One");
 
   const clientTwo = sdkPackage.clients.filter((c) => c.name === "TwoClient")[0];
-  strictEqual(clientTwo.nameSpace, "My.Service.Two");
+  strictEqual(clientTwo.namespace, "My.Service.Two");
 });
 
 it("operationGroup", async () => {

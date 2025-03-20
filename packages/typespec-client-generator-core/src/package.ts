@@ -70,7 +70,6 @@ import {
   findRootSourceProperty,
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
-  getClientNamespaceStringHelper,
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
@@ -83,13 +82,11 @@ import {
 import { createDiagnostic } from "./lib.js";
 import { getLicenseInfo } from "./license.js";
 import {
-  getClientNamespaceString,
   getCrossLanguageDefinitionId,
   getCrossLanguagePackageId,
   getDefaultApiVersion,
   getHttpOperationWithCache,
   getLibraryName,
-  listAllServiceNamespaces,
 } from "./public-utils.js";
 import {
   getAllReferencedTypes,
@@ -613,7 +610,6 @@ function getSdkMethodResponse(
       name: createGeneratedName(context, operation, "UnionResponse"),
       isGeneratedName: true,
       namespace: client.namespace,
-      clientNamespace: client.namespace,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
       decorators: [],
     };
@@ -631,7 +627,6 @@ function getSdkMethodResponse(
       access: "public",
       usage: UsageFlags.Output,
       namespace: client.namespace,
-      clientNamespace: client.namespace,
     };
   }
   return {
@@ -749,7 +744,6 @@ function getSdkInitializationType(
   } else {
     const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
     const name = `${namePrefix.split(".").at(-1)}Options`;
-    const namespace = getClientNamespace(context, client.type);
     initializationModel = {
       __raw: client.service,
       doc: "Initialization class for the client",
@@ -760,8 +754,7 @@ function getSdkInitializationType(
       access,
       usage: UsageFlags.Input,
       crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-      namespace,
-      clientNamespace: namespace,
+      namespace: getClientNamespace(context, client.type),
       apiVersions: context.getApiVersionsForType(client.type),
       decorators: [],
       serializationOptions: {},
@@ -1022,7 +1015,6 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   }
   let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
-    const namespace = getClientNamespace(context, rawClient.service);
     type = {
       kind: "union",
       access: "public",
@@ -1031,8 +1023,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
-      namespace,
-      clientNamespace: namespace,
+      namespace: getClientNamespace(context, rawClient.service),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -1061,7 +1052,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const namespace = getClientNamespace(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -1070,9 +1060,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.getApiVersionsForType(client.type),
-    nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    namespace: namespace,
-    clientNamespace: namespace,
+    namespace: getClientNamespace(context, client.type),
     initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
@@ -1175,8 +1163,6 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    name: getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]) || "",
-    rootNamespace: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),

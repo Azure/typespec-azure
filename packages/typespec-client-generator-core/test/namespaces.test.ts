@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkEmitterOptions } from "../src/interfaces.js";
+import { SdkEmitterOptions } from "../src/context.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 let runner: SdkTestRunner;
@@ -11,28 +11,6 @@ beforeEach(async () => {
 });
 
 describe("no namespace flag", () => {
-  it("basic namespace", async () => {
-    await runner.compile(`
-      @client({name: "MyClient"})
-      @service
-      namespace My.Namespace;
-    `);
-
-    strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
-  });
-  it("nested namespaces", async () => {
-    await runner.compile(`
-      @client({name: "MyClient"})
-      @service
-      namespace My.Namespace {};
-
-      @client({name: "MySecondClient"})
-      @service
-      namespace My.Namespace.Sub {};
-    `);
-
-    strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
-  });
   it("two sub-clients", async () => {
     await runner.compile(`
       @server("http://localhost:3000", "endpoint")
@@ -257,10 +235,10 @@ describe("no namespace flag", () => {
     const sdkPackage = runner.context.sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
     const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
     ok(petActionClient);
-    strictEqual(petActionClient.clientNamespace, "PetStoreRenamed.SubNamespace");
+    strictEqual(petActionClient.namespace, "PetStoreRenamed.SubNamespace");
   });
 
   it("restructure client with namespace flag", async () => {
@@ -285,7 +263,7 @@ describe("no namespace flag", () => {
     ).sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "PetStoreClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
   });
 });
 
@@ -354,13 +332,13 @@ describe("namespace config flag", () => {
     strictEqual(fooRenamedNamespace.clients.length, 3);
     const fooClient = fooRenamedNamespace.clients.find((x) => x.name === "FooClient");
     ok(fooClient);
-    strictEqual(fooClient.clientNamespace, "FooRenamed");
+    strictEqual(fooClient.namespace, "FooRenamed");
     const barClient = fooRenamedNamespace.clients.find((x) => x.name === "Bar");
     ok(barClient);
-    strictEqual(barClient.clientNamespace, "FooRenamed");
+    strictEqual(barClient.namespace, "FooRenamed");
     const bazClient = fooRenamedNamespace.clients.find((x) => x.name === "Baz");
     ok(bazClient);
-    strictEqual(bazClient.clientNamespace, "FooRenamed");
+    strictEqual(bazClient.namespace, "FooRenamed");
     strictEqual(fooRenamedNamespace.models.length, 2);
     strictEqual(fooRenamedNamespace.enums.length, 0);
     strictEqual(fooRenamedNamespace.unions.length, 0);
@@ -388,7 +366,7 @@ describe("namespace config flag", () => {
     ).sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "PetStoreClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
   });
   it("use namespace config flag with an azure spec", async () => {
     const runnerWithCore = await createSdkTestRunner({

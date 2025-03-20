@@ -39,10 +39,6 @@ export interface TCGCContext {
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
-  /**
-   * @deprecated Use `namespaceFlag` instead.
-   */
-  packageName?: string;
   examplesDir?: string;
   namespaceFlag?: string;
   apiVersion?: string;
@@ -83,27 +79,6 @@ export interface SdkContext<
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   sdkPackage: SdkPackage<TServiceOperation>;
-}
-
-export interface SdkEmitterOptions {
-  "emitter-name"?: string;
-  "generate-protocol-methods"?: boolean;
-  "generate-convenience-methods"?: boolean;
-  /**
-   * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
-   */
-  "package-name"?: string;
-  "flatten-union-as-enum"?: boolean;
-  "api-version"?: string;
-  "examples-dir"?: string;
-  namespace?: string;
-  license?: {
-    name: string;
-    company?: string;
-    link?: string;
-    header?: string;
-    description?: string;
-  };
 }
 
 // Types for TCGC customization decorators
@@ -200,10 +175,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   kind: "client";
   name: string;
   /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
-  /**
    * Full qualified namespace.
    */
   namespace: string;
@@ -216,10 +187,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   clientInitialization: SdkClientInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
-  /**
-   * @deprecated Use `clientNamespace` instead.
-   */
-  nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
   // The parent client of this client. The structure follows the definition hierarchy.
   parent?: SdkClientType<TServiceOperation>;
@@ -417,10 +384,6 @@ export interface SdkNullableType extends SdkTypeBase {
   usage: UsageFlags;
   access: AccessFlags;
   /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
-  /**
    * Full qualified namespace.
    */
   namespace: string;
@@ -430,10 +393,6 @@ export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
   /**
    * Full qualified namespace.
    */
@@ -470,10 +429,6 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   name: string;
   isGeneratedName: boolean;
   /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
-  /**
    * Full qualified namespace.
    */
   namespace: string;
@@ -489,10 +444,6 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
   /**
    * Full qualified namespace.
    */
@@ -938,11 +889,6 @@ export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkClientAccessor<TServiceOperation>; // eslint-disable-line @typescript-eslint/no-deprecated
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
-  name: string;
-  /**
-   * @deprecated Look at `.namespaces` instead
-   */
-  rootNamespace: string;
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
