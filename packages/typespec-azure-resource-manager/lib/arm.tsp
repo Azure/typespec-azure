@@ -17,10 +17,10 @@ import "./interfaces.tsp";
 import "./responses.tsp";
 import "./parameters.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
-using TypeSpec.OpenAPI;
+using Http;
+using Rest;
+using Versioning;
+using OpenAPI;
 using Azure.ResourceManager.Foundations;
 
 @versioned(Azure.ResourceManager.Versions)

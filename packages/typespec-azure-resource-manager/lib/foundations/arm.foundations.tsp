@@ -10,8 +10,8 @@ import "../responses.tsp";
 import "../private.decorators.tsp";
 import "../parameters.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.OpenAPI;
+using Http;
+using OpenAPI;
 using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
