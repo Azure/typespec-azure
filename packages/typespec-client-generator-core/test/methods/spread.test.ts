@@ -356,19 +356,19 @@ it("model with @body decorator", async () => {
   deepStrictEqual(bodyParam.type, shelfModel);
   deepStrictEqual(bodyParam.correspondingMethodParams[0], shelfParameter);
 });
-it("formdata model without body decorator in spread model", async () => {
+
+it("formdata model with multipartBody decorator in spread model", async () => {
   await runner.compileWithBuiltInService(`
 
     model DocumentTranslateContent {
       @header contentType: "multipart/form-data";
-      document: bytes;
+      @multipartBody testRequest: {document: HttpPart<bytes>};
     }
     alias Intersected = DocumentTranslateContent & {};
-    #suppress "deprecated" "For test"
     op test(...Intersected): void;
   `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
-  const documentMethodParam = method.parameters.find((x) => x.name === "document");
+  const documentMethodParam = method.parameters.find((x) => x.name === "testRequest");
   ok(documentMethodParam);
   strictEqual(documentMethodParam.kind, "method");
   const op = method.operation;
