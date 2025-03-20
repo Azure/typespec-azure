@@ -25,7 +25,7 @@ using TypeSpec.Http;
 namespace Contoso.WidgetManager;
 
 model Widget {
-  @visibility("read", "update")
+  @visibility(Lifecycle.Read, Lifecycle.Update)
   @path
   id: string;
 
