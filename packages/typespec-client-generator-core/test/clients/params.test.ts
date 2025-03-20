@@ -631,7 +631,7 @@ it("service with default api version, method with api version param", async () =
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
   strictEqual(clientApiVersionParam.optional, false);
-  strictEqual(clientApiVersionParam.kind, "apiVersion");
+  strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
@@ -685,7 +685,7 @@ it("service with default api version, method with path api version param", async
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
   strictEqual(clientApiVersionParam.optional, false);
-  strictEqual(clientApiVersionParam.kind, "apiVersion");
+  strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
