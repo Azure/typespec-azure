@@ -33,7 +33,7 @@ options:
 
 **Type:** `string`
 
-Set `emitter-name` to output TCGC code models for specific language's emitter. This flag only work for taking TCGC as an emitter.
+Set `emitter-name` to output TCGC code models for specific language's emitter.
 
 ### `generate-protocol-methods`
 
@@ -46,14 +46,6 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 **Type:** `boolean`
 
 When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
-
-### `package-name`
-
-**Type:** `string`
-
-### `flatten-union-as-enum`
-
-**Type:** `boolean`
 
 ### `examples-dir`
 

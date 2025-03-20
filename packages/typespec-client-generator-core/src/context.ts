@@ -18,7 +18,6 @@ import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
   SdkContext,
-  SdkEmitterOptions,
   SdkEnumType,
   SdkHttpOperation,
   SdkModelPropertyType,
@@ -34,6 +33,25 @@ import {
   TspLiteralType,
 } from "./internal-utils.js";
 import { getSdkPackage } from "./package.js";
+
+export interface TCGCEmitterOptions extends SdkEmitterOptions {
+  "emitter-name"?: string;
+}
+
+export interface SdkEmitterOptions {
+  "generate-protocol-methods"?: boolean;
+  "generate-convenience-methods"?: boolean;
+  "api-version"?: string;
+  "examples-dir"?: string;
+  namespace?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
+}
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
   const diagnostics = createDiagnosticCollector();
@@ -113,17 +131,12 @@ export async function createSdkContext<
     context.program,
     emitterName ?? context.options["emitter-name"],
   );
-  let flattenUnionAsEnum = options?.flattenUnionAsEnum;
-  if (flattenUnionAsEnum === undefined) {
-    flattenUnionAsEnum = context.options["flatten-union-as-enum"] ?? true;
-  }
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
     emitContext: context,
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    packageName: context.options["package-name"],
     examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
@@ -131,7 +144,7 @@ export async function createSdkContext<
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
-    flattenUnionAsEnum,
+    flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
@@ -168,7 +181,7 @@ async function exportTCGCOutput(context: SdkContext) {
   });
 }
 
-export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
+export async function $onEmit(context: EmitContext<TCGCEmitterOptions>) {
   if (!context.program.compilerOptions.noEmit) {
     const sdkContext = await createSdkContext(context, undefined, { exportTCGCoutput: true });
     context.program.reportDiagnostics(sdkContext.diagnostics);
