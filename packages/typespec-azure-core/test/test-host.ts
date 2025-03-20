@@ -32,9 +32,9 @@ const CommonCode = `
   import "${RestTestLibrary.name}";
   import "${VersioningTestLibrary.name}";
   import "${OpenAPITestLibrary.name}";
-  using TypeSpec.Http;
-  using TypeSpec.Rest;
-  using TypeSpec.Versioning;
+  using Http;
+  using Rest;
+  using Versioning;
   using Azure.Core;\n`;
 
 export function getRunnerPosOffset(pos: number): number {

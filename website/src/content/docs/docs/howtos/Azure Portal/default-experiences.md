@@ -31,4 +31,4 @@ Azure Portal generates end-to-end experiences automatically, providing Resource 
 
 ## Promoting generated experiences to production
 
-See [Promoting Default Experiences](https://eng.ms/docs/products/azure-portal-framework-ibizafx/declarative/promotion) to learn how to promote your default generated Portal experience using TypeSpec.
+See [Promoting Default Experiences](https://eng.ms/docs/products/azure-portal-framework-ibizafx/declarative/promotion) to learn how to promote your default generated Portal experience using

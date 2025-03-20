@@ -12,7 +12,7 @@ import "./decorators.tsp";
 import "./legacy.tsp";
 import "../dist/src/tsp-index.js";
 
-using TypeSpec.Versioning;
+using Versioning;
 
 @versioned(Versions)
 namespace Azure.Core;

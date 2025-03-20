@@ -3,9 +3,9 @@ import "@typespec/rest";
 import "@typespec/spector";
 import "@typespec/versioning";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Spector;
 
 /** Test for loading JSON example and generating sample code. */

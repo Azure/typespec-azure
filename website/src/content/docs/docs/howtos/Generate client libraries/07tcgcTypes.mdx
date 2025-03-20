@@ -11,7 +11,7 @@ This page documents what type definitions in TypeSpec would look like when retur
 ```typespec
 import "@typespec/http";
 
-using TypeSpec.Http;
+using Http;
 
 @useAuth(ApiKeyAuth<ApiKeyLocation.header, "api-key">)
 @service(#{ title: "Contoso Widget Manager" })
