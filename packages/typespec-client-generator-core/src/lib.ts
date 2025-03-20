@@ -20,6 +20,7 @@ export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
     "examples-dir": {
       type: "string",
       nullable: true,
+      format: "absolute-path",
       description:
         "Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.",
     },
