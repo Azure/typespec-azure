@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-add some tcgc rules to the list
+add `no-legacy-usage` rule to rules list

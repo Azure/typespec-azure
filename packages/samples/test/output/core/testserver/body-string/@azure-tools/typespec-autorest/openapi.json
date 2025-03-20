@@ -91,6 +91,10 @@
           "String Operations"
         ],
         "description": "Get empty string value",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -119,6 +123,9 @@
           "String Operations"
         ],
         "description": "Put empty string value",
+        "consumes": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "value",
@@ -259,6 +266,10 @@
           "String Operations"
         ],
         "description": "Get mbcs string value '啊齄丂狛狜隣郎隣兀﨩ˊ〞〡￤℡㈱‐ー﹡﹢﹫、〓ⅰⅹ⒈€㈠㈩ⅠⅫ！￣ぁんァヶΑ︴АЯаяāɡㄅㄩ─╋︵﹄︻︱︳︴ⅰⅹɑɡ〇〾⿻⺁䜣€'",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -287,6 +298,9 @@
           "String Operations"
         ],
         "description": "Put mbcs string value '啊齄丂狛狜隣郎隣兀﨩ˊ〞〡￤℡㈱‐ー﹡﹢﹫、〓ⅰⅹ⒈€㈠㈩ⅠⅫ！￣ぁんァヶΑ︴АЯаяāɡㄅㄩ─╋︵﹄︻︱︳︴ⅰⅹɑɡ〇〾⿻⺁䜣€'",
+        "consumes": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "value",
@@ -377,6 +391,10 @@
           "String Operations"
         ],
         "description": "Get string value with leading and trailing whitespace '<tab><space><space>Now is the time for all good men to come to the aid of their country<tab><space><space>'",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -405,6 +423,9 @@
           "String Operations"
         ],
         "description": "Get string value with leading and trailing whitespace '<tab><space><space>Now is the time for all good men to come to the aid of their country<tab><space><space>'",
+        "consumes": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "value",

@@ -9,6 +9,7 @@ let runner: SdkTestRunner;
 beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
+
 it("operation client projected name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -22,6 +23,7 @@ it("operation client projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("operation language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -40,6 +42,7 @@ it("operation language projected name", async () => {
   await helper("@azure-tools/typespec-ts", "madeForTS");
   await helper("@azure-tools/typespec-python", "made_for_python");
 });
+
 it("operation language projected name augmented", async () => {
   async function helper(emitterName: string, expected: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -59,6 +62,7 @@ it("operation language projected name augmented", async () => {
   await helper("@azure-tools/typespec-ts", "madeForTS");
   await helper("@azure-tools/typespec-python", "made_for_python");
 });
+
 it("operation json projected name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -74,6 +78,7 @@ it("operation json projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("operation no projected name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -88,6 +93,7 @@ it("operation no projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("model client projected name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -105,6 +111,7 @@ it("model client projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("model language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -125,6 +132,7 @@ it("model language projected name", async () => {
   await helper("@azure-tools/typespec-ts", "JavascriptModel");
   await helper("@azure-tools/typespec-python", "PythonModel");
 });
+
 it("model language projected name augmented", async () => {
   async function helper(emitterName: string, expected: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -146,6 +154,7 @@ it("model language projected name augmented", async () => {
   await helper("@azure-tools/typespec-ts", "JavascriptModel");
   await helper("@azure-tools/typespec-python", "PythonModel");
 });
+
 it("model json projected name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -163,6 +172,7 @@ it("model json projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("model no projected name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -179,6 +189,7 @@ it("model no projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("model friendly name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -196,6 +207,7 @@ it("model friendly name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("model friendly name augmented", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -273,6 +285,7 @@ it("parameter client projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("parameter language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -313,6 +326,7 @@ it("parameter json projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("parameter no projected name", async () => {
   async function helper(emitterName: string) {
     const runner = await createSdkTestRunner({ emitterName });
@@ -330,6 +344,7 @@ it("parameter no projected name", async () => {
   await helper("@azure-tools/typespec-ts");
   await helper("@azure-tools/typespec-python");
 });
+
 it("template without @friendlyName renaming", async () => {
   await runner.compileWithBuiltInService(`
     op GetResourceOperationStatus<
@@ -380,4 +395,31 @@ it("template without @friendlyName renaming for union as enum", async () => {
     (x) => x.name === "RelationshipOriginInformationDependencyOfOrigins",
   )[0];
   ok(model);
+});
+
+it("template without @friendlyName renaming with naming conflict", async () => {
+  await runner.compileWithBuiltInService(`
+    model Test<T> {
+      prop: T;
+    }
+
+    model Instance {
+      stringModel: Test<string>;
+      int32Model: Test<int32>;
+      booleanModel: Test<boolean>;
+    }
+
+    op test(): Instance;
+    `);
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 4);
+  const model = models.filter((x) => x.name === "Instance")[0];
+  ok(model);
+  strictEqual(model.properties.length, 3);
+  strictEqual(model.properties[0].type.kind, "model");
+  strictEqual(model.properties[0].type.name, "Test");
+  strictEqual(model.properties[1].type.kind, "model");
+  strictEqual(model.properties[1].type.name, "Test1");
+  strictEqual(model.properties[2].type.kind, "model");
+  strictEqual(model.properties[2].type.name, "Test2");
 });

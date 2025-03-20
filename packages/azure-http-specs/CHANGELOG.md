@@ -1,5 +1,16 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.9
+
+### Features
+
+- [#2379](https://github.com/Azure/typespec-azure/pull/2379) Add test for duration-constant format
+
+### Bug Fixes
+
+- [#2384](https://github.com/Azure/typespec-azure/pull/2384) Uptake changes to new reserved keywords
+
+
 ## 0.1.0-alpha.8
 
 ### Breaking Changes

@@ -858,6 +858,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   nextLinkSegments?: SdkModelPropertyType[];
   /** Method used to get next page. If not defined, use the initial method. */
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
+  nextLinkReInjectedParametersSegments?: SdkModelPropertyType[][];
   /** Segments to indicate how to set continuation token for next page request. */
   continuationTokenParameterSegments?: SdkModelPropertyType[];
   /** Segments to indicate how to get continuation token value from response. */

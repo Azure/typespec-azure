@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Recurse over namespaces to get all user defined namespaces"
+Do not add encode for bytes according to content type if it has user defined encode.

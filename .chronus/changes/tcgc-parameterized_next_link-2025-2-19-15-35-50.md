@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Report diagnostic errors for discriminated unions.
+Support re-injected query parameter for next link.

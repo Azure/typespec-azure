@@ -1,0 +1,114 @@
+---
+title: 0.53.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+:::danger
+TypeSpec core contains Breaking Changes
+:::
+
+<LinkCard
+  title="TypeSpec Core 0.66"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2025-03-04"
+/>
+
+## Breaking Changes
+
+### All packages
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+## Deprecations
+
+### @azure-tools/typespec-azure-core
+
+- [#1208](https://github.com/Azure/typespec-azure/pull/1208) Remove `property-name-conflict` from azure-core and move into tcgc
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2344](https://github.com/Azure/typespec-azure/pull/2344) Remove unused public `listSubClients` to avoid confusion with new internal utils function
+- [#2216](https://github.com/Azure/typespec-azure/pull/2216) Deprecate `packageName` in `TCGCContext`. Use `namespaceFlag` instead.
+- [#2216](https://github.com/Azure/typespec-azure/pull/2216) Remove support for deprecated `examples-directory`
+
+## Features
+
+### @azure-tools/typespec-autorest
+
+- [#2336](https://github.com/Azure/typespec-azure/pull/2336) Remove reference to deleted projection feature
+- [#2382](https://github.com/Azure/typespec-azure/pull/2382) Add support for new `dryRun` option
+
+### @azure-tools/typespec-azure-core
+
+- [#2336](https://github.com/Azure/typespec-azure/pull/2336) Remove reference to deleted projection feature
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2298](https://github.com/Azure/typespec-azure/pull/2298) Add `pageItemsSegments` for `SdkPagingServiceMetadata` to indicate how to get page items from response.
+- [#2390](https://github.com/Azure/typespec-azure/pull/2390) Specific scope decorator should always override all-scopes decorator.
+- [#2377](https://github.com/Azure/typespec-azure/pull/2377) Report diagnostic errors for discriminated unions.
+- [#2378](https://github.com/Azure/typespec-azure/pull/2378) Output auth related info in the yaml of code model.
+- [#2373](https://github.com/Azure/typespec-azure/pull/2373) Provide `listAllServiceNamespaces` to list service namespaces with versioning support.
+- [#2393](https://github.com/Azure/typespec-azure/pull/2393) Export `SdkEmitterOptionsSchema` for downstream emitter to add same options.
+- [#2353](https://github.com/Azure/typespec-azure/pull/2353) Add `licenseInfo` property of `LicenseInfo` type to `SdkPackage`, which is used to indicate the license for the package and could be configured by `license.name`, `license.company`, `license.link`, `license.header` and `license.description` in `tspconfig.yaml`.
+- [#2319](https://github.com/Azure/typespec-azure/pull/2319) Map all streaming request and response type to bytes.
+- [#2372](https://github.com/Azure/typespec-azure/pull/2372) Extend `@access` to also apply to `ModelProperty`s.
+- [#2326](https://github.com/Azure/typespec-azure/pull/2326) Add `namespace` flag to tcgc.
+- [#2216](https://github.com/Azure/typespec-azure/pull/2216) Refine all tcgc flags. Deprecate `flatten-union-as-enum` flag in `tspconfig.yaml`, and switch it to `flattenUnionAsEnum` in `CreateSdkContextOptions`.
+- [#2305](https://github.com/Azure/typespec-azure/pull/2305) Move from projections to mutators.
+- [#1208](https://github.com/Azure/typespec-azure/pull/1208) Add linter rulesets to TCGC, for both generic and language-specific linter rules.
+
+## Bump dependencies
+
+### @azure-tools/typespec-autorest
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### @azure-tools/typespec-azure-core
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### @azure-tools/typespec-azure-portal-core
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#2348](https://github.com/Azure/typespec-azure/pull/2348) Autorest Case insensitive check for http auth scheme
+- [#2297](https://github.com/Azure/typespec-azure/pull/2297) Fix using `@identifiers` on array of model with id not respected
+- [#2258](https://github.com/Azure/typespec-azure/pull/2258) Target param property when warn on unsupported parameter type
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+- [#2307](https://github.com/Azure/typespec-azure/pull/2307) Fixed a bug causing properties marked `@invisible(Lifecycle)` to remain included in payloads."
+
+### @azure-tools/typespec-azure-core
+
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#2297](https://github.com/Azure/typespec-azure/pull/2297) Fix using `@identifiers` on array of model with id not respected
+- [#2328](https://github.com/Azure/typespec-azure/pull/2328) Fix `ArmProviderActionAsync` and `ArmProviderActionSync` operations as both operations were returning `ErrorResponse` and not accepting changes to the error response type.
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2298](https://github.com/Azure/typespec-azure/pull/2298) Keep empty for `serializedName` if the body parmeter is not explicitly defined.
+- [#2319](https://github.com/Azure/typespec-azure/pull/2319) Consider extensible enum when doing example value mapping.
+- [#2319](https://github.com/Azure/typespec-azure/pull/2319) Do not consider template type when calculating discriminator and orphan types.
+- [#2351](https://github.com/Azure/typespec-azure/pull/2351) Support `@nextLink` along with `@header`.
+- [#2152](https://github.com/Azure/typespec-azure/pull/2152) move from `isApiVersionParam` -> SdkApiVersionType
+- [#2222](https://github.com/Azure/typespec-azure/pull/2222) Recurse over namespaces to get all user defined namespaces"
+- [#2344](https://github.com/Azure/typespec-azure/pull/2344) Set `.clientDefaultValue` for api-versions in triple-nested clients
+- [#2356](https://github.com/Azure/typespec-azure/pull/2356) Fix setting of api versions to ensure we aren't dropping versions throughout building up our api version graph
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.

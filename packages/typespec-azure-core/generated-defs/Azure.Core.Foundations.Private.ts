@@ -82,6 +82,18 @@ export type DefaultFinalStateViaDecorator = (
   states: readonly ("operation-location" | "location" | "azure-async-operation")[],
 ) => void;
 
+/**
+ * Internal decorator marking a scalar as a next link that requires parameterization before use.
+ *
+ * You most likely don't need to use this decorator since next links that require parameterization are against
+ * guidelines.
+ */
+export type ParameterizedNextLinkConfigDecorator = (
+  context: DecoratorContext,
+  target: Scalar,
+  parameters: Type,
+) => void;
+
 export type AzureCoreFoundationsPrivateDecorators = {
   spreadCustomParameters: SpreadCustomParametersDecorator;
   spreadCustomResponseProperties: SpreadCustomResponsePropertiesDecorator;
@@ -91,4 +103,5 @@ export type AzureCoreFoundationsPrivateDecorators = {
   needsRoute: NeedsRouteDecorator;
   ensureVerb: EnsureVerbDecorator;
   defaultFinalStateVia: DefaultFinalStateViaDecorator;
+  parameterizedNextLinkConfig: ParameterizedNextLinkConfigDecorator;
 };

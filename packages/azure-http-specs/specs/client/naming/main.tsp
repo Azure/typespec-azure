@@ -224,7 +224,10 @@ namespace UnionEnum {
     """)
   @route("/union-enum-name")
   @post
-  op unionEnumName(@body body: ServerExtensibleEnum): NoContentResponse;
+  op unionEnumName(
+    @header contentType: "application/json",
+    @body body: ServerExtensibleEnum,
+  ): NoContentResponse;
 
   @scenario
   @scenarioDoc("""
@@ -239,5 +242,8 @@ namespace UnionEnum {
     """)
   @route("/union-enum-member-name")
   @post
-  op unionEnumMemberName(@body body: ExtensibleEnum): NoContentResponse;
+  op unionEnumMemberName(
+    @header contentType: "application/json",
+    @body body: ExtensibleEnum,
+  ): NoContentResponse;
 }
