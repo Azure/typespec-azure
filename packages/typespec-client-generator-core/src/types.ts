@@ -533,7 +533,6 @@ export function getSdkUnionWithDiagnostics(
           access: "public",
           usage: UsageFlags.None,
           namespace,
-          clientNamespace: namespace,
         };
         updateReferencedTypeMap(context, type, retval);
         retval.type = diagnostics.pipe(
@@ -564,7 +563,6 @@ export function getSdkUnionWithDiagnostics(
               access: "public",
               usage: UsageFlags.None,
               namespace,
-              clientNamespace: namespace,
             };
           }
           updateReferencedTypeMap(context, type, retval);
@@ -578,7 +576,6 @@ export function getSdkUnionWithDiagnostics(
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
           namespace,
-          clientNamespace: namespace,
           variantTypes: [],
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           access: "public",
@@ -594,7 +591,6 @@ export function getSdkUnionWithDiagnostics(
             access: "public",
             usage: UsageFlags.None,
             namespace,
-            clientNamespace: namespace,
           };
         }
         updateReferencedTypeMap(context, type, retval);
@@ -822,13 +818,11 @@ export function getSdkModelWithDiagnostics(
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
     const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // eslint-disable-line @typescript-eslint/no-deprecated
-    const namespace = getClientNamespace(context, type);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
-      namespace,
-      clientNamespace: namespace,
+      namespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       properties: [],
@@ -955,13 +949,11 @@ function getSdkEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   let sdkType = context.__referencedTypeCache?.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
-    const namespace = getClientNamespace(context, type);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
-      namespace,
-      clientNamespace: namespace,
+      namespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
@@ -1023,13 +1015,11 @@ export function getSdkUnionEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   const union = type.union;
   const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
-  const namespace = getClientNamespace(context, type.union);
   const sdkType: SdkEnumType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
     isGeneratedName: !type.union.name,
-    namespace,
-    clientNamespace: namespace,
+    namespace: getClientNamespace(context, type.union),
     doc: getDoc(context.program, union),
     summary: getSummary(context.program, union),
     valueType:

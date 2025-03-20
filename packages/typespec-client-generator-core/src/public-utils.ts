@@ -51,7 +51,6 @@ import {
 import {
   AllScopes,
   TspLiteralType,
-  getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   hasNoneVisibility,
@@ -104,18 +103,6 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
-}
-
-/**
- * @deprecated Access namespace information by iterating through `sdkPackage.namespaces` instead
- * Get the client's namespace for generation. If package-name is passed in config, we return
- * that value as our namespace. Otherwise, we default to the TypeSpec service namespace.
- * @param program
- * @param context
- * @returns
- */
-export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  return getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]);
 }
 
 /**

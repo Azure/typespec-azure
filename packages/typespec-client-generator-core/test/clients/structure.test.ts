@@ -494,7 +494,7 @@ it("single with core", async () => {
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
-  strictEqual(apiVersionParam.kind, "apiVersion");
+  strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
 });
 
@@ -566,7 +566,7 @@ it("multiple with core", async () => {
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
-  strictEqual(apiVersionParam.kind, "apiVersion");
+  strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01");
 });
 
@@ -590,10 +590,10 @@ it("namespace", async () => {
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 2);
   const clientOne = sdkPackage.clients.filter((c) => c.name === "OneClient")[0];
-  strictEqual(clientOne.nameSpace, "My.Service.One");
+  strictEqual(clientOne.namespace, "My.Service.One");
 
   const clientTwo = sdkPackage.clients.filter((c) => c.name === "TwoClient")[0];
-  strictEqual(clientTwo.nameSpace, "My.Service.Two");
+  strictEqual(clientTwo.namespace, "My.Service.Two");
 });
 
 it("operationGroup", async () => {
