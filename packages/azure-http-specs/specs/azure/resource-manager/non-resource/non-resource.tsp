@@ -11,6 +11,8 @@ using Azure.ResourceManager;
 using TypeSpec.OpenAPI;
 using Spector;
 
+namespace Azure.ResourceManager.NonResource;
+
 /**
  * Though this model has `id`, `name`, `type` properties, it is not a resource as it doesn't extends `Resource`.
  */
