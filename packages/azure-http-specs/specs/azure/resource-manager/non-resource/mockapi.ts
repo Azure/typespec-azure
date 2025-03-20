@@ -28,3 +28,22 @@ Scenarios.Azure_ResourceManager_NonResource_NonResourceOperations_get = passOnSu
   },
   kind: "MockApiDefinition",
 });
+
+Scenarios.Azure_ResourceManager_NonResource_NonResourceOperations_create = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/providers/Microsoft.NonResource/locations/:location/otherParameters/:parameter",
+  method: "put",
+  request: {
+    params: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      location: LOCATION_EXPECTED,
+      parameter: "hello",
+      "api-version": "2023-12-01-preview",
+    },
+    body: nonResource,
+  },
+  response: {
+    status: 200,
+    body: json(nonResource),
+  },
+  kind: "MockApiDefinition",
+});
