@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.10
+
+### Bug Fixes
+
+- [#2408](https://github.com/Azure/typespec-azure/pull/2408) Fix behavior change of contentType of string/bytes
+
+
 ## 0.1.0-alpha.9
 
 ### Features
