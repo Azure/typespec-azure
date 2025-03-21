@@ -8,7 +8,7 @@ const LOCATION_EXPECTED = "eastus";
 const nonResource = {
   id: "id",
   name: "hello",
-  type: "nonResource"
+  type: "nonResource",
 };
 
 Scenarios.Azure_ResourceManager_NonResource_NonResourceOperations_get = passOnSuccess({

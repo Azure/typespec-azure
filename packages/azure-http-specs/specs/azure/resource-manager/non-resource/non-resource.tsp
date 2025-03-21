@@ -85,7 +85,7 @@ interface NonResourceOperations {
       "type": "nonResource"
     }
     ```
-
+    
     Expected response body:
     ```json
     {
