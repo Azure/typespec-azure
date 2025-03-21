@@ -2,8 +2,8 @@ import "@typespec/rest";
 import "@azure-tools/typespec-client-generator-core";
 import "@typespec/spector";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
+using Http;
+using Rest;
 using Azure.ClientGenerator;
 using Azure.ClientGenerator.Core;
 

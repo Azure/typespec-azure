@@ -23,6 +23,9 @@
     "/test": {
       "get": {
         "operationId": "OptionalMethods_Read",
+        "consumes": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "queryString",

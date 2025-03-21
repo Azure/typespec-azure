@@ -6,9 +6,9 @@ import "@azure-tools/typespec-azure-resource-manager";
 import "./ref-library/int-templates.tsp";
 import "./ref-library/op-templates.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 
 @service(#{ title: "Microsoft.EnvelopeTest" })

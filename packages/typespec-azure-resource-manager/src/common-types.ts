@@ -14,10 +14,8 @@ import {
   isTypeSpecValueTypeOf,
 } from "@typespec/compiler";
 import { $useDependency, getVersion } from "@typespec/versioning";
-import {
-  ArmCommonTypesVersionDecorator,
-  ExternalTypeRefDecorator,
-} from "../generated-defs/Azure.ResourceManager.js";
+import { ArmCommonTypesVersionDecorator } from "../generated-defs/Azure.ResourceManager.js";
+import { ExternalTypeRefDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import {
   ArmCommonTypeRecord,
   ArmCommonTypesDefaultVersion,

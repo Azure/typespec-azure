@@ -2,7 +2,7 @@ import "@typespec/http";
 import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
-using TypeSpec.Http;
+using Http;
 using Azure.ClientGenerator.Core;
 using Spector;
 
@@ -224,7 +224,10 @@ namespace UnionEnum {
     """)
   @route("/union-enum-name")
   @post
-  op unionEnumName(@body body: ServerExtensibleEnum): NoContentResponse;
+  op unionEnumName(
+    @header contentType: "application/json",
+    @body body: ServerExtensibleEnum,
+  ): NoContentResponse;
 
   @scenario
   @scenarioDoc("""
@@ -239,5 +242,8 @@ namespace UnionEnum {
     """)
   @route("/union-enum-member-name")
   @post
-  op unionEnumMemberName(@body body: ExtensibleEnum): NoContentResponse;
+  op unionEnumMemberName(
+    @header contentType: "application/json",
+    @body body: ExtensibleEnum,
+  ): NoContentResponse;
 }

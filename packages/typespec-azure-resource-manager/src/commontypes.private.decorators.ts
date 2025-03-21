@@ -19,7 +19,7 @@ export const namespace = "Azure.ResourceManager.CommonTypes.Private";
 export const ArmCommonTypesDefaultVersion = "v3";
 
 function getArmTypesPath(program: Program): string {
-  return program.getOption("arm-types-path") || "{arm-types-dir}";
+  return "{arm-types-dir}";
 }
 
 function storeCommonTypeRecord(

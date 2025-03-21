@@ -2,7 +2,7 @@ import "@azure-tools/typespec-client-generator-core";
 import "@typespec/spector";
 import "./main.tsp";
 
-using TypeSpec.Http;
+using Http;
 using Azure.ClientGenerator.Core;
 using Spector;
 

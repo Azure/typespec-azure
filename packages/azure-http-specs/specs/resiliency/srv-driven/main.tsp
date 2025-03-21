@@ -3,9 +3,9 @@ import "@typespec/versioning";
 import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
-using TypeSpec.Versioning;
+using Versioning;
 using Azure.ClientGenerator.Core;
-using TypeSpec.Http;
+using Http;
 using Spector;
 
 @versioned(Versions)

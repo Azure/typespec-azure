@@ -24,7 +24,7 @@ model ResourceProperties {
 
 ```tsp
 model ResourceProperties {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 }
 ```

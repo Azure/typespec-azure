@@ -11,8 +11,8 @@ Content negotiation in `Azure.Core` is done in the same way as in Http operation
 For example, consider an api that lets you download the avatar of the `User` resource as a `png` or `jpeg` depending on which Accept header is sent.
 
 ```tsp
-using TypeSpec.Http;
-using TypeSpec.Rest;
+using Http;
+using Rest;
 using Azure.Core;
 
 @resource("users")

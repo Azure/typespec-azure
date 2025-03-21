@@ -1,9 +1,15 @@
 import {
+  CallableMessage,
+  DecoratedType,
+  DiagnosticTarget,
   Enum,
   EnumMember,
+  getLocationContext,
   getNamespaceFullName,
+  getTypeName,
   Interface,
   isTemplateDeclaration,
+  LinterRuleContext,
   Model,
   ModelProperty,
   Namespace,
@@ -11,10 +17,11 @@ import {
   Program,
   Scalar,
   SourceLocation,
-  SyntaxKind,
+  Type,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 type DeclarableType =
   | Namespace
@@ -150,4 +157,64 @@ export function findLineStartAndIndent(location: SourceLocation): {
     pos--;
   }
   return { lineStart: pos, indent: location.file.text.slice(pos, pos + indent) };
+}
+
+export function checkReferenceInDisallowedNamespace(
+  context: LinterRuleContext<{ readonly default: CallableMessage<["ns"]> }>,
+  origin: Type,
+  type: Type,
+  target: DiagnosticTarget,
+  disallowedNamespace: "Private" | "Legacy",
+) {
+  if (getLocationContext(context.program, origin).type !== "project") {
+    return;
+  }
+  if (getLocationContext(context.program, type).type === "project") {
+    return;
+  }
+  if (isInDisallowedNamespace(type, disallowedNamespace)) {
+    context.reportDiagnostic({
+      target,
+      format: { ns: getTypeName(type.namespace) },
+    });
+  }
+}
+
+export function checkDecoratorsInDisallowedNamespace(
+  context: LinterRuleContext<{ readonly default: CallableMessage<["ns"]> }>,
+  type: Type & DecoratedType,
+  disallowedNamespace: "Private" | "Legacy",
+) {
+  if (getLocationContext(context.program, type).type !== "project") {
+    return;
+  }
+  for (const decorator of type.decorators) {
+    if (
+      decorator.definition &&
+      isInDisallowedNamespace(decorator.definition, disallowedNamespace) &&
+      getLocationContext(context.program, decorator.definition).type !== "project"
+    ) {
+      context.reportDiagnostic({
+        target: decorator.node ?? type,
+        format: { ns: getTypeName(decorator.definition.namespace) },
+      });
+    }
+  }
+}
+
+function isInDisallowedNamespace(
+  type: Type,
+  disallowedNamespace: "Private" | "Legacy",
+): type is Type & { namespace: Namespace } {
+  if (!("namespace" in type)) {
+    return false;
+  }
+  let current = type;
+  while (current.namespace) {
+    if (current.namespace?.name === disallowedNamespace) {
+      return true;
+    }
+    current = current.namespace;
+  }
+  return false;
 }

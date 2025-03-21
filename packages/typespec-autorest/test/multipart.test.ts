@@ -104,6 +104,7 @@ describe("legacy implicit form", () => {
   it("part of type `bytes` produce `type: file`", async () => {
     const res = await openApiFor(
       `
+      #suppress "deprecated" "For test"
       op upload(@header contentType: "multipart/form-data", profileImage: bytes): void;
       `,
     );
@@ -121,6 +122,7 @@ describe("legacy implicit form", () => {
   it("set part doc", async () => {
     const res = await openApiFor(
       `
+      #suppress "deprecated" "For test"
       op upload(@header contentType: "multipart/form-data", @doc("Part doc") profileImage: bytes): void;
       `,
     );
@@ -139,6 +141,7 @@ describe("legacy implicit form", () => {
   it("part of type `bytes[]` produce `type: array, items: { type: string, format: binary }`", async () => {
     const res = await openApiFor(
       `
+      #suppress "deprecated" "For test"
       op upload(@header contentType: "multipart/form-data", profileImage: bytes[]): void;
       `,
     );
@@ -160,6 +163,7 @@ describe("legacy implicit form", () => {
   it("part of type `string` produce `type: string`", async () => {
     const res = await openApiFor(
       `
+      #suppress "deprecated" "For test"
       op upload(@header contentType: "multipart/form-data", name: string): void;
       `,
     );
@@ -179,6 +183,7 @@ describe("legacy implicit form", () => {
     const res = await openApiFor(
       `
       #suppress "@azure-tools/typespec-autorest/unsupported-multipart-type" "For test"
+      #suppress "deprecated" "For test"
       op upload(@header contentType: "multipart/form-data", address: {city: string, street: string}): void;
       `,
     );

@@ -180,6 +180,10 @@
           "Widgets"
         ],
         "description": "Analyze a widget",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "id",

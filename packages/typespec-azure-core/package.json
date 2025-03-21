@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-core",
-  "version": "0.52.0",
+  "version": "0.53.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Core library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -21,6 +21,7 @@
   "tspMain": "lib/azure-core.tsp",
   "exports": {
     ".": {
+      "typespec": "./lib/azure-core.tsp",
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
     },

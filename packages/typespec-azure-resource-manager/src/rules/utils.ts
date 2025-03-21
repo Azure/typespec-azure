@@ -9,8 +9,8 @@ import {
   Namespace,
   Operation,
   Program,
-  SyntaxKind,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import { getResourceOperation } from "@typespec/rest";
 import { ArmResourceOperation } from "../operations.js";
 import { ArmResourceDetails, getArmResourceKind } from "../resource.js";

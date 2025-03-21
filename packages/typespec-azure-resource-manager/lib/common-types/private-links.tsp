@@ -1,5 +1,5 @@
-using TypeSpec.Http;
-using TypeSpec.Versioning;
+using Http;
+using Versioning;
 using OpenAPI;
 
 using Azure.Core;

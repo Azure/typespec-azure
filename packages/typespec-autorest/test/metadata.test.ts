@@ -341,6 +341,7 @@ describe("typespec-autorest: metadata", () => {
       "/single/{p}": {
         get: {
           operationId: "Single",
+          produces: ["text/plain"],
           parameters: [
             { $ref: "#/parameters/Parameters.q" },
             { $ref: "#/parameters/Parameters.p" },
@@ -357,6 +358,7 @@ describe("typespec-autorest: metadata", () => {
       "/batch": {
         get: {
           operationId: "Batch",
+          produces: ["text/plain"],
           responses: {
             "200": {
               description: "The request has succeeded.",

@@ -9,8 +9,7 @@
     "docs/spec.html": true,
     "**/bin/**": true,
     "**/node_modules/**": true,
-    "packages/website/versioned_docs/**": true,
-    "core/packages/website/versioned_docs/**": true
+    "core/packages/http-client-*/**": true
   },
   "files.exclude": {
     "**/common/temp/**": true,

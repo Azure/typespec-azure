@@ -1,7 +1,7 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using OpenAPI;
+using Versioning;
 using Azure.Core;
 
 namespace Azure.ResourceManager.CommonTypes;

@@ -10,12 +10,12 @@ import "./singleton.tsp";
 import "./extension.tsp";
 import "./location.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
-using TypeSpec.OpenAPI;
+using OpenAPI;
 
 @armProviderNamespace
 @service

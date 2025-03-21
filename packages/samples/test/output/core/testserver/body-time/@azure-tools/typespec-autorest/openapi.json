@@ -24,6 +24,10 @@
       "get": {
         "operationId": "Time_Get",
         "description": "Get time value \"11:34:56\"",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -44,6 +48,9 @@
       "put": {
         "operationId": "Time_Put",
         "description": "Put time value \"08:07:56\"",
+        "consumes": [
+          "text/plain"
+        ],
         "parameters": [
           {
             "name": "value",

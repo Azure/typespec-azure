@@ -209,7 +209,7 @@ import "@azure-tools/typespec-azure-core";
 
 using Azure.Core;
 using Azure.Core.Traits;
-using TypeSpec.Versioning;
+using Versioning;
 
 @service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)

@@ -4,7 +4,7 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-client-generator-core";
 
 using Spector;
-using TypeSpec.Versioning;
+using Versioning;
 using global.Azure.Core;
 using global.Azure.ClientGenerator.Core;
 

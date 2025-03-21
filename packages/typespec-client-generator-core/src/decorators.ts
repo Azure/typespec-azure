@@ -1,7 +1,5 @@
 import {
-  AugmentDecoratorStatementNode,
   DecoratorContext,
-  DecoratorExpressionNode,
   DecoratorFunction,
   Enum,
   EnumMember,
@@ -9,12 +7,10 @@ import {
   Model,
   ModelProperty,
   Namespace,
-  Node,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   getDiscriminator,
@@ -24,6 +20,7 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
+import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -58,13 +55,12 @@ import {
   clientNamespaceKey,
   findRootSourceProperty,
   listAllNamespaces,
-  listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { getLibraryName, listAllServiceNamespaces } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -111,13 +107,20 @@ function setScopedDecoratorData(
   value: unknown,
   scope?: LanguageScopes,
 ) {
+  const targetEntry = context.program.stateMap(key).get(target);
   // if no scope specified, then set with the new value
   if (!scope) {
-    context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
+    if (targetEntry && targetEntry[AllScopes]) {
+      targetEntry[AllScopes] = value;
+    } else {
+      const newObject = Object.fromEntries([[AllScopes, value]]);
+      context.program
+        .stateMap(key)
+        .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+    }
     return;
   }
 
-  const targetEntry = context.program.stateMap(key).get(target);
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
@@ -693,7 +696,7 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
@@ -710,20 +713,23 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
-  if (!accessOverride && entity.namespace) {
+  if (!accessOverride && entity.kind !== "ModelProperty" && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }
 
   return accessOverride;
 }
 
-export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+export function getAccess(
+  context: TCGCContext,
+  entity: Model | Enum | Operation | Union | ModelProperty,
+) {
   const override = getAccessOverride(context, entity);
-  if (override || entity.kind === "Operation") {
+  if (override || entity.kind === "Operation" || entity.kind === "ModelProperty") {
     return override || "public";
   }
 
@@ -787,19 +793,20 @@ export const $clientName: ClientNameDecorator = (
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
   if (entity.kind === "Model" || entity.kind === "Operation") {
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+    const target = context.decoratorTarget as Node;
+    if (target.kind === SyntaxKind.AugmentDecoratorStatement) {
       if (
-        ignoreDiagnostics(
-          context.program.checker.resolveTypeReference(
-            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType,
-          ),
+        (
+          ignoreDiagnostics(
+            (context.program.checker as any).resolveTypeReference(target.targetType),
+          ) as any
         )?.node !== entity.node
       ) {
         return;
       }
     }
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
-      if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+    if (target.kind === SyntaxKind.DecoratorExpression) {
+      if (target.parent !== entity.node) {
         return;
       }
     }
@@ -1157,10 +1164,10 @@ function findShortestNamespaceOverlap(
 /**
  * Returns the client namespace for a given entity. The order of operations is as follows:
  *
- * 1. if `@clientNamespace` is applied to the entity, this wins out.
+ * 1. If `@clientNamespace` is applied to the entity, this wins out.
  *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
- * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace
- * 3. We return the namespace of the entity retrieved from the original spec
+ * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace.
+ * 3. We return the namespace of the entity retrieved from the original spec.
  * @param context
  * @param entity
  * @returns

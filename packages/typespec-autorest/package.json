@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest",
-  "version": "0.52.0",
+  "version": "0.53.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting openapi from the TypeSpec REST protocol binding",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -22,6 +22,7 @@
   "tspMain": "lib/autorest.tsp",
   "exports": {
     ".": {
+      "typespec": "./lib/autorest.tsp",
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
     },

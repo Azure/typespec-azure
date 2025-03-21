@@ -32,6 +32,7 @@ import {
   $spreadCustomParameters,
   $spreadCustomResponseProperties,
   $useFinalStateVia,
+  parameterizedNextLinkConfigDecorator,
 } from "./decorators.js";
 import {
   $addTraitProperties,
@@ -85,6 +86,7 @@ export const $decorators = {
     needsRoute: $needsRoute,
     ensureVerb: $ensureVerb,
     defaultFinalStateVia: $defaultFinalStateVia,
+    parameterizedNextLinkConfig: parameterizedNextLinkConfigDecorator,
   } satisfies AzureCoreFoundationsPrivateDecorators,
 
   "Azure.Core.Traits": {

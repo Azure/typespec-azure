@@ -587,11 +587,11 @@ describe("typespec-autorest: request", () => {
         @post op read(@body body: bytes): {};
       `);
       const operation = res.paths["/"].post;
-      deepStrictEqual(operation.consumes, undefined);
+      deepStrictEqual(operation.consumes, ["application/octet-stream"]);
       const requestBody = operation.parameters[0];
       ok(requestBody);
       strictEqual(requestBody.schema.type, "string");
-      strictEqual(requestBody.schema.format, "byte");
+      strictEqual(requestBody.schema.format, "binary");
     });
 
     it("bytes request should respect @header contentType", async () => {
@@ -1030,39 +1030,5 @@ describe("identifiers decorator", () => {
       "dogs/breed",
       "cats/features/color",
     ]);
-  });
-});
-
-describe("typespec-autorest: multipart formData", () => {
-  it("expands model into formData parameters", async () => {
-    const oapi = await openApiFor(`
-    @service
-    namespace Widget;
-
-    @doc("A widget.")
-    model Widget {
-      @key("widgetName")
-      name: string;
-      displayName: string;
-      description: string;
-      color: string;
-    }
-
-    model WidgetForm is Widget {
-      @header("content-type")
-      contentType: "multipart/form-data";
-    }
-
-    @route("/widgets")
-    interface Widgets {
-      @route(":upload")
-      @post
-      upload(...WidgetForm): Widget;
-    }
-    `);
-    for (const val of ["Widget.color", "Widget.description", "Widget.displayName", "Widget.name"]) {
-      const param = oapi.parameters[val];
-      strictEqual(param["in"], "formData");
-    }
   });
 });

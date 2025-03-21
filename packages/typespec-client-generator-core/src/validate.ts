@@ -1,6 +1,4 @@
 import {
-  AugmentDecoratorStatementNode,
-  DecoratorExpressionNode,
   Enum,
   EnumMember,
   Interface,
@@ -10,17 +8,22 @@ import {
   Operation,
   Program,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+import {
+  AugmentDecoratorStatementNode,
+  DecoratorExpressionNode,
+  SyntaxKind,
+} from "@typespec/compiler/ast";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { createTCGCContext } from "./context.js";
 import { getClientNameOverride } from "./decorators.js";
 import { TCGCContext } from "./interfaces.js";
 import { AllScopes, clientNameKey } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
+import { validateTypes } from "./types/validate.js";
 
 export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core");
@@ -28,6 +31,8 @@ export function $onValidate(program: Program) {
   for (const scope of languageScopes) {
     validateClientNamesPerNamespace(tcgcContext, scope, program.getGlobalNamespaceType());
   }
+
+  validateTypes(tcgcContext);
 }
 
 function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {

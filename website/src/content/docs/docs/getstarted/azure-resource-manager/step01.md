@@ -29,8 +29,8 @@ Just after the `namespace` declaration, you will also need to include a few `usi
 For example, these lines pull in symbols from the `@typespec/rest` and `@azure-tools/typespec-azure-resource-manager`:
 
 ```
-using TypeSpec.Http;
-using TypeSpec.Rest;
+using Http;
+using Rest;
 using Azure.ResourceManager;
 ```
 

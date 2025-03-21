@@ -4,9 +4,9 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 using Azure.Core;
 
@@ -35,7 +35,7 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @path
   name: string;
 
-  ...Legacy.ManagedServiceIdentityV4Property; // Or ...ManagedSystemAssignedIdentityProperty;
+  ...Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property; // Or ...ManagedSystemAssignedIdentityProperty;
 }
 
 @doc("Widget Resource Properties.")

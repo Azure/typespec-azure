@@ -21,6 +21,18 @@ export function parseMediaType(mediaType: string) {
   return undefined;
 }
 
+export function isMediaTypeTextPlain(mediaType: string): boolean {
+  const mt = parseMediaType(mediaType);
+
+  return mt ? mt.type === text && mt.subtype === "plain" : false;
+}
+
+export function isMediaTypeOctetStream(mediaType: string): boolean {
+  const mt = parseMediaType(mediaType);
+
+  return mt ? mt.type === application && mt.subtype === "octet-stream" : false;
+}
+
 export function isMediaTypeJson(mediaType: string): boolean {
   const mt = parseMediaType(mediaType);
   return mt

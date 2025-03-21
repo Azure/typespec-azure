@@ -44,10 +44,10 @@ By default, any property that occurs in your resource model will also appear in 
 
 #### Properties That Are Never Directly Set by the User
 
-It is common to have properties that are calculated by the service or otherwise not directly set by the user, examples include timestamps, dates, values that are only set by specific actions (on/off, enabled/disabled, provisioningState). You want to make sure that these properties are marked so that they will appear in responses and not requests. this is done using the `@visibility("read")` decorator instance:
+It is common to have properties that are calculated by the service or otherwise not directly set by the user, examples include timestamps, dates, values that are only set by specific actions (on/off, enabled/disabled, provisioningState). You want to make sure that these properties are marked so that they will appear in responses and not requests. this is done using the `@visibility(Lifecycle.Read)` decorator instance:
 
 ```typespec
-@visibility("read")
+@visibility(Lifecycle.Read)
 provisioningState: ProvisioningState;
 ```
 

@@ -22,12 +22,12 @@ We understand that change can be challenging, and we appreciate your patience an
 | Old Package Name                         | Old Namespace                | New Package Name                             | New Namespace                     |
 | ---------------------------------------- | ---------------------------- | -------------------------------------------- | --------------------------------- |
 | @cadl-lang/compiler                      | using Cadl;                  | @typespec/compiler                           | using TypeSpec;                   |
-| @cadl-lang/rest                          | using Cadl.Http;             | @typespec/http;                              | using TypeSpec.Http;              |
-| @cadl-lang/rest                          | using Cadl.Rest;             | @typespec/rest                               | using TypeSpec.Rest;              |
-| @cadl-lang/openapi                       | using Cadl.OpenApi;          | @typespec/openapi                            | using TypeSpec.OpenApi;           |
-| @cadl-lang/openapi3                      | using Cadl.OpenApi3;         | @typespec/openapi3                           | using TypeSpec.OpenApi3;          |
+| @cadl-lang/rest                          | using Cadl.Http;             | @typespec/http;                              | using Http;                       |
+| @cadl-lang/rest                          | using Cadl.Rest;             | @typespec/rest                               | using Rest;                       |
+| @cadl-lang/openapi                       | using Cadl.OpenApi;          | @typespec/openapi                            | using OpenApi;                    |
+| @cadl-lang/openapi3                      | using Cadl.OpenApi3;         | @typespec/openapi3                           | using OpenApi3;                   |
 |                                          |                              |                                              |                                   |
-| @azure-tools/cadl-autorest               | using Cadl.AutoRest;         | @azure-tools/typespec-autorest               | using TypeSpec.AutoRest;          |
+| @azure-tools/cadl-autorest               | using Cadl.AutoRest;         | @azure-tools/typespec-autorest               | using AutoRest;                   |
 | @azure-tools/cadl-azure-core             | using Azure.Core;            | @azure-tools/typespec-azure-core             | using Azure.Core;                 |
 | @azure-tools/cadl-azure-resource-manager | using Azure.ResourceManager; | @azure-tools/typespec-azure-resource-manager | using Azure.ResourceManager;      |
 | @azure-tools/cadl-dpg                    | using Azure.DPG;             | @azure-tools/typespec-client-generator-core  | using Azure.ClientGenerator.Core; |

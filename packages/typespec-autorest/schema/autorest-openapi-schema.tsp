@@ -4,7 +4,7 @@
  */
 import "@typespec/json-schema";
 
-using TypeSpec.JsonSchema;
+using JsonSchema;
 
 namespace AutorestOpenAPISchema;
 

@@ -8,7 +8,7 @@ toc_max_heading_level: 3
 
 ### `@access` {#@Azure.ClientGenerator.Core.access}
 
-Override access for operations, models and enums.
+Override access for operations, models, enums and model property.
 When setting access for namespaces,
 the access info will be propagated to the models and operations defined in the namespace.
 If the model has an access override, the model override takes precedence.
@@ -21,6 +21,7 @@ parent models, discriminated sub models.
 The override access should not be narrow than the access calculated by operation,
 and different override access should not conflict with each other,
 otherwise a warning will be added to diagnostics list.
+Model property's access will default to public unless there is an override.
 
 ```typespec
 @Azure.ClientGenerator.Core.access(value: EnumMember, scope?: valueof string)
@@ -28,7 +29,7 @@ otherwise a warning will be added to diagnostics list.
 
 #### Target
 
-`Model | Operation | Enum | Union | Namespace`
+`ModelProperty | Model | Operation | Enum | Union | Namespace`
 
 #### Parameters
 

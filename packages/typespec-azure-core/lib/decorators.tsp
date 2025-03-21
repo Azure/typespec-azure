@@ -1,4 +1,4 @@
-using TypeSpec.Reflection;
+using Reflection;
 
 namespace Azure.Core {
   /**
@@ -210,4 +210,12 @@ namespace Azure.Core.Foundations.Private {
     target: TypeSpec.Reflection.Operation,
     states: valueof ("operation-location" | "location" | "azure-async-operation")[]
   );
+
+  /**
+   * Internal decorator marking a scalar as a next link that requires parameterization before use.
+   *
+   * You most likely don't need to use this decorator since next links that require parameterization are against
+   * guidelines.
+   */
+  extern dec parameterizedNextLinkConfig(target: Scalar, parameters: ModelProperty[]);
 }

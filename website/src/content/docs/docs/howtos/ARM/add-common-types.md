@@ -2,7 +2,7 @@
 title: Adding Common Types to Azure Resource Manager (ARM)
 ---
 
-This guide provides detailed instructions on how to add and manage common types in Azure Resource Manager (ARM) using TypeSpec. Common types are reusable components that can be shared across multiple ARM templates, ensuring consistency and reducing redundancy.
+This guide provides detailed instructions on how to add and manage common types in Azure Resource Manager (ARM) using Common types are reusable components that can be shared across multiple ARM templates, ensuring consistency and reducing redundancy.
 
 The TypeSpec common-types files are located in the [typespec-azure repository](https://github.com/Azure/typespec-azure/tree/main/packages/typespec-azure-resource-manager/lib/common-types). The generated Swagger files can be found in the [common-types/openapi directory](https://github.com/Azure/typespec-azure/tree/main/packages/samples/common-types/openapi).
 

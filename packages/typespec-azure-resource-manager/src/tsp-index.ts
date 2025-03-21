@@ -1,8 +1,6 @@
 import { definePackageFlags } from "@typespec/compiler";
-import {
-  AzureResourceManagerDecorators,
-  AzureResourceManagerLegacyDecorators,
-} from "../generated-defs/Azure.ResourceManager.js";
+import { AzureResourceManagerDecorators } from "../generated-defs/Azure.ResourceManager.js";
+import { AzureResourceManagerLegacyDecorators } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { $armCommonTypesVersion, $externalTypeRef } from "./common-types.js";
 import { $armLibraryNamespace, $armProviderNamespace, $useLibraryNamespace } from "./namespace.js";
 import {

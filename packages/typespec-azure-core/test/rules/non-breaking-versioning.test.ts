@@ -17,7 +17,7 @@ describe("typespec-azure-core: non-breaking-versioning rule", () => {
     runner = createTestWrapper(host, {
       wrapper: (code) =>
         `
-        using TypeSpec.Versioning;
+        using Versioning;
         
         @versioned(Versions)
         namespace Test;

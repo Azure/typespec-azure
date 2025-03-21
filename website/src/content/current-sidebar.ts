@@ -74,6 +74,7 @@ const sidebar: SidebarItem[] = [
         "libraries/typespec-client-generator-core",
         "Azure.ClientGenerator.Core",
         false,
+        ["libraries/typespec-client-generator-core/guideline"],
       ),
       createLibraryReferenceStructure("libraries/azure-portal-core", "Azure.Portal", false),
     ],

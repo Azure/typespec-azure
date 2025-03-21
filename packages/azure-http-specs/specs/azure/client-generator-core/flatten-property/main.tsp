@@ -2,7 +2,7 @@ import "@typespec/http";
 import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
-using TypeSpec.Http;
+using Http;
 using global.Azure.ClientGenerator.Core;
 using Spector;
 

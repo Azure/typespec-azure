@@ -23,6 +23,7 @@ it("supports emitting multiple services", async () => {
       get: {
         operationId: "Get",
         parameters: [],
+        produces: ["text/plain"],
         responses: {
           200: {
             description: "The request has succeeded.",
@@ -38,6 +39,7 @@ it("supports emitting multiple services", async () => {
       get: {
         operationId: "Other",
         parameters: [],
+        produces: ["text/plain"],
         responses: {
           200: {
             description: "The request has succeeded.",

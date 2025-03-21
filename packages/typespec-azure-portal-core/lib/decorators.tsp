@@ -1,6 +1,6 @@
 import "../dist/src/index.js";
 
-using TypeSpec.Reflection;
+using Reflection;
 namespace Azure.Portal;
 
 /**

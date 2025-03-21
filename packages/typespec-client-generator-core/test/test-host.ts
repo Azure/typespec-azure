@@ -11,13 +11,8 @@ import {
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { CreateSdkContextOptions, createSdkContext } from "../src/context.js";
-import {
-  SdkContext,
-  SdkEmitterOptions,
-  SdkHttpOperation,
-  SdkServiceOperation,
-} from "../src/interfaces.js";
+import { CreateSdkContextOptions, SdkEmitterOptions, createSdkContext } from "../src/context.js";
+import { SdkContext, SdkHttpOperation, SdkServiceOperation } from "../src/interfaces.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 
 export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
@@ -281,8 +276,4 @@ export async function createSdkContextTestHelper<
     options.emitterName ?? "@azure-tools/typespec-csharp",
     sdkContextOption,
   );
-}
-
-export function hasFlag<T extends number>(value: T, flag: T): boolean {
-  return (value & flag) !== 0;
 }
