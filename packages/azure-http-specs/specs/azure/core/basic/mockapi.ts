@@ -7,8 +7,10 @@ Scenarios.Azure_Core_Basic_createOrUpdate = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "patch",
   request: {
-    query: {
+    pathParams: {
       id: "1",
+    },
+    query: {
       "api-version": "2022-12-01-preview",
     },
     headers: {
@@ -24,8 +26,10 @@ Scenarios.Azure_Core_Basic_createOrReplace = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "put",
   request: {
-    query: {
+    pathParams: {
       id: "1",
+    },
+    query: {
       "api-version": "2022-12-01-preview",
     },
     body: json({ name: "Madge" }),
@@ -38,8 +42,10 @@ Scenarios.Azure_Core_Basic_get = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "get",
   request: {
-    query: {
+    pathParams: {
       id: "1",
+    },
+    query: {
       "api-version": "2022-12-01-preview",
     },
   },
@@ -84,8 +90,10 @@ Scenarios.Azure_Core_Basic_delete = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "delete",
   request: {
-    query: {
+    pathParams: {
       id: "1",
+    },
+    query: {
       "api-version": "2022-12-01-preview",
     },
   },
@@ -99,8 +107,10 @@ Scenarios.Azure_Core_Basic_export = passOnSuccess({
   uri: "/azure/core/basic/users/:id[:]export",
   method: "post",
   request: {
-    query: {
+    pathParams: {
       id: "1",
+    },
+    query: {
       format: "json",
       "api-version": "2022-12-01-preview",
     },
