@@ -1,4 +1,4 @@
 [submodule "core"]
 	path = core
-	url = https://github.com/microsoft/typespec
-	branch = main
+	url = https://github.com/witemple-msft/typespec
+	branch = witemple-msft/http-file-body
