@@ -24,14 +24,17 @@ TODO
 
 The `licenseInfo` property of the [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) type in `SdkPackage` contains the license information to be used for client code license comments or license file generation.
 
-Client emitters should use `licenseInfo.name` (license name), `licenseInfo.link` (link to the official license document), `licenseInfo.header` (license sentences for code header comments), and `licenseInfo.description` (license sentences for separate license file) directly when generating license information in configuration files, code files, or license files. If `licenseInfo` is `undefined`, no license information should be included in the client code generation. Client emitters do not need to handle how the license information is configured.
+If `licenseInfo` is `undefined`, no license information should be included in the generated client code or separate license file.
 
-For Azure services, client emitters should hard-code the `license.name` configuration to `MIT License` when calling `createSdkContext`.
+Client emitters should use `licenseInfo.name` (license name), `licenseInfo.company` (company name), `licenseInfo.link` (link to the official license document), `licenseInfo.header` (license sentences for code header comments), and `licenseInfo.description` (license sentences for separate license file) directly when generating license information in configuration files, code files, or license files. Client emitters do not need to handle how the license information is configured.
+
+For Azure services, client emitters should hard-code the `license.name` configuration to `MIT License` and `license.company` configuration to `Microsoft Corporation` when calling `createSdkContext`.
 
 ```typescript
 export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
   context.options.license = {
     name: "MIT License",
+    company: "Microsoft Corporation",
   };
   const sdkContext = await createSdkContext(context);
   // ...
