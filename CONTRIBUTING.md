@@ -265,7 +265,7 @@ Do the following to publish a new release:
    - Include the TypeSpec/TypeSpec-Azure release notes (links plus contents) as part of the announcement.
      Example:
 4. Run `pnpm upgrade --latest -r -i` on each repo and create PR to update dependencies and vulnerabilities.
-5. After update PRs have been merged, review any remaining reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typesepc-azure](https://github.com/Azure/typespec-azure/security).
+5. After update PRs have been merged, review any remaining reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typespec-azure](https://github.com/Azure/typespec-azure/security).
 
 ```md
 TypeSpec X.X and Azure libraries Y.Y were just released
