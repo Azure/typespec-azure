@@ -215,7 +215,9 @@ Do the following to publish a new release:
    be publishing and that they should hold off on merging until the process
    is complete.
 
-2. Make sure the core submodule is up to date and `typespec-next` validations are passing.
+1. Review any reported vulnerabilities in both the Repos' `Security` tabs and initiate a discussion on the `Engineering` channel regarding potential mitigations, such as updating package versions. `Security` tab links: [typespec](https://github.com/microsoft/typespec/security) and [typesepc-azure](https://github.com/Azure/typespec-azure/security).
+
+1. Make sure the core submodule is up to date and `typespec-next` validations are passing.
 
 3. Make sure your working copy is clean and you are up-to-date and on the
    main branch (both typespec-azure and core should point to main).
