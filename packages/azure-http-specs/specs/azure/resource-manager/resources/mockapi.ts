@@ -157,7 +157,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "get",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         extensionName: "extension",
@@ -174,7 +174,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "get",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
@@ -190,7 +190,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "get",
     request: {
-      params: {
+      query: {
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
@@ -205,7 +205,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSucces
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "get",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         extensionName: "extension",
@@ -226,17 +226,17 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "put",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid",
         },
-      },
+      }),
     },
     response: {
       status: 200,
@@ -248,16 +248,16 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "put",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid",
         },
-      },
+      }),
     },
     response: {
       status: 200,
@@ -269,15 +269,15 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "put",
     request: {
-      params: {
+      query: {
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid",
         },
-      },
+      }),
     },
     response: {
       status: 200,
@@ -289,18 +289,18 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = p
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "put",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         topLevelResourceName: "top",
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid",
         },
-      },
+      }),
     },
     response: {
       status: 200,
@@ -315,17 +315,17 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "patch",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid2",
         },
-      },
+      }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -346,16 +346,16 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "patch",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid2",
         },
-      },
+      }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -376,15 +376,15 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "patch",
     request: {
-      params: {
+      query: {
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid2",
         },
-      },
+      }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -405,18 +405,18 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "patch",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         topLevelResourceName: "top",
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         properties: {
           description: "valid2",
         },
-      },
+      }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -440,7 +440,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "delete",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         extensionName: "extension",
@@ -456,7 +456,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "delete",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
@@ -471,7 +471,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     uri: "/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "delete",
     request: {
-      params: {
+      query: {
         extensionName: "extension",
         "api-version": "2023-12-01-preview",
       },
@@ -485,7 +485,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuc
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
     method: "delete",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         topLevelResourceName: "top",
@@ -505,7 +505,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = pass
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/extensionsResources",
     method: "get",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         "api-version": "2023-12-01-preview",
@@ -523,7 +523,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = pass
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/extensionsResources",
     method: "get",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         "api-version": "2023-12-01-preview",
       },
@@ -540,7 +540,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = pass
     uri: "/providers/Azure.ResourceManager.Resources/extensionsResources",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2023-12-01-preview",
       },
     },
@@ -556,7 +556,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = pass
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/providers/Azure.ResourceManager.Resources/extensionsResources",
     method: "get",
     request: {
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         topLevelResourceName: "top",
@@ -578,7 +578,7 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_get = passOnSuccess(
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       location: LOCATION_EXPECTED,
       locationResourceName: "resource",
@@ -596,17 +596,17 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_createOrUpdate = pas
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
   method: "put",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       location: LOCATION_EXPECTED,
       locationResourceName: "resource",
       "api-version": "2023-12-01-preview",
     },
-    body: {
+    body: json({
       properties: {
         description: "valid",
       },
-    },
+    }),
   },
   response: {
     status: 200,
@@ -619,17 +619,17 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_update = passOnSucce
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
   method: "patch",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       location: LOCATION_EXPECTED,
       locationResourceName: "resource",
       "api-version": "2023-12-01-preview",
     },
-    body: {
+    body: json({
       properties: {
         description: "valid2",
       },
-    },
+    }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -651,7 +651,7 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_delete = passOnSucce
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources/:locationResourceName",
   method: "delete",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       location: LOCATION_EXPECTED,
       locationResourceName: "resource",
@@ -668,7 +668,7 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_listByLocation = pas
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/locations/:location/locationResources",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       location: LOCATION_EXPECTED,
       "api-version": "2023-12-01-preview",
@@ -688,7 +688,7 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_getByResourceGroup = passOnS
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/singletonTrackedResources/default",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       "api-version": "2023-12-01-preview",
@@ -705,17 +705,17 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_createOrUpdate = passOnSucce
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/singletonTrackedResources/default",
   method: "put",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       "api-version": "2023-12-01-preview",
     },
-    body: {
+    body: json({
       location: "eastus",
       properties: {
         description: "valid",
       },
-    },
+    }),
   },
   response: {
     status: 200,
@@ -728,16 +728,16 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/singletonTrackedResources/default",
   method: "patch",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       "api-version": "2023-12-01-preview",
     },
-    body: {
+    body: json({
       properties: {
         description: "valid2",
       },
-    },
+    }),
     headers: {
       "Content-Type": "application/merge-patch+json",
     },
@@ -759,7 +759,7 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_listByResourceGroup = passOn
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/singletonTrackedResources",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       "api-version": "2023-12-01-preview",
@@ -778,16 +778,16 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_actionSync = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/actionSync",
   method: "post",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
       "api-version": "2023-12-01-preview",
     },
-    body: {
+    body: json({
       message: "Resource action at top level.",
       urgent: true,
-    },
+    }),
   },
   response: {
     status: 204,
@@ -800,7 +800,7 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_get = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
@@ -818,18 +818,18 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_createOrReplace = passOnSucce
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName",
   method: "put",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
       "api-version": "2023-12-01-preview",
     },
-    body: {
+    body: json({
       location: "eastus",
       properties: {
         description: "valid",
       },
-    },
+    }),
   },
   response: {
     status: 200,
@@ -842,20 +842,20 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_update = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName",
   method: "patch",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
       "api-version": "2023-12-01-preview",
     },
-    body: {
-      properties: {
-        description: "valid2",
+    body: json(
+      {
+        properties: {
+          description: "valid2",
+        },
       },
-    },
-    headers: {
-      "Content-Type": "application/merge-patch+json",
-    },
+      "application/merge-patch+json",
+    ),
   },
   response: {
     status: 200,
@@ -874,7 +874,7 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_delete = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName",
   method: "delete",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
@@ -891,7 +891,7 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_listByResourceGroup = passOnS
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       "api-version": "2023-12-01-preview",
@@ -910,7 +910,7 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_listBySubscription = passOnSu
   uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.Resources/topLevelTrackedResources",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       "api-version": "2023-12-01-preview",
     },
@@ -929,7 +929,7 @@ Scenarios.Azure_ResourceManager_Resources_Nested_get = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/nestedProxyResources/:nestedResourceName",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
@@ -948,18 +948,18 @@ Scenarios.Azure_ResourceManager_Resources_Nested_createOrReplace = passOnSuccess
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/nestedProxyResources/:nestedResourceName",
   method: "put",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
       nestedResourceName: "nested",
       "api-version": "2023-12-01-preview",
     },
-    body: {
+    body: json({
       properties: {
         description: "valid",
       },
-    },
+    }),
   },
   response: {
     status: 200,
@@ -972,21 +972,21 @@ Scenarios.Azure_ResourceManager_Resources_Nested_update = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/nestedProxyResources/:nestedResourceName",
   method: "patch",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
       nestedResourceName: "nested",
       "api-version": "2023-12-01-preview",
     },
-    body: {
-      properties: {
-        description: "valid2",
+    body: json(
+      {
+        properties: {
+          description: "valid2",
+        },
       },
-    },
-    headers: {
-      "Content-Type": "application/merge-patch+json",
-    },
+      "application/merge-patch+json",
+    ),
   },
   response: {
     status: 200,
@@ -1005,7 +1005,7 @@ Scenarios.Azure_ResourceManager_Resources_Nested_delete = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/nestedProxyResources/:nestedResourceName",
   method: "delete",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",
@@ -1023,7 +1023,7 @@ Scenarios.Azure_ResourceManager_Resources_Nested_listByTopLevelTrackedResource =
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/:topLevelResourceName/nestedProxyResources",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       topLevelResourceName: "top",

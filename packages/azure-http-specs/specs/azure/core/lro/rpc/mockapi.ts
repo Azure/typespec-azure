@@ -9,8 +9,8 @@ Scenarios.Azure_Core_Lro_Rpc_longRunningRpc = passOnSuccess([
     uri: "/azure/core/lro/rpc/generations:submit",
     method: "post",
     request: {
-      body: { prompt: "text" },
-      params: {
+      body: json({ prompt: "text" }),
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -39,7 +39,7 @@ Scenarios.Azure_Core_Lro_Rpc_longRunningRpc = passOnSuccess([
     uri: "/azure/core/lro/rpc/generations/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -54,7 +54,7 @@ Scenarios.Azure_Core_Lro_Rpc_longRunningRpc = passOnSuccess([
     uri: "/azure/core/lro/rpc/generations/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },

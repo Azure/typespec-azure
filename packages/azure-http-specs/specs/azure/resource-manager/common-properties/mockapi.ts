@@ -66,7 +66,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_get = passOnSuc
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/:managedIdentityResourceName",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       managedIdentityResourceName: "identity",
@@ -85,10 +85,10 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSyste
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/:managedIdentityResourceName",
     method: "put",
     request: {
-      body: {
+      body: json({
         identity: createExpectedIdentity,
-      },
-      params: {
+      }),
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         managedIdentityResourceName: "identity",
@@ -107,13 +107,13 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/:managedIdentityResourceName",
     method: "patch",
     request: {
-      body: {
+      body: json({
         identity: updateExpectedIdentity,
-      },
+      }),
       headers: {
         "Content-Type": "application/merge-patch+json",
       },
-      params: {
+      query: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         managedIdentityResourceName: "identity",
@@ -131,7 +131,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_getForPredefinedError = p
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
   method: "get",
   request: {
-    params: {
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       resourceName: "confidential",
@@ -156,12 +156,12 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
   method: "put",
   request: {
-    body: {
+    body: json({
       properties: {
         username: "00",
       },
-    },
-    params: {
+    }),
+    query: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       resourceName: "confidential",

@@ -7,14 +7,14 @@ Scenarios.Azure_Core_Basic_createOrUpdate = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "patch",
   request: {
-    params: {
+    query: {
       id: "1",
       "api-version": "2022-12-01-preview",
     },
     headers: {
       "Content-Type": "application/merge-patch+json",
     },
-    body: { name: "Madge" },
+    body: json({ name: "Madge" }),
   },
   response: { status: 200, body: json(validUser) },
   kind: "MockApiDefinition",
@@ -24,11 +24,11 @@ Scenarios.Azure_Core_Basic_createOrReplace = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "put",
   request: {
-    params: {
+    query: {
       id: "1",
       "api-version": "2022-12-01-preview",
     },
-    body: { name: "Madge" },
+    body: json({ name: "Madge" }),
   },
   response: { status: 200, body: json(validUser) },
   kind: "MockApiDefinition",
@@ -38,7 +38,7 @@ Scenarios.Azure_Core_Basic_get = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "get",
   request: {
-    params: {
+    query: {
       id: "1",
       "api-version": "2022-12-01-preview",
     },
@@ -66,7 +66,7 @@ Scenarios.Azure_Core_Basic_list = passOnSuccess({
   uri: "/azure/core/basic/users",
   method: "get",
   request: {
-    params: {
+    query: {
       "api-version": "2022-12-01-preview",
       top: 5,
       skip: 10,
@@ -84,7 +84,7 @@ Scenarios.Azure_Core_Basic_delete = passOnSuccess({
   uri: "/azure/core/basic/users/:id",
   method: "delete",
   request: {
-    params: {
+    query: {
       id: "1",
       "api-version": "2022-12-01-preview",
     },
@@ -99,7 +99,7 @@ Scenarios.Azure_Core_Basic_export = passOnSuccess({
   uri: "/azure/core/basic/users/:id[:]export",
   method: "post",
   request: {
-    params: {
+    query: {
       id: "1",
       format: "json",
       "api-version": "2022-12-01-preview",
@@ -117,7 +117,7 @@ Scenarios.Azure_Core_Basic_exportAllUsers = passOnSuccess({
   uri: "/azure/core/basic/users:exportallusers",
   method: "post",
   request: {
-    params: {
+    query: {
       format: "json",
       "api-version": "2022-12-01-preview",
     },
