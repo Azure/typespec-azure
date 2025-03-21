@@ -18,7 +18,7 @@ Scenarios.Azure_Core_Traits_smokeTest = passOnSuccess({
   uri: "/azure/core/traits/user/:id",
   method: "get",
   request: {
-    params: {
+    pathParams: {
       id: "1",
     },
     headers: {
@@ -79,14 +79,14 @@ Scenarios.Azure_Core_Traits_repeatableAction = passOnSuccess({
   uri: "/azure/core/traits/user/:id:repeatableAction",
   method: "post",
   request: {
-    body: {
+    body: json({
       userActionValue: "test",
-    },
+    }),
     headers: {
       "Repeatability-Request-ID": "86aede1f-96fa-4e7f-b1e1-bf8a947cb804",
       "Repeatability-First-Sent": "Mon, 27 Nov 2023 11:58:00 GMT",
     },
-    params: {
+    pathParams: {
       id: "1",
     },
   },

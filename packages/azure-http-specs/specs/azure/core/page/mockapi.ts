@@ -13,12 +13,12 @@ Scenarios.Azure_Core_Page_listWithPage = passOnSuccess({
 
 Scenarios.Azure_Core_Page_listWithParameters = passOnSuccess({
   uri: "/azure/core/page/parameters",
-  method: "get",
+  method: "post",
   request: {
-    params: {
+    query: {
       another: "Second",
     },
-    body: { inputName: "Madge" },
+    body: json({ inputName: "Madge" }),
   },
   response: { status: 200, body: json({ value: [validUser] }) },
   kind: "MockApiDefinition",

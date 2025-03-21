@@ -55,7 +55,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_ListAvailableOperations = pas
   uri: "/providers/Azure.ResourceManager.OperationTemplates/operations",
   method: "get",
   request: {
-    params: {
+    query: {
       "api-version": "2023-12-01-preview",
     },
   },
@@ -74,14 +74,16 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGl
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/checkNameAvailability",
     method: "post",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         name: "checkName",
         type: "Microsoft.Web/site",
-      },
+      }),
     },
     response: {
       status: 200,
@@ -96,15 +98,17 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLo
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/:location/checkNameAvailability",
     method: "post",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         location: "westus",
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         name: "checkName",
         type: "Microsoft.Web/site",
-      },
+      }),
     },
     response: {
       status: 200,
@@ -121,19 +125,21 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
     method: "put",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         orderName: "order1",
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         location: "eastus",
         properties: {
           productId: "product1",
           amount: 1,
         },
-      },
+      }),
     },
     response: {
       status: 201,
@@ -169,8 +175,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao",
     method: "get",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
     },
@@ -212,10 +220,12 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
     method: "get",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         orderName: "order1",
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
     },
@@ -233,15 +243,17 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName/export",
     method: "post",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         orderName: "order1",
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
-      body: {
+      body: json({
         format: "csv",
-      },
+      }),
     },
     response: {
       status: 202,
@@ -267,10 +279,12 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/:operation_name",
     method: "get",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        "api-version": "2023-12-01-preview",
         operation_name: "lro_post_aao", // operation_name can be "lro_post_location" or "lro_post_aao", depending on the header you choose to poll. "lro_post_aao" here is just for passing e2e test
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
       },
     },
     response: {
@@ -332,10 +346,12 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
     method: "delete",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         orderName: "order1",
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
     },
@@ -361,8 +377,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/lro_delete_location",
     method: "get",
     request: {
-      params: {
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
     },
