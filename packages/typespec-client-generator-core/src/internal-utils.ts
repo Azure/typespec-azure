@@ -99,28 +99,6 @@ export function parseEmitterName(
 }
 
 /**
- * @param context
- * @param namespace If we know explicitly the namespace of the client, pass this in
- * @returns The name of the namespace
- */
-export function getClientNamespaceStringHelper(
-  context: TCGCContext,
-  namespace?: Namespace,
-): string | undefined {
-  let packageName = context.packageName; // eslint-disable-line @typescript-eslint/no-deprecated
-  if (packageName) {
-    packageName = packageName
-      .replace(/-/g, ".")
-      .replace(/\.([a-z])?/g, (match: string) => match.toUpperCase());
-    return packageName.charAt(0).toUpperCase() + packageName.slice(1);
-  }
-  if (namespace) {
-    return getNamespaceFullName(namespace);
-  }
-  return undefined;
-}
-
-/**
  *
  * @param context
  * @param type The type that we are adding api version information onto

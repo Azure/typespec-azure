@@ -56,7 +56,7 @@ Finally, you can express changes to your service using the `@added` and `@remove
 model Widget {
   /** The widget name. */
   @key("widgetName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   /** The widget color. */

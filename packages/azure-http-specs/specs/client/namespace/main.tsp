@@ -1,7 +1,7 @@
 import "@typespec/http";
 import "@typespec/spector";
 
-using TypeSpec.Http;
+using Http;
 using Spector;
 
 /** Illustrates the clientNamespace cases. */

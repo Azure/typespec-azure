@@ -741,7 +741,7 @@ Expected request body:
 
 Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
 
-When generate the code, one need to set the "examples-directory" option.
+When generate the code, one need to set the "examples-dir" option.
 
 Expected query parameter: query-param=query&api-version=2022-12-01-preview
 Expected header parameter: header-param=header

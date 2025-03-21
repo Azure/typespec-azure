@@ -241,7 +241,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("supports @nextPageOperation", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
 
       model MyResource {
         @key
@@ -518,7 +518,7 @@ describe("typespec-azure-core: decorators", () => {
   describe("@operationLink", () => {
     it("works for sample usage", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model MyResource {
         @key("resourceName")
@@ -566,7 +566,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if RequestParameter or ResponseProperty are not used", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -593,7 +593,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if parameter does not exist on linked operation", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -620,7 +620,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if requestParameter does not exist", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -647,7 +647,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("passes if requestParameter exists", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -673,7 +673,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if responseProperty does not exist", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -701,7 +701,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("passes if responseProperty exists", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;

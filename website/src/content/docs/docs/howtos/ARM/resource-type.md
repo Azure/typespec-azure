@@ -40,7 +40,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -64,7 +64,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -88,7 +88,7 @@ model EmployeeResource is ExtensionResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -112,7 +112,7 @@ model JobResource is ProxyResource<JobProperties> {
   /** The job name */
   @segment("jobs")
   @key("jobName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -137,7 +137,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -162,7 +162,7 @@ model EmployeeResource is ProxyResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -188,7 +188,7 @@ model EmployeeAgreementResource is ProxyResource<EmployeeAgreementProperties> {
   /** The default employee agreement, applying to all employees. */
   @segment("employeeAgreements")
   @key
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -222,7 +222,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -279,17 +279,17 @@ model EmployeeProperties {
   /** The current title of the employee */
   title: string;
 
-  @visibility("read", "create")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
   level: EmployeeLevel;
 
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   employeeId: int32;
 
   biography?: string = "No biography provided";
   colleagues: EmployeeResourceId[];
   employmentHistory: Job[];
 
-  @visibility("create")
+  @visibility(Lifecycle.Create)
   password: Password;
 
   provisioningState?: EmployeeProvisioningState;
@@ -317,7 +317,7 @@ Alternately, this is also equivalent:
 ```typespec
 model ResourceProperties {
   /** The status of the last provisioning operation performed on the resource. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 }
 ```
@@ -428,7 +428,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
     /** The employee name, using 'Firstname Lastname' notation */
     @segment("employees")
     @key("employeeName")
-    @visibility("read")
+    @visibility(Lifecycle.Read)
     @path
     name: string;
 
@@ -443,7 +443,7 @@ Standard configuration for ARM support of both SystemAssigned and UserAssigned M
     /** The employee name, using 'Firstname Lastname' notation */
     @segment("employees")
     @key("employeeName")
-    @visibility("read")
+    @visibility(Lifecycle.Read)
     @path
     name: string;
 
@@ -462,7 +462,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 
@@ -481,7 +481,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 
@@ -500,7 +500,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 
@@ -519,7 +519,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 
@@ -538,7 +538,7 @@ model EmployeeResource is TrackedResource<EmployeeProperties> {
   /** The employee name, using 'Firstname Lastname' notation */
   @segment("employees")
   @key("employeeName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 

@@ -334,7 +334,7 @@ it("template case", async () => {
       title: "Pet Store Service",
     })
     namespace PetStore;
-    using TypeSpec.Rest.Resource;
+    using Rest.Resource;
 
     @error
     model PetStoreError {
