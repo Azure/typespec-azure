@@ -18,17 +18,17 @@ namespace Azure.ResourceManager.NonResource;
  */
 model NonResource {
   /**
-   * The identification of the result
+   * An id.
    */
   id?: string;
 
   /**
-   * The name of the result
+   * A name.
    */
   name?: string;
 
   /**
-   * The result resource type
+   * A type.
    */
   type?: string;
 }
@@ -39,7 +39,7 @@ model NonResource {
 interface NonResourceOperations {
   @scenario
   @scenarioDoc("""
-    It's non resource get operation operating on non resource model, though the model has `id`, `name`, `type` properties.
+    It's non-resource get operation operating on non resource model, though the model has `id`, `name`, `type` properties.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -65,7 +65,7 @@ interface NonResourceOperations {
     location: string,
 
     /**
-     * The cluster code version.
+     * Another parameter.
      */
     @path
     parameter: string,
@@ -73,7 +73,7 @@ interface NonResourceOperations {
 
   @scenario
   @scenarioDoc("""
-    It's non resource put operation operating on non resource model, though the model has `id`, `name`, `type` properties.
+    It's non-resource put operation operating on non resource model, though the model has `id`, `name`, `type` properties.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
     Expected query parameter: api-version=2023-12-01-preview
     
@@ -108,7 +108,7 @@ interface NonResourceOperations {
     location: string,
 
     /**
-     * The cluster code version.
+     * Another parameter.
      */
     @path
     parameter: string,
