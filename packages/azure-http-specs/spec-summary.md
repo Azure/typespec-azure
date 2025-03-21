@@ -984,6 +984,52 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_NonResource_NonResourceOperations_create
+
+- Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
+
+It's non-resource put operation operating on non-resource model, though the model has `id`, `name`, `type` properties.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
+}
+```
+
+### Azure_ResourceManager_NonResource_NonResourceOperations_get
+
+- Endpoint: `get https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
+
+It's non-resource get operation operating on non-resource model, though the model has `id`, `name`, `type` properties.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
+}
+```
+
 ### Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal
 
 - Endpoint: `post https://management.azure.com`
