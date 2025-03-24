@@ -135,7 +135,7 @@ model ListItemInputBody {
   }
   ```
   """)
-@get
+@post
 op listWithParameters is global.Azure.Core.Foundations.Operation<
   ListItemInput,
   global.Azure.Core.Page<User>
