@@ -15,7 +15,7 @@ Scenarios.Azure_ResourceManager_NonResource_NonResourceOperations_get = passOnSu
   uri: "/subscriptions/:subscriptionId/providers/Microsoft.NonResource/locations/:location/otherParameters/:parameter",
   method: "get",
   request: {
-    params: {
+    pathParams: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       location: LOCATION_EXPECTED,
       parameter: "hello",
@@ -33,13 +33,13 @@ Scenarios.Azure_ResourceManager_NonResource_NonResourceOperations_create = passO
   uri: "/subscriptions/:subscriptionId/providers/Microsoft.NonResource/locations/:location/otherParameters/:parameter",
   method: "put",
   request: {
-    params: {
+    pathParams: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       location: LOCATION_EXPECTED,
       parameter: "hello",
       "api-version": "2023-12-01-preview",
     },
-    body: nonResource,
+    body: json(nonResource),
   },
   response: {
     status: 200,
