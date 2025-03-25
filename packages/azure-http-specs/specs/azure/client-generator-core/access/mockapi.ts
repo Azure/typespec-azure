@@ -7,7 +7,7 @@ function createMockApiDefinitions(route: string): MockApiDefinition {
     uri: `/azure/client-generator-core/access/${route}`,
     method: "get",
     request: {
-      params: {
+      query: {
         name: "sample",
       },
     },
@@ -40,7 +40,7 @@ Scenarios.Azure_ClientGenerator_Core_Access_RelativeModelInOperation = passOnSuc
     uri: "/azure/client-generator-core/access/relativeModelInOperation/operation",
     method: "get",
     request: {
-      params: {
+      query: {
         name: "Madge",
       },
     },
@@ -54,7 +54,7 @@ Scenarios.Azure_ClientGenerator_Core_Access_RelativeModelInOperation = passOnSuc
     uri: "/azure/client-generator-core/access/relativeModelInOperation/discriminator",
     method: "get",
     request: {
-      params: {
+      query: {
         kind: "real",
       },
     },

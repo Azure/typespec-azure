@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.53.1
+
+### Bug Fixes
+
+- [#2425](https://github.com/Azure/typespec-azure/pull/2425) Rollback change of `SdkApiVersionParameter`.
+- [#2425](https://github.com/Azure/typespec-azure/pull/2425) Removed `package-name` and `flatten-union-as-enum` from `SdkEmitterOptions`, `clientNamespace` from `SdkClientType`/`SdkNullableType`/`SdkEnumType`/`SdkUnionType`/`SdkModelType`, `packageName` from `TCGCContext`, `nameSpace` from `SdkClientType`, `name`/`rootNamespace` from `SdkPackage` and `getClientNamespaceString` function. All these things should have been deprecated in previous version or not used by any emitters.
+
+
 ## 0.53.0
 
 ### Breaking Changes

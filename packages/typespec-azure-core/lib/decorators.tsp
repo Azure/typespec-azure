@@ -1,4 +1,4 @@
-using TypeSpec.Reflection;
+using Reflection;
 
 namespace Azure.Core {
   /**
