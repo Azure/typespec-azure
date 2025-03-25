@@ -165,6 +165,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
   method: "put",
   request: {
     body: json({
+      location: "eastus",
       properties: {
         username: "00",
       },
