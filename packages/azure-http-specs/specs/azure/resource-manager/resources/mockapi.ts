@@ -344,9 +344,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -376,9 +373,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -407,9 +401,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -441,9 +432,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -674,9 +662,6 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_update = passOnSucce
         description: "valid2",
       },
     }),
-    headers: {
-      "Content-Type": "application/json",
-    },
   },
   response: {
     status: 200,
@@ -790,9 +775,6 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
         description: "valid2",
       },
     }),
-    headers: {
-      "Content-Type": "application/json",
-    },
   },
   response: {
     status: 200,

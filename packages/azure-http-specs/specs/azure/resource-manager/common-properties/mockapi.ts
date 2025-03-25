@@ -126,9 +126,6 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
       body: json({
         identity: updateExpectedIdentity,
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
       pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
