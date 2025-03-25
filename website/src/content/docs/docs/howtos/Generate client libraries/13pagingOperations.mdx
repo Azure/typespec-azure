@@ -288,7 +288,6 @@ NOT_SUPPORTED
 
 </ClientTabs>
 
-
 ## Advanced
 
 ### Parameterized next links (against guidelines)
@@ -310,6 +309,8 @@ model Certificate {
 }
 model Page {
   @items items: Certificate[];
-  @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
+  @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
+    ListCertificateOptions.includePending
+  ]>;
 }
 ```

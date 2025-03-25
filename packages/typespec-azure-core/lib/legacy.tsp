@@ -4,7 +4,7 @@ namespace Azure.Core.Legacy;
 
 /**
  * A scalar type representing a next link that requires formatting with parameters to be used.
- * 
+ *
  * @example
  * ```typespec
  * model ListCertificateOptions {
