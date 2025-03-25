@@ -405,6 +405,33 @@ Whether you want to generate an operation as a convenient operation.
 op test: void;
 ```
 
+### `@emptyStringAsNull` {#@Azure.ClientGenerator.Core.emptyStringAsNull}
+
+Whether a model needs to treat empty string as null, this is only used for backward compatibility for csharp.
+
+```typespec
+@Azure.ClientGenerator.Core.emptyStringAsNull(scope?: valueof string)
+```
+
+#### Target
+
+`Model`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                            |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+#### Examples
+
+```typespec
+@emptyStringAsNull
+model MyModel {
+  prop: string;
+}
+```
+
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
 
 :::caution

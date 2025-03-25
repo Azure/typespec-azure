@@ -30,6 +30,7 @@ import {
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
+  EmptyStringAsNullDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -1251,3 +1252,9 @@ function IsInScope(context: TCGCContext, entity: Operation): boolean {
   }
   return true;
 }
+
+export const $emptyStringAsNull: EmptyStringAsNullDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  scope?: LanguageScopes,
+) => {};

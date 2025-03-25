@@ -338,11 +338,12 @@ describe("csharp only decorator", () => {
   it("@useSystemTextJsonConverter", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] },
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter", "Azure\\.ClientGenerator\\.Core\\.@emptyStringAsNull"] },
     );
 
     await runner.compileWithBuiltInService(`
         @useSystemTextJsonConverter("csharp")
+        @emptyStringAsNull("csharp")
         model A {
           id: string;
         }
@@ -352,9 +353,18 @@ describe("csharp only decorator", () => {
 
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    deepStrictEqual(models[0].decorators, [
+    strictEqual(models[0].decorators.length, 2);
+    const decorator1 = models[0].decorators.find((d) => d.name === "Azure.ClientGenerator.Core.@useSystemTextJsonConverter");
+    const decorator2 = models[0].decorators.find((d) => d.name === "Azure.ClientGenerator.Core.@emptyStringAsNull");
+    ok(decorator1);
+    ok(decorator2);
+    deepStrictEqual([decorator1, decorator2], [
       {
         name: "Azure.ClientGenerator.Core.@useSystemTextJsonConverter",
+        arguments: { scope: "csharp" },
+      },
+      {
+        name: "Azure.ClientGenerator.Core.@emptyStringAsNull",
         arguments: { scope: "csharp" },
       },
     ]);

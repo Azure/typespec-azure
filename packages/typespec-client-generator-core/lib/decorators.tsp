@@ -608,3 +608,18 @@ extern dec scope(target: Operation, scope?: valueof string);
  * ```
  */
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
+
+/**
+ * Whether a model needs to treat empty string as null, this is only used for backward compatibility for csharp.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ *
+ * @example
+ * ```typespec
+ * @emptyStringAsNull
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ */
+extern dec emptyStringAsNull(target: Model, scope?: valueof string);

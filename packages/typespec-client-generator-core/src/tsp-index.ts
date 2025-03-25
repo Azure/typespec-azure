@@ -8,6 +8,7 @@ import {
   $clientName,
   $clientNamespace,
   $convenientAPI,
+  $emptyStringAsNull,
   $flattenProperty,
   $operationGroup,
   $override,
@@ -40,5 +41,6 @@ export const $decorators = {
     clientNamespace: $clientNamespace,
     alternateType: $alternateType,
     scope: $scope,
+    emptyStringAsNull: $emptyStringAsNull,
   } as AzureClientGeneratorCoreDecorators,
 };
