@@ -7,6 +7,10 @@ import "@typespec/spector";
 
 using Http;
 using Rest;
+using Versioning;
+using Azure.Core;
+using Azure.ResourceManager;
+using OpenAPI;
 using Spector;
 
 namespace Azure.ResourceManager.CommonProperties;

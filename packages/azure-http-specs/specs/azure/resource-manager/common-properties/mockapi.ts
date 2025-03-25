@@ -1,4 +1,11 @@
-import { json, passOnCode, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { deepEquals } from "@typespec/compiler/utils";
+import {
+  json,
+  passOnCode,
+  passOnSuccess,
+  ScenarioMockApi,
+  ValidationError,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -88,6 +95,11 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSyste
     method: "put",
     request: {
       body: json({
+        location: "eastus",
+        tags: {
+          tagKey1: "tagValue1",
+        },
+        properties: {},
         identity: createExpectedIdentity,
       }),
       pathParams: {
@@ -115,7 +127,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
         identity: updateExpectedIdentity,
       }),
       headers: {
-        "Content-Type": "application/merge-patch+json",
+        "Content-Type": "application/json",
       },
       pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
@@ -131,6 +143,19 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
       body: json(validUserAssignedAndSystemAssignedManagedIdentityResource),
     },
     kind: "MockApiDefinition",
+    handler: (req) => {
+      if (!deepEquals(req.body["identity"], updateExpectedIdentity)) {
+        throw new ValidationError(
+          "Body should contain 'identity' property",
+          updateExpectedIdentity,
+          req.body,
+        );
+      }
+      return {
+        status: 200,
+        body: json(validUserAssignedAndSystemAssignedManagedIdentityResource),
+      };
+    },
   });
 
 Scenarios.Azure_ResourceManager_CommonProperties_Error_getForPredefinedError = passOnCode(404, {

@@ -1,4 +1,4 @@
-import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { json, passOnSuccess, ScenarioMockApi, ValidationError } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -791,7 +791,7 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
       },
     }),
     headers: {
-      "Content-Type": "application/merge-patch+json",
+      "Content-Type": "application/json",
     },
   },
   response: {
@@ -805,6 +805,25 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
     }),
   },
   kind: "MockApiDefinition",
+  handler: (req) => {
+    if (req.body["properties"]["description"] !== "valid2") {
+      throw new ValidationError(
+        "Body should contain 'properties.description' property",
+        "valid2",
+        req.body,
+      );
+    }
+    return {
+      status: 200,
+      body: json({
+        ...validSingletonResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    };
+  },
 });
 
 Scenarios.Azure_ResourceManager_Resources_Singleton_listByResourceGroup = passOnSuccess({
@@ -916,7 +935,7 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_update = passOnSuccess({
           description: "valid2",
         },
       },
-      "application/merge-patch+json",
+      "application/json",
     ),
   },
   response: {
@@ -930,6 +949,25 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_update = passOnSuccess({
     }),
   },
   kind: "MockApiDefinition",
+  handler: (req) => {
+    if (req.body["properties"]["description"] !== "valid2") {
+      throw new ValidationError(
+        "Body should contain 'properties.description' property",
+        "valid2",
+        req.body,
+      );
+    }
+    return {
+      status: 200,
+      body: json({
+        ...validTopLevelResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    };
+  },
 });
 
 Scenarios.Azure_ResourceManager_Resources_TopLevel_delete = passOnSuccess({
@@ -1051,7 +1089,7 @@ Scenarios.Azure_ResourceManager_Resources_Nested_update = passOnSuccess({
           description: "valid2",
         },
       },
-      "application/merge-patch+json",
+      "application/json",
     ),
   },
   response: {
