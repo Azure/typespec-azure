@@ -59,6 +59,7 @@ import {
   listAllUserDefinedNamespaces,
   listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
+  resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 
@@ -189,7 +190,7 @@ export function getLibraryName(
     type.kind === "Model" &&
     type.templateMapper?.args
   ) {
-    const generatedName = context.__generatedNames?.get(type);
+    const generatedName = context.__generatedNames.get(type);
     if (generatedName) return generatedName;
     return resolveDuplicateGenearatedName(
       context,
@@ -319,7 +320,7 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  const generatedName = context.__generatedNames?.get(type);
+  const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -636,21 +637,6 @@ function buildNameFromContextPaths(
   return createName;
 }
 
-function resolveDuplicateGenearatedName(
-  context: TCGCContext,
-  type: Union | Model | TspLiteralType,
-  createName: string,
-): string {
-  let duplicateCount = 1;
-  const rawCreateName = createName;
-  const generatedNames = [...(context.__generatedNames?.values() ?? [])];
-  while (generatedNames.includes(createName)) {
-    createName = `${rawCreateName}${duplicateCount++}`;
-  }
-  context.__generatedNames!.set(type, createName);
-  return createName;
-}
-
 export function getHttpOperationWithCache(
   context: TCGCContext,
   operation: Operation,
@@ -670,7 +656,7 @@ export function getHttpOperationExamples(
   context: TCGCContext,
   operation: HttpOperation,
 ): SdkHttpOperationExample[] {
-  return context.__httpOperationExamples?.get(operation) ?? [];
+  return context.__httpOperationExamples.get(operation) ?? [];
 }
 
 export function isAzureCoreModel(t: SdkType): boolean {
