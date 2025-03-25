@@ -1,7 +1,7 @@
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
-import { SdkEmitterOptions, TCGCEmitterOptions } from "./context.js";
+import { SdkEmitterOptions, TCGCEmitterOptions, UnbrandedSdkEmitterOptions } from "./context.js";
 
-export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
+export const UnbrandedSdkEmitterOptionsSchema: JSONSchemaType<UnbrandedSdkEmitterOptions> = {
   type: "object",
   additionalProperties: false,
   properties: {
@@ -23,12 +23,6 @@ export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
       format: "absolute-path",
       description:
         "Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.",
-    },
-    namespace: {
-      type: "string",
-      nullable: true,
-      description:
-        "Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.",
     },
     "api-version": {
       type: "string",
@@ -72,6 +66,20 @@ export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
       },
       description: "License information for the generated client code.",
     },
+  },
+};
+
+export const SdkEmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    namespace: {
+      type: "string",
+      nullable: true,
+      description:
+        "Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.",
+    },
+    ...UnbrandedSdkEmitterOptionsSchema.properties!,
   },
 };
 

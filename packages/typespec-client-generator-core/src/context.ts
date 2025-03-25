@@ -38,12 +38,11 @@ export interface TCGCEmitterOptions extends SdkEmitterOptions {
   "emitter-name"?: string;
 }
 
-export interface SdkEmitterOptions {
+export interface UnbrandedSdkEmitterOptions {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
   "api-version"?: string;
   "examples-dir"?: string;
-  namespace?: string;
   license?: {
     name: string;
     company?: string;
@@ -51,6 +50,10 @@ export interface SdkEmitterOptions {
     header?: string;
     description?: string;
   };
+}
+
+export interface SdkEmitterOptions extends UnbrandedSdkEmitterOptions {
+  namespace?: string;
 }
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
