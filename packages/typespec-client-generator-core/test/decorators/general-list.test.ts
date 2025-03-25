@@ -338,7 +338,12 @@ describe("csharp only decorator", () => {
   it("@useSystemTextJsonConverter", async function () {
     runner = await createSdkTestRunner(
       {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter", "Azure\\.ClientGenerator\\.Core\\.@emptyStringAsNull"] },
+      {
+        additionalDecorators: [
+          "Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter",
+          "Azure\\.ClientGenerator\\.Core\\.@emptyStringAsNull",
+        ],
+      },
     );
 
     await runner.compileWithBuiltInService(`
@@ -354,20 +359,27 @@ describe("csharp only decorator", () => {
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].decorators.length, 2);
-    const decorator1 = models[0].decorators.find((d) => d.name === "Azure.ClientGenerator.Core.@useSystemTextJsonConverter");
-    const decorator2 = models[0].decorators.find((d) => d.name === "Azure.ClientGenerator.Core.@emptyStringAsNull");
+    const decorator1 = models[0].decorators.find(
+      (d) => d.name === "Azure.ClientGenerator.Core.@useSystemTextJsonConverter",
+    );
+    const decorator2 = models[0].decorators.find(
+      (d) => d.name === "Azure.ClientGenerator.Core.@emptyStringAsNull",
+    );
     ok(decorator1);
     ok(decorator2);
-    deepStrictEqual([decorator1, decorator2], [
-      {
-        name: "Azure.ClientGenerator.Core.@useSystemTextJsonConverter",
-        arguments: { scope: "csharp" },
-      },
-      {
-        name: "Azure.ClientGenerator.Core.@emptyStringAsNull",
-        arguments: { scope: "csharp" },
-      },
-    ]);
+    deepStrictEqual(
+      [decorator1, decorator2],
+      [
+        {
+          name: "Azure.ClientGenerator.Core.@useSystemTextJsonConverter",
+          arguments: { scope: "csharp" },
+        },
+        {
+          name: "Azure.ClientGenerator.Core.@emptyStringAsNull",
+          arguments: { scope: "csharp" },
+        },
+      ],
+    );
     expectDiagnostics(runner.context.diagnostics, []);
   });
 });
