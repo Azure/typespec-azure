@@ -209,7 +209,7 @@ function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
   if (method.operation.kind === "http") {
     diagnostics.pipe(handleHttpOperationExamples(method.operation, examples));
     if (method.operation.examples) {
-      context.__httpOperationExamples!.set(method.operation.__raw, method.operation.examples);
+      context.__httpOperationExamples.set(method.operation.__raw, method.operation.examples);
     }
   }
 

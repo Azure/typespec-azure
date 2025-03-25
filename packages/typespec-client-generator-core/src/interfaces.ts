@@ -17,7 +17,6 @@ import {
   PagingOperation,
   Program,
   Type,
-  Union,
 } from "@typespec/compiler";
 import {
   HttpAuth,
@@ -27,7 +26,6 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import { TspLiteralType } from "./internal-utils.js";
 
 // Types for TCGC lib
 
@@ -57,14 +55,14 @@ export interface TCGCContext {
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
-  __generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
+  __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
 

@@ -665,3 +665,38 @@ export function listRawSubClients(
   }
   return retval;
 }
+
+export function resolveDuplicateGenearatedName(
+  context: TCGCContext,
+  type: Union | Model | TspLiteralType,
+  createName: string,
+): string {
+  let duplicateCount = 1;
+  const rawCreateName = createName;
+  const generatedNames = [...context.__generatedNames.values()];
+  while (generatedNames.includes(createName)) {
+    createName = `${rawCreateName}${duplicateCount++}`;
+  }
+  context.__generatedNames.set(type, createName);
+  return createName;
+}
+
+export function resolveConflictGeneratedName(context: TCGCContext) {
+  const userDefinedNames = [...context.__referencedTypeCache.values()]
+    .filter((x) => !x.isGeneratedName)
+    .map((x) => x.name);
+  const generatedNames = [...context.__generatedNames.values()];
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
+      const rawName = sdkType.name;
+      let duplicateCount = 1;
+      let createName = `${rawName}${duplicateCount++}`;
+      while (userDefinedNames.includes(createName) || generatedNames.includes(createName)) {
+        createName = `${rawName}${duplicateCount++}`;
+      }
+      sdkType.name = createName;
+      context.__generatedNames.set(sdkType.__raw, createName);
+      generatedNames.push(createName);
+    }
+  }
+}
