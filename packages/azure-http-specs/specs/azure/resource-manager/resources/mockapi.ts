@@ -1,4 +1,4 @@
-import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { json, passOnSuccess, ScenarioMockApi, ValidationError } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -344,9 +344,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -376,9 +373,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -407,9 +401,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -441,9 +432,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuc
           description: "valid2",
         },
       }),
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
     response: {
       status: 200,
@@ -674,9 +662,6 @@ Scenarios.Azure_ResourceManager_Resources_LocationResources_update = passOnSucce
         description: "valid2",
       },
     }),
-    headers: {
-      "Content-Type": "application/json",
-    },
   },
   response: {
     status: 200,
@@ -790,9 +775,6 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
         description: "valid2",
       },
     }),
-    headers: {
-      "Content-Type": "application/merge-patch+json",
-    },
   },
   response: {
     status: 200,
@@ -805,6 +787,25 @@ Scenarios.Azure_ResourceManager_Resources_Singleton_update = passOnSuccess({
     }),
   },
   kind: "MockApiDefinition",
+  handler: (req) => {
+    if (req.body["properties"]["description"] !== "valid2") {
+      throw new ValidationError(
+        "Body should contain 'properties.description' property",
+        "valid2",
+        req.body,
+      );
+    }
+    return {
+      status: 200,
+      body: json({
+        ...validSingletonResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    };
+  },
 });
 
 Scenarios.Azure_ResourceManager_Resources_Singleton_listByResourceGroup = passOnSuccess({
@@ -910,14 +911,11 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_update = passOnSuccess({
     query: {
       "api-version": "2023-12-01-preview",
     },
-    body: json(
-      {
-        properties: {
-          description: "valid2",
-        },
+    body: json({
+      properties: {
+        description: "valid2",
       },
-      "application/merge-patch+json",
-    ),
+    }),
   },
   response: {
     status: 200,
@@ -930,6 +928,25 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_update = passOnSuccess({
     }),
   },
   kind: "MockApiDefinition",
+  handler: (req) => {
+    if (req.body["properties"]["description"] !== "valid2") {
+      throw new ValidationError(
+        "Body should contain 'properties.description' property",
+        "valid2",
+        req.body,
+      );
+    }
+    return {
+      status: 200,
+      body: json({
+        ...validTopLevelResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    };
+  },
 });
 
 Scenarios.Azure_ResourceManager_Resources_TopLevel_delete = passOnSuccess({
@@ -1045,14 +1062,11 @@ Scenarios.Azure_ResourceManager_Resources_Nested_update = passOnSuccess({
       nestedResourceName: "nested",
     },
     query: { "api-version": "2023-12-01-preview" },
-    body: json(
-      {
-        properties: {
-          description: "valid2",
-        },
+    body: json({
+      properties: {
+        description: "valid2",
       },
-      "application/merge-patch+json",
-    ),
+    }),
   },
   response: {
     status: 200,
