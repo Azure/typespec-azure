@@ -911,13 +911,11 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_update = passOnSuccess({
     query: {
       "api-version": "2023-12-01-preview",
     },
-    body: json(
-      {
-        properties: {
-          description: "valid2",
-        },
+    body: json({
+      properties: {
+        description: "valid2",
       },
-    ),
+    }),
   },
   response: {
     status: 200,
@@ -1064,13 +1062,11 @@ Scenarios.Azure_ResourceManager_Resources_Nested_update = passOnSuccess({
       nestedResourceName: "nested",
     },
     query: { "api-version": "2023-12-01-preview" },
-    body: json(
-      {
-        properties: {
-          description: "valid2",
-        },
+    body: json({
+      properties: {
+        description: "valid2",
       },
-    ),
+    }),
   },
   response: {
     status: 200,
