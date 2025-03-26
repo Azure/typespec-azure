@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.12
+
+### Bug Fixes
+
+- [#2440](https://github.com/Azure/typespec-azure/pull/2440) Fix mockapi for flattenProperties and ARM
+
+
 ## 0.1.0-alpha.11
 
 ### Features
