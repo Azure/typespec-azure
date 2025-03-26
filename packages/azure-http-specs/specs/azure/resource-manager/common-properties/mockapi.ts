@@ -116,6 +116,21 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSyste
       body: json(validSystemAssignedManagedIdentityResource),
     },
     kind: "MockApiDefinition",
+    handler: (req) => {
+      // .NET SDK would not send "properties" property, if it is empty.
+      // Hence here we only verify "identity" property.
+      if (!deepEquals(req.body["identity"], createExpectedIdentity)) {
+        throw new ValidationError(
+          "Body should contain 'identity' property",
+          createExpectedIdentity,
+          req.body,
+        );
+      }
+      return {
+        status: 200,
+        body: json(validSystemAssignedManagedIdentityResource),
+      };
+    },
   });
 
 Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserAssignedAndSystemAssigned =
