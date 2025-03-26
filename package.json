@@ -41,7 +41,7 @@
     "@chronus/chronus": "^1.0.0",
     "@chronus/github": "^1.0.0",
     "@eslint/js": "^9.23.0",
-    "@pnpm/find-workspace-packages": "^6.0.9",
+    "@pnpm/workspace.find-packages": "^1000.0.17",
     "@types/node": "~22.13.11",
     "@vitest/coverage-v8": "^3.0.9",
     "c8": "^10.1.3",
