@@ -917,7 +917,6 @@ Scenarios.Azure_ResourceManager_Resources_TopLevel_update = passOnSuccess({
           description: "valid2",
         },
       },
-      "application/json",
     ),
   },
   response: {
@@ -1071,7 +1070,6 @@ Scenarios.Azure_ResourceManager_Resources_Nested_update = passOnSuccess({
           description: "valid2",
         },
       },
-      "application/json",
     ),
   },
   response: {
