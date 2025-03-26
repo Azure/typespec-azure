@@ -150,6 +150,16 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
   if (tspBody) {
+    if (tspBody.bodyKind === "file") {
+      // file body is not supported yet
+      diagnostics.add(
+        createDiagnostic({
+          code: "unsupported-http-file-body",
+          target: tspBody,
+        }),
+      );
+      return diagnostics.wrap(retval);
+    }
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
