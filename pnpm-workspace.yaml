@@ -7,5 +7,3 @@ packages:
   - "!core/packages/http-client-csharp/**"
   - "!core/packages/http-client-java/**"
   - "!core/packages/http-client-python/**"
-  - "!core/packages/typespec-vs/**"
-  - "!core/packages/typespec-vscode/**"
