@@ -885,7 +885,7 @@ export const $override = (
 
   if (!parametersMatch) {
     reportDiagnostic(context.program, {
-      code: "override-method-parameters-mismatch",
+      code: "override-parameters-mismatch",
       target: context.decoratorTarget,
       format: {
         methodName: original.name,
@@ -893,7 +893,6 @@ export const $override = (
         overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
       },
     });
-    return;
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };

@@ -220,10 +220,9 @@ it("params mismatch", async () => {
 
     model ParamsCustomized {
       foo: string;
-      bar: string;
     }
 
-    op func(params: MyCustomizations.ParamsCustomized): void;
+    op func(...MyCustomizations.ParamsCustomized): void;
 
     @@override(MyService.func, MyCustomizations.func);
     `;
@@ -231,8 +230,25 @@ it("params mismatch", async () => {
     await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
   )[1];
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/override-method-parameters-mismatch",
+    code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
   });
+  const sdkPackage = runner.context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  strictEqual(client.methods.length, 1);
+  const method = client.methods[0];
+  strictEqual(method.kind, "basic");
+  strictEqual(method.name, "func");
+  strictEqual(method.parameters.length, 2);
+  ok(method.parameters.find((x) => x.name === "contentType"));
+  const fooParam = method.parameters.find((x) => x.name === "foo");
+  ok(fooParam);
+
+  const operation = method.operation;
+  ok(operation.bodyParam);
+  strictEqual(operation.bodyParam.type.kind, "model");
+  strictEqual(operation.bodyParam.type.properties.length, 2);
+  ok(operation.bodyParam.type.properties.find((x) => x.name === "foo"));
+  ok(operation.bodyParam.type.properties.find((x) => x.name === "bar"));
 });
 
 it("recursive params", async () => {
