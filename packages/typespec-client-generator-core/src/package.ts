@@ -7,7 +7,6 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDoc,
-  getNamespaceFullName,
   getPagingOperation,
   getSummary,
   isList,
@@ -19,7 +18,6 @@ import { getServers, HttpServer, isHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
-  getClientInitialization,
   getClientInitializationOptions,
   getClientNamespace,
   getOverriddenClientMethod,
@@ -40,7 +38,6 @@ import {
   SdkEndpointType,
   SdkEnumType,
   SdkHttpOperation,
-  SdkInitializationType,
   SdkLroPagingServiceMethod,
   SdkLroServiceFinalResponse,
   SdkLroServiceMetadata,
@@ -729,38 +726,6 @@ function getClientDefaultApiVersion(
     return context.apiVersion;
   }
   return getDefaultApiVersion(context, client.service)?.value;
-}
-
-function getSdkInitializationType(
-  context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
-): [SdkInitializationType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  let initializationModel = getClientInitialization(context, client.type); // eslint-disable-line @typescript-eslint/no-deprecated
-  const access = client.kind === "SdkClient" ? "public" : "internal";
-  if (initializationModel) {
-    initializationModel.access = access;
-  } else {
-    const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
-    const name = `${namePrefix.split(".").at(-1)}Options`;
-    initializationModel = {
-      __raw: client.service,
-      doc: "Initialization class for the client",
-      kind: "model",
-      properties: [],
-      name,
-      isGeneratedName: true,
-      access,
-      usage: UsageFlags.Input,
-      crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-      namespace: getClientNamespace(context, client.type),
-      apiVersions: context.getApiVersionsForType(client.type),
-      decorators: [],
-      serializationOptions: {},
-    };
-  }
-
-  return diagnostics.wrap(initializationModel);
 }
 
 function createSdkClientInitializationType(
