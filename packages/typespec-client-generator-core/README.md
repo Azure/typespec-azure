@@ -524,7 +524,7 @@ op test: void;
 
 #### `@emptyStringAsNull`
 
-Whether a model needs to treat empty string as null, this is only used for backward compatibility for csharp.
+Whether a model needs to treat empty string as null.
 
 ```typespec
 @Azure.ClientGenerator.Core.emptyStringAsNull(scope?: valueof string)
