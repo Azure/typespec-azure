@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-add `@emptyStringAsNull` decorator
+add `@deserializeEmptyStringAsNull` decorator

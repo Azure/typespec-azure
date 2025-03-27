@@ -407,7 +407,7 @@ op test: void;
 
 ### `@deserializeEmptyStringAsNull` {#@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull}
 
-Determine whether a model property of type string or a Scalar type extended from string need to be deserialized as null when its value is "" (empty string).
+Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
 
 ```typespec
 @Azure.ClientGenerator.Core.deserializeEmptyStringAsNull(scope?: valueof string)

@@ -10,7 +10,7 @@ beforeEach(async () => {
 });
 
 describe("deserialized empty string as null", () => {
-  it("should add decorator on model property of type string or Scalar type extended from string", async function () {
+  it("Apply the decorator to model properties of type 'string' and a Scalar type derived from 'string'", async function () {
     runner = await createSdkTestRunner(
       {},
       { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
@@ -43,7 +43,7 @@ describe("deserialized empty string as null", () => {
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
-  it("does not support model property of none string primitive type", async function () {
+  it("should not allow the decorator on model properties of non-string primitive types", async function () {
     runner = await createSdkTestRunner(
       {},
       { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
@@ -61,7 +61,7 @@ describe("deserialized empty string as null", () => {
     });
   });
 
-  it("does not support model property of none string extended Scalar type", async function () {
+  it("should not support the decorator on model properties of non-string extended Scalar types", async function () {
     runner = await createSdkTestRunner(
       {},
       { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },

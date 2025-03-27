@@ -610,7 +610,7 @@ extern dec scope(target: Operation, scope?: valueof string);
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
 
 /**
- * Determine whether a model property of type string or a Scalar type extended from string need to be deserialized as null when its value is "" (empty string).
+ * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
