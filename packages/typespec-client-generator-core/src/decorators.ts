@@ -1267,9 +1267,8 @@ export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorato
     return;
   }
 
-  const scalarType = target.type as Scalar;
-
   if (target.type.name !== "string") {
+    const scalarType = target.type as Scalar;
     if (scalarType.baseScalar === undefined || scalarType.baseScalar.name !== "string") {
       reportDiagnostic(context.program, {
         code: "invalid-deserializeEmptyStringAsNull-target-type",
