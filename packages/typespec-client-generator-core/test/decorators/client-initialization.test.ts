@@ -32,7 +32,6 @@ it("change client initialization", async () => {
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 2);
-  strictEqual(client.clientInitialization.parameters.length, 2);
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
   ok(endpoint);
   strictEqual(
@@ -86,7 +85,6 @@ it("backward compatibility", async () => {
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
-  strictEqual(client.clientInitialization.parameters.length, 2);
   strictEqual(client.clientInitialization.parameters.length, 2);
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
   ok(endpoint);
@@ -198,7 +196,6 @@ it("subclient", async () => {
   strictEqual(client.name, "StorageClient");
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 2);
-  strictEqual(client.clientInitialization.parameters.length, 2);
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
   ok(endpoint);
   strictEqual(
@@ -226,7 +223,6 @@ it("subclient", async () => {
   strictEqual(blobClient.kind, "client");
   strictEqual(blobClient.name, "BlobClient");
   strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
-  strictEqual(blobClient.clientInitialization.parameters.length, 2);
   strictEqual(blobClient.clientInitialization.parameters.length, 2);
 
   const blobClientEndpoint = blobClient.clientInitialization.parameters.find(
@@ -285,7 +281,6 @@ it("some methods don't have client initialization params", async () => {
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
-  strictEqual(client.clientInitialization.parameters.length, 2);
   strictEqual(client.clientInitialization.parameters.length, 2);
 
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
@@ -353,7 +348,6 @@ it("multiple client params", async () => {
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
-  strictEqual(client.clientInitialization.parameters.length, 3);
   strictEqual(client.clientInitialization.parameters.length, 3);
 
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
@@ -429,7 +423,6 @@ it("@operationGroup with same model on parent client", async () => {
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 3);
-  strictEqual(client.clientInitialization.parameters.length, 3);
 
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
   ok(endpoint);
@@ -464,7 +457,6 @@ it("@operationGroup with same model on parent client", async () => {
   strictEqual(og.kind, "client");
 
   strictEqual(og.clientInitialization.initializedBy, InitializedByFlags.Parent);
-  strictEqual(og.clientInitialization.parameters.length, 3);
   strictEqual(og.clientInitialization.parameters.length, 3);
 
   ok(og.clientInitialization.parameters.find((x) => x.kind === "endpoint"));
@@ -529,7 +521,6 @@ it("redefine client structure", async () => {
   ok(containerClient);
   strictEqual(containerClient.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(containerClient.clientInitialization.parameters.length, 2);
-  strictEqual(containerClient.clientInitialization.parameters.length, 2);
 
   const endpoint = containerClient.clientInitialization.parameters.find(
     (x) => x.kind === "endpoint",
@@ -560,7 +551,6 @@ it("redefine client structure", async () => {
   const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
   ok(blobClient);
   strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Individually);
-  strictEqual(blobClient.clientInitialization.parameters.length, 3);
   strictEqual(blobClient.clientInitialization.parameters.length, 3);
 
   const endpointOnBlobClient = blobClient.clientInitialization.parameters.find(
@@ -625,7 +615,6 @@ it("@paramAlias", async () => {
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 2);
-  strictEqual(client.clientInitialization.parameters.length, 2);
 
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
   ok(endpoint);
@@ -688,12 +677,12 @@ it("sub client initialized individually", async () => {
         op op1(@path p1: string, @query q1: string): void;
 
         @route("/op2")
-          @doc("bump parameter")
-          @post
-          @convenientAPI(true)
-          op op2(@path p1: string): void;
-      }
-      `,
+        @doc("bump parameter")
+        @post
+        @convenientAPI(true)
+        op op2(@path p1: string): void;
+    }
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
