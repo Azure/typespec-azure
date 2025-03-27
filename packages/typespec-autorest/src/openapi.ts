@@ -1208,10 +1208,15 @@ export async function getOpenAPIForService(
             items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
           };
         }
+        let description;
+        if (part.property) {
+          description = getDoc(program, part.property);
+        }
         currentEndpoint.parameters.push({
           name: partName,
           in: "formData",
           required: !part.optional,
+          ...(description ? { description } : {}),
           ...schema,
         });
       }
