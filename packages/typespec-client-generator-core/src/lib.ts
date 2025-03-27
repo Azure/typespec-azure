@@ -205,7 +205,7 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
-    "override-method-parameters-mismatch": {
+    "override-parameters-mismatch": {
       severity: "error",
       messages: {
         default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
