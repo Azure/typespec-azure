@@ -1153,15 +1153,23 @@ export async function getOpenAPIForService(
         emitMultipartBodyParameters(body, visibility);
         break;
       case "file":
-        currentEndpoint.parameters.push({
-          name: "body",
-          in: "body",
-          schema: {
-            type: "string",
-            format: "binary",
-          },
-          required: true,
-        });
+        const bodySchema = { type: "string", format: "binary" };
+        const { property } = body;
+        if (property) {
+          emitParameter(property, () =>
+            getOpenAPI2BodyParameter(property, property.name, bodySchema),
+          );
+        } else {
+          currentEndpoint.parameters.push({
+            name: "body",
+            in: "body",
+            schema: {
+              type: "string",
+              format: "binary",
+            },
+            required: true,
+          });
+        }
         break;
     }
   }
