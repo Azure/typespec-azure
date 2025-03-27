@@ -59,7 +59,7 @@ it("path basic", async () => {
   strictEqual(pathParam.onClient, false);
   strictEqual(pathParam.isApiVersionParam, false);
   strictEqual(pathParam.type.kind, "string");
-  strictEqual(pathParam.urlEncode, true);
+  strictEqual(pathParam.allowReserved, false);
   strictEqual(method.response.kind, "method");
   strictEqual(method.response.type, undefined);
 
@@ -123,7 +123,7 @@ it("path defined in model", async () => {
   strictEqual(pathParam.onClient, false);
   strictEqual(pathParam.isApiVersionParam, false);
   strictEqual(pathParam.type.kind, "string");
-  strictEqual(pathParam.urlEncode, true);
+  strictEqual(pathParam.allowReserved, false);
   strictEqual(pathParam.correspondingMethodParams.length, 1);
   deepStrictEqual(pathParam.correspondingMethodParams[0], pathMethod);
 });

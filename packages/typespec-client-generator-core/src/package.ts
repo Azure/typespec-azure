@@ -55,7 +55,6 @@ import {
   SdkOperationGroup,
   SdkPackage,
   SdkPagingServiceMethod,
-  SdkParameter,
   SdkPathParameter,
   SdkServiceMethod,
   SdkServiceOperation,
@@ -875,7 +874,6 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     );
   }
   for (const operationGroup of listOperationGroups(context, client)) {
-    // We create a client accessor for each operation group
     const operationGroupClient = diagnostics.pipe(
       createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
     );
@@ -884,26 +882,6 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     } else {
       sdkClientType.children = [operationGroupClient];
     }
-    const clientInitialization = getClientInitialization(context, operationGroup.type); // eslint-disable-line @typescript-eslint/no-deprecated
-    const parameters: SdkParameter[] = [];
-    if (clientInitialization) {
-      for (const property of clientInitialization.properties) {
-        parameters.push(property);
-      }
-    }
-    const name = `get${operationGroup.type.name}`;
-    retval.push({
-      kind: "clientaccessor",
-      parameters,
-      name,
-      doc: getDoc(context.program, operationGroup.type),
-      summary: getSummary(context.program, operationGroup.type),
-      access: "internal",
-      response: operationGroupClient,
-      apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operationGroup.type)}.${name}`,
-      decorators: [],
-    });
   }
   return diagnostics.wrap(retval);
 }
@@ -927,7 +905,6 @@ function getEndpointTypeFromSingleServer<
         doc: "Service host",
         kind: "path",
         onClient: true,
-        urlEncode: false,
         explode: false,
         style: "simple",
         allowReserved: false,
@@ -1061,7 +1038,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     methods: [],
     apiVersions: context.getApiVersionsForType(client.type),
     namespace: getClientNamespace(context, client.type),
-    initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
@@ -1075,7 +1051,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
 
-  sdkClientType.initialization.properties = [...sdkClientType.clientInitialization.parameters]; // eslint-disable-line @typescript-eslint/no-deprecated
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -1184,10 +1159,9 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   while (clients.length > 0) {
     const client = clients.shift()!;
     getSdkNamespace(sdkPackage, client.namespace).clients.push(client);
-    client.methods
-      .filter((m) => m.kind === "clientaccessor")
-      .map((m) => m.response)
-      .map((c) => clients.push(c));
+    if (client.children && client.children.length > 0) {
+      clients.push(...client.children);
+    }
   }
   for (const model of sdkPackage.models) {
     getSdkNamespace(sdkPackage, model.namespace).models.push(model);

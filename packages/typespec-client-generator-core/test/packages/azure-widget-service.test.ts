@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { SdkClientType, SdkHeaderParameter, SdkHttpOperation } from "../../src/interfaces.js";
+import { InitializedByFlags, SdkHeaderParameter } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
@@ -210,7 +210,9 @@ it("getWidget", async () => {
     `,
   );
   const sdkPackage = runnerWithCore.context.sdkPackage;
-  const parentClient = sdkPackage.clients.filter((c) => c.initialization.access === "public")[0];
+  const parentClient = sdkPackage.clients.filter(
+    (c) => c.clientInitialization.initializedBy & InitializedByFlags.Individually,
+  )[0];
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(parentClient.name, "WidgetManagerClient");
   strictEqual(method.name, "getWidget");
@@ -245,12 +247,11 @@ it("getWidget", async () => {
   strictEqual(queryParam.onClient, true);
   strictEqual(
     queryParam.correspondingMethodParams[0],
-    parentClient.initialization.properties.find((x) => x.isApiVersionParam),
+    parentClient.clientInitialization.parameters.find((x) => x.isApiVersionParam),
   );
-  ok(parentClient.initialization);
   strictEqual(
     queryParam.correspondingMethodParams[0],
-    parentClient.initialization.properties.find((x) => x.isApiVersionParam),
+    parentClient.clientInitialization.parameters.find((x) => x.isApiVersionParam),
   );
 
   const methodAcceptParam = method.parameters.find((x) => x.name === "accept");
@@ -295,8 +296,7 @@ it("poll widget", async () => {
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const parentClient = sdkPackage.clients[0];
-  const client = parentClient.methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = parentClient.children?.[0];
   ok(client);
   strictEqual(client.methods.length, 2);
 
@@ -361,10 +361,9 @@ it("poll widget", async () => {
   strictEqual(apiVersionParam.serializedName, "api-version");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
-  ok(parentClient.initialization);
   strictEqual(
     apiVersionParam.correspondingMethodParams[0],
-    parentClient.initialization.properties.find((x) => x.isApiVersionParam),
+    parentClient.clientInitialization.parameters.find((x) => x.isApiVersionParam),
   );
 
   const operationAcceptParam = getStatus.operation.parameters.find((x) => x.kind === "header");
@@ -511,17 +510,16 @@ it("paging", async () => {
     (x) => !isAzureCoreModel(x) && x.name === "Manufacturer",
   );
   ok(manufacturerModel);
-  const widgetClient = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const widgetClient = sdkPackage.clients[0].children?.[0];
   ok(widgetClient);
 
-  strictEqual(widgetClient.initialization.properties.length, 3);
-  const apiVersionClientParam = widgetClient.initialization.properties.find(
+  strictEqual(widgetClient.clientInitialization.parameters.length, 3);
+  const apiVersionClientParam = widgetClient.clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionClientParam);
 
-  strictEqual(widgetClient.initialization.access, "internal");
+  strictEqual(widgetClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
   strictEqual(widgetClient.methods.length, 1);
   const listManufacturers = widgetClient.methods[0];
 
@@ -604,7 +602,9 @@ it("getWidgetAnalytics", async () => {
     `,
   );
   const sdkPackage = runnerWithCore.context.sdkPackage;
-  const parentClient = sdkPackage.clients.filter((c) => c.initialization.access === "public")[0];
+  const parentClient = sdkPackage.clients.filter(
+    (c) => c.clientInitialization.initializedBy & InitializedByFlags.Individually,
+  )[0];
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(parentClient.name, "WidgetManagerClient");
   strictEqual(method.name, "getWidgetAnalytics");

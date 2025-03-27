@@ -1,12 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, it } from "vitest";
-import {
-  SdkBodyModelPropertyType,
-  SdkClientType,
-  SdkHttpOperation,
-  UsageFlags,
-} from "../../src/interfaces.js";
+import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
@@ -270,9 +265,8 @@ it("expands model into formData parameters", async function () {
       upload(...WidgetForm): Widget;
     }
   `);
-  const client = runner.context.sdkPackage.clients[0].methods.find(
-    (x) => x.kind === "clientaccessor",
-  )?.response as SdkClientType<SdkHttpOperation>;
+  const client = runner.context.sdkPackage.clients[0].children?.[0];
+  ok(client);
   const formDataMethod = client.methods[0];
   strictEqual(formDataMethod.kind, "basic");
   strictEqual(formDataMethod.name, "upload");

@@ -5,12 +5,10 @@ import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import {
-  SdkClientType,
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,
   SdkEndpointType,
-  SdkHttpOperation,
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -63,6 +61,7 @@ it("name", async () => {
   strictEqual(sdkPackage.clients[0].kind, "client");
   strictEqual(sdkPackage.clients[0].parent, undefined);
 });
+
 it("initialization default endpoint no credential", async () => {
   await runner.compile(`
         @server("http://localhost:3000", "endpoint")
@@ -88,7 +87,7 @@ it("initialization default endpoint no credential", async () => {
   strictEqual(templateArg.kind, "path");
   strictEqual(templateArg.name, "endpoint");
   strictEqual(templateArg.serializedName, "endpoint");
-  strictEqual(templateArg.urlEncode, false);
+  strictEqual(templateArg.allowReserved, false);
   strictEqual(templateArg.type.kind, "string");
   strictEqual(templateArg.optional, false);
   strictEqual(templateArg.onClient, true);
@@ -278,7 +277,7 @@ it("initialization one server parameter with apikey auth", async () => {
   const templateArg = endpointParam.type.templateArguments[0];
   strictEqual(templateArg.kind, "path");
   strictEqual(templateArg.name, "endpointInput");
-  strictEqual(templateArg.urlEncode, false);
+  strictEqual(templateArg.allowReserved, false);
   strictEqual(templateArg.optional, false);
   strictEqual(templateArg.onClient, true);
   strictEqual(templateArg.clientDefaultValue, undefined);
@@ -365,7 +364,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
 
   const apiVersionParam = templatedEndpoint.templateArguments[1];
   strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-  strictEqual(apiVersionParam.urlEncode, true);
+  strictEqual(apiVersionParam.allowReserved, false);
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
@@ -793,12 +792,12 @@ it("client level signatures by default", async () => {
   `);
 
   const sdkPackage = runnerWithArm.context.sdkPackage;
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
-  for (const p of client.initialization.properties) {
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
+  for (const p of client.clientInitialization.parameters) {
     ok(p.onClient);
   }
-  deepStrictEqual(client.initialization.properties.map((x) => x.name).sort(), [
+  deepStrictEqual(client.clientInitialization.parameters.map((x) => x.name).sort(), [
     "apiVersion",
     "credential",
     "endpoint",
