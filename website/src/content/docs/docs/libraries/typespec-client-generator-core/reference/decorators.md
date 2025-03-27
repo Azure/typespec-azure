@@ -430,10 +430,10 @@ Indicates that a model property of type `string` or a `Scalar` type derived from
 model MyModel {
   scalar stringlike extends string;
 
-  @deserializeScalarStringAsNull
+  @deserializeEmptyStringAsNull
   prop: string;
 
-  @deserializeScalarStringAsNull
+  @deserializeEmptyStringAsNull
   prop: stringlike;
 }
 ```

@@ -620,10 +620,10 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  * model MyModel {
  *   scalar stringlike extends string;
  *
- *   @deserializeScalarStringAsNull
+ *   @deserializeEmptyStringAsNull
  *   prop: string;
  *
- *   @deserializeScalarStringAsNull
+ *   @deserializeEmptyStringAsNull
  *   prop: stringlike;
  * }
  * ```
