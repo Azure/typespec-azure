@@ -1032,6 +1032,23 @@ A scalar type representing a next link that requires formatting with parameters 
 scalar Azure.Core.Legacy.parameterizedNextLink
 ```
 
+#### Examples
+
+```typespec
+model ListCertificateOptions {
+  includePending?: string;
+}
+model Certificate {
+  name: string;
+}
+model Page {
+  @items items: Certificate[];
+  @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
+    ListCertificateOptions.includePending
+  ]>;
+}
+```
+
 ## Azure.Core.Traits
 
 ### `ListQueryParametersTrait` {#Azure.Core.Traits.ListQueryParametersTrait}

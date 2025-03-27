@@ -454,7 +454,6 @@ export async function getOpenAPIForService(
             explode: false,
             style: "simple",
             name: prop.name,
-            type: "path",
           },
         },
         {
