@@ -878,10 +878,24 @@ export const $override = (
     a.name.localeCompare(b.name),
   );
 
-  // Check if the sorted parameter names arrays are equal
-  const parametersMatch =
-    originalParams.length === overrideParams.length &&
-    originalParams.every((value, index) => compareModelProperties(value, overrideParams[index]));
+  // Check if the sorted parameter names arrays are equal, omit optional parameters
+  let parametersMatch = true;
+  let index = 0;
+  for (const originalParam of originalParams) {
+    if (index > overrideParams.length - 1) {
+      parametersMatch = false;
+      break;
+    }
+    if (!compareModelProperties(originalParam, overrideParams[index])) {
+      if (!originalParam.optional) {
+        parametersMatch = false;
+        break;
+      } else {
+        continue;
+      }
+    }
+    index++;
+  }
 
   if (!parametersMatch) {
     reportDiagnostic(context.program, {

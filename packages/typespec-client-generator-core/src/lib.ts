@@ -206,7 +206,7 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "override-parameters-mismatch": {
-      severity: "warning",
+      severity: "error",
       messages: {
         default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
       },
