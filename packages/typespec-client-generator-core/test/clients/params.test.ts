@@ -364,7 +364,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
 
   const apiVersionParam = templatedEndpoint.templateArguments[1];
   strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-  strictEqual(apiVersionParam.allowReserved, false);
+  strictEqual(apiVersionParam.allowReserved, true);
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
