@@ -2,6 +2,7 @@ import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core
 import {
   createDiagnosticCollector,
   Diagnostic,
+  DiagnosticCollector,
   getDoc,
   getNamespaceFullName,
   getPagingOperation,
@@ -1177,10 +1178,11 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
+  
   const sdkPackage: SdkPackage<TServiceOperation> = {
     name: getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]) || "",
     rootNamespace: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
-    clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
+    clients: getClients(context, diagnostics),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
     unions: allReferencedTypes.filter(
@@ -1191,6 +1193,37 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);
+}
+
+// filter out clients with no methods
+// and flatten the child clients to the root
+function getClients<TServiceOperation extends SdkServiceOperation>
+(context: TCGCContext, diagnostics: DiagnosticCollector)
+: SdkClientType<TServiceOperation>[] {
+  var listedClients: SdkClient[] = listClients(context);
+  let clients: SdkClientType<TServiceOperation>[] = listedClients.map((c) => diagnostics.pipe(createSdkClientType(context, c)));
+  let result: SdkClientType<TServiceOperation>[] = [];
+  for (const client of clients) {
+    skipEmptyClientAndFlattenSubClients(client, result);
+  }
+  return result;
+}
+
+function skipEmptyClientAndFlattenSubClients<TServiceOperation extends SdkServiceOperation>
+(client: SdkClientType<TServiceOperation>, clients: SdkClientType<TServiceOperation>[]) {
+  if (client.children) {
+    if (client.methods.filter(m => m.kind !== "clientaccessor").length === 0) {
+      // if the client only contains methods to get the sub-clients, 
+      // skip the client and flatten the sub-clients
+      for (const child of client.children) {
+        skipEmptyClientAndFlattenSubClients(child, clients);
+      }
+    }
+  }
+  // skip the client if it has no methods
+  else if (client.methods.length > 0) {
+    clients.push(client);
+  }
 }
 
 function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
