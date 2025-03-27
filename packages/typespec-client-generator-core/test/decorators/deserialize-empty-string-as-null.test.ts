@@ -43,7 +43,25 @@ describe("deserialized empty string as null", () => {
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
-  it("should not allow the decorator on model properties of non-string primitive types", async function () {
+  it("should not allow the decorator on none model property target", async function () {
+    runner = await createSdkTestRunner(
+      {},
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
+    );
+
+    const diagnostics = await runner.diagnose(`
+        @deserializeEmptyStringAsNull
+        model A {
+          prop1: string[];
+        }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "decorator-wrong-target",
+    });
+  });
+
+  it("should not allow the decorator on model properties of non-scalar type", async function () {
     runner = await createSdkTestRunner(
       {},
       { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
@@ -52,7 +70,7 @@ describe("deserialized empty string as null", () => {
     const diagnostics = await runner.diagnose(`
         model A {
           @deserializeEmptyStringAsNull
-          prop1: int64;
+          prop1: string[];
         }
     `);
 
@@ -61,7 +79,25 @@ describe("deserialized empty string as null", () => {
     });
   });
 
-  it("should not support the decorator on model properties of non-string extended Scalar types", async function () {
+  it("should not allow the decorator on model properties of non-string primitive type", async function () {
+    runner = await createSdkTestRunner(
+      {},
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
+    );
+
+    const diagnostics = await runner.diagnose(`
+        model A {
+          @deserializeEmptyStringAsNull
+          prop1: int32;
+        }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-deserializeEmptyStringAsNull-target-type",
+    });
+  });
+
+  it("should not allow the decorator on model properties of non-string extended Scalar type", async function () {
     runner = await createSdkTestRunner(
       {},
       { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },

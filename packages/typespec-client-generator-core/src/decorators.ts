@@ -1258,10 +1258,7 @@ export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorato
   target: ModelProperty,
   scope?: LanguageScopes,
 ) => {
-  if (
-    target.kind !== "ModelProperty" ||
-    (target.type.kind !== "Scalar" && target.type.kind !== "String")
-  ) {
+  if (target.kind !== "ModelProperty" || target.type.kind !== "Scalar") {
     reportDiagnostic(context.program, {
       code: "invalid-deserializeEmptyStringAsNull-target-type",
       format: {},
@@ -1270,10 +1267,10 @@ export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorato
     return;
   }
 
-  if (target.type.kind === "Scalar") {
-    const scalarType = target.type as Scalar;
+  const scalarType = target.type as Scalar;
 
-    if (scalarType.baseScalar !== undefined && scalarType.baseScalar.name !== "string") {
+  if (target.type.name !== "string") {
+    if (scalarType.baseScalar === undefined || scalarType.baseScalar.name !== "string") {
       reportDiagnostic(context.program, {
         code: "invalid-deserializeEmptyStringAsNull-target-type",
         format: {},
