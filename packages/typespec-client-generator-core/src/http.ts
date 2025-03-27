@@ -748,7 +748,11 @@ function getCollectionFormat(
       getHeaderFieldOptions(program, type).explode,
     );
   } else if (isQueryParam(program, type)) {
-    return getFormatFromExplodeOrEncode(context, type, getQueryParamOptions(program, type).explode);
+    return getFormatFromExplodeOrEncode(
+      context,
+      type,
+      getQueryParamOptions(program, type)?.explode,
+    );
   }
   return diagnostics.wrap(undefined);
 }

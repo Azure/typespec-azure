@@ -6,7 +6,7 @@ function createMockApiDefinitions(route: string, request: any, response: any): M
     uri: `/azure/client-generator-core/flatten-property/${route}`,
     method: "put",
     request: {
-      body: request,
+      body: json(request),
     },
     response: {
       status: 200,

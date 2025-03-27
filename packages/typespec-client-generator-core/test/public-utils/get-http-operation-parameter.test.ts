@@ -284,21 +284,20 @@ it("multipart case", async () => {
   await runner.compileWithBuiltInService(`
     @route("upload/{name}")
     @post
-    #suppress "deprecated" "For test"
     op uploadFile(
       @path name: string,
       @header contentType: "multipart/form-data",
-      file_data: bytes,
-
-      @visibility(Lifecycle.Read) readOnly: string,
-
-      constant: "constant",
+      @multipartBody body: {
+        file_data: HttpPart<bytes>,
+        @visibility(Lifecycle.Read) readOnly: HttpPart<string>,
+        constant: HttpPart<"constant">,
+      },
     ): OkResponse;
   `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
-  strictEqual(parameters.length, 5);
+  strictEqual(parameters.length, 3);
 
   for (const param of parameters) {
     if (param.name === "name") {
@@ -311,19 +310,11 @@ it("multipart case", async () => {
       ok(httpParam);
       strictEqual(httpParam.kind, "header");
       strictEqual(httpParam.serializedName, "content-type");
-    } else if (param.name === "file_data") {
+    } else if (param.name === "body") {
       const httpParam = getHttpOperationParameter(method, param);
       ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "file_data");
-    } else if (param.name === "readOnly") {
-      const httpParam = getHttpOperationParameter(method, param);
-      ok(!httpParam);
-    } else if (param.name === "constant") {
-      const httpParam = getHttpOperationParameter(method, param);
-      ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "constant");
+      strictEqual(httpParam.kind, "body");
+      strictEqual(httpParam.name, "body");
     }
   }
 });

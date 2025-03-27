@@ -203,7 +203,7 @@ export async function createSdkTestRunner(
       .filter((x) => x !== StandardTestLibrary)
       .map((x) => x.name)
       .map((x) => `import "${x}";`),
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
+    ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
 
   const clientAutoCode = [
@@ -212,7 +212,7 @@ export async function createSdkTestRunner(
       .map((x) => x.name)
       .map((x) => `import "${x}";`),
     `import "./main.tsp";`,
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
+    ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
 
   // compile with client.tsp

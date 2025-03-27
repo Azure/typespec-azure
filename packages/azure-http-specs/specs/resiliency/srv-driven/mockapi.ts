@@ -48,7 +48,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromNone = passOnSuccess([
     uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v2/add-optional-param/from-none`,
     method: "head",
     request: {
-      params: {
+      query: {
         "new-parameter": "new",
       },
     },
@@ -64,7 +64,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
     uri: `${commonBase}/client[:]v1/service[:]v1/api-version[:]v1/add-optional-param/from-one-required`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "required",
       },
     },
@@ -77,7 +77,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
     uri: `${commonBase}/client[:]v1/service[:]v2/api-version[:]v1/add-optional-param/from-one-required`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "required",
       },
     },
@@ -90,7 +90,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
     uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v1/add-optional-param/from-one-required`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "required",
       },
     },
@@ -116,7 +116,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
     uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v2/add-optional-param/from-one-required`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "required",
         "new-parameter": "new",
       },
@@ -133,7 +133,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
     uri: `${commonBase}/client[:]v1/service[:]v1/api-version[:]v1/add-optional-param/from-one-optional`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "optional",
       },
     },
@@ -146,7 +146,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
     uri: `${commonBase}/client[:]v1/service[:]v2/api-version[:]v1/add-optional-param/from-one-optional`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "optional",
       },
     },
@@ -159,7 +159,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
     uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v1/add-optional-param/from-one-optional`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "optional",
       },
     },
@@ -185,7 +185,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
     uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v2/add-optional-param/from-one-optional`,
     method: "get",
     request: {
-      params: {
+      query: {
         parameter: "optional",
         "new-parameter": "new",
       },

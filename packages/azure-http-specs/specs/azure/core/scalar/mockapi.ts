@@ -15,10 +15,7 @@ Scenarios.Azure_Core_Scalar_AzureLocationScalar_put = passOnSuccess({
   uri: "/azure/core/scalar/azureLocation",
   method: "put",
   request: {
-    body: "eastus",
-    headers: {
-      "Content-Type": "text/plain",
-    },
+    body: json("eastus"),
   },
   response: { status: 204 },
   kind: "MockApiDefinition",
@@ -28,7 +25,7 @@ const azureLocation = { location: "eastus" };
 Scenarios.Azure_Core_Scalar_AzureLocationScalar_post = passOnSuccess({
   uri: "/azure/core/scalar/azureLocation",
   method: "post",
-  request: { body: azureLocation },
+  request: { body: json(azureLocation) },
   response: { status: 200, body: json(azureLocation) },
   kind: "MockApiDefinition",
 });
@@ -49,7 +46,7 @@ Scenarios.Azure_Core_Scalar_AzureLocationScalar_query = passOnSuccess({
   uri: "/azure/core/scalar/azureLocation/query",
   method: "post",
   request: {
-    params: {
+    query: {
       region: "eastus",
     },
   },
