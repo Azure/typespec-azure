@@ -155,7 +155,7 @@ function getSdkHttpParameters(
       diagnostics.add(
         createDiagnostic({
           code: "unsupported-http-file-body",
-          target: tspBody,
+          target: tspBody.property ?? tspBody.type,
         }),
       );
       return diagnostics.wrap(retval);
