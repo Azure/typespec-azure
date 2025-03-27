@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import { it } from "vitest";
+import { expect, it } from "vitest";
 import { openApiFor } from "./test-host.js";
 
 it("model properties are spread into individual parameters", async () => {
@@ -79,6 +79,16 @@ it("part of type `string` produce `type: string`", async () => {
       type: "string",
     },
   ]);
+});
+
+it("doc of property is carried to the description field", async () => {
+  const res = await openApiFor(
+    `
+  op upload(@header contentType: "multipart/form-data", @multipartBody _: { /** My doc */ name: HttpPart<string> }): void;
+  `,
+  );
+  const param = res.paths["/"].post.parameters[0];
+  expect(param.description).toEqual("My doc");
 });
 
 // https://github.com/Azure/typespec-azure/issues/3860
