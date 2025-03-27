@@ -609,21 +609,27 @@ export type ApiVersionDecorator = (
 ) => void;
 
 /**
- * Whether a model needs to treat empty string as null.
+ * Determine whether a model property of type string or a Scalar type extended from string need to be deserialized as null when its value is "" (empty string).
  *
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
  * ```typespec
- * @emptyStringAsNull
+ *
  * model MyModel {
+ *   scalar stringlike extends string;
+ *
+ *   @deserializeScalarStringAsNull
  *   prop: string;
+ *
+ *   @deserializeScalarStringAsNull
+ *   prop: stringlike;
  * }
  * ```
  */
-export type EmptyStringAsNullDecorator = (
+export type DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,
-  target: Model,
+  target: ModelProperty,
   scope?: string,
 ) => void;
 
@@ -644,5 +650,5 @@ export type AzureClientGeneratorCoreDecorators = {
   alternateType: AlternateTypeDecorator;
   scope: ScopeDecorator;
   apiVersion: ApiVersionDecorator;
-  emptyStringAsNull: EmptyStringAsNullDecorator;
+  deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator;
 };

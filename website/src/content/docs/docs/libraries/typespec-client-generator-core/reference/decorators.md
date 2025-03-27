@@ -405,17 +405,17 @@ Whether you want to generate an operation as a convenient operation.
 op test: void;
 ```
 
-### `@emptyStringAsNull` {#@Azure.ClientGenerator.Core.emptyStringAsNull}
+### `@deserializeEmptyStringAsNull` {#@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull}
 
-Whether a model needs to treat empty string as null.
+Determine whether a model property of type string or a Scalar type extended from string need to be deserialized as null when its value is "" (empty string).
 
 ```typespec
-@Azure.ClientGenerator.Core.emptyStringAsNull(scope?: valueof string)
+@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull(scope?: valueof string)
 ```
 
 #### Target
 
-`Model`
+`ModelProperty`
 
 #### Parameters
 
@@ -426,9 +426,15 @@ Whether a model needs to treat empty string as null.
 #### Examples
 
 ```typespec
-@emptyStringAsNull
+
 model MyModel {
+  scalar stringlike extends string;
+
+  @deserializeScalarStringAsNull
   prop: string;
+
+  @deserializeScalarStringAsNull
+  prop: stringlike;
 }
 ```
 

@@ -360,30 +360,4 @@ describe("csharp only decorator", () => {
     ]);
     expectDiagnostics(runner.context.diagnostics, []);
   });
-
-  it("@emptyStringAsNull", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@emptyStringAsNull"] },
-    );
-
-    await runner.compileWithBuiltInService(`
-        @emptyStringAsNull("csharp")
-        model A {
-          id: string;
-        }
-
-        op test(): A;
-      `);
-
-    const models = runner.context.sdkPackage.models;
-    strictEqual(models.length, 1);
-    deepStrictEqual(models[0].decorators, [
-      {
-        name: "Azure.ClientGenerator.Core.@emptyStringAsNull",
-        arguments: { scope: "csharp" },
-      },
-    ]);
-    expectDiagnostics(runner.context.diagnostics, []);
-  });
 });

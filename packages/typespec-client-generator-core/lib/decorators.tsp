@@ -610,16 +610,22 @@ extern dec scope(target: Operation, scope?: valueof string);
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
 
 /**
- * Whether a model needs to treat empty string as null.
+ * Determine whether a model property of type string or a Scalar type extended from string need to be deserialized as null when its value is "" (empty string).
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
  * @example
  * ```typespec
- * @emptyStringAsNull
+ *
  * model MyModel {
+ *   scalar stringlike extends string;
+ *
+ *   @deserializeScalarStringAsNull
  *   prop: string;
+ *
+ *   @deserializeScalarStringAsNull
+ *   prop: stringlike;
  * }
  * ```
  */
-extern dec emptyStringAsNull(target: Model, scope?: valueof string);
+extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof string);
