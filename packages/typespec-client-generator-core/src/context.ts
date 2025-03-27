@@ -33,7 +33,6 @@ import {
   parseEmitterName,
   TCGCEmitterOptions,
   TspLiteralType,
-
 } from "./internal-utils.js";
 import { getSdkPackage } from "./package.js";
 
