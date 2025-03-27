@@ -28,7 +28,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
-  BrandedSdkEmitterOptions,
+  BrandedSdkEmitterOptionsInterface,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
   TCGCEmitterOptions,
@@ -100,7 +100,7 @@ export interface CreateSdkContextOptions {
 }
 
 export async function createSdkContext<
-  TOptions extends Record<string, any> = BrandedSdkEmitterOptions,
+  TOptions extends Record<string, any> = BrandedSdkEmitterOptionsInterface,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   context: EmitContext<TOptions>,

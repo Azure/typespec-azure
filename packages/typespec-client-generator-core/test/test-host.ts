@@ -13,10 +13,10 @@ import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { CreateSdkContextOptions, createSdkContext } from "../src/context.js";
 import { SdkContext, SdkHttpOperation, SdkServiceOperation } from "../src/interfaces.js";
-import { BrandedSdkEmitterOptions } from "../src/internal-utils.js";
+import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 
-export interface CreateSdkTestRunnerOptions extends BrandedSdkEmitterOptions {
+export interface CreateSdkTestRunnerOptions extends BrandedSdkEmitterOptionsInterface {
   emitterName?: string;
   librariesToAdd?: TypeSpecTestLibrary[];
   autoImports?: string[];

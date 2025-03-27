@@ -63,11 +63,11 @@ import { getClientTypeWithDiagnostics } from "./types.js";
 
 import { $ } from "@typespec/compiler/experimental/typekit";
 
-export interface TCGCEmitterOptions extends BrandedSdkEmitterOptions {
+export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
 }
 
-export interface UnbrandedSdkEmitterOptions {
+export interface UnbrandedSdkEmitterOptionsInterface {
   "generate-protocol-methods"?: boolean;
   "generate-convenience-methods"?: boolean;
   "api-version"?: string;
@@ -80,7 +80,7 @@ export interface UnbrandedSdkEmitterOptions {
   };
 }
 
-export interface BrandedSdkEmitterOptions extends UnbrandedSdkEmitterOptions {
+export interface BrandedSdkEmitterOptionsInterface extends UnbrandedSdkEmitterOptionsInterface {
   "examples-dir"?: string;
   namespace?: string;
 }

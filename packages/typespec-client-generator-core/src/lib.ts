@@ -1,11 +1,11 @@
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
 import {
-  BrandedSdkEmitterOptions,
+  BrandedSdkEmitterOptionsInterface,
   TCGCEmitterOptions,
-  UnbrandedSdkEmitterOptions,
+  UnbrandedSdkEmitterOptionsInterface,
 } from "./internal-utils.js";
 
-export const UnbrandedTcgcOptions = {
+export const UnbrandedSdkEmitterOptions = {
   "generate-protocol-methods": {
     "generate-protocol-methods": {
       type: "boolean",
@@ -70,18 +70,19 @@ export const UnbrandedTcgcOptions = {
   },
 } as const;
 
-const UnbrandedSdkEmitterOptionsSchema: JSONSchemaType<UnbrandedSdkEmitterOptions> = {
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    ...UnbrandedTcgcOptions["generate-protocol-methods"],
-    ...UnbrandedTcgcOptions["generate-convenience-methods"],
-    ...UnbrandedTcgcOptions["api-version"],
-    ...UnbrandedTcgcOptions["license"],
-  },
-};
+const UnbrandedSdkEmitterOptionsInterfaceSchema: JSONSchemaType<UnbrandedSdkEmitterOptionsInterface> =
+  {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      ...UnbrandedSdkEmitterOptions["generate-protocol-methods"],
+      ...UnbrandedSdkEmitterOptions["generate-convenience-methods"],
+      ...UnbrandedSdkEmitterOptions["api-version"],
+      ...UnbrandedSdkEmitterOptions["license"],
+    },
+  };
 
-export const BrandedTcgcOptions = {
+export const BrandedSdkEmitterOptions = {
   "examples-dir": {
     "examples-dir": {
       type: "string",
@@ -101,13 +102,13 @@ export const BrandedTcgcOptions = {
   },
 } as const;
 
-const BrandedSdkEmitterOptionsSchema: JSONSchemaType<BrandedSdkEmitterOptions> = {
+const BrandedSdkEmitterOptionsSchema: JSONSchemaType<BrandedSdkEmitterOptionsInterface> = {
   type: "object",
   additionalProperties: false,
   properties: {
-    ...UnbrandedSdkEmitterOptionsSchema.properties!,
-    ...BrandedTcgcOptions["examples-dir"],
-    ...BrandedTcgcOptions["namespace"],
+    ...UnbrandedSdkEmitterOptionsInterfaceSchema.properties!,
+    ...BrandedSdkEmitterOptions["examples-dir"],
+    ...BrandedSdkEmitterOptions["namespace"],
   },
 };
 
