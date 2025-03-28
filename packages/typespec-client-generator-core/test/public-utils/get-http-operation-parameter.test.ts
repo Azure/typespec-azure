@@ -1,11 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import {
-  SdkClientType,
-  SdkHttpOperation,
-  SdkMethodParameter,
-  SdkServiceMethod,
-} from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkMethodParameter, SdkServiceMethod } from "../../src/interfaces.js";
 import { getHttpOperationParameter } from "../../src/public-utils.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
@@ -353,8 +348,8 @@ it("template case", async () => {
         ExtensionResourceList<Checkup, Pet, PetStoreError> {}
   `);
   const sdkPackage = runner.context.sdkPackage;
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
   const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
   const parameters = method.parameters;
 
@@ -399,7 +394,7 @@ it("api version parameter", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   const httpParam = getHttpOperationParameter(
     method,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "query");
@@ -430,7 +425,7 @@ it("client parameter", async () => {
   const client = sdkPackage.clients[0];
   let httpParam = getHttpOperationParameter(
     client.methods[0] as SdkServiceMethod<SdkHttpOperation>,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "path");
@@ -438,7 +433,7 @@ it("client parameter", async () => {
 
   httpParam = getHttpOperationParameter(
     client.methods[1] as SdkServiceMethod<SdkHttpOperation>,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "path");

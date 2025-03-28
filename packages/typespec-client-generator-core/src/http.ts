@@ -382,10 +382,9 @@ export function getSdkHttpParameter(
     return diagnostics.wrap({
       ...base,
       kind: "path",
-      urlEncode,
       explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
       style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
-      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? false,
+      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? !urlEncode,
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,

@@ -15,7 +15,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "../../src/decorators.js";
-import { SdkOperationGroup } from "../../src/interfaces.js";
+import { SdkClientType, SdkHttpOperation, SdkOperationGroup } from "../../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -450,12 +450,11 @@ describe("@operationGroup", () => {
     const sdkPackage = runner.context.sdkPackage;
     strictEqual(sdkPackage.clients.length, 1);
     const mainClient = sdkPackage.clients[0];
-    strictEqual(mainClient.methods.length, 1);
+    strictEqual(mainClient.methods.length, 0);
 
-    const clientAccessor = mainClient.methods[0];
-    strictEqual(clientAccessor.kind, "clientaccessor");
-    strictEqual(clientAccessor.response.kind, "client");
-    strictEqual(clientAccessor.response.name, "ClientModel");
+    const client = mainClient.children![0] as SdkClientType<SdkHttpOperation>;
+    strictEqual(client.kind, "client");
+    strictEqual(client.name, "ClientModel");
   });
 
   it("@operationGroup with diagnostics", async () => {
@@ -1483,10 +1482,10 @@ describe("client hierarchy", () => {
     );
 
     const sdkPackage = runnerWithCore.context.sdkPackage;
-    const containerClient = sdkPackage.clients[0].methods[1].response;
-    strictEqual(containerClient.kind, "client");
-    const blobClient = containerClient.methods[1].response;
-    strictEqual(blobClient.kind, "client");
+    const containerClient = sdkPackage.clients[0].children?.[0];
+    strictEqual(containerClient?.kind, "client");
+    const blobClient = containerClient.children?.[0];
+    strictEqual(blobClient?.kind, "client");
     const apiVersionParam = blobClient.clientInitialization.parameters.find(
       (x) => x.name === "apiVersion",
     );
