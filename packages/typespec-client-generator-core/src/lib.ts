@@ -350,6 +350,12 @@ export const $lib = createTypeSpecLibrary({
           "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
       },
     },
+    "unsupported-http-file-body": {
+      severity: "error",
+      messages: {
+        default: "File body is not supported for HTTP operations. Please use bytes instead.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
