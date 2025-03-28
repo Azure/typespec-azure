@@ -1196,17 +1196,20 @@ export async function getOpenAPIForService(
             items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
           };
         }
-        let description;
-        if (part.property) {
-          description = getDoc(program, part.property);
-        }
-        currentEndpoint.parameters.push({
+
+        const param: OpenAPI2Parameter = {
           name: partName,
           in: "formData",
           required: !part.optional,
-          ...(description ? { description } : {}),
           ...schema,
-        });
+        };
+        if (part.property) {
+          param.description = getDoc(program, part.property);
+          if (part.property.name !== partName) {
+            param["x-ms-client-name"] = part.property.name;
+          }
+        }
+        currentEndpoint.parameters.push(param);
       }
     }
   }

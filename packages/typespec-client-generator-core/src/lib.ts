@@ -205,7 +205,7 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
-    "override-method-parameters-mismatch": {
+    "override-parameters-mismatch": {
       severity: "error",
       messages: {
         default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
@@ -284,6 +284,13 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
+      },
+    },
+    "invalid-deserializeEmptyStringAsNull-target-type": {
+      severity: "error",
+      messages: {
+        default:
+          "@deserializeEmptyStringAsNull can only be applied to `ModelProperty` of type 'string' or a `Scalar` derived from 'string'.",
       },
     },
     "api-version-not-string": {

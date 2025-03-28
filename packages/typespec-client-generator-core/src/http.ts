@@ -382,10 +382,9 @@ export function getSdkHttpParameter(
     return diagnostics.wrap({
       ...base,
       kind: "path",
-      urlEncode,
       explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
       style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
-      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? false,
+      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? !urlEncode,
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,
@@ -621,13 +620,17 @@ export function getCorrespondingMethodParams(
   // 5. To see if all the property of the service parameter could be mapped to a method parameter or a property of a method parameter.
   if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
     const retVal = [];
+    let optionalSkip = 0;
     for (const serviceParamProp of serviceParam.type.properties) {
       const propertyMapping = findMapping(methodParameters, serviceParamProp);
       if (propertyMapping) {
         retVal.push(propertyMapping);
+      } else if (serviceParamProp.optional) {
+        // If the property is optional, we can skip the mapping.
+        optionalSkip++;
       }
     }
-    if (retVal.length === serviceParam.type.properties.length) {
+    if (retVal.length + optionalSkip === serviceParam.type.properties.length) {
       return diagnostics.wrap(retVal);
     }
   }
