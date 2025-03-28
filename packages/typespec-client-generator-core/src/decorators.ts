@@ -1305,7 +1305,7 @@ export const $responseAsBool: ResponseAsBoolDecorator = (
   target: Operation,
   scope?: LanguageScopes,
 ) => {
-  if (!target.decorators.some((d) => d.decorator.name === "$head")) {
+  if (!target.decorators.some((d) => d.definition?.name === "@head")) {
     reportDiagnostic(context.program, {
       code: "non-head-bool-response-decorator",
       format: {

@@ -14,6 +14,7 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import { getServers, HttpServer, isHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
@@ -21,6 +22,7 @@ import {
   getClientInitializationOptions,
   getClientNamespace,
   getOverriddenClientMethod,
+  getResponseAsBool,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -87,6 +89,7 @@ import {
 import {
   getAllReferencedTypes,
   getClientTypeWithDiagnostics,
+  getSdkBuiltInType,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
   getSdkModelWithDiagnostics,
@@ -595,36 +598,41 @@ function getSdkMethodResponse(
   const { allResponseBodies, nonBodyExists } = getAllResponseBodiesAndNonBodyExists(responses);
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
-  if (responseTypes.size > 1) {
-    // return union of all the different types
-    type = {
-      __raw: operation,
-      kind: "union",
-      access: "public",
-      usage: UsageFlags.Output,
-      variantTypes: allResponseBodies,
-      name: createGeneratedName(context, operation, "UnionResponse"),
-      isGeneratedName: true,
-      namespace: client.namespace,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
-      decorators: [],
-    };
-  } else if (responseTypes.size === 1) {
-    type = allResponseBodies[0];
+  if (getResponseAsBool(context, operation)) {
+    type = getSdkBuiltInType(context, $.builtin.boolean);
+  } else {
+    if (responseTypes.size > 1) {
+      // return union of all the different types
+      type = {
+        __raw: operation,
+        kind: "union",
+        access: "public",
+        usage: UsageFlags.Output,
+        variantTypes: allResponseBodies,
+        name: createGeneratedName(context, operation, "UnionResponse"),
+        isGeneratedName: true,
+        namespace: client.namespace,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
+        decorators: [],
+      };
+    } else if (responseTypes.size === 1) {
+      type = allResponseBodies[0];
+    }
+    if (nonBodyExists && type) {
+      type = {
+        kind: "nullable",
+        name: createGeneratedName(context, operation, "NullableResponse"),
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
+        isGeneratedName: true,
+        type: type,
+        decorators: [],
+        access: "public",
+        usage: UsageFlags.Output,
+        namespace: client.namespace,
+      };
+    }
   }
-  if (nonBodyExists && type) {
-    type = {
-      kind: "nullable",
-      name: createGeneratedName(context, operation, "NullableResponse"),
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
-      isGeneratedName: true,
-      type: type,
-      decorators: [],
-      access: "public",
-      usage: UsageFlags.Output,
-      namespace: client.namespace,
-    };
-  }
+
   return {
     kind: "method",
     type,
