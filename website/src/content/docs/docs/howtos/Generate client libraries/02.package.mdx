@@ -1,0 +1,96 @@
+---
+title: Package
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This page documents the common bahavior for a client package.
+
+## Service
+
+The service is the entry point for a client library. Currently, we only support one service per package.The service is defined by the `@service` decorator. If multiple services are defined, the first one will be used as the entry point.
+
+## Namespace
+
+Clients, models, enums, and unions in TypeSpec have namespace information. Language's code generator use it in different ways to organize the generated code.
+
+### Basic cases
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+@route("/feed")
+op feed(food: Food): void;
+
+model Food {
+  name: string;
+  quantity: int32;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+### Customization
+
+You could use `@clientNamespace` to change the namespace for specific client, enum, model or union.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+@route("/feed")
+op feed(food: Food): void;
+
+model Food {
+  name: string;
+  quantity: int32;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+namespace Customization;
+
+@@clientNamespace(PetStore.Food, "PetStore.Models");
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>

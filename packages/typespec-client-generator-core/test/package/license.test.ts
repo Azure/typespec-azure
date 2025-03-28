@@ -1,7 +1,7 @@
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { licenseMap } from "../src/license.js";
-import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
+import { licenseMap } from "../../src/license.js";
+import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 describe("typespec-client-generator-core: license", () => {
   let runner: SdkTestRunner;

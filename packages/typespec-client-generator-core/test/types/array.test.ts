@@ -51,14 +51,11 @@ it("EmbeddingVector from azure-core", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-    @service
-    namespace TestClient {
-      model ModelWithEmbeddingVector {
-        prop: EmbeddingVector<int32>;
-      }
-
-      op get(): ModelWithEmbeddingVector;
+    model ModelWithEmbeddingVector {
+      prop: EmbeddingVector<int32>;
     }
+
+    op get(): ModelWithEmbeddingVector;
   `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -77,16 +74,13 @@ it("alias of EmbeddingVector", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-    @service
-    namespace TestClient {
-      alias MyEmbeddingVector = EmbeddingVector<int32>;
+    alias MyEmbeddingVector = EmbeddingVector<int32>;
 
-      model ModelWithEmbeddingVector {
-        prop: MyEmbeddingVector;
-      }
-
-      op get(): ModelWithEmbeddingVector;
+    model ModelWithEmbeddingVector {
+      prop: MyEmbeddingVector;
     }
+
+    op get(): ModelWithEmbeddingVector;
   `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);

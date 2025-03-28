@@ -8,7 +8,7 @@ beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
 
-it("duplicate discriminated unions", async () => {
+it("no-discriminated-unions", async () => {
   const diagnostics = await runner.diagnose(
     `
       @service

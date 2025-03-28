@@ -1372,29 +1372,26 @@ it("additionalProperties of same type", async () => {
 
 it("additionalProperties usage", async () => {
   await runner.compileWithBuiltInService(`
-    @service
-    namespace MyService {
-      model AdditionalPropertiesModel extends Record<Test> {
-      }
-
-      model AdditionalPropertiesModel2 is Record<Test> {
-      }
-
-      model AdditionalPropertiesModel3 {
-        ...Record<Test2>;
-      }
-
-      model Test {
-      }
-
-      model Test2 {
-      }
-
-      @route("test")
-      op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
-      @route("test2")
-      op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
+    model AdditionalPropertiesModel extends Record<Test> {
     }
+
+    model AdditionalPropertiesModel2 is Record<Test> {
+    }
+
+    model AdditionalPropertiesModel3 {
+      ...Record<Test2>;
+    }
+
+    model Test {
+    }
+
+    model Test2 {
+    }
+
+    @route("test")
+    op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
+    @route("test2")
+    op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
   `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 5);
@@ -1845,4 +1842,38 @@ it("discriminator from template", async function () {
   strictEqual(one.properties[1].name, "prop");
 
   expectDiagnosticEmpty(runner.context.diagnostics);
+});
+
+it("model sequence", async function () {
+  await runner.compileWithBuiltInService(`
+    model A {
+      prop: string;
+    }
+
+    model B {
+      prop: string;
+    }
+
+    model C {
+      prop: string;
+    }
+
+    namespace Foo {
+      @route("/foo")
+      op foo(): A;
+
+      interface Bar {
+        @route("/bar")
+        bar(): B;
+      }
+    }
+
+    interface Baz {
+      @route("/baz")
+      baz(): C;
+    }
+  `);
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 3);
+  strictEqual(models.map((x) => x.name).join(","), "A,C,B");
 });

@@ -91,6 +91,12 @@ const TCGCEmitterOptionsSchema: JSONSchemaType<TCGCEmitterOptions> = {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "service-more-than-one": {
+      severity: "warning",
+      messages: {
+        default: "Only one service is supported. This service will be ignored.",
+      },
+    },
     "client-service": {
       severity: "warning",
       messages: {

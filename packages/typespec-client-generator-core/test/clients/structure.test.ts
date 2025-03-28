@@ -580,20 +580,12 @@ it("namespace", async () => {
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
     @service
-    namespace My.Service.One {};
-
-    @server("http://localhost:3000", "endpoint")
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-    @service
-    namespace My.Service.Two {};
+    namespace My.Service {};
   `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 2);
-  const clientOne = sdkPackage.clients.filter((c) => c.name === "OneClient")[0];
-  strictEqual(clientOne.namespace, "My.Service.One");
-
-  const clientTwo = sdkPackage.clients.filter((c) => c.name === "TwoClient")[0];
-  strictEqual(clientTwo.namespace, "My.Service.Two");
+  strictEqual(sdkPackage.clients.length, 1);
+  const clientOne = sdkPackage.clients.filter((c) => c.name === "ServiceClient")[0];
+  strictEqual(clientOne.namespace, "My.Service");
 });
 
 it("operationGroup", async () => {

@@ -32,6 +32,7 @@ import {
   getClientNameOverride,
   getIsApiVersion,
   listClients,
+  listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
@@ -57,7 +58,6 @@ import {
   isAzureCoreTspModel,
   isHttpBodySpread,
   listAllUserDefinedNamespaces,
-  listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
@@ -360,7 +360,7 @@ function findContextPath(
         return result;
       }
     }
-    for (const og of listRawSubClients(context, client)) {
+    for (const og of listOperationGroups(context, client, true)) {
       for (const operation of listOperationsInOperationGroup(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
