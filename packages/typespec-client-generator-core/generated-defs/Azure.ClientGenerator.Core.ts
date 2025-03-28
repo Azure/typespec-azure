@@ -634,7 +634,7 @@ export type DeserializeEmptyStringAsNullDecorator = (
 ) => void;
 
 /**
- * Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, intead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+ * Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
  *
  * @example
  * ```typespec
