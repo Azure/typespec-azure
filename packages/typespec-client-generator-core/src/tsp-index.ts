@@ -14,6 +14,7 @@ import {
   $override,
   $paramAlias,
   $protocolAPI,
+  $responseAsBool,
   $scope,
   $usage,
   $useSystemTextJsonConverter,
@@ -42,5 +43,6 @@ export const $decorators = {
     alternateType: $alternateType,
     scope: $scope,
     deserializeEmptyStringAsNull: $deserializeEmptyStringAsNull,
+    responseAsBool: $responseAsBool,
   } as AzureClientGeneratorCoreDecorators,
 };
