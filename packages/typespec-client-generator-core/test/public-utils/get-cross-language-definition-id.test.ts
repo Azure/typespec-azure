@@ -32,7 +32,7 @@ it("parameter's crossLanguageDefinitionId", async () => {
 
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(
-    sdkPackage.clients[0].initialization.properties[1].crossLanguageDefinitionId,
+    sdkPackage.clients[0].clientInitialization.parameters[1].crossLanguageDefinitionId,
     "My.Service.getServiceStatus.apiVersion",
   );
   const getServiceStatus = sdkPackage.clients[0].methods[0];
@@ -89,8 +89,8 @@ it("endpoint's crossLanguageDefinitionId", async () => {
   `);
 
   const sdkPackage = runner.context.sdkPackage;
-  const initialization = sdkPackage.clients[0].initialization;
-  const endpoint = initialization.properties[0];
+  const initialization = sdkPackage.clients[0].clientInitialization;
+  const endpoint = initialization.parameters[0];
   strictEqual(endpoint.crossLanguageDefinitionId, "Contoso.WidgetManager.endpoint");
   strictEqual(endpoint.type.kind, "union");
   strictEqual(endpoint.type.crossLanguageDefinitionId, "Contoso.WidgetManager.Endpoint");

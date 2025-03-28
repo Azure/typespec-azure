@@ -17,7 +17,6 @@ import {
   PagingOperation,
   Program,
   Type,
-  Union,
 } from "@typespec/compiler";
 import {
   HttpAuth,
@@ -27,7 +26,6 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import { TspLiteralType } from "./internal-utils.js";
 
 // Types for TCGC lib
 
@@ -57,14 +55,14 @@ export interface TCGCContext {
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
-  __generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
+  __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
 
@@ -115,11 +113,6 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
-  /**
-   * @deprecated Use `Exception` instead.
-   */
-  // Output will also be set when Error is set.
-  Error = 1 << 7,
   // Set when type is used in conjunction with an application/json content type.
   Json = 1 << 8,
   // Set when type is used in conjunction with an application/xml content type.
@@ -180,10 +173,6 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   namespace: string;
   doc?: string;
   summary?: string;
-  /**
-   * @deprecated Use `clientInitialization.paramters` instead.
-   */
-  initialization: SdkInitializationType;
   clientInitialization: SdkClientInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
@@ -619,11 +608,6 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
 
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
-  /**
-   * @deprecated This property is deprecated. Use `allowReserved` instead.
-   * @param serviceParam
-   */
-  urlEncode: boolean;
   explode: boolean;
   style: "simple" | "label" | "matrix" | "fragment" | "path";
   allowReserved: boolean;
@@ -875,18 +859,8 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-/**
- * @deprecated Use `parent` and `children` property from `SdkClientType` to find client hierarchy instead.
- */
-export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase {
-  kind: "clientaccessor";
-  response: SdkClientType<TServiceOperation>;
-}
-
 export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
-  | SdkServiceMethod<TServiceOperation>
-  | SdkClientAccessor<TServiceOperation>; // eslint-disable-line @typescript-eslint/no-deprecated
+  SdkServiceMethod<TServiceOperation>;
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
@@ -923,10 +897,6 @@ export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" 
 interface SdkExampleBase {
   kind: string;
   name: string;
-  /**
-   * @deprecated Use `doc` instead.
-   */
-  description: string;
   doc: string;
   filePath: string;
   rawExample: any;

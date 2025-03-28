@@ -21,7 +21,7 @@ describe("@apiVersion", () => {
     `);
     const sdkPackage = runner.context.sdkPackage;
     // there will be no api version param on client, bc the service isn't versioned
-    const apiVersionClientParam = sdkPackage.clients[0].initialization.properties.find(
+    const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
       (x) => x.name === "version",
     );
     ok(!apiVersionClientParam);
@@ -53,7 +53,7 @@ describe("@apiVersion", () => {
     `);
     const sdkPackage = runner.context.sdkPackage;
 
-    const apiVersionClientParam = sdkPackage.clients[0].initialization.properties.find(
+    const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
       (x) => x.name === "version",
     );
     ok(apiVersionClientParam);
@@ -81,7 +81,7 @@ describe("@apiVersion", () => {
       ): string;
     `);
     const sdkPackage = runner.context.sdkPackage;
-    const apiVersionClientParam = sdkPackage.clients[0].initialization.properties.find(
+    const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
       (x) => x.name === "api-version",
     );
     // there will be no api version param on client, bc we overrode it to not be api version

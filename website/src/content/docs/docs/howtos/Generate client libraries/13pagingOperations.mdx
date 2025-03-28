@@ -287,3 +287,30 @@ NOT_SUPPORTED
 ```
 
 </ClientTabs>
+
+## Advanced
+
+### Parameterized next links (against guidelines)
+
+:::danger
+Parameterized next links are against guidelines. Please don't follow this unless explicitly told to do so
+:::
+
+In very rare cases, there are cases of next links that require parameterization. These cases exist outside of the Azure guidelines for paging, but must be supported for legacy reasons.
+
+In cases like this, you may use the special scalar type `Azure.Core.Legacy.parameterizedNextLink`. You can specify which parameters must be reformatted into the next link. Your emitted SDK will handle the reformatting based on the tsp definition
+
+```tsp
+model ListCertificateOptions {
+  includePending?: string;
+}
+model Certificate {
+  name: string;
+}
+model Page {
+  @items items: Certificate[];
+  @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
+    ListCertificateOptions.includePending
+  ]>;
+}
+```

@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/azure-http-specs",
-  "version": "0.1.0-alpha.10",
+  "version": "0.1.0-alpha.12",
   "description": "Azure Spec scenarios and mock apis",
   "main": "dist/index.js",
   "type": "module",
@@ -43,7 +43,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/multer": "^1.4.10",
-    "@types/node": "~22.13.9",
+    "@types/node": "~22.13.11",
     "@typespec/openapi": "workspace:^",
     "@typespec/openapi3": "workspace:^",
     "concurrently": "^9.1.2",

@@ -147,7 +147,6 @@ import {
   OpenAPI2BodyParameter,
   OpenAPI2Document,
   OpenAPI2FileSchema,
-  OpenAPI2FormDataParameter,
   OpenAPI2HeaderDefinition,
   OpenAPI2HeaderParameter,
   OpenAPI2OAuth2FlowType,
@@ -454,7 +453,6 @@ export async function getOpenAPIForService(
             explode: false,
             style: "simple",
             name: prop.name,
-            type: "path",
           },
         },
         {
@@ -1169,18 +1167,7 @@ export async function getOpenAPIForService(
       ? { type: "string", format: "binary" }
       : getSchemaOrRef(body.type, schemaContext);
 
-    if (currentConsumes.has("multipart/form-data")) {
-      const bodyModelType = body.type;
-      // Assert, this should never happen. Rest library guard against that.
-      compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
-      if (bodyModelType) {
-        for (const param of bodyModelType.properties.values()) {
-          emitParameter(param, () =>
-            getOpenAPI2FormDataParameter(param, schemaContext, getJsonName(param)),
-          );
-        }
-      }
-    } else if (body.property) {
+    if (body.property) {
       const prop = body.property;
       emitParameter(prop, () => getOpenAPI2BodyParameter(prop, getJsonName(prop), schema));
     } else {
@@ -1209,10 +1196,15 @@ export async function getOpenAPIForService(
             items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
           };
         }
+        let description;
+        if (part.property) {
+          description = getDoc(program, part.property);
+        }
         currentEndpoint.parameters.push({
           name: partName,
           in: "formData",
           required: !part.optional,
+          ...(description ? { description } : {}),
           ...schema,
         });
       }
@@ -1363,30 +1355,6 @@ export async function getOpenAPIForService(
         delete result["x-ms-client-name"];
       }
     }
-
-    return result;
-  }
-
-  function getOpenAPI2FormDataParameter(
-    param: ModelProperty,
-    schemaContext: SchemaContext,
-    name?: string,
-  ): OpenAPI2FormDataParameter {
-    const base = getOpenAPI2ParameterBase(param, name);
-    const result = {
-      in: "formData",
-      ...base,
-      ...(getFormDataSchema(param.type, schemaContext, base.name, param) as any),
-      default: param.defaultValue && getDefaultValue(param.defaultValue, param),
-    };
-
-    Object.assign(
-      result,
-      applyIntrinsicDecorators(param, {
-        type: (result as any).type,
-        format: (result as any).format,
-      }),
-    );
 
     return result;
   }

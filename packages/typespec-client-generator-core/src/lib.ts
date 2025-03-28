@@ -145,13 +145,6 @@ export const $lib = createTypeSpecLibrary({
         default: "@client or @operationGroup should decorate namespace or interface in client.tsp",
       },
     },
-    "encoding-multipart-bytes": {
-      severity: "warning",
-      messages: {
-        default:
-          "Encoding should not be applied to bytes content in a multipart request. This is semi-incompatible with how multipart works in HTTP.",
-      },
-    },
     "unsupported-kind": {
       severity: "warning",
       messages: {
@@ -212,7 +205,7 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
-    "override-method-parameters-mismatch": {
+    "override-parameters-mismatch": {
       severity: "error",
       messages: {
         default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,

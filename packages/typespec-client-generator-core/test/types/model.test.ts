@@ -777,7 +777,7 @@ it("filterOutCoreModels true", async () => {
   strictEqual(models[0].name, "User");
   strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-  for (const [type, sdkType] of runner.context.__referencedTypeCache?.entries() ?? []) {
+  for (const [type, sdkType] of runner.context.__referencedTypeCache.entries()) {
     if (isAzureCoreTspModel(type)) {
       ok(sdkType.usage !== UsageFlags.None);
     }
@@ -1053,7 +1053,7 @@ it("propagation", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const salmon = Array.from(runner.context.__referencedTypeCache?.values() ?? []).find(
+  const salmon = Array.from(runner.context.__referencedTypeCache.values()).find(
     (x) => x.kind === "model" && x.name === "Salmon",
   ) as SdkModelType;
   strictEqual(salmon?.serializationOptions.json, undefined);
@@ -1112,7 +1112,7 @@ it("propagation from subtype", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const types = Array.from(runner.context.__referencedTypeCache?.values() ?? []);
+  const types = Array.from(runner.context.__referencedTypeCache.values());
 
   const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
   strictEqual(shark?.serializationOptions.json, undefined);
@@ -1630,14 +1630,18 @@ it("error model inheritance", async () => {
   `);
   const models = getAllModels(runner.context);
   strictEqual(models.length, 5);
-  const errorModels = models.filter((x) => x.kind === "model" && (x.usage & UsageFlags.Error) > 0);
+  const errorModels = models.filter(
+    (x) => x.kind === "model" && (x.usage & UsageFlags.Exception) > 0,
+  );
   deepStrictEqual(errorModels.map((x) => x.name).sort(), [
     "ApiError",
     "FiveHundredError",
     "FourHundredError",
     "FourZeroFourError",
   ]);
-  const validModel = models.filter((x) => x.kind === "model" && (x.usage & UsageFlags.Error) === 0);
+  const validModel = models.filter(
+    (x) => x.kind === "model" && (x.usage & UsageFlags.Exception) === 0,
+  );
   deepStrictEqual(
     validModel.map((x) => x.name),
     ["ValidResponse"],
