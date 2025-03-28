@@ -286,6 +286,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
     },
+    "invalid-deserializeEmptyStringAsNull-target-type": {
+      severity: "error",
+      messages: {
+        default:
+          "@deserializeEmptyStringAsNull can only be applied to `ModelProperty` of type 'string' or a `Scalar` derived from 'string'.",
+      },
+    },
     "api-version-not-string": {
       severity: "warning",
       messages: {
