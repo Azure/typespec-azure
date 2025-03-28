@@ -1258,7 +1258,7 @@ export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorato
   target: ModelProperty,
   scope?: LanguageScopes,
 ) => {
-  if (target.kind !== "ModelProperty" || target.type.kind !== "Scalar") {
+  if (target.type.kind !== "Scalar") {
     reportDiagnostic(context.program, {
       code: "invalid-deserializeEmptyStringAsNull-target-type",
       format: {},
