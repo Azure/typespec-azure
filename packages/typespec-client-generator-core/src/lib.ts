@@ -297,7 +297,7 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default:
-          "@deserializeEmptyStringAsNull can only be applied to ModelProperty of type 'string' or a Scalar type derived from 'string'.",
+          "@deserializeEmptyStringAsNull can only be applied to `ModelProperty` of type 'string' or a `Scalar` derived from 'string'.",
       },
     },
     "api-version-not-string": {
