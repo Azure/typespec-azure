@@ -32,7 +32,7 @@ import {
   parseEmitterName,
   TspLiteralType,
 } from "./internal-utils.js";
-import { getSdkPackage } from "./package.js";
+import { createSdkPackage } from "./package.js";
 
 export interface TCGCEmitterOptions extends SdkEmitterOptions {
   "emitter-name"?: string;
@@ -146,7 +146,7 @@ export async function createSdkContext<
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
   };
-  sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
+  sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }

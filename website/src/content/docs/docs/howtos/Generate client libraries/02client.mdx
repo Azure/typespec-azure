@@ -6,15 +6,21 @@ import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents the client behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
 
-JS RLC is not in the business of customization. it will ignore client.tsp and the follow scenarios will not have impact on the JS RLC user experiences. In this context, TypeScript part means JS Modular Emitter.
+> **NOTE:** JS RLC is not in the business of customization. it will ignore client.tsp and the follow scenarios will not have impact on the JS RLC user experiences. In this context, TypeScript part means JS Modular Emitter.
 
 ## Default behavior
 
-By default, each namespace with `@service` decorator will be generated as a root client. The name for that client will be the namespace name concatenating `Client` as suffix.
+### Basic rules
+
+By default, the namespace with `@service` decorator will be generated as a root client. The name for that client will be the namespace name concatenating `Client` as suffix.
 
 Other sub namespaces and interfaces of each root client will be generated as operation groups with hierarchy.
 
+The operation group sequence is determined by the order of the namespace declaration then the interface declaration.
+
 The root client's SDK namespace will follow the namespace decorated with `@service`. If an operation group comes from a sub namespace, its SDK namespace will follow that namespace. If it comes from a interface, its SDK namespace will follow the namespace which the interface belongs to.
+
+By default, the operation group could only be initialized by root client or parent operation group.
 
 Different language's code generator will have different way to organize clients and operation groups. Please refer the following examples.
 
@@ -239,6 +245,8 @@ Customization SHOULD always be done in a file called `client.tsp` along with the
 You can use `@client` and `@operationGroup` to reconstruct the client hierarchy. However, if any customizations are made, the client hierarchy will only be inferred from those customizations. The logic defined in the default behaviors will no longer take effect.
 
 If any customizations are made, the client's SDK namespace will follow the namespace decorated with `@client` or the namespace which the interface decorated with `@client` belongs to. The operation group's SDK namespace follows the same logic for `@operationGroup`. You can use `@clientNamespace` to override it if needed.
+
+The client and operation group sequence is determined by the order of the `@client` and `@operationGroup` decorators.
 
 For this section, we will assume that you have service called `PetStore` in the namespace `PetStore`, defining the two operations `feed` and `pet`.
 
@@ -617,9 +625,13 @@ petActionClient.pet();
 
 ### Adding Client Initialization Parameters
 
-By default, we only generate our clients with initialization parameters for `endpoint`, `credential`, and `apiVersion`, whenever any of these are applicable. There are cases where spec authors would like their clients to have additional input parameters. This is where the `@clientInitialization` decorator comes in.
+By default, we only generate our clients with initialization parameters for `endpoint`, `credential`, and `apiVersion`, whenever any of these are applicable.
+There are cases where spec authors would like their clients to have additional input parameters.
 
-With `@clientInitialization`, you can pass in additional parameters you would like your client to have, by passing in an input model. All properties of the input model will be appended to the current default list of client initialization parameters. Additionally, these client parameters will no longer appear on service methods that previously had them as part of the method signature. The generated code will automatically pass in the inputted value from the client init to the service.
+With `@clientInitialization`, you can pass in additional parameters you would like your client to have, by passing in `parameters` option of a model.
+All properties of the model will be appended to the current default list of client initialization parameters.
+Additionally, these client parameters will no longer appear on service methods that previously had them as part of the method signature.
+The generated code will automatically pass in the inputted value from the client init to the service.
 
 <ClientTabs>
 
@@ -643,7 +655,11 @@ model StorageClientOptions {
   blobName: string;
 }
 
-@@clientInitialization(Storage, StorageClientOptions);
+@@clientInitialization(Storage,
+  {
+    parameters: StorageClientOptions,
+  }
+);
 ```
 
 ```python
@@ -685,6 +701,59 @@ StorageClient client = new StorageClient()
 
 client.upload()
 client.download()
+```
+
+</ClientTabs>
+
+### Change operation group initialization way
+
+By default, all the nested operation group could only be initialized by parent client or operation group.
+There are cases where spec authors would like their operation groups could both be initialized by parent as well as individually.
+
+With `@clientInitialization`, you can change the initialization way, by passing in `initializedBy` option of `InitializedBy.individually | InitializedBy.parent` value.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace Storage;
+
+op download(@path blobName: string): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace Customizations;
+
+model StorageClientOptions {
+  blobName: string;
+}
+
+@@clientInitialization(Storage,
+  {
+    initializedBy: InitializedBy.individually | InitializedBy.parent,
+  }
+);
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
 ```
 
 </ClientTabs>
