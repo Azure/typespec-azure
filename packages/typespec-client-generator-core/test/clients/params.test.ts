@@ -277,7 +277,7 @@ it("initialization one server parameter with apikey auth", async () => {
   const templateArg = endpointParam.type.templateArguments[0];
   strictEqual(templateArg.kind, "path");
   strictEqual(templateArg.name, "endpointInput");
-  strictEqual(templateArg.allowReserved, false);
+  strictEqual(templateArg.allowReserved, true);
   strictEqual(templateArg.optional, false);
   strictEqual(templateArg.onClient, true);
   strictEqual(templateArg.clientDefaultValue, undefined);
@@ -360,11 +360,12 @@ it("initialization multiple server parameters with apikey auth", async () => {
   strictEqual(endpointTemplateArg.name, "endpoint");
   strictEqual(endpointTemplateArg.onClient, true);
   strictEqual(endpointTemplateArg.optional, false);
+  strictEqual(endpointTemplateArg.allowReserved, true);
   strictEqual(endpointTemplateArg.kind, "path");
 
   const apiVersionParam = templatedEndpoint.templateArguments[1];
   strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-  strictEqual(apiVersionParam.allowReserved, true);
+  strictEqual(apiVersionParam.allowReserved, false);
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
