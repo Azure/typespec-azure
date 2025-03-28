@@ -91,6 +91,18 @@ it("doc of property is carried to the description field", async () => {
   expect(param.description).toEqual("My doc");
 });
 
+it("doc of property is carried to the description field for extensible union", async () => {
+  const res = await openApiFor(
+    `
+  op upload(@header contentType: "multipart/form-data", @multipartBody _: { /** Prop doc */ name: HttpPart<Foo> }): void;
+  /** Union doc */
+  union Foo { string, "a" };
+  `,
+  );
+  const param = res.paths["/"].post.parameters[0];
+  expect(param.description).toEqual("Prop doc");
+});
+
 // https://github.com/Azure/typespec-azure/issues/3860
 it("part of type `object` produce `type: string`", async () => {
   const res = await openApiFor(
@@ -108,4 +120,17 @@ it("part of type `object` produce `type: string`", async () => {
       type: "string",
     },
   ]);
+});
+
+it("include x-ms-client-name if http part defines a different name from the property", async () => {
+  const res = await openApiFor(
+    `
+    op upload(@header contentType: "multipart/form-data", @multipartBody _: { propName: HttpPart<string, #{name: "part_name"}> }): void;
+  `,
+  );
+  const param = res.paths["/"].post.parameters[0];
+  expect(param).toMatchObject({
+    name: "part_name",
+    "x-ms-client-name": "propName",
+  });
 });
