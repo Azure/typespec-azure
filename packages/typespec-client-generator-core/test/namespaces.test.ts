@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkEmitterOptions } from "../src/context.js";
+import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 let runner: SdkTestRunner;
@@ -257,7 +257,7 @@ describe("no namespace flag", () => {
       `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreRenamed",
       })
     ).sdkPackage;
@@ -278,7 +278,7 @@ describe("namespace config flag", () => {
     `);
 
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "Azure.Foo",
       })
     ).sdkPackage;
@@ -319,7 +319,7 @@ describe("namespace config flag", () => {
       }
     `);
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "FooRenamed",
       })
     ).sdkPackage;
@@ -360,7 +360,7 @@ describe("namespace config flag", () => {
       `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreRenamed",
       })
     ).sdkPackage;
@@ -379,9 +379,12 @@ describe("namespace config flag", () => {
     `);
 
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runnerWithCore.context.program, {
-        namespace: "Azure.My.Service",
-      })
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(
+        runnerWithCore.context.program,
+        {
+          namespace: "Azure.My.Service",
+        },
+      )
     ).sdkPackage;
 
     const myNamespace = sdkPackage.namespaces.find((x) => x.name === "My");
@@ -437,7 +440,7 @@ describe("namespace config flag", () => {
     `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreFlagRenamed",
       })
     ).sdkPackage;
@@ -479,7 +482,7 @@ describe("namespace config flag", () => {
       `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreFlagRenamed",
       })
     ).sdkPackage;
@@ -516,7 +519,7 @@ describe("namespace config flag", () => {
     `);
 
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "Azure.A",
       })
     ).sdkPackage;
@@ -555,7 +558,7 @@ it("customization with models from original namespace", async () => {
   );
 
   const sdkPackage = (
-    await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+    await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
       namespace: "Renamed",
     })
   ).sdkPackage;
