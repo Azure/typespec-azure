@@ -77,7 +77,7 @@ const $enforceConstraint: EnforceConstraintDecorator = (
     // walk the baseModel chain until find a match or fail
     let baseType: Model | undefined = sourceType;
     do {
-      if (baseType === constraintType) return;
+      if (baseType === constraintType || isCustomAzureResource(context.program, baseType)) return;
     } while ((baseType = baseType.baseModel) !== undefined);
 
     reportDiagnostic(context.program, {

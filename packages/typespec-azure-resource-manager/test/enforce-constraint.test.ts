@@ -88,4 +88,48 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       },
     ]);
   });
+
+  it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Custom Mix in resource")
+    model CustomResource is CustomAzureResource;
+
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model CustomAzureResource {
+      name: string;
+    }
+
+    interface Widgets {
+      delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+    }
+  `);
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("emits error when template is extended from Resource or from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Custom Mix in resource")
+    model CustomResource is CustomAzureResource;
+
+    model CustomAzureResource {
+      name: string;
+    }
+
+    interface Widgets {
+      delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
+      { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
+    ]);
+  });
 });
