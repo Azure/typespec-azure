@@ -1281,8 +1281,12 @@ export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorato
   }
 
   if (target.type.name !== "string") {
-    const scalarType = target.type as Scalar;
-    if (scalarType.baseScalar === undefined || scalarType.baseScalar.name !== "string") {
+    let scalarType = target.type as Scalar;
+    while (scalarType.baseScalar !== undefined) {
+      scalarType = scalarType.baseScalar;
+    }
+
+    if (scalarType.name !== "string") {
       reportDiagnostic(context.program, {
         code: "invalid-deserializeEmptyStringAsNull-target-type",
         format: {},

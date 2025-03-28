@@ -43,6 +43,57 @@ describe("deserialized empty string as null", () => {
     expectDiagnostics(runner.context.diagnostics, []);
   });
 
+  it("Apply decorator to model properties of indirectly derived from 'string'", async function () {
+    runner = await createSdkTestRunner(
+      {},
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
+    );
+
+    await runner.compileWithBuiltInService(`
+        scalar l1 extends string;
+        scalar l2 extends l1;
+
+        model A {
+          @deserializeEmptyStringAsNull("csharp")
+          prop1: l2;
+        }
+
+        op test(): A;
+      `);
+
+    const models = runner.context.sdkPackage.models;
+    const prop = models[0].properties[0];
+    deepStrictEqual(prop.decorators, [
+      {
+        name: "Azure.ClientGenerator.Core.@deserializeEmptyStringAsNull",
+        arguments: { scope: "csharp" },
+      },
+    ]);
+    expectDiagnostics(runner.context.diagnostics, []);
+  });
+
+  it("should not allow the decorator on model property which is a model type", async function () {
+    runner = await createSdkTestRunner(
+      {},
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
+    );
+
+    const diagnostics = await runner.diagnose(`
+        model B {
+          prop1: string;
+        }
+
+        model A {
+          @deserializeEmptyStringAsNull
+          prop1: B;
+        }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-deserializeEmptyStringAsNull-target-type",
+    });
+  });
+
   it("should not allow the decorator on none model property target", async function () {
     runner = await createSdkTestRunner(
       {},
@@ -108,6 +159,26 @@ describe("deserialized empty string as null", () => {
             model A {
               @deserializeEmptyStringAsNull
               prop1: int64like;
+            }
+        `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/invalid-deserializeEmptyStringAsNull-target-type",
+    });
+  });
+
+  it("should not allow the decorator on model properties of indirectly extended from a none string Scalar type", async function () {
+    runner = await createSdkTestRunner(
+      {},
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
+    );
+
+    const diagnostics = await runner.diagnose(`
+            scalar l1 extends int64;
+            scalar l2 extends l1;
+            model A {
+              @deserializeEmptyStringAsNull
+              prop1: l2;
             }
         `);
 
