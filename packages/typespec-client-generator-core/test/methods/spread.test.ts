@@ -1,12 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import {
-  SdkClientType,
-  SdkHttpOperation,
-  SdkServiceMethod,
-  UsageFlags,
-} from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkServiceMethod, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -155,8 +150,8 @@ it("rest template spreading of multiple models", async () => {
     sdkPackage.models.map((x) => x.name).sort(),
     ["CheckupCollectionWithNextLink", "Checkup", "PetStoreError", "CheckupUpdate"].sort(),
   );
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
   const createOrUpdate = client.methods[0];
   strictEqual(createOrUpdate.kind, "basic");
   strictEqual(createOrUpdate.name, "createOrUpdate");
@@ -253,8 +248,8 @@ it("multi layer template with discriminated model spread", async () => {
   const nonCoreModels = sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(nonCoreModels.length, 2);
 
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
 
   const createOrReplace = client.methods[1];
   strictEqual(createOrReplace.kind, "basic");

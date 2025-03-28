@@ -4,7 +4,7 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
-import { UsageFlags } from "../../src/interfaces.js";
+import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -403,9 +403,7 @@ describe("data plane LRO templates", () => {
         `);
 
       const client = runner.context.sdkPackage.clients[0];
-      const method = client.methods[0];
-      strictEqual(method.kind, "clientaccessor");
-      const resourceOpClient = method.response;
+      const resourceOpClient = client.children![0] as SdkClientType<SdkHttpOperation>;
       const lroMethod = resourceOpClient.methods[0];
       strictEqual(lroMethod.kind, "lro");
       const lroMetadata = lroMethod.lroMetadata;

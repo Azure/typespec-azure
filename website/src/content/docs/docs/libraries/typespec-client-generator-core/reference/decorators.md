@@ -405,6 +405,39 @@ Whether you want to generate an operation as a convenient operation.
 op test: void;
 ```
 
+### `@deserializeEmptyStringAsNull` {#@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull}
+
+Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
+
+```typespec
+@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull(scope?: valueof string)
+```
+
+#### Target
+
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                            |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+#### Examples
+
+```typespec
+
+model MyModel {
+  scalar stringlike extends string;
+
+  @deserializeEmptyStringAsNull
+  prop: string;
+
+  @deserializeEmptyStringAsNull
+  prop: stringlike;
+}
+```
+
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
 
 :::caution

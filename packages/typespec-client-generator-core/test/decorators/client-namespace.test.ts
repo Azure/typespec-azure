@@ -83,10 +83,8 @@ describe("normal namespace", () => {
       `,
     );
     strictEqual(
-      (
-        runner.context.sdkPackage.clients[0].methods[0]
-          .response as SdkClientType<SdkServiceOperation>
-      ).namespace,
+      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
+        .namespace,
       "TestService.Inner",
     );
   });
@@ -99,10 +97,8 @@ describe("normal namespace", () => {
       `,
     );
     strictEqual(
-      (
-        runner.context.sdkPackage.clients[0].methods[0]
-          .response as SdkClientType<SdkServiceOperation>
-      ).namespace,
+      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
+        .namespace,
       "TestService",
     );
   });
@@ -189,10 +185,8 @@ describe("namespace override", () => {
       `,
     );
     strictEqual(
-      (
-        runner.context.sdkPackage.clients[0].methods[0]
-          .response as SdkClientType<SdkServiceOperation>
-      ).namespace,
+      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
+        .namespace,
       "MyNamespace",
     );
   });
@@ -207,10 +201,8 @@ describe("namespace override", () => {
       `,
     );
     strictEqual(
-      (
-        runner.context.sdkPackage.clients[0].methods[0]
-          .response as SdkClientType<SdkServiceOperation>
-      ).namespace,
+      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
+        .namespace,
       "MyNamespace",
     );
   });
@@ -237,18 +229,14 @@ describe("namespace override", () => {
     );
     strictEqual(runner.context.sdkPackage.clients[0].namespace, "TestService"); // root namespace
     strictEqual(
-      (
-        runner.context.sdkPackage.clients[0].methods[0]
-          .response as SdkClientType<SdkServiceOperation>
-      ).namespace,
+      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
+        .namespace,
       "MyNamespace",
     ); // Inner namespace with override
     strictEqual(
       (
-        (
-          runner.context.sdkPackage.clients[0].methods[0]
-            .response as SdkClientType<SdkServiceOperation>
-        ).methods[0].response as SdkClientType<SdkServiceOperation>
+        (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
+          .children![0] as SdkClientType<SdkServiceOperation>
       ).namespace,
       "MyNamespace.Test",
     ); // Test namespace affected by Inner namespace override
