@@ -356,6 +356,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on ${"operationName"}.`,
       },
     },
+    "unsupported-http-file-body": {
+      severity: "error",
+      messages: {
+        default: "File body is not supported for HTTP operations. Please use bytes instead.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

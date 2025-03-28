@@ -28,12 +28,7 @@ import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
 } from "@typespec/compiler/experimental";
-import {
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationResponseContent,
-} from "@typespec/http";
+import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
@@ -511,8 +506,8 @@ export function twoParamsEquivalent(
  * @param parameters
  * @returns
  */
-export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
-  return httpBody.property === undefined;
+export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
+  return httpBody.bodyKind !== "file" && httpBody.property === undefined;
 }
 
 /**
