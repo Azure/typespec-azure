@@ -2318,17 +2318,27 @@ Expected response body:
 
 - Endpoint: `post https://management.azure.com`
 
-  Resource sync action.
-  Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/actionSync
-  Expected query parameter: api-version=2023-12-01-preview
-  Expected request body:
+Resource sync action.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/actionSync
+Expected query parameter: api-version=2023-12-01-preview
 
-  ```json
-  {
-    "message": "Resource action at top level.",
-    "urgent": true
-  }
-  ```
+Expected request body:
+
+```json
+{
+  "message": "Resource action at top level.",
+  "urgent": true
+}
+```
+
+### Azure_ResourceManager_Resources_TopLevel_checkExistence
+
+- Endpoint: `head https://management.azure.com`
+
+Resource HEAD operation.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
 
 ### Azure_ResourceManager_Resources_TopLevel_createOrReplace
 
@@ -2337,6 +2347,7 @@ Expected response body:
 Resource PUT operation.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
 Expected query parameter: api-version=2023-12-01-preview
+
 Expected request body:
 
 ```json
@@ -2485,6 +2496,7 @@ Expected response body:
 Resource PATCH operation.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top
 Expected query parameter: api-version=2023-12-01-preview
+
 Expected request body:
 
 ```json
