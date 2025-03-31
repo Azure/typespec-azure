@@ -4,27 +4,27 @@ title: Clients
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
-This page documents the client behavior as well as how to customize clients. For an overview of the setup, please visit the previous page.
+This page explains client behavior and how to customize clients. For an overview of the setup, please refer to the previous page.
 
-> **NOTE:** JS RLC is not in the business of customization. it will ignore client.tsp and the follow scenarios will not have impact on the JS RLC user experiences. In this context, TypeScript part means JS Modular Emitter.
+> **NOTE:** JS RLC does not support customization. It will ignore `client.tsp`, and the following scenarios will not affect the JS RLC user experience. In this context, "TypeScript part" refers to the JS Modular Emitter.
 
-## Default behavior
+## Default Behavior
 
-### Basic rules
+### Basic Rules
 
-By default, the namespace with `@service` decorator will be generated as a root client. The name for that client will be the namespace name concatenating `Client` as suffix.
+By default, the namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
 
-Other sub namespaces and interfaces of each root client will be generated as operation groups with hierarchy.
+Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure.
 
-The operation group sequence is determined by the order of the namespace declaration then the interface declaration.
+The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
 
-The root client's SDK namespace will follow the namespace decorated with `@service`. If an operation group comes from a sub namespace, its SDK namespace will follow that namespace. If it comes from a interface, its SDK namespace will follow the namespace which the interface belongs to.
+The root client's SDK namespace corresponds to the namespace decorated with `@service`. If an operation group originates from a sub-namespace, its SDK namespace corresponds to that sub-namespace. If it originates from an interface, its SDK namespace corresponds to the namespace containing the interface.
 
-By default, the operation group could only be initialized by root client or parent operation group.
+By default, operation groups can only be initialized by the root client or their parent operation group.
 
-Different language's code generator will have different way to organize clients and operation groups. Please refer the following examples.
+Different languages organize clients and operation groups differently. Refer to the examples below for details.
 
-### Single client
+### Single Client
 
 <ClientTabs>
 
@@ -71,9 +71,9 @@ client.pet();
 
 </ClientTabs>
 
-### Client with one-layer child operation groups
+### Client with One-Layer Child Operation Groups
 
-`PetStore` has two operation groups. Operation group `Dogs` is from a sub namespace, and `Cats` is from an interface.
+`PetStore` has two operation groups. The `Dogs` operation group comes from a sub-namespace, while `Cats` comes from an interface.
 
 <ClientTabs>
 
@@ -138,9 +138,9 @@ catsClient.pet();
 
 </ClientTabs>
 
-### Client with multi-layer child operation group
+### Client with Multi-Layer Child Operation Groups
 
-`PetStore` has three operation groups. Operation group `Billings` is from an interface, `Pets` is from a sub namespace, and `Actions` is from an interface. `Pets` has one nested operation group `Actions` from an interface.
+`PetStore` has three operation groups: `Billings` (from an interface), `Pets` (from a sub-namespace), and `Actions` (from an interface). `Pets` also contains a nested operation group, `Actions`, from an interface.
 
 <ClientTabs>
 
@@ -240,17 +240,17 @@ actionsClient.close();
 
 ## Customizations
 
-Customization SHOULD always be done in a file called `client.tsp` along with the `main.tsp`.
+Customizations SHOULD always be made in a file named `client.tsp` alongside `main.tsp`.
 
-You can use `@client` and `@operationGroup` to reconstruct the client hierarchy. However, if any customizations are made, the client hierarchy will only be inferred from those customizations. The logic defined in the default behaviors will no longer take effect.
+You can use `@client` and `@operationGroup` to restructure the client hierarchy. However, if any customizations are made, the client hierarchy will only reflect those customizations. The default behavior logic will no longer apply.
 
-If any customizations are made, the client's SDK namespace will follow the namespace decorated with `@client` or the namespace which the interface decorated with `@client` belongs to. The operation group's SDK namespace follows the same logic for `@operationGroup`. You can use `@clientNamespace` to override it if needed.
+If customizations are made, the client's SDK namespace will follow the namespace decorated with `@client` or the namespace containing the interface decorated with `@client`. Similarly, the operation group's SDK namespace follows the same logic for `@operationGroup`. You can override this using `@clientNamespace` if needed.
 
-The client and operation group sequence is determined by the order of the `@client` and `@operationGroup` decorators.
+The sequence of clients and operation groups is determined by the order of the `@client` and `@operationGroup` decorators.
 
-For this section, we will assume that you have service called `PetStore` in the namespace `PetStore`, defining the two operations `feed` and `pet`.
+For this section, we assume you have a service called `PetStore` in the `PetStore` namespace, defining two operations: `feed` and `pet`.
 
-### Renaming the client name
+### Renaming the Client Name
 
 This can be achieved with the augment decorator: `@clientName` from `typespec-client-generator-core`.
 
@@ -297,7 +297,7 @@ client.pet();
 
 </ClientTabs>
 
-### Renaming the client namespace
+### Renaming the Client Namespace
 
 This can be achieved with the augment decorator: `@clientNamespace` from `typespec-client-generator-core`.
 
@@ -346,7 +346,7 @@ client.pet();
 
 </ClientTabs>
 
-### Splitting the operations into two clients
+### Splitting the Operations into Two Clients
 
 Two clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`.
 
@@ -418,7 +418,7 @@ petActionClient.pet()
 
 </ClientTabs>
 
-### One client and two operation groups
+### One Client and Two Operation Groups
 
 Two clients that separate the operations can be declared using the `@client` decorator and the `@operationGroup` decorator from `typespec-client-generator-core`:
 
@@ -487,7 +487,7 @@ opGrp2Client.pet();
 
 </ClientTabs>
 
-### Splitting the operations into sub namespaces
+### Splitting the Operations into Sub-Namespaces
 
 <ClientTabs>
 
@@ -550,9 +550,9 @@ petActionClient.pet();
 
 </ClientTabs>
 
-### Splitting the operations in two clients and have clients in different namespace
+### Splitting the Operations into Two Clients and Having Clients in Different Namespaces
 
-Two clients that separates the operations can be declared using the `client` decorator of `typespec-client-generator-core`:
+Two clients that separate the operations can be declared using the `client` decorator of `typespec-client-generator-core`:
 
 <ClientTabs>
 
@@ -705,7 +705,7 @@ client.download()
 
 </ClientTabs>
 
-### Change operation group initialization way
+### Change Operation Group Initialization Way
 
 By default, all the nested operation group could only be initialized by parent client or operation group.
 There are cases where spec authors would like their operation groups could both be initialized by parent as well as individually.

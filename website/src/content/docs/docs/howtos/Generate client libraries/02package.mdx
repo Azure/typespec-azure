@@ -1,20 +1,20 @@
 ---
-title: Common behavior for client package
+title: Common Behavior for Client Packages
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
-This page documents the common bahavior for a client package, including the service, namespace, license, etc.
+This page documents the common behavior for a client package, including the service, namespace, license, and more.
 
 ## Service
 
-The service is the entry point for a client library. Currently, we only support one service per package.The service is defined by the `@service` decorator. If multiple services are defined, the first one will be used as the entry point.
+The service acts as the entry point for a client library. Currently, only one service per package is supported. The service is defined using the `@service` decorator. If multiple services are defined, the first one will be used as the entry point.
 
 ## Namespace
 
-Clients, models, enums, and unions in TypeSpec have namespace information. Language's code generator use it in different ways to organize the generated code.
+Clients, models, enums, and unions in TypeSpec include namespace information. Code generators for different languages use this information to organize the generated code.
 
-### Basic cases
+### Basic Example
 
 <ClientTabs>
 
@@ -51,7 +51,7 @@ model Food {
 
 ### Customization
 
-You could use `@clientNamespace` to change the namespace for specific client, enum, model or union.
+You can use the `@clientNamespace` decorator to customize the namespace for specific clients, enums, models, or unions.
 
 <ClientTabs>
 
@@ -97,20 +97,20 @@ namespace Customization;
 
 ## License
 
-The license info is auto-generated in the client code header as well as in the `LICENSE` file depending on the language's emitter.
+License information is automatically generated in the client code header and the `LICENSE` file, depending on the language's emitter.
 
-## Azure license
+### Azure License
 
-For Azure scenarios, client code will always use the MIT license and include the license info in the header of the generated code or in a separate file depending on the language.
+For Azure scenarios, client code always uses the MIT license. The license information is included in the header of the generated code or in a separate file, depending on the language.
 
-For example, this is the license comment in the generated code of a Java client:
+For example, here is the license comment in the generated code of a Java client:
 
 ```java
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 ```
 
-This is the `LICENSE` file of a Python client library:
+And here is the `LICENSE` file for a Python client library:
 
 ```text
 Copyright (c) Microsoft Corporation
@@ -134,21 +134,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-## Unbranded license
+### Unbranded License
 
-For unbranded scenarios, client code will have no license info if there is no `license` configuration in `tspconfig.yaml`.
-Spec authors can set the license info with the `license` configuration in the `tspconfig.yaml`, the configuration is as follows:
+For unbranded scenarios, client code will not include license information unless it is configured in `tspconfig.yaml`. Spec authors can define license information using the `license` configuration in `tspconfig.yaml` as shown below:
 
 ```yaml
 license:
-  name: <License name. This is required. We have built-in "MIT License", "Apache License 2.0", "BSD 3-Clause License", "MPL 2.0", "GPL-3.0", and "LGPL-3.0". If you use build-in license, you only need to set the name and company. For other licenses, you need to set the name, company, link, header, and description manually.>
-  company: <Company name. Optional. For build-in license, it will affect the copyright sentence.>
-  link: <License link. Optional. If you want a customized license, you need to set the link manually.>
-  header: <License header in the generated code. Optional. If you want a customized license, you need to set the header manually.>
-  description: <License description in the separate license file. Optional. If you want a customized license, you need to set the description manually.>
+  name: <License name. This is required. We support built-in licenses such as "MIT License", "Apache License 2.0", "BSD 3-Clause License", "MPL 2.0", "GPL-3.0", and "LGPL-3.0". For custom licenses, you must provide the name, company, link, header, and description manually.>
+  company: <Company name. Optional. For built-in licenses, this affects the copyright statement.>
+  link: <License link. Optional. Required for custom licenses.>
+  header: <License header in the generated code. Optional. Required for custom licenses.>
+  description: <License description in the separate license file. Optional. Required for custom licenses.>
 ```
 
-For example, if you configure the license using a built-in license:
+#### Example: Built-in License
 
 ```yaml
 emit:
@@ -165,23 +164,23 @@ options:
       company: "Microsoft Corporation"
 ```
 
-This is the license comment in the generated code of a Java client:
+Generated license comment in Java client code:
 
 ```java
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 ```
 
-This is the `LICENSE` file of a Python client library:
+Generated `LICENSE` file for Python client library:
 
 ```text
 Copyright (c) Microsoft Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-You may obtain a copy of the License at\n
+You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0\n
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -190,7 +189,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-If you configure the license using a customized license:
+#### Example: Custom License
 
 ```yaml
 emit:
@@ -211,30 +210,13 @@ options:
       description: "This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/."
 ```
 
-For example, if you configure the license using a built-in license:
-
-```yaml
-emit:
-  - "@azure-tools/typespec-python"
-  - "@azure-tools/typespec-java"
-options:
-  "@azure-tools/typespec-python":
-    license:
-      name: "Apache License 2.0"
-      company: "Microsoft Corporation"
-  "@azure-tools/typespec-java":
-    license:
-      name: "Apache License 2.0"
-      company: "Microsoft Corporation"
-```
-
-This is the license comment in the generated code of a Java client:
+Generated license comment in Java client code:
 
 ```java
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 ```
 
-This is the `LICENSE` file of a Python client library:
+Generated `LICENSE` file for Python client library:
 
 ```text
 This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
