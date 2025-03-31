@@ -590,7 +590,7 @@ export function getCorrespondingMethodParams(
       diagnostics.add(
         createDiagnostic({
           code: "no-corresponding-method-param",
-          target: serviceParam.__raw!,
+          target: operation,
           format: {
             paramName: "apiVersion",
             methodName: operation.name,
@@ -609,7 +609,7 @@ export function getCorrespondingMethodParams(
       diagnostics.add(
         createDiagnostic({
           code: "no-corresponding-method-param",
-          target: serviceParam.__raw!,
+          target: operation,
           format: {
             paramName: "subscriptionId",
             methodName: operation.name,
@@ -649,7 +649,7 @@ export function getCorrespondingMethodParams(
   diagnostics.add(
     createDiagnostic({
       code: "no-corresponding-method-param",
-      target: serviceParam.__raw!,
+      target: operation,
       format: {
         paramName: serviceParam.name,
         methodName: operation.name,
