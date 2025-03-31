@@ -623,6 +623,32 @@ Whether you want to generate an operation as a protocol operation.
 op test: void;
 ```
 
+### `@responseAsBool` {#@Azure.ClientGenerator.Core.responseAsBool}
+
+Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+
+```typespec
+@Azure.ClientGenerator.Core.responseAsBool(scope?: valueof string)
+```
+
+#### Target
+
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description |
+| ----- | ---------------- | ----------- |
+| scope | `valueof string` |             |
+
+#### Examples
+
+```typespec
+@responseAsBool
+@head
+op headOperation(): void;
+```
+
 ### `@scope` {#@Azure.ClientGenerator.Core.scope}
 
 To define the client scope of an operation.
