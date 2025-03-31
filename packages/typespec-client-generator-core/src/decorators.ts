@@ -316,7 +316,13 @@ export function listClients(context: TCGCContext): SdkClient[] {
   // if there is no explicit client, we will treat the first namespace with service decorator as client
   const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
   if (serviceNamespaces.length >= 1) {
-    const service = serviceNamespaces[0];
+    const service = serviceNamespaces.shift()!;
+    serviceNamespaces.map((ns) => {
+      reportDiagnostic(context.program, {
+        code: "service-more-than-one",
+        target: ns,
+      });
+    });
     let originalName = service.name;
     const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
