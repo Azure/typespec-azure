@@ -28,12 +28,7 @@ import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
 } from "@typespec/compiler/experimental";
-import {
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationResponseContent,
-} from "@typespec/http";
+import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
@@ -61,6 +56,28 @@ import {
 import { getClientTypeWithDiagnostics } from "./types.js";
 
 import { $ } from "@typespec/compiler/experimental/typekit";
+
+export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
+  "emitter-name"?: string;
+}
+
+export interface UnbrandedSdkEmitterOptionsInterface {
+  "generate-protocol-methods"?: boolean;
+  "generate-convenience-methods"?: boolean;
+  "api-version"?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
+}
+
+export interface BrandedSdkEmitterOptionsInterface extends UnbrandedSdkEmitterOptionsInterface {
+  "examples-dir"?: string;
+  namespace?: string;
+}
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -488,8 +505,8 @@ export function twoParamsEquivalent(
  * @param parameters
  * @returns
  */
-export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
-  return httpBody.property === undefined;
+export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
+  return httpBody.bodyKind !== "file" && httpBody.property === undefined;
 }
 
 /**

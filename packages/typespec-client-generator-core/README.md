@@ -53,18 +53,6 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
-### `examples-dir`
-
-**Type:** `string`
-
-Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
-
-### `namespace`
-
-**Type:** `string`
-
-Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.
-
 ### `api-version`
 
 **Type:** `string`
@@ -76,6 +64,18 @@ Use this flag if you would like to generate the sdk only for a specific version.
 **Type:** `object`
 
 License information for the generated client code.
+
+### `examples-dir`
+
+**Type:** `string`
+
+Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
+
+### `namespace`
+
+**Type:** `string`
+
+Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.
 
 ## Usage
 
@@ -113,6 +113,7 @@ Available ruleSets:
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
 - [`@convenientAPI`](#@convenientapi)
+- [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
 - [`@flattenProperty`](#@flattenproperty)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
@@ -519,6 +520,39 @@ Whether you want to generate an operation as a convenient operation.
 ```typespec
 @convenientAPI(false)
 op test: void;
+```
+
+#### `@deserializeEmptyStringAsNull`
+
+Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
+
+```typespec
+@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull(scope?: valueof string)
+```
+
+##### Target
+
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                            |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+##### Examples
+
+```typespec
+
+model MyModel {
+  scalar stringlike extends string;
+
+  @deserializeEmptyStringAsNull
+  prop: string;
+
+  @deserializeEmptyStringAsNull
+  prop: stringlike;
+}
 ```
 
 #### `@flattenProperty`

@@ -28,30 +28,13 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  BrandedSdkEmitterOptionsInterface,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
+  TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
 import { createSdkPackage } from "./package.js";
-
-export interface TCGCEmitterOptions extends SdkEmitterOptions {
-  "emitter-name"?: string;
-}
-
-export interface SdkEmitterOptions {
-  "generate-protocol-methods"?: boolean;
-  "generate-convenience-methods"?: boolean;
-  "api-version"?: string;
-  "examples-dir"?: string;
-  namespace?: string;
-  license?: {
-    name: string;
-    company?: string;
-    link?: string;
-    header?: string;
-    description?: string;
-  };
-}
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
   const diagnostics = createDiagnosticCollector();
@@ -117,7 +100,7 @@ export interface CreateSdkContextOptions {
 }
 
 export async function createSdkContext<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TOptions extends Record<string, any> = BrandedSdkEmitterOptionsInterface,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   context: EmitContext<TOptions>,

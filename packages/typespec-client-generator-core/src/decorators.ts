@@ -30,6 +30,7 @@ import {
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
+  DeserializeEmptyStringAsNullDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -1272,3 +1273,34 @@ function IsInScope(context: TCGCContext, entity: Operation): boolean {
   }
   return true;
 }
+
+export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes,
+) => {
+  if (target.type.kind !== "Scalar") {
+    reportDiagnostic(context.program, {
+      code: "invalid-deserializeEmptyStringAsNull-target-type",
+      format: {},
+      target: target,
+    });
+    return;
+  }
+
+  if (target.type.name !== "string") {
+    let scalarType = target.type as Scalar;
+    while (scalarType.baseScalar !== undefined) {
+      scalarType = scalarType.baseScalar;
+    }
+
+    if (scalarType.name !== "string") {
+      reportDiagnostic(context.program, {
+        code: "invalid-deserializeEmptyStringAsNull-target-type",
+        format: {},
+        target: target,
+      });
+      return;
+    }
+  }
+};

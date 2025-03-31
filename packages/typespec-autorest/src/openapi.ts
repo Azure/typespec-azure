@@ -111,6 +111,7 @@ import {
   HttpOperationMultipartBody,
   HttpOperationParameters,
   HttpOperationResponse,
+  HttpPayloadBody,
   HttpProperty,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
@@ -855,7 +856,7 @@ export async function getOpenAPIForService(
       openapiResponse["x-ms-error-response"] = true;
     }
     const contentTypes: string[] = [];
-    let body: HttpOperationBody | HttpOperationMultipartBody | undefined;
+    let body: HttpPayloadBody | undefined;
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
@@ -888,11 +889,11 @@ export async function getOpenAPIForService(
   }
 
   function getSchemaForResponseBody(
-    body: HttpOperationBody | HttpOperationMultipartBody,
+    body: HttpPayloadBody,
     contentTypes: string[],
   ): OpenAPI2Schema | OpenAPI2FileSchema {
     const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
-    if (isBinary) {
+    if (body.bodyKind === "file" || isBinary) {
       return { type: "file" };
     }
     if (body.bodyKind === "multipart") {
@@ -1143,16 +1144,32 @@ export async function getOpenAPIForService(
     }
   }
 
-  function emitBodyParameters(
-    body: HttpOperationBody | HttpOperationMultipartBody,
-    visibility: Visibility,
-  ) {
+  function emitBodyParameters(body: HttpPayloadBody, visibility: Visibility) {
     switch (body.bodyKind) {
       case "single":
         emitSingleBodyParameters(body, visibility);
         break;
       case "multipart":
         emitMultipartBodyParameters(body, visibility);
+        break;
+      case "file":
+        const bodySchema = { type: "string", format: "binary" };
+        const { property } = body;
+        if (property) {
+          emitParameter(property, () =>
+            getOpenAPI2BodyParameter(property, property.name, bodySchema),
+          );
+        } else {
+          currentEndpoint.parameters.push({
+            name: "body",
+            in: "body",
+            schema: {
+              type: "string",
+              format: "binary",
+            },
+            required: true,
+          });
+        }
         break;
     }
   }
@@ -1196,17 +1213,20 @@ export async function getOpenAPIForService(
             items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
           };
         }
-        let description;
-        if (part.property) {
-          description = getDoc(program, part.property);
-        }
-        currentEndpoint.parameters.push({
+
+        const param: OpenAPI2Parameter = {
           name: partName,
           in: "formData",
           required: !part.optional,
-          ...(description ? { description } : {}),
           ...schema,
-        });
+        };
+        if (part.property) {
+          param.description = getDoc(program, part.property);
+          if (part.property.name !== partName) {
+            param["x-ms-client-name"] = part.property.name;
+          }
+        }
+        currentEndpoint.parameters.push(param);
       }
     }
   }
