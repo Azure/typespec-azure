@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkEmitterOptions } from "../src/interfaces.js";
+import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "./test-host.js";
 
 let runner: SdkTestRunner;
@@ -11,50 +11,28 @@ beforeEach(async () => {
 });
 
 describe("no namespace flag", () => {
-  it("basic namespace", async () => {
-    await runner.compile(`
-        @client({name: "MyClient"})
-        @service
-        namespace My.Namespace;
-      `);
-
-    strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
-  });
-  it("nested namespaces", async () => {
-    await runner.compile(`
-        @client({name: "MyClient"})
-        @service
-        namespace My.Namespace {};
-
-        @client({name: "MySecondClient"})
-        @service
-        namespace My.Namespace.Sub {};
-      `);
-
-    strictEqual(runner.context.sdkPackage.rootNamespace, "My.Namespace");
-  });
   it("two sub-clients", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Foo {
-          @route("/bar")
-          namespace Bar {
-            model BarResponse {
-              prop: string;
-            }
-            op get(): BarResponse;
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Foo {
+        @route("/bar")
+        namespace Bar {
+          model BarResponse {
+            prop: string;
           }
-  
-          @route("/baz")
-          namespace Baz {
-            model BazResponse {
-              prop: string;
-            }
-            op get(): BazResponse;
-          }
+          op get(): BarResponse;
         }
-      `);
+
+        @route("/baz")
+        namespace Baz {
+          model BazResponse {
+            prop: string;
+          }
+          op get(): BazResponse;
+        }
+      }
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
     const fooNamespace = sdkPackage.namespaces.find((x) => x.name === "Foo");
@@ -87,40 +65,40 @@ describe("no namespace flag", () => {
 
   it("separate defined clients and operation groups", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Service {
-          model BarResponse {
-            prop: string;
-          }
-  
-          @route("/bar")
-          op getBar(): BarResponse;
-  
-          model BazResponse {
-            prop: string;
-          }
-  
-          @route("/baz")
-          op getBaz(): BazResponse;
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Service {
+        model BarResponse {
+          prop: string;
         }
-        
-        @client({
-          name: "FooClient",
-          service: Service,
-        })
-        namespace Foo {
-          @operationGroup
-          namespace Bar {
-            op get is Service.getBar;
-          }
-  
-          @operationGroup
-          namespace Baz {
-            op get is Service.getBaz;
-          }
+
+        @route("/bar")
+        op getBar(): BarResponse;
+
+        model BazResponse {
+          prop: string;
         }
-      `);
+
+        @route("/baz")
+        op getBaz(): BazResponse;
+      }
+      
+      @client({
+        name: "FooClient",
+        service: Service,
+      })
+      namespace Foo {
+        @operationGroup
+        namespace Bar {
+          op get is Service.getBar;
+        }
+
+        @operationGroup
+        namespace Baz {
+          op get is Service.getBaz;
+        }
+      }
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
 
@@ -162,24 +140,24 @@ describe("no namespace flag", () => {
 
   it("complicated namespaces", async () => {
     await runner.compile(`
-        @service
-        @route("/a")
-        namespace A {
-          interface AG {
+      @service
+      @route("/a")
+      namespace A {
+        interface AG {
+        }
+        namespace AA {
+          interface AAG {
           }
-          namespace AA {
-            interface AAG {
+          namespace AAA{};
+          namespace AAB{
+            interface AABGroup1 {
             }
-            namespace AAA{};
-            namespace AAB{
-              interface AABGroup1 {
-              }
-              interface AABGroup2 {
-              }
+            interface AABGroup2 {
             }
           }
         }
-      `);
+      }
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
     const aNamespace = sdkPackage.namespaces.find((x) => x.name === "A");
@@ -257,10 +235,10 @@ describe("no namespace flag", () => {
     const sdkPackage = runner.context.sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
     const petActionClient = sdkPackage.clients.find((x) => x.name === "PetActionClient");
     ok(petActionClient);
-    strictEqual(petActionClient.clientNamespace, "PetStoreRenamed.SubNamespace");
+    strictEqual(petActionClient.namespace, "PetStoreRenamed.SubNamespace");
   });
 
   it("restructure client with namespace flag", async () => {
@@ -279,28 +257,28 @@ describe("no namespace flag", () => {
       `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreRenamed",
       })
     ).sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "PetStoreClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
   });
 });
 
 describe("namespace config flag", () => {
   it("replace single-segment namespace with multi-segment namespace", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Foo {
-          op get(): string;
-        }
-      `);
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Foo {
+        op get(): string;
+      }
+    `);
 
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "Azure.Foo",
       })
     ).sdkPackage;
@@ -320,28 +298,28 @@ describe("namespace config flag", () => {
   });
   it("two sub-clients with namespace flag", async () => {
     await runner.compile(`
-        @server("http://localhost:3000", "endpoint")
-        @service
-        namespace Foo {
-          @route("/bar")
-          namespace Bar {
-            model BarResponse {
-              prop: string;
-            }
-            op get(): BarResponse;
+      @server("http://localhost:3000", "endpoint")
+      @service
+      namespace Foo {
+        @route("/bar")
+        namespace Bar {
+          model BarResponse {
+            prop: string;
           }
-  
-          @route("/baz")
-          namespace Baz {
-            model BazResponse {
-              prop: string;
-            }
-            op get(): BazResponse;
-          }
+          op get(): BarResponse;
         }
-      `);
+
+        @route("/baz")
+        namespace Baz {
+          model BazResponse {
+            prop: string;
+          }
+          op get(): BazResponse;
+        }
+      }
+    `);
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "FooRenamed",
       })
     ).sdkPackage;
@@ -354,13 +332,13 @@ describe("namespace config flag", () => {
     strictEqual(fooRenamedNamespace.clients.length, 3);
     const fooClient = fooRenamedNamespace.clients.find((x) => x.name === "FooClient");
     ok(fooClient);
-    strictEqual(fooClient.clientNamespace, "FooRenamed");
+    strictEqual(fooClient.namespace, "FooRenamed");
     const barClient = fooRenamedNamespace.clients.find((x) => x.name === "Bar");
     ok(barClient);
-    strictEqual(barClient.clientNamespace, "FooRenamed");
+    strictEqual(barClient.namespace, "FooRenamed");
     const bazClient = fooRenamedNamespace.clients.find((x) => x.name === "Baz");
     ok(bazClient);
-    strictEqual(bazClient.clientNamespace, "FooRenamed");
+    strictEqual(bazClient.namespace, "FooRenamed");
     strictEqual(fooRenamedNamespace.models.length, 2);
     strictEqual(fooRenamedNamespace.enums.length, 0);
     strictEqual(fooRenamedNamespace.unions.length, 0);
@@ -382,13 +360,13 @@ describe("namespace config flag", () => {
       `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreRenamed",
       })
     ).sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "PetStoreClient");
     ok(foodClient);
-    strictEqual(foodClient.clientNamespace, "PetStoreRenamed");
+    strictEqual(foodClient.namespace, "PetStoreRenamed");
   });
   it("use namespace config flag with an azure spec", async () => {
     const runnerWithCore = await createSdkTestRunner({
@@ -401,9 +379,12 @@ describe("namespace config flag", () => {
     `);
 
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runnerWithCore.context.program, {
-        namespace: "Azure.My.Service",
-      })
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(
+        runnerWithCore.context.program,
+        {
+          namespace: "Azure.My.Service",
+        },
+      )
     ).sdkPackage;
 
     const myNamespace = sdkPackage.namespaces.find((x) => x.name === "My");
@@ -459,7 +440,7 @@ describe("namespace config flag", () => {
     `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreFlagRenamed",
       })
     ).sdkPackage;
@@ -501,7 +482,7 @@ describe("namespace config flag", () => {
       `,
     );
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "PetStoreFlagRenamed",
       })
     ).sdkPackage;
@@ -538,7 +519,7 @@ describe("namespace config flag", () => {
     `);
 
     const sdkPackage = (
-      await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
         namespace: "Azure.A",
       })
     ).sdkPackage;
@@ -577,7 +558,7 @@ it("customization with models from original namespace", async () => {
   );
 
   const sdkPackage = (
-    await createSdkContextTestHelper<SdkEmitterOptions>(runner.context.program, {
+    await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
       namespace: "Renamed",
     })
   ).sdkPackage;

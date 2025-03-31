@@ -16,8 +16,8 @@ If there is just one api version in the spec, we will generate the api surface a
 import "@typespec/versioning";
 import "@typespec/http";
 
-using TypeSpec.Versioning;
-using TypeSpec.Http;
+using Versioning;
+using Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -124,8 +124,8 @@ For the below example, all languages will generate the api surface of default ve
 import "@typespec/versioning";
 import "@typespec/http";
 
-using TypeSpec.Versioning;
-using TypeSpec.Http;
+using Versioning;
+using Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -249,8 +249,8 @@ options:
 import "@typespec/versioning";
 import "@typespec/http";
 
-using TypeSpec.Versioning;
-using TypeSpec.Http;
+using Versioning;
+using Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -380,8 +380,8 @@ options:
 import "@typespec/versioning";
 import "@typespec/http";
 
-using TypeSpec.Versioning;
-using TypeSpec.Http;
+using Versioning;
+using Http;
 
 @versioned(My.Service.Versions)
 @service
@@ -490,8 +490,8 @@ There are cases where you have an api-versioning parameter without the explicit 
 import "@typespec/versioning";
 import "@typespec/http";
 import "@azure-tools/typespec-client-generator-core";
-using TypeSpec.Versioning;
-using TypeSpec.Http;
+using Versioning;
+using Http;
 using Azure.ClientGenerator.Core;
 @versioned(My.Service.Versions)
 @service

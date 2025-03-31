@@ -1,11 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import {
-  SdkClientType,
-  SdkHttpOperation,
-  SdkMethodParameter,
-  SdkServiceMethod,
-} from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkMethodParameter, SdkServiceMethod } from "../../src/interfaces.js";
 import { getHttpOperationParameter } from "../../src/public-utils.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
@@ -18,8 +13,8 @@ beforeEach(async () => {
 
 it("normal method case", async () => {
   await runner.compileWithBuiltInService(`
-      op myOp(@header h: string, @query q: string, @path p: string, @body b: string): void;
-    `);
+    op myOp(@header h: string, @query q: string, @path p: string, @body b: string): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
@@ -56,12 +51,12 @@ it("normal method case", async () => {
 
 it("normal spread case", async () => {
   await runner.compileWithBuiltInService(`
-      model Input {
-        key: string;
-      }
+    model Input {
+      key: string;
+    }
 
-      op myOp(...Input): void;
-    `);
+    op myOp(...Input): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
@@ -85,16 +80,16 @@ it("normal spread case", async () => {
 
 it("spread model with @body property", async () => {
   await runner.compileWithBuiltInService(`
-      model Shelf {
-        name: string;
-        theme?: string;
-      }
-      model CreateShelfRequest {
-        @body
-        body: Shelf;
-      }
-      op createShelf(...CreateShelfRequest): Shelf;
-    `);
+    model Shelf {
+      name: string;
+      theme?: string;
+    }
+    model CreateShelfRequest {
+      @body
+      body: Shelf;
+    }
+    op createShelf(...CreateShelfRequest): Shelf;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
@@ -122,17 +117,17 @@ it("spread model with @body property", async () => {
 
 it("spread model with @bodyRoot property", async () => {
   await runner.compileWithBuiltInService(`
-      model Shelf {
-        @query
-        name: string;
-        theme?: string;
-      }
-      model CreateShelfRequest {
-        @bodyRoot
-        body: Shelf;
-      }
-      op createShelf(...CreateShelfRequest): Shelf;
-    `);
+    model Shelf {
+      @query
+      name: string;
+      theme?: string;
+    }
+    model CreateShelfRequest {
+      @bodyRoot
+      body: Shelf;
+    }
+    op createShelf(...CreateShelfRequest): Shelf;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
@@ -172,8 +167,8 @@ it("spread model with @bodyRoot property", async () => {
 
 it("implicit spread for body", async () => {
   await runner.compileWithBuiltInService(`
-      op myOp(a: string, b: string): void;
-    `);
+    op myOp(a: string, b: string): void;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
@@ -201,8 +196,8 @@ it("implicit spread for body", async () => {
 
 it("implicit spread for header and body", async () => {
   await runner.compileWithBuiltInService(`
-      op myOp(@header a: string, b: string): void;
-    `);
+    op myOp(@header a: string, b: string): void;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
@@ -230,16 +225,16 @@ it("implicit spread for header and body", async () => {
 
 it("@bodyRoot case", async () => {
   await runner.compileWithBuiltInService(`
-      model TestRequest {
-        @header
-        h: string;
-        @query
-        q: string;
-        prop1: string;
-        prop2: string;
-      }
-      op test(@bodyRoot request: TestRequest): void;
-    `);
+    model TestRequest {
+      @header
+      h: string;
+      @query
+      q: string;
+      prop1: string;
+      prop2: string;
+    }
+    op test(@bodyRoot request: TestRequest): void;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
@@ -282,22 +277,22 @@ it("@bodyRoot case", async () => {
 
 it("multipart case", async () => {
   await runner.compileWithBuiltInService(`
-      @route("upload/{name}")
-      @post
-      op uploadFile(
-        @path name: string,
-        @header contentType: "multipart/form-data",
-        file_data: bytes,
-
-        @visibility(Lifecycle.Read) readOnly: string,
-
-        constant: "constant",
-      ): OkResponse;
-    `);
+    @route("upload/{name}")
+    @post
+    op uploadFile(
+      @path name: string,
+      @header contentType: "multipart/form-data",
+      @multipartBody body: {
+        file_data: HttpPart<bytes>,
+        @visibility(Lifecycle.Read) readOnly: HttpPart<string>,
+        constant: HttpPart<"constant">,
+      },
+    ): OkResponse;
+  `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
-  strictEqual(parameters.length, 5);
+  strictEqual(parameters.length, 3);
 
   for (const param of parameters) {
     if (param.name === "name") {
@@ -310,59 +305,51 @@ it("multipart case", async () => {
       ok(httpParam);
       strictEqual(httpParam.kind, "header");
       strictEqual(httpParam.serializedName, "content-type");
-    } else if (param.name === "file_data") {
+    } else if (param.name === "body") {
       const httpParam = getHttpOperationParameter(method, param);
       ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "file_data");
-    } else if (param.name === "readOnly") {
-      const httpParam = getHttpOperationParameter(method, param);
-      ok(!httpParam);
-    } else if (param.name === "constant") {
-      const httpParam = getHttpOperationParameter(method, param);
-      ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "constant");
+      strictEqual(httpParam.kind, "body");
+      strictEqual(httpParam.name, "body");
     }
   }
 });
 
 it("template case", async () => {
   await runner.compile(`
-      @service(#{
-        title: "Pet Store Service",
-      })
-      namespace PetStore;
-      using TypeSpec.Rest.Resource;
+    @service(#{
+      title: "Pet Store Service",
+    })
+    namespace PetStore;
+    using Rest.Resource;
 
-      @error
-      model PetStoreError {
-        code: int32;
-        message: string;
-      }
+    @error
+    model PetStoreError {
+      code: int32;
+      message: string;
+    }
 
-      @resource("pets")
-      model Pet {
-        @key("petId")
-        id: int32;
-      }
+    @resource("pets")
+    model Pet {
+      @key("petId")
+      id: int32;
+    }
 
-      @resource("checkups")
-      model Checkup {
-        @key("checkupId")
-        id: int32;
+    @resource("checkups")
+    model Checkup {
+      @key("checkupId")
+      id: int32;
 
-        vetName: string;
-        notes: string;
-      }
+      vetName: string;
+      notes: string;
+    }
 
-      interface PetCheckups
-        extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
-          ExtensionResourceList<Checkup, Pet, PetStoreError> {}
-    `);
+    interface PetCheckups
+      extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
+        ExtensionResourceList<Checkup, Pet, PetStoreError> {}
+  `);
   const sdkPackage = runner.context.sdkPackage;
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
   const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
   const parameters = method.parameters;
 
@@ -400,14 +387,14 @@ it("template case", async () => {
 
 it("api version parameter", async () => {
   await runner.compileWithVersionedService(`
-      op test(@query apiVersion: string, @body body: string): void;
-    `);
+    op test(@query apiVersion: string, @body body: string): void;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
   const method = getServiceMethodOfClient(sdkPackage);
   const httpParam = getHttpOperationParameter(
     method,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "query");
@@ -438,7 +425,7 @@ it("client parameter", async () => {
   const client = sdkPackage.clients[0];
   let httpParam = getHttpOperationParameter(
     client.methods[0] as SdkServiceMethod<SdkHttpOperation>,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "path");
@@ -446,7 +433,7 @@ it("client parameter", async () => {
 
   httpParam = getHttpOperationParameter(
     client.methods[1] as SdkServiceMethod<SdkHttpOperation>,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "path");

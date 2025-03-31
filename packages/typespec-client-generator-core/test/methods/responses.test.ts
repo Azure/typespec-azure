@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkMethodResponse, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -13,13 +13,13 @@ beforeEach(async () => {
 it("basic returning void", async () => {
   await runner.compileWithBuiltInService(
     `
-      @error
-      model Error {
-        code: int32;
-        message: string;
-      }
-      @delete op delete(@path id: string): void | Error;
-      `,
+    @error
+    model Error {
+      code: int32;
+      message: string;
+    }
+    @delete op delete(@path id: string): void | Error;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -48,14 +48,14 @@ it("basic returning void", async () => {
 it("basic returning void and error model has status code", async () => {
   await runner.compileWithBuiltInService(
     `
-      @error
-      model Error {
-        @statusCode _: 403;
-        code: int32;
-        message: string;
-      }
-      @delete op delete(@path id: string): void | Error;
-      `,
+    @error
+    model Error {
+      @statusCode _: 403;
+      code: int32;
+      message: string;
+    }
+    @delete op delete(@path id: string): void | Error;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -84,10 +84,10 @@ it("basic returning void and error model has status code", async () => {
 it("basic returning compiler NotFoundResponse error", async () => {
   await runner.compileWithBuiltInService(
     `
-      @error
-      model NotFoundErrorResponse is NotFoundResponse;
-      @get op get(): void | NotFoundErrorResponse;
-      `,
+    @error
+    model NotFoundErrorResponse is NotFoundResponse;
+    @get op get(): void | NotFoundErrorResponse;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
@@ -104,22 +104,22 @@ it("basic returning compiler NotFoundResponse error", async () => {
 it("basic returning model", async () => {
   await runner.compileWithBuiltInService(
     `
-      model Widget {
-        @visibility(Lifecycle.Read, Lifecycle.Update)
-        @path
-        id: string;
+    model Widget {
+      @visibility(Lifecycle.Read, Lifecycle.Update)
+      @path
+      id: string;
 
-        weight: int32;
-        color: "red" | "blue";
-      }
+      weight: int32;
+      color: "red" | "blue";
+    }
 
-      @error
-      model Error {
-        code: int32;
-        message: string;
-      }
-      @post op create(...Widget): Widget | Error;
-      `,
+    @error
+    model Error {
+      code: int32;
+      message: string;
+    }
+    @post op create(...Widget): Widget | Error;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -156,13 +156,13 @@ it("basic returning model", async () => {
 it("Headers and body", async () => {
   await runner.compileWithBuiltInService(
     `
-      model Widget {
-        @header id: string;
-        weight: int32;
-      }
+    model Widget {
+      @header id: string;
+      weight: int32;
+    }
 
-      op operation(): Widget;
-      `,
+    op operation(): Widget;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -197,12 +197,12 @@ it("Headers and body", async () => {
 it("Headers and body with null", async () => {
   await runner.compileWithBuiltInService(
     `
-      model Widget {
-        weight: int32;
-      }
+    model Widget {
+      weight: int32;
+    }
 
-      op operation(): {@header id: string | null, @body body: Widget | null};
-      `,
+    op operation(): {@header id: string | null, @body body: Widget | null};
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -218,12 +218,12 @@ it("Headers and body with null", async () => {
 it("OkResponse with NoContentResponse", async () => {
   await runner.compileWithBuiltInService(
     `
-      model Widget {
-        weight: int32;
-      }
+    model Widget {
+      weight: int32;
+    }
 
-      op operation(): Widget | NoContentResponse;
-      `,
+    op operation(): Widget | NoContentResponse;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -245,8 +245,8 @@ it("OkResponse with NoContentResponse", async () => {
 it("NoContentResponse", async () => {
   await runner.compileWithBuiltInService(
     `
-      @delete op delete(@path id: string): NoContentResponse;
-      `,
+    @delete op delete(@path id: string): NoContentResponse;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -270,8 +270,8 @@ it("NoContentResponse", async () => {
 it("binary return type", async () => {
   await runner.compileWithBuiltInService(
     `
-      op get(): {@header contentType: "image/jpeg"; @body image: bytes;};
-      `,
+    op get(): {@header contentType: "image/jpeg"; @body image: bytes;};
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
@@ -284,13 +284,13 @@ it("binary return type", async () => {
 it("protocol response usage", async () => {
   await runner.compileWithBuiltInService(
     `
-      model Test {
-        prop: string;
-      }
+    model Test {
+      prop: string;
+    }
 
-      @convenientAPI(false)
-      op get(): Test;
-      `,
+    @convenientAPI(false)
+    op get(): Test;
+    `,
   );
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 0);
@@ -301,13 +301,13 @@ it("protocol response usage", async () => {
 
 it("response model with property with none visibility", async function () {
   await runner.compileWithBuiltInService(`
-      model Test{
-          prop: string;
-          @invisible(Lifecycle)
-          nonProp: string;
-      }
-      op get(): Test;
-      `);
+    model Test{
+        prop: string;
+        @invisible(Lifecycle)
+        nonProp: string;
+    }
+    op get(): Test;
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const models = sdkPackage.models;
   strictEqual(models.length, 1);
@@ -320,11 +320,11 @@ it("response model with property with none visibility", async function () {
 
 it("rename for response header", async function () {
   await runner.compileWithBuiltInService(`
-      model Test{
-          prop: string;
-      }
-      op get(): {@header @clientName("xRename") x: string};
-      `);
+    model Test{
+        prop: string;
+    }
+    op get(): {@header @clientName("xRename") x: string};
+    `);
   const sdkPackage = runner.context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
   const header = method.operation.responses[0].headers[0];
@@ -370,4 +370,46 @@ it("description shall be included in response", async () => {
   const responses = Array.from(method.operation.responses.values());
   strictEqual(responses.length, 1);
   strictEqual(responses[0].description, "description on response");
+});
+
+it("response body with non-read visibility", async () => {
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        @visibility(Lifecycle.Create)
+        create: string;
+
+        read: string;
+      }
+
+      op get(): Test;
+    }
+  `);
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.name, "Test");
+  const client = runner.context.sdkPackage.clients[0];
+  ok(client);
+  const method = client.methods[0];
+  ok(method);
+  strictEqual((method.response as SdkMethodResponse).type, model);
+});
+
+it("response body of scalar with encode", async () => {
+  await runner.compileWithBuiltInService(
+    `
+    @encode(BytesKnownEncoding.base64url)
+    scalar base64urlBytes extends bytes;
+    
+    op get(): {@header contentType: "application/json", @body body: base64urlBytes;};
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const serviceResponse = method.operation.responses[0];
+  deepStrictEqual(serviceResponse.contentTypes, ["application/json"]);
+  strictEqual(serviceResponse.type?.kind, "bytes");
+  strictEqual(serviceResponse.type?.encode, "base64url");
 });

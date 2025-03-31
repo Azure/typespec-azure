@@ -4,7 +4,7 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
-import { UsageFlags } from "../../src/interfaces.js";
+import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -403,9 +403,7 @@ describe("data plane LRO templates", () => {
         `);
 
       const client = runner.context.sdkPackage.clients[0];
-      const method = client.methods[0];
-      strictEqual(method.kind, "clientaccessor");
-      const resourceOpClient = method.response;
+      const resourceOpClient = client.children![0] as SdkClientType<SdkHttpOperation>;
       const lroMethod = resourceOpClient.methods[0];
       strictEqual(lroMethod.kind, "lro");
       const lroMetadata = lroMethod.lroMetadata;
@@ -579,37 +577,37 @@ describe("data plane LRO templates", () => {
 
   it("LRO defined in different namespace", async () => {
     await runner.compile(`
-        @service
-        @versioned(Versions)
-        namespace TestClient {
-          enum Versions {
-            @useDependency(Azure.Core.Versions.v1_0_Preview_1)
-            v1: "v1",
-            @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-            v2: "v2",
-          }
-        
-          alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
-            NoRepeatableRequests &
-            NoClientRequestId>;
+      @service
+      @versioned(Versions)
+      namespace TestClient {
+        enum Versions {
+          @useDependency(Azure.Core.Versions.v1_0_Preview_1)
+          v1: "v1",
+          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+          v2: "v2",
+        }
+      
+        alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
+          NoRepeatableRequests &
+          NoClientRequestId>;
 
-          model PollResponse {
-            operationId: string;
-            status: Azure.Core.Foundations.OperationState;
-          }
-
-          @pollingOperation(NonService.poll)
-          @post
-          @route("/post")
-          op longRunning(): AcceptedResponse;
+        model PollResponse {
+          operationId: string;
+          status: Azure.Core.Foundations.OperationState;
         }
 
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2, TestClient.Versions.v2)
-        namespace NonService {
-          @route("/poll")
-          @get
-          op poll(): TestClient.PollResponse;
-        }`);
+        @pollingOperation(NonService.poll)
+        @post
+        @route("/post")
+        op longRunning(): AcceptedResponse;
+      }
+
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2, TestClient.Versions.v2)
+      namespace NonService {
+        @route("/poll")
+        @get
+        op poll(): TestClient.PollResponse;
+      }`);
     const method = runner.context.sdkPackage.clients[0].methods.find(
       (m) => m.name === "longRunning",
     );
@@ -645,130 +643,130 @@ describe("data plane LRO templates", () => {
     });
     await runnerWithCore.compileWithCustomization(
       `
-        @useDependency(Versions.v1_0_Preview_2)
-        @server("http://localhost:3000", "endpoint")
-        @service()
-        namespace DocumentIntelligence;
-          @lroStatus
-          @doc("Operation status.")
-          union DocumentIntelligenceOperationStatus {
-            string,
-            @doc("The operation has not started yet.")
-            notStarted: "notStarted",
-            @doc("The operation is in progress.")
-            running: "running",
-            @doc("The operation has failed.")
-            @lroFailed
-            failed: "failed",
-            @doc("The operation has succeeded.")
-            @lroSucceeded
-            succeeded: "succeeded",
-            @doc("The operation has been canceled.")
-            @lroCanceled
-            canceled: "canceled",
-            @doc("The operation has been skipped.")
-            @lroCanceled
-            skipped: "skipped",
-          }
-          #suppress "@azure-tools/typespec-azure-core/long-running-polling-operation-required" "This is a template"
-          op DocumentIntelligenceLongRunningOperation<
-            TParams extends TypeSpec.Reflection.Model,
-            TResponse extends TypeSpec.Reflection.Model
-          > is Foundations.Operation<
-            {
-              ...TParams,
-              @doc("Unique document model name.")
-              @path
-              @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
-              @maxLength(64)
-              modelId: string;
-            },
-            AcceptedResponse &
-              Foundations.RetryAfterHeader & {
-                @pollingLocation
-                @header("Operation-Location")
-                operationLocation: ResourceLocation<TResponse>;
-              },
-            {},
-            {}
-          >;
-          op DocumentIntelligenceOperation<
-            TParams extends TypeSpec.Reflection.Model,
-            TResponse extends TypeSpec.Reflection.Model & Foundations.RetryAfterHeader
-          > is Foundations.Operation<
-            TParams,
-            TResponse,
-            {},
-            {}
-          >;
-          @doc("Document analysis result.")
-          model AnalyzeResult {
-            @doc("API version used to produce this result.")
-            apiVersion: string;
-            @doc("Document model ID used to produce this result.")
+      @useDependency(Versions.v1_0_Preview_2)
+      @server("http://localhost:3000", "endpoint")
+      @service()
+      namespace DocumentIntelligence;
+        @lroStatus
+        @doc("Operation status.")
+        union DocumentIntelligenceOperationStatus {
+          string,
+          @doc("The operation has not started yet.")
+          notStarted: "notStarted",
+          @doc("The operation is in progress.")
+          running: "running",
+          @doc("The operation has failed.")
+          @lroFailed
+          failed: "failed",
+          @doc("The operation has succeeded.")
+          @lroSucceeded
+          succeeded: "succeeded",
+          @doc("The operation has been canceled.")
+          @lroCanceled
+          canceled: "canceled",
+          @doc("The operation has been skipped.")
+          @lroCanceled
+          skipped: "skipped",
+        }
+        #suppress "@azure-tools/typespec-azure-core/long-running-polling-operation-required" "This is a template"
+        op DocumentIntelligenceLongRunningOperation<
+          TParams extends TypeSpec.Reflection.Model,
+          TResponse extends TypeSpec.Reflection.Model
+        > is Foundations.Operation<
+          {
+            ...TParams,
+            @doc("Unique document model name.")
+            @path
             @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+            @maxLength(64)
             modelId: string;
-          }
-          @doc("Status and result of the analyze operation.")
-          model AnalyzeOperation {
-            @doc("Operation status.  notStarted, running, succeeded, or failed")
-            status: DocumentIntelligenceOperationStatus;
-            @doc("Date and time (UTC) when the analyze operation was submitted.")
-            createdDateTime: utcDateTime;
-            @doc("Date and time (UTC) when the status was last updated.")
-            lastUpdatedDateTime: utcDateTime;
-            @doc("Encountered error during document analysis.")
-            error?: {};
-            @lroResult
-            @doc("Document analysis result.")
-            analyzeResult?: AnalyzeResult;
-          }
-          #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
-          @doc("Analyzes document with document model.")
-          @post
-          @pollingOperation(getAnalyzeResult)
-          @sharedRoute
-          @route("/documentModels/{modelId}:analyze")
-          op analyzeDocument is DocumentIntelligenceLongRunningOperation<
-            {
-              @doc("Input content type.")
-              @header
-              contentType: "application/json";
-              @doc("Analyze request parameters.")
-              @bodyRoot
-              @clientName("body", "python")
-              analyzeRequest?: {};
+          },
+          AcceptedResponse &
+            Foundations.RetryAfterHeader & {
+              @pollingLocation
+              @header("Operation-Location")
+              operationLocation: ResourceLocation<TResponse>;
             },
-            AnalyzeOperation
-          >;
-          #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
-          @doc("Gets the result of document analysis.")
-          @route("/documentModels/{modelId}/analyzeResults/{resultId}")
-          @get
-          op getAnalyzeResult is DocumentIntelligenceOperation<
-            {
-              @doc("Unique document model name.")
-              @path
-              @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
-              @maxLength(64)
-              modelId: string;
-              @doc("Analyze operation result ID.")
-              @path
-              resultId: uuid;
-            },
-            AnalyzeOperation
-          >;
-          `,
+          {},
+          {}
+        >;
+        op DocumentIntelligenceOperation<
+          TParams extends TypeSpec.Reflection.Model,
+          TResponse extends TypeSpec.Reflection.Model & Foundations.RetryAfterHeader
+        > is Foundations.Operation<
+          TParams,
+          TResponse,
+          {},
+          {}
+        >;
+        @doc("Document analysis result.")
+        model AnalyzeResult {
+          @doc("API version used to produce this result.")
+          apiVersion: string;
+          @doc("Document model ID used to produce this result.")
+          @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+          modelId: string;
+        }
+        @doc("Status and result of the analyze operation.")
+        model AnalyzeOperation {
+          @doc("Operation status.  notStarted, running, succeeded, or failed")
+          status: DocumentIntelligenceOperationStatus;
+          @doc("Date and time (UTC) when the analyze operation was submitted.")
+          createdDateTime: utcDateTime;
+          @doc("Date and time (UTC) when the status was last updated.")
+          lastUpdatedDateTime: utcDateTime;
+          @doc("Encountered error during document analysis.")
+          error?: {};
+          @lroResult
+          @doc("Document analysis result.")
+          analyzeResult?: AnalyzeResult;
+        }
+        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
+        @doc("Analyzes document with document model.")
+        @post
+        @pollingOperation(getAnalyzeResult)
+        @sharedRoute
+        @route("/documentModels/{modelId}:analyze")
+        op analyzeDocument is DocumentIntelligenceLongRunningOperation<
+          {
+            @doc("Input content type.")
+            @header
+            contentType: "application/json";
+            @doc("Analyze request parameters.")
+            @bodyRoot
+            @clientName("body", "python")
+            analyzeRequest?: {};
+          },
+          AnalyzeOperation
+        >;
+        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Doesn't fit standard ops"
+        @doc("Gets the result of document analysis.")
+        @route("/documentModels/{modelId}/analyzeResults/{resultId}")
+        @get
+        op getAnalyzeResult is DocumentIntelligenceOperation<
+          {
+            @doc("Unique document model name.")
+            @path
+            @pattern("^[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}$")
+            @maxLength(64)
+            modelId: string;
+            @doc("Analyze operation result ID.")
+            @path
+            resultId: uuid;
+          },
+          AnalyzeOperation
+        >;
+        `,
       `
-          namespace ClientCustomizations;
-          @client({
-            name: "DocumentIntelligenceClient",
-            service: DocumentIntelligence,
-          })
-          interface DocumentIntelligenceClient {
-            analyzeDocument is DocumentIntelligence.analyzeDocument;
-          }
-          `,
+        namespace ClientCustomizations;
+        @client({
+          name: "DocumentIntelligenceClient",
+          service: DocumentIntelligence,
+        })
+        interface DocumentIntelligenceClient {
+          analyzeDocument is DocumentIntelligence.analyzeDocument;
+        }
+        `,
     );
     const models = runnerWithCore.context.sdkPackage.models;
     strictEqual(models.length, 4);
@@ -807,16 +805,16 @@ describe("Arm LRO templates", () => {
 
   it("ArmResourceCreateOrReplaceAsync", async () => {
     await runner.compileWithVersionedService(`
-        model Employee is TrackedResource<EmployeeProperties> {
-          ...ResourceNameParameter<Employee>;
-        }
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
 
-        model EmployeeProperties {
-          age?: int32;
-        }
+      model EmployeeProperties {
+        age?: int32;
+      }
 
-        op createOrReplace is ArmResourceCreateOrReplaceAsync<Employee>;
-    `);
+      op createOrReplace is ArmResourceCreateOrReplaceAsync<Employee>;
+  `);
     const methods = runner.context.sdkPackage.clients[0].methods;
     strictEqual(methods.length, 1);
     const method = methods[0];
@@ -881,15 +879,15 @@ describe("Arm LRO templates", () => {
 
   it("ArmResourceDeleteWithoutOkAsync", async () => {
     await runner.compileWithVersionedService(`
-        model Employee is TrackedResource<EmployeeProperties> {
-          ...ResourceNameParameter<Employee>;
-        }
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
 
-        model EmployeeProperties {
-          age?: int32;
-        }
+      model EmployeeProperties {
+        age?: int32;
+      }
 
-        op delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+      op delete is ArmResourceDeleteWithoutOkAsync<Employee>;
     `);
     const roundtripModel = runner.context.sdkPackage.models.find((m) => m.name === "Employee");
     assert.isUndefined(roundtripModel);
@@ -939,17 +937,17 @@ describe("Arm LRO templates", () => {
 
   it("ArmResourceActionAsync", async () => {
     await runner.compileWithVersionedService(`
-        model Employee is TrackedResource<EmployeeProperties> {
-          ...ResourceNameParameter<Employee>;
-        }
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
 
-        model EmployeeProperties {
-          /** Age of employee */
-          age?: int32;
-        }
+      model EmployeeProperties {
+        /** Age of employee */
+        age?: int32;
+      }
 
-        op actionAsync is ArmResourceActionAsync<Employee, void, void>;
-    `);
+      op actionAsync is ArmResourceActionAsync<Employee, void, void>;
+  `);
     const methods = runner.context.sdkPackage.clients[0].methods;
     strictEqual(methods.length, 1);
     const method = methods[0];
@@ -1001,43 +999,43 @@ it("customized lro delete", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
-      @versioned(MyVersions)
-      @server("http://localhost:3000", "endpoint")
-      @service
-      namespace My.Service;
+    @versioned(MyVersions)
+    @server("http://localhost:3000", "endpoint")
+    @service
+    namespace My.Service;
 
-      enum MyVersions {
-        @useDependency(Versions.v1_0_Preview_2)
-        v1: "v1",
-      }
+    enum MyVersions {
+      @useDependency(Versions.v1_0_Preview_2)
+      v1: "v1",
+    }
 
-      op delete(): {
-        ...AcceptedResponse,
-        @header("Location")
-        @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>)
-        @Azure.Core.finalLocation(void)
-        location?: string;
-      };
+    op delete(): {
+      ...AcceptedResponse,
+      @header("Location")
+      @Azure.Core.pollingLocation(Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>)
+      @Azure.Core.finalLocation(void)
+      location?: string;
+    };
 
+    @Azure.Core.lroStatus
+    union ResourceProvisioningState {
+      Succeeded: "Succeeded",
+      Failed: "Failed",
+      Canceled: "Canceled",
+      string,
+    }
+
+    model ArmOperationStatus {
       @Azure.Core.lroStatus
-      union ResourceProvisioningState {
-        Succeeded: "Succeeded",
-        Failed: "Failed",
-        Canceled: "Canceled",
-        string,
-      }
-
-      model ArmOperationStatus {
-        @Azure.Core.lroStatus
-        status: ResourceProvisioningState;
-        @key
-        @path
-        @segment("operationStatuses")
-        id: Azure.Core.uuid;
-        @visibility(Lifecycle.Read)
-        name?: string;
-      }
-    `);
+      status: ResourceProvisioningState;
+      @key
+      @path
+      @segment("operationStatuses")
+      id: Azure.Core.uuid;
+      @visibility(Lifecycle.Read)
+      name?: string;
+    }
+  `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.enums.length, 2);

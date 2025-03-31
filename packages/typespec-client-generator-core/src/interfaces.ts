@@ -17,7 +17,6 @@ import {
   PagingOperation,
   Program,
   Type,
-  Union,
 } from "@typespec/compiler";
 import {
   HttpAuth,
@@ -27,7 +26,6 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import { TspLiteralType } from "./internal-utils.js";
 
 // Types for TCGC lib
 
@@ -39,13 +37,16 @@ export interface TCGCContext {
 
   generateProtocolMethods?: boolean;
   generateConvenienceMethods?: boolean;
-  /**
-   * @deprecated Use `namespaceFlag` instead.
-   */
-  packageName?: string;
   examplesDir?: string;
   namespaceFlag?: string;
   apiVersion?: string;
+  license?: {
+    name: string;
+    company?: string;
+    header?: string;
+    link?: string;
+    description?: string;
+  };
 
   decoratorsAllowList?: string[];
   previewStringRegex: RegExp;
@@ -54,14 +55,14 @@ export interface TCGCContext {
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
-  __generatedNames?: Map<Union | Model | TspLiteralType, string>;
+  __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClients?: SdkClient[];
-  __httpOperationExamples?: Map<HttpOperation, SdkHttpOperationExample[]>;
+  __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
 
@@ -76,20 +77,6 @@ export interface SdkContext<
 > extends TCGCContext {
   emitContext: EmitContext<TOptions>;
   sdkPackage: SdkPackage<TServiceOperation>;
-}
-
-export interface SdkEmitterOptions {
-  "generate-protocol-methods"?: boolean;
-  "generate-convenience-methods"?: boolean;
-  /**
-   * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
-   */
-  "package-name"?: string;
-  "flatten-union-as-enum"?: boolean;
-  "api-version"?: string;
-  "examples-dir"?: string;
-  "emitter-name"?: string;
-  namespace?: string;
 }
 
 // Types for TCGC customization decorators
@@ -126,11 +113,6 @@ export enum UsageFlags {
   MultipartFormData = 1 << 5,
   // Used in spread.
   Spread = 1 << 6,
-  /**
-   * @deprecated Use `Exception` instead.
-   */
-  // Output will also be set when Error is set.
-  Error = 1 << 7,
   // Set when type is used in conjunction with an application/json content type.
   Json = 1 << 8,
   // Set when type is used in conjunction with an application/xml content type.
@@ -186,26 +168,14 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   kind: "client";
   name: string;
   /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
-  /**
    * Full qualified namespace.
    */
   namespace: string;
   doc?: string;
   summary?: string;
-  /**
-   * @deprecated Use `clientInitialization.paramters` instead.
-   */
-  initialization: SdkInitializationType;
   clientInitialization: SdkClientInitializationType;
   methods: SdkMethod<TServiceOperation>[];
   apiVersions: string[];
-  /**
-   * @deprecated Use `clientNamespace` instead.
-   */
-  nameSpace: string; // fully qualified
   crossLanguageDefinitionId: string;
   // The parent client of this client. The structure follows the definition hierarchy.
   parent?: SdkClientType<TServiceOperation>;
@@ -403,10 +373,6 @@ export interface SdkNullableType extends SdkTypeBase {
   usage: UsageFlags;
   access: AccessFlags;
   /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
-  /**
    * Full qualified namespace.
    */
   namespace: string;
@@ -416,10 +382,6 @@ export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
   /**
    * Full qualified namespace.
    */
@@ -456,10 +418,6 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   name: string;
   isGeneratedName: boolean;
   /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
-  /**
    * Full qualified namespace.
    */
   namespace: string;
@@ -475,10 +433,6 @@ export interface SdkModelType extends SdkTypeBase {
   properties: SdkModelPropertyType[];
   name: string;
   isGeneratedName: boolean;
-  /**
-   * @deprecated Use `namespace` instead.
-   */
-  clientNamespace: string;
   /**
    * Full qualified namespace.
    */
@@ -529,13 +483,11 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   apiVersions: string[];
   onClient: boolean;
   clientDefaultValue?: unknown;
-  /**
-   * @deprecated This property is deprecated. See if the kind is `apiVersion` instead
-   */
   isApiVersionParam: boolean;
   optional: boolean;
   crossLanguageDefinitionId: string;
   visibility?: Visibility[];
+  access: AccessFlags;
 }
 
 /**
@@ -592,34 +544,17 @@ export interface SdkEndpointParameter
   serializedName?: string;
 }
 
-export interface SdkApiVersionParameter
-  extends SdkModelPropertyTypeBase<
-    SdkBuiltInType<"string"> | SdkEnumValueType<SdkBuiltInType<"string">>
-  > {
-  kind: "apiVersion";
-  onClient: true;
-  type: SdkBuiltInType<"string"> | SdkEnumValueType<SdkBuiltInType<"string">>;
-  isApiVersionParam: true;
-}
-
 export interface SdkCredentialParameter
   extends SdkModelPropertyTypeBase<SdkCredentialType | SdkUnionType<SdkCredentialType>> {
   kind: "credential";
   onClient: true;
 }
 
-export type SdkModelPropertyType<TType extends SdkTypeBase = SdkType> =
-  | SdkBodyModelPropertyType<TType>
-  | SdkParameter<TType>
-  | SdkEndpointParameter
-  | SdkCredentialParameter
-  | SdkApiVersionParameter
-  | SdkQueryParameter<TType>
-  | SdkPathParameter<TType>
-  | SdkBodyParameter<TType>
-  | SdkHeaderParameter<TType>
-  | SdkCookieParameter<TType>
-  | SdkServiceResponseHeader<TType>;
+export type SdkModelPropertyType =
+  | SdkBodyModelPropertyType
+  | SdkParameter
+  | SdkHttpParameter
+  | SdkServiceResponseHeader;
 
 export interface MultipartOptions {
   name: string;
@@ -635,8 +570,7 @@ export interface MultipartOptions {
   defaultContentTypes: string[];
 }
 
-export interface SdkBodyModelPropertyType<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
   kind: "property";
   discriminator: boolean;
   /**
@@ -657,16 +591,14 @@ export interface SdkBodyModelPropertyType<TType extends SdkTypeBase = SdkType>
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
-export interface SdkHeaderParameter<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkQueryParameter<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
   serializedName: string;
@@ -674,14 +606,8 @@ export interface SdkQueryParameter<TType extends SdkTypeBase = SdkType>
   explode: boolean;
 }
 
-export interface SdkPathParameter<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
-  /**
-   * @deprecated This property is deprecated. Use `allowReserved` instead.
-   * @param serviceParam
-   */
-  urlEncode: boolean;
   explode: boolean;
   style: "simple" | "label" | "matrix" | "fragment" | "path";
   allowReserved: boolean;
@@ -690,15 +616,13 @@ export interface SdkPathParameter<TType extends SdkTypeBase = SdkType>
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkCookieParameter<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
   kind: "cookie";
   serializedName: string;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
-export interface SdkBodyParameter<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
   serializedName: string;
   optional: boolean;
@@ -714,13 +638,11 @@ export type SdkHttpParameter =
   | SdkHeaderParameter
   | SdkCookieParameter;
 
-export interface SdkMethodParameter<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkMethodParameter extends SdkModelPropertyTypeBase {
   kind: "method";
 }
 
-export interface SdkServiceResponseHeader<TType extends SdkTypeBase = SdkType>
-  extends SdkModelPropertyTypeBase<TType> {
+export interface SdkServiceResponseHeader extends SdkModelPropertyTypeBase {
   __raw: ModelProperty;
   kind: "responseheader";
   serializedName: string;
@@ -763,11 +685,7 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
 
 interface SdkServiceOperationBase {}
 
-export type SdkParameter<TType extends SdkTypeBase = SdkType> =
-  | SdkEndpointParameter
-  | SdkCredentialParameter
-  | SdkApiVersionParameter
-  | SdkMethodParameter<TType>;
+export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
 export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;
@@ -843,6 +761,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   nextLinkSegments?: SdkModelPropertyType[];
   /** Method used to get next page. If not defined, use the initial method. */
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
+  nextLinkReInjectedParametersSegments?: SdkModelPropertyType[][];
   /** Segments to indicate how to set continuation token for next page request. */
   continuationTokenParameterSegments?: SdkModelPropertyType[];
   /** Segments to indicate how to get continuation token value from response. */
@@ -939,31 +859,25 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
   | SdkLroServiceMethod<TServiceOperation>
   | SdkLroPagingServiceMethod<TServiceOperation>;
 
-/**
- * @deprecated Use `parent` and `children` property from `SdkClientType` to find client hierarchy instead.
- */
-export interface SdkClientAccessor<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase {
-  kind: "clientaccessor";
-  response: SdkClientType<TServiceOperation>;
-}
-
 export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
-  | SdkServiceMethod<TServiceOperation>
-  | SdkClientAccessor<TServiceOperation>; // eslint-disable-line @typescript-eslint/no-deprecated
+  SdkServiceMethod<TServiceOperation>;
 
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
-  name: string;
-  /**
-   * @deprecated Look at `.namespaces` instead
-   */
-  rootNamespace: string;
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
   unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
   namespaces: SdkNamespace<TServiceOperation>[];
+  licenseInfo?: LicenseInfo;
+}
+
+export interface LicenseInfo {
+  name: string;
+  company: string;
+  link: string;
+  header: string;
+  description: string;
 }
 
 export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
@@ -983,10 +897,6 @@ export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" 
 interface SdkExampleBase {
   kind: string;
   name: string;
-  /**
-   * @deprecated Use `doc` instead.
-   */
-  description: string;
   doc: string;
   filePath: string;
   rawExample: any;

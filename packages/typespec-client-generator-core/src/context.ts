@@ -18,7 +18,6 @@ import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
   SdkContext,
-  SdkEmitterOptions,
   SdkEnumType,
   SdkHttpOperation,
   SdkModelPropertyType,
@@ -29,8 +28,10 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  BrandedSdkEmitterOptionsInterface,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
+  TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
 import { getSdkPackage } from "./package.js";
@@ -99,7 +100,7 @@ export interface CreateSdkContextOptions {
 }
 
 export async function createSdkContext<
-  TOptions extends Record<string, any> = SdkEmitterOptions,
+  TOptions extends Record<string, any> = BrandedSdkEmitterOptionsInterface,
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   context: EmitContext<TOptions>,
@@ -113,24 +114,20 @@ export async function createSdkContext<
     context.program,
     emitterName ?? context.options["emitter-name"],
   );
-  let flattenUnionAsEnum = options?.flattenUnionAsEnum;
-  if (flattenUnionAsEnum === undefined) {
-    flattenUnionAsEnum = context.options["flatten-union-as-enum"] ?? true;
-  }
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
     emitContext: context,
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    packageName: context.options["package-name"],
     examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
     apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
+    license: context.options["license"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
-    flattenUnionAsEnum,
+    flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
   };
   sdkContext.sdkPackage = diagnostics.pipe(getSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
@@ -154,7 +151,8 @@ async function exportTCGCOutput(context: SdkContext) {
           return undefined; // skip keys starting with "__" from the output
         }
         if (k === "scheme") {
-          return undefined; // remove credential schema
+          const { model, ...rest } = v;
+          return rest; // remove credential schema's model property
         }
         if (k === "rawExample") {
           return undefined; // remove raw example
@@ -166,7 +164,7 @@ async function exportTCGCOutput(context: SdkContext) {
   });
 }
 
-export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
+export async function $onEmit(context: EmitContext<TCGCEmitterOptions>) {
   if (!context.program.compilerOptions.noEmit) {
     const sdkContext = await createSdkContext(context, undefined, { exportTCGCoutput: true });
     context.program.reportDiagnostics(sdkContext.diagnostics);

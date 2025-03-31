@@ -13,8 +13,8 @@ beforeEach(async () => {
 });
 it("is api version query", async () => {
   const { func } = (await runner.compile(`
-      @test op func(@query("api-version") myApiVersion: string): void;
-    `)) as { func: Operation };
+    @test op func(@query("api-version") myApiVersion: string): void;
+  `)) as { func: Operation };
 
   const queryParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
     .parameters[0];
@@ -23,8 +23,8 @@ it("is api version query", async () => {
 
 it("is api version path", async () => {
   const { func } = (await runner.compile(`
-      @test op func(@path apiVersion: string): void;
-    `)) as { func: Operation };
+    @test op func(@path apiVersion: string): void;
+  `)) as { func: Operation };
 
   const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
     .parameters[0];
@@ -33,8 +33,8 @@ it("is api version path", async () => {
 
 it("not api version param", async () => {
   const { func } = (await runner.compile(`
-      @test op func(@path foo: string): void;
-    `)) as { func: Operation };
+    @test op func(@path foo: string): void;
+  `)) as { func: Operation };
 
   const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
     .parameters[0];
@@ -43,25 +43,25 @@ it("not api version param", async () => {
 
 it("api version in host param", async () => {
   await runner.compile(`
-      @service(#{
-        title: "ApiVersion",
-      })
-      @server(
-        "{endpoint}/{ApiVersion}",
-        "Api Version",
-        {
-          endpoint: string,
+    @service(#{
+      title: "ApiVersion",
+    })
+    @server(
+      "{endpoint}/{ApiVersion}",
+      "Api Version",
+      {
+        endpoint: string,
 
-          @doc("Api Version")
-          @path
-          ApiVersion: APIVersions,
-        }
-      )
-      namespace MyService;
-      enum APIVersions {
-        v1_0: "v1.0",
+        @doc("Api Version")
+        @path
+        ApiVersion: APIVersions,
       }
-    `);
+    )
+    namespace MyService;
+    enum APIVersions {
+      v1_0: "v1.0",
+    }
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   const server = getServers(runner.context.program, serviceNamespace)?.[0];
   const hostParam = server?.parameters.get("ApiVersion");

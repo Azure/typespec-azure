@@ -5,7 +5,7 @@ import {
   SdkPackage,
   SdkServiceMethod,
 } from "../src/interfaces.js";
-import { listAllServiceNamespaces } from "../src/internal-utils.js";
+import { listAllServiceNamespaces } from "../src/public-utils.js";
 import { SdkTestRunner } from "./test-host.js";
 
 export function hasFlag<T extends number>(value: T, flag: T): boolean {
@@ -49,9 +49,8 @@ export function getServiceMethodOfClient(
   methodIndex: number = 0,
 ): SdkServiceMethod<SdkHttpOperation> {
   let client = sdkPackage.clients[0];
-  if (client.methods.some((x) => x.kind === "clientaccessor")) {
-    client = client.methods.find((x) => x.kind === "clientaccessor")
-      ?.response as SdkClientType<SdkHttpOperation>;
+  if (client.children) {
+    client = client.children[0] as SdkClientType<SdkHttpOperation>;
   }
   strictEqual(client.methods.length, numMethods);
   const method = client.methods[methodIndex];

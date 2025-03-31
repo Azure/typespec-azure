@@ -3,9 +3,9 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "./traits.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core.Traits;
 using Azure.Core.Traits.Private;
 

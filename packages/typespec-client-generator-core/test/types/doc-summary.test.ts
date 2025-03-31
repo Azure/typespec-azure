@@ -16,11 +16,11 @@ afterEach(async () => {
 });
 it("unicode", async () => {
   await runner.compileWithBuiltInService(`
-      @usage(Usage.input | Usage.output)
-      @doc("测试doc")
-      @summary("测试summary")
-      model Test {}
-      `);
+    @usage(Usage.input | Usage.output)
+    @doc("测试doc")
+    @summary("测试summary")
+    model Test {}
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);

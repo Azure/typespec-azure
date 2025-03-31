@@ -35,37 +35,47 @@ options:
 
 ## Emitter options
 
+### `emitter-name`
+
+**Type:** `string`
+
+Set `emitter-name` to output TCGC code models for specific language's emitter.
+
 ### `generate-protocol-methods`
 
 **Type:** `boolean`
+
+When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@protocolAPI` is not set for an operation. Default value is `true`.
 
 ### `generate-convenience-methods`
 
 **Type:** `boolean`
 
-### `package-name`
-
-**Type:** `string`
-
-### `flatten-union-as-enum`
-
-**Type:** `boolean`
+When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
 ### `api-version`
 
 **Type:** `string`
 
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
+
+### `license`
+
+**Type:** `object`
+
+License information for the generated client code.
+
 ### `examples-dir`
 
 **Type:** `string`
 
-### `emitter-name`
-
-**Type:** `string`
+Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.
 
 ### `namespace`
 
 **Type:** `string`
+
+Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.
 
 ## Usage
 
@@ -103,18 +113,20 @@ Available ruleSets:
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
 - [`@convenientAPI`](#@convenientapi)
+- [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
 - [`@flattenProperty`](#@flattenproperty)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@paramAlias`](#@paramalias)
 - [`@protocolAPI`](#@protocolapi)
+- [`@responseAsBool`](#@responseasbool)
 - [`@scope`](#@scope)
 - [`@usage`](#@usage)
 - [`@useSystemTextJsonConverter`](#@usesystemtextjsonconverter)
 
 #### `@access`
 
-Override access for operations, models and enums.
+Override access for operations, models, enums and model property.
 When setting access for namespaces,
 the access info will be propagated to the models and operations defined in the namespace.
 If the model has an access override, the model override takes precedence.
@@ -127,6 +139,7 @@ parent models, discriminated sub models.
 The override access should not be narrow than the access calculated by operation,
 and different override access should not conflict with each other,
 otherwise a warning will be added to diagnostics list.
+Model property's access will default to public unless there is an override.
 
 ```typespec
 @Azure.ClientGenerator.Core.access(value: EnumMember, scope?: valueof string)
@@ -134,7 +147,7 @@ otherwise a warning will be added to diagnostics list.
 
 ##### Target
 
-`Model | Operation | Enum | Union | Namespace`
+`ModelProperty | Model | Operation | Enum | Union | Namespace`
 
 ##### Parameters
 
@@ -510,6 +523,39 @@ Whether you want to generate an operation as a convenient operation.
 op test: void;
 ```
 
+#### `@deserializeEmptyStringAsNull`
+
+Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
+
+```typespec
+@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull(scope?: valueof string)
+```
+
+##### Target
+
+`ModelProperty`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                            |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+##### Examples
+
+```typespec
+
+model MyModel {
+  scalar stringlike extends string;
+
+  @deserializeEmptyStringAsNull
+  prop: string;
+
+  @deserializeEmptyStringAsNull
+  prop: stringlike;
+}
+```
+
 #### `@flattenProperty`
 
 _Deprecated: @flattenProperty decorator is not recommended to use._
@@ -691,6 +737,32 @@ Whether you want to generate an operation as a protocol operation.
 ```typespec
 @protocolAPI(false)
 op test: void;
+```
+
+#### `@responseAsBool`
+
+Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+
+```typespec
+@Azure.ClientGenerator.Core.responseAsBool(scope?: valueof string)
+```
+
+##### Target
+
+`Operation`
+
+##### Parameters
+
+| Name  | Type             | Description |
+| ----- | ---------------- | ----------- |
+| scope | `valueof string` |             |
+
+##### Examples
+
+```typespec
+@responseAsBool
+@head
+op headOperation(): void;
 ```
 
 #### `@scope`

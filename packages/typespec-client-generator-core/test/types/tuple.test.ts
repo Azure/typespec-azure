@@ -16,14 +16,14 @@ afterEach(async () => {
 });
 it("model with tupled properties", async function () {
   await runner.compileAndDiagnose(`
-        @service
-        namespace MyService;
-        @usage(Usage.input | Usage.output)
-        model MyFlow {
-          scopes: ["https://security.microsoft.com/.default"];
-          test: [int32, string]
-        }
-      `);
+    @service
+    namespace MyService;
+    @usage(Usage.input | Usage.output)
+    model MyFlow {
+      scopes: ["https://security.microsoft.com/.default"];
+      test: [int32, string]
+    }
+  `);
 
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);

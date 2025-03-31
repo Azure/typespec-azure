@@ -87,7 +87,7 @@ it("api version parameter", async () => {
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.parameters.length, 2);
   const apiVersionParam = client.clientInitialization.parameters.find(
-    (x) => x.kind === "apiVersion",
+    (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
   strictEqual(apiVersionParam.apiVersions.length, 3);

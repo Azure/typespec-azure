@@ -1,9 +1,12 @@
-import { getLroMetadata, getPagedResult } from "@azure-tools/typespec-azure-core";
+import {
+  getLroMetadata,
+  getPagedResult,
+  getParameterizedNextLinkArguments,
+} from "@azure-tools/typespec-azure-core";
 import {
   createDiagnosticCollector,
   Diagnostic,
   getDoc,
-  getNamespaceFullName,
   getPagingOperation,
   getSummary,
   isList,
@@ -11,14 +14,15 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import { getServers, HttpServer, isHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
   getAccess,
-  getClientInitialization,
   getClientInitializationOptions,
   getClientNamespace,
   getOverriddenClientMethod,
+  getResponseAsBool,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -28,7 +32,6 @@ import {
 import { getSdkHttpOperation, getSdkHttpParameter } from "./http.js";
 import {
   InitializedByFlags,
-  SdkApiVersionParameter,
   SdkBodyModelPropertyType,
   SdkClient,
   SdkClientInitializationType,
@@ -37,7 +40,6 @@ import {
   SdkEndpointType,
   SdkEnumType,
   SdkHttpOperation,
-  SdkInitializationType,
   SdkLroPagingServiceMethod,
   SdkLroServiceFinalResponse,
   SdkLroServiceMetadata,
@@ -52,7 +54,6 @@ import {
   SdkOperationGroup,
   SdkPackage,
   SdkPagingServiceMethod,
-  SdkParameter,
   SdkPathParameter,
   SdkServiceMethod,
   SdkServiceOperation,
@@ -67,30 +68,28 @@ import {
   findRootSourceProperty,
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
-  getClientNamespaceStringHelper,
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
   getValueTypeValue,
   isNeverOrVoidType,
   isSubscriptionId,
-  listAllServiceNamespaces,
   listRawSubClients,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { getLicenseInfo } from "./license.js";
 import {
-  getClientNamespaceString,
   getCrossLanguageDefinitionId,
   getCrossLanguagePackageId,
   getDefaultApiVersion,
   getHttpOperationWithCache,
   getLibraryName,
-  isApiVersion,
 } from "./public-utils.js";
 import {
   getAllReferencedTypes,
   getClientTypeWithDiagnostics,
+  getSdkBuiltInType,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
   getSdkModelWithDiagnostics,
@@ -324,6 +323,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
   let nextLinkPath = undefined;
   let nextLinkSegments = undefined;
+  let nextLinkReInjectedParametersSegments = undefined;
   if (pagedMetadata.nextLinkProperty) {
     if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
       nextLinkSegments = baseServiceMethod.operation.responses
@@ -345,6 +345,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       nextLinkSegments = getPropertySegmentsFromModelOrParameters(
         responseType,
         (p) => p.__raw === pagedMetadata.nextLinkProperty,
+      );
+    }
+
+    if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
+      nextLinkReInjectedParametersSegments = (
+        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ||
+        []
+      ).map((t: ModelProperty) =>
+        getPropertySegmentsFromModelOrParameters(
+          baseServiceMethod.parameters,
+          (p) =>
+            p.__raw?.kind === "ModelProperty" &&
+            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+        ),
       );
     }
   }
@@ -375,6 +389,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             ),
           )
         : undefined,
+      nextLinkReInjectedParametersSegments,
       pageItemsSegments: baseServiceMethod.response.resultSegments,
     },
   });
@@ -583,38 +598,41 @@ function getSdkMethodResponse(
   const { allResponseBodies, nonBodyExists } = getAllResponseBodiesAndNonBodyExists(responses);
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
-  if (responseTypes.size > 1) {
-    // return union of all the different types
-    type = {
-      __raw: operation,
-      kind: "union",
-      access: "public",
-      usage: UsageFlags.Output,
-      variantTypes: allResponseBodies,
-      name: createGeneratedName(context, operation, "UnionResponse"),
-      isGeneratedName: true,
-      namespace: client.namespace,
-      clientNamespace: client.namespace,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
-      decorators: [],
-    };
-  } else if (responseTypes.size === 1) {
-    type = allResponseBodies[0];
+  if (getResponseAsBool(context, operation)) {
+    type = getSdkBuiltInType(context, $.builtin.boolean);
+  } else {
+    if (responseTypes.size > 1) {
+      // return union of all the different types
+      type = {
+        __raw: operation,
+        kind: "union",
+        access: "public",
+        usage: UsageFlags.Output,
+        variantTypes: allResponseBodies,
+        name: createGeneratedName(context, operation, "UnionResponse"),
+        isGeneratedName: true,
+        namespace: client.namespace,
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.UnionResponse`,
+        decorators: [],
+      };
+    } else if (responseTypes.size === 1) {
+      type = allResponseBodies[0];
+    }
+    if (nonBodyExists && type) {
+      type = {
+        kind: "nullable",
+        name: createGeneratedName(context, operation, "NullableResponse"),
+        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
+        isGeneratedName: true,
+        type: type,
+        decorators: [],
+        access: "public",
+        usage: UsageFlags.Output,
+        namespace: client.namespace,
+      };
+    }
   }
-  if (nonBodyExists && type) {
-    type = {
-      kind: "nullable",
-      name: createGeneratedName(context, operation, "NullableResponse"),
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
-      isGeneratedName: true,
-      type: type,
-      decorators: [],
-      access: "public",
-      usage: UsageFlags.Output,
-      namespace: client.namespace,
-      clientNamespace: client.namespace,
-    };
-  }
+
   return {
     kind: "method",
     type,
@@ -647,9 +665,9 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
       const operationLocation = getLocationOfOperation(operation);
-      if (isApiVersion(context, param)) {
+      if (sdkMethodParam.isApiVersionParam) {
         if (
-          !context.__clientToParameters.get(operationLocation)?.find((x) => x.kind === "apiVersion")
+          !context.__clientToParameters.get(operationLocation)?.find((x) => x.isApiVersionParam)
         ) {
           clientParams.push(sdkMethodParam);
         }
@@ -716,40 +734,6 @@ function getClientDefaultApiVersion(
     return context.apiVersion;
   }
   return getDefaultApiVersion(context, client.service)?.value;
-}
-
-function getSdkInitializationType(
-  context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
-): [SdkInitializationType, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  let initializationModel = getClientInitialization(context, client.type); // eslint-disable-line @typescript-eslint/no-deprecated
-  const access = client.kind === "SdkClient" ? "public" : "internal";
-  if (initializationModel) {
-    initializationModel.access = access;
-  } else {
-    const namePrefix = client.kind === "SdkClient" ? client.name : client.groupPath;
-    const name = `${namePrefix.split(".").at(-1)}Options`;
-    const namespace = getClientNamespace(context, client.type);
-    initializationModel = {
-      __raw: client.service,
-      doc: "Initialization class for the client",
-      kind: "model",
-      properties: [],
-      name,
-      isGeneratedName: true,
-      access,
-      usage: UsageFlags.Input,
-      crossLanguageDefinitionId: `${getNamespaceFullName(client.service.namespace!)}.${name}`,
-      namespace,
-      clientNamespace: namespace,
-      apiVersions: context.getApiVersionsForType(client.type),
-      decorators: [],
-      serializationOptions: {},
-    };
-  }
-
-  return diagnostics.wrap(initializationModel);
 }
 
 function createSdkClientInitializationType(
@@ -842,27 +826,10 @@ function getSdkMethodParameter(
   context: TCGCContext,
   type: ModelProperty,
   operation: Operation,
-): [SdkMethodParameter | SdkApiVersionParameter, readonly Diagnostic[]] {
+): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const base = diagnostics.pipe(getSdkModelPropertyType(context, type, operation));
-  if (isApiVersion(context, type) && base.onClient) {
-    if (base.type.kind !== "string") {
-      diagnostics.add(
-        createDiagnostic({
-          code: "api-version-not-string",
-          target: type,
-        }),
-      );
-    }
-    return diagnostics.wrap({
-      ...base,
-      kind: "apiVersion",
-      isApiVersionParam: true,
-      onClient: true,
-    } as SdkApiVersionParameter);
-  }
   return diagnostics.wrap({
-    ...base,
+    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
     kind: "method",
   });
 }
@@ -880,7 +847,6 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     );
   }
   for (const operationGroup of listOperationGroups(context, client)) {
-    // We create a client accessor for each operation group
     const operationGroupClient = diagnostics.pipe(
       createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
     );
@@ -889,26 +855,6 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     } else {
       sdkClientType.children = [operationGroupClient];
     }
-    const clientInitialization = getClientInitialization(context, operationGroup.type); // eslint-disable-line @typescript-eslint/no-deprecated
-    const parameters: SdkParameter[] = [];
-    if (clientInitialization) {
-      for (const property of clientInitialization.properties) {
-        parameters.push(property);
-      }
-    }
-    const name = `get${operationGroup.type.name}`;
-    retval.push({
-      kind: "clientaccessor",
-      parameters,
-      name,
-      doc: getDoc(context.program, operationGroup.type),
-      summary: getSummary(context.program, operationGroup.type),
-      access: "internal",
-      response: operationGroupClient,
-      apiVersions: getAvailableApiVersions(context, operationGroup.type, client.type),
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operationGroup.type)}.${name}`,
-      decorators: [],
-    });
   }
   return diagnostics.wrap(retval);
 }
@@ -932,7 +878,6 @@ function getEndpointTypeFromSingleServer<
         doc: "Service host",
         kind: "path",
         onClient: true,
-        urlEncode: false,
         explode: false,
         style: "simple",
         allowReserved: false,
@@ -944,6 +889,7 @@ function getEndpointTypeFromSingleServer<
         apiVersions: context.getApiVersionsForType(client.__raw.type),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
         decorators: [],
+        access: "public",
       },
     ],
     decorators: [],
@@ -961,11 +907,8 @@ function getEndpointTypeFromSingleServer<
         sdkParam.clientDefaultValue = getValueTypeValue(param.defaultValue);
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw.type);
-      sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam; // eslint-disable-line @typescript-eslint/no-deprecated
-      if (
-        sdkParam.isApiVersionParam && // eslint-disable-line @typescript-eslint/no-deprecated
-        apiVersionInfo.clientDefaultValue
-      ) {
+      sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
+      if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
       sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);
@@ -1022,7 +965,6 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   }
   let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
   if (types.length > 1) {
-    const namespace = getClientNamespace(context, rawClient.service);
     type = {
       kind: "union",
       access: "public",
@@ -1031,8 +973,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       name: createGeneratedName(context, rawClient.service, "Endpoint"),
       isGeneratedName: true,
       crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
-      namespace,
-      clientNamespace: namespace,
+      namespace: getClientNamespace(context, rawClient.service),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -1051,6 +992,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
     decorators: [],
+    access: "public",
   });
 }
 
@@ -1060,7 +1002,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const namespace = getClientNamespace(context, client.type);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -1069,10 +1010,7 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
     summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.getApiVersionsForType(client.type),
-    nameSpace: getClientNamespaceStringHelper(context, client.service)!,
-    namespace: namespace,
-    clientNamespace: namespace,
-    initialization: diagnostics.pipe(getSdkInitializationType(context, client)),
+    namespace: getClientNamespace(context, client.type),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
     decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
     parent,
@@ -1086,7 +1024,6 @@ function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
 
-  sdkClientType.initialization.properties = [...sdkClientType.clientInitialization.parameters]; // eslint-disable-line @typescript-eslint/no-deprecated
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -1101,16 +1038,14 @@ function addDefaultClientParameters<
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
-  let apiVersionParam: SdkApiVersionParameter | undefined = context.__clientToParameters
+  let apiVersionParam = context.__clientToParameters
     .get(client.__raw.type)
-    ?.find((x) => x.kind === "apiVersion");
+    ?.find((x) => x.isApiVersionParam);
   if (!apiVersionParam) {
     for (const sc of listRawSubClients(context, client.__raw)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
-      apiVersionParam = context.__clientToParameters
-        .get(sc.type)
-        ?.find((x) => x.kind === "apiVersion");
+      apiVersionParam = context.__clientToParameters.get(sc.type)?.find((x) => x.isApiVersionParam);
       if (apiVersionParam) break;
     }
   }
@@ -1176,8 +1111,6 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    name: getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]) || "",
-    rootNamespace: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
@@ -1186,6 +1119,7 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
     ),
     crossLanguagePackageId,
     namespaces: [],
+    licenseInfo: getLicenseInfo(context),
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);
@@ -1198,10 +1132,9 @@ function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
   while (clients.length > 0) {
     const client = clients.shift()!;
     getSdkNamespace(sdkPackage, client.namespace).clients.push(client);
-    client.methods
-      .filter((m) => m.kind === "clientaccessor")
-      .map((m) => m.response)
-      .map((c) => clients.push(c));
+    if (client.children && client.children.length > 0) {
+      clients.push(...client.children);
+    }
   }
   for (const model of sdkPackage.models) {
     getSdkNamespace(sdkPackage, model.namespace).models.push(model);

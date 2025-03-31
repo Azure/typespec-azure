@@ -13,13 +13,13 @@ beforeEach(async () => {
 it("emitter with same scope as decorator", async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
   const { func } = (await runner.compile(`
-          @test
-          @access(Access.internal, "csharp")
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-        `)) as { func: Operation };
+    @test
+    @access(Access.internal, "csharp")
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `)) as { func: Operation };
 
   const actual = getAccess(runner.context, func);
   strictEqual(actual, "internal");
@@ -27,13 +27,13 @@ it("emitter with same scope as decorator", async () => {
 
 it("emitter different scope from decorator", async () => {
   const code = `
-        @test
-        @access(Access.internal, "csharp")
-        op func(
-          @query("createdAt")
-          createdAt: utcDateTime;
-        ): void;
-      `;
+    @test
+    @access(Access.internal, "csharp")
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `;
   const { func } = (await runner.compile(code)) as { func: Operation };
   strictEqual(getAccess(runner.context, func), "public");
 
@@ -47,14 +47,14 @@ it("emitter different scope from decorator", async () => {
 it("emitter first in decorator scope list", async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
   const { func } = (await runner.compile(`
-          @test
-          @access(Access.internal, "java")
-          @access(Access.internal, "csharp")
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-        `)) as { func: Operation };
+    @test
+    @access(Access.internal, "java")
+    @access(Access.internal, "csharp")
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `)) as { func: Operation };
 
   const actual = getAccess(runner.context, func);
   strictEqual(actual, "internal");
@@ -63,14 +63,14 @@ it("emitter first in decorator scope list", async () => {
 it("emitter second in decorator scope list", async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
   const { func } = (await runner.compile(`
-          @test
-          @access(Access.internal, "java")
-          @access(Access.internal, "csharp")
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-        `)) as { func: Operation };
+    @test
+    @access(Access.internal, "java")
+    @access(Access.internal, "csharp")
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `)) as { func: Operation };
 
   const actual = getAccess(runner.context, func);
   strictEqual(actual, "internal");
@@ -78,14 +78,14 @@ it("emitter second in decorator scope list", async () => {
 
 it("emitter excluded from decorator scope list", async () => {
   const code = `
-        @test
-        @access(Access.internal, "java")
-        @access(Access.internal, "csharp")
-        op func(
-          @query("createdAt")
-          createdAt: utcDateTime;
-        ): void;
-      `;
+    @test
+    @access(Access.internal, "java")
+    @access(Access.internal, "csharp")
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `;
   const { func } = (await runner.compile(code)) as { func: Operation };
 
   strictEqual(getAccess(runner.context, func), "public");
@@ -121,14 +121,14 @@ it("no scope decorator", async () => {
 
 it("first non-scoped decorator then scoped decorator", async () => {
   const code = `
-          @test
-          @access(Access.public, "csharp")
-          @access(Access.internal)
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-        `;
+    @test
+    @access(Access.public, "csharp")
+    @access(Access.internal)
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `;
 
   const { func } = (await runner.compile(code)) as { func: Operation };
   strictEqual(getAccess(runner.context, func), "internal");
@@ -142,14 +142,14 @@ it("first non-scoped decorator then scoped decorator", async () => {
 
 it("first scoped decorator then non-scoped decorator", async () => {
   const code = `
-          @test
-          @access(Access.internal)
-          @access(Access.public, "csharp")
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-        `;
+    @test
+    @access(Access.internal)
+    @access(Access.public, "csharp")
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `;
 
   const { func } = (await runner.compile(code)) as { func: Operation };
   strictEqual(getAccess(runner.context, func), "internal");
@@ -158,20 +158,20 @@ it("first scoped decorator then non-scoped decorator", async () => {
     emitterName: "@azure-tools/typespec-csharp",
   });
   const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
 });
 
 it("first non-scoped augmented decorator then scoped augmented decorator", async () => {
   const code = `
-          @test
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-  
-          @@access(func, Access.public);
-          @@access(func, Access.internal, "csharp"); 
-        `;
+    @test
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+
+    @@access(func, Access.public);
+    @@access(func, Access.internal, "csharp"); 
+  `;
 
   const { func } = (await runner.compile(code)) as { func: Operation };
   strictEqual(getAccess(runner.context, func), "public");
@@ -185,15 +185,15 @@ it("first non-scoped augmented decorator then scoped augmented decorator", async
 
 it("first scoped augmented decorator then non-scoped augmented decorator", async () => {
   const code = `
-          @test
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-  
-          @@access(func, Access.internal, "csharp");
-          @@access(func, Access.public);
-        `;
+    @test
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+
+    @@access(func, Access.internal, "csharp");
+    @@access(func, Access.public);
+  `;
 
   const { func } = (await runner.compile(code)) as { func: Operation };
   strictEqual(getAccess(runner.context, func), "public");
@@ -202,19 +202,40 @@ it("first scoped augmented decorator then non-scoped augmented decorator", async
     emitterName: "@azure-tools/typespec-csharp",
   });
   const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
+  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
 });
 
-it("two scoped decorator", async () => {
+it("two scoped decorators", async () => {
   const code = `
-          @test
-          @access(Access.internal, "csharp")
-          @access(Access.internal, "python")
-          op func(
-            @query("createdAt")
-            createdAt: utcDateTime;
-          ): void;
-        `;
+    @test
+    @access(Access.internal, "csharp")
+    @access(Access.internal, "python")
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `;
+
+  const { func } = (await runner.compile(code)) as { func: Operation };
+  strictEqual(getAccess(runner.context, func), "internal");
+
+  const runnerWithCsharp = await createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
+  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+});
+
+it("two non-scoped decorators", async () => {
+  const code = `
+    @test
+    @access(Access.internal)
+    @access(Access.public)
+    op func(
+      @query("createdAt")
+      createdAt: utcDateTime;
+    ): void;
+  `;
 
   const { func } = (await runner.compile(code)) as { func: Operation };
   strictEqual(getAccess(runner.context, func), "internal");
@@ -229,12 +250,12 @@ it("two scoped decorator", async () => {
 it("csv scope list", async () => {
   function getCodeTemplate(language: string) {
     return `
-            @test
-            @access(Access.internal, "${language}")
-            model Test {
-              prop: string;
-            }
-            `;
+      @test
+      @access(Access.internal, "${language}")
+      model Test {
+        prop: string;
+      }
+      `;
   }
   const pythonRunner = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-python",
@@ -258,14 +279,14 @@ it("csv scope list", async () => {
 it("csv scope list augment", async () => {
   function getCodeTemplate(language: string) {
     return `
-            @test
-            model Test {
-              prop: string;
-            }
-  
-            @@access(Test, Access.public, "java, ts");
-            @@access(Test, Access.internal, "${language}");
-            `;
+      @test
+      model Test {
+        prop: string;
+      }
+
+      @@access(Test, Access.public, "java, ts");
+      @@access(Test, Access.internal, "${language}");
+      `;
   }
   const pythonRunner = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-python",

@@ -1,5 +1,61 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.12
+
+### Bug Fixes
+
+- [#2440](https://github.com/Azure/typespec-azure/pull/2440) Fix mockapi for flattenProperties and ARM
+
+
+## 0.1.0-alpha.11
+
+### Features
+
+- [#2403](https://github.com/Azure/typespec-azure/pull/2403) Add test for non resource operations
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2431](https://github.com/Azure/typespec-azure/pull/2431) Fix specs to handle body correctly with new spector change
+
+
+## 0.1.0-alpha.10
+
+### Bug Fixes
+
+- [#2408](https://github.com/Azure/typespec-azure/pull/2408) Fix behavior change of contentType of string/bytes
+
+
+## 0.1.0-alpha.9
+
+### Features
+
+- [#2379](https://github.com/Azure/typespec-azure/pull/2379) Add test for duration-constant format
+
+### Bug Fixes
+
+- [#2384](https://github.com/Azure/typespec-azure/pull/2384) Uptake changes to new reserved keywords
+
+
+## 0.1.0-alpha.8
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Features
+
+- [#2318](https://github.com/Azure/typespec-azure/pull/2318) Add orphanModelSerializable operation to verify the JSON serialization of an orphan model
+- [#2300](https://github.com/Azure/typespec-azure/pull/2300) azure-http-specs, add ARM Exception test case
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+
 ## 0.1.0-alpha.7
 
 ### Features

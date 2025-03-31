@@ -1,6 +1,6 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
+using Http;
+using Rest;
+using OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 using Azure.ResourceManager.CommonTypes.Private;

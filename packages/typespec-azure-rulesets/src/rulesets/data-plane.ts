@@ -37,6 +37,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
     "@azure-tools/typespec-azure-core/require-versioned": true,
     "@azure-tools/typespec-azure-core/no-private-usage": true,
+    "@azure-tools/typespec-azure-core/no-legacy-usage": true,
     "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/no-query-explode": true,
     "@azure-tools/typespec-azure-core/no-header-explode": true,

@@ -1,4 +1,11 @@
-import { json, passOnCode, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { deepEquals } from "@typespec/compiler/utils";
+import {
+  json,
+  passOnCode,
+  passOnSuccess,
+  ScenarioMockApi,
+  ValidationError,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -66,10 +73,12 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_get = passOnSuc
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/:managedIdentityResourceName",
   method: "get",
   request: {
-    params: {
+    pathParams: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       managedIdentityResourceName: "identity",
+    },
+    query: {
       "api-version": "2023-12-01-preview",
     },
   },
@@ -85,13 +94,20 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSyste
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/:managedIdentityResourceName",
     method: "put",
     request: {
-      body: {
+      body: json({
+        location: "eastus",
+        tags: {
+          tagKey1: "tagValue1",
+        },
+        properties: {},
         identity: createExpectedIdentity,
-      },
-      params: {
+      }),
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         managedIdentityResourceName: "identity",
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
     },
@@ -100,6 +116,21 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSyste
       body: json(validSystemAssignedManagedIdentityResource),
     },
     kind: "MockApiDefinition",
+    handler: (req) => {
+      // .NET SDK would not send "properties" property, if it is empty.
+      // Hence here we only verify "identity" property.
+      if (!deepEquals(req.body["identity"], createExpectedIdentity)) {
+        throw new ValidationError(
+          "Body should contain 'identity' property",
+          createExpectedIdentity,
+          req.body,
+        );
+      }
+      return {
+        status: 200,
+        body: json(validSystemAssignedManagedIdentityResource),
+      };
+    },
   });
 
 Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserAssignedAndSystemAssigned =
@@ -107,16 +138,15 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/managedIdentityTrackedResources/:managedIdentityResourceName",
     method: "patch",
     request: {
-      body: {
+      body: json({
         identity: updateExpectedIdentity,
-      },
-      headers: {
-        "Content-Type": "application/merge-patch+json",
-      },
-      params: {
+      }),
+      pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
         managedIdentityResourceName: "identity",
+      },
+      query: {
         "api-version": "2023-12-01-preview",
       },
     },
@@ -125,16 +155,31 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
       body: json(validUserAssignedAndSystemAssignedManagedIdentityResource),
     },
     kind: "MockApiDefinition",
+    handler: (req) => {
+      if (!deepEquals(req.body["identity"], updateExpectedIdentity)) {
+        throw new ValidationError(
+          "Body should contain 'identity' property",
+          updateExpectedIdentity,
+          req.body,
+        );
+      }
+      return {
+        status: 200,
+        body: json(validUserAssignedAndSystemAssignedManagedIdentityResource),
+      };
+    },
   });
 
 Scenarios.Azure_ResourceManager_CommonProperties_Error_getForPredefinedError = passOnCode(404, {
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
   method: "get",
   request: {
-    params: {
+    pathParams: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       resourceName: "confidential",
+    },
+    query: {
       "api-version": "2023-12-01-preview",
     },
     status: 404,
@@ -156,15 +201,18 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.CommonProperties/confidentialResources/:resourceName",
   method: "put",
   request: {
-    body: {
+    body: json({
+      location: "eastus",
       properties: {
         username: "00",
       },
-    },
-    params: {
+    }),
+    pathParams: {
       subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       resourceGroup: RESOURCE_GROUP_EXPECTED,
       resourceName: "confidential",
+    },
+    query: {
       "api-version": "2023-12-01-preview",
     },
     status: 400,

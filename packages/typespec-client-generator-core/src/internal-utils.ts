@@ -10,7 +10,6 @@ import {
   Interface,
   isNeverType,
   isNullType,
-  isService,
   isVoidType,
   listServices,
   Model,
@@ -29,12 +28,7 @@ import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
 } from "@typespec/compiler/experimental";
-import {
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationResponseContent,
-} from "@typespec/http";
+import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
@@ -63,6 +57,28 @@ import {
 import { getClientTypeWithDiagnostics } from "./types.js";
 
 import { $ } from "@typespec/compiler/experimental/typekit";
+
+export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
+  "emitter-name"?: string;
+}
+
+export interface UnbrandedSdkEmitterOptionsInterface {
+  "generate-protocol-methods"?: boolean;
+  "generate-convenience-methods"?: boolean;
+  "api-version"?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
+}
+
+export interface BrandedSdkEmitterOptionsInterface extends UnbrandedSdkEmitterOptionsInterface {
+  "examples-dir"?: string;
+  namespace?: string;
+}
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -97,28 +113,6 @@ export function parseEmitterName(
   const language = match[1];
   if (["typescript", "ts"].includes(language)) return diagnostics.wrap("javascript");
   return diagnostics.wrap(language);
-}
-
-/**
- * @param context
- * @param namespace If we know explicitly the namespace of the client, pass this in
- * @returns The name of the namespace
- */
-export function getClientNamespaceStringHelper(
-  context: TCGCContext,
-  namespace?: Namespace,
-): string | undefined {
-  let packageName = context.packageName; // eslint-disable-line @typescript-eslint/no-deprecated
-  if (packageName) {
-    packageName = packageName
-      .replace(/-/g, ".")
-      .replace(/\.([a-z])?/g, (match: string) => match.toUpperCase());
-    return packageName.charAt(0).toUpperCase() + packageName.slice(1);
-  }
-  if (namespace) {
-    return getNamespaceFullName(namespace);
-  }
-  return undefined;
 }
 
 /**
@@ -512,8 +506,8 @@ export function twoParamsEquivalent(
  * @param parameters
  * @returns
  */
-export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
-  return httpBody.property === undefined;
+export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
+  return httpBody.bodyKind !== "file" && httpBody.property === undefined;
 }
 
 /**
@@ -673,41 +667,53 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   return subgraph.type;
 }
 
-/**
- * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
- * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
- * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
- * instead to list all of the services in the global namespace.
- *
- * See https://github.com/microsoft/typespec/issues/6247
- *
- * @param context
- */
-export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
-  const serviceNamespaces: Namespace[] = [];
-  for (const ns of listAllUserDefinedNamespaces(context)) {
-    if (isService(context.program, ns)) {
-      serviceNamespaces.push(ns);
-    }
-  }
-  return serviceNamespaces;
-}
-
 export function listRawSubClients(
   context: TCGCContext,
   client: SdkOperationGroup | SdkClient,
-  retval?: (SdkOperationGroup | SdkClient)[],
-): (SdkOperationGroup | SdkClient)[] {
-  if (retval === undefined) {
-    retval = [];
-  }
-  if (retval.includes(client)) return retval;
-  if (client.kind === "SdkOperationGroup") {
-    retval.push(client);
-  }
-
-  for (const operationGroup of listOperationGroups(context, client)) {
-    listRawSubClients(context, operationGroup, retval);
+): SdkOperationGroup[] {
+  const retval: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = listOperationGroups(context, client);
+  while (queue.length > 0) {
+    const operationGroup = queue.pop()!;
+    retval.push(operationGroup);
+    if (operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
+    }
   }
   return retval;
+}
+
+export function resolveDuplicateGenearatedName(
+  context: TCGCContext,
+  type: Union | Model | TspLiteralType,
+  createName: string,
+): string {
+  let duplicateCount = 1;
+  const rawCreateName = createName;
+  const generatedNames = [...context.__generatedNames.values()];
+  while (generatedNames.includes(createName)) {
+    createName = `${rawCreateName}${duplicateCount++}`;
+  }
+  context.__generatedNames.set(type, createName);
+  return createName;
+}
+
+export function resolveConflictGeneratedName(context: TCGCContext) {
+  const userDefinedNames = [...context.__referencedTypeCache.values()]
+    .filter((x) => !x.isGeneratedName)
+    .map((x) => x.name);
+  const generatedNames = [...context.__generatedNames.values()];
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
+      const rawName = sdkType.name;
+      let duplicateCount = 1;
+      let createName = `${rawName}${duplicateCount++}`;
+      while (userDefinedNames.includes(createName) || generatedNames.includes(createName)) {
+        createName = `${rawName}${duplicateCount++}`;
+      }
+      sdkType.name = createName;
+      context.__generatedNames.set(sdkType.__raw, createName);
+      generatedNames.push(createName);
+    }
+  }
 }

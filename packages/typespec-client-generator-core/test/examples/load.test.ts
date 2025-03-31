@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { SdkClientAccessor, SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
@@ -21,11 +21,11 @@ it("example config", async () => {
 
   await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op get(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -42,11 +42,11 @@ it("example default config", async () => {
 
   await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op get(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -58,11 +58,11 @@ it("example default config", async () => {
 
 it("no example folder found", async () => {
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op get(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
 
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-loading",
@@ -72,11 +72,11 @@ it("no example folder found", async () => {
 it("load example without version", async () => {
   await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op get(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -89,18 +89,18 @@ it("load example without version", async () => {
 it("load example with version", async () => {
   await runner.host.addRealTypeSpecFile("./examples/v3/get.json", `${__dirname}/load/get.json`);
   await runner.compile(`
-      @service
-      @versioned(Versions)
-      namespace TestClient {
-        op get(): string;
-      }
+    @service
+    @versioned(Versions)
+    namespace TestClient {
+      op get(): string;
+    }
 
-      enum Versions {
-        v1,
-        v2,
-        v3,
-      }
-    `);
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -135,11 +135,11 @@ it("load multiple example for one operation", async () => {
 it("load example with client customization", async () => {
   await runner.host.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op get(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
 
   await runner.compileWithCustomization(
     `
@@ -179,36 +179,37 @@ it("load multiple example with @clientName", async () => {
     `${__dirname}/load/clientNameAnother.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @clientName("renamedNS")
-        namespace NS {
-          @route("/ns")
-          @clientName("renamedOP")
-          op get(): string;
-        }
-
-        @clientName("renamedIF")
-        namespace IF {
-          @route("/if")
-          @clientName("renamedOP")
-          op get(): string;
-        }
+    @service
+    namespace TestClient {
+      @clientName("renamedNS")
+      namespace NS {
+        @route("/ns")
+        @clientName("renamedOP")
+        op get(): string;
       }
-    `);
 
-  let operation = (
-    (runner.context.sdkPackage.clients[0].methods[0] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  operation = (
-    (runner.context.sdkPackage.clients[0].methods[1] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
+      @clientName("renamedIF")
+      namespace IF {
+        @route("/if")
+        @clientName("renamedOP")
+        op get(): string;
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const nsClient = mainClient.children?.find((client) => client.name === "renamedNS");
+  ok(nsClient);
+  const operation1 = (nsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation1);
+  strictEqual(operation1.examples?.length, 1);
+
+  const ifClient = mainClient.children?.find((client) => client.name === "renamedIF");
+  ok(ifClient);
+  const operation2 = (ifClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation2);
+  strictEqual(operation2.examples?.length, 1);
 });
 
 it("load multiple example of original operation id with @clientName", async () => {
@@ -221,36 +222,37 @@ it("load multiple example of original operation id with @clientName", async () =
     `${__dirname}/load/clientNameAnotherOriginal.json`,
   );
   await runner.compile(`
-      @service
-      namespace TestClient {
-        @clientName("renamedNS")
-        namespace NS {
-          @route("/ns")
-          @clientName("renamedOP")
-          op get(): string;
-        }
-
-        @clientName("renamedIF")
-        namespace IF {
-          @route("/if")
-          @clientName("renamedOP")
-          op get(): string;
-        }
+    @service
+    namespace TestClient {
+      @clientName("renamedNS")
+      namespace NS {
+        @route("/ns")
+        @clientName("renamedOP")
+        op get(): string;
       }
-    `);
 
-  let operation = (
-    (runner.context.sdkPackage.clients[0].methods[0] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  operation = (
-    (runner.context.sdkPackage.clients[0].methods[1] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
+      @clientName("renamedIF")
+      namespace IF {
+        @route("/if")
+        @clientName("renamedOP")
+        op get(): string;
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const nsClient = mainClient.children?.find((client) => client.name === "renamedNS");
+  ok(nsClient);
+  const operation1 = (nsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation1);
+  strictEqual(operation1.examples?.length, 1);
+
+  const ifClient = mainClient.children?.find((client) => client.name === "renamedIF");
+  ok(ifClient);
+  const operation2 = (ifClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation2);
+  strictEqual(operation2.examples?.length, 1);
 });
 
 it("ensure ordering for multiple examples", async () => {
@@ -258,11 +260,11 @@ it("ensure ordering for multiple examples", async () => {
   await runner.host.addRealTypeSpecFile("./examples/a_b.json", `${__dirname}/load/a_b.json`);
   await runner.host.addRealTypeSpecFile("./examples/a.json", `${__dirname}/load/a.json`);
   await runner.compile(`
-      @service
-      namespace TestClient {
-        op get(): string;
-      }
-    `);
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
 
   const operation = (
     runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>

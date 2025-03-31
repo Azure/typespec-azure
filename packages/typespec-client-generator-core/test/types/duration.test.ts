@@ -18,11 +18,11 @@ afterEach(async () => {
 it("default", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          prop: duration;
-        }
-      `,
+    @usage(Usage.input | Usage.output)
+    model Test {
+      prop: duration;
+    }
+  `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "duration");
@@ -32,12 +32,12 @@ it("default", async function () {
 it("iso8601", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @encode(DurationKnownEncoding.ISO8601)
-          prop: duration;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(DurationKnownEncoding.ISO8601)
+        prop: duration;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "duration");
@@ -48,12 +48,12 @@ it("iso8601", async function () {
 it("int32 seconds", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @encode(DurationKnownEncoding.seconds, int32)
-          prop: duration;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(DurationKnownEncoding.seconds, int32)
+        prop: duration;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "duration");
@@ -64,12 +64,12 @@ it("int32 seconds", async function () {
 it("float seconds", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @encode(DurationKnownEncoding.seconds, float)
-          prop: duration;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(DurationKnownEncoding.seconds, float)
+        prop: duration;
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "duration");
@@ -80,12 +80,12 @@ it("float seconds", async function () {
 it("nullable float seconds", async function () {
   await runner.compileWithBuiltInService(
     `
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @encode(DurationKnownEncoding.seconds, float)
-          prop: duration | null;
-        }
-      `,
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode(DurationKnownEncoding.seconds, float)
+        prop: duration | null;
+      }
+    `,
   );
   const nullableType = getSdkTypeHelper(runner);
   strictEqual(nullableType.kind, "nullable");
@@ -99,16 +99,16 @@ it("nullable float seconds", async function () {
 it("float seconds decorated scalar", async function () {
   await runner.compileWithBuiltInService(
     `
-        @doc("doc")
-        @summary("title")
-        @encode(DurationKnownEncoding.seconds, float32)
-        scalar Float32Duration extends duration;
-        
-        @usage(Usage.input | Usage.output)
-        model Test {
-          value: Float32Duration[];
-        }
-      `,
+      @doc("doc")
+      @summary("title")
+      @encode(DurationKnownEncoding.seconds, float32)
+      scalar Float32Duration extends duration;
+      
+      @usage(Usage.input | Usage.output)
+      model Test {
+        value: Float32Duration[];
+      }
+    `,
   );
   const sdkType = getSdkTypeHelper(runner);
   strictEqual(sdkType.kind, "array");

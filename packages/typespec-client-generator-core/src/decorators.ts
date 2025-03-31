@@ -1,7 +1,5 @@
 import {
-  AugmentDecoratorStatementNode,
   DecoratorContext,
-  DecoratorExpressionNode,
   DecoratorFunction,
   Enum,
   EnumMember,
@@ -9,12 +7,10 @@ import {
   Model,
   ModelProperty,
   Namespace,
-  Node,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   getDiscriminator,
@@ -24,6 +20,7 @@ import {
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
+import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
   AccessDecorator,
   AdditionalApiVersionsDecorator,
@@ -34,10 +31,12 @@ import {
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
+  DeserializeEmptyStringAsNullDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
+  ResponseAsBoolDecorator,
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
@@ -59,13 +58,12 @@ import {
   clientNamespaceKey,
   findRootSourceProperty,
   listAllNamespaces,
-  listAllServiceNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { getLibraryName, listAllServiceNamespaces } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -112,13 +110,20 @@ function setScopedDecoratorData(
   value: unknown,
   scope?: LanguageScopes,
 ) {
+  const targetEntry = context.program.stateMap(key).get(target);
   // if no scope specified, then set with the new value
   if (!scope) {
-    context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
+    if (targetEntry && targetEntry[AllScopes]) {
+      targetEntry[AllScopes] = value;
+    } else {
+      const newObject = Object.fromEntries([[AllScopes, value]]);
+      context.program
+        .stateMap(key)
+        .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+    }
     return;
   }
 
-  const targetEntry = context.program.stateMap(key).get(target);
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
@@ -694,7 +699,7 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
@@ -711,20 +716,23 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
-  if (!accessOverride && entity.namespace) {
+  if (!accessOverride && entity.kind !== "ModelProperty" && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }
 
   return accessOverride;
 }
 
-export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+export function getAccess(
+  context: TCGCContext,
+  entity: Model | Enum | Operation | Union | ModelProperty,
+) {
   const override = getAccessOverride(context, entity);
-  if (override || entity.kind === "Operation") {
+  if (override || entity.kind === "Operation" || entity.kind === "ModelProperty") {
     return override || "public";
   }
 
@@ -788,19 +796,20 @@ export const $clientName: ClientNameDecorator = (
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
   if (entity.kind === "Model" || entity.kind === "Operation") {
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+    const target = context.decoratorTarget as Node;
+    if (target.kind === SyntaxKind.AugmentDecoratorStatement) {
       if (
-        ignoreDiagnostics(
-          context.program.checker.resolveTypeReference(
-            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType,
-          ),
+        (
+          ignoreDiagnostics(
+            (context.program.checker as any).resolveTypeReference(target.targetType),
+          ) as any
         )?.node !== entity.node
       ) {
         return;
       }
     }
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
-      if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+    if (target.kind === SyntaxKind.DecoratorExpression) {
+      if (target.parent !== entity.node) {
         return;
       }
     }
@@ -872,14 +881,28 @@ export const $override = (
     a.name.localeCompare(b.name),
   );
 
-  // Check if the sorted parameter names arrays are equal
-  const parametersMatch =
-    originalParams.length === overrideParams.length &&
-    originalParams.every((value, index) => compareModelProperties(value, overrideParams[index]));
+  // Check if the sorted parameter names arrays are equal, omit optional parameters
+  let parametersMatch = true;
+  let index = 0;
+  for (const originalParam of originalParams) {
+    if (index > overrideParams.length - 1) {
+      parametersMatch = false;
+      break;
+    }
+    if (!compareModelProperties(originalParam, overrideParams[index])) {
+      if (!originalParam.optional) {
+        parametersMatch = false;
+        break;
+      } else {
+        continue;
+      }
+    }
+    index++;
+  }
 
   if (!parametersMatch) {
     reportDiagnostic(context.program, {
-      code: "override-method-parameters-mismatch",
+      code: "override-parameters-mismatch",
       target: context.decoratorTarget,
       format: {
         methodName: original.name,
@@ -887,7 +910,6 @@ export const $override = (
         overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
       },
     });
-    return;
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
@@ -1284,4 +1306,58 @@ export function getAdditionalApiVersions(
   target: Namespace,
 ): Enum | undefined {
   return getScopedDecoratorData(context, additionalApiVersionsKey, target);
+}
+export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes,
+) => {
+  if (target.type.kind !== "Scalar") {
+    reportDiagnostic(context.program, {
+      code: "invalid-deserializeEmptyStringAsNull-target-type",
+      format: {},
+      target: target,
+    });
+    return;
+  }
+
+  if (target.type.name !== "string") {
+    let scalarType = target.type as Scalar;
+    while (scalarType.baseScalar !== undefined) {
+      scalarType = scalarType.baseScalar;
+    }
+
+    if (scalarType.name !== "string") {
+      reportDiagnostic(context.program, {
+        code: "invalid-deserializeEmptyStringAsNull-target-type",
+        format: {},
+        target: target,
+      });
+      return;
+    }
+  }
+};
+
+const responseAsBoolKey = createStateSymbol("responseAsBool");
+
+export const $responseAsBool: ResponseAsBoolDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  if (!target.decorators.some((d) => d.definition?.name === "@head")) {
+    reportDiagnostic(context.program, {
+      code: "non-head-bool-response-decorator",
+      format: {
+        operationName: target.name,
+      },
+      target: target,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $responseAsBool, responseAsBoolKey, target, true, scope);
+};
+
+export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
+  return getScopedDecoratorData(context, responseAsBoolKey, target);
 }

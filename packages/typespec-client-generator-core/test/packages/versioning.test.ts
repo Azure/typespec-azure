@@ -7,12 +7,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "../../src/decorators.js";
-import {
-  SdkClientType,
-  SdkHttpOperation,
-  SdkMethodResponse,
-  UsageFlags,
-} from "../../src/interfaces.js";
+import { SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -77,7 +72,7 @@ it("basic default version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -176,7 +171,7 @@ it("basic latest version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -225,56 +220,56 @@ it("basic v3 version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
 
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
 
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
 
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -323,56 +318,56 @@ it("basic v2 version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
 
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
 
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
 
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -424,56 +419,56 @@ it("basic v1 version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
 
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
 
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
 
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
 `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -513,53 +508,53 @@ it("basic all version", async () => {
   });
 
   await runnerWithVersion.compile(`
-  @service(#{
-    title: "Contoso Widget Manager",
-  })
-  @versioned(Contoso.WidgetManager.Versions)
-  namespace Contoso.WidgetManager;
-  
-  enum Versions {
-    v1,
-    v2,
-    v3,
-  }
-  
-  @error
-  model Error {
-    code: string;
-    message?: string;
-  }
-  
-  model Widget {
-    @key
-    @typeChangedFrom(Versions.v3, string)
-    id: int32;
-  
-    @renamedFrom(Versions.v3, "name")
-    @madeOptional(Versions.v3)
-    description?: string;
-  }
-  @added(Versions.v2)
-  @removed(Versions.v3)
-  model Test {
-    prop1: string;
-  }
-  @route("/test")
-  @added(Versions.v2)
-  @returnTypeChangedFrom(Versions.v3, Test)
-  op test(): void | Error;
-  op list(@query apiVersion: string): Widget[] | Error;
-  
-  @added(Versions.v2)
-  @route("/widget/{id}")
-  op get(...Resource.KeysOf<Widget>): Widget | Error;
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
 `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -615,7 +610,7 @@ it("define own api version param", async () => {
     }
 
     op getPet(...ApiVersionParam): void;
-    `);
+  `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.operation.parameters.length, 1);
@@ -629,29 +624,31 @@ it("define own api version param", async () => {
 
 it("default api version for interface extends", async () => {
   await runner.compile(`
-      namespace Azure.ResourceManager {
-        interface Operations {
-          @get
-          list(@query "api-version": string): void;
-        }
+    namespace Azure.ResourceManager {
+      interface Operations {
+        @get
+        list(@query "api-version": string): void;
       }
-      
-      @service
-      @versioned(Versions)
-      namespace Test {
-        enum Versions {
-          v1,
-          v2,
-        }
-      
-        interface Operations extends Azure.ResourceManager.Operations {}
-      }      
-    `);
+    }
+    
+    @service
+    @versioned(Versions)
+    namespace Test {
+      enum Versions {
+        v1,
+        v2,
+      }
+    
+      interface Operations extends Azure.ResourceManager.Operations {}
+    }      
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
-  const apiVersionClientParam = client.initialization.properties.find((x) => x.isApiVersionParam);
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
+  const apiVersionClientParam = client.clientInitialization.parameters.find(
+    (x) => x.isApiVersionParam,
+  );
   ok(apiVersionClientParam);
   strictEqual(apiVersionClientParam.clientDefaultValue, "v2");
 
@@ -667,24 +664,24 @@ it("default api version for interface extends", async () => {
 
 it("default api version for operation is", async () => {
   await runner.compile(`
-      namespace Azure.ResourceManager {
-        interface Operations {
-          @get
-          list(@query "api-version": string): void;
-        }
+    namespace Azure.ResourceManager {
+      interface Operations {
+        @get
+        list(@query "api-version": string): void;
       }
-      
-      @service
-      @versioned(Versions)
-      namespace Test {
-        enum Versions {
-          v1,
-          v2,
-        }
-      
-        op list is Azure.ResourceManager.Operations.list;
-      }      
-    `);
+    }
+    
+    @service
+    @versioned(Versions)
+    namespace Test {
+      enum Versions {
+        v1,
+        v2,
+      }
+    
+      op list is Azure.ResourceManager.Operations.list;
+    }      
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
@@ -696,7 +693,9 @@ it("default api version for operation is", async () => {
   strictEqual(apiVersionParam.isApiVersionParam, true);
   strictEqual(apiVersionParam.clientDefaultValue, "v2");
   strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
-  const clientApiVersionParam = client.initialization.properties.find((x) => x.isApiVersionParam);
+  const clientApiVersionParam = client.clientInitialization.parameters.find(
+    (x) => x.isApiVersionParam,
+  );
   ok(clientApiVersionParam);
   strictEqual(apiVersionParam.correspondingMethodParams[0], clientApiVersionParam);
   strictEqual(clientApiVersionParam.clientDefaultValue, "v2");
@@ -707,7 +706,7 @@ it("add method", async () => {
     @post
     @added(Versions.v2)
     op v2(@header headerV2: string): void;
-    `);
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
@@ -731,7 +730,7 @@ it("add parameter", async () => {
     @route("/v1")
     @post
     op v1(@added(Versions.v2) @header headerV2: string): void;
-    `);
+  `);
 
   const sdkPackage = runner.context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
@@ -856,10 +855,11 @@ it("add client", async () => {
   strictEqual(sdkPackage.clients.length, 1);
   const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
   ok(versioningClient);
-  strictEqual(versioningClient.methods.length, 2);
+  strictEqual(versioningClient.methods.length, 1);
+  strictEqual(versioningClient.children?.length, 1);
 
-  strictEqual(versioningClient.initialization.properties.length, 1);
-  const versioningClientEndpoint = versioningClient.initialization.properties.find(
+  strictEqual(versioningClient.clientInitialization.parameters.length, 1);
+  const versioningClientEndpoint = versioningClient.clientInitialization.parameters.find(
     (x) => x.kind === "endpoint",
   );
   ok(versioningClientEndpoint);
@@ -870,18 +870,12 @@ it("add client", async () => {
   strictEqual(serviceMethod.name, "test");
   deepStrictEqual(serviceMethod.apiVersions, ["v1", "v2"]);
 
-  const clientAccessor = versioningClient.methods.find((x) => x.kind === "clientaccessor");
-  ok(clientAccessor);
-  strictEqual(clientAccessor.name, "getInterfaceV2");
-  deepStrictEqual(clientAccessor.apiVersions, ["v2"]);
-
-  const interfaceV2 = versioningClient.methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const interfaceV2 = versioningClient.children?.[0];
   ok(interfaceV2);
   strictEqual(interfaceV2.methods.length, 1);
 
-  strictEqual(interfaceV2.initialization.properties.length, 1);
-  const interfaceV2Endpoint = interfaceV2.initialization.properties.find(
+  strictEqual(interfaceV2.clientInitialization.parameters.length, 1);
+  const interfaceV2Endpoint = interfaceV2.clientInitialization.parameters.find(
     (x) => x.kind === "endpoint",
   );
   ok(interfaceV2Endpoint);

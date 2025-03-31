@@ -6,14 +6,14 @@ Scenarios.Azure_Example_Basic = passOnSuccess({
   uri: "/azure/example/basic/basic",
   method: "post",
   request: {
-    params: {
+    query: {
       "api-version": "2022-12-01-preview",
       "query-param": "query",
     },
     headers: {
       "header-param": "header",
     },
-    body: {
+    body: json({
       stringProperty: "text",
       modelProperty: {
         int32Property: 1,
@@ -24,7 +24,7 @@ Scenarios.Azure_Example_Basic = passOnSuccess({
       recordProperty: {
         record: "value",
       },
-    },
+    }),
   },
   response: {
     status: 200,

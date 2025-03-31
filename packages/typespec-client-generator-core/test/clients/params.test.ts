@@ -5,12 +5,10 @@ import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import {
-  SdkClientType,
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,
   SdkEndpointType,
-  SdkHttpOperation,
 } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -63,6 +61,7 @@ it("name", async () => {
   strictEqual(sdkPackage.clients[0].kind, "client");
   strictEqual(sdkPackage.clients[0].parent, undefined);
 });
+
 it("initialization default endpoint no credential", async () => {
   await runner.compile(`
         @server("http://localhost:3000", "endpoint")
@@ -88,7 +87,7 @@ it("initialization default endpoint no credential", async () => {
   strictEqual(templateArg.kind, "path");
   strictEqual(templateArg.name, "endpoint");
   strictEqual(templateArg.serializedName, "endpoint");
-  strictEqual(templateArg.urlEncode, false);
+  strictEqual(templateArg.allowReserved, false);
   strictEqual(templateArg.type.kind, "string");
   strictEqual(templateArg.optional, false);
   strictEqual(templateArg.onClient, true);
@@ -278,7 +277,7 @@ it("initialization one server parameter with apikey auth", async () => {
   const templateArg = endpointParam.type.templateArguments[0];
   strictEqual(templateArg.kind, "path");
   strictEqual(templateArg.name, "endpointInput");
-  strictEqual(templateArg.urlEncode, false);
+  strictEqual(templateArg.allowReserved, true);
   strictEqual(templateArg.optional, false);
   strictEqual(templateArg.onClient, true);
   strictEqual(templateArg.clientDefaultValue, undefined);
@@ -361,11 +360,12 @@ it("initialization multiple server parameters with apikey auth", async () => {
   strictEqual(endpointTemplateArg.name, "endpoint");
   strictEqual(endpointTemplateArg.onClient, true);
   strictEqual(endpointTemplateArg.optional, false);
+  strictEqual(endpointTemplateArg.allowReserved, true);
   strictEqual(endpointTemplateArg.kind, "path");
 
   const apiVersionParam = templatedEndpoint.templateArguments[1];
   strictEqual(apiVersionParam.clientDefaultValue, "v1.0");
-  strictEqual(apiVersionParam.urlEncode, true);
+  strictEqual(apiVersionParam.allowReserved, false);
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
@@ -615,10 +615,10 @@ it("service with default api version, method with api version param", async () =
   });
   await runnerWithCore.compile(
     getServiceWithDefaultApiVersion(`
-        @route("/with-query-api-version")
-        @head
-        op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
-      `),
+      @route("/with-query-api-version")
+      @head
+      op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
+    `),
   );
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -631,7 +631,7 @@ it("service with default api version, method with api version param", async () =
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
   strictEqual(clientApiVersionParam.optional, false);
-  strictEqual(clientApiVersionParam.kind, "apiVersion");
+  strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
@@ -669,10 +669,10 @@ it("service with default api version, method with path api version param", async
   });
   await runnerWithCore.compile(
     getServiceWithDefaultApiVersion(`
-        @route("/with-path-api-version")
-        @head
-        op withPathApiVersion(@path apiVersion: string): OkResponse;
-      `),
+      @route("/with-path-api-version")
+      @head
+      op withPathApiVersion(@path apiVersion: string): OkResponse;
+    `),
   );
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -685,7 +685,7 @@ it("service with default api version, method with path api version param", async
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
   strictEqual(clientApiVersionParam.optional, false);
-  strictEqual(clientApiVersionParam.kind, "apiVersion");
+  strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
@@ -719,28 +719,28 @@ it("service with default api version, method with path api version param", async
 
 it("endpoint template argument with default value of enum member", async () => {
   await runner.compile(`
-      @server(
-        "{endpoint}/client/structure/{client}",
-        "",
-        {
-          @doc("Need to be set as 'http://localhost:3000' in client.")
-          endpoint: url,
-      
-          @doc("Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client.")
-          client: ClientType = ClientType.Default,
-        }
-      )
-      @service
-      namespace My.Service;
-
-      enum ClientType {
-        Default: "default",
-        MultiClient: "multi-client",
-        RenamedOperation: "renamed-operation",
-        TwoOperationGroup: "two-operation-group",
-        ClientOperationGroup: "client-operation-group",
+    @server(
+      "{endpoint}/client/structure/{client}",
+      "",
+      {
+        @doc("Need to be set as 'http://localhost:3000' in client.")
+        endpoint: url,
+    
+        @doc("Need to be set as 'default', 'multi-client', 'renamed-operation', 'two-operation-group' in client.")
+        client: ClientType = ClientType.Default,
       }
-    `);
+    )
+    @service
+    namespace My.Service;
+
+    enum ClientType {
+      Default: "default",
+      MultiClient: "multi-client",
+      RenamedOperation: "renamed-operation",
+      TwoOperationGroup: "two-operation-group",
+      ClientOperationGroup: "client-operation-group",
+    }
+  `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -768,37 +768,37 @@ it("client level signatures by default", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
-      model MyProperties {
-        @visibility(Lifecycle.Read)
-        @doc("Display name of the Azure Extended Zone.")
-        displayName: string;
-      }
+    model MyProperties {
+      @visibility(Lifecycle.Read)
+      @doc("Display name of the Azure Extended Zone.")
+      displayName: string;
+    }
 
-      @subscriptionResource
-      model MyModel is ProxyResource<MyProperties> {
-        @key("extendedZoneName")
-        @segment("extendedZones")
-        @path
-        name: string;
-      }
+    @subscriptionResource
+    model MyModel is ProxyResource<MyProperties> {
+      @key("extendedZoneName")
+      @segment("extendedZones")
+      @path
+      name: string;
+    }
 
-      namespace MyClient {
-        interface Operations extends Azure.ResourceManager.Operations {}
+    namespace MyClient {
+      interface Operations extends Azure.ResourceManager.Operations {}
 
-        @armResourceOperations
-        interface MyInterface {
-          get is ArmResourceRead<MyModel>;
-        }
+      @armResourceOperations
+      interface MyInterface {
+        get is ArmResourceRead<MyModel>;
       }
-    `);
+    }
+  `);
 
   const sdkPackage = runnerWithArm.context.sdkPackage;
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
-  for (const p of client.initialization.properties) {
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
+  for (const p of client.clientInitialization.parameters) {
     ok(p.onClient);
   }
-  deepStrictEqual(client.initialization.properties.map((x) => x.name).sort(), [
+  deepStrictEqual(client.clientInitialization.parameters.map((x) => x.name).sort(), [
     "apiVersion",
     "credential",
     "endpoint",

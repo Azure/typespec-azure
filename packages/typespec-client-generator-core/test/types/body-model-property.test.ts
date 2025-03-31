@@ -20,11 +20,11 @@ afterEach(async () => {
 
 it("required", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: string | int32;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: string | int32;
+    }
+  `);
   const prop = getSdkBodyModelPropertyTypeHelper(runner);
   strictEqual(prop.optional, false);
   strictEqual(isReadOnly(prop), false);
@@ -32,11 +32,11 @@ it("required", async function () {
 
 it("optional", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name?: string;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name?: string;
+    }
+  `);
 
   const prop = getSdkBodyModelPropertyTypeHelper(runner);
   strictEqual(prop.optional, true);
@@ -44,12 +44,12 @@ it("optional", async function () {
 
 it("readonly", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @visibility(Lifecycle.Read)
-          name?: string;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      @visibility(Lifecycle.Read)
+      name?: string;
+    }
+  `);
 
   const prop = getSdkBodyModelPropertyTypeHelper(runner);
   strictEqual(isReadOnly(prop), true);
@@ -57,12 +57,12 @@ it("readonly", async function () {
 
 it("not readonly", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @visibility(Lifecycle.Read, Lifecycle.Create, Lifecycle.Update)
-          name?: string;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      @visibility(Lifecycle.Read, Lifecycle.Create, Lifecycle.Update)
+      name?: string;
+    }
+  `);
 
   const prop = getSdkBodyModelPropertyTypeHelper(runner);
   strictEqual(isReadOnly(prop), false);
@@ -70,11 +70,11 @@ it("not readonly", async function () {
 
 it("union type", async function () {
   await runner.compileWithBuiltInService(`
-        @usage(Usage.input | Usage.output)
-        model Test {
-          name: string | int32;
-        }
-      `);
+    @usage(Usage.input | Usage.output)
+    model Test {
+      name: string | int32;
+    }
+  `);
 
   const prop = getSdkBodyModelPropertyTypeHelper(runner);
   strictEqual(prop.kind, "property");
@@ -93,26 +93,26 @@ it("versioning", async function () {
   });
 
   await runner.compile(`
-        @versioned(Versions)
-        @service(#{title: "Widget Service"})
-        namespace DemoService;
-        enum Versions {
-          v1,
-          v2,
-          v3,
-          v4,
-        }
-        @usage(Usage.input | Usage.output)
-        model Test {
-          @added(Versions.v1)
-          @removed(Versions.v2)
-          @added(Versions.v3)
-          versionedProp: string;
-          nonVersionedProp: string;
-          @removed(Versions.v3)
-          removedProp: string;
-        }
-      `);
+    @versioned(Versions)
+    @service(#{title: "Widget Service"})
+    namespace DemoService;
+    enum Versions {
+      v1,
+      v2,
+      v3,
+      v4,
+    }
+    @usage(Usage.input | Usage.output)
+    model Test {
+      @added(Versions.v1)
+      @removed(Versions.v2)
+      @added(Versions.v3)
+      versionedProp: string;
+      nonVersionedProp: string;
+      @removed(Versions.v3)
+      removedProp: string;
+    }
+  `);
   const sdkModel = runner.context.sdkPackage.models.find((x) => x.kind === "model");
   ok(sdkModel);
   strictEqual(sdkModel.kind, "model");

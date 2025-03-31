@@ -13,14 +13,14 @@ beforeEach(async () => {
 
 it("get single", async () => {
   await runner.compile(`
-      enum Versions {
-        v2022_01_01: "2022-01-01",
-      }
+    enum Versions {
+      v2022_01_01: "2022-01-01",
+    }
 
-      @versioned(Versions)
-      @service
-      namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   const defaultApiVersion = getDefaultApiVersion(runner.context, serviceNamespace);
   ok(defaultApiVersion);
@@ -29,16 +29,16 @@ it("get single", async () => {
 
 it("get multiple date incorrect ordering", async () => {
   await runner.compile(`
-      enum Versions {
-        v2022_02_01: "2022-02-01",
-        v2022_02_01_PREVIEW: "2022-02-01-preview",
-        v2022_01_01: "2022-01-01",
-      }
+    enum Versions {
+      v2022_02_01: "2022-02-01",
+      v2022_02_01_PREVIEW: "2022-02-01-preview",
+      v2022_01_01: "2022-01-01",
+    }
 
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   const defaultApiVersion = getDefaultApiVersion(runner.context, serviceNamespace);
   ok(defaultApiVersion);
@@ -47,16 +47,16 @@ it("get multiple date incorrect ordering", async () => {
 
 it("get multiple date correct ordering", async () => {
   await runner.compile(`
-      enum Versions {
-        v2022_01_01: "2022-01-01",
-        v2022_02_01_PREVIEW: "2022-02-01-preview",
-        v2022_02_01: "2022-02-01",
-      }
+    enum Versions {
+      v2022_01_01: "2022-01-01",
+      v2022_02_01_PREVIEW: "2022-02-01-preview",
+      v2022_02_01: "2022-02-01",
+    }
 
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   const defaultApiVersion = getDefaultApiVersion(runner.context, serviceNamespace);
   ok(defaultApiVersion);
@@ -65,16 +65,16 @@ it("get multiple date correct ordering", async () => {
 
 it("get multiple semantic incorrect", async () => {
   await runner.compile(`
-      enum Versions {
-        v1_0_0: "1.0.0",
-        v1_1_0: "1.1.0",
-        v1_0_1: "1.0.1",
-      }
+    enum Versions {
+      v1_0_0: "1.0.0",
+      v1_1_0: "1.1.0",
+      v1_0_1: "1.0.1",
+    }
 
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   const defaultApiVersion = getDefaultApiVersion(runner.context, serviceNamespace);
   ok(defaultApiVersion);
@@ -83,16 +83,16 @@ it("get multiple semantic incorrect", async () => {
 
 it("get multiple semantic correct", async () => {
   await runner.compile(`
-      enum Versions {
-        v1_0_0: "1.0",
-        v1_0_1: "1.0.1",
-        v1_1_0: "1.1.0",
-      }
+    enum Versions {
+      v1_0_0: "1.0",
+      v1_0_1: "1.0.1",
+      v1_1_0: "1.1.0",
+    }
 
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   const defaultApiVersion = getDefaultApiVersion(runner.context, serviceNamespace);
   ok(defaultApiVersion);
@@ -101,22 +101,22 @@ it("get multiple semantic correct", async () => {
 
 it("get undefined", async () => {
   await runner.compile(`
-      @service
-      @test namespace MyService {};
-    `);
+    @service
+    @test namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   ok(!getDefaultApiVersion(runner.context, serviceNamespace));
 });
 
 it("get empty", async () => {
   await runner.compile(`
-      enum Versions {
-      }
+    enum Versions {
+    }
 
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const serviceNamespace = getServiceNamespace(runner);
   ok(!getDefaultApiVersion(runner.context, serviceNamespace));
 });
@@ -128,15 +128,15 @@ it("get with all", async () => {
   });
 
   const { MyService } = await runnerWithVersion.compile(`
-      enum Versions {
-        v1_0_0: "1.0",
-        v1_0_1: "1.0.1",
-        v1_1_0: "1.1.0",
-      }
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    enum Versions {
+      v1_0_0: "1.0",
+      v1_0_1: "1.0.1",
+      v1_1_0: "1.1.0",
+    }
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const defaultApiVersion = getDefaultApiVersion(runnerWithVersion.context, MyService as Namespace);
   ok(defaultApiVersion);
   strictEqual(defaultApiVersion.value, "1.1.0");
@@ -149,16 +149,16 @@ it("get with latest", async () => {
   });
 
   const { MyService } = await runnerWithVersion.compile(`
-      enum Versions {
-        v1_0_0: "1.0",
-        v1_0_1: "1.0.1",
-        v1_1_0: "1.1.0",
-      }
+    enum Versions {
+      v1_0_0: "1.0",
+      v1_0_1: "1.0.1",
+      v1_1_0: "1.1.0",
+    }
 
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const defaultApiVersion = getDefaultApiVersion(runnerWithVersion.context, MyService as Namespace);
   ok(defaultApiVersion);
   strictEqual(defaultApiVersion.value, "1.1.0");
@@ -171,16 +171,16 @@ it("get with specific version", async () => {
   });
 
   const { MyService } = await runnerWithVersion.compile(`
-      enum Versions {
-        v1_0_0: "1.0",
-        v1_0_1: "1.0.1",
-        v1_1_0: "1.1.0",
-      }
+    enum Versions {
+      v1_0_0: "1.0",
+      v1_0_1: "1.0.1",
+      v1_1_0: "1.1.0",
+    }
 
-      @versioned(Versions)
-      @service
-      @test namespace MyService {};
-    `);
+    @versioned(Versions)
+    @service
+    @test namespace MyService {};
+  `);
   const defaultApiVersion = getDefaultApiVersion(runnerWithVersion.context, MyService as Namespace);
   ok(defaultApiVersion);
   strictEqual(defaultApiVersion.value, "1.0.1");
