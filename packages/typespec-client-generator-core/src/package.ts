@@ -14,6 +14,7 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import { getServers, HttpServer, isHeader } from "@typespec/http";
 import { resolveVersions } from "@typespec/versioning";
 import {
@@ -87,10 +88,10 @@ import {
 import {
   getAllReferencedTypes,
   getClientTypeWithDiagnostics,
+  getSdkBuiltInType,
   getSdkCredentialParameter,
   getSdkModelPropertyType,
   getSdkModelWithDiagnostics,
-  getTypeSpecBuiltInType,
   handleAllTypes,
 } from "./types.js";
 
@@ -872,11 +873,11 @@ function getEndpointTypeFromSingleServer<
         onClient: true,
         explode: false,
         style: "simple",
-        allowReserved: false,
+        allowReserved: true,
         optional: false,
         serializedName: "endpoint",
         correspondingMethodParams: [],
-        type: getTypeSpecBuiltInType(context, "string"),
+        type: getSdkBuiltInType(context, $.builtin.url),
         isApiVersionParam: false,
         apiVersions: context.getApiVersionsForType(client.__raw.type),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,

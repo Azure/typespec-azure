@@ -385,16 +385,21 @@ export function getSdkHttpParameter(
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, param) || location === "path") {
-    // we don't url encode if the type can be assigned to url
-    const urlEncode = !ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(param.type, program.checker.getStdType("url"), param.type),
-    );
     return diagnostics.wrap({
       ...base,
       kind: "path",
       explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
       style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
-      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? !urlEncode,
+      // url type need allow reserved
+      allowReserved:
+        (httpParam as HttpOperationPathParameter)?.allowReserved ??
+        ignoreDiagnostics(
+          program.checker.isTypeAssignableTo(
+            param.type,
+            program.checker.getStdType("url"),
+            param.type,
+          ),
+        ),
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,
