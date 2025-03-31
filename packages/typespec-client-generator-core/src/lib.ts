@@ -356,6 +356,12 @@ export const $lib = createTypeSpecLibrary({
           "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
       },
     },
+    "non-head-bool-response-decorator": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on ${"operationName"}.`,
+      },
+    },
     "unsupported-http-file-body": {
       severity: "error",
       messages: {

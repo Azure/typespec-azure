@@ -35,6 +35,7 @@ import {
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
+  ResponseAsBoolDecorator,
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
@@ -1304,3 +1305,27 @@ export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorato
     }
   }
 };
+
+const responseAsBoolKey = createStateSymbol("responseAsBool");
+
+export const $responseAsBool: ResponseAsBoolDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  if (!target.decorators.some((d) => d.definition?.name === "@head")) {
+    reportDiagnostic(context.program, {
+      code: "non-head-bool-response-decorator",
+      format: {
+        operationName: target.name,
+      },
+      target: target,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $responseAsBool, responseAsBoolKey, target, true, scope);
+};
+
+export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
+  return getScopedDecoratorData(context, responseAsBoolKey, target);
+}
