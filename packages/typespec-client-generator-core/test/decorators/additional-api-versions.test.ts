@@ -19,8 +19,8 @@ it("add older api versions", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVerisons);
-    enum AdditionalApiVerisons { v1, v2, v3 };
+    @@additionalApiVersions(My.Service, AdditionalApiVersions);
+    enum AdditionalApiVersions { v1, v2, v3 };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
@@ -48,8 +48,8 @@ it("add newer api versions", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVerisons);
-    enum AdditionalApiVerisons { v7, v8, v9 };
+    @@additionalApiVersions(My.Service, AdditionalApiVersions);
+    enum AdditionalApiVersions { v7, v8, v9 };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
@@ -79,16 +79,14 @@ it("api version parameter", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVerisons);
-    enum AdditionalApiVerisons { v1, v2, v3 };
+    @@additionalApiVersions(My.Service, AdditionalApiVersions);
+    enum AdditionalApiVersions { v1, v2, v3 };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.parameters.length, 2);
-  const apiVersionParam = client.clientInitialization.parameters.find(
-    (x) => x.isApiVersionParam,
-  );
+  const apiVersionParam = client.clientInitialization.parameters.find((x) => x.isApiVersionParam);
   ok(apiVersionParam);
   strictEqual(apiVersionParam.apiVersions.length, 3);
   deepStrictEqual(apiVersionParam.apiVersions, ["v4", "v5", "v6"]);
@@ -109,8 +107,8 @@ it("model .apiVersions", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVerisons);
-    enum AdditionalApiVerisons { v1, v2, v3 };
+    @@additionalApiVersions(My.Service, AdditionalApiVersions);
+    enum AdditionalApiVersions { v1, v2, v3 };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
@@ -135,8 +133,8 @@ it("with @added", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVerisons);
-    enum AdditionalApiVerisons { v1, v2, v3 };
+    @@additionalApiVersions(My.Service, AdditionalApiVersions);
+    enum AdditionalApiVersions { v1, v2, v3 };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
@@ -164,8 +162,8 @@ it("with `api-version` flag", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVerisons);
-    enum AdditionalApiVerisons { v1, v2, v3 };
+    @@additionalApiVersions(My.Service, AdditionalApiVersions);
+    enum AdditionalApiVersions { v1, v2, v3 };
   `,
   );
   const sdkPackage = runnerWithVersion.context.sdkPackage;
