@@ -609,7 +609,7 @@ it("nullable union with anonymous model ref self", async function () {
 
   strictEqual(models.length, 1);
   strictEqual(models[0].kind, "model");
-  strictEqual(models[0].name, "PostRequest");
+  strictEqual(models[0].name, "PostRequestBody");
   strictEqual(models[0].properties[2].type, unions[0]);
 
   strictEqual(unions.length, 1);

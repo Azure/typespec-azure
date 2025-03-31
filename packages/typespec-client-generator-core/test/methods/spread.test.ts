@@ -388,7 +388,7 @@ it("anonymous model with @body should not be spread", async () => {
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
-  const model = models.find((x) => x.name === "TestRequest");
+  const model = models.find((x) => x.name === "TestRequestBody");
   ok(model);
   strictEqual(model.usage, UsageFlags.Input | UsageFlags.Json);
 
@@ -433,7 +433,7 @@ it("anonymous model from spread with @bodyRoot should not be spread", async () =
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
-  const model = models.find((x) => x.name === "TestRequest");
+  const model = models.find((x) => x.name === "TestRequestBody");
   ok(model);
   strictEqual(model.usage, UsageFlags.Input | UsageFlags.Json);
 

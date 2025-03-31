@@ -20,8 +20,8 @@ describe("simple anonymous model", () => {
     `);
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    strictEqual(models[0].name, "TestRequest");
-    strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
+    strictEqual(models[0].name, "TestRequestBody");
+    strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.body.anonymous");
     ok(models[0].isGeneratedName);
   });
 
@@ -45,9 +45,9 @@ describe("simple anonymous model", () => {
     ok(
       models.find(
         (x) =>
-          x.name === "TestRequest" &&
+          x.name === "TestRequestBody" &&
           x.isGeneratedName &&
-          x.crossLanguageDefinitionId === "TestService.test.Request.anonymous",
+          x.crossLanguageDefinitionId === "TestService.test.Request.body.anonymous",
       ),
     );
     ok(
@@ -160,8 +160,8 @@ describe("anonymous model with array or dict", () => {
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    strictEqual(models[0].name, "TestRequest");
-    strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
+    strictEqual(models[0].name, "TestRequestBody");
+    strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.body.anonymous");
     ok(models[0].isGeneratedName);
   });
 
@@ -173,8 +173,8 @@ describe("anonymous model with array or dict", () => {
     );
     const models = runner.context.sdkPackage.models;
     strictEqual(models.length, 1);
-    strictEqual(models[0].name, "TestRequest");
-    strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.anonymous");
+    strictEqual(models[0].name, "TestRequestBody");
+    strictEqual(models[0].crossLanguageDefinitionId, "TestService.test.Request.body.anonymous");
     ok(models[0].isGeneratedName);
   });
 

@@ -1846,3 +1846,25 @@ it("discriminator from template", async function () {
 
   expectDiagnosticEmpty(runner.context.diagnostics);
 });
+
+it("generated name for body root anonymous model", async function () {
+  await runner.compileWithBuiltInService(`
+    model Test {
+      prop: string;
+    }
+    op test(@bodyRoot body: {@body body: Test}): void;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 2);
+  const testModel = sdkPackage.models.find((m) => m.name === "Test");
+  ok(testModel);
+  strictEqual(testModel.properties.length, 1);
+  strictEqual(testModel.properties[0].name, "prop");
+
+  const anonymousModel = sdkPackage.models.find((m) => m.name === "TestRequest");
+  ok(anonymousModel);
+  strictEqual(anonymousModel.properties.length, 1);
+  strictEqual(anonymousModel.properties[0].kind, "body");
+  strictEqual(anonymousModel.properties[0].name, "body");
+  strictEqual(anonymousModel.properties[0].type, testModel);
+});

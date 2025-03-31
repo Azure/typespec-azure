@@ -403,7 +403,9 @@ function getContextPath(
       if (isHttpBodySpread(httpOperation.parameters.body)) {
         bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
       } else {
-        bodyType = httpOperation.parameters.body.type;
+        // find the parameter in the method that corresponds to the http body
+        bodyType =
+          httpOperation.parameters.body.property?.model || httpOperation.parameters.body.type;
       }
       if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
