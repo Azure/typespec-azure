@@ -1,6 +1,7 @@
 import {
   Enum,
   EnumMember,
+  getNamespaceFullName,
   Interface,
   Model,
   ModelProperty,
@@ -18,10 +19,11 @@ import {
   SyntaxKind,
 } from "@typespec/compiler/ast";
 import { DuplicateTracker } from "@typespec/compiler/utils";
+import { getVersions } from "@typespec/versioning";
 import { createTCGCContext } from "./context.js";
-import { getClientNameOverride } from "./decorators.js";
+import { getAdditionalApiVersions, getClientNameOverride } from "./decorators.js";
 import { TCGCContext } from "./interfaces.js";
-import { AllScopes, clientNameKey } from "./internal-utils.js";
+import { AllScopes, clientNameKey, listAllNamespaces } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 import { validateTypes } from "./types/validate.js";
 
@@ -31,8 +33,24 @@ export function $onValidate(program: Program) {
   for (const scope of languageScopes) {
     validateClientNamesPerNamespace(tcgcContext, scope, program.getGlobalNamespaceType());
   }
-
+  validateNamespaces(tcgcContext);
   validateTypes(tcgcContext);
+}
+
+function validateNamespaces(tcgcContext: TCGCContext) {
+  for (const namespace of listAllNamespaces(tcgcContext, tcgcContext.getMutatedGlobalNamespace())) {
+    const versions = getVersions(tcgcContext.program, namespace)[1];
+    if (versions === undefined && getAdditionalApiVersions(tcgcContext, namespace)) {
+      reportDiagnostic(tcgcContext.program, {
+        code: "require-versioned-service",
+        format: {
+          serviceName: getNamespaceFullName(namespace),
+          decoratorName: "@additionalApiVersions",
+        },
+        target: namespace,
+      });
+    }
+  }
 }
 
 function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {

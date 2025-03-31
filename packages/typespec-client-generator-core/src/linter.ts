@@ -1,9 +1,8 @@
 import { defineLinter } from "@typespec/compiler";
 import { propertyNameConflictRule } from "./rules/property-name-conflict.rule.js";
 import { requireClientSuffixRule } from "./rules/require-client-suffix.rule.js";
-import { requireVersionedServiceRule } from "./rules/require-versioned-service.rule.js";
 
-const rules = [requireClientSuffixRule, propertyNameConflictRule, requireVersionedServiceRule];
+const rules = [requireClientSuffixRule, propertyNameConflictRule];
 
 const csharpRules = [propertyNameConflictRule];
 

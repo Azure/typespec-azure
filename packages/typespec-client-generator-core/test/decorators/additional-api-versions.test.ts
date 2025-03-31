@@ -1,3 +1,4 @@
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
@@ -10,7 +11,7 @@ beforeEach(async () => {
 });
 
 it("add older api versions", async () => {
-  await runner.compileWithCustomization(
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
     `
     @service
     @versioned(Versions)
@@ -23,6 +24,7 @@ it("add older api versions", async () => {
     enum AdditionalApiVersions { v1, v2, v3 };
   `,
   );
+  expectDiagnosticEmpty(diagnostics);
   const sdkPackage = runner.context.sdkPackage;
   const apiVersionEnum = sdkPackage.enums.find((x) => x.usage & UsageFlags.ApiVersionEnum);
   ok(apiVersionEnum);
@@ -177,4 +179,23 @@ it("with `api-version` flag", async () => {
   );
   const model = sdkPackage.models[0];
   deepStrictEqual(model.apiVersions, ["v4", "v5"]);
+});
+
+it("diagnostics: no versioned service", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    @additionalApiVersions(AdditionalApiVersions)
+    namespace My.Service {
+      enum AdditionalApiVersions { v1, v2, v3 };
+    }
+      `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/require-versioned-service",
+      severity: "warning",
+      message: `Service "My.Service" must be versioned if you want to apply the "@additionalApiVersions" decorator`,
+    },
+  ]);
 });

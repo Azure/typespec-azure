@@ -362,6 +362,13 @@ export const $lib = createTypeSpecLibrary({
         default: "File body is not supported for HTTP operations. Please use bytes instead.",
       },
     },
+    "require-versioned-service": {
+      severity: "warning",
+      description: "Require a versioned service to use this decorator",
+      messages: {
+        default: paramMessage`Service "${"serviceName"}" must be versioned if you want to apply the "${"decoratorName"}" decorator`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
