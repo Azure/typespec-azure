@@ -703,6 +703,79 @@ client.upload()
 client.download()
 ```
 
+If you want to rename the parameter name that you elevate to the client level, you can use the `@paramAlias` decorator.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace Storage;
+
+op upload(@path blobName: string): void;
+op download(@path blobName: string): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+namespace Customizations;
+
+model StorageClientOptions {
+  @paramAlias("blobName")
+  blob: string;
+}
+
+@@clientInitialization(Storage,
+  {
+    parameters: StorageClientOptions,
+  }
+);
+```
+
+```python
+from storage import StorageClient
+
+client = StorageClient(endpoint="<my-endpoint>", blob="myBlobName", ...)
+
+client.upload()
+client.download()
+```
+
+```csharp
+// TODO: how do you pass in the options model
+using Storage;
+
+StorageClient client = new StorageClient();
+
+client.Upload();
+client.Download();
+```
+
+```typescript
+// TODO: how do you pass in the options model
+import { StorageClient } from "@azure/package-name";
+
+const client = new StorageClient();
+
+client.upload();
+client.download();
+```
+
+```java
+package storage;
+
+StorageClient client = new StorageClient()
+    .endpoint("<my-endpoint>")
+    .blob("myBlobName")
+    .buildClient();
+
+client.upload()
+client.download()
+```
+
 </ClientTabs>
 
 ### Change Operation Group Initialization Way
