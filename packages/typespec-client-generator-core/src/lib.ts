@@ -370,6 +370,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Service "${"serviceName"}" must be versioned if you want to apply the "${"decoratorName"}" decorator`,
       },
     },
+    "missing-service-versions": {
+      severity: "warning",
+      description: "Missing service versions",
+      messages: {
+        default: paramMessage`The @clientApiVersions decorator is missing one or more versions defined in ${"serviceName"}. Client API must support all service versions to ensure compatibility. Missing versions: ${"missingVersions"}. Please update the client API to support all required service versions.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

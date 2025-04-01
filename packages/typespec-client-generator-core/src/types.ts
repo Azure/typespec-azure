@@ -49,9 +49,9 @@ import { isStream } from "@typespec/streams";
 import {
   getAccess,
   getAccessOverride,
-  getAdditionalApiVersions,
   getAlternateType,
   getClientNamespace,
+  getExplicitClientApiVersions,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
@@ -1930,29 +1930,16 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     const [_, versionMap] = getVersions(context.program, client.service);
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
-      const sdkVersionsEnum = diagnostics.pipe(
-        getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
-      );
-      const additionalApiVersions = getAdditionalApiVersions(context, client.service);
-      if (additionalApiVersions) {
+      let sdkVersionsEnum: SdkEnumType;
+      const explicitApiVersions = getExplicitClientApiVersions(context, client.service);
+      if (explicitApiVersions) {
         // add additional api versions to the enum
-        for (const member of additionalApiVersions.members.values()) {
-          sdkVersionsEnum.values.push(
-            diagnostics.pipe(getSdkEnumValueWithDiagnostics(context, sdkVersionsEnum, member)),
-          );
-        }
-        // sort the enum values by order. Not the most perfect, since we might mess up
-        // existing api version order, but this is an edge case and we are ultimately
-        // adding in api versions that weren't defined in the @versioned enum
-        sdkVersionsEnum.values.sort((a, b) => {
-          if (typeof a.value === "string" && typeof b.value === "string") {
-            return a.value.localeCompare(b.value);
-          } else if (typeof a.value === "number" && typeof b.value === "number") {
-            return a.value - b.value;
-          } else {
-            return 0;
-          }
-        });
+        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
+        // TODO: make sure the enum includes all of the listed service ones as well
+      } else {
+        sdkVersionsEnum = diagnostics.pipe(
+          getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
+        );
       }
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));

@@ -1,4 +1,4 @@
-import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
@@ -20,15 +20,15 @@ it("add older api versions", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVersions);
-    enum AdditionalApiVersions { v1, v2, v3 };
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions { v1, v2, v3, ...My.Service.Versions };
   `,
   );
   expectDiagnosticEmpty(diagnostics);
   const sdkPackage = runner.context.sdkPackage;
   const apiVersionEnum = sdkPackage.enums.find((x) => x.usage & UsageFlags.ApiVersionEnum);
   ok(apiVersionEnum);
-  strictEqual(apiVersionEnum.name, "Versions");
+  strictEqual(apiVersionEnum.name, "ClientApiVersions");
   strictEqual(apiVersionEnum.values.length, 6);
   deepStrictEqual(
     apiVersionEnum.values.map((x) => x.name),
@@ -50,14 +50,14 @@ it("add newer api versions", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVersions);
-    enum AdditionalApiVersions { v7, v8, v9 };
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions { ...My.Service.Versions, v7, v8, v9 };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
   const apiVersionEnum = sdkPackage.enums.find((x) => x.usage & UsageFlags.ApiVersionEnum);
   ok(apiVersionEnum);
-  strictEqual(apiVersionEnum.name, "Versions");
+  strictEqual(apiVersionEnum.name, "ClientApiVersions");
   strictEqual(apiVersionEnum.values.length, 6);
   deepStrictEqual(
     apiVersionEnum.values.map((x) => x.name),
@@ -81,8 +81,8 @@ it("api version parameter", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVersions);
-    enum AdditionalApiVersions { v1, v2, v3 };
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions { v1, v2, v3, ...My.Service.Versions };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
@@ -109,8 +109,8 @@ it("model .apiVersions", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVersions);
-    enum AdditionalApiVersions { v1, v2, v3 };
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions { v1, v2, v3, ...My.Service.Versions };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
@@ -135,8 +135,8 @@ it("with @added", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVersions);
-    enum AdditionalApiVersions { v1, v2, v3 };
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions { v1, v2, v3, ...My.Service.Versions };
   `,
   );
   const sdkPackage = runner.context.sdkPackage;
@@ -164,14 +164,14 @@ it("with `api-version` flag", async () => {
     }
   `,
     `
-    @@additionalApiVersions(My.Service, AdditionalApiVersions);
-    enum AdditionalApiVersions { v1, v2, v3 };
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions { v1, v2, v3, ...My.Service.Versions };
   `,
   );
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   const apiVersionEnum = sdkPackage.enums.find((x) => x.usage & UsageFlags.ApiVersionEnum);
   ok(apiVersionEnum);
-  strictEqual(apiVersionEnum.name, "Versions");
+  strictEqual(apiVersionEnum.name, "ClientApiVersions");
   strictEqual(apiVersionEnum.values.length, 5);
   deepStrictEqual(
     apiVersionEnum.values.map((x) => x.name),
@@ -181,21 +181,38 @@ it("with `api-version` flag", async () => {
   deepStrictEqual(model.apiVersions, ["v4", "v5"]);
 });
 
-it("diagnostics: no versioned service", async () => {
-  const diagnostics = await runner.diagnose(
+it("with service versions defined with separate name and value", async () => {
+  await runner.compileWithCustomization(
     `
     @service
-    @additionalApiVersions(AdditionalApiVersions)
+    @versioned(Versions)
     namespace My.Service {
-      enum AdditionalApiVersions { v1, v2, v3 };
+
+      enum Versions { 
+        v2023_10_01: "2023-10-01",
+        v2024_10_01: "2024-10-01",
+      };
+      @usage(Usage.input)
+      model MyModel {
+        id: string;
+      };
     }
-      `,
+  `,
+    `
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    enum ClientApiVersions { 
+      v2022_10_01: "2022-10-01",
+      ...My.Service.Versions,
+    };
+  `,
   );
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/require-versioned-service",
-      severity: "warning",
-      message: `Service "My.Service" must be versioned if you want to apply the "@additionalApiVersions" decorator`,
-    },
-  ]);
+  const sdkPackage = runner.context.sdkPackage;
+  const apiVersionEnum = sdkPackage.enums.find((x) => x.usage & UsageFlags.ApiVersionEnum);
+  ok(apiVersionEnum);
+  strictEqual(apiVersionEnum.name, "ClientApiVersions");
+  strictEqual(apiVersionEnum.values.length, 3);
+  deepStrictEqual(
+    apiVersionEnum.values.map((x) => x.name),
+    ["v2022_10_01", "v2023_10_01", "v2024_10_01"],
+  );
 });

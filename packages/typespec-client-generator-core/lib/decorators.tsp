@@ -610,7 +610,8 @@ extern dec scope(target: Operation, scope?: valueof string);
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
 
 /**
- * Add additional api versions that are possible for the client to use. Only adds these api versions to the exposed API version enum.
+ * Add additional api versions that are possible for the client to use. Has to include listed versions from the service.
+ * Only adds these api versions to the exposed API version enum.
  * Use if you want to generate an accurate API version enum, while not having to actually annotate the entire spec with versioning decorators,
  * since we won't be using the versioning information on the generation side.
  *
@@ -624,12 +625,12 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  *
  * //client.tsp
  *
- * enum AdditionalApiVersions { v1, v2, v3 }
+ * enum ClientApiVersions { v1, v2, v3, ...Contoso.Versions }
  *
- * @@additionalApiVersions(Contoso, AdditionalApiVersions)
+ * @@clientApiVersions(Contoso, ClientApiVersions)
  * ```
  */
-extern dec additionalApiVersions(target: Namespace, value: Enum, scope?: valueof string);
+extern dec clientApiVersions(target: Namespace, value: Enum, scope?: valueof string);
 /**
  * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.

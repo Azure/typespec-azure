@@ -23,9 +23,9 @@ import {
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
   AccessDecorator,
-  AdditionalApiVersionsDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
+  ClientApiVersionsDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
@@ -1282,7 +1282,7 @@ function IsInScope(context: TCGCContext, entity: Operation): boolean {
   return true;
 }
 
-const additionalApiVersionsKey = createStateSymbol("additionalApiVersions");
+const clientApiVersionsKey = createStateSymbol("clientApiVersions");
 
 /**
  * Add additional api versions that are possible for the client to use.
@@ -1292,34 +1292,27 @@ const additionalApiVersionsKey = createStateSymbol("additionalApiVersions");
  * @param value Enum with the additional api versions
  * @param scope
  */
-export const $additionalApiVersions: AdditionalApiVersionsDecorator = (
+export const $clientApiVersions: ClientApiVersionsDecorator = (
   context: DecoratorContext,
   target: Namespace,
   value: Enum,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(
-    context,
-    $additionalApiVersions,
-    additionalApiVersionsKey,
-    target,
-    value,
-    scope,
-  );
+  setScopedDecoratorData(context, $clientApiVersions, clientApiVersionsKey, target, value, scope);
 };
 
 /**
- * Get the additional api versions that are possible for the client to use.
+ * Get the explicit client api versions that are possible for the client to use denoted by `@clientApiVersions`
  *
  * @param context
  * @param target
  * @returns
  */
-export function getAdditionalApiVersions(
+export function getExplicitClientApiVersions(
   context: TCGCContext,
   target: Namespace,
 ): Enum | undefined {
-  return getScopedDecoratorData(context, additionalApiVersionsKey, target);
+  return getScopedDecoratorData(context, clientApiVersionsKey, target);
 }
 export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,

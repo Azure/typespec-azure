@@ -1,10 +1,10 @@
 import { AzureClientGeneratorCoreDecorators } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   $access,
-  $additionalApiVersions,
   $alternateType,
   $apiVersion,
   $client,
+  $clientApiVersions,
   $clientInitialization,
   $clientName,
   $clientNamespace,
@@ -43,7 +43,7 @@ export const $decorators = {
     clientNamespace: $clientNamespace,
     alternateType: $alternateType,
     scope: $scope,
-    additionalApiVersions: $additionalApiVersions,
+    clientApiVersions: $clientApiVersions,
     deserializeEmptyStringAsNull: $deserializeEmptyStringAsNull,
     responseAsBool: $responseAsBool,
   } as AzureClientGeneratorCoreDecorators,

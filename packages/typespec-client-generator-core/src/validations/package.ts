@@ -1,26 +1,61 @@
-import { getNamespaceFullName } from "@typespec/compiler";
+import { getNamespaceFullName, Namespace } from "@typespec/compiler";
 import { getVersions } from "@typespec/versioning";
-import { getAdditionalApiVersions } from "../decorators.js";
+import { getExplicitClientApiVersions } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
 import { listAllNamespaces } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validatePackage(context: TCGCContext) {
-  validateDecoratorsAppliedToVersionedService(context);
+  validateNamespaces(context);
 }
 
-function validateDecoratorsAppliedToVersionedService(tcgcContext: TCGCContext) {
-  for (const namespace of listAllNamespaces(tcgcContext, tcgcContext.getMutatedGlobalNamespace())) {
-    const versions = getVersions(tcgcContext.program, namespace)[1];
-    if (versions === undefined && getAdditionalApiVersions(tcgcContext, namespace)) {
-      reportDiagnostic(tcgcContext.program, {
-        code: "require-versioned-service",
-        format: {
-          serviceName: getNamespaceFullName(namespace),
-          decoratorName: "@additionalApiVersions",
-        },
-        target: namespace,
-      });
-    }
+function validateNamespaces(context: TCGCContext) {
+  for (const namespace of listAllNamespaces(context, context.getMutatedGlobalNamespace())) {
+    validateDecoratorsAppliedToVersionedService(context, namespace);
+    validateClientApiVersionsIncludesAllServiceVersions(context, namespace);
+  }
+}
+function validateDecoratorsAppliedToVersionedService(context: TCGCContext, namespace: Namespace) {
+  const versions = getVersions(context.program, namespace)[1];
+  if (versions === undefined && getExplicitClientApiVersions(context, namespace)) {
+    reportDiagnostic(context.program, {
+      code: "require-versioned-service",
+      format: {
+        serviceName: getNamespaceFullName(namespace),
+        decoratorName: "@clientApiVersions",
+      },
+      target: namespace,
+    });
+  }
+}
+
+function validateClientApiVersionsIncludesAllServiceVersions(
+  context: TCGCContext,
+  namespace: Namespace,
+) {
+  const versions = getVersions(context.program, namespace)[1];
+  if (versions === undefined) {
+    return;
+  }
+  const clientApiVersionsEnum = getExplicitClientApiVersions(context, namespace);
+  if (clientApiVersionsEnum === undefined) {
+    return;
+  }
+  const clientApiVersions = [...clientApiVersionsEnum.members.values()].map(
+    (x) => x.value ?? x.name,
+  );
+  const missingVersions = versions
+    .getVersions()
+    .map((x) => x.value)
+    .filter((version) => !clientApiVersions.includes(version));
+  if (missingVersions.length > 0) {
+    reportDiagnostic(context.program, {
+      code: "missing-service-versions",
+      format: {
+        serviceName: getNamespaceFullName(namespace),
+        missingVersions: missingVersions.join(", "),
+      },
+      target: namespace,
+    });
   }
 }

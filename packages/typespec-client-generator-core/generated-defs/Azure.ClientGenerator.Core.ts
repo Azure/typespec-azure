@@ -609,7 +609,8 @@ export type ApiVersionDecorator = (
 ) => void;
 
 /**
- * Add additional api versions that are possible for the client to use. Only adds these api versions to the exposed API version enum.
+ * Add additional api versions that are possible for the client to use. Has to include listed versions from the service.
+ * Only adds these api versions to the exposed API version enum.
  * Use if you want to generate an accurate API version enum, while not having to actually annotate the entire spec with versioning decorators,
  * since we won't be using the versioning information on the generation side.
  *
@@ -623,12 +624,12 @@ export type ApiVersionDecorator = (
  *
  * //client.tsp
  *
- * enum AdditionalApiVersions { v1, v2, v3 }
+ * enum ClientApiVersions { v1, v2, v3, ...Contoso.Versions }
  *
- * @@additionalApiVersions(Contoso, AdditionalApiVersions)
+ * @@clientApiVersions(Contoso, ClientApiVersions)
  * ```
  */
-export type AdditionalApiVersionsDecorator = (
+export type ClientApiVersionsDecorator = (
   context: DecoratorContext,
   target: Namespace,
   value: Enum,
@@ -694,7 +695,7 @@ export type AzureClientGeneratorCoreDecorators = {
   alternateType: AlternateTypeDecorator;
   scope: ScopeDecorator;
   apiVersion: ApiVersionDecorator;
-  additionalApiVersions: AdditionalApiVersionsDecorator;
+  clientApiVersions: ClientApiVersionsDecorator;
   deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator;
   responseAsBool: ResponseAsBoolDecorator;
 };

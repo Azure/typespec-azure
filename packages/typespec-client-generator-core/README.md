@@ -106,10 +106,10 @@ Available ruleSets:
 ### Azure.ClientGenerator.Core
 
 - [`@access`](#@access)
-- [`@additionalApiVersions`](#@additionalapiversions)
 - [`@alternateType`](#@alternatetype)
 - [`@apiVersion`](#@apiversion)
 - [`@client`](#@client)
+- [`@clientApiVersions`](#@clientapiversions)
 - [`@clientInitialization`](#@clientinitialization)
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
@@ -267,50 +267,6 @@ op func7(@body body: Test5): void;
 op func8(@body body: Test5): void;
 ```
 
-#### `@additionalApiVersions`
-
-Add additional api versions that are possible for the client to use. Only adds these api versions to the exposed API version enum.
-Use if you want to generate an accurate API version enum, while not having to actually annotate the entire spec with versioning decorators,
-since we won't be using the versioning information on the generation side.
-
-```typespec
-@Azure.ClientGenerator.Core.additionalApiVersions(value: Enum, scope?: valueof string)
-```
-
-##### Target
-
-`Namespace`
-
-##### Parameters
-
-| Name  | Type             | Description |
-| ----- | ---------------- | ----------- |
-| value | `Enum`           |             |
-| scope | `valueof string` |             |
-
-##### Examples
-
-```typespec
-// main.tsp
-@versioned(Versions)
-namespace Contoso {
-  enum Versions {
-    v4,
-    v5,
-  }
-}
-
-//client.tsp
-
-enum AdditionalApiVersions {
-  v1,
-  v2,
-  v3,
-}
-
-@@additionalApiVersions(Contoso, AdditionalApiVersions);
-```
-
 #### `@alternateType`
 
 Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
@@ -432,6 +388,52 @@ interface MyInterface {}
   client: MySpecialClient,
 })
 interface MyInterface {}
+```
+
+#### `@clientApiVersions`
+
+Add additional api versions that are possible for the client to use. Has to include listed versions from the service.
+Only adds these api versions to the exposed API version enum.
+Use if you want to generate an accurate API version enum, while not having to actually annotate the entire spec with versioning decorators,
+since we won't be using the versioning information on the generation side.
+
+```typespec
+@Azure.ClientGenerator.Core.clientApiVersions(value: Enum, scope?: valueof string)
+```
+
+##### Target
+
+`Namespace`
+
+##### Parameters
+
+| Name  | Type             | Description |
+| ----- | ---------------- | ----------- |
+| value | `Enum`           |             |
+| scope | `valueof string` |             |
+
+##### Examples
+
+```typespec
+// main.tsp
+@versioned(Versions)
+namespace Contoso {
+  enum Versions {
+    v4,
+    v5,
+  }
+}
+
+//client.tsp
+
+enum ClientApiVersions {
+  v1,
+  v2,
+  v3,
+  ...Contoso.Versions,
+}
+
+@@clientApiVersions(Contoso, ClientApiVersions);
 ```
 
 #### `@clientInitialization`
