@@ -1,4 +1,5 @@
 import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
   getClientInitializationOptions,
@@ -35,9 +36,9 @@ import { createDiagnostic } from "./lib.js";
 import { createSdkMethods } from "./methods.js";
 import { getCrossLanguageDefinitionId, getLibraryName } from "./public-utils.js";
 import {
+  getSdkBuiltInType,
   getSdkCredentialParameter,
   getSdkModelWithDiagnostics,
-  getTypeSpecBuiltInType,
 } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
@@ -61,11 +62,11 @@ function getEndpointTypeFromSingleServer<
         onClient: true,
         explode: false,
         style: "simple",
-        allowReserved: false,
+        allowReserved: true,
         optional: false,
         serializedName: "endpoint",
         correspondingMethodParams: [],
-        type: getTypeSpecBuiltInType(context, "string"),
+        type: getSdkBuiltInType(context, $.builtin.url),
         isApiVersionParam: false,
         apiVersions: context.getApiVersionsForType(client.__raw.type),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,

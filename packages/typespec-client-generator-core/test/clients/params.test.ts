@@ -87,8 +87,8 @@ it("initialization default endpoint no credential", async () => {
   strictEqual(templateArg.kind, "path");
   strictEqual(templateArg.name, "endpoint");
   strictEqual(templateArg.serializedName, "endpoint");
-  strictEqual(templateArg.allowReserved, false);
-  strictEqual(templateArg.type.kind, "string");
+  strictEqual(templateArg.allowReserved, true);
+  strictEqual(templateArg.type.kind, "url");
   strictEqual(templateArg.optional, false);
   strictEqual(templateArg.onClient, true);
   strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
@@ -115,7 +115,8 @@ it("initialization default endpoint with apikey auth", async () => {
   strictEqual(endpointParam.type.templateArguments.length, 1);
   const templateArg = endpointParam.type.templateArguments[0];
   strictEqual(templateArg.kind, "path");
-  strictEqual(templateArg.type.kind, "string");
+  strictEqual(templateArg.allowReserved, true);
+  strictEqual(templateArg.type.kind, "url");
   strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");
 
   const credentialParam = client.clientInitialization.parameters.filter(
@@ -158,7 +159,8 @@ it("initialization default endpoint with bearer auth", async () => {
   strictEqual(endpointParam.type.templateArguments.length, 1);
   const templateArg = endpointParam.type.templateArguments[0];
   strictEqual(templateArg.kind, "path");
-  strictEqual(templateArg.type.kind, "string");
+  strictEqual(templateArg.allowReserved, true);
+  strictEqual(templateArg.type.kind, "url");
   strictEqual(templateArg.optional, false);
   strictEqual(templateArg.onClient, true);
   strictEqual(templateArg.clientDefaultValue, "http://localhost:3000");

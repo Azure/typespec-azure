@@ -216,7 +216,7 @@ export const $lib = createTypeSpecLibrary({
     "no-corresponding-method-param": {
       severity: "error",
       messages: {
-        default: paramMessage`Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
+        default: paramMessage`Missing HTTP operation parameter "${"paramName"}" in method "${"methodName"}". Please check the method definition.`,
       },
     },
     "unsupported-protocol": {
