@@ -1,5 +1,5 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
+using Http;
+using Rest;
 using Azure.ResourceManager.Foundations;
 
 namespace Azure.ResourceManager;

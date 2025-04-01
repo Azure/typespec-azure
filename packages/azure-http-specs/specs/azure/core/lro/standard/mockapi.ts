@@ -46,8 +46,8 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge",
     method: "put",
     request: {
-      body: { role: "contributor" },
-      params: {
+      body: json({ role: "contributor" }),
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -76,7 +76,7 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -91,7 +91,7 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -119,7 +119,7 @@ Scenarios.Azure_Core_Lro_Standard_delete = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge",
     method: "delete",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -147,7 +147,7 @@ Scenarios.Azure_Core_Lro_Standard_delete = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation2",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -162,7 +162,7 @@ Scenarios.Azure_Core_Lro_Standard_delete = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation2",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -180,7 +180,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge:export",
     method: "post",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
         format: "json",
       },
@@ -210,7 +210,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation3",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -225,7 +225,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation3",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },

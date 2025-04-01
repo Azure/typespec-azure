@@ -545,9 +545,8 @@ describe("binary responses", () => {
       @get op read(): bytes;
     `);
     const operation = res.paths["/"].get;
-    deepStrictEqual(operation.produces, undefined);
-    strictEqual(operation.responses["200"].schema.type, "string");
-    strictEqual(operation.responses["200"].schema.format, "byte");
+    deepStrictEqual(operation.produces, ["application/octet-stream"]);
+    strictEqual(operation.responses["200"].schema.type, "file");
   });
 
   it("@body body: bytes responses should produce application/json with byte schema", async () => {
@@ -556,9 +555,8 @@ describe("binary responses", () => {
     `);
 
     const operation = res.paths["/"].get;
-    deepStrictEqual(operation.produces, undefined);
-    strictEqual(operation.responses["200"].schema.type, "string");
-    strictEqual(operation.responses["200"].schema.format, "byte");
+    deepStrictEqual(operation.produces, ["application/octet-stream"]);
+    strictEqual(operation.responses["200"].schema.type, "file");
   });
 
   it("@header contentType should override content type and set type to file", async () => {

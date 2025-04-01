@@ -1,5 +1,5 @@
 using Azure.Core;
-using TypeSpec.Versioning;
+using Versioning;
 
 namespace Azure.ResourceManager.CommonTypes;
 

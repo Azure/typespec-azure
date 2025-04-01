@@ -23,8 +23,8 @@ These lines import the libraries you will need to build your first service.
 **Add the following lines** to bring the models, operations, and decorators you will need into the specification:
 
 ```typespec
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Resource.Manager;
 ```

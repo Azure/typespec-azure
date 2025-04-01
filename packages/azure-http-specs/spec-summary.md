@@ -722,13 +722,26 @@ Expected response body:
 }
 ```
 
+### Azure_Encode_Duration_durationConstant
+
+- Endpoint: `put /azure/encode/duration/duration-constant`
+
+Test case for azure specific encoding. SDK should generate correct serialization format according to the set encoding.
+Expected request body:
+
+```json
+{
+  "input": "1.02:59:59.5000000"
+}
+```
+
 ### Azure_Example_Basic
 
 - Endpoint: `post /azure/example/basic/basic`
 
 Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
 
-When generate the code, one need to set the "examples-directory" option.
+When generate the code, one need to set the "examples-dir" option.
 
 Expected query parameter: query-param=query&api-version=2022-12-01-preview
 Expected header parameter: header-param=header
@@ -968,6 +981,52 @@ Expected response body:
   "properties": {
     "provisioningState": "Succeeded"
   }
+}
+```
+
+### Azure_ResourceManager_NonResource_NonResourceOperations_create
+
+- Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
+
+It's non-resource put operation operating on non-resource model, though the model has `id`, `name`, `type` properties.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
+}
+```
+
+### Azure_ResourceManager_NonResource_NonResourceOperations_get
+
+- Endpoint: `get https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
+
+It's non-resource get operation operating on non-resource model, though the model has `id`, `name`, `type` properties.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
 }
 ```
 

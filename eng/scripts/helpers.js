@@ -1,4 +1,4 @@
-import { findWorkspacePackagesNoCheck } from "@pnpm/find-workspace-packages";
+import { findWorkspacePackagesNoCheck } from "@pnpm/workspace.find-packages";
 import { spawn, spawnSync } from "child_process";
 import { lstatSync, readdirSync } from "fs";
 import { dirname, resolve } from "path";
@@ -10,7 +10,7 @@ export const prettier = resolve(repoRoot, "core/packages/compiler/node_modules/.
 export const tsc = resolve(repoRoot, "core/packages/compiler/node_modules/.bin/tsc");
 export const autorest = resolve(repoRoot, "eng/scripts/node_modules/.bin/autorest");
 
-/** @returns {Promise<import("@pnpm/find-workspace-packages").Project[]>*/
+/** @returns {Promise<import("@pnpm/workspace.find-packages").Project[]>*/
 export function listPackages() {
   return findWorkspacePackagesNoCheck(repoRoot);
 }

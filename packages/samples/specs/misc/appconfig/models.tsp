@@ -1,5 +1,5 @@
-using TypeSpec.Http;
-using TypeSpec.OpenAPI;
+using Http;
+using OpenAPI;
 
 namespace AppConfig;
 

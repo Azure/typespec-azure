@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import { describe, it } from "vitest";
+import { expect, it } from "vitest";
 import { openApiFor } from "./test-host.js";
 
 it("model properties are spread into individual parameters", async () => {
@@ -81,6 +81,28 @@ it("part of type `string` produce `type: string`", async () => {
   ]);
 });
 
+it("doc of property is carried to the description field", async () => {
+  const res = await openApiFor(
+    `
+  op upload(@header contentType: "multipart/form-data", @multipartBody _: { /** My doc */ name: HttpPart<string> }): void;
+  `,
+  );
+  const param = res.paths["/"].post.parameters[0];
+  expect(param.description).toEqual("My doc");
+});
+
+it("doc of property is carried to the description field for extensible union", async () => {
+  const res = await openApiFor(
+    `
+  op upload(@header contentType: "multipart/form-data", @multipartBody _: { /** Prop doc */ name: HttpPart<Foo> }): void;
+  /** Union doc */
+  union Foo { string, "a" };
+  `,
+  );
+  const param = res.paths["/"].post.parameters[0];
+  expect(param.description).toEqual("Prop doc");
+});
+
 // https://github.com/Azure/typespec-azure/issues/3860
 it("part of type `object` produce `type: string`", async () => {
   const res = await openApiFor(
@@ -100,96 +122,15 @@ it("part of type `object` produce `type: string`", async () => {
   ]);
 });
 
-describe("legacy implicit form", () => {
-  it("part of type `bytes` produce `type: file`", async () => {
-    const res = await openApiFor(
-      `
-      op upload(@header contentType: "multipart/form-data", profileImage: bytes): void;
-      `,
-    );
-    const op = res.paths["/"].post;
-    deepStrictEqual(op.parameters, [
-      {
-        in: "formData",
-        name: "profileImage",
-        required: true,
-        type: "file",
-      },
-    ]);
-  });
-
-  it("set part doc", async () => {
-    const res = await openApiFor(
-      `
-      op upload(@header contentType: "multipart/form-data", @doc("Part doc") profileImage: bytes): void;
-      `,
-    );
-    const op = res.paths["/"].post;
-    deepStrictEqual(op.parameters, [
-      {
-        in: "formData",
-        name: "profileImage",
-        description: "Part doc",
-        required: true,
-        type: "file",
-      },
-    ]);
-  });
-
-  it("part of type `bytes[]` produce `type: array, items: { type: string, format: binary }`", async () => {
-    const res = await openApiFor(
-      `
-      op upload(@header contentType: "multipart/form-data", profileImage: bytes[]): void;
-      `,
-    );
-    const op = res.paths["/"].post;
-    deepStrictEqual(op.parameters, [
-      {
-        in: "formData",
-        name: "profileImage",
-        required: true,
-        type: "array",
-        items: {
-          type: "string",
-          format: "binary",
-        },
-      },
-    ]);
-  });
-
-  it("part of type `string` produce `type: string`", async () => {
-    const res = await openApiFor(
-      `
-      op upload(@header contentType: "multipart/form-data", name: string): void;
-      `,
-    );
-    const op = res.paths["/"].post;
-    deepStrictEqual(op.parameters, [
-      {
-        in: "formData",
-        name: "name",
-        required: true,
-        type: "string",
-      },
-    ]);
-  });
-
-  // https://github.com/Azure/typespec-azure/issues/3860
-  it("part of type `object` produce `type: string`", async () => {
-    const res = await openApiFor(
-      `
-      #suppress "@azure-tools/typespec-autorest/unsupported-multipart-type" "For test"
-      op upload(@header contentType: "multipart/form-data", address: {city: string, street: string}): void;
-      `,
-    );
-    const op = res.paths["/"].post;
-    deepStrictEqual(op.parameters, [
-      {
-        in: "formData",
-        name: "address",
-        required: true,
-        type: "string",
-      },
-    ]);
+it("include x-ms-client-name if http part defines a different name from the property", async () => {
+  const res = await openApiFor(
+    `
+    op upload(@header contentType: "multipart/form-data", @multipartBody _: { propName: HttpPart<string, #{name: "part_name"}> }): void;
+  `,
+  );
+  const param = res.paths["/"].post.parameters[0];
+  expect(param).toMatchObject({
+    name: "part_name",
+    "x-ms-client-name": "propName",
   });
 });

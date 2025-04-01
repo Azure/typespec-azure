@@ -44,7 +44,6 @@ import {
   Scalar,
   StringLiteral,
   StringTemplate,
-  SyntaxKind,
   Type,
   TypeNameOptions,
   Union,
@@ -101,6 +100,7 @@ import {
   resolvePath,
   serializeValueAsJson,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
@@ -111,6 +111,7 @@ import {
   HttpOperationMultipartBody,
   HttpOperationParameters,
   HttpOperationResponse,
+  HttpPayloadBody,
   HttpProperty,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
@@ -147,7 +148,6 @@ import {
   OpenAPI2BodyParameter,
   OpenAPI2Document,
   OpenAPI2FileSchema,
-  OpenAPI2FormDataParameter,
   OpenAPI2HeaderDefinition,
   OpenAPI2HeaderParameter,
   OpenAPI2OAuth2FlowType,
@@ -454,7 +454,6 @@ export async function getOpenAPIForService(
             explode: false,
             style: "simple",
             name: prop.name,
-            type: "path",
           },
         },
         {
@@ -857,7 +856,7 @@ export async function getOpenAPIForService(
       openapiResponse["x-ms-error-response"] = true;
     }
     const contentTypes: string[] = [];
-    let body: HttpOperationBody | HttpOperationMultipartBody | undefined;
+    let body: HttpPayloadBody | undefined;
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
@@ -890,11 +889,11 @@ export async function getOpenAPIForService(
   }
 
   function getSchemaForResponseBody(
-    body: HttpOperationBody | HttpOperationMultipartBody,
+    body: HttpPayloadBody,
     contentTypes: string[],
   ): OpenAPI2Schema | OpenAPI2FileSchema {
     const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
-    if (isBinary) {
+    if (body.bodyKind === "file" || isBinary) {
       return { type: "file" };
     }
     if (body.bodyKind === "multipart") {
@@ -1145,16 +1144,32 @@ export async function getOpenAPIForService(
     }
   }
 
-  function emitBodyParameters(
-    body: HttpOperationBody | HttpOperationMultipartBody,
-    visibility: Visibility,
-  ) {
+  function emitBodyParameters(body: HttpPayloadBody, visibility: Visibility) {
     switch (body.bodyKind) {
       case "single":
         emitSingleBodyParameters(body, visibility);
         break;
       case "multipart":
         emitMultipartBodyParameters(body, visibility);
+        break;
+      case "file":
+        const bodySchema = { type: "string", format: "binary" };
+        const { property } = body;
+        if (property) {
+          emitParameter(property, () =>
+            getOpenAPI2BodyParameter(property, property.name, bodySchema),
+          );
+        } else {
+          currentEndpoint.parameters.push({
+            name: "body",
+            in: "body",
+            schema: {
+              type: "string",
+              format: "binary",
+            },
+            required: true,
+          });
+        }
         break;
     }
   }
@@ -1169,18 +1184,7 @@ export async function getOpenAPIForService(
       ? { type: "string", format: "binary" }
       : getSchemaOrRef(body.type, schemaContext);
 
-    if (currentConsumes.has("multipart/form-data")) {
-      const bodyModelType = body.type;
-      // Assert, this should never happen. Rest library guard against that.
-      compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
-      if (bodyModelType) {
-        for (const param of bodyModelType.properties.values()) {
-          emitParameter(param, () =>
-            getOpenAPI2FormDataParameter(param, schemaContext, getJsonName(param)),
-          );
-        }
-      }
-    } else if (body.property) {
+    if (body.property) {
       const prop = body.property;
       emitParameter(prop, () => getOpenAPI2BodyParameter(prop, getJsonName(prop), schema));
     } else {
@@ -1209,12 +1213,20 @@ export async function getOpenAPIForService(
             items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
           };
         }
-        currentEndpoint.parameters.push({
+
+        const param: OpenAPI2Parameter = {
           name: partName,
           in: "formData",
           required: !part.optional,
           ...schema,
-        });
+        };
+        if (part.property) {
+          param.description = getDoc(program, part.property);
+          if (part.property.name !== partName) {
+            param["x-ms-client-name"] = part.property.name;
+          }
+        }
+        currentEndpoint.parameters.push(param);
       }
     }
   }
@@ -1363,30 +1375,6 @@ export async function getOpenAPIForService(
         delete result["x-ms-client-name"];
       }
     }
-
-    return result;
-  }
-
-  function getOpenAPI2FormDataParameter(
-    param: ModelProperty,
-    schemaContext: SchemaContext,
-    name?: string,
-  ): OpenAPI2FormDataParameter {
-    const base = getOpenAPI2ParameterBase(param, name);
-    const result = {
-      in: "formData",
-      ...base,
-      ...(getFormDataSchema(param.type, schemaContext, base.name, param) as any),
-      default: param.defaultValue && getDefaultValue(param.defaultValue, param),
-    };
-
-    Object.assign(
-      result,
-      applyIntrinsicDecorators(param, {
-        type: (result as any).type,
-        format: (result as any).format,
-      }),
-    );
 
     return result;
   }

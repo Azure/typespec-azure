@@ -1,6 +1,6 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
+using Http;
+using Rest;
+using OpenAPI;
 using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
@@ -44,7 +44,7 @@ model ResourceNameParameter<
  */
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
-@includeInapplicableMetadataInPayload(false)
+@Http.Private.includeInapplicableMetadataInPayload(false)
 model TrackedResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
@@ -62,7 +62,7 @@ model TrackedResource<Properties extends {}, PropertiesOptional extends valueof 
  */
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
-@includeInapplicableMetadataInPayload(false)
+@Http.Private.includeInapplicableMetadataInPayload(false)
 model ProxyResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
@@ -81,7 +81,7 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
 @extensionResource
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
-@includeInapplicableMetadataInPayload(false)
+@Http.Private.includeInapplicableMetadataInPayload(false)
 model ExtensionResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")

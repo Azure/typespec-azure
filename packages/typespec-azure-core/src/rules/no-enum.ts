@@ -1,16 +1,18 @@
 import {
   CodeFix,
   Enum,
-  EnumMemberNode,
-  EnumSpreadMemberNode,
-  Node,
-  SyntaxKind,
-  TypeSpecScriptNode,
   createRule,
   getPositionBeforeTrivia,
   getSourceLocation,
   paramMessage,
 } from "@typespec/compiler";
+import {
+  type EnumMemberNode,
+  type EnumSpreadMemberNode,
+  type Node,
+  SyntaxKind,
+  type TypeSpecScriptNode,
+} from "@typespec/compiler/ast";
 import { getVersionsForEnum } from "@typespec/versioning";
 export const noEnumRule = createRule({
   name: "no-enum",

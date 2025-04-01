@@ -17,7 +17,14 @@ import {
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
+import {
+  HttpOperation,
+  Visibility,
+  getHttpOperation,
+  getHttpPart,
+  isMetadata,
+  isVisible,
+} from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
@@ -25,6 +32,7 @@ import {
   getClientNameOverride,
   getIsApiVersion,
   listClients,
+  listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
@@ -44,17 +52,15 @@ import {
 import {
   AllScopes,
   TspLiteralType,
-  getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
   listAllUserDefinedNamespaces,
-  listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
+  resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
-import { createDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -100,27 +106,20 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
 }
 
 /**
- * @deprecated Access namespace information by iterating through `sdkPackage.namespaces` instead
- * Get the client's namespace for generation. If package-name is passed in config, we return
- * that value as our namespace. Otherwise, we default to the TypeSpec service namespace.
- * @param program
- * @param context
- * @returns
- */
-export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  return getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]);
-}
-
-/**
- * If the given type is an anonymous model and all of its properties excluding
- * header/query/path/status-code are sourced from a named model, returns that original named model.
- * Otherwise the given type is returned unchanged.
+ * If the given type is an anonymous model, returns a named model with same shape.
+ * The finding logic will ignore all the properties of header/query/path/status-code metadata,
+ * as well as the properties that are not visible in the given visibility if provided.
+ * If the model found is also anonymous, the input type is returned unchanged.
  *
  * @param context
  * @param type
  * @returns
  */
-export function getEffectivePayloadType(context: TCGCContext, type: Model): Model {
+export function getEffectivePayloadType(
+  context: TCGCContext,
+  type: Model,
+  visibility?: Visibility,
+): Model {
   const program = context.program;
 
   // if a type has name, we should resolve the name
@@ -135,7 +134,10 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
   const effective = getEffectiveModelType(
     program,
     type,
-    (t) => !isMetadata(context.program, t) && !hasNoneVisibility(context, t),
+    (t) =>
+      !isMetadata(context.program, t) &&
+      !hasNoneVisibility(context, t) &&
+      (visibility === undefined || isVisible(program, t, visibility)),
   );
   if (effective.name) {
     return effective;
@@ -176,29 +178,33 @@ export function getLibraryName(
   const emitterSpecificName = getClientNameOverride(context, type, scope);
   if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
-  // 4. check if there's a friendly name, if so return friendly name
+  // 2. check if there's a friendly name, if so return friendly name
   const friendlyName = getFriendlyName(context.program, type);
   if (friendlyName) return friendlyName;
 
-  // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
+  // 3. if type is derived from template and name is the same as template, add template parameters' name as suffix
   if (
     typeof type.name === "string" &&
     type.name !== "" &&
     type.kind === "Model" &&
     type.templateMapper?.args
   ) {
-    return (
+    const generatedName = context.__generatedNames.get(type);
+    if (generatedName) return generatedName;
+    return resolveDuplicateGenearatedName(
+      context,
+      type,
       type.name +
-      type.templateMapper.args
-        .filter(
-          (arg): arg is Model | Enum =>
-            "kind" in arg &&
-            (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
-            arg.name !== undefined &&
-            arg.name.length > 0,
-        )
-        .map((arg) => pascalCase(arg.name))
-        .join("")
+        type.templateMapper.args
+          .filter(
+            (arg): arg is Model | Enum =>
+              "kind" in arg &&
+              (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
+              arg.name !== undefined &&
+              arg.name.length > 0,
+          )
+          .map((arg) => pascalCase(arg.name))
+          .join(""),
     );
   }
 
@@ -288,19 +294,7 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
   const diagnostics = createDiagnosticCollector();
   const serviceNamespaces = listAllServiceNamespaces(context);
   if (serviceNamespaces.length === 0) return diagnostics.wrap("");
-  const serviceNamespace = getNamespaceFullName(serviceNamespaces[0]);
-  if (serviceNamespaces.length > 1) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "multiple-services",
-        target: serviceNamespaces[0],
-        format: {
-          service: serviceNamespace,
-        },
-      }),
-    );
-  }
-  return diagnostics.wrap(serviceNamespace);
+  return diagnostics.wrap(getNamespaceFullName(serviceNamespaces[0]));
 }
 
 /**
@@ -313,7 +307,7 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  const generatedName = context.__generatedNames?.get(type);
+  const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -353,7 +347,7 @@ function findContextPath(
         return result;
       }
     }
-    for (const og of listRawSubClients(context, client)) {
+    for (const og of listOperationGroups(context, client, true)) {
       for (const operation of listOperationsInOperationGroup(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
@@ -626,13 +620,7 @@ function buildNameFromContextPaths(
     }
   }
   // 3. simplely handle duplication
-  let duplicateCount = 1;
-  const rawCreateName = createName;
-  const generatedNames = [...(context.__generatedNames?.values() ?? [])];
-  while (generatedNames.includes(createName)) {
-    createName = `${rawCreateName}${duplicateCount++}`;
-  }
-  context.__generatedNames!.set(type, createName);
+  createName = resolveDuplicateGenearatedName(context, type, createName);
   return createName;
 }
 
@@ -655,7 +643,7 @@ export function getHttpOperationExamples(
   context: TCGCContext,
   operation: HttpOperation,
 ): SdkHttpOperationExample[] {
-  return context.__httpOperationExamples?.get(operation) ?? [];
+  return context.__httpOperationExamples.get(operation) ?? [];
 }
 
 export function isAzureCoreModel(t: SdkType): boolean {

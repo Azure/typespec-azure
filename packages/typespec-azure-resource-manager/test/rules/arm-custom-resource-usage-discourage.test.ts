@@ -35,7 +35,5 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.customAzureResourc
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage",
-      message:
-        "Avoid using this decorator except when converting old APIs to TypeSpec, as it does not provide validation for ARM resources.",
     });
 });

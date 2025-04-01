@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkMethodResponse, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -370,4 +370,46 @@ it("description shall be included in response", async () => {
   const responses = Array.from(method.operation.responses.values());
   strictEqual(responses.length, 1);
   strictEqual(responses[0].description, "description on response");
+});
+
+it("response body with non-read visibility", async () => {
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        @visibility(Lifecycle.Create)
+        create: string;
+
+        read: string;
+      }
+
+      op get(): Test;
+    }
+  `);
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.name, "Test");
+  const client = runner.context.sdkPackage.clients[0];
+  ok(client);
+  const method = client.methods[0];
+  ok(method);
+  strictEqual((method.response as SdkMethodResponse).type, model);
+});
+
+it("response body of scalar with encode", async () => {
+  await runner.compileWithBuiltInService(
+    `
+    @encode(BytesKnownEncoding.base64url)
+    scalar base64urlBytes extends bytes;
+    
+    op get(): {@header contentType: "application/json", @body body: base64urlBytes;};
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  const serviceResponse = method.operation.responses[0];
+  deepStrictEqual(serviceResponse.contentTypes, ["application/json"]);
+  strictEqual(serviceResponse.type?.kind, "bytes");
+  strictEqual(serviceResponse.type?.encode, "base64url");
 });

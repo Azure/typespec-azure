@@ -54,6 +54,7 @@ import {
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
+  listOperationGroups,
   listOperationsInOperationGroup,
   shouldFlattenProperty,
   shouldGenerateConvenient,
@@ -104,7 +105,7 @@ import {
   isNeverOrVoidType,
   isOnClient,
   listAllUserDefinedNamespaces,
-  listRawSubClients,
+  resolveConflictGeneratedName,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
@@ -121,7 +122,7 @@ import {
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
-import { isMediaTypeJson, isMediaTypeXml } from "./media-types.js";
+import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
   context: TCGCContext,
@@ -139,17 +140,10 @@ function getUnknownType(context: TCGCContext, type: Type): [SdkBuiltInType, read
   const unknownType: SdkBuiltInType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "unknown")),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type),
+    encode: undefined,
     crossLanguageDefinitionId: "",
   };
   return diagnostics.wrap(unknownType);
-}
-
-function getEncodeHelper(context: TCGCContext, type: Type): string | undefined {
-  if (type.kind === "ModelProperty" || type.kind === "Scalar") {
-    return getEncode(context.program, type)?.encoding;
-  }
-  return undefined;
 }
 
 /**
@@ -189,26 +183,28 @@ export function addEncodeInfo(
   if (innerType.kind === "bytes") {
     if (encodeData) {
       innerType.encode = encodeData.encoding as BytesKnownEncoding;
-    } else if (
-      !defaultContentType ||
-      isMediaTypeJson(defaultContentType) ||
-      isMediaTypeXml(defaultContentType)
-    ) {
+    } else if (type.kind === "Scalar" || !defaultContentType) {
+      // for scalar bytes without specific encode, or no specific content type, fallback to base64
       innerType.encode = "base64";
-    } else {
+    } else if (
+      !isMediaTypeJson(defaultContentType) &&
+      !isMediaTypeXml(defaultContentType) &&
+      !isMediaTypeTextPlain(defaultContentType)
+    ) {
+      // for model property bytes with specific content type, will change to bytes for non-text content type
       innerType.encode = "bytes";
     }
   }
   if (isSdkIntKind(innerType.kind)) {
     // only integer type is allowed to be encoded as string
-    if (encodeData && "encode" in innerType) {
+    if (encodeData) {
       if (encodeData?.encoding) {
-        innerType.encode = encodeData.encoding;
+        (innerType as any).encode = encodeData.encoding;
       }
       if (encodeData?.type) {
         // if we specify the encoding type in the decorator, we set the `.encode` string
         // to the kind of the encoding type
-        innerType.encode = getSdkBuiltInType(context, encodeData.type).kind;
+        (innerType as any).encode = getSdkBuiltInType(context, encodeData.type).kind;
       }
     }
   }
@@ -251,7 +247,6 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: getEncodeHelper(context, type),
     doc: getDoc(context.program, type),
     summary: getSummary(context.program, type),
     baseType:
@@ -503,7 +498,7 @@ export function getSdkUnionWithDiagnostics(
   type: Union,
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
-  let retval: SdkType | undefined = context.__referencedTypeCache?.get(type);
+  let retval: SdkType | undefined = context.__referencedTypeCache.get(type);
   const diagnostics = createDiagnosticCollector();
 
   if (!retval) {
@@ -533,7 +528,6 @@ export function getSdkUnionWithDiagnostics(
           access: "public",
           usage: UsageFlags.None,
           namespace,
-          clientNamespace: namespace,
         };
         updateReferencedTypeMap(context, type, retval);
         retval.type = diagnostics.pipe(
@@ -564,7 +558,6 @@ export function getSdkUnionWithDiagnostics(
               access: "public",
               usage: UsageFlags.None,
               namespace,
-              clientNamespace: namespace,
             };
           }
           updateReferencedTypeMap(context, type, retval);
@@ -578,7 +571,6 @@ export function getSdkUnionWithDiagnostics(
           name: getLibraryName(context, type) || getGeneratedName(context, type, operation),
           isGeneratedName: nullOption !== undefined ? true : !type.name, // if nullable, always set inner union type as generated name
           namespace,
-          clientNamespace: namespace,
           variantTypes: [],
           crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           access: "public",
@@ -594,7 +586,6 @@ export function getSdkUnionWithDiagnostics(
             access: "public",
             usage: UsageFlags.None,
             namespace,
-            clientNamespace: namespace,
           };
         }
         updateReferencedTypeMap(context, type, retval);
@@ -817,24 +808,21 @@ export function getSdkModelWithDiagnostics(
   operation?: Operation,
 ): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let sdkType = context.__referencedTypeCache?.get(type) as SdkModelType | undefined;
+  let sdkType = context.__referencedTypeCache.get(type) as SdkModelType | undefined;
 
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
-    const usage = isErrorModel(context.program, type) ? UsageFlags.Error : UsageFlags.None; // eslint-disable-line @typescript-eslint/no-deprecated
-    const namespace = getClientNamespace(context, type);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
       isGeneratedName: !type.name,
-      namespace,
-      clientNamespace: namespace,
+      namespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
-      usage,
+      usage: UsageFlags.None,
       crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
       apiVersions: getAvailableApiVersions(context, type, type.namespace),
       serializationOptions: {},
@@ -856,7 +844,7 @@ export function getSdkModelWithDiagnostics(
     // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
     diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     if (type.baseModel) {
-      sdkType.baseModel = context.__referencedTypeCache?.get(type.baseModel) as
+      sdkType.baseModel = context.__referencedTypeCache.get(type.baseModel) as
         | SdkModelType
         | undefined;
       if (sdkType.baseModel === undefined) {
@@ -953,15 +941,13 @@ function getSdkEnumWithDiagnostics(
   operation?: Operation,
 ): [SdkEnumType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let sdkType = context.__referencedTypeCache?.get(type) as SdkEnumType | undefined;
+  let sdkType = context.__referencedTypeCache.get(type) as SdkEnumType | undefined;
   if (!sdkType) {
-    const namespace = getClientNamespace(context, type);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enum")),
       name: getLibraryName(context, type),
       isGeneratedName: false,
-      namespace,
-      clientNamespace: namespace,
+      namespace: getClientNamespace(context, type),
       doc: getDoc(context.program, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
@@ -1023,13 +1009,11 @@ export function getSdkUnionEnumWithDiagnostics(
   const diagnostics = createDiagnosticCollector();
   const union = type.union;
   const name = getLibraryName(context, type.union) || getGeneratedName(context, union, operation);
-  const namespace = getClientNamespace(context, type.union);
   const sdkType: SdkEnumType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type.union, "enum")),
     name,
     isGeneratedName: !type.union.name,
-    namespace,
-    clientNamespace: namespace,
+    namespace: getClientNamespace(context, type.union),
     doc: getDoc(context.program, union),
     summary: getSummary(context.program, union),
     valueType:
@@ -1355,32 +1339,6 @@ function updateMultiPartInfo(
     if (httpPart?.options?.name) {
       base.serializedName = httpPart?.options?.name; // eslint-disable-line @typescript-eslint/no-deprecated
       base.serializationOptions.multipart.name = httpPart?.options?.name;
-    }
-  } else {
-    // common body
-    const httpOperation = getHttpOperationWithCache(context, operation);
-    const operationIsMultipart = Boolean(
-      httpOperation && httpOperation.parameters.body?.contentTypes.includes("multipart/form-data"),
-    );
-    if (operationIsMultipart) {
-      const isBytesInput =
-        base.type.kind === "bytes" ||
-        (base.type.kind === "array" && base.type.valueType.kind === "bytes");
-      // Currently we only recognize bytes and list of bytes as potential file inputs
-      if (isBytesInput && getEncode(context.program, type)) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "encoding-multipart-bytes",
-            target: type,
-          }),
-        );
-      }
-      base.serializationOptions.multipart = {
-        isFilePart: isBytesInput,
-        isMulti: base.type.kind === "array",
-        defaultContentTypes: [],
-        name: base.name,
-      };
     }
   }
   if (base.serializationOptions.multipart !== undefined) {
@@ -1752,7 +1710,7 @@ function updateTypesFromOperation(
       if (innerResponse.body?.type && !isNeverOrVoidType(innerResponse.body.type)) {
         const body =
           innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type)
+            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
             : innerResponse.body.type;
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, body, operation));
         if (generateConvenient) {
@@ -1827,13 +1785,13 @@ function updateTypesFromOperation(
 function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   // set access for all orphan model without override
-  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache.values()) {
     const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (!sdkType.__accessSet && accessOverride === undefined) {
       diagnostics.pipe(updateUsageOrAccess(context, "public", sdkType));
     }
   }
-  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache.values()) {
     const accessOverride = getAccessOverride(context, sdkType.__raw as any);
     if (accessOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, accessOverride, sdkType, { isOverride: true }));
@@ -1844,7 +1802,7 @@ function updateAccessOverride(context: TCGCContext): [void, readonly Diagnostic[
 
 function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache.values()) {
     const usageOverride = getUsageOverride(context, sdkType.__raw as any);
     if (usageOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, usageOverride, sdkType, { isOverride: true }));
@@ -1854,7 +1812,7 @@ function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]
 }
 
 function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
-  for (const [_, sdkType] of context.__referencedTypeCache?.entries() ?? []) {
+  for (const [_, sdkType] of context.__referencedTypeCache.entries()) {
     if (
       sdkType.kind === "model" &&
       (sdkType.usage & UsageFlags.Spread) > 0 &&
@@ -1892,7 +1850,7 @@ function filterOutTypes(
   filter: number,
 ): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
   const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
-  for (const sdkType of context.__referencedTypeCache?.values() ?? []) {
+  for (const sdkType of context.__referencedTypeCache.values()) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
       continue;
@@ -1953,7 +1911,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       // operations on a client
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
-    for (const sc of listRawSubClients(context, client)) {
+    for (const sc of listOperationGroups(context, client, true)) {
       for (const operation of listOperationsInOperationGroup(context, sc)) {
         // operations on operation groups
         diagnostics.pipe(updateTypesFromOperation(context, operation));
@@ -2005,6 +1963,9 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
+
+  // update generated name
+  resolveConflictGeneratedName(context);
 
   return diagnostics.wrap(undefined);
 }
@@ -2086,7 +2047,7 @@ function setSerializationOptions(
   type: SdkModelType | SdkBodyModelPropertyType,
   contentTypes: string[],
 ) {
-  for (const contentType of contentTypes ?? []) {
+  for (const contentType of contentTypes) {
     if (isMediaTypeJson(contentType) && !type.serializationOptions.json) {
       updateJsonSerializationOptions(context, type);
     }

@@ -26,7 +26,9 @@ describe("typespec-azure-core: byos rule", () => {
 
   it("emit warning if content type is multipart/form-data (explicit)", async () => {
     await tester
-      .expect(`op uploadFile(data: bytes, @header contentType: "multipart/form-data"): void;`)
+      .expect(
+        `op uploadFile(@multipartBody data: {data: HttpPart<bytes>}, @header contentType: "multipart/form-data"): void;`,
+      )
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-core/byos",
       });

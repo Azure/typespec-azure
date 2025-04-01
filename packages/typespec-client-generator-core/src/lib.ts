@@ -1,27 +1,140 @@
 import { createTypeSpecLibrary, JSONSchemaType, paramMessage } from "@typespec/compiler";
-import { SdkEmitterOptions } from "./interfaces.js";
+import {
+  BrandedSdkEmitterOptionsInterface,
+  TCGCEmitterOptions,
+  UnbrandedSdkEmitterOptionsInterface,
+} from "./internal-utils.js";
 
-const EmitterOptionsSchema: JSONSchemaType<SdkEmitterOptions> = {
+export const UnbrandedSdkEmitterOptions = {
+  "generate-protocol-methods": {
+    "generate-protocol-methods": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@protocolAPI` is not set for an operation. Default value is `true`.",
+    },
+  },
+  "generate-convenience-methods": {
+    "generate-convenience-methods": {
+      type: "boolean",
+      nullable: true,
+      description:
+        "When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.",
+    },
+  },
+  "api-version": {
+    "api-version": {
+      type: "string",
+      nullable: true,
+      description:
+        "Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.",
+    },
+  },
+  license: {
+    license: {
+      type: "object",
+      additionalProperties: false,
+      nullable: true,
+      required: ["name"],
+      properties: {
+        name: {
+          type: "string",
+          nullable: false,
+          description:
+            "License name. The config is required. Predefined license are: MIT License, Apache License 2.0, BSD 3-Clause License, MPL 2.0, GPL-3.0, LGPL-3.0. For other license, you need to configure all the other license config manually.",
+        },
+        company: {
+          type: "string",
+          nullable: true,
+          description: "License company name. It will be used in copyright sentences.",
+        },
+        link: {
+          type: "string",
+          nullable: true,
+          description: "License link.",
+        },
+        header: {
+          type: "string",
+          nullable: true,
+          description:
+            "License header. It will be used in the header comment of generated client code.",
+        },
+        description: {
+          type: "string",
+          nullable: true,
+          description: "License description. The full license text.",
+        },
+      },
+      description: "License information for the generated client code.",
+    },
+  },
+} as const;
+
+const UnbrandedSdkEmitterOptionsInterfaceSchema: JSONSchemaType<UnbrandedSdkEmitterOptionsInterface> =
+  {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      ...UnbrandedSdkEmitterOptions["generate-protocol-methods"],
+      ...UnbrandedSdkEmitterOptions["generate-convenience-methods"],
+      ...UnbrandedSdkEmitterOptions["api-version"],
+      ...UnbrandedSdkEmitterOptions["license"],
+    },
+  };
+
+export const BrandedSdkEmitterOptions = {
+  "examples-dir": {
+    "examples-dir": {
+      type: "string",
+      nullable: true,
+      format: "absolute-path",
+      description:
+        "Specifies the directory where the emitter will look for example files. If the flag isn’t set, the emitter defaults to using an `examples` directory located at the project root.",
+    },
+  },
+  namespace: {
+    namespace: {
+      type: "string",
+      nullable: true,
+      description:
+        "Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.",
+    },
+  },
+} as const;
+
+const BrandedSdkEmitterOptionsSchema: JSONSchemaType<BrandedSdkEmitterOptionsInterface> = {
   type: "object",
-  additionalProperties: true,
+  additionalProperties: false,
   properties: {
-    "generate-protocol-methods": { type: "boolean", nullable: true },
-    "generate-convenience-methods": { type: "boolean", nullable: true },
-    /**
-     * @deprecated Use the `package-name` option on your language emitter instead, if it exists.
-     */
-    "package-name": { type: "string", nullable: true },
-    "flatten-union-as-enum": { type: "boolean", nullable: true },
-    "api-version": { type: "string", nullable: true },
-    "examples-dir": { type: "string", nullable: true },
-    "emitter-name": { type: "string", nullable: true },
-    namespace: { type: "string", nullable: true },
+    ...UnbrandedSdkEmitterOptionsInterfaceSchema.properties!,
+    ...BrandedSdkEmitterOptions["examples-dir"],
+    ...BrandedSdkEmitterOptions["namespace"],
+  },
+};
+
+const TCGCEmitterOptionsSchema: JSONSchemaType<TCGCEmitterOptions> = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    "emitter-name": {
+      type: "string",
+      nullable: true,
+      description: "Set `emitter-name` to output TCGC code models for specific language's emitter.",
+    },
+    ...BrandedSdkEmitterOptionsSchema.properties!,
   },
 };
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "multiple-services": {
+      severity: "warning",
+      messages: {
+        default:
+          "Multiple services found. Only the first service will be used; others will be ignored.",
+      },
+    },
     "client-service": {
       severity: "warning",
       messages: {
@@ -76,23 +189,10 @@ export const $lib = createTypeSpecLibrary({
         default: "@client or @operationGroup should decorate namespace or interface in client.tsp",
       },
     },
-    "encoding-multipart-bytes": {
-      severity: "warning",
-      messages: {
-        default:
-          "Encoding should not be applied to bytes content in a multipart request. This is semi-incompatible with how multipart works in HTTP.",
-      },
-    },
     "unsupported-kind": {
       severity: "warning",
       messages: {
         default: paramMessage`Unsupported kind ${"kind"}`,
-      },
-    },
-    "multiple-services": {
-      severity: "warning",
-      messages: {
-        default: paramMessage`Multiple services found in definition. Only one service is supported, so we will choose the first one ${"service"}`,
       },
     },
     "server-param-not-path": {
@@ -116,7 +216,7 @@ export const $lib = createTypeSpecLibrary({
     "no-corresponding-method-param": {
       severity: "error",
       messages: {
-        default: paramMessage`Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
+        default: paramMessage`Missing HTTP operation parameter "${"paramName"}" in method "${"methodName"}". Please check the method definition.`,
       },
     },
     "unsupported-protocol": {
@@ -143,7 +243,7 @@ export const $lib = createTypeSpecLibrary({
         default: `Cannot pass an empty value to the @clientName decorator`,
       },
     },
-    "override-method-parameters-mismatch": {
+    "override-parameters-mismatch": {
       severity: "error",
       messages: {
         default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
@@ -224,6 +324,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Invalid 'initializedBy' value. ${"message"}`,
       },
     },
+    "invalid-deserializeEmptyStringAsNull-target-type": {
+      severity: "error",
+      messages: {
+        default:
+          "@deserializeEmptyStringAsNull can only be applied to `ModelProperty` of type 'string' or a `Scalar` derived from 'string'.",
+      },
+    },
     "api-version-not-string": {
       severity: "warning",
       messages: {
@@ -244,9 +351,21 @@ export const $lib = createTypeSpecLibrary({
           "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
       },
     },
+    "non-head-bool-response-decorator": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on ${"operationName"}.`,
+      },
+    },
+    "unsupported-http-file-body": {
+      severity: "error",
+      messages: {
+        default: "File body is not supported for HTTP operations. Please use bytes instead.",
+      },
+    },
   },
   emitter: {
-    options: EmitterOptionsSchema as JSONSchemaType<SdkEmitterOptions>,
+    options: TCGCEmitterOptionsSchema,
   },
 });
 

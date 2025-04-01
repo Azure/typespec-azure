@@ -1,4 +1,4 @@
-import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -6,7 +6,7 @@ Scenarios.Client_Naming_Property_client = passOnSuccess({
   uri: "/client/naming/property/client",
   method: "post",
   request: {
-    body: { defaultName: true },
+    body: json({ defaultName: true }),
   },
   response: {
     status: 204,
@@ -18,7 +18,7 @@ Scenarios.Client_Naming_Property_language = passOnSuccess({
   uri: "/client/naming/property/language",
   method: "post",
   request: {
-    body: { defaultName: true },
+    body: json({ defaultName: true }),
   },
   response: {
     status: 204,
@@ -30,7 +30,7 @@ Scenarios.Client_Naming_Property_compatibleWithEncodedName = passOnSuccess({
   uri: `/client/naming/property/compatible-with-encoded-name`,
   method: "post",
   request: {
-    body: { wireName: true },
+    body: json({ wireName: true }),
   },
   response: {
     status: 204,
@@ -52,7 +52,7 @@ Scenarios.Client_Naming_parameter = passOnSuccess({
   uri: `/client/naming/parameter`,
   method: "post",
   request: {
-    params: { defaultName: "true" },
+    query: { defaultName: "true" },
   },
   response: {
     status: 204,
@@ -89,7 +89,7 @@ Scenarios.Client_Naming_Model_client = passOnSuccess({
   uri: `/client/naming/model/client`,
   method: "post",
   request: {
-    body: { defaultName: true },
+    body: json({ defaultName: true }),
   },
   response: {
     status: 204,
@@ -101,7 +101,7 @@ Scenarios.Client_Naming_Model_language = passOnSuccess({
   uri: `/client/naming/model/language`,
   method: "post",
   request: {
-    body: { defaultName: true },
+    body: json({ defaultName: true }),
   },
   response: {
     status: 204,
@@ -113,7 +113,7 @@ Scenarios.Client_Naming_UnionEnum_unionEnumName = passOnSuccess({
   uri: `/client/naming/union-enum/union-enum-name`,
   method: "post",
   request: {
-    body: "value1",
+    body: json("value1"),
     headers: {
       "Content-Type": "text/plain",
     },
@@ -128,7 +128,7 @@ Scenarios.Client_Naming_UnionEnum_unionEnumMemberName = passOnSuccess({
   uri: `/client/naming/union-enum/union-enum-member-name`,
   method: "post",
   request: {
-    body: "value1",
+    body: json("value1"),
     headers: {
       "Content-Type": "text/plain",
     },

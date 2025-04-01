@@ -54,7 +54,7 @@ linter:
 model Widget {
   /** The widget name. */
   @key("widgetName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   /** The widget color. */
