@@ -269,9 +269,9 @@ op func8(@body body: Test5): void;
 
 #### `@additionalApiVersions`
 
-Add additional api versions that are possible for the client to use. Only adds these api versions to the exposed API version enum.
-Use if you want to generate an accurate API version enum, while not having to actually annotate the entire spec with versioning decorators,
-since we won't be using the versioning information on the generation side.
+Specify additional API versions that the client can support. These versions will be added to the generated API version enum.
+This is useful for creating a comprehensive API version enum without requiring the entire specification to be annotated with versioning decorators.
+Note that these additional versions are only used for generating the API version enum and do not affect versioning behavior elsewhere.
 
 ```typespec
 @Azure.ClientGenerator.Core.additionalApiVersions(value: Enum, scope?: valueof string)
@@ -300,7 +300,7 @@ namespace Contoso {
   }
 }
 
-//client.tsp
+// client.tsp
 
 enum AdditionalApiVersions {
   v1,
