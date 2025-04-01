@@ -55,6 +55,7 @@ import {
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
+  listOperationGroups,
   listOperationsInOperationGroup,
   shouldFlattenProperty,
   shouldGenerateConvenient,
@@ -105,7 +106,6 @@ import {
   isNeverOrVoidType,
   isOnClient,
   listAllUserDefinedNamespaces,
-  listRawSubClients,
   resolveConflictGeneratedName,
   twoParamsEquivalent,
   updateWithApiVersionInformation,
@@ -1912,7 +1912,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       // operations on a client
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
-    for (const sc of listRawSubClients(context, client)) {
+    for (const sc of listOperationGroups(context, client, true)) {
       for (const operation of listOperationsInOperationGroup(context, sc)) {
         // operations on operation groups
         diagnostics.pipe(updateTypesFromOperation(context, operation));
