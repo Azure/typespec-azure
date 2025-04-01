@@ -29,7 +29,7 @@
     "test": "vitest run --workspace ./vitest.workspace.fast.ts",
     "test:ci": "vitest run --workspace ./vitest.workspace.fast.ts --coverage --reporter=junit --reporter=default",
     "test:e2e": "pnpm run-azure-only run test:e2e",
-    "update-latest-docs": "pnpm run-all run update-latest-docs",
+    "update-playground-versions": "pnpm run-all run update-playground-versions",
     "watch": "tsc --build ./tsconfig.ws.json --watch",
     "sync-labels": "tsx ./core/eng/common/scripts/labels/sync-labels.ts --config ./eng/config/labels.ts",
     "validate-scenarios": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-scenarios",

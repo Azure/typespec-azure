@@ -314,10 +314,16 @@ export function listClients(context: TCGCContext): SdkClient[] {
     return context.__rawClients;
   }
 
-  // if there is no explicit client, we will treat namespaces with service decorator as clients
+  // if there is no explicit client, we will treat the first namespace with service decorator as client
   const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
-
-  context.__rawClients = serviceNamespaces.map((service) => {
+  if (serviceNamespaces.length >= 1) {
+    const service = serviceNamespaces.shift()!;
+    serviceNamespaces.map((ns) => {
+      reportDiagnostic(context.program, {
+        code: "multiple-services",
+        target: ns,
+      });
+    });
     let originalName = service.name;
     const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
@@ -327,14 +333,19 @@ export function listClients(context: TCGCContext): SdkClient[] {
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service);
-    return {
-      kind: "SdkClient",
-      name: clientName,
-      service: service,
-      type: service,
-      crossLanguageDefinitionId: getNamespaceFullName(service),
-    };
-  });
+    context.__rawClients = [
+      {
+        kind: "SdkClient",
+        name: clientName,
+        service: service,
+        type: service,
+        crossLanguageDefinitionId: getNamespaceFullName(service),
+      },
+    ];
+  } else {
+    context.__rawClients = [];
+  }
+
   return context.__rawClients;
 }
 
@@ -517,27 +528,30 @@ export function listOperationGroups(
   ignoreHierarchy = false,
 ): SdkOperationGroup[] {
   const groups: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = [];
 
   if (group.type.kind === "Interface") {
     return groups;
   }
 
   for (const subItem of group.type.namespaces.values()) {
-    track(getOperationGroup(context, subItem)!);
+    const og = getOperationGroup(context, subItem);
+    if (og) {
+      queue.push(og);
+    }
   }
   for (const subItem of group.type.interfaces.values()) {
-    track(getOperationGroup(context, subItem)!);
+    const og = getOperationGroup(context, subItem);
+    if (og) {
+      queue.push(og);
+    }
   }
 
-  function track(item: SdkOperationGroup | undefined) {
-    if (!item) {
-      return;
-    }
-    groups.push(item);
-    if (ignoreHierarchy) {
-      for (const subItem of item.subOperationGroups ?? []) {
-        track(subItem);
-      }
+  while (queue.length > 0) {
+    const operationGroup = queue.shift()!;
+    groups.push(operationGroup);
+    if (ignoreHierarchy && operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
     }
   }
 

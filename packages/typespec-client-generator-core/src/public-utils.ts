@@ -32,6 +32,7 @@ import {
   getClientNameOverride,
   getIsApiVersion,
   listClients,
+  listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
@@ -57,11 +58,9 @@ import {
   isAzureCoreTspModel,
   isHttpBodySpread,
   listAllUserDefinedNamespaces,
-  listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
-import { createDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -295,19 +294,7 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
   const diagnostics = createDiagnosticCollector();
   const serviceNamespaces = listAllServiceNamespaces(context);
   if (serviceNamespaces.length === 0) return diagnostics.wrap("");
-  const serviceNamespace = getNamespaceFullName(serviceNamespaces[0]);
-  if (serviceNamespaces.length > 1) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "multiple-services",
-        target: serviceNamespaces[0],
-        format: {
-          service: serviceNamespace,
-        },
-      }),
-    );
-  }
-  return diagnostics.wrap(serviceNamespace);
+  return diagnostics.wrap(getNamespaceFullName(serviceNamespaces[0]));
 }
 
 /**
@@ -360,7 +347,7 @@ function findContextPath(
         return result;
       }
     }
-    for (const og of listRawSubClients(context, client)) {
+    for (const og of listOperationGroups(context, client, true)) {
       for (const operation of listOperationsInOperationGroup(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
