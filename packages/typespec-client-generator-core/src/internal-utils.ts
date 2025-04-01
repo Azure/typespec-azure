@@ -35,7 +35,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias, listOperationGroups } from "./decorators.js";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -43,7 +43,6 @@ import {
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkOperationGroup,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -665,22 +664,6 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;
-}
-
-export function listRawSubClients(
-  context: TCGCContext,
-  client: SdkOperationGroup | SdkClient,
-): SdkOperationGroup[] {
-  const retval: SdkOperationGroup[] = [];
-  const queue: SdkOperationGroup[] = listOperationGroups(context, client);
-  while (queue.length > 0) {
-    const operationGroup = queue.pop()!;
-    retval.push(operationGroup);
-    if (operationGroup.subOperationGroups) {
-      queue.push(...operationGroup.subOperationGroups);
-    }
-  }
-  return retval;
 }
 
 export function resolveDuplicateGenearatedName(
