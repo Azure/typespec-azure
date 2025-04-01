@@ -319,7 +319,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
     const service = serviceNamespaces.shift()!;
     serviceNamespaces.map((ns) => {
       reportDiagnostic(context.program, {
-        code: "service-more-than-one",
+        code: "multiple-services",
         target: ns,
       });
     });
