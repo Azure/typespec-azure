@@ -885,6 +885,10 @@ function getSdkMethods<TServiceOperation extends SdkServiceOperation>(
     const operationGroupClient = diagnostics.pipe(
       createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
     );
+    // skip if there is no operation or sub-client
+    if (operationGroupClient.methods.length === 0) {
+      continue;
+    }
     if (sdkClientType.children) {
       sdkClientType.children.push(operationGroupClient);
     } else {
@@ -1178,11 +1182,12 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
-  
+  const allClients: SdkClientType<TServiceOperation>[] = listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c)));
+
   const sdkPackage: SdkPackage<TServiceOperation> = {
     name: getClientNamespaceStringHelper(context, listAllServiceNamespaces(context)[0]) || "",
     rootNamespace: getClientNamespaceString(context)!, // eslint-disable-line @typescript-eslint/no-deprecated
-    clients: getClients(context, diagnostics),
+    clients: allClients.filter((x) => x.methods.length > 0), // filter out model-only clients
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
     unions: allReferencedTypes.filter(
@@ -1193,20 +1198,6 @@ export function getSdkPackage<TServiceOperation extends SdkServiceOperation>(
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);
-}
-
-// filter out clients with no methods
-// and flatten the child clients to the root
-function getClients<TServiceOperation extends SdkServiceOperation>
-(context: TCGCContext, diagnostics: DiagnosticCollector)
-: SdkClientType<TServiceOperation>[] {
-  var listedClients: SdkClient[] = listClients(context);
-  let clients: SdkClientType<TServiceOperation>[] = listedClients.map((c) => diagnostics.pipe(createSdkClientType(context, c)));
-  let result: SdkClientType<TServiceOperation>[] = [];
-  for (const client of clients) {
-    skipEmptyClientAndFlattenSubClients(client, result);
-  }
-  return result;
 }
 
 function skipEmptyClientAndFlattenSubClients<TServiceOperation extends SdkServiceOperation>

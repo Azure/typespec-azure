@@ -56,6 +56,7 @@ it("name", async () => {
         @client({name: "MyClient"})
         @service
         namespace NotMyClient;
+        op myOp(): void;
       `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -68,6 +69,7 @@ it("initialization default endpoint no credential", async () => {
         @server("http://localhost:3000", "endpoint")
         @service
         namespace My.Service;
+        op myOp(): void;
       `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -101,6 +103,7 @@ it("initialization default endpoint with apikey auth", async () => {
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
         @service
         namespace My.Service;
+        op myOp(): void;
       `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -138,6 +141,7 @@ it("initialization default endpoint with bearer auth", async () => {
         @useAuth(OAuth2Auth<[MyFlow]>)
         @service
         namespace My.Service;
+        op myOp(): void;
 
         model MyFlow {
           type: OAuth2FlowType.implicit;
@@ -189,6 +193,7 @@ it("initialization default endpoint with union auth", async () => {
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key"> | OAuth2Auth<[MyFlow]>)
         @service
         namespace My.Service;
+        op myOp(): void;
 
         model MyFlow {
           type: OAuth2FlowType.implicit;
@@ -257,6 +262,7 @@ it("initialization one server parameter with apikey auth", async () => {
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
         @service
         namespace My.Service;
+        op myOp(): void;
       `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -314,6 +320,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
         @service
         namespace My.Service;
+        op myOp(): void;
 
         enum Versions {
           @doc("Version 1.0")
@@ -401,6 +408,7 @@ it("non-versioning service with api version param in endpoint", async () => {
         )
         @service
         namespace My.Service;
+        op myOp(): void;
       `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -463,6 +471,7 @@ it("endpoint with path param default value", async () => {
         )
         @service
         namespace MyService;
+        op myOp(): void;
       `);
   const sdkPackage = runner.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -732,6 +741,7 @@ it("endpoint template argument with default value of enum member", async () => {
     )
     @service
     namespace My.Service;
+    op myOp(): void;
 
     enum ClientType {
       Default: "default",

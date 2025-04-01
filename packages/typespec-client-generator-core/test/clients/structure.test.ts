@@ -580,12 +580,16 @@ it("namespace", async () => {
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
     @service
-    namespace My.Service.One {};
+    namespace My.Service.One {
+      op func1(): void;
+    }
 
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
     @service
-    namespace My.Service.Two {};
+    namespace My.Service.Two {
+      op func2(): void;
+    }
   `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 2);
@@ -594,6 +598,40 @@ it("namespace", async () => {
 
   const clientTwo = sdkPackage.clients.filter((c) => c.name === "TwoClient")[0];
   strictEqual(clientTwo.nameSpace, "My.Service.Two");
+});
+
+it("model-only namespace should be filtered out", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
+    namespace Foo {
+      model B {}
+    }
+  `);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 0);
+});
+
+
+it("empty namespace with empty subclient", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
+    namespace Foo {
+      model B {}
+      namespace Bar {
+        model A {}
+      }
+    }
+  `);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 0);
 });
 
 it("operationGroup", async () => {
