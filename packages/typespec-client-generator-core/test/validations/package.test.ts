@@ -10,7 +10,7 @@ beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
 
-it("service-more-than-one", async () => {
+it("multiple-services", async () => {
   const diagnostics = await runner.diagnose(
     `
       @service
@@ -26,7 +26,7 @@ it("service-more-than-one", async () => {
 
   expectDiagnostics(diagnostics, [
     {
-      code: "@azure-tools/typespec-client-generator-core/service-more-than-one",
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
     },
   ]);
 
