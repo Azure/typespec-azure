@@ -728,7 +728,10 @@ export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
       createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
     );
     // skip if there is no operation or sub-client
-    if (operationGroupClient.methods.length === 0 && (!operationGroupClient.children || operationGroupClient.children.length === 0)) {
+    if (
+      operationGroupClient.methods.length === 0 &&
+      (!operationGroupClient.children || operationGroupClient.children.length === 0)
+    ) {
       continue;
     }
     if (sdkClientType.children) {
