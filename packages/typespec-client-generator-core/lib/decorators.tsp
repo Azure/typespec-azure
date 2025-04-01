@@ -623,7 +623,7 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  *  enum Versions { v4, v5 }
  * }
  *
- * //client.tsp
+ * // client.tsp
  *
  * enum ClientApiVersions { v1, v2, v3, ...Contoso.Versions }
  *
