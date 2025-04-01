@@ -1,10 +1,10 @@
-
 import { createDiagnosticCollector, Diagnostic } from "@typespec/compiler";
 import { resolveVersions } from "@typespec/versioning";
 import { createSdkClientType } from "./clients.js";
 import { listClients, listOperationGroups } from "./decorators.js";
 import {
   SdkClient,
+  SdkClientType,
   SdkEnumType,
   SdkModelType,
   SdkNamespace,
@@ -43,23 +43,6 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);
-}
-
-function skipEmptyClientAndFlattenSubClients<TServiceOperation extends SdkServiceOperation>
-(client: SdkClientType<TServiceOperation>, clients: SdkClientType<TServiceOperation>[]) {
-  if (client.children) {
-    if (client.methods.filter(m => m.kind !== "clientaccessor").length === 0) {
-      // if the client only contains methods to get the sub-clients, 
-      // skip the client and flatten the sub-clients
-      for (const child of client.children) {
-        skipEmptyClientAndFlattenSubClients(child, clients);
-      }
-    }
-  }
-  // skip the client if it has no methods
-  else if (client.methods.length > 0) {
-    clients.push(client);
-  }
 }
 
 function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
