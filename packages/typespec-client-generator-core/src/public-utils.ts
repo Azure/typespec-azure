@@ -31,6 +31,7 @@ import pluralize from "pluralize";
 import {
   getClientNameOverride,
   getIsApiVersion,
+  getOverriddenClientMethod,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -428,6 +429,13 @@ function getContextPath(
           }
         }
       }
+    }
+
+    const overriddenClientMethod = getOverriddenClientMethod(context, root);
+    visited.clear();
+    result = [{ name: root.name, type: root }];
+    if (dfsModelProperties(typeToFind, overriddenClientMethod ?? root.parameters, "Parameter")) {
+      return result;
     }
   } else {
     visited.clear();
