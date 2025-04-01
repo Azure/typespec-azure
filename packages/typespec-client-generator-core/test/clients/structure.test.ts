@@ -604,7 +604,6 @@ it("model-only namespace should be filtered out", async () => {
   strictEqual(sdkPackage.clients.length, 0);
 });
 
-
 it("empty namespace with empty subclient", async () => {
   const runnerWithCore = await createSdkTestRunner({
     librariesToAdd: [AzureCoreTestLibrary],
