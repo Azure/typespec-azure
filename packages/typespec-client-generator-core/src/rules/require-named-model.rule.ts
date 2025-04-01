@@ -15,7 +15,7 @@ export const requireNamedModelRule = createRule({
       context.program,
       "@azure-tools/typespec-client-generator-core",
     );
-    // we create the package to see if the model is used in the final outpu
+    // we create the package to see if the model is used in the final output
     createSdkPackage(tcgcContext);
     return {
       model: (model: Model) => {
