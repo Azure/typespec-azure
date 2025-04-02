@@ -38,3 +38,47 @@ it("multiple-services", async () => {
   strictEqual(client.methods.length, 1);
   strictEqual(client.methods[0].name, "x");
 });
+
+it("require-versioned-service", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    @clientApiVersions(ApiVersions)
+    namespace My.Service {
+      enum ApiVersions { v1, v2, v3 };
+    }
+      `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/require-versioned-service",
+      severity: "warning",
+      message: `Service "My.Service" must be versioned if you want to apply the "@clientApiVersions" decorator`,
+    },
+  ]);
+});
+
+it("missing-service-versions", async () => {
+  const diagnostics = (
+    await runner.compileAndDiagnoseWithCustomization(
+      `
+    @service
+    @versioned(Versions)
+    namespace My.Service {
+      enum Versions { v1, v2, v3 };
+    }
+    `,
+      `
+    enum ClientApiVersions { v4, v5, v6 };
+    @@clientApiVersions(My.Service, ClientApiVersions);
+    `,
+    )
+  )[1];
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/missing-service-versions",
+      severity: "warning",
+      message: `The @clientApiVersions decorator is missing one or more versions defined in My.Service. Client API must support all service versions to ensure compatibility. Missing versions: v1, v2, v3. Please update the client API to support all required service versions.`,
+    },
+  ]);
+});
