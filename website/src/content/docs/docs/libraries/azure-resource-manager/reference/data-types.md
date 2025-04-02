@@ -428,7 +428,7 @@ model Foo is TrackedResource<FooProperties> {
 
 | Name       | Type                                                                         | Description                                  |
 | ---------- | ---------------------------------------------------------------------------- | -------------------------------------------- |
-| encryption | [`encryption`](./data-types.md#Azure.ResourceManager.CommonTypes.encryption) | All encryption configuration for a resource. |
+| encryption | [`Encryption`](./data-types.md#Azure.ResourceManager.CommonTypes.Encryption) | All encryption configuration for a resource. |
 
 ### `EntityTagProperty` {#Azure.ResourceManager.EntityTagProperty}
 
@@ -1092,12 +1092,12 @@ model Azure.ResourceManager.CommonTypes.CheckNameAvailabilityResponse
 | reason?        | [`CheckNameAvailabilityReason`](./data-types.md#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason) | The reason why the given name is not available.      |
 | message?       | `string`                                                                                                       | Detailed reason why the given name is not available. |
 
-### `customerManagedKeyEncryption` {#Azure.ResourceManager.CommonTypes.customerManagedKeyEncryption}
+### `CustomerManagedKeyEncryption` {#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption}
 
 Customer-managed key encryption properties for the resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.customerManagedKeyEncryption
+model Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption
 ```
 
 #### Properties
@@ -1138,12 +1138,12 @@ model Azure.ResourceManager.CommonTypes.DelegatedResources
 | ---- | ------------------------------------------------------------------------------------------ | --------------------- |
 |      | [`DelegatedResource`](./data-types.md#Azure.ResourceManager.CommonTypes.DelegatedResource) | Additional properties |
 
-### `encryption` {#Azure.ResourceManager.CommonTypes.encryption}
+### `Encryption` {#Azure.ResourceManager.CommonTypes.Encryption}
 
 (Optional) Discouraged to include in resource definition. Only needed where it is possible to disable platform (AKA infrastructure) encryption. Azure SQL TDE is an example of this. Values are enabled and disabled.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.encryption
+model Azure.ResourceManager.CommonTypes.Encryption
 ```
 
 #### Properties
@@ -1151,7 +1151,7 @@ model Azure.ResourceManager.CommonTypes.encryption
 | Name                          | Type                                                                                                             | Description                                                      |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.InfrastructureEncryption)         | Values are enabled and disabled.                                 |
-| customerManagedKeyEncryption? | [`customerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.customerManagedKeyEncryption) | All Customer-managed key encryption properties for the resource. |
+| customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption) | All Customer-managed key encryption properties for the resource. |
 
 ### `encryptionProperties` {#Azure.ResourceManager.CommonTypes.encryptionProperties}
 
