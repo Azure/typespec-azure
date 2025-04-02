@@ -1935,7 +1935,6 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       if (explicitApiVersions) {
         // add additional api versions to the enum
         sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
-        // TODO: make sure the enum includes all of the listed service ones as well
       } else {
         sdkVersionsEnum = diagnostics.pipe(
           getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),

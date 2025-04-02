@@ -610,10 +610,9 @@ extern dec scope(target: Operation, scope?: valueof string);
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
 
 /**
- * Add additional api versions that are possible for the client to use. Has to include listed versions from the service.
- * Only adds these api versions to the exposed API version enum.
- * Use if you want to generate an accurate API version enum, while not having to actually annotate the entire spec with versioning decorators,
- * since we won't be using the versioning information on the generation side.
+ * Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
+ * This decorator is useful for extending the API version enum exposed by the client.
+ * It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
  *
  * @example
  * ```typespec
