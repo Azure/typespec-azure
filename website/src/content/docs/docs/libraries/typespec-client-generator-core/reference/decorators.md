@@ -271,6 +271,51 @@ interface MyInterface {}
 interface MyInterface {}
 ```
 
+### `@clientApiVersions` {#@Azure.ClientGenerator.Core.clientApiVersions}
+
+Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
+This decorator is useful for extending the API version enum exposed by the client.
+It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
+
+```typespec
+@Azure.ClientGenerator.Core.clientApiVersions(value: Enum, scope?: valueof string)
+```
+
+#### Target
+
+`Namespace`
+
+#### Parameters
+
+| Name  | Type             | Description |
+| ----- | ---------------- | ----------- |
+| value | `Enum`           |             |
+| scope | `valueof string` |             |
+
+#### Examples
+
+```typespec
+// main.tsp
+@versioned(Versions)
+namespace Contoso {
+  enum Versions {
+    v4,
+    v5,
+  }
+}
+
+// client.tsp
+
+enum ClientApiVersions {
+  v1,
+  v2,
+  v3,
+  ...Contoso.Versions,
+}
+
+@@clientApiVersions(Contoso, ClientApiVersions);
+```
+
 ### `@clientInitialization` {#@Azure.ClientGenerator.Core.clientInitialization}
 
 Customize the client initialization way.
@@ -621,6 +666,32 @@ Whether you want to generate an operation as a protocol operation.
 ```typespec
 @protocolAPI(false)
 op test: void;
+```
+
+### `@responseAsBool` {#@Azure.ClientGenerator.Core.responseAsBool}
+
+Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+
+```typespec
+@Azure.ClientGenerator.Core.responseAsBool(scope?: valueof string)
+```
+
+#### Target
+
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description |
+| ----- | ---------------- | ----------- |
+| scope | `valueof string` |             |
+
+#### Examples
+
+```typespec
+@responseAsBool
+@head
+op headOperation(): void;
 ```
 
 ### `@scope` {#@Azure.ClientGenerator.Core.scope}

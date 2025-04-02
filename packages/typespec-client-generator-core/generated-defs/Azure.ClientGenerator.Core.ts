@@ -609,6 +609,33 @@ export type ApiVersionDecorator = (
 ) => void;
 
 /**
+ * Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
+ * This decorator is useful for extending the API version enum exposed by the client.
+ * It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
+ *
+ * @example
+ * ```typespec
+ * // main.tsp
+ * @versioned(Versions)
+ * namespace Contoso {
+ *  enum Versions { v4, v5 }
+ * }
+ *
+ * // client.tsp
+ *
+ * enum ClientApiVersions { v1, v2, v3, ...Contoso.Versions }
+ *
+ * @@clientApiVersions(Contoso, ClientApiVersions)
+ * ```
+ */
+export type ClientApiVersionsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  value: Enum,
+  scope?: string,
+) => void;
+
+/**
  * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
  *
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
@@ -633,6 +660,23 @@ export type DeserializeEmptyStringAsNullDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+ *
+ * @example
+ * ```typespec
+ *
+ * @responseAsBool
+ * @head
+ * op headOperation(): void;
+ * ```
+ */
+export type ResponseAsBoolDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -650,5 +694,7 @@ export type AzureClientGeneratorCoreDecorators = {
   alternateType: AlternateTypeDecorator;
   scope: ScopeDecorator;
   apiVersion: ApiVersionDecorator;
+  clientApiVersions: ClientApiVersionsDecorator;
   deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator;
+  responseAsBool: ResponseAsBoolDecorator;
 };

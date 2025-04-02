@@ -6,7 +6,7 @@ import { SdkMethodParameter } from "../../src/interfaces.js";
 import {
   getPropertyPathFromModel,
   getPropertySegmentsFromModelOrParameters,
-} from "../../src/package.js";
+} from "../../src/methods.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
 

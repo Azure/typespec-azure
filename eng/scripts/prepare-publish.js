@@ -71,7 +71,7 @@ if (production) {
 // Stage the typespec core publish
 await typespecRun("pnpm", "change", "version", "--exclude", "standalone");
 if (!args.values.onlyBumpVersions) {
-  await typespecRun("pnpm", "update-latest-docs");
+  await typespecRun("pnpm", "update-playground-versions");
 }
 await typespecRunWithRetries(3, "pnpm", "install");
 
@@ -95,7 +95,7 @@ const versions = await getProjectVersions();
 // Stage typespec-azure publish
 await typespecAzureRun("pnpm", "change", "version");
 if (!args.values.onlyBumpVersions) {
-  await typespecAzureRun("pnpm", "update-latest-docs");
+  await typespecAzureRun("pnpm", "update-playground-versions");
 }
 if (await checkForChangedFiles(repoRoot, undefined, { silent: true })) {
   if (production) {

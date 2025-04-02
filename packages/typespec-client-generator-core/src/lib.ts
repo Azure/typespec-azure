@@ -128,6 +128,13 @@ const TCGCEmitterOptionsSchema: JSONSchemaType<TCGCEmitterOptions> = {
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-client-generator-core",
   diagnostics: {
+    "multiple-services": {
+      severity: "warning",
+      messages: {
+        default:
+          "Multiple services found. Only the first service will be used; others will be ignored.",
+      },
+    },
     "client-service": {
       severity: "warning",
       messages: {
@@ -188,12 +195,6 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Unsupported kind ${"kind"}`,
       },
     },
-    "multiple-services": {
-      severity: "warning",
-      messages: {
-        default: paramMessage`Multiple services found in definition. Only one service is supported, so we will choose the first one ${"service"}`,
-      },
-    },
     "server-param-not-path": {
       severity: "error",
       messages: {
@@ -215,7 +216,7 @@ export const $lib = createTypeSpecLibrary({
     "no-corresponding-method-param": {
       severity: "error",
       messages: {
-        default: paramMessage`Missing "${"paramName"}" method parameter in method "${"methodName"}", when "${"paramName"}" must be sent to the service. Add a parameter named "${"paramName"}" to the method.`,
+        default: paramMessage`Missing HTTP operation parameter "${"paramName"}" in method "${"methodName"}". Please check the method definition.`,
       },
     },
     "unsupported-protocol": {
@@ -350,10 +351,30 @@ export const $lib = createTypeSpecLibrary({
           "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
       },
     },
+    "non-head-bool-response-decorator": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on ${"operationName"}.`,
+      },
+    },
     "unsupported-http-file-body": {
       severity: "error",
       messages: {
         default: "File body is not supported for HTTP operations. Please use bytes instead.",
+      },
+    },
+    "require-versioned-service": {
+      severity: "warning",
+      description: "Require a versioned service to use this decorator",
+      messages: {
+        default: paramMessage`Service "${"serviceName"}" must be versioned if you want to apply the "${"decoratorName"}" decorator`,
+      },
+    },
+    "missing-service-versions": {
+      severity: "warning",
+      description: "Missing service versions",
+      messages: {
+        default: paramMessage`The @clientApiVersions decorator is missing one or more versions defined in ${"serviceName"}. Client API must support all service versions to ensure compatibility. Missing versions: ${"missingVersions"}. Please update the client API to support all required service versions.`,
       },
     },
   },

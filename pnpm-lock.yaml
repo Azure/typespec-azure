@@ -81,6 +81,12 @@ importers:
 
   core:
     devDependencies:
+      '@alloy-js/babel-preset':
+        specifier: ^0.2.0
+        version: 0.2.0(@babel/core@7.26.10)
+      '@babel/preset-typescript':
+        specifier: ^7.27.0
+        version: 7.27.0(@babel/core@7.26.10)
       '@chronus/chronus':
         specifier: ^1.0.0
         version: 1.0.0
@@ -999,6 +1005,9 @@ importers:
       '@typespec/spector':
         specifier: workspace:^
         version: link:../spector
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../tspd
       '@vitest/coverage-v8':
         specifier: ^3.0.9
         version: 3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.13)(@vitest/ui@3.0.9)(happy-dom@17.4.4)(jsdom@25.0.1)(tsx@4.19.3)(yaml@2.7.0))
