@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Common types",
-    "version": "v5"
+    "version": "5.0"
   },
   "paths": {},
   "definitions": {
@@ -44,7 +44,9 @@
           "items": {
             "$ref": "#/definitions/PrivateEndpointConnection"
           },
-          "x-ms-identifiers": []
+          "x-ms-identifiers": [
+            "id"
+          ]
         }
       }
     },
