@@ -4,7 +4,7 @@ import {
   LinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { requireNamedModelRule } from "../../src/rules/require-named-model.rule.js";
+import { noUnnamedTypesRule } from "../../src/rules/no-unnamed-types.rule.js";
 import { createSdkTestRunner } from "../test-host.js";
 
 let runner: BasicTestRunner;
@@ -14,7 +14,7 @@ beforeEach(async () => {
   runner = await createSdkTestRunner();
   tester = createLinterRuleTester(
     runner,
-    requireNamedModelRule,
+    noUnnamedTypesRule,
     "@azure-tools/typespec-client-generator-core",
   );
 });
