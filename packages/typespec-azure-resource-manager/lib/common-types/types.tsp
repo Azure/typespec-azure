@@ -1,7 +1,7 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using OpenAPI;
+using Versioning;
 using Azure.Core;
 
 namespace Azure.ResourceManager.CommonTypes;
@@ -10,26 +10,26 @@ namespace Azure.ResourceManager.CommonTypes;
 model Resource {
   /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
   @typeChangedFrom(Versions.v4, string)
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id?: armResourceIdentifier;
 
   /** The name of the resource */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name?: string;
 
   /** The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts" */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   type?: armResourceType;
 
   /** Azure Resource Manager metadata containing createdBy and modifiedBy information. */
-  @visibility("read")
-  systemData?: systemData;
+  @visibility(Lifecycle.Read)
+  systemData?: SystemData;
 }
 
 /** The resource model definition for an Azure Resource Manager resource with an etag. */
 model AzureEntityResource extends Resource {
   /** Resource Etag. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   etag?: string;
 }
 
@@ -41,7 +41,7 @@ model TrackedResource extends Resource {
   tags?: Record<string>;
 
   /** The geo-location where the resource lives */
-  @visibility("read", "create")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
   location: string;
 }
 
@@ -67,13 +67,13 @@ model ResourceModelWithAllowedPropertySet extends TrackedResource {
   /** Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.
    * If supported, the resource provider must validate and persist this value. */
   @pattern("^[-\\w\\._,\\(\\)]+$")
-  @visibility("read", "create")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
   kind?: string;
 
   /** The etag field is *not* required. If it is provided in the response body, it must also be provided as a header per the normal etag convention.
    * Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19),
    * If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   etag?: string;
 
   @typeChangedFrom(Versions.v6, Identity)
@@ -133,13 +133,13 @@ model Operation {
   /** 
     The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
      */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name?: string;
 
   /** 
     Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
      */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   isDataAction?: boolean;
 
   /** Localized display information for this particular operation. */
@@ -148,13 +148,13 @@ model Operation {
   /** 
     The intended executor of the operation; as in Resource Based Access Control (RBAC) and audit logs UX. Default value is "user,system"
      */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   origin?: Origin;
 
   /** 
     Extensible enum. Indicates the action type. "Internal" refers to actions that are for internal only APIs.
      */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   actionType?: ActionType;
 }
 
@@ -165,23 +165,23 @@ model OperationDisplay {
   /** 
   The localized friendly form of the resource provider name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".
    */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provider?: string;
 
   /** 
     The localized friendly name of the resource type related to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
      */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   resource?: string;
 
   /** 
     The concise, localized friendly name for the operation; suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart Virtual Machine".
      */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   operation?: string;
 
   /** The short, localized friendly description of the operation; suitable for tool tips and detailed views. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   description?: string;
 }
 
@@ -217,7 +217,7 @@ model OperationStatusResult {
   error?: ErrorDetail;
 
   /** Fully qualified ID of the resource against which the original async operation was started. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @format("arm-id")
   @added(Versions.v5)
   resourceId?: string;
@@ -254,23 +254,23 @@ union Origin {
  */
 model ErrorDetail {
   /** The error code. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   code?: string;
 
   /** The error message. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   message?: string;
 
   /** The error target. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   target?: string;
 
   /** The error details. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   details?: ErrorDetail[];
 
   /** The error additional info. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   additionalInfo?: ErrorAdditionalInfo[];
 }
 
@@ -288,11 +288,11 @@ model ErrorResponse {
  */
 model ErrorAdditionalInfo {
   /** The additional info type. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   type?: string;
 
   /** The additional info. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   info?: {};
 }
 
@@ -349,13 +349,13 @@ model Identity {
   /** The principal ID of resource identity. The value must be an UUID. */
   @removed(Versions.v6)
   @typeChangedFrom(Versions.v4, string)
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
 
   /** The tenant ID of resource. The value must be an UUID. */
   @removed(Versions.v6)
   @typeChangedFrom(Versions.v4, string)
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   tenantId?: uuid;
 
   /** The identity type. */

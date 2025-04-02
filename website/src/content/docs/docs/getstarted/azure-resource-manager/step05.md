@@ -22,18 +22,15 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
 /** Contoso Resource Provider management API */
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-  version: "2021-01-01-preview",
-})
+@service(#{ title: "ContosoProviderHubClient", version: "2021-01-01-preview" })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub;

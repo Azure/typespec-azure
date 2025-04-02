@@ -1,5 +1,37 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.53.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Features
+
+- [#2336](https://github.com/Azure/typespec-azure/pull/2336) Remove reference to deleted projection feature
+- [#2382](https://github.com/Azure/typespec-azure/pull/2382) Add support for new `dryRun` option
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### Bug Fixes
+
+- [#2348](https://github.com/Azure/typespec-azure/pull/2348) Autorest Case insensitive check for http auth scheme
+- [#2297](https://github.com/Azure/typespec-azure/pull/2297) Fix using `@identifiers` on array of model with id not respected
+- [#2258](https://github.com/Azure/typespec-azure/pull/2258) Target param property when warn on unsupported parameter type
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+- [#2307](https://github.com/Azure/typespec-azure/pull/2307) Fixed a bug causing properties marked `@invisible(Lifecycle)` to remain included in payloads."
+
+
+## 0.52.0
+
+### Features
+
+- [#2257](https://github.com/Azure/typespec-azure/pull/2257) Adds support for `@header` explode field
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+
 ## 0.51.0
 
 ### Bug Fixes

@@ -1,14 +1,14 @@
 {
   "name": "@azure-tools/azure-http-specs",
-  "version": "0.1.0-alpha.6",
+  "version": "0.1.0-alpha.12",
   "description": "Azure Spec scenarios and mock apis",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "watch": "tsc -p ./tsconfig.build.json --watch",
-    "build": "tsc -p ./tsconfig.build.json",
+    "build": "tsc -p ./tsconfig.build.json && pnpm validate-scenarios",
     "clean": "rimraf dist/ temp/",
-    "test:e2e": "pnpm validate-scenarios  && pnpm validate-mock-apis && pnpm validate-client-server",
+    "test:e2e": "pnpm validate-mock-apis && pnpm validate-client-server",
     "validate-scenarios": "tsp-spector validate-scenarios ./specs",
     "generate-scenarios-summary": "tsp-spector generate-scenarios-summary ./specs",
     "regen-docs": "pnpm generate-scenarios-summary",
@@ -17,12 +17,12 @@
     "validate-mock-apis": "tsp-spector validate-mock-apis ./specs",
     "check-scenario-coverage": "tsp-spector check-coverage ./specs",
     "validate-client-server": "concurrently \"tsp-spector server start ./specs\" \"npm run client\" && tsp-spector server stop",
-    "client": "tsp-spector server-test ./specs",
+    "client": "tsp-spector knock ./specs",
     "serve": "tsp-spector serve ./specs",
     "test": "echo \"Error: no test specified\""
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "repository": {
     "type": "git",
@@ -35,27 +35,27 @@
   },
   "homepage": "https://azure.github.io/typespec-azure",
   "dependencies": {
-    "@typespec/spec-api": "workspace:~",
-    "@typespec/spector": "workspace:~"
+    "@typespec/spec-api": "workspace:^",
+    "@typespec/spector": "workspace:^"
   },
   "devDependencies": {
-    "@azure-tools/typespec-autorest": "workspace:~",
-    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
-    "@azure-tools/typespec-client-generator-core": "workspace:~",
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/multer": "^1.4.10",
-    "@types/node": "~22.10.10",
-    "@typespec/openapi": "workspace:~",
-    "@typespec/openapi3": "workspace:~",
+    "@types/node": "~22.13.11",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/openapi3": "workspace:^",
     "concurrently": "^9.1.2",
     "rimraf": "~6.0.1",
-    "typescript": "~5.7.3"
+    "typescript": "~5.8.2"
   },
   "peerDependencies": {
-    "@azure-tools/typespec-azure-core": "workspace:~",
-    "@typespec/compiler": "workspace:~",
-    "@typespec/http": "workspace:~",
-    "@typespec/rest": "workspace:~",
-    "@typespec/versioning": "workspace:~",
-    "@typespec/xml": "workspace:~"
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "@typespec/xml": "workspace:^"
   }
 }

@@ -4,17 +4,21 @@ import {
   ModelProperty,
   Operation,
   Type,
+  compilerAssert,
   createDiagnosticCollector,
   getDoc,
+  getEncode,
   getSummary,
   ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
+  Visibility,
   getCookieParamOptions,
   getHeaderFieldName,
   getHeaderFieldOptions,
@@ -27,6 +31,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
+import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
 import { getParamAlias } from "./decorators.js";
 import {
@@ -54,6 +59,7 @@ import {
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
+  getStreamAsBytes,
   getTypeDecorators,
   isAcceptHeader,
   isContentTypeHeader,
@@ -63,6 +69,7 @@ import {
   twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
+import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
@@ -143,7 +150,16 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
   if (tspBody) {
-    // explicit @body and @bodyRoot
+    if (tspBody.bodyKind === "file") {
+      // file body is not supported yet
+      diagnostics.add(
+        createDiagnostic({
+          code: "unsupported-http-file-body",
+          target: tspBody.property ?? tspBody.type,
+        }),
+      );
+      return diagnostics.wrap(retval);
+    }
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
@@ -184,7 +200,7 @@ function getSdkHttpParameters(
         kind: "body",
         name,
         isGeneratedName: true,
-        serializedName: "body",
+        serializedName: "",
         doc: getDoc(context.program, tspBody.type),
         summary: getSummary(context.program, tspBody.type),
         onClient: false,
@@ -197,10 +213,10 @@ function getSdkHttpParameters(
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
+        access: "public",
       };
     }
     if (retval.bodyParam) {
-      addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
       retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
         getCorrespondingMethodParams(
           context,
@@ -209,6 +225,16 @@ function getSdkHttpParameters(
           retval.bodyParam,
         ),
       );
+
+      addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
+
+      // map stream request body type to bytes
+      if (getStreamMetadata(context.program, httpOperation.parameters)) {
+        retval.bodyParam.type = diagnostics.pipe(
+          getStreamAsBytes(context, retval.bodyParam.type.__raw!),
+        );
+        retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
+      }
     }
   }
   if (retval.bodyParam && !headerParams.some((h) => isContentTypeHeader(h))) {
@@ -263,7 +289,10 @@ function createContentTypeOrAcceptHeader(
 ): Omit<SdkMethodParameter, "kind"> {
   const name = bodyObject.kind === "body" ? "contentType" : "accept";
   let type: SdkType = getTypeSpecBuiltInType(context, "string");
-  // for contentType, we treat it as a constant IFF there's one value and it's application/json.
+  // for contentType, we treat it as a constant IFF there's one value and it's one of:
+  //  - application/json
+  //  - text/plain
+  //  - application/octet-stream
   // this is to prevent a breaking change when a service adds more content types in the future.
   // e.g. the service accepting image/png then later image/jpeg should _not_ be a breaking change.
   //
@@ -273,7 +302,10 @@ function createContentTypeOrAcceptHeader(
   if (
     bodyObject.contentTypes &&
     bodyObject.contentTypes.length === 1 &&
-    (/json/.test(bodyObject.contentTypes[0]) || name === "accept")
+    (isMediaTypeJson(bodyObject.contentTypes[0]) ||
+      isMediaTypeTextPlain(bodyObject.contentTypes[0]) ||
+      isMediaTypeOctetStream(bodyObject.contentTypes[0]) ||
+      name === "accept")
   ) {
     // in this case, we just want a content type of application/json
     type = {
@@ -297,6 +329,7 @@ function createContentTypeOrAcceptHeader(
     optional: optional,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
+    access: "public",
   };
 }
 
@@ -308,16 +341,26 @@ function addContentTypeInfoToBodyParam(
   const diagnostics = createDiagnosticCollector();
   const tspBody = httpOperation.parameters.body;
   if (!tspBody) return diagnostics.diagnostics;
-  let contentTypes = tspBody.contentTypes;
-  if (contentTypes.length === 0) {
-    contentTypes = ["application/json"];
-  }
+  const contentTypes = tspBody.contentTypes;
+  compilerAssert(contentTypes.length > 0, "contentTypes should not be empty"); // this should be http lib bug
   const defaultContentType = contentTypes.includes("application/json")
     ? "application/json"
     : contentTypes[0];
   bodyParam.contentTypes = contentTypes;
   bodyParam.defaultContentType = defaultContentType;
   diagnostics.pipe(addEncodeInfo(context, bodyParam.__raw!, bodyParam.type, defaultContentType));
+  // set the correct encode for body parameter of method according to the content-type
+  if (bodyParam.correspondingMethodParams.length === 1) {
+    const methodBodyParam = bodyParam.correspondingMethodParams[0];
+    diagnostics.pipe(
+      addEncodeInfo(
+        context,
+        methodBodyParam.__raw!,
+        methodBodyParam.type,
+        bodyParam.defaultContentType,
+      ),
+    );
+  }
   return diagnostics.diagnostics;
 }
 
@@ -344,21 +387,14 @@ export function getSdkHttpParameter(
   if (isPathParam(context.program, param) || location === "path") {
     // we don't url encode if the type can be assigned to url
     const urlEncode = !ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(
-        // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        param.type.projectionBase ?? param.type,
-        program.checker.getStdType("url"),
-        param.type,
-      ),
+      program.checker.isTypeAssignableTo(param.type, program.checker.getStdType("url"), param.type),
     );
     return diagnostics.wrap({
       ...base,
       kind: "path",
-      urlEncode,
       explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
       style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
-      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? false,
+      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? !urlEncode,
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,
@@ -378,8 +414,8 @@ export function getSdkHttpParameter(
       ...base,
       kind: "body",
       serializedName: param.name === "" ? "body" : getWireName(context, param),
-      contentTypes: ["application/json"], // will update when we get to the operation level
-      defaultContentType: "application/json", // will update when we get to the operation level
+      contentTypes: ["application/json"],
+      defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams,
     });
@@ -387,7 +423,7 @@ export function getSdkHttpParameter(
   const headerQueryBase = {
     ...base,
     optional: param.optional,
-    collectionFormat: getCollectionFormat(context, param),
+    collectionFormat: diagnostics.pipe(getCollectionFormat(context, param)),
     correspondingMethodParams,
   };
   if (isQueryParam(context.program, param) || location === "query") {
@@ -470,13 +506,18 @@ function getSdkHttpResponseAndExceptions(
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body =
           innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type)
+            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
             : innerResponse.body.type;
-        type = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-        );
-        if (innerResponse.body.property) {
-          addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+        if (getStreamMetadata(context.program, innerResponse)) {
+          // map stream response body type to bytes
+          type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
+        } else {
+          type = diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+          );
+          if (innerResponse.body.property) {
+            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+          }
         }
       }
     }
@@ -589,13 +630,17 @@ export function getCorrespondingMethodParams(
   // 5. To see if all the property of the service parameter could be mapped to a method parameter or a property of a method parameter.
   if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
     const retVal = [];
+    let optionalSkip = 0;
     for (const serviceParamProp of serviceParam.type.properties) {
       const propertyMapping = findMapping(methodParameters, serviceParamProp);
       if (propertyMapping) {
         retVal.push(propertyMapping);
+      } else if (serviceParamProp.optional) {
+        // If the property is optional, we can skip the mapping.
+        optionalSkip++;
       }
     }
-    if (retVal.length === serviceParam.type.properties.length) {
+    if (retVal.length + optionalSkip === serviceParam.type.properties.length) {
       return diagnostics.wrap(retVal);
     }
   }
@@ -696,15 +741,51 @@ function filterOutUselessPathParameters(
 function getCollectionFormat(
   context: TCGCContext,
   type: ModelProperty,
-): CollectionFormat | undefined {
+): [CollectionFormat | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const program = context.program;
-  /* eslint-disable @typescript-eslint/no-deprecated */
-  const tspCollectionFormat = (
-    isQueryParam(program, type)
-      ? getQueryParamOptions(program, type)
-      : isHeader(program, type)
-        ? getHeaderFieldOptions(program, type)
-        : undefined
-  )?.format;
-  return tspCollectionFormat;
+  if (isHeader(program, type)) {
+    return getFormatFromExplodeOrEncode(
+      context,
+      type,
+      getHeaderFieldOptions(program, type).explode,
+    );
+  } else if (isQueryParam(program, type)) {
+    return getFormatFromExplodeOrEncode(
+      context,
+      type,
+      getQueryParamOptions(program, type)?.explode,
+    );
+  }
+  return diagnostics.wrap(undefined);
+}
+
+function getFormatFromExplodeOrEncode(
+  context: TCGCContext,
+  type: ModelProperty,
+  explode?: boolean,
+): [CollectionFormat | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if ($.array.is(type.type)) {
+    if (explode) {
+      return diagnostics.wrap("multi");
+    }
+    const encode = getEncode(context.program, type);
+    if (encode) {
+      if (encode?.encoding === "ArrayEncoding.pipeDelimited") {
+        return diagnostics.wrap("pipes");
+      }
+      if (encode?.encoding === "ArrayEncoding.spaceDelimited") {
+        return diagnostics.wrap("ssv");
+      }
+      diagnostics.add(
+        createDiagnostic({
+          code: "invalid-encode-for-collection-format",
+          target: type,
+        }),
+      );
+    }
+    return diagnostics.wrap("csv");
+  }
+  return diagnostics.wrap(undefined);
 }

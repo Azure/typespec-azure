@@ -9,7 +9,6 @@ import {
   StringLiteral,
   Type,
   getDirectoryPath,
-  getService,
   getSourceLocation,
   normalizePath,
   resolvePath,
@@ -89,20 +88,6 @@ export function $promotion(context: DecoratorContext, target: Model, options: Mo
         reportDiagnostic(program, {
           code: "invalid-apiversion",
           messageId: "versionsList",
-          format: {
-            version: currentApiVersion,
-          },
-          target,
-        });
-        return;
-      }
-    } else if (target.namespace) {
-      const service = getService(program, target.namespace);
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      if (service?.version && currentApiVersion !== service.version) {
-        reportDiagnostic(program, {
-          code: "invalid-apiversion",
-          messageId: "serviceVersion",
           format: {
             version: currentApiVersion,
           },

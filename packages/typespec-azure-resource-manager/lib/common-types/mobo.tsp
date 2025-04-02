@@ -1,5 +1,5 @@
 using Azure.Core;
-using TypeSpec.Versioning;
+using Versioning;
 
 namespace Azure.ResourceManager.CommonTypes;
 
@@ -7,7 +7,7 @@ namespace Azure.ResourceManager.CommonTypes;
 @added(Versions.v5)
 model ManagedOnBehalfOfConfiguration {
   /** Managed-On-Behalf-Of broker resources */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   moboBrokerResources?: MoboBrokerResource[];
 }
 

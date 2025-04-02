@@ -1,5 +1,6 @@
 import {
   BooleanLiteral,
+  compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
@@ -10,6 +11,7 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -23,13 +25,17 @@ import {
   Value,
 } from "@typespec/compiler";
 import {
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationResponseContent,
-} from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+  unsafe_mutateSubgraphWithNamespace,
+  unsafe_MutatorWithNamespace,
+} from "@typespec/compiler/experimental";
+import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
+import {
+  getAddedOnVersions,
+  getRemovedOnVersions,
+  getVersioningMutators,
+  getVersions,
+} from "@typespec/versioning";
+import { getParamAlias, listOperationGroups } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -37,6 +43,7 @@ import {
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
+  SdkOperationGroup,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -48,6 +55,30 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
+
+import { $ } from "@typespec/compiler/experimental/typekit";
+
+export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
+  "emitter-name"?: string;
+}
+
+export interface UnbrandedSdkEmitterOptionsInterface {
+  "generate-protocol-methods"?: boolean;
+  "generate-convenience-methods"?: boolean;
+  "api-version"?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
+}
+
+export interface BrandedSdkEmitterOptionsInterface extends UnbrandedSdkEmitterOptionsInterface {
+  "examples-dir"?: string;
+  namespace?: string;
+}
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -82,29 +113,6 @@ export function parseEmitterName(
   const language = match[1];
   if (["typescript", "ts"].includes(language)) return diagnostics.wrap("javascript");
   return diagnostics.wrap(language);
-}
-
-/**
- *
- * @param context
- * @param namespace If we know explicitly the namespace of the client, pass this in
- * @returns The name of the namespace
- */
-export function getClientNamespaceStringHelper(
-  context: TCGCContext,
-  namespace?: Namespace,
-): string | undefined {
-  let packageName = context.packageName;
-  if (packageName) {
-    packageName = packageName
-      .replace(/-/g, ".")
-      .replace(/\.([a-z])?/g, (match: string) => match.toUpperCase());
-    return packageName.charAt(0).toUpperCase() + packageName.slice(1);
-  }
-  if (namespace) {
-    return getNamespaceFullName(namespace);
-  }
-  return undefined;
 }
 
 /**
@@ -167,11 +175,6 @@ export function filterApiVersionsWithDecorators(
   return retval;
 }
 
-function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]): string[] {
-  const union = Array.from(new Set([...a, ...b]));
-  return apiVersions.filter((item) => union.includes(item));
-}
-
 /**
  *
  * @param context
@@ -186,7 +189,7 @@ export function getAvailableApiVersions(
 ): string[] {
   let wrapperApiVersions: string[] = [];
   if (wrapper) {
-    wrapperApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
+    wrapperApiVersions = context.getApiVersionsForType(wrapper);
   }
 
   const allApiVersions =
@@ -198,16 +201,11 @@ export function getAvailableApiVersions(
   if (!apiVersions) return [];
   const explicitlyDecorated = filterApiVersionsWithDecorators(context, type, apiVersions);
   if (explicitlyDecorated.length) {
-    context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
+    context.setApiVersionsForType(type, explicitlyDecorated);
     return explicitlyDecorated;
   }
-  // we take the union of all of the api versions that the type is available on
-  // if it's called multiple times with diff wrappers, we want to make sure we have
-  // all of the possible api versions listed
-  const existing = context.__tspTypeToApiVersions.get(type) || [];
-  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
-  context.__tspTypeToApiVersions.set(type, retval);
-  return retval;
+  context.setApiVersionsForType(type, wrapperApiVersions);
+  return context.getApiVersionsForType(type);
 }
 
 /**
@@ -508,8 +506,8 @@ export function twoParamsEquivalent(
  * @param parameters
  * @returns
  */
-export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
-  return httpBody.property === undefined;
+export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
+  return httpBody.bodyKind !== "file" && httpBody.property === undefined;
 }
 
 /**
@@ -589,9 +587,133 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   return visibility.size === 0;
 }
 
+export function listAllNamespaces(
+  context: TCGCContext,
+  namespace: Namespace,
+  retval?: Namespace[],
+): Namespace[] {
+  if (!retval) {
+    retval = [];
+  }
+  if (retval.includes(namespace)) return retval;
+  retval.push(namespace);
+  for (const ns of namespace.namespaces.values()) {
+    listAllNamespaces(context, ns, retval);
+  }
+  return retval;
+}
+
+export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
+  return listAllNamespaces(context, context.getMutatedGlobalNamespace()).filter((ns) =>
+    $.type.isUserDefined(ns),
+  );
+}
+
 export function findRootSourceProperty(property: ModelProperty): ModelProperty {
   while (property.sourceProperty) {
     property = property.sourceProperty;
   }
   return property;
+}
+
+export function getStreamAsBytes(
+  context: TCGCContext,
+  type: Type,
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const unknownType: SdkBuiltInType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "bytes")),
+    name: "bytes",
+    encode: "bytes",
+    crossLanguageDefinitionId: "",
+  };
+  return diagnostics.wrap(unknownType);
+}
+
+function getVersioningMutator(
+  context: TCGCContext,
+  service: Namespace,
+  apiVersion: string,
+): unsafe_MutatorWithNamespace {
+  const versionMutator = getVersioningMutators(context.program, service);
+  compilerAssert(
+    versionMutator !== undefined && versionMutator.kind !== "transient",
+    "Versioning service should not get undefined or transient versioning mutator",
+  );
+
+  const mutators = versionMutator.snapshots
+    .filter((snapshot) => apiVersion === snapshot.version.value)
+    .map((x) => x.mutator);
+  compilerAssert(mutators.length === 1, "One api version should not get multiple mutators");
+
+  return mutators[0];
+}
+
+export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
+  const globalNamespace = context.program.getGlobalNamespaceType();
+  const service = listServices(context.program)[0];
+  if (!service) return globalNamespace;
+  const allApiVersions = getVersions(context.program, service.type)[1]
+    ?.getVersions()
+    .map((x) => x.value);
+  if (!allApiVersions || context.apiVersion === "all") return globalNamespace;
+
+  const apiVersion = getValidApiVersion(context, allApiVersions);
+  if (apiVersion === undefined) return globalNamespace;
+
+  const mutator = getVersioningMutator(context, service.type, apiVersion);
+  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
+  compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
+  return subgraph.type;
+}
+
+export function listRawSubClients(
+  context: TCGCContext,
+  client: SdkOperationGroup | SdkClient,
+): SdkOperationGroup[] {
+  const retval: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = listOperationGroups(context, client);
+  while (queue.length > 0) {
+    const operationGroup = queue.pop()!;
+    retval.push(operationGroup);
+    if (operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
+    }
+  }
+  return retval;
+}
+
+export function resolveDuplicateGenearatedName(
+  context: TCGCContext,
+  type: Union | Model | TspLiteralType,
+  createName: string,
+): string {
+  let duplicateCount = 1;
+  const rawCreateName = createName;
+  const generatedNames = [...context.__generatedNames.values()];
+  while (generatedNames.includes(createName)) {
+    createName = `${rawCreateName}${duplicateCount++}`;
+  }
+  context.__generatedNames.set(type, createName);
+  return createName;
+}
+
+export function resolveConflictGeneratedName(context: TCGCContext) {
+  const userDefinedNames = [...context.__referencedTypeCache.values()]
+    .filter((x) => !x.isGeneratedName)
+    .map((x) => x.name);
+  const generatedNames = [...context.__generatedNames.values()];
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
+      const rawName = sdkType.name;
+      let duplicateCount = 1;
+      let createName = `${rawName}${duplicateCount++}`;
+      while (userDefinedNames.includes(createName) || generatedNames.includes(createName)) {
+        createName = `${rawName}${duplicateCount++}`;
+      }
+      sdkType.name = createName;
+      context.__generatedNames.set(sdkType.__raw, createName);
+      generatedNames.push(createName);
+    }
+  }
 }

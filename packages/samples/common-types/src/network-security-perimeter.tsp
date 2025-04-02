@@ -6,9 +6,7 @@ import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/comm
 using Autorest;
 using OpenAPI;
 
-@info({
-  title: "Network security perimeter common type definitions",
-})
+@info(#{ title: "Network security perimeter common type definitions" })
 @doc("Common types for network security perimeters based on a shared API specification. These common, versioned type definitions are intended for resource providers (RPs, except Network RP) to use, and reuse, for defining their own API versions that share a set of type definitions that is consistent across providers.")
 namespace Azure.ResourceManager.CommonTypes;
 
@@ -17,7 +15,7 @@ model Resource {}
 
 @useRef("./types.json#/definitions/ProxyResource")
 model ProxyResource {
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id?: Azure.Core.armResourceIdentifier;
 }
 

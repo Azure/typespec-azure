@@ -28,7 +28,7 @@ describe("typespec-autorest: decorators", () => {
     it("returns embedding vector metadata for embedding vector models", async () => {
       const [result, _] = await runner.compileAndDiagnose(`
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @test @service({title:"MyService"})
+      @test @service(#{title:"MyService"})
       namespace MyNamespace;
 
       model MyVector is EmbeddingVector<int64>;
@@ -42,7 +42,7 @@ describe("typespec-autorest: decorators", () => {
     it("returns undefined for non-embedding vector models", async () => {
       const [result, _] = await runner.compileAndDiagnose(`
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @test @service({title:"MyService"})
+      @test @service(#{title:"MyService"})
       namespace MyNamespace;
 
       model Foo {};
@@ -124,7 +124,8 @@ describe("typespec-autorest: decorators", () => {
         const diagnostics = await runner.diagnose(code, {
           noEmit: false,
           config: resolveVirtualPath("specification/org/service/tspconfig.json"),
-          emitters: {
+          emit: ["@azure-tools/typespec-autorest"],
+          options: {
             [AutorestTestLibrary.name]: {
               ...options,
               "emitter-output-dir": outputDir,

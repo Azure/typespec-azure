@@ -11,12 +11,10 @@ This page documents what type definitions in TypeSpec would look like when retur
 ```typespec
 import "@typespec/http";
 
-using TypeSpec.Http;
+using Http;
 
 @useAuth(ApiKeyAuth<ApiKeyLocation.header, "api-key">)
-@service({
-  title: "Contoso Widget Manager",
-})
+@service(#{ title: "Contoso Widget Manager" })
 @server(
   "{endpoint}/widget",
   "Contoso Widget APIs",
@@ -27,7 +25,7 @@ using TypeSpec.Http;
 namespace Contoso.WidgetManager;
 
 model Widget {
-  @visibility("read", "update")
+  @visibility(Lifecycle.Read, Lifecycle.Update)
   @path
   id: string;
 

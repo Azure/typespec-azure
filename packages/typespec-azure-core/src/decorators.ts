@@ -2,20 +2,20 @@ import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js
 import { getAllProperties } from "./utils.js";
 
 import {
+  compilerAssert,
   createDiagnosticCollector,
   DecoratorContext,
+  DecoratorFunction,
   Diagnostic,
   DiagnosticCollector,
   Enum,
   EnumMember,
-  getKnownValues,
   getNamespaceFullName,
   getTypeName,
   ignoreDiagnostics,
   IntrinsicType,
   isKey,
   isNeverType,
-  isStringType,
   isTemplateDeclarationOrInstance,
   isVoidType,
   Model,
@@ -45,6 +45,7 @@ import {
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
   NeedsRouteDecorator,
+  ParameterizedNextLinkConfigDecorator,
   SpreadCustomParametersDecorator,
   SpreadCustomResponsePropertiesDecorator,
 } from "../generated-defs/Azure.Core.Foundations.Private.js";
@@ -443,13 +444,6 @@ export function getLongRunningStates(
   program: Program,
   entity: Enum | Model | Scalar | ModelProperty,
 ): LongRunningStates | undefined {
-  // Is the type a string with known values?
-  if (isStringType(program, entity)) {
-    // Check the known values enum for LRO states
-    const knownValues = getKnownValues(program, entity as Scalar);
-    return knownValues ? getLongRunningStates(program, knownValues) : undefined;
-  }
-
   // Otherwise just check the type itself
   return program.stateMap(AzureCoreStateKeys.lroStatus).get(entity);
 }
@@ -1516,6 +1510,45 @@ export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
   }
 };
 
+function createMarkerDecorator<T extends DecoratorFunction>(
+  validate?: (...args: Parameters<T>) => boolean,
+) {
+  const getParameterizedNextLinkArguments = (program: Program, target: Parameters<T>[1]) =>
+    program.stateMap(AzureCoreStateKeys.parameterizedNextLinkConfig).get(target);
+  const markParameterizedNextLinkConfigTemplate = (program: Program, target: Parameters<T>[1]) => {
+    compilerAssert(
+      target.templateArguments[0].kind === "Tuple" || target.templateArguments[0].kind === "Model",
+      "Using the defined internal scalar parameterizedNextLink will result in a Tuple template argument type",
+    );
+
+    program
+      .stateMap(AzureCoreStateKeys.parameterizedNextLinkConfig)
+      .set(target, target.templateArguments[0].values);
+  };
+
+  const decorator = (...args: Parameters<T>) => {
+    if (validate && !validate(...args)) {
+      return;
+    }
+    const [context, target] = args;
+    markParameterizedNextLinkConfigTemplate(context.program, target);
+  };
+  return [
+    getParameterizedNextLinkArguments,
+    markParameterizedNextLinkConfigTemplate,
+    decorator as T,
+  ] as const;
+}
+
+const [
+  getParameterizedNextLinkArguments,
+  _markParameterizedNextLinkConfigTemplate,
+  /** {@inheritDoc ParameterizedNextLinkConfigDecorator} */
+  parameterizedNextLinkConfigDecorator,
+] = createMarkerDecorator<ParameterizedNextLinkConfigDecorator>();
+
+export { getParameterizedNextLinkArguments, parameterizedNextLinkConfigDecorator };
+
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
   "Foundations.Private",
@@ -1527,4 +1560,5 @@ setTypeSpecNamespace(
   $embeddingVector,
   $armResourceIdentifierConfig,
   $defaultFinalStateVia,
+  parameterizedNextLinkConfigDecorator,
 );

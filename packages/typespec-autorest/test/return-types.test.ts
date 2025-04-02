@@ -493,7 +493,7 @@ describe("typespec-autorest: return types", () => {
   });
 
   describe("response model resolving to no property in the body produce no body", () => {
-    it.each(["{}", "{@header prop: string}", `{@visibility("none") prop: string}`])(
+    it.each(["{}", "{@header prop: string}", `{@invisible(Lifecycle) prop: string}`])(
       "%s",
       async (body) => {
         const res = await openApiFor(`op test(): ${body};`);
@@ -543,9 +543,8 @@ describe("typespec-autorest: return types", () => {
         @get op read(): bytes;
       `);
       const operation = res.paths["/"].get;
-      deepStrictEqual(operation.produces, undefined);
-      strictEqual(operation.responses["200"].schema.type, "string");
-      strictEqual(operation.responses["200"].schema.format, "byte");
+      deepStrictEqual(operation.produces, ["application/octet-stream"]);
+      strictEqual(operation.responses["200"].schema.type, "file");
     });
 
     it("@body body: bytes responses should produce application/json with byte schema", async () => {
@@ -554,9 +553,8 @@ describe("typespec-autorest: return types", () => {
       `);
 
       const operation = res.paths["/"].get;
-      deepStrictEqual(operation.produces, undefined);
-      strictEqual(operation.responses["200"].schema.type, "string");
-      strictEqual(operation.responses["200"].schema.format, "byte");
+      deepStrictEqual(operation.produces, ["application/octet-stream"]);
+      strictEqual(operation.responses["200"].schema.type, "file");
     });
 
     it("@header contentType should override content type and set type to file", async () => {

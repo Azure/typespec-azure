@@ -6,14 +6,12 @@ import "@azure-tools/typespec-azure-resource-manager";
 import "./ref-library/int-templates.tsp";
 import "./ref-library/op-templates.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 
-@service({
-  title: "Microsoft.EnvelopeTest",
-})
+@service(#{ title: "Microsoft.EnvelopeTest" })
 @useLibraryNamespace(Microsoft.InterfacesTest, Microsoft.OperationsTest)
 @armProviderNamespace
 @versioned(Versions)
@@ -52,7 +50,7 @@ interface AllProperties
 @doc("rp-specific properties for the resource with all envelope properties")
 model AllPropertiesProperties {
   @doc("The status of the last operation performed on this resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: SystemEnvelopeProvisioningState;
 
   @doc("Name of the resource")

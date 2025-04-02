@@ -75,7 +75,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       .expect(
         `
     @armProviderNamespace
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     namespace Microsoft.Foo;
     enum Versions {
@@ -106,7 +106,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     await tester
       .expect(
         `
-          @service({title: "Microsoft.Foo"})
+          @service(#{title: "Microsoft.Foo"})
           @versioned(Versions)
           @armProviderNamespace
           namespace Microsoft.Foo;
@@ -132,7 +132,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     
           @doc("Foo resource")
           model FooResource is TrackedResource<FooProperties> {
-            @visibility("read")
+            @visibility(Lifecycle.Read)
             @doc("The name of the all properties resource.")
             @key("foo")
             @segment("foo")
@@ -172,7 +172,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     await tester
       .expect(
         `
-        @service({title: "Microsoft.Foo"})
+        @service(#{title: "Microsoft.Foo"})
         @versioned(Versions)
         @armProviderNamespace
         namespace Microsoft.Foo;
@@ -195,7 +195,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     
           @doc("Foo resource")
           model FooResource is TrackedResource<FooProperties> {
-            @visibility("read")
+            @visibility(Lifecycle.Read)
             @doc("The name of the all properties resource.")
             @key("foo")
             @segment("foo")

@@ -27,7 +27,7 @@ describe("typespec-azure-resource-manager: arm resource invalid chars in path ru
         @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
 
         model FooResource is TrackedResource<{}> {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @key("foo")
           @segment("foo")
           @path
@@ -45,7 +45,7 @@ describe("typespec-azure-resource-manager: arm resource invalid chars in path ru
         @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
 
         model FooResource is TrackedResource<{}> {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @key("foo")
           @segment("/foo/bar")
           @path

@@ -203,7 +203,7 @@ export type UsageDecorator = (
 ) => void;
 
 /**
- * Override access for operations, models and enums.
+ * Override access for operations, models, enums and model property.
  * When setting access for namespaces,
  * the access info will be propagated to the models and operations defined in the namespace.
  * If the model has an access override, the model override takes precedence.
@@ -216,6 +216,7 @@ export type UsageDecorator = (
  * The override access should not be narrow than the access calculated by operation,
  * and different override access should not conflict with each other,
  * otherwise a warning will be added to diagnostics list.
+ * Model property's access will default to public unless there is an override.
  *
  * @param value The access info you want to set for this model or operation.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
@@ -346,7 +347,7 @@ export type UsageDecorator = (
  */
 export type AccessDecorator = (
   context: DecoratorContext,
-  target: Model | Operation | Enum | Union | Namespace,
+  target: ModelProperty | Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
   scope?: string,
 ) => void;
@@ -607,6 +608,31 @@ export type ApiVersionDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
+ *
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @example
+ * ```typespec
+ *
+ * model MyModel {
+ *   scalar stringlike extends string;
+ *
+ *   @deserializeEmptyStringAsNull
+ *   prop: string;
+ *
+ *   @deserializeEmptyStringAsNull
+ *   prop: stringlike;
+ * }
+ * ```
+ */
+export type DeserializeEmptyStringAsNullDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -624,4 +650,5 @@ export type AzureClientGeneratorCoreDecorators = {
   alternateType: AlternateTypeDecorator;
   scope: ScopeDecorator;
   apiVersion: ApiVersionDecorator;
+  deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator;
 };

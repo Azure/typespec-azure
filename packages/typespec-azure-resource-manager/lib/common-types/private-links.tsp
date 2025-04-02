@@ -1,5 +1,5 @@
-using TypeSpec.Http;
-using TypeSpec.Versioning;
+using Http;
+using Versioning;
 using OpenAPI;
 
 using Azure.Core;
@@ -9,7 +9,7 @@ namespace Azure.ResourceManager.CommonTypes;
 /** The private endpoint resource. */
 model PrivateEndpoint {
   /** The resource identifier of the private endpoint */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @typeChangedFrom(CommonTypes.Versions.v4, string)
   id?: Azure.Core.armResourceIdentifier;
 }
@@ -23,11 +23,11 @@ model PrivateLinkResource extends Resource {
 /** Properties of a private link resource. */
 model PrivateLinkResourceProperties {
   /** The private link resource group id. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   groupId?: string;
 
   /** The private link resource required member names. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   requiredMembers?: string[];
 
   /** The private link resource private link DNS zone name. */
@@ -42,8 +42,8 @@ model PrivateLinkResourceListResult {
   value?: PrivateLinkResource[];
 
   /** URL to get the next set of operation list results (if there are any). */
-  @visibility("read")
-  nextLink?: url;
+  @visibility(Lifecycle.Read)
+  nextLink?: string;
 }
 //#region
 /** The private endpoint connection resource */
@@ -60,14 +60,14 @@ model PrivateEndpointConnectionListResult {
   value?: PrivateEndpointConnection[];
 
   /** URL to get the next set of operation list results (if there are any). */
-  @visibility("read")
-  nextLink?: url;
+  @visibility(Lifecycle.Read)
+  nextLink?: string;
 }
 
 /** Properties of the private endpoint connection. */
 model PrivateEndpointConnectionProperties {
   /** The group ids for the private endpoint resource. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @added(Versions.v4)
   groupIds?: string[];
 
@@ -78,7 +78,7 @@ model PrivateEndpointConnectionProperties {
   privateLinkServiceConnectionState: PrivateLinkServiceConnectionState;
 
   /** The provisioning state of the private endpoint connection resource. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: PrivateEndpointConnectionProvisioningState;
 }
 

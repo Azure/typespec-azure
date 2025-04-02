@@ -256,6 +256,9 @@ export const $lib = createTypeSpecLibrary({
     trait: { description: "Data for `@trait` decorator" },
     traitContext: { description: "Data for `@traitContext` decorator" },
     traitLocation: { description: "Data for `@traitLocation` decorator" },
+    parameterizedNextLinkConfig: {
+      description: "Data for `@parameterizedNextLinkConfig` decorator",
+    },
   },
   // AzureCoreStateKeys.traitLocation
 });

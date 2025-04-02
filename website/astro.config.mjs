@@ -45,10 +45,7 @@ export default defineConfig({
     // @ts-expect-error wrong type
     remarkPlugins: [remarkHeadingID],
     rehypePlugins: [
-      [
-        rehypeAstroRelativeMarkdownLinks,
-        { base, contentPath: "src/content/docs", trailingSlash: "always" },
-      ],
+      [rehypeAstroRelativeMarkdownLinks, { base, collectionBase: false, trailingSlash: "always" }],
     ],
     shikiConfig: {
       langs: [TypeSpecLang],

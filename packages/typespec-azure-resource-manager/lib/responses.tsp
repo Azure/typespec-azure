@@ -1,6 +1,6 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
+using Http;
+using Rest;
+using OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 using Azure.ResourceManager.CommonTypes.Private;
@@ -95,7 +95,7 @@ model ArmOperationStatus<
   StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
 > {
   /** RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   properties?: Properties;
 
   /** The operation status */
@@ -109,23 +109,23 @@ model ArmOperationStatus<
   id: string;
 
   /** The name of the  operationStatus resource */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name?: string;
 
   /** Operation start time */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   startTime?: utcDateTime;
 
   /** Operation complete time */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   endTime?: utcDateTime;
 
   /** The progress made toward completing the operation */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   percentComplete?: float64;
 
   /** Errors that occurred if the operation ended with Canceled or Failed status */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   error?: ErrorDetail;
 }
 
