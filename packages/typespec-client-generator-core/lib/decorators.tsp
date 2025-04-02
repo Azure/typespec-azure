@@ -554,7 +554,7 @@ extern dec clientNamespace(
  * When the alternate type is a `scalar array`, it can must be applied to a model property of type `scalar array`.
  * When the alternate type is `unknown`, the source type can be a scalar type or a model property of type `scalar`.
  *
- * @param source The source type to which the alternate type will be applied. Supported types include scalar types and scalar array.
+ * @param source The target to which the alternate type will be applied. Supported types include scalar types and model property.
  * @param alternate The alternate type to apply to the target. Supported types include scalar types, scalar array or `unknown`.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
@@ -577,11 +577,11 @@ extern dec clientNamespace(
  * @example
  * ```typespec
  * model Test {
- * @alternateType(unknown)
- * thumbprint?: string;
+ *   @alternateType(unknown)
+ *   thumbprint?: string;
  *
- * @alternateType(AzureLocation[], "csharp")
- * locations: string[];
+ *   @alternateType(AzureLocation[], "csharp")
+ *   locations: string[];
  * }
 } * ```
  */

@@ -279,7 +279,7 @@ When the alternate type is `unknown`, the source type can be a scalar type or a 
 
 ##### Target
 
-The source type to which the alternate type will be applied. Supported types include scalar types and scalar array.
+The target to which the alternate type will be applied. Supported types include scalar types and model property.
 `ModelProperty | Scalar`
 
 ##### Parameters
@@ -309,11 +309,11 @@ op test(@param @alternateType(string) date: utcDateTime): void;
 
 ````typespec
 model Test {
-@alternateType(unknown)
-thumbprint?: string;
+  @alternateType(unknown)
+  thumbprint?: string;
 
-@alternateType(AzureLocation[], "csharp")
-locations: string[];
+  @alternateType(AzureLocation[], "csharp")
+  locations: string[];
 }
 } * ```
 
