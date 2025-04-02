@@ -591,7 +591,7 @@ Expected response body:
 
 ### Azure_Core_Page_listWithParameters
 
-- Endpoint: `post /azure/core/page/parameters`
+- Endpoint: `get /azure/core/page/parameters`
 
 Expected query parameter: api-version=2022-12-01-preview&another=Second
 
