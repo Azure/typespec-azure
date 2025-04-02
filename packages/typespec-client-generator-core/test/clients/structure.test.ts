@@ -597,11 +597,13 @@ it("model-only namespace should be filtered out", async () => {
   });
   await runnerWithCore.compile(`
     namespace Foo {
+      @usage(Usage.input)
       model B {}
     }
   `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
+  strictEqual(sdkPackage.models.length, 1);
 });
 
 it("empty namespace with empty subclient", async () => {
