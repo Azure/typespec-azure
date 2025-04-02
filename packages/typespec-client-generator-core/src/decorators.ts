@@ -25,6 +25,7 @@ import {
   AccessDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
+  ClientApiVersionsDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
@@ -1281,6 +1282,38 @@ function IsInScope(context: TCGCContext, entity: Operation): boolean {
   return true;
 }
 
+const clientApiVersionsKey = createStateSymbol("clientApiVersions");
+
+/**
+ * Add additional api versions that are possible for the client to use.
+ *
+ * @param context
+ * @param target Service namespace that has these additional api versions
+ * @param value Enum with the additional api versions
+ * @param scope
+ */
+export const $clientApiVersions: ClientApiVersionsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  value: Enum,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $clientApiVersions, clientApiVersionsKey, target, value, scope);
+};
+
+/**
+ * Get the explicit client api versions that are possible for the client to use denoted by `@clientApiVersions`
+ *
+ * @param context
+ * @param target
+ * @returns
+ */
+export function getExplicitClientApiVersions(
+  context: TCGCContext,
+  target: Namespace,
+): Enum | undefined {
+  return getScopedDecoratorData(context, clientApiVersionsKey, target);
+}
 export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,
   target: ModelProperty,

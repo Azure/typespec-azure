@@ -363,6 +363,20 @@ export const $lib = createTypeSpecLibrary({
         default: "File body is not supported for HTTP operations. Please use bytes instead.",
       },
     },
+    "require-versioned-service": {
+      severity: "warning",
+      description: "Require a versioned service to use this decorator",
+      messages: {
+        default: paramMessage`Service "${"serviceName"}" must be versioned if you want to apply the "${"decoratorName"}" decorator`,
+      },
+    },
+    "missing-service-versions": {
+      severity: "warning",
+      description: "Missing service versions",
+      messages: {
+        default: paramMessage`The @clientApiVersions decorator is missing one or more versions defined in ${"serviceName"}. Client API must support all service versions to ensure compatibility. Missing versions: ${"missingVersions"}. Please update the client API to support all required service versions.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
