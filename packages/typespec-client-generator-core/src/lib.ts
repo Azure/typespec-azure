@@ -318,6 +318,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
       },
     },
+    "invalid-alternate-type": {
+      severity: "error",
+      messages: {
+        default: paramMessage`@alternateType only supports scalar types, scalar array or unknown as the alternate type.`,
+      },
+    },
     "invalid-initialized-by": {
       severity: "error",
       messages: {

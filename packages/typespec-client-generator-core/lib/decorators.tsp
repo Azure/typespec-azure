@@ -551,9 +551,11 @@ extern dec clientNamespace(
 
 /**
  * Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ * When the alternate type is a `scalar array`, it can must be applied to a model property of type `scalar array`.
+ * When the alternate type is `unknown`, the source type can be a scalar type or a model property of type `scalar`.
  *
- * @param source The source type you want to apply the alternate type to. Only scalar types are supported.
- * @param alternate The alternate type you want applied to the target. Only scalar types are supported.
+ * @param source The source type to which the alternate type will be applied. Supported types include scalar types and scalar array.
+ * @param alternate The alternate type to apply to the target. Supported types include scalar types, scalar array or `unknown`.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
@@ -572,8 +574,22 @@ extern dec clientNamespace(
  * ```typespec
  * op test(@param @alternateType(string) date: utcDateTime): void;
  * ```
+ * @example
+ * ```typespec
+ * model Test {
+ * @alternateType(unknown)
+ * thumbprint?: string;
+ *
+ * @alternateType(AzureLocation[], "csharp")
+ * locations: string[];
+ * }
+} * ```
  */
-extern dec alternateType(source: ModelProperty | Scalar, alternate: Scalar, scope?: valueof string);
+extern dec alternateType(
+  source: ModelProperty | Scalar,
+  alternate: Scalar | Model | unknown,
+  scope?: valueof string
+);
 
 /**
  * To define the client scope of an operation.
