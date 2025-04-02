@@ -26,6 +26,7 @@
     },
     "AzureEntityResource": {
       "type": "object",
+      "title": "Entity Resource",
       "description": "The resource model definition for an Azure Resource Manager resource with an etag.",
       "properties": {
         "etag": {
@@ -180,6 +181,7 @@
     },
     "ErrorResponse": {
       "type": "object",
+      "title": "Error response",
       "description": "Common error response for all Azure Resource Manager APIs to return error details for failed operations.",
       "properties": {
         "error": {
@@ -246,6 +248,7 @@
     },
     "Operation": {
       "type": "object",
+      "title": "REST API Operation",
       "description": "Details of a REST API operation, returned from the Resource Provider Operations API",
       "properties": {
         "name": {
@@ -436,6 +439,7 @@
     },
     "ProxyResource": {
       "type": "object",
+      "title": "Proxy Resource",
       "description": "The resource model definition for a Azure Resource Manager proxy resource. It will not have tags and a location",
       "allOf": [
         {
@@ -445,6 +449,7 @@
     },
     "Resource": {
       "type": "object",
+      "title": "Resource",
       "description": "Common fields that are returned in the response for all Azure Resource Manager resources",
       "properties": {
         "id": {
@@ -587,6 +592,7 @@
     },
     "TrackedResource": {
       "type": "object",
+      "title": "Tracked Resource",
       "description": "The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'",
       "properties": {
         "tags": {

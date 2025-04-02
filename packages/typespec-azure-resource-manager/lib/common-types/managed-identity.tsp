@@ -5,6 +5,7 @@ namespace Azure.ResourceManager.CommonTypes;
 
 /** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests. */
 #deprecated "Do not use this model. Instead, use Record<UserAssignedIdentity | null> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger."
+@summary("User-Assigned Identities")
 @removed(Versions.v6)
 model UserAssignedIdentities is Record<UserAssignedIdentity | null>;
 
