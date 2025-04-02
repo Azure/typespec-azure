@@ -1,4 +1,4 @@
-import { createRule, Model, paramMessage } from "@typespec/compiler";
+import { createRule, Model, paramMessage, Union } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { createSdkPackage } from "../package.js";
 
@@ -8,7 +8,7 @@ export const noUnnamedTypesRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-unnamed-types",
   messages: {
-    default: paramMessage`Anonymous type detected. Define this type separately with a proper name to improve code readability and reusability.`,
+    default: paramMessage`Anonymous ${"type"} with generated name "${"generatedName"}" detected. Define this ${"type"} separately with a proper name to improve code readability and reusability.`,
   },
   create(context) {
     const tcgcContext = createTCGCContext(
@@ -24,7 +24,20 @@ export const noUnnamedTypesRule = createRule({
           context.reportDiagnostic({
             target: model,
             format: {
+              type: "model",
               generatedName: createdModel.name,
+            },
+          });
+        }
+      },
+      union: (union: Union) => {
+        const createdUnion = tcgcContext.__referencedTypeCache.get(union);
+        if (createdUnion && createdUnion.isGeneratedName) {
+          context.reportDiagnostic({
+            target: union,
+            format: {
+              type: "union",
+              generatedName: createdUnion.name,
             },
           });
         }
