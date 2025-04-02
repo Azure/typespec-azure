@@ -4,7 +4,7 @@ import "@typespec/spector";
 
 using Spector;
 
-@@scenario(Client.Structure.Service);
+@@`scenario`(Client.Structure.Service);
 @@scenarioDoc(Client.Structure.Service,
   """
     This is to show that if we don't do any customization. The client side should be able to call the api like

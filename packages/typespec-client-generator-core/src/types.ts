@@ -51,6 +51,7 @@ import {
   getAccessOverride,
   getAlternateType,
   getClientNamespace,
+  getExplicitClientApiVersions,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
@@ -1929,9 +1930,16 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     const [_, versionMap] = getVersions(context.program, client.service);
     if (versionMap && versionMap.getVersions()[0]) {
       // create sdk enum for versions enum
-      const sdkVersionsEnum = diagnostics.pipe(
-        getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
-      );
+      let sdkVersionsEnum: SdkEnumType;
+      const explicitApiVersions = getExplicitClientApiVersions(context, client.service);
+      if (explicitApiVersions) {
+        // add additional api versions to the enum
+        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
+      } else {
+        sdkVersionsEnum = diagnostics.pipe(
+          getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
+        );
+      }
       filterApiVersionsInEnum(context, client, sdkVersionsEnum);
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
