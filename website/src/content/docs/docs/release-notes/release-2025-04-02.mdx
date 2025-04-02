@@ -1,0 +1,73 @@
+---
+title: 0.54.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+:::danger
+TypeSpec core contains Breaking Changes
+:::
+
+<LinkCard
+  title="TypeSpec Core 1.0 Release Candidate"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2025-04-02"
+/>
+
+## Breaking Changes
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2466](https://github.com/Azure/typespec-azure/pull/2466) Reorder clients, enums, models and unions.
+- [#2456](https://github.com/Azure/typespec-azure/pull/2456) Remove deprecated staffs:
+  1. `UsageFlags.Error` -> `UsageFlags.Exception`
+  2. `SdkClientType.initialization` -> `SdkClientType.clientInitialization.paramters`
+  3. `SdkPathParameter.urlEncode` -> `SdkPathParameter.allowReserved`
+  4. `SdkClientAccessor` -> `SdkClientType.parent`/`SdkClientType.children`
+  5. `SdkExampleBase.description` -> `SdkExampleBase.doc`
+- [#2447](https://github.com/Azure/typespec-azure/pull/2447) Split emitter options into `UnbrandedSdkEmitterOptions` and `BrandedSdkEmitterOptions`. Each flag will be exported individually, so emitters can choose which flags to support
+- [#2421](https://github.com/Azure/typespec-azure/pull/2421) Removed `package-name` and `flatten-union-as-enum` from `SdkEmitterOptions`, `clientNamespace` from `SdkClientType`/`SdkNullableType`/`SdkEnumType`/`SdkUnionType`/`SdkModelType`, `packageName` from `TCGCContext`, `nameSpace` from `SdkClientType`, `name`/`rootNamespace` from `SdkPackage` and `getClientNamespaceString` function. All these things should have been deprecated in previous version or not used by any emitters.
+
+## Features
+
+### @azure-tools/typespec-autorest
+
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### @azure-tools/typespec-azure-core
+
+- [#2396](https://github.com/Azure/typespec-azure/pull/2396) add internal scalar type `parameterizedNextLink` to handle next links that don't meet guidelines
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#2470](https://github.com/Azure/typespec-azure/pull/2470) Relax `@enforceConstraint` to allow validation to pass when a resource is identified using the `@legacy.armCustomResource` decorator.
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2466](https://github.com/Azure/typespec-azure/pull/2466) Report warning for multiple `@service` and fall back to the first one.
+- [#2441](https://github.com/Azure/typespec-azure/pull/2441) add `@deserializeEmptyStringAsNull` decorator
+- [#2368](https://github.com/Azure/typespec-azure/pull/2368) Add `@clientApiVersions` decorator to specify all API versions you would like to expose in the client API versions enum.
+- [#2416](https://github.com/Azure/typespec-azure/pull/2416) Simplely handle duplication for template instance.
+- [#2412](https://github.com/Azure/typespec-azure/pull/2412) Support re-injected query parameter for next link.
+- [#2414](https://github.com/Azure/typespec-azure/pull/2414) Remove support for old multipart format
+- [#2469](https://github.com/Azure/typespec-azure/pull/2469) add `@responseAsBool` decorator
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#2459](https://github.com/Azure/typespec-azure/pull/2459) Fix doc on HttpPart properties not being carried to `formData` parameter
+- [#2464](https://github.com/Azure/typespec-azure/pull/2464) Fix multipart not applying `x-ms-client-name` when using an explicit part name different from the property name
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2480](https://github.com/Azure/typespec-azure/pull/2480) Consider method parameter model when generating name for anonymous model.
+- [#2439](https://github.com/Azure/typespec-azure/pull/2439) Resolve generated name for anonymous model conflict with user-defined type name.
+- [#2471](https://github.com/Azure/typespec-azure/pull/2471) Change diagnostic target for `no-corresponding-method-param` error.
+- [#2471](https://github.com/Azure/typespec-azure/pull/2471) Change default endpoint's type to `url` and `allowReserved` to `true`.
+- [#2436](https://github.com/Azure/typespec-azure/pull/2436) Remove duplicate line for build-in license info.
+- [#2411](https://github.com/Azure/typespec-azure/pull/2411) Do not add encode for bytes according to content type if it has user defined encode.
+- [#2452](https://github.com/Azure/typespec-azure/pull/2452) Downgrade override params mismatch to a warning instead of an error
+- [#2421](https://github.com/Azure/typespec-azure/pull/2421) Rollback change of `SdkApiVersionParameter`.
