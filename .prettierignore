@@ -82,3 +82,6 @@ CODEOWNERS
 
 # http-client-csharp
 tspCodeModel.json
+
+# Auto generated version list
+website/playground-versions.json

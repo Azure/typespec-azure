@@ -11,7 +11,9 @@ console.log("Current versions:", current);
 async function getMajorMinorVersion() {
   const version = JSON.parse(
     (
-      await readFile(resolve(import.meta.dirname, "../../packages/compiler/package.json"))
+      await readFile(
+        resolve(import.meta.dirname, "../../packages/typespec-azure-core/package.json"),
+      )
     ).toString(),
   ).version;
   const [major, minor] = version.split(".");
