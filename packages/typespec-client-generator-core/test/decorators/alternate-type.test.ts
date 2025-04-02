@@ -168,8 +168,10 @@ it.each([
   ["string[]", "utcDateTime[]"],
   ["int64[]", "utcDateTime[]"],
   ["duration[]", "string[]"],
-])("supports both source type and alternate type are scalar array", async (source: string, alternate: string) => {
-  await runner.compile(`
+])(
+  "supports both source type and alternate type are scalar array",
+  async (source: string, alternate: string) => {
+    await runner.compile(`
       @service
       namespace MyService {
         model Model1 {
@@ -184,16 +186,17 @@ it.each([
       };
     `);
 
-  const models = getAllModels(runner.context);
-  const model1 = models[0];
-  strictEqual(model1.kind, "model");
-  const childProperty1 = model1.properties[0];
-  const childProperty2 = model1.properties[1];
-  const type1 = childProperty1.type as SdkArrayType;
-  const type2 = childProperty2.type as SdkArrayType;
-  strictEqual(type1.kind, type2.kind);
-  strictEqual(type1.valueType.kind, type2.valueType.kind);
-});
+    const models = getAllModels(runner.context);
+    const model1 = models[0];
+    strictEqual(model1.kind, "model");
+    const childProperty1 = model1.properties[0];
+    const childProperty2 = model1.properties[1];
+    const type1 = childProperty1.type as SdkArrayType;
+    const type2 = childProperty2.type as SdkArrayType;
+    strictEqual(type1.kind, type2.kind);
+    strictEqual(type1.valueType.kind, type2.valueType.kind);
+  },
+);
 
 it("should not support source type is none-scalar array when alternate type is scalar array", async () => {
   const diagnostics = await runner.diagnose(`
