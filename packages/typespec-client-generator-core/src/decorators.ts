@@ -960,21 +960,45 @@ export const $alternateType: AlternateTypeDecorator = (
   scope?: LanguageScopes,
 ) => {
   let invalidAlternate = true;
+  let invalidSource = true;
 
+  // if alternate type is unknown, source type must be a scalar
   if (alternate.kind === "Intrinsic" && alternate.name === "unknown") {
     invalidAlternate = false;
+    if (
+      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
+      source.kind === "Scalar"
+    ) {
+      invalidSource = false;
+    }
   }
 
+  // if alternate type is array, source type must be array
   if (
     alternate.kind === "Model" &&
     alternate.name === "Array" &&
     alternate.indexer?.value.kind === "Scalar"
   ) {
     invalidAlternate = false;
+    if (
+      source.kind === "ModelProperty" &&
+      source.type.kind === "Model" &&
+      source.type.name === "Array" &&
+      source.type.indexer?.value.kind === "Scalar"
+    ) {
+      invalidSource = false;
+    }
   }
 
+  // if alternate type is scalar, source type must be scalar
   if (alternate.kind === "Scalar") {
     invalidAlternate = false;
+    if (
+      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
+      source.kind === "Scalar"
+    ) {
+      invalidSource = false;
+    }
   }
 
   if (invalidAlternate) {
@@ -984,37 +1008,6 @@ export const $alternateType: AlternateTypeDecorator = (
       target: alternate,
     });
     return;
-  }
-
-  let invalidSource = true;
-
-  if (alternate.kind === "Intrinsic" && alternate.name === "unknown") {
-    if (
-      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
-      source.kind === "Scalar"
-    ) {
-      invalidSource = false;
-    }
-  }
-
-  if (alternate.kind === "Scalar") {
-    if (
-      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
-      source.kind === "Scalar"
-    ) {
-      invalidSource = false;
-    }
-  }
-
-  if (alternate.kind === "Model") {
-    if (
-      source.kind === "ModelProperty" &&
-      source.type.kind === "Model" &&
-      source.type.name === "Array" &&
-      source.type.indexer?.value.kind === "Scalar"
-    ) {
-      invalidSource = false;
-    }
   }
 
   if (invalidSource) {

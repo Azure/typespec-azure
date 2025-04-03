@@ -198,6 +198,24 @@ it.each([
   },
 );
 
+it("should not support source type is scalar when alternate type is scalar array", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model Model1 {
+        prop: string;
+      }
+      @@alternateType(Model1.prop, string[]);
+      
+      @route("/func1")
+      op func1(@body body: Model1): void;
+    };
+  `);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
+  });
+});
+
 it("should not support source type is none-scalar array when alternate type is scalar array", async () => {
   const diagnostics = await runner.diagnose(`
     @service
