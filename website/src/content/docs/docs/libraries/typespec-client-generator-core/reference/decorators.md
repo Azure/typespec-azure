@@ -188,7 +188,7 @@ scalar storageDateTime extends utcDataTime;
 op test(@param @alternateType(string) date: utcDateTime): void;
 ```
 
-````typespec
+```typespec
 model Test {
   @alternateType(unknown)
   thumbprint?: string;
@@ -196,17 +196,17 @@ model Test {
   @alternateType(AzureLocation[], "csharp")
   locations: string[];
 }
-} * ```
-
+```
 
 ### `@apiVersion` {#@Azure.ClientGenerator.Core.apiVersion}
 
 Use to override default assumptions on whether a parameter is an api-version parameter or not.
 By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
 a client parameter, we will also elevate this parameter up onto the client.
+
 ```typespec
 @Azure.ClientGenerator.Core.apiVersion(value?: valueof boolean, scope?: valueof string)
-````
+```
 
 #### Target
 

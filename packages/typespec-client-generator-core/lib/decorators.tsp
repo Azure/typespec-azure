@@ -583,7 +583,7 @@ extern dec clientNamespace(
  *   @alternateType(AzureLocation[], "csharp")
  *   locations: string[];
  * }
-} * ```
+ * ```
  */
 extern dec alternateType(
   source: ModelProperty | Scalar,

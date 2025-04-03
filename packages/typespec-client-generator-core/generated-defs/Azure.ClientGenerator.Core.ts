@@ -572,7 +572,7 @@ export type ClientNamespaceDecorator = (
  *   @alternateType(AzureLocation[], "csharp")
  *   locations: string[];
  * }
- * } * ```
+ * ```
  */
 export type AlternateTypeDecorator = (
   context: DecoratorContext,
