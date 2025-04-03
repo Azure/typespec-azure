@@ -6,7 +6,7 @@ To define an Azure Resource Manager service, the first thing you will need to do
 
 ```typespec
 @armProviderNamespace
-@service({title: "<service name>", version: "<service version>"})
+@service(#{title: "<service name>", version: "<service version>"})
 namespace <mynamespace>;
 ```
 
@@ -14,10 +14,7 @@ For example:
 
 ```typespec
 @armProviderNamespace
-@service({
-  title: "Contoso User Service",
-  version: "2020-10-01-preview",
-})
+@service(#{ title: "Contoso User Service", version: "2020-10-01-preview" })
 @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Contoso.Users;
@@ -32,8 +29,8 @@ Just after the `namespace` declaration, you will also need to include a few `usi
 For example, these lines pull in symbols from the `@typespec/rest` and `@azure-tools/typespec-azure-resource-manager`:
 
 ```
-using TypeSpec.Http;
-using TypeSpec.Rest;
+using Http;
+using Rest;
 using Azure.ResourceManager;
 ```
 

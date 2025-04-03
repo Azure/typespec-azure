@@ -5,12 +5,12 @@ import { openApiFor } from "./test-host.js";
 it("supports emitting multiple services", async () => {
   const { Service, Client } = await openApiFor(
     `
-      @service({ title: "My service" })
+      @service(#{ title: "My service" })
       namespace Service {
         op get(): int32;
       }
 
-      @service({ title: "Other service" })
+      @service(#{ title: "Other service" })
       namespace Client {
         @route("other") op other(): string;
       }
@@ -23,6 +23,7 @@ it("supports emitting multiple services", async () => {
       get: {
         operationId: "Get",
         parameters: [],
+        produces: ["text/plain"],
         responses: {
           200: {
             description: "The request has succeeded.",
@@ -38,6 +39,7 @@ it("supports emitting multiple services", async () => {
       get: {
         operationId: "Other",
         parameters: [],
+        produces: ["text/plain"],
         responses: {
           200: {
             description: "The request has succeeded.",

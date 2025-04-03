@@ -1,9 +1,7 @@
-using TypeSpec.Http;
-using TypeSpec.OpenAPI;
+using Http;
+using OpenAPI;
 
-@service({
-  title: "App Config Service",
-})
+@service(#{ title: "App Config Service" })
 namespace AppConfig;
 
 @doc("Used for /kv endpoints (key in query)")

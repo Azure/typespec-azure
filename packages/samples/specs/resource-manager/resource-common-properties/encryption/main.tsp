@@ -4,16 +4,14 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 using Azure.Core;
 
 @armProviderNamespace("Contoso.CustomerManagedKeyExample")
-@service({
-  title: "Contoso.CustomerManagedKeyExample",
-})
+@service(#{ title: "Contoso.CustomerManagedKeyExample" })
 @versioned(Versions)
 @doc("An example of using the Customer Managed Key Encryption properties in a resource type.")
 namespace Microsoft.UpdateTests;
@@ -41,11 +39,11 @@ model WidgetResource is TrackedResource<WidgetResourceProperties> {
 @doc("Widget Resource Properties.")
 model WidgetResourceProperties {
   @doc("The widget color.")
-  @visibility("create", "read")
+  @visibility(Lifecycle.Create, Lifecycle.Read)
   color: string;
 
   /** Provisioning state */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
   ...EncryptionProperty;

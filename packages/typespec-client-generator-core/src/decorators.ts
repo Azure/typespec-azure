@@ -1,7 +1,5 @@
 import {
-  AugmentDecoratorStatementNode,
   DecoratorContext,
-  DecoratorExpressionNode,
   DecoratorFunction,
   Enum,
   EnumMember,
@@ -9,38 +7,36 @@ import {
   Model,
   ModelProperty,
   Namespace,
-  Node,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   getDiscriminator,
   getNamespaceFullName,
-  getProjectedName,
   ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
-  listServices,
-  projectProgram,
 } from "@typespec/compiler";
-import { buildVersionProjections, getVersions } from "@typespec/versioning";
+import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
+  ClientApiVersionsDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
+  DeserializeEmptyStringAsNullDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
+  ResponseAsBoolDecorator,
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
@@ -60,13 +56,14 @@ import {
   AllScopes,
   clientNameKey,
   clientNamespaceKey,
-  getValidApiVersion,
-  isAzureCoreTspModel,
+  findRootSourceProperty,
+  listAllNamespaces,
+  listAllUserDefinedNamespaces,
   negationScopesKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { getLibraryName, listAllServiceNamespaces } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -113,13 +110,20 @@ function setScopedDecoratorData(
   value: unknown,
   scope?: LanguageScopes,
 ) {
+  const targetEntry = context.program.stateMap(key).get(target);
   // if no scope specified, then set with the new value
   if (!scope) {
-    context.program.stateMap(key).set(target, Object.fromEntries([[AllScopes, value]]));
+    if (targetEntry && targetEntry[AllScopes]) {
+      targetEntry[AllScopes] = value;
+    } else {
+      const newObject = Object.fromEntries([[AllScopes, value]]);
+      context.program
+        .stateMap(key)
+        .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+    }
     return;
   }
 
-  const targetEntry = context.program.stateMap(key).get(target);
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
@@ -203,13 +207,6 @@ export const $client: ClientDecorator = (
     explicitService?.kind === "Namespace"
       ? explicitService
       : (findClientService(context.program, target) ?? (target as any));
-  if (!name.endsWith("Client")) {
-    reportDiagnostic(context.program, {
-      code: "client-name",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-  }
 
   if (!isService(context.program, service)) {
     reportDiagnostic(context.program, {
@@ -288,70 +285,6 @@ function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
     listScopedDecoratorData(context, operationGroupKey).length > 0
   );
 }
-
-function serviceVersioningProjection(context: TCGCContext, client: SdkClient) {
-  if (!context.__service_projection) {
-    context.__service_projection = new Map();
-  }
-
-  let projectedService;
-  let projectedProgram;
-
-  if (context.__service_projection.has(client.service)) {
-    [projectedService, projectedProgram] = context.__service_projection.get(client.service)!;
-  } else {
-    const allApiVersions = getVersions(context.program, client.service)[1]
-      ?.getVersions()
-      .map((x) => x.value);
-    if (!allApiVersions) return;
-    const apiVersion = getValidApiVersion(context, allApiVersions);
-    if (apiVersion === undefined) return;
-    const versionProjections = buildVersionProjections(context.program, client.service).filter(
-      (v) => apiVersion === v.version,
-    );
-    if (versionProjections.length !== 1)
-      throw new Error("Version projects should only contain one element");
-    const projectedVersion = versionProjections[0];
-    if (projectedVersion.projections.length > 0) {
-      // TODO: THIS NEED TO BE MIGRATED BY MARCH 2024 release.
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      projectedProgram = context.program = projectProgram(
-        context.originalProgram,
-        projectedVersion.projections,
-      );
-    }
-    projectedService = projectedProgram
-      ? (projectedProgram.projector.projectedTypes.get(client.service) as Namespace)
-      : client.service;
-    context.__service_projection.set(client.service, [projectedService, projectedProgram]);
-  }
-
-  if (client.service !== client.type) {
-    client.type = projectedProgram
-      ? (projectedProgram.projector.projectedTypes.get(client.type) as Interface)
-      : client.type;
-  } else {
-    client.type = projectedService;
-  }
-  client.service = projectedService;
-}
-
-function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): SdkClient[] {
-  if (context.apiVersion !== "all") {
-    const projectedClients = [];
-    for (const client of clients) {
-      const projectedClient = { ...client };
-      serviceVersioningProjection(context, projectedClient);
-      // filter client not existed in the current version
-      if ((projectedClient.type as Type).kind !== "Intrinsic") {
-        projectedClients.push(projectedClient);
-      }
-    }
-    return projectedClients;
-  }
-  return clients;
-}
-
 /**
  * List all the clients.
  *
@@ -360,39 +293,59 @@ function getClientsWithVersioning(context: TCGCContext, clients: SdkClient[]): S
  */
 export function listClients(context: TCGCContext): SdkClient[] {
   if (context.__rawClients) return context.__rawClients;
+  const namespaces: Namespace[] = listAllNamespaces(context, context.getMutatedGlobalNamespace());
 
-  const explicitClients = [...listScopedDecoratorData(context, clientKey)];
+  const explicitClients = [];
+  for (const ns of namespaces) {
+    if (getScopedDecoratorData(context, clientKey, ns)) {
+      explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
+    }
+    for (const i of ns.interfaces.values()) {
+      if (getScopedDecoratorData(context, clientKey, i)) {
+        explicitClients.push(getScopedDecoratorData(context, clientKey, i));
+      }
+    }
+  }
   if (explicitClients.length > 0) {
-    context.__rawClients = getClientsWithVersioning(context, explicitClients);
+    context.__rawClients = explicitClients;
     if (context.__rawClients.some((client) => isArm(client.service))) {
       context.arm = true;
     }
     return context.__rawClients;
   }
 
-  // if there is no explicit client, we will treat namespaces with service decorator as clients
-  const services = listServices(context.program);
-
-  const clients: SdkClient[] = services.map((service) => {
-    let originalName = service.type.name;
-    const clientNameOverride = getClientNameOverride(context, service.type);
+  // if there is no explicit client, we will treat the first namespace with service decorator as client
+  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
+  if (serviceNamespaces.length >= 1) {
+    const service = serviceNamespaces.shift()!;
+    serviceNamespaces.map((ns) => {
+      reportDiagnostic(context.program, {
+        code: "multiple-services",
+        target: ns,
+      });
+    });
+    let originalName = service.name;
+    const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
       originalName = clientNameOverride;
     } else {
-      originalName = getProjectedName(context.program, service.type, "client") ?? service.type.name;
+      originalName = service.name;
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-    context.arm = isArm(service.type);
-    return {
-      kind: "SdkClient",
-      name: clientName,
-      service: service.type,
-      type: service.type,
-      crossLanguageDefinitionId: getNamespaceFullName(service.type),
-    };
-  });
+    context.arm = isArm(service);
+    context.__rawClients = [
+      {
+        kind: "SdkClient",
+        name: clientName,
+        service: service,
+        type: service,
+        crossLanguageDefinitionId: getNamespaceFullName(service),
+      },
+    ];
+  } else {
+    context.__rawClients = [];
+  }
 
-  context.__rawClients = getClientsWithVersioning(context, clients);
   return context.__rawClients;
 }
 
@@ -575,27 +528,30 @@ export function listOperationGroups(
   ignoreHierarchy = false,
 ): SdkOperationGroup[] {
   const groups: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = [];
 
   if (group.type.kind === "Interface") {
     return groups;
   }
 
   for (const subItem of group.type.namespaces.values()) {
-    track(getOperationGroup(context, subItem)!);
+    const og = getOperationGroup(context, subItem);
+    if (og) {
+      queue.push(og);
+    }
   }
   for (const subItem of group.type.interfaces.values()) {
-    track(getOperationGroup(context, subItem)!);
+    const og = getOperationGroup(context, subItem);
+    if (og) {
+      queue.push(og);
+    }
   }
 
-  function track(item: SdkOperationGroup | undefined) {
-    if (!item) {
-      return;
-    }
-    groups.push(item);
-    if (ignoreHierarchy) {
-      for (const subItem of item.subOperationGroups ?? []) {
-        track(subItem);
-      }
+  while (queue.length > 0) {
+    const operationGroup = queue.shift()!;
+    groups.push(operationGroup);
+    if (ignoreHierarchy && operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
     }
   }
 
@@ -757,13 +713,13 @@ const accessKey = createStateSymbol("access");
 
 export const $access: AccessDecorator = (
   context: DecoratorContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
   if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
     reportDiagnostic(context.program, {
-      code: "access",
+      code: "invalid-access",
       format: {},
       target: entity,
     });
@@ -774,20 +730,23 @@ export const $access: AccessDecorator = (
 
 export function getAccessOverride(
   context: TCGCContext,
-  entity: Model | Enum | Operation | Union | Namespace,
+  entity: Model | Enum | Operation | Union | Namespace | ModelProperty,
 ): AccessFlags | undefined {
   const accessOverride = getScopedDecoratorData(context, accessKey, entity);
 
-  if (!accessOverride && entity.namespace) {
+  if (!accessOverride && entity.kind !== "ModelProperty" && entity.namespace) {
     return getAccessOverride(context, entity.namespace);
   }
 
   return accessOverride;
 }
 
-export function getAccess(context: TCGCContext, entity: Model | Enum | Operation | Union) {
+export function getAccess(
+  context: TCGCContext,
+  entity: Model | Enum | Operation | Union | ModelProperty,
+) {
   const override = getAccessOverride(context, entity);
-  if (override || entity.kind === "Operation") {
+  if (override || entity.kind === "Operation" || entity.kind === "ModelProperty") {
     return override || "public";
   }
 
@@ -851,19 +810,20 @@ export const $clientName: ClientNameDecorator = (
   // workaround for current lack of functionality in compiler
   // https://github.com/microsoft/typespec/issues/2717
   if (entity.kind === "Model" || entity.kind === "Operation") {
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+    const target = context.decoratorTarget as Node;
+    if (target.kind === SyntaxKind.AugmentDecoratorStatement) {
       if (
-        ignoreDiagnostics(
-          context.program.checker.resolveTypeReference(
-            (context.decoratorTarget as AugmentDecoratorStatementNode).targetType,
-          ),
+        (
+          ignoreDiagnostics(
+            (context.program.checker as any).resolveTypeReference(target.targetType),
+          ) as any
         )?.node !== entity.node
       ) {
         return;
       }
     }
-    if ((context.decoratorTarget as Node).kind === SyntaxKind.DecoratorExpression) {
-      if ((context.decoratorTarget as DecoratorExpressionNode).parent !== entity.node) {
+    if (target.kind === SyntaxKind.DecoratorExpression) {
+      if (target.parent !== entity.node) {
         return;
       }
     }
@@ -901,20 +861,7 @@ function collectParams(
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
-        let sourceProp = value;
-        while (sourceProp.sourceProperty) {
-          sourceProp = sourceProp.sourceProperty;
-        }
-        if (sourceProp.model && !isAzureCoreTspModel(sourceProp.model)) {
-          params.push(value);
-        } else if (!sourceProp.model) {
-          params.push(value);
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(
-            `We are not counting "${sourceProp.name}" as part of a method parameter because it's been added by Azure.Core templates`,
-          );
-        }
+        params.push(findRootSourceProperty(value));
       }
     }
   });
@@ -948,14 +895,28 @@ export const $override = (
     a.name.localeCompare(b.name),
   );
 
-  // Check if the sorted parameter names arrays are equal
-  const parametersMatch =
-    originalParams.length === overrideParams.length &&
-    originalParams.every((value, index) => compareModelProperties(value, overrideParams[index]));
+  // Check if the sorted parameter names arrays are equal, omit optional parameters
+  let parametersMatch = true;
+  let index = 0;
+  for (const originalParam of originalParams) {
+    if (index > overrideParams.length - 1) {
+      parametersMatch = false;
+      break;
+    }
+    if (!compareModelProperties(originalParam, overrideParams[index])) {
+      if (!originalParam.optional) {
+        parametersMatch = false;
+        break;
+      } else {
+        continue;
+      }
+    }
+    index++;
+  }
 
   if (!parametersMatch) {
     reportDiagnostic(context.program, {
-      code: "override-method-parameters-mismatch",
+      code: "override-parameters-mismatch",
       target: context.decoratorTarget,
       format: {
         methodName: original.name,
@@ -963,7 +924,6 @@ export const $override = (
         overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
       },
     });
-    return;
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
@@ -1208,12 +1168,60 @@ export const $clientNamespace: ClientNamespaceDecorator = (
   setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
 };
 
+/**
+ * Find the shortest namespace that overlaps with the override string.
+ * @param override
+ * @param userDefinedNamespaces
+ * @returns
+ */
+function findShortestNamespaceOverlap(
+  override: string,
+  userDefinedNamespaces: Namespace[],
+): Namespace | undefined {
+  let shortestNamespace: Namespace | undefined = undefined;
+
+  for (const namespace of userDefinedNamespaces) {
+    if (override.includes(namespace.name)) {
+      if (!shortestNamespace || namespace.name.length < shortestNamespace.name.length) {
+        shortestNamespace = namespace;
+      }
+    }
+  }
+
+  return shortestNamespace;
+}
+
+/**
+ * Returns the client namespace for a given entity. The order of operations is as follows:
+ *
+ * 1. If `@clientNamespace` is applied to the entity, this wins out.
+ *    a. If the `--namespace` flag is passed in during generation, we will replace the root of the client namespace with the flag.
+ * 2. If the `--namespace` flag is passed in, we treat that as the only namespace in the entire spec, and return that namespace.
+ * 3. We return the namespace of the entity retrieved from the original spec.
+ * @param context
+ * @param entity
+ * @returns
+ */
 export function getClientNamespace(
   context: TCGCContext,
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  if (override) return override;
+  if (override) {
+    // if `@clientNamespace` is applied to the entity, this wins out
+    const userDefinedNamespace = findShortestNamespaceOverlap(
+      override,
+      listAllUserDefinedNamespaces(context),
+    );
+    if (userDefinedNamespace && context.namespaceFlag) {
+      // we still make sure to replace the root of the client namespace with the flag (if the flag exists)
+      return override.replace(userDefinedNamespace.name, context.namespaceFlag);
+    }
+    return override;
+  }
+  if (context.namespaceFlag) {
+    return context.namespaceFlag;
+  }
   if (!entity.namespace) {
     return "";
   }
@@ -1272,4 +1280,91 @@ function IsInScope(context: TCGCContext, entity: Operation): boolean {
     return false;
   }
   return true;
+}
+
+const clientApiVersionsKey = createStateSymbol("clientApiVersions");
+
+/**
+ * Add additional api versions that are possible for the client to use.
+ *
+ * @param context
+ * @param target Service namespace that has these additional api versions
+ * @param value Enum with the additional api versions
+ * @param scope
+ */
+export const $clientApiVersions: ClientApiVersionsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  value: Enum,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $clientApiVersions, clientApiVersionsKey, target, value, scope);
+};
+
+/**
+ * Get the explicit client api versions that are possible for the client to use denoted by `@clientApiVersions`
+ *
+ * @param context
+ * @param target
+ * @returns
+ */
+export function getExplicitClientApiVersions(
+  context: TCGCContext,
+  target: Namespace,
+): Enum | undefined {
+  return getScopedDecoratorData(context, clientApiVersionsKey, target);
+}
+export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes,
+) => {
+  if (target.type.kind !== "Scalar") {
+    reportDiagnostic(context.program, {
+      code: "invalid-deserializeEmptyStringAsNull-target-type",
+      format: {},
+      target: target,
+    });
+    return;
+  }
+
+  if (target.type.name !== "string") {
+    let scalarType = target.type as Scalar;
+    while (scalarType.baseScalar !== undefined) {
+      scalarType = scalarType.baseScalar;
+    }
+
+    if (scalarType.name !== "string") {
+      reportDiagnostic(context.program, {
+        code: "invalid-deserializeEmptyStringAsNull-target-type",
+        format: {},
+        target: target,
+      });
+      return;
+    }
+  }
+};
+
+const responseAsBoolKey = createStateSymbol("responseAsBool");
+
+export const $responseAsBool: ResponseAsBoolDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  if (!target.decorators.some((d) => d.definition?.name === "@head")) {
+    reportDiagnostic(context.program, {
+      code: "non-head-bool-response-decorator",
+      format: {
+        operationName: target.name,
+      },
+      target: target,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $responseAsBool, responseAsBoolKey, target, true, scope);
+};
+
+export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
+  return getScopedDecoratorData(context, responseAsBoolKey, target);
 }

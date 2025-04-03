@@ -1,5 +1,152 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.54.0
+
+### Breaking Changes
+
+- [#2466](https://github.com/Azure/typespec-azure/pull/2466) Reorder clients, enums, models and unions.
+- [#2456](https://github.com/Azure/typespec-azure/pull/2456) Remove deprecated staffs:
+  1. `UsageFlags.Error` -> `UsageFlags.Exception`
+  2. `SdkClientType.initialization` -> `SdkClientType.clientInitialization.paramters`
+  3. `SdkPathParameter.urlEncode` -> `SdkPathParameter.allowReserved`
+  4. `SdkClientAccessor` -> `SdkClientType.parent`/`SdkClientType.children`
+  5. `SdkExampleBase.description` -> `SdkExampleBase.doc`
+- [#2447](https://github.com/Azure/typespec-azure/pull/2447) Split emitter options into `UnbrandedSdkEmitterOptions` and `BrandedSdkEmitterOptions`. Each flag will be exported individually, so emitters can choose which flags to support
+- [#2421](https://github.com/Azure/typespec-azure/pull/2421) Removed `package-name` and `flatten-union-as-enum` from `SdkEmitterOptions`, `clientNamespace` from `SdkClientType`/`SdkNullableType`/`SdkEnumType`/`SdkUnionType`/`SdkModelType`, `packageName` from `TCGCContext`, `nameSpace` from `SdkClientType`, `name`/`rootNamespace` from `SdkPackage` and `getClientNamespaceString` function. All these things should have been deprecated in previous version or not used by any emitters.
+
+### Features
+
+- [#2466](https://github.com/Azure/typespec-azure/pull/2466) Report warning for multiple `@service` and fall back to the first one.
+- [#2441](https://github.com/Azure/typespec-azure/pull/2441) add `@deserializeEmptyStringAsNull` decorator
+- [#2368](https://github.com/Azure/typespec-azure/pull/2368) Add `@clientApiVersions` decorator to specify all API versions you would like to expose in the client API versions enum.
+- [#2416](https://github.com/Azure/typespec-azure/pull/2416) Simplely handle duplication for template instance.
+- [#2412](https://github.com/Azure/typespec-azure/pull/2412) Support re-injected query parameter for next link.
+- [#2414](https://github.com/Azure/typespec-azure/pull/2414) Remove support for old multipart format
+- [#2469](https://github.com/Azure/typespec-azure/pull/2469) add `@responseAsBool` decorator
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2480](https://github.com/Azure/typespec-azure/pull/2480) Consider method parameter model when generating name for anonymous model.
+- [#2439](https://github.com/Azure/typespec-azure/pull/2439) Resolve generated name for anonymous model conflict with user-defined type name.
+- [#2471](https://github.com/Azure/typespec-azure/pull/2471) Change diagnostic target for `no-corresponding-method-param` error.
+- [#2471](https://github.com/Azure/typespec-azure/pull/2471) Change default endpoint's type to `url` and `allowReserved` to `true`.
+- [#2436](https://github.com/Azure/typespec-azure/pull/2436) Remove duplicate line for build-in license info.
+- [#2411](https://github.com/Azure/typespec-azure/pull/2411) Do not add encode for bytes according to content type if it has user defined encode.
+- [#2452](https://github.com/Azure/typespec-azure/pull/2452) Downgrade override params mismatch to a warning instead of an error
+- [#2421](https://github.com/Azure/typespec-azure/pull/2421) Rollback change of `SdkApiVersionParameter`.
+
+
+## 0.53.1
+
+### Bug Fixes
+
+- [#2425](https://github.com/Azure/typespec-azure/pull/2425) Rollback change of `SdkApiVersionParameter`.
+- [#2425](https://github.com/Azure/typespec-azure/pull/2425) Removed `package-name` and `flatten-union-as-enum` from `SdkEmitterOptions`, `clientNamespace` from `SdkClientType`/`SdkNullableType`/`SdkEnumType`/`SdkUnionType`/`SdkModelType`, `packageName` from `TCGCContext`, `nameSpace` from `SdkClientType`, `name`/`rootNamespace` from `SdkPackage` and `getClientNamespaceString` function. All these things should have been deprecated in previous version or not used by any emitters.
+
+
+## 0.53.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Deprecations
+
+- [#2344](https://github.com/Azure/typespec-azure/pull/2344) Remove unused public `listSubClients` to avoid confusion with new internal utils function
+- [#2216](https://github.com/Azure/typespec-azure/pull/2216) Deprecate `packageName` in `TCGCContext`. Use `namespaceFlag` instead.
+- [#2216](https://github.com/Azure/typespec-azure/pull/2216) Remove support for deprecated `examples-directory`
+
+### Features
+
+- [#2298](https://github.com/Azure/typespec-azure/pull/2298) Add `pageItemsSegments` for `SdkPagingServiceMetadata` to indicate how to get page items from response.
+- [#2390](https://github.com/Azure/typespec-azure/pull/2390) Specific scope decorator should always override all-scopes decorator.
+- [#2377](https://github.com/Azure/typespec-azure/pull/2377) Report diagnostic errors for discriminated unions.
+- [#2378](https://github.com/Azure/typespec-azure/pull/2378) Output auth related info in the yaml of code model.
+- [#2373](https://github.com/Azure/typespec-azure/pull/2373) Provide `listAllServiceNamespaces` to list service namespaces with versioning support.
+- [#2393](https://github.com/Azure/typespec-azure/pull/2393) Export `SdkEmitterOptionsSchema` for downstream emitter to add same options.
+- [#2353](https://github.com/Azure/typespec-azure/pull/2353) Add `licenseInfo` property of `LicenseInfo` type to `SdkPackage`, which is used to indicate the license for the package and could be configured by `license.name`, `license.company`, `license.link`, `license.header` and `license.description` in `tspconfig.yaml`.
+- [#2319](https://github.com/Azure/typespec-azure/pull/2319) Map all streaming request and response type to bytes.
+- [#2372](https://github.com/Azure/typespec-azure/pull/2372) Extend `@access` to also apply to `ModelProperty`s.
+- [#2326](https://github.com/Azure/typespec-azure/pull/2326) Add `namespace` flag to tcgc.
+- [#2216](https://github.com/Azure/typespec-azure/pull/2216) Refine all tcgc flags. Deprecate `flatten-union-as-enum` flag in `tspconfig.yaml`, and switch it to `flattenUnionAsEnum` in `CreateSdkContextOptions`.
+- [#2305](https://github.com/Azure/typespec-azure/pull/2305) Move from projections to mutators.
+- [#1208](https://github.com/Azure/typespec-azure/pull/1208) Add linter rulesets to TCGC, for both generic and language-specific linter rules.
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### Bug Fixes
+
+- [#2298](https://github.com/Azure/typespec-azure/pull/2298) Keep empty for `serializedName` if the body parmeter is not explicitly defined.
+- [#2319](https://github.com/Azure/typespec-azure/pull/2319) Consider extensible enum when doing example value mapping.
+- [#2319](https://github.com/Azure/typespec-azure/pull/2319) Do not consider template type when calculating discriminator and orphan types.
+- [#2351](https://github.com/Azure/typespec-azure/pull/2351) Support `@nextLink` along with `@header`.
+- [#2152](https://github.com/Azure/typespec-azure/pull/2152) move from `isApiVersionParam` -> SdkApiVersionType
+- [#2222](https://github.com/Azure/typespec-azure/pull/2222) Recurse over namespaces to get all user defined namespaces"
+- [#2344](https://github.com/Azure/typespec-azure/pull/2344) Set `.clientDefaultValue` for api-versions in triple-nested clients
+- [#2356](https://github.com/Azure/typespec-azure/pull/2356) Fix setting of api versions to ensure we aren't dropping versions throughout building up our api version graph
+- [#2402](https://github.com/Azure/typespec-azure/pull/2402) Ignore visibility when finding HTTP response type if it is anonymous model.
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+
+
+## 0.52.0
+
+### Features
+
+- [#2257](https://github.com/Azure/typespec-azure/pull/2257) Adds support for `@header` explode field
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+### Bug Fixes
+
+- [#2208](https://github.com/Azure/typespec-azure/pull/2208) Make sure to keep orphan models
+
+
+## 0.51.3
+
+### Bug Fixes
+
+- [#2252](https://github.com/Azure/typespec-azure/pull/2252) `isGeneratedName` always set to true only when it is the inner type of nullable union.
+- [#2252](https://github.com/Azure/typespec-azure/pull/2252) Remove parameter cache to retain HTTP metadata info for model property.
+
+
+## 0.51.2
+
+### Bug Fixes
+
+- [#2229](https://github.com/Azure/typespec-azure/pull/2229) Fix missing result segments of anonymous paged response with header.
+- [#2196](https://github.com/Azure/typespec-azure/pull/2196) Do not allow union with circular ref, change union name inside nullable type and do not take nullable type as non-body response.
+
+### Features
+
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Add `pagingMetadata.continuationTokenParameterSegments` and `pagingMetadata.continuationTokenResponseSegments` to `SdkPagingServiceMetadata` to indicate the mapping of continuation token parameter and response.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Make `SdkServiceResponseHeader` to be part of `SdkModelPropertyType`. Then it could contain the client related info.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Add `SdkPagingServiceMetadata` type to store all paging related info.
+- [#2220](https://github.com/Azure/typespec-azure/pull/2220) Add `crossLanguageDefinitionId` property for `SdkNullableType`.
+
+### Deprecations
+
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Deprecate `__raw_paged_metadata`, `nextLinkPath` and `nextLinkOperation`  in `SdkPagingServiceMethodOptions`. Use `pagingMetadata.__raw`, `pagingMetadata.nextLinkSegments` and `pagingMetadata.nextLinkOperation` instead.
+- [#2206](https://github.com/Azure/typespec-azure/pull/2206) Deprecate `resultPath` in `SdkMethodResponse`. Use `resultSegments` instead.
+- [#2219](https://github.com/Azure/typespec-azure/pull/2219) Deprecate `clientNamespace` property in `SdkClientType`, `SdkNullableType`, `SdkEnumType`, `SdkUnionType` and `SdkModelType`. Use `namespace` instead.
+
+### Breaking Changes
+
+- [#2217](https://github.com/Azure/typespec-azure/pull/2217) Remove `null` form union for `value` property type of `SdkConstantType`. It is a breaking change, but since no logic will come to `null` type, it shall have little impact.
+
+
+## 0.51.1
+
+### Bug Fixes
+
+- [#2211](https://github.com/Azure/typespec-azure/pull/2211) Make sure to keep orphan models
+
+
 ## 0.51.0
 
 ### Bug Fixes

@@ -24,7 +24,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
     namespace Microsoft.Foo;
@@ -44,7 +44,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
 
       @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")

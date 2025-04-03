@@ -3,9 +3,9 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "./traits.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core.Traits;
 using Azure.Core.Traits.Private;
 
@@ -179,13 +179,13 @@ model InnerError {
  */
 @omitKeyProperties
 model ResourceCreateOrReplaceModel<Resource extends TypeSpec.Reflection.Model>
-  is UpdateableProperties<DefaultKeyVisibility<Resource, "read">>;
+  is UpdateableProperties<DefaultKeyVisibility<Resource, Lifecycle.Read>>;
 
 /**
  * Collection of properties from a resource that are visible to create or update scopes.
  * @template Resource The type of the resource.
  */
-@withVisibility("create", "update")
+@withVisibility(Lifecycle.Create, Lifecycle.Update)
 model CreateableAndUpdateableProperties<Resource> {
   ...Resource;
 }
@@ -196,7 +196,10 @@ model CreateableAndUpdateableProperties<Resource> {
  */
 @omitKeyProperties
 model ResourceCreateOrUpdateModel<Resource>
-  is OptionalProperties<CreateableAndUpdateableProperties<DefaultKeyVisibility<Resource, "read">>>;
+  is OptionalProperties<CreateableAndUpdateableProperties<DefaultKeyVisibility<
+    Resource,
+    Lifecycle.Read
+  >>>;
 
 /**
  * Version of a model for an update operation which only includes updateable properties.
@@ -204,7 +207,7 @@ model ResourceCreateOrUpdateModel<Resource>
  */
 @omitKeyProperties
 model ResourceUpdateModel<Resource>
-  is OptionalProperties<UpdateableProperties<DefaultKeyVisibility<Resource, "read">>>;
+  is OptionalProperties<UpdateableProperties<DefaultKeyVisibility<Resource, Lifecycle.Read>>>;
 
 /**
  * A model containing the keys of the provided resource.

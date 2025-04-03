@@ -1022,6 +1022,33 @@ Enum describing allowed operation states.
 union Azure.Core.Foundations.OperationState
 ```
 
+## Azure.Core.Legacy
+
+### `parameterizedNextLink` {#Azure.Core.Legacy.parameterizedNextLink}
+
+A scalar type representing a next link that requires formatting with parameters to be used.
+
+```typespec
+scalar Azure.Core.Legacy.parameterizedNextLink
+```
+
+#### Examples
+
+```typespec
+model ListCertificateOptions {
+  includePending?: string;
+}
+model Certificate {
+  name: string;
+}
+model Page {
+  @items items: Certificate[];
+  @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
+    ListCertificateOptions.includePending
+  ]>;
+}
+```
+
 ## Azure.Core.Traits
 
 ### `ListQueryParametersTrait` {#Azure.Core.Traits.ListQueryParametersTrait}

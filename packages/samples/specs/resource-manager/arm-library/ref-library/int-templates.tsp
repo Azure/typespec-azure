@@ -4,9 +4,9 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint" "cuz"
@@ -25,7 +25,7 @@ model TestTrackedResource is TrackedResource<TestTrackedProperties> {
   @doc("The name of the Tracked resource.")
   @key("trackedResourceName")
   @segment("trackedResources")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @path
   name: string;
 }
@@ -40,10 +40,10 @@ interface TrackedOperations
 @doc("rp-specific properties for the resource with all envelope properties")
 model TestTrackedProperties {
   @doc("The status of the last operation performed on this resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
-  @visibility("create", "read")
+  @visibility(Lifecycle.Create, Lifecycle.Read)
   @doc("Name of the resource")
   displayName?: string = "default";
 }
@@ -90,7 +90,7 @@ interface TenantOperations
 @doc("rp-specific properties for the resource")
 model TestTenantProperties {
   @doc("The status of the last operation performed on this resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
   @doc("Name of the resource")
@@ -116,7 +116,7 @@ interface ExtensionOperations
 @doc("rp-specific properties for the resource")
 model TestExtensionProperties {
   @doc("The status of the last operation performed on this resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 
   @doc("Name of the resource")

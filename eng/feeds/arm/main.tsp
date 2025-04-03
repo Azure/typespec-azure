@@ -5,19 +5,19 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "./employee.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
-/** {{parameters.ServiceNamespace}} Resource Provider management API. */
+/** Microsoft.{{parameters.ServiceNamespace}} Resource Provider management API. */
 @armProviderNamespace
-@service({
-  title: "{{parameters.ServiceNamespace}} management service",
+@service(#{
+  title: "Microsoft.{{parameters.ServiceNamespace}} management service",
 })
 @versioned(Microsoft.Contoso.Versions)
-namespace {{parameters.ServiceNamespace}};
+namespace Microsoft.{{parameters.ServiceNamespace}};
 
 /** The available API versions. */
 enum Versions {

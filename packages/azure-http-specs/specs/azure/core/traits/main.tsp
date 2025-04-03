@@ -21,7 +21,7 @@ using Spector;
   }
 )
 @versioned(Versions)
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.trait", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.traits", "java")
 namespace _Specs_.Azure.Core.Traits;
 
 @doc("Service versions")
@@ -44,7 +44,7 @@ alias RepeatableOperationsWithTraits = global.Azure.Core.ResourceOperations<Supp
 model User {
   @key
   @doc("The user's id.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: int32;
 
   @doc("The user's name.")

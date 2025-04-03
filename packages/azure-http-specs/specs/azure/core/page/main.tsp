@@ -34,7 +34,7 @@ enum Versions {
 model User {
   @key
   @doc("The user's id.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: int32;
 
   @doc("The user's name.")
@@ -51,7 +51,7 @@ model User {
 model UserOrder {
   @key
   @doc("The user's id.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: int32;
 
   @doc("The user's id.")
@@ -135,7 +135,7 @@ model ListItemInputBody {
   }
   ```
   """)
-@get
+@post
 op listWithParameters is global.Azure.Core.Foundations.Operation<
   ListItemInput,
   global.Azure.Core.Page<User>
@@ -180,14 +180,14 @@ op listWithCustomPageModel is global.Azure.Core.Foundations.Operation<{}, Custom
 @doc("First item.")
 model FirstItem {
   @doc("The id of the item.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   id: int32;
 }
 
 @doc("Second item.")
 model SecondItem {
   @doc("The name of the item.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 }
 

@@ -8,7 +8,7 @@ toc_max_heading_level: 3
 
 ### `@access` {#@Azure.ClientGenerator.Core.access}
 
-Override access for operations, models and enums.
+Override access for operations, models, enums and model property.
 When setting access for namespaces,
 the access info will be propagated to the models and operations defined in the namespace.
 If the model has an access override, the model override takes precedence.
@@ -21,6 +21,7 @@ parent models, discriminated sub models.
 The override access should not be narrow than the access calculated by operation,
 and different override access should not conflict with each other,
 otherwise a warning will be added to diagnostics list.
+Model property's access will default to public unless there is an override.
 
 ```typespec
 @Azure.ClientGenerator.Core.access(value: EnumMember, scope?: valueof string)
@@ -28,7 +29,7 @@ otherwise a warning will be added to diagnostics list.
 
 #### Target
 
-`Model | Operation | Enum | Union | Namespace`
+`ModelProperty | Model | Operation | Enum | Union | Namespace`
 
 #### Parameters
 
@@ -270,6 +271,51 @@ interface MyInterface {}
 interface MyInterface {}
 ```
 
+### `@clientApiVersions` {#@Azure.ClientGenerator.Core.clientApiVersions}
+
+Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
+This decorator is useful for extending the API version enum exposed by the client.
+It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
+
+```typespec
+@Azure.ClientGenerator.Core.clientApiVersions(value: Enum, scope?: valueof string)
+```
+
+#### Target
+
+`Namespace`
+
+#### Parameters
+
+| Name  | Type             | Description |
+| ----- | ---------------- | ----------- |
+| value | `Enum`           |             |
+| scope | `valueof string` |             |
+
+#### Examples
+
+```typespec
+// main.tsp
+@versioned(Versions)
+namespace Contoso {
+  enum Versions {
+    v4,
+    v5,
+  }
+}
+
+// client.tsp
+
+enum ClientApiVersions {
+  v1,
+  v2,
+  v3,
+  ...Contoso.Versions,
+}
+
+@@clientApiVersions(Contoso, ClientApiVersions);
+```
+
 ### `@clientInitialization` {#@Azure.ClientGenerator.Core.clientInitialization}
 
 Customize the client initialization way.
@@ -402,6 +448,39 @@ Whether you want to generate an operation as a convenient operation.
 ```typespec
 @convenientAPI(false)
 op test: void;
+```
+
+### `@deserializeEmptyStringAsNull` {#@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull}
+
+Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
+
+```typespec
+@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull(scope?: valueof string)
+```
+
+#### Target
+
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                            |
+| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+#### Examples
+
+```typespec
+
+model MyModel {
+  scalar stringlike extends string;
+
+  @deserializeEmptyStringAsNull
+  prop: string;
+
+  @deserializeEmptyStringAsNull
+  prop: stringlike;
+}
 ```
 
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
@@ -587,6 +666,32 @@ Whether you want to generate an operation as a protocol operation.
 ```typespec
 @protocolAPI(false)
 op test: void;
+```
+
+### `@responseAsBool` {#@Azure.ClientGenerator.Core.responseAsBool}
+
+Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+
+```typespec
+@Azure.ClientGenerator.Core.responseAsBool(scope?: valueof string)
+```
+
+#### Target
+
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description |
+| ----- | ---------------- | ----------- |
+| scope | `valueof string` |             |
+
+#### Examples
+
+```typespec
+@responseAsBool
+@head
+op headOperation(): void;
 ```
 
 ### `@scope` {#@Azure.ClientGenerator.Core.scope}
