@@ -962,7 +962,7 @@ export const $alternateType: AlternateTypeDecorator = (
   let invalidAlternate = true;
   let invalidSource = true;
 
-  // if alternate type is unknown, source type must be a scalar
+  // if alternate type is unknown, source type must be scalar
   if (alternate.kind === "Intrinsic" && alternate.name === "unknown") {
     invalidAlternate = false;
     if (
@@ -973,7 +973,7 @@ export const $alternateType: AlternateTypeDecorator = (
     }
   }
 
-  // if alternate type is array, source type must be array
+  // if alternate type is scalar array, source type must be scalar array
   if (
     alternate.kind === "Model" &&
     alternate.name === "Array" &&
