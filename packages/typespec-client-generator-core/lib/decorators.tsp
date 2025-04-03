@@ -551,7 +551,7 @@ extern dec clientNamespace(
 
 /**
  * Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
- * When the alternate type is a `scalar array`, it can must be applied to a model property of type `scalar array`.
+ * When the alternate type is a `scalar array`, the source type must be a model property of type `scalar array`.
  * When the alternate type is `unknown`, the source type can be a scalar type or a model property of type `scalar`.
  *
  * @param source The target to which the alternate type will be applied. Supported types include scalar types and model property.
