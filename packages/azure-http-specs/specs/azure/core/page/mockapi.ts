@@ -48,3 +48,44 @@ Scenarios.Azure_Core_Page_listWithCustomPageModel = passOnSuccess({
   response: { status: 200, body: json({ items: [validUser] }) },
   kind: "MockApiDefinition",
 });
+
+Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
+  {
+    // First page request
+    uri: "/azure/core/page/parameterized-next-link",
+    method: "get",
+    request: {
+      query: {
+        includePending: true,
+        select: "name",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [{ id: 1, name: "User1" }],
+        // Include the original query parameters in the nextLink
+        nextLink: "/azure/core/page/with-parameterized-next-link?select=name",
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // Follow-up page request
+    uri: "/azure/core/page/with-parameterized-next-link",
+    method: "get",
+    request: {
+      query: {
+        includePending: true,
+        select: "name",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [{ id: 2, name: "User2" }],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
