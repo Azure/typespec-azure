@@ -48,7 +48,7 @@ model ParamAliasClientOptions {
     name: "test-name-value"
   });
   
-  client.withQuery("some-id");  // No need to pass name here
+  client.withQuery(id: "some-id");  // No need to pass name here
   client.withBody({ name: "test-name" });  // No need to pass name here
   ```
   """)
@@ -59,7 +59,7 @@ model ParamAliasClientOptions {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(HeaderParamClientOptions)
-interface HeaderParamClient {
+interface HeaderParam {
   withQuery is Service.HeaderParam.withQuery;
   withBody is Service.HeaderParam.withBody;
 }
@@ -79,7 +79,7 @@ interface HeaderParamClient {
     region: "us-west"
   });
   
-  client.withQuery("some-id");  // No need to pass name or region here
+  client.withQuery(id: "some-id");  // No need to pass name or region here
   client.withBody({ name: "test-name" });  // No need to pass name or region here
   ```
   """)
@@ -89,7 +89,7 @@ interface HeaderParamClient {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MultipleParamsClientOptions)
-interface MultipleParamsClient {
+interface MultipleParams {
   withQuery is Service.MultipleParams.withQuery;
   withBody is Service.MultipleParams.withBody;
 }
@@ -110,8 +110,8 @@ interface MultipleParamsClient {
       name: "test-name-value"
     });
     
-    client.withQuery("some-id", { region: "us-west" });  // region stays as method param
-    client.withBody({ name: "test-name" }, { region: "us-west" });  // region stays as method param
+    client.withQuery(region: "us-west");  // region stays as method param
+    client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
     ```
   """)
 @scenario
@@ -120,7 +120,7 @@ interface MultipleParamsClient {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MixedParamsClientOptions)
-interface MixedParamsClient {
+interface MixedParams {
   withQuery is Service.MixedParams.withQuery;
   withBody is Service.MixedParams.withBody;
 }
@@ -139,7 +139,7 @@ interface MixedParamsClient {
   });
   
   // No need to pass blobName to any operations
-  client.withQuery({ format: "text" });  
+  client.withQuery(format: "text");  
   client.getStandalone();
   client.withBody("New content for sample-blob");
   client.deleteStandalone();
@@ -151,7 +151,7 @@ interface MixedParamsClient {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(PathParamClientOptions)
-interface PathParamClient {
+interface PathParam {
   withQuery is Service.PathParam.withQuery;
   getStandalone is Service.PathParam.getStandalone;
   withBody is Service.PathParam.withBody;
@@ -179,7 +179,7 @@ interface PathParamClient {
   name: "ParamAliasClient",
   service: Service,
 })
-interface ParamAliasClient {
+interface ParamAlias {
   withAliasedName is Service.ParamAlias.withAliasedName;
   withOriginalName is Service.ParamAlias.withOriginalName;
 }

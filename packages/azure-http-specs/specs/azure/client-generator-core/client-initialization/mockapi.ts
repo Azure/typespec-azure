@@ -3,7 +3,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Mock responses for HeaderParam scenario
-Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_HeaderParam = passOnSuccess([
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_HeaderParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/header-param/with-query",
     method: "get",
@@ -41,7 +41,7 @@ Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_HeaderParam = 
 ]);
 
 // Mock responses for MultipleParams scenario
-Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_MultipleParams = passOnSuccess([
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MultipleParams = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/multiple-params/with-query",
     method: "get",
@@ -83,7 +83,7 @@ Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_MultipleParams
 ]);
 
 // Mock responses for MixedParams scenario
-Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_MixedParams = passOnSuccess([
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/mixed-params/with-query",
     method: "get",
@@ -125,7 +125,7 @@ Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_MixedParams = 
 ]);
 
 // Mock responses for PathParam scenario
-Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_PathParam = passOnSuccess([
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/path/sample-blob/content",
     method: "get",
@@ -178,7 +178,7 @@ Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_PathParam = pa
 ]);
 
 // Mock responses for ParamAlias scenario
-Scenarios.Service_ParamAlias = passOnSuccess([
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/param-alias/sample-blob/with-aliased-name",
     method: "get",
