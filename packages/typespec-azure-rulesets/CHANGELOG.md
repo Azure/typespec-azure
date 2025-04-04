@@ -1,5 +1,16 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.54.0
+
+### Features
+
+- [#2396](https://github.com/Azure/typespec-azure/pull/2396) add `no-legacy-usage` rule to rules list
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
 ## 0.53.0
 
 ### Breaking Changes
