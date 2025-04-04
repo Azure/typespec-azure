@@ -176,3 +176,27 @@ Scenarios._Specs__Azure_ClientGenerator_Core_ClientInitialization_PathParam = pa
     kind: "MockApiDefinition",
   },
 ]);
+
+// Mock responses for ParamAlias scenario
+Scenarios.Service_ParamAlias = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/param-alias/sample-blob/with-aliased-name",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json("Successfully used aliased parameters"),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/param-alias/sample-blob/with-original-name",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json("Successfully used aliased parameters"),
+    },
+    kind: "MockApiDefinition",
+  },
+]);

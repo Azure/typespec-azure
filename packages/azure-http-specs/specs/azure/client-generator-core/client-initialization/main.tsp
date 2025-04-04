@@ -1,8 +1,10 @@
 import "@typespec/http";
 import "@typespec/spector";
+import "@azure-tools/typespec-client-generator-core";
 
 using Http;
 using Spector;
+using Azure.ClientGenerator.Core;
 
 @doc("Test for client initialization decorator - moving parameters from method to client level")
 @scenarioService("/azure/client-generator-core/client-initialization")
@@ -94,6 +96,25 @@ namespace PathParam {
   @route("/{blobName}")
   @delete
   op deleteStandalone(@path blobName: string): void;
+}
+
+// Scenario 5: Parameter aliases for better client API names
+@doc("Operations demonstrating the @paramAlias decorator for renaming parameters in client code")
+@route("/param-alias")
+namespace ParamAlias {
+  @route("/{blob}/with-aliased-name")
+  @get
+  op withAliasedName(
+    @path
+    blob: string,
+  ): string;
+
+  @route("/{blobName}/with-original-name")
+  @get
+  op withOriginalName(
+    @path
+    blobName: string,
+  ): void;
 }
 
 @doc("Properties of a blob")

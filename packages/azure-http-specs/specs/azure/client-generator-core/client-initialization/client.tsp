@@ -23,8 +23,15 @@ model MixedParamsClientOptions {
   @doc("The name of the client. This parameter is used as a header in all operations.")
   name: string;
 }
+
 model PathParamClientOptions {
   @doc("The name of the blob. This parameter is used as a path parameter in all operations.")
+  blobName: string;
+}
+
+model ParamAliasClientOptions {
+  @doc("Blob name for the client.")
+  @global.Azure.ClientGenerator.Core.paramAlias("blob")
   blobName: string;
 }
 
@@ -149,4 +156,30 @@ interface PathParamClient {
   getStandalone is Service.PathParam.getStandalone;
   withBody is Service.PathParam.withBody;
   deleteStandalone is Service.PathParam.deleteStandalone;
+}
+
+// Scenario 5: Parameter aliases for better client API names
+@scenarioDoc("""
+  Client for testing the @paramAlias decorator for renaming parameters in client code.
+  
+  Parameters elevated to client level:
+  - blobName: "sample-blob" (path parameter)
+  
+  Expected client usage:
+  ```ts
+  // Elevated to client level via alias
+  client.withAliasedName();
+  
+  // Elevated to client level via original name
+  client.withOriginalName();
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.client({
+  name: "ParamAliasClient",
+  service: Service,
+})
+interface ParamAliasClient {
+  withAliasedName is Service.ParamAlias.withAliasedName;
+  withOriginalName is Service.ParamAlias.withOriginalName;
 }
