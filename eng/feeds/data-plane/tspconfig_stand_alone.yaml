@@ -2,7 +2,6 @@ parameters:
   "service-dir":
     default: "sdk/{{#toLowerCase}}{{folderName}}{{/toLowerCase}}"
   "dependencies":
-    "additionalDirectories": []
     default: ""
 emit:
   - "@azure-tools/typespec-autorest"

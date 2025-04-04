@@ -15,7 +15,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "../../src/decorators.js";
-import { SdkOperationGroup } from "../../src/interfaces.js";
+import { SdkClientType, SdkHttpOperation, SdkOperationGroup } from "../../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -450,12 +450,11 @@ describe("@operationGroup", () => {
     const sdkPackage = runner.context.sdkPackage;
     strictEqual(sdkPackage.clients.length, 1);
     const mainClient = sdkPackage.clients[0];
-    strictEqual(mainClient.methods.length, 1);
+    strictEqual(mainClient.methods.length, 0);
 
-    const clientAccessor = mainClient.methods[0];
-    strictEqual(clientAccessor.kind, "clientaccessor");
-    strictEqual(clientAccessor.response.kind, "client");
-    strictEqual(clientAccessor.response.name, "ClientModel");
+    const client = mainClient.children![0] as SdkClientType<SdkHttpOperation>;
+    strictEqual(client.kind, "client");
+    strictEqual(client.name, "ClientModel");
   });
 
   it("@operationGroup with diagnostics", async () => {
@@ -733,9 +732,9 @@ describe("listOperationGroups without @client and @operationGroup", () => {
     deepStrictEqual(listOperationGroups(runner.context, ag), []);
 
     allOperationGroups = listOperationGroups(runner.context, client, true);
-    deepStrictEqual(allOperationGroups, [aa, aaa, aab, aabGroup1, aabGroup2, aag, ag]);
+    deepStrictEqual(allOperationGroups, [aa, ag, aaa, aab, aag, aabGroup1, aabGroup2]);
     allOperationGroups = listOperationGroups(runner.context, aa, true);
-    deepStrictEqual(allOperationGroups, [aaa, aab, aabGroup1, aabGroup2, aag]);
+    deepStrictEqual(allOperationGroups, [aaa, aab, aag, aabGroup1, aabGroup2]);
     allOperationGroups = listOperationGroups(runner.context, aaa, true);
     deepStrictEqual(allOperationGroups, []);
     allOperationGroups = listOperationGroups(runner.context, aab, true);
@@ -866,38 +865,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
 });
 
 describe("client hierarchy", () => {
-  it("multi clients ", async () => {
-    await runner.compile(`
-        @service
-        namespace Test1Client {
-          op x(): void;
-        }
-        @service
-        namespace Test2Client {
-          op y(): void;
-        }
-      `);
-
-    const clients = listClients(runner.context);
-    deepStrictEqual(clients.length, 2);
-
-    const client1 = clients.find((x) => x.name === "Test1Client");
-    ok(client1);
-    deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
-      ["x"],
-    );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
-
-    const client2 = clients.find((x) => x.name === "Test2Client");
-    ok(client2);
-    deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client2).map((x) => x.name),
-      ["y"],
-    );
-    deepStrictEqual(listOperationGroups(runner.context, client2).length, 0);
-  });
-
   it("no client", async () => {
     await runner.compile(`
         namespace Test1Client {
@@ -1483,10 +1450,10 @@ describe("client hierarchy", () => {
     );
 
     const sdkPackage = runnerWithCore.context.sdkPackage;
-    const containerClient = sdkPackage.clients[0].methods[1].response;
-    strictEqual(containerClient.kind, "client");
-    const blobClient = containerClient.methods[1].response;
-    strictEqual(blobClient.kind, "client");
+    const containerClient = sdkPackage.clients[0].children?.[0];
+    strictEqual(containerClient?.kind, "client");
+    const blobClient = containerClient.children?.[0];
+    strictEqual(blobClient?.kind, "client");
     const apiVersionParam = blobClient.clientInitialization.parameters.find(
       (x) => x.name === "apiVersion",
     );

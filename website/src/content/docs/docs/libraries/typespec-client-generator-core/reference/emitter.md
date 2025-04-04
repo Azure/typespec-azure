@@ -33,7 +33,7 @@ options:
 
 **Type:** `string`
 
-Set `emitter-name` to output TCGC code models for specific language's emitter. This flag only work for taking TCGC as an emitter.
+Set `emitter-name` to output TCGC code models for specific language's emitter.
 
 ### `generate-protocol-methods`
 
@@ -47,13 +47,17 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
-### `package-name`
+### `api-version`
 
 **Type:** `string`
 
-### `flatten-union-as-enum`
+Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
 
-**Type:** `boolean`
+### `license`
+
+**Type:** `object`
+
+License information for the generated client code.
 
 ### `examples-dir`
 
@@ -66,15 +70,3 @@ Specifies the directory where the emitter will look for example files. If the fl
 **Type:** `string`
 
 Specifies the namespace you want to override for namespaces set in the spec. With this config, all namespace for the spec types will default to it.
-
-### `api-version`
-
-**Type:** `string`
-
-Use this flag if you would like to generate the sdk only for a specific version. Default value is the latest version. Also accepts values `latest` and `all`.
-
-### `license`
-
-**Type:** `object`
-
-License information for the generated client code.

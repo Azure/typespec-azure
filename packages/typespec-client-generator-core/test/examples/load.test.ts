@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { SdkClientAccessor, SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
@@ -197,18 +197,19 @@ it("load multiple example with @clientName", async () => {
     }
   `);
 
-  let operation = (
-    (runner.context.sdkPackage.clients[0].methods[0] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  operation = (
-    (runner.context.sdkPackage.clients[0].methods[1] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const nsClient = mainClient.children?.find((client) => client.name === "renamedNS");
+  ok(nsClient);
+  const operation1 = (nsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation1);
+  strictEqual(operation1.examples?.length, 1);
+
+  const ifClient = mainClient.children?.find((client) => client.name === "renamedIF");
+  ok(ifClient);
+  const operation2 = (ifClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation2);
+  strictEqual(operation2.examples?.length, 1);
 });
 
 it("load multiple example of original operation id with @clientName", async () => {
@@ -239,18 +240,19 @@ it("load multiple example of original operation id with @clientName", async () =
     }
   `);
 
-  let operation = (
-    (runner.context.sdkPackage.clients[0].methods[0] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  operation = (
-    (runner.context.sdkPackage.clients[0].methods[1] as SdkClientAccessor<SdkHttpOperation>)
-      .response.methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const nsClient = mainClient.children?.find((client) => client.name === "renamedNS");
+  ok(nsClient);
+  const operation1 = (nsClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation1);
+  strictEqual(operation1.examples?.length, 1);
+
+  const ifClient = mainClient.children?.find((client) => client.name === "renamedIF");
+  ok(ifClient);
+  const operation2 = (ifClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation2);
+  strictEqual(operation2.examples?.length, 1);
 });
 
 it("ensure ordering for multiple examples", async () => {

@@ -171,12 +171,13 @@ export async function handleClientExamples(
   const examples = diagnostics.pipe(
     await loadExamples(context, getValidApiVersion(context, client.apiVersions)),
   );
-  const methodQueue = [...client.methods];
-  while (methodQueue.length > 0) {
-    const method = methodQueue.pop()!;
-    if (method.kind === "clientaccessor") {
-      methodQueue.push(...method.response.methods);
-    } else {
+  const clientQueue = [client];
+  while (clientQueue.length > 0) {
+    const client = clientQueue.pop()!;
+    if (client.children) {
+      clientQueue.push(...client.children);
+    }
+    for (const method of client.methods) {
       // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
       let operation = method.__raw;
       while (operation && operation.templateMapper === undefined) {
@@ -209,7 +210,7 @@ function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
   if (method.operation.kind === "http") {
     diagnostics.pipe(handleHttpOperationExamples(method.operation, examples));
     if (method.operation.examples) {
-      context.__httpOperationExamples!.set(method.operation.__raw, method.operation.examples);
+      context.__httpOperationExamples.set(method.operation.__raw, method.operation.examples);
     }
   }
 
@@ -227,7 +228,6 @@ function handleHttpOperationExamples(
     const operationExample: SdkHttpOperationExample = {
       kind: "http",
       name: title,
-      description: title,
       doc: title,
       filePath: example.relativePath,
       parameters: diagnostics.pipe(

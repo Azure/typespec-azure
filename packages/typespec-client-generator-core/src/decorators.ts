@@ -25,15 +25,18 @@ import {
   AccessDecorator,
   AlternateTypeDecorator,
   ApiVersionDecorator,
+  ClientApiVersionsDecorator,
   ClientDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
+  DeserializeEmptyStringAsNullDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
+  ResponseAsBoolDecorator,
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
@@ -311,10 +314,16 @@ export function listClients(context: TCGCContext): SdkClient[] {
     return context.__rawClients;
   }
 
-  // if there is no explicit client, we will treat namespaces with service decorator as clients
+  // if there is no explicit client, we will treat the first namespace with service decorator as client
   const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
-
-  context.__rawClients = serviceNamespaces.map((service) => {
+  if (serviceNamespaces.length >= 1) {
+    const service = serviceNamespaces.shift()!;
+    serviceNamespaces.map((ns) => {
+      reportDiagnostic(context.program, {
+        code: "multiple-services",
+        target: ns,
+      });
+    });
     let originalName = service.name;
     const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
@@ -324,14 +333,19 @@ export function listClients(context: TCGCContext): SdkClient[] {
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service);
-    return {
-      kind: "SdkClient",
-      name: clientName,
-      service: service,
-      type: service,
-      crossLanguageDefinitionId: getNamespaceFullName(service),
-    };
-  });
+    context.__rawClients = [
+      {
+        kind: "SdkClient",
+        name: clientName,
+        service: service,
+        type: service,
+        crossLanguageDefinitionId: getNamespaceFullName(service),
+      },
+    ];
+  } else {
+    context.__rawClients = [];
+  }
+
   return context.__rawClients;
 }
 
@@ -514,27 +528,30 @@ export function listOperationGroups(
   ignoreHierarchy = false,
 ): SdkOperationGroup[] {
   const groups: SdkOperationGroup[] = [];
+  const queue: SdkOperationGroup[] = [];
 
   if (group.type.kind === "Interface") {
     return groups;
   }
 
   for (const subItem of group.type.namespaces.values()) {
-    track(getOperationGroup(context, subItem)!);
+    const og = getOperationGroup(context, subItem);
+    if (og) {
+      queue.push(og);
+    }
   }
   for (const subItem of group.type.interfaces.values()) {
-    track(getOperationGroup(context, subItem)!);
+    const og = getOperationGroup(context, subItem);
+    if (og) {
+      queue.push(og);
+    }
   }
 
-  function track(item: SdkOperationGroup | undefined) {
-    if (!item) {
-      return;
-    }
-    groups.push(item);
-    if (ignoreHierarchy) {
-      for (const subItem of item.subOperationGroups ?? []) {
-        track(subItem);
-      }
+  while (queue.length > 0) {
+    const operationGroup = queue.shift()!;
+    groups.push(operationGroup);
+    if (ignoreHierarchy && operationGroup.subOperationGroups) {
+      queue.push(...operationGroup.subOperationGroups);
     }
   }
 
@@ -878,14 +895,28 @@ export const $override = (
     a.name.localeCompare(b.name),
   );
 
-  // Check if the sorted parameter names arrays are equal
-  const parametersMatch =
-    originalParams.length === overrideParams.length &&
-    originalParams.every((value, index) => compareModelProperties(value, overrideParams[index]));
+  // Check if the sorted parameter names arrays are equal, omit optional parameters
+  let parametersMatch = true;
+  let index = 0;
+  for (const originalParam of originalParams) {
+    if (index > overrideParams.length - 1) {
+      parametersMatch = false;
+      break;
+    }
+    if (!compareModelProperties(originalParam, overrideParams[index])) {
+      if (!originalParam.optional) {
+        parametersMatch = false;
+        break;
+      } else {
+        continue;
+      }
+    }
+    index++;
+  }
 
   if (!parametersMatch) {
     reportDiagnostic(context.program, {
-      code: "override-method-parameters-mismatch",
+      code: "override-parameters-mismatch",
       target: context.decoratorTarget,
       format: {
         methodName: original.name,
@@ -893,7 +924,6 @@ export const $override = (
         overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
       },
     });
-    return;
   }
   setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
 };
@@ -1250,4 +1280,91 @@ function IsInScope(context: TCGCContext, entity: Operation): boolean {
     return false;
   }
   return true;
+}
+
+const clientApiVersionsKey = createStateSymbol("clientApiVersions");
+
+/**
+ * Add additional api versions that are possible for the client to use.
+ *
+ * @param context
+ * @param target Service namespace that has these additional api versions
+ * @param value Enum with the additional api versions
+ * @param scope
+ */
+export const $clientApiVersions: ClientApiVersionsDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  value: Enum,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $clientApiVersions, clientApiVersionsKey, target, value, scope);
+};
+
+/**
+ * Get the explicit client api versions that are possible for the client to use denoted by `@clientApiVersions`
+ *
+ * @param context
+ * @param target
+ * @returns
+ */
+export function getExplicitClientApiVersions(
+  context: TCGCContext,
+  target: Namespace,
+): Enum | undefined {
+  return getScopedDecoratorData(context, clientApiVersionsKey, target);
+}
+export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: LanguageScopes,
+) => {
+  if (target.type.kind !== "Scalar") {
+    reportDiagnostic(context.program, {
+      code: "invalid-deserializeEmptyStringAsNull-target-type",
+      format: {},
+      target: target,
+    });
+    return;
+  }
+
+  if (target.type.name !== "string") {
+    let scalarType = target.type as Scalar;
+    while (scalarType.baseScalar !== undefined) {
+      scalarType = scalarType.baseScalar;
+    }
+
+    if (scalarType.name !== "string") {
+      reportDiagnostic(context.program, {
+        code: "invalid-deserializeEmptyStringAsNull-target-type",
+        format: {},
+        target: target,
+      });
+      return;
+    }
+  }
+};
+
+const responseAsBoolKey = createStateSymbol("responseAsBool");
+
+export const $responseAsBool: ResponseAsBoolDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  if (!target.decorators.some((d) => d.definition?.name === "@head")) {
+    reportDiagnostic(context.program, {
+      code: "non-head-bool-response-decorator",
+      format: {
+        operationName: target.name,
+      },
+      target: target,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $responseAsBool, responseAsBoolKey, target, true, scope);
+};
+
+export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
+  return getScopedDecoratorData(context, responseAsBoolKey, target);
 }

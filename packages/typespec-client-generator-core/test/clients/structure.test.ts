@@ -87,7 +87,7 @@ it("arm client with operation groups", async () => {
   strictEqual(client.clientInitialization.parameters[1].name, "credential");
   strictEqual(client.clientInitialization.parameters[2].name, "apiVersion");
   strictEqual(client.clientInitialization.parameters[3].name, "subscriptionId");
-  strictEqual(client.methods.length, 1); // client accessor methods which have already deprecated
+  strictEqual(client.methods.length, 0);
   strictEqual(client.children?.length, 1);
 
   const tests = client.children?.find((c) => c.name === "Tests");
@@ -145,7 +145,7 @@ it("client with sub clients", async () => {
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 1);
   strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(client.methods.length, 2); // client accessor methods which have already deprecated
+  strictEqual(client.methods.length, 0);
   strictEqual(client.children?.length, 2);
 
   const pets = client.children?.find((c) => c.name === "Pets");
@@ -153,7 +153,7 @@ it("client with sub clients", async () => {
   strictEqual(pets.clientInitialization.initializedBy, InitializedByFlags.Parent);
   strictEqual(pets.clientInitialization.parameters.length, 1);
   strictEqual(pets.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(pets?.methods.length, 2); // client accessor methods which have already deprecated
+  strictEqual(pets?.methods.length, 0);
   strictEqual(pets?.children?.length, 2);
 
   const dogs = pets.children?.find((c) => c.name === "Dogs");
@@ -239,7 +239,7 @@ it("client with sub client and sub client has extra initialization paramters", a
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 1);
   strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(client.methods.length, 2); // client accessor methods which have already deprecated
+  strictEqual(client.methods.length, 0);
   strictEqual(client.children?.length, 2);
 
   const largeFaceList = client.children?.find((c) => c.name === "LargeFaceList");
@@ -308,7 +308,7 @@ it("client with sub client and sub client can also be initialized individually",
   strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(client.clientInitialization.parameters.length, 1);
   strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(client.methods.length, 2); // client accessor methods which have already deprecated
+  strictEqual(client.methods.length, 0);
   strictEqual(client.children?.length, 2);
 
   const pets = client.children?.find((c) => c.name === "Pets");
@@ -369,7 +369,7 @@ it("client with sub client and sub client can also be initialized individually w
   strictEqual(client.clientInitialization.parameters.length, 2);
   strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(client.clientInitialization.parameters[1].name, "containerName");
-  strictEqual(client.methods.length, 1); // client accessor methods which have already deprecated
+  strictEqual(client.methods.length, 0);
   strictEqual(client.children?.length, 1);
 
   const blob = client.children?.find((c) => c.name === "Blob");
@@ -494,7 +494,7 @@ it("single with core", async () => {
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
-  strictEqual(apiVersionParam.kind, "apiVersion");
+  strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
 });
 
@@ -566,7 +566,7 @@ it("multiple with core", async () => {
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.optional, false);
-  strictEqual(apiVersionParam.kind, "apiVersion");
+  strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01");
 });
 
@@ -580,20 +580,12 @@ it("namespace", async () => {
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
     @service
-    namespace My.Service.One {};
-
-    @server("http://localhost:3000", "endpoint")
-    @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
-    @service
-    namespace My.Service.Two {};
+    namespace My.Service {};
   `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 2);
-  const clientOne = sdkPackage.clients.filter((c) => c.name === "OneClient")[0];
-  strictEqual(clientOne.nameSpace, "My.Service.One");
-
-  const clientTwo = sdkPackage.clients.filter((c) => c.name === "TwoClient")[0];
-  strictEqual(clientTwo.nameSpace, "My.Service.Two");
+  strictEqual(sdkPackage.clients.length, 1);
+  const clientOne = sdkPackage.clients.filter((c) => c.name === "ServiceClient")[0];
+  strictEqual(clientOne.namespace, "My.Service");
 });
 
 it("operationGroup", async () => {
@@ -613,21 +605,11 @@ it("operationGroup", async () => {
   ok(operationGroup);
   strictEqual(operationGroup.parent, mainClient);
 
-  strictEqual(mainClient.methods.length, 1);
+  strictEqual(mainClient.methods.length, 0);
+  strictEqual(mainClient.children?.length, 1);
   strictEqual(mainClient.clientInitialization.parameters.length, 1);
   strictEqual(mainClient.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
-
-  const clientAccessor = mainClient.methods[0];
-  strictEqual(clientAccessor.kind, "clientaccessor");
-  strictEqual(clientAccessor.access, "internal");
-  strictEqual(clientAccessor.name, "getMyOperationGroup");
-  strictEqual(clientAccessor.parameters.length, 0);
-  strictEqual(clientAccessor.response, operationGroup);
-  strictEqual(
-    clientAccessor.crossLanguageDefinitionId,
-    "TestService.MyOperationGroup.getMyOperationGroup",
-  );
 
   strictEqual(operationGroup.clientInitialization.parameters.length, 1);
   strictEqual(operationGroup.clientInitialization.initializedBy, InitializedByFlags.Parent);
@@ -667,40 +649,18 @@ it("operationGroup2", async () => {
   strictEqual(fooBarClient.parent, fooClient);
   strictEqual(barClient.parent, mainClient);
 
-  strictEqual(mainClient.methods.length, 2);
+  strictEqual(mainClient.methods.length, 0);
+  strictEqual(mainClient.children?.length, 2);
   ok(mainClient.clientInitialization);
   strictEqual(mainClient.clientInitialization.parameters.length, 1);
   strictEqual(mainClient.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
 
-  const fooAccessor = mainClient.methods[0];
-  strictEqual(fooAccessor.kind, "clientaccessor");
-  strictEqual(fooAccessor.crossLanguageDefinitionId, "TestService.Foo.getFoo");
-  strictEqual(fooAccessor.access, "internal");
-  strictEqual(fooAccessor.name, "getFoo");
-  strictEqual(fooAccessor.parameters.length, 0);
-  strictEqual(fooAccessor.response, fooClient);
-
-  const barAccessor = mainClient.methods[1];
-  strictEqual(barAccessor.kind, "clientaccessor");
-  strictEqual(barAccessor.access, "internal");
-  strictEqual(barAccessor.name, "getBar");
-  strictEqual(barAccessor.crossLanguageDefinitionId, "TestService.Bar.getBar");
-  strictEqual(barAccessor.parameters.length, 0);
-  strictEqual(barAccessor.response, barClient);
-
   strictEqual(fooClient.clientInitialization.parameters.length, 1);
   strictEqual(fooClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
-  strictEqual(fooClient.methods.length, 1);
+  strictEqual(fooClient.methods.length, 0);
+  strictEqual(fooClient.children?.length, 1);
   strictEqual(fooClient.crossLanguageDefinitionId, "TestService.Foo");
-
-  const fooBarAccessor = fooClient.methods[0];
-  strictEqual(fooBarAccessor.kind, "clientaccessor");
-  strictEqual(fooBarAccessor.crossLanguageDefinitionId, "TestService.Foo.Bar.getBar");
-  strictEqual(fooBarAccessor.access, "internal");
-  strictEqual(fooBarAccessor.name, "getBar");
-  strictEqual(fooBarAccessor.parameters.length, 0);
-  strictEqual(fooBarAccessor.response, fooBarClient);
 
   strictEqual(fooBarClient.clientInitialization.parameters.length, 1);
   strictEqual(fooBarClient.clientInitialization.initializedBy, InitializedByFlags.Parent);

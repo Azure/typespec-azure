@@ -2,8 +2,8 @@ import "@typespec/versioning";
 
 namespace Azure.Core.Traits;
 
-using TypeSpec.Reflection;
-using TypeSpec.Versioning;
+using Reflection;
+using Versioning;
 
 /**
  * Enumerates the standard trait locations for Azure.Core operations.

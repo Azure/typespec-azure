@@ -2,8 +2,8 @@ import "@typespec/http";
 import "@typespec/rest";
 import "./traits.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
+using Http;
+using Rest;
 
 namespace Azure.Core;
 

@@ -2,7 +2,7 @@ import "../dist/src/private.decorators.js";
 
 namespace Azure.ResourceManager.Private;
 
-using TypeSpec.Reflection;
+using Reflection;
 
 /**
  * Update the Azure Resource Manager provider namespace for a given entity.

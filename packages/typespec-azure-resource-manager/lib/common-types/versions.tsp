@@ -1,6 +1,6 @@
 import "./commontypes.private.decorators.tsp";
 
-using TypeSpec.Versioning;
+using Versioning;
 
 @versioned(Versions)
 namespace Azure.ResourceManager.CommonTypes;

@@ -1,12 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import {
-  SdkClientType,
-  SdkHttpOperation,
-  SdkServiceMethod,
-  UsageFlags,
-} from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkServiceMethod, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -122,7 +117,7 @@ it("rest template spreading of multiple models", async () => {
       title: "Pet Store Service",
     })
     namespace PetStore;
-    using TypeSpec.Rest.Resource;
+    using Rest.Resource;
 
     @error
     model PetStoreError {
@@ -155,8 +150,8 @@ it("rest template spreading of multiple models", async () => {
     sdkPackage.models.map((x) => x.name).sort(),
     ["CheckupCollectionWithNextLink", "Checkup", "PetStoreError", "CheckupUpdate"].sort(),
   );
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
   const createOrUpdate = client.methods[0];
   strictEqual(createOrUpdate.kind, "basic");
   strictEqual(createOrUpdate.name, "createOrUpdate");
@@ -253,8 +248,8 @@ it("multi layer template with discriminated model spread", async () => {
   const nonCoreModels = sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(nonCoreModels.length, 2);
 
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
 
   const createOrReplace = client.methods[1];
   strictEqual(createOrReplace.kind, "basic");
@@ -356,19 +351,19 @@ it("model with @body decorator", async () => {
   deepStrictEqual(bodyParam.type, shelfModel);
   deepStrictEqual(bodyParam.correspondingMethodParams[0], shelfParameter);
 });
-it("formdata model without body decorator in spread model", async () => {
+
+it("formdata model with multipartBody decorator in spread model", async () => {
   await runner.compileWithBuiltInService(`
 
     model DocumentTranslateContent {
       @header contentType: "multipart/form-data";
-      document: bytes;
+      @multipartBody testRequest: {document: HttpPart<bytes>};
     }
     alias Intersected = DocumentTranslateContent & {};
-    #suppress "deprecated" "For test"
     op test(...Intersected): void;
   `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
-  const documentMethodParam = method.parameters.find((x) => x.name === "document");
+  const documentMethodParam = method.parameters.find((x) => x.name === "testRequest");
   ok(documentMethodParam);
   strictEqual(documentMethodParam.kind, "method");
   const op = method.operation;
