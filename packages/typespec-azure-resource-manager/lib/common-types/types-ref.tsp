@@ -173,10 +173,10 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * locationData
  */
-@@armCommonDefinition(LocationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v3);
-@@armCommonDefinition(LocationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v4);
-@@armCommonDefinition(LocationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v5);
-@@armCommonDefinition(LocationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v6);
+@@armCommonDefinition(locationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v3);
+@@armCommonDefinition(locationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v4);
+@@armCommonDefinition(locationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v5);
+@@armCommonDefinition(locationData, "locationData", Azure.ResourceManager.CommonTypes.Versions.v6);
 
 /**
  * The error detail.
@@ -216,10 +216,10 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * Metadata pertaining to creation and last modification of the resource.
  */
-@@armCommonDefinition(SystemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v3);
-@@armCommonDefinition(SystemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v4);
-@@armCommonDefinition(SystemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v5);
-@@armCommonDefinition(SystemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v6);
+@@armCommonDefinition(systemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v3);
+@@armCommonDefinition(systemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v4);
+@@armCommonDefinition(systemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v5);
+@@armCommonDefinition(systemData, "systemData", Azure.ResourceManager.CommonTypes.Versions.v6);
 
 /**
  * Details of the resource plan.
@@ -232,19 +232,19 @@ namespace Azure.ResourceManager.CommonTypes;
 /**
  * encryptionProperties
  */
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(encryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v3
 );
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(encryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v4
 );
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(encryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v5
 );
-@@armCommonDefinition(EncryptionProperties,
+@@armCommonDefinition(encryptionProperties,
   "encryptionProperties",
   Azure.ResourceManager.CommonTypes.Versions.v6
 );

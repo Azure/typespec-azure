@@ -1153,12 +1153,12 @@ model Azure.ResourceManager.CommonTypes.Encryption
 | infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.InfrastructureEncryption)         | Values are enabled and disabled.                                 |
 | customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption) | All Customer-managed key encryption properties for the resource. |
 
-### `EncryptionProperties` {#Azure.ResourceManager.CommonTypes.EncryptionProperties}
+### `encryptionProperties` {#Azure.ResourceManager.CommonTypes.encryptionProperties}
 
 Configuration of key for data encryption
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.EncryptionProperties
+model Azure.ResourceManager.CommonTypes.encryptionProperties
 ```
 
 #### Properties
@@ -1316,12 +1316,12 @@ model Azure.ResourceManager.CommonTypes.KeyVaultProperties
 | keyIdentifier? | `string` | Key vault uri to access the encryption key.                           |
 | identity?      | `string` | The client ID of the identity which will be used to access key vault. |
 
-### `LocationData` {#Azure.ResourceManager.CommonTypes.LocationData}
+### `locationData` {#Azure.ResourceManager.CommonTypes.locationData}
 
 Metadata pertaining to the geographic location of the resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.LocationData
+model Azure.ResourceManager.CommonTypes.locationData
 ```
 
 #### Properties
@@ -1635,7 +1635,7 @@ model Azure.ResourceManager.CommonTypes.Plan
 
 ### `PrivateEndpoint` {#Azure.ResourceManager.CommonTypes.PrivateEndpoint}
 
-The Private Endpoint resource.
+The private endpoint resource.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.PrivateEndpoint
@@ -1643,9 +1643,9 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpoint
 
 #### Properties
 
-| Name | Type                         | Description                                  |
-| ---- | ---------------------------- | -------------------------------------------- |
-| id?  | `Core.armResourceIdentifier` | The resource identifier for private endpoint |
+| Name | Type                         | Description                                     |
+| ---- | ---------------------------- | ----------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | The resource identifier of the private endpoint |
 
 ### `PrivateEndpointConnection` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnection}
 
@@ -1674,7 +1674,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 | Name      | Type                                                      | Description                                                           |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | value?    | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections.                                |
-| nextLink? | `string`                                                  | URL to get the next set of operation list results (if there are any). |
+| nextLink? | `url`                                                     | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateEndpointConnectionListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5}
 
@@ -1786,7 +1786,7 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
 | Name      | Type                                                | Description                                                           |
 | --------- | --------------------------------------------------- | --------------------------------------------------------------------- |
 | value?    | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources                                       |
-| nextLink? | `string`                                            | URL to get the next set of operation list results (if there are any). |
+| nextLink? | `url`                                               | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateLinkResourceListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5}
 
@@ -1944,7 +1944,7 @@ model Azure.ResourceManager.CommonTypes.Resource
 | id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
 | name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
 | type?       | `Core.armResourceType`                                                       | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
-| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
+| systemData? | [`systemData`](./data-types.md#Azure.ResourceManager.CommonTypes.systemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
 ### `ResourceAssociation` {#Azure.ResourceManager.CommonTypes.ResourceAssociation}
 
@@ -2056,12 +2056,12 @@ model Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity
 | tenantId?    | `Core.uuid`                                                                                                                | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
 | type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
 
-### `SystemData` {#Azure.ResourceManager.CommonTypes.SystemData}
+### `systemData` {#Azure.ResourceManager.CommonTypes.systemData}
 
 Metadata pertaining to creation and last modification of the resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.SystemData
+model Azure.ResourceManager.CommonTypes.systemData
 ```
 
 #### Properties
@@ -2134,8 +2134,8 @@ model Azure.ResourceManager.CommonTypes.UserAssignedIdentity
 
 | Name         | Type        | Description                                |
 | ------------ | ----------- | ------------------------------------------ |
-| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 | principalId? | `Core.uuid` | The principal ID of the assigned identity. |
+| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 
 ### `ResourceHome` {#Azure.ResourceManager.CommonTypes.ResourceHome}
 
