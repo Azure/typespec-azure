@@ -1613,7 +1613,7 @@ model Azure.ResourceManager.CommonTypes.OperationStatusResult
 | endTime?         | `utcDateTime`                                                                  | The end time of the operation.                                                             |
 | operations?      | `ResourceManager.CommonTypes.OperationStatusResult[]`                          | The operations list.                                                                       |
 | error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | If present, details of the operation error.                                                |
-| resourceId?      | `string`                                                                       | Fully qualified ID of the resource against which the original async operation was started. |
+| resourceId?      | `Core.armResourceIdentifier`                                                   | Fully qualified ID of the resource against which the original async operation was started. |
 
 ### `Plan` {#Azure.ResourceManager.CommonTypes.Plan}
 
