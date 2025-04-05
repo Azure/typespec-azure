@@ -17,6 +17,7 @@ it("add older api versions", async () => {
     @versioned(Versions)
     namespace My.Service {
       enum Versions { v4, v5, v6 };
+      op func(): void;
     }
   `,
     `
@@ -47,6 +48,7 @@ it("add newer api versions", async () => {
     @versioned(Versions)
     namespace My.Service {
       enum Versions { v4, v5, v6 };
+      op func(): void;
     }
   `,
     `
