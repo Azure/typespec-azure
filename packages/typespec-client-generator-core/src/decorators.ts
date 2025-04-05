@@ -956,19 +956,71 @@ const alternateTypeKey = createStateSymbol("alternateType");
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar,
-  alternate: Scalar,
+  alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "ModelProperty" && source.type.kind !== "Scalar") {
+  let invalidAlternate = true;
+  let invalidSource = true;
+
+  // if alternate type is unknown, source type must be scalar
+  if (alternate.kind === "Intrinsic" && alternate.name === "unknown") {
+    invalidAlternate = false;
+    if (
+      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
+      source.kind === "Scalar"
+    ) {
+      invalidSource = false;
+    }
+  }
+
+  // if alternate type is scalar array, source type must be scalar array
+  if (
+    alternate.kind === "Model" &&
+    alternate.name === "Array" &&
+    alternate.indexer?.value.kind === "Scalar"
+  ) {
+    invalidAlternate = false;
+    if (
+      source.kind === "ModelProperty" &&
+      source.type.kind === "Model" &&
+      source.type.name === "Array" &&
+      source.type.indexer?.value.kind === "Scalar"
+    ) {
+      invalidSource = false;
+    }
+  }
+
+  // if alternate type is scalar, source type must be scalar
+  if (alternate.kind === "Scalar") {
+    invalidAlternate = false;
+    if (
+      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
+      source.kind === "Scalar"
+    ) {
+      invalidSource = false;
+    }
+  }
+
+  if (invalidAlternate) {
+    reportDiagnostic(context.program, {
+      code: "invalid-alternate-type",
+      format: {},
+      target: alternate,
+    });
+    return;
+  }
+
+  if (invalidSource) {
     reportDiagnostic(context.program, {
       code: "invalid-alternate-source-type",
       format: {
-        typeName: source.type.kind,
+        typeName: source.kind,
       },
       target: source,
     });
     return;
   }
+
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
 };
 

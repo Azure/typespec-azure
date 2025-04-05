@@ -539,10 +539,12 @@ export type ClientNamespaceDecorator = (
 ) => void;
 
 /**
- * Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ * When the alternate type is `Scalar` or `unknown`, the source type must be `Scalar` or model property of `Scalar`.
+ * When the alternate type is `Scalar Array`, the source type must be model property of `Scalar Array`.
  *
- * @param source The source type you want to apply the alternate type to. Only scalar types are supported.
- * @param alternate The alternate type you want applied to the target. Only scalar types are supported.
+ * @param source The source type to which the alternate type will be applied. Supported types include `Scalar`, model property of `Scalar` or model property of `Scalar Array`.
+ * @param alternate The alternate type to apply to the target. Supported types include `Scalar`, `Scalar Array` or `unknown`.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
@@ -561,11 +563,21 @@ export type ClientNamespaceDecorator = (
  * ```typespec
  * op test(@param @alternateType(string) date: utcDateTime): void;
  * ```
+ * @example
+ * ```typespec
+ * model Test {
+ *   @alternateType(unknown)
+ *   thumbprint?: string;
+ *
+ *   @alternateType(AzureLocation[], "csharp")
+ *   locations: string[];
+ * }
+ * ```
  */
 export type AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar,
-  alternate: Scalar,
+  alternate: Type,
   scope?: string,
 ) => void;
 
