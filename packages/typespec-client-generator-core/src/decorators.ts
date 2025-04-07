@@ -1011,10 +1011,11 @@ export const $alternateType: AlternateTypeDecorator = (
   }
 
   if (invalidSource) {
+    const sourceTypeName = source.kind === "ModelProperty" ? source.type.kind : source.kind;
     reportDiagnostic(context.program, {
       code: "invalid-alternate-source-type",
       format: {
-        typeName: source.kind,
+        typeName: sourceTypeName,
       },
       target: source,
     });
