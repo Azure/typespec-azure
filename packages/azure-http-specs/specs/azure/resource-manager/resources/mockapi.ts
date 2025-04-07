@@ -236,6 +236,15 @@ function requestHandler(
   }
 }
 
+function getUri(resourceUri: string, extensionName: string, requestMethod: string): string {
+  switch (requestMethod) {
+    case "list":
+      return `/${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources`;
+    default:
+      return `/${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources/${extensionName}`;
+  }
+}
+
 // extension tracked resource
 Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceKeys([
   "ResourceGroup",
@@ -244,13 +253,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
   "Resource",
 ]).pass([
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -264,13 +269,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "get"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -284,13 +285,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -304,13 +301,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "get"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -324,13 +317,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: TENANT_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -344,13 +333,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -364,13 +349,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "get"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -392,13 +373,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
   "Resource",
 ]).pass([
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
     method: "put",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -417,13 +394,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "put"),
     method: "put",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -442,13 +415,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
     method: "put",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -467,13 +436,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "put"),
     method: "put",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -492,13 +457,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
     method: "put",
     request: {
-      pathParams: {
-        resourceUri: TENANT_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -517,13 +478,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
     method: "put",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -542,13 +499,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "put"),
     method: "put",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -575,13 +528,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
   "Resource",
 ]).pass([
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
     method: "patch",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -606,13 +555,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "patch"),
     method: "patch",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -637,13 +582,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
     method: "patch",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -668,13 +609,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "patch"),
     method: "patch",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -699,13 +636,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
     method: "patch",
     request: {
-      pathParams: {
-        resourceUri: TENANT_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -730,13 +663,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
     method: "patch",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -761,13 +690,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "patch"),
     method: "patch",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -800,13 +725,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
   "Resource",
 ]).pass([
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
     method: "delete",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -818,13 +739,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "delete"),
     method: "delete",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -836,13 +753,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
     method: "delete",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -854,13 +767,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "delete"),
     method: "delete",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -872,13 +781,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
     method: "delete",
     request: {
-      pathParams: {
-        resourceUri: TENANT_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -890,13 +795,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
     method: "delete",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI,
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -908,13 +809,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources/:extensionName",
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "delete"),
     method: "delete",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI.substring(1),
-        extensionName: EXTENSION_RESOURCE_NAME,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -934,12 +831,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
   "Resource",
 ]).pass([
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -955,12 +849,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources",
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "list"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_GROUP_SCOPE_URI.substring(1),
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -976,12 +867,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -997,12 +885,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources",
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "list"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: SUBSCRIPTION_SCOPE_URI.substring(1),
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -1018,12 +903,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources",
+    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: TENANT_SCOPE_URI,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -1039,12 +921,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources",
+    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI,
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
@@ -1060,12 +939,9 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: "/:resourceUri/providers/Azure.ResourceManager.Resources/extensionsResources",
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "list"),
     method: "get",
     request: {
-      pathParams: {
-        resourceUri: RESOURCE_SCOPE_URI.substring(1),
-      },
       query: {
         "api-version": "2023-12-01-preview",
       },
