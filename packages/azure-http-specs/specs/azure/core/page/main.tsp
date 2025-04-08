@@ -233,8 +233,8 @@ model ParameterizedNextLinkPagingResult {
     - select=name
   
     Expected query parameters on next link request. Note: the SDK will need to re-inject this parameter:
-    - includePending=true (note: the client will need to manually reinject this parameter into the next link)
-    - select=name (note: this is returned in the next link, the client does NOT need to manually reinject this parameter)
+    - includePending=true (note: the client will need to manually re-inject this parameter into the next link)
+    - select=name (note: this is returned in the next link, the client does NOT need to manually re-inject this parameter)
     
     Expected concatenation of the paged items:
     ```json
