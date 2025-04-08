@@ -235,7 +235,7 @@ it("should not support source type is scalar but alternate type is unknown", asy
 });
 
 it("should support alternate type unknown on model property", async () => {
-  const diagnostics = await runner.diagnose(`
+  await runner.compile(`
     @service
     namespace MyService {
       model Model1 {
