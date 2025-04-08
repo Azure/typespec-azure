@@ -3,9 +3,9 @@ import "@typespec/rest";
 import "@typespec/spector";
 import "@typespec/versioning";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Spector;
 
 /** Test for loading JSON example and generating sample code. */
@@ -19,7 +19,7 @@ using Spector;
 @scenarioDoc("""
   Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
   
-  When generate the code, one need to set the "examples-directory" option.
+  When generate the code, one need to set the "examples-dir" option.
   
   Expected query parameter: query-param=query&api-version=2022-12-01-preview
   Expected header parameter: header-param=header

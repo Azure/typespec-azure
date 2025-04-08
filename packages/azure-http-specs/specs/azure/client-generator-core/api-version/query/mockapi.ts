@@ -7,7 +7,7 @@ Scenarios.Client_AlternateApiVersion_Service_Query_queryApiVersion = passOnSucce
     uri: "/azure/client-generator-core/api-version/query",
     method: "post",
     request: {
-      params: {
+      query: {
         version: "2025-01-01",
       },
     },

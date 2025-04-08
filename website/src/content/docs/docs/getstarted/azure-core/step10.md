@@ -9,9 +9,7 @@ It is inevitable that service specifications will change over time. It is a best
 Here is an example for the `WidgetManager` service:
 
 ```typespec
-@service({
-  title: "Contoso Widget Manager",
-})
+@service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
 
@@ -58,7 +56,7 @@ Finally, you can express changes to your service using the `@added` and `@remove
 model Widget {
   /** The widget name. */
   @key("widgetName")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   name: string;
 
   /** The widget color. */
@@ -80,9 +78,7 @@ model Widget {
 Simple TypeSpec specs need only pass the desired `Azure.Core` version into the `@useDependency` decorator:
 
 ```typespec
-@service({
-  title: "Contoso Widget Manager",
-})
+@service(#{ title: "Contoso Widget Manager" })
 @useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Contoso.WidgetManager;
 ```
@@ -90,9 +86,7 @@ namespace Contoso.WidgetManager;
 If your spec has [multiple versions](#versioning-your-service), you will need to specify the version of `typespec-azure-core` that was used for each version in your spec. Assuming that there are two versions of `Azure.Core` and each version of your service uses a different one, it would look like this:
 
 ```typespec
-@service({
-  title: "Contoso Widget Manager",
-})
+@service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
 

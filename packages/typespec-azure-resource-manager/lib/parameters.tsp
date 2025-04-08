@@ -1,6 +1,6 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
+using Http;
+using Rest;
+using OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 using Azure.ResourceManager.CommonTypes;
@@ -145,7 +145,7 @@ alias TenantInstanceParameters<Resource extends Foundations.Resource> = Resource
 model SubscriptionActionScope {
   @doc("Symbolic name of scope")
   @path
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @key
   @segment("subscription")
   name: string;
@@ -159,7 +159,7 @@ model SubscriptionActionScope {
 model TenantActionScope {
   @doc("Symbolic name of scope")
   @path
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @key
   @segment("tenant")
   name: string;

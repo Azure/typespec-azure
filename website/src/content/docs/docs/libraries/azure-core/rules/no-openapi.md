@@ -73,7 +73,7 @@ model Pet {
 
 ```tsp
 model Pet {
-  @visibility("read", "create")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
   name: string;
 }
 ```

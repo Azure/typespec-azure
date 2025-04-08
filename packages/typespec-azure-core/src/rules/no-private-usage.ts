@@ -2,12 +2,13 @@ import {
   createRule,
   DecoratedType,
   DiagnosticTarget,
-  getLocationContext,
-  getTypeName,
-  Namespace,
   paramMessage,
   Type,
 } from "@typespec/compiler";
+import {
+  checkDecoratorsInDisallowedNamespace,
+  checkReferenceInDisallowedNamespace,
+} from "./utils.js";
 
 export const noPrivateUsage = createRule({
   name: "no-private-usage",
@@ -19,36 +20,11 @@ export const noPrivateUsage = createRule({
   },
   create(context) {
     function checkReference(origin: Type, type: Type, target: DiagnosticTarget) {
-      if (getLocationContext(context.program, origin).type !== "project") {
-        return;
-      }
-      if (getLocationContext(context.program, type).type === "project") {
-        return;
-      }
-      if (isInPrivateNamespace(type)) {
-        context.reportDiagnostic({
-          target,
-          format: { ns: getTypeName(type.namespace) },
-        });
-      }
+      return checkReferenceInDisallowedNamespace(context, origin, type, target, "Private");
     }
 
     function checkDecorators(type: Type & DecoratedType) {
-      if (getLocationContext(context.program, type).type !== "project") {
-        return;
-      }
-      for (const decorator of type.decorators) {
-        if (
-          decorator.definition &&
-          isInPrivateNamespace(decorator.definition) &&
-          getLocationContext(context.program, decorator.definition).type !== "project"
-        ) {
-          context.reportDiagnostic({
-            target: decorator.node ?? type,
-            format: { ns: getTypeName(decorator.definition.namespace) },
-          });
-        }
-      }
+      return checkDecoratorsInDisallowedNamespace(context, type, "Private");
     }
     return {
       model: (model) => {
@@ -78,17 +54,3 @@ export const noPrivateUsage = createRule({
     };
   },
 });
-
-function isInPrivateNamespace(type: Type): type is Type & { namespace: Namespace } {
-  if (!("namespace" in type)) {
-    return false;
-  }
-  let current = type;
-  while (current.namespace) {
-    if (current.namespace?.name === "Private") {
-      return true;
-    }
-    current = current.namespace;
-  }
-  return false;
-}

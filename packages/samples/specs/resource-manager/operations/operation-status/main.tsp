@@ -4,14 +4,12 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 
-@service({
-  title: "Microsoft.OperationsTest",
-})
+@service(#{ title: "Microsoft.OperationsTest" })
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.OperationStatusSample;

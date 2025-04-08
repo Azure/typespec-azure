@@ -1,5 +1,41 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.54.0
+
+### Features
+
+- [#2470](https://github.com/Azure/typespec-azure/pull/2470) Relax `@enforceConstraint` to allow validation to pass when a resource is identified using the `@legacy.armCustomResource` decorator.
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
+## 0.53.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### Bug Fixes
+
+- [#2297](https://github.com/Azure/typespec-azure/pull/2297) Fix using `@identifiers` on array of model with id not respected
+- [#2328](https://github.com/Azure/typespec-azure/pull/2328) Fix `ArmProviderActionAsync` and `ArmProviderActionSync` operations as both operations were returning `ErrorResponse` and not accepting changes to the error response type.
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+
+
+## 0.52.0
+
+### Features
+
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+
 ## 0.51.0
 
 ### Bug Fixes

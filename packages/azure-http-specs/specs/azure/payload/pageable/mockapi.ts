@@ -40,16 +40,17 @@ Scenarios.Azure_Payload_Pageable_list = withServiceKeys(["firstPage", "secondPag
     uri: "/azure/payload/pageable",
     method: "get",
     request: {
-      params: {
+      query: {
         maxpagesize: "3",
       },
     },
     response: {
       status: 200,
-      body: json({
-        value: [{ name: "user5" }, { name: "user6" }, { name: "user7" }],
-        nextLink: `/azure/payload/pageable?skipToken=name-user7&maxpagesize=3`,
-      }),
+      // TODO: next link not working as it should include the base url
+      // body: json({
+      //   value: [{ name: "user5" }, { name: "user6" }, { name: "user7" }],
+      //   nextLink: `/azure/payload/pageable?skipToken=name-user7&maxpagesize=3`,
+      // }),
     },
     handler: pageableHandler,
     kind: "MockApiDefinition",
@@ -58,7 +59,7 @@ Scenarios.Azure_Payload_Pageable_list = withServiceKeys(["firstPage", "secondPag
     uri: "/azure/payload/pageable",
     method: "get",
     request: {
-      params: {
+      query: {
         maxpagesize: "3",
         skipToken: "name-user7",
       },

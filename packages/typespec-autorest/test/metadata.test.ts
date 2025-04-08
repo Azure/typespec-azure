@@ -6,11 +6,11 @@ describe("typespec-autorest: metadata", () => {
   it("will expose create visibility properties on PATCH model using @requestVisibility", async () => {
     const res = await openApiFor(`
       model M {
-        @visibility("read") r: string;
-        @visibility("read", "create") rc?: string;
-        @visibility("read", "update", "create") ruc?: string;
+        @visibility(Lifecycle.Read) r: string;
+        @visibility(Lifecycle.Read, Lifecycle.Create) rc?: string;
+        @visibility(Lifecycle.Read, Lifecycle.Update, Lifecycle.Create) ruc?: string;
       }
-      @parameterVisibility("create", "update")
+      @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
       @route("/") @patch op createOrUpdate(...M): M; 
     `);
 
@@ -42,9 +42,9 @@ describe("typespec-autorest: metadata", () => {
   it("will expose create visibility properties on PUT model", async () => {
     const res = await openApiFor(`
       model M {
-        @visibility("read") r: string;
-        @visibility("read", "create") rc?: string;
-        @visibility("read", "update", "create") ruc?: string;
+        @visibility(Lifecycle.Read) r: string;
+        @visibility(Lifecycle.Read, Lifecycle.Create) rc?: string;
+        @visibility(Lifecycle.Read, Lifecycle.Update, Lifecycle.Create) ruc?: string;
       }
       @route("/") @put op createOrUpdate(...M): M; 
     `);
@@ -70,17 +70,17 @@ describe("typespec-autorest: metadata", () => {
   it("ensures properties are required for array updates", async () => {
     const res = await openApiFor(`
       model Person {
-        @visibility("read") id: string;
-        @visibility("create") secret: string;
+        @visibility(Lifecycle.Read) id: string;
+        @visibility(Lifecycle.Create) secret: string;
         name: string;
       
-        @visibility("read", "create")
+        @visibility(Lifecycle.Read, Lifecycle.Create)
         test: string;
       
-        @visibility("read", "update")
+        @visibility(Lifecycle.Read, Lifecycle.Update)
         other: string;
       
-        @visibility("read", "create", "update")
+        @visibility(Lifecycle.Read, Lifecycle.Create, Lifecycle.Update)
         relatives: PersonRelative[];
       }
       
@@ -139,11 +139,11 @@ describe("typespec-autorest: metadata", () => {
   it("can share read, update, create visibility via x-ms-mutability or readonly", async () => {
     const res = await openApiFor(`
     model M {
-      @visibility("read") r?: string;
-      @visibility("create") c?: string;
-      @visibility("update") u?: string;
-      @visibility("update", "create") uc?: string;
-      @visibility("read", "update", "create") ruc?: string;
+      @visibility(Lifecycle.Read) r?: string;
+      @visibility(Lifecycle.Create) c?: string;
+      @visibility(Lifecycle.Update) u?: string;
+      @visibility(Lifecycle.Update, Lifecycle.Create) uc?: string;
+      @visibility(Lifecycle.Read, Lifecycle.Update, Lifecycle.Create) ruc?: string;
       
     }
     @route("/") @post op create(...M): M; 
@@ -172,9 +172,9 @@ describe("typespec-autorest: metadata", () => {
   it("does not emit invisible, unshared readonly properties", async () => {
     const res = await openApiFor(`
     model M {
-      @visibility("read") r?: string;
-      @visibility("query") q?: string;
-      @visibility("delete") d?: string;
+      @visibility(Lifecycle.Read) r?: string;
+      @visibility(Lifecycle.Query) q?: string;
+      @visibility(Lifecycle.Delete) d?: string;
     }
     @route("/") @get op get(...M): M; 
   `);
@@ -205,11 +205,11 @@ describe("typespec-autorest: metadata", () => {
     const res = await openApiFor(
       `
     model M {
-      @visibility("read") r?: string;
-      @visibility("create") c?: string;
-      @visibility("update") u?: string;
-      @visibility("delete") d?: string;
-      @visibility("query") q?: string;
+      @visibility(Lifecycle.Read) r?: string;
+      @visibility(Lifecycle.Create) c?: string;
+      @visibility(Lifecycle.Update) u?: string;
+      @visibility(Lifecycle.Delete) d?: string;
+      @visibility(Lifecycle.Query) q?: string;
     }
 
     // base model
@@ -341,6 +341,7 @@ describe("typespec-autorest: metadata", () => {
       "/single/{p}": {
         get: {
           operationId: "Single",
+          produces: ["text/plain"],
           parameters: [
             { $ref: "#/parameters/Parameters.q" },
             { $ref: "#/parameters/Parameters.p" },
@@ -357,6 +358,7 @@ describe("typespec-autorest: metadata", () => {
       "/batch": {
         get: {
           operationId: "Batch",
+          produces: ["text/plain"],
           responses: {
             "200": {
               description: "The request has succeeded.",
@@ -427,7 +429,7 @@ describe("typespec-autorest: metadata", () => {
       model Thing {
         @header etag: string;
         name: string;
-        @visibility("delete") d: string;
+        @visibility(Lifecycle.Delete) d: string;
       }
       @route("/") @post op createMultiple(...Thing): Thing[];
       `,
@@ -501,8 +503,8 @@ describe("typespec-autorest: metadata", () => {
     const res = await openApiFor(
       `
       model Thing {
-        @visibility("delete") d?: string;
-        @visibility("query") q?: string;
+        @visibility(Lifecycle.Delete) d?: string;
+        @visibility(Lifecycle.Query) q?: string;
         inner?: Thing;
       }
 

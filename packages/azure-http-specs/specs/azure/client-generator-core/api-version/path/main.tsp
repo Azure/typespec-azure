@@ -8,8 +8,8 @@ import "@azure-tools/typespec-azure-core";
 import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
-using TypeSpec.Http;
-using TypeSpec.Versioning;
+using Http;
+using Versioning;
 using Azure.ClientGenerator.Core;
 using Spector;
 

@@ -1,5 +1,5 @@
 using Azure.Core;
-using TypeSpec.Versioning;
+using Versioning;
 
 namespace Azure.ResourceManager.CommonTypes;
 
@@ -13,11 +13,11 @@ model UserAssignedIdentities is Record<UserAssignedIdentity | null>;
  */
 model ManagedServiceIdentity {
   /** The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
 
   /** The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   tenantId?: uuid;
 
   /** The type of managed identity assigned to this resource. */
@@ -33,11 +33,11 @@ model ManagedServiceIdentity {
  */
 model SystemAssignedServiceIdentity {
   /** The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
 
   /** The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   tenantId?: uuid;
 
   /** The type of managed identity assigned to this resource. */
@@ -49,11 +49,11 @@ model SystemAssignedServiceIdentity {
  */
 model UserAssignedIdentity {
   /** The client ID of the assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   clientId?: uuid;
 
   /** The principal ID of the assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
 }
 

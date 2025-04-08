@@ -24,7 +24,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
     await tester
       .expect(
         `
-        @service({ title: "Test" })
+        @service(#{ title: "Test" })
         @versioned(Service.Versions)
         @armProviderNamespace("Contoso.Service")
         namespace Service;
@@ -46,7 +46,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
     await tester
       .expect(
         `
-        @service({ title: "Test" })
+        @service(#{ title: "Test" })
         @armProviderNamespace("Contoso.Service")
         namespace Service;
       `,
@@ -60,7 +60,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
     await tester
       .expect(
         `
-        @service({ title: "Test" })
+        @service(#{ title: "Test" })
         @versioned(Service.Versions)
         @armProviderNamespace("Contoso.Service")
         @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
@@ -79,7 +79,7 @@ describe("typespec-azure-resource-manager: ARM common-types version rule", () =>
     await tester
       .expect(
         `
-        @service({ title: "Test" })
+        @service(#{ title: "Test" })
         @versioned(Service.Versions)
         @armProviderNamespace("Contoso.Service")
         namespace Service;

@@ -1,12 +1,10 @@
 import "@typespec/http";
 import "@typespec/rest";
 
-@service({
-  title: "TypeSpec Overloads Sample",
-})
+@service(#{ title: "TypeSpec Overloads Sample" })
 namespace TypeSpec.Samples.Overloads;
 
-using TypeSpec.Http;
+using Http;
 
 @route("/typespec/things")
 namespace Things {
