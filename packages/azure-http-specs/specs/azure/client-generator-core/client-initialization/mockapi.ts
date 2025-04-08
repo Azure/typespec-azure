@@ -185,7 +185,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
     request: {},
     response: {
       status: 200,
-      body: json("Successfully used aliased parameters"),
+      body: json("Successfully used aliased parameter"),
     },
     kind: "MockApiDefinition",
   },
@@ -195,7 +195,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
     request: {},
     response: {
       status: 200,
-      body: json("Successfully used aliased parameters"),
+      body: json("Successfully used original parameter"),
     },
     kind: "MockApiDefinition",
   },

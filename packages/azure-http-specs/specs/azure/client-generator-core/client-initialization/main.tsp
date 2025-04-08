@@ -26,13 +26,7 @@ model Input {
   name: string;
 }
 
-model CommonHeaders {
-  @header("client-name")
-  clientName: string;
-
-  @header("correlation-id")
-  correlationId: string;
-}
+// Scenario 1: Header parameter moved to client level
 
 @route("/header-param")
 interface HeaderParam {

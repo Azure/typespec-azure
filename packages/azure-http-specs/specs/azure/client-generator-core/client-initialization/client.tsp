@@ -175,6 +175,7 @@ interface PathParam {
   ```
   """)
 @scenario
+@global.Azure.ClientGenerator.Core.clientInitialization(ParamAliasClientOptions)
 @global.Azure.ClientGenerator.Core.client({
   name: "ParamAliasClient",
   service: Service,
