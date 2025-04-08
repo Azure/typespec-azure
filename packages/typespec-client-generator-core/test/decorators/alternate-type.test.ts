@@ -194,7 +194,7 @@ it.each([
   },
 );
 
-it("should not support source type is scalar but alternate type string[]", async () => {
+it("should not support source type is scalar but alternate type is string[]", async () => {
   const diagnostics = await runner.diagnose(`
     @service
     namespace MyService {
