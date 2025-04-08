@@ -551,11 +551,10 @@ extern dec clientNamespace(
 
 /**
  * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
- * When the alternate type is `Scalar` or `unknown`, the source type must be `Scalar` or model property of `Scalar`.
- * When the alternate type is `Scalar Array`, the source type must be model property of `Scalar Array`.
+ * When the source type is `Scalar`, the alternate type must be `Scalar`.
  *
- * @param source The source type to which the alternate type will be applied. Supported types include `Scalar`, model property of `Scalar` or model property of `Scalar Array`.
- * @param alternate The alternate type to apply to the target. Supported types include `Scalar`, `Scalar Array` or `unknown`.
+ * @param source The source type to which the alternate type will be applied.
+ * @param alternate The alternate type to apply to the target.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
@@ -587,7 +586,7 @@ extern dec clientNamespace(
  */
 extern dec alternateType(
   source: ModelProperty | Scalar,
-  alternate: Scalar | Model | unknown,
+  alternate: unknown,
   scope?: valueof string
 );
 

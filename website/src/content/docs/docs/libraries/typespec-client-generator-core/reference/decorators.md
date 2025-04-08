@@ -151,24 +151,23 @@ op func8(@body body: Test5): void;
 ### `@alternateType` {#@Azure.ClientGenerator.Core.alternateType}
 
 Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
-When the alternate type is `Scalar` or `unknown`, the source type must be `Scalar` or model property of `Scalar`.
-When the alternate type is `Scalar Array`, the source type must be model property of `Scalar Array`.
+When the source type is `Scalar`, the alternate type must be `Scalar`.
 
 ```typespec
-@Azure.ClientGenerator.Core.alternateType(alternate: Scalar | Model | unknown, scope?: valueof string)
+@Azure.ClientGenerator.Core.alternateType(alternate: unknown, scope?: valueof string)
 ```
 
 #### Target
 
-The source type to which the alternate type will be applied. Supported types include `Scalar`, model property of `Scalar` or model property of `Scalar Array`.
+The source type to which the alternate type will be applied.
 `ModelProperty | Scalar`
 
 #### Parameters
 
-| Name      | Type                         | Description                                                                                                                                                                                            |
-| --------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| alternate | `Scalar \| Model \| unknown` | The alternate type to apply to the target. Supported types include `Scalar`, `Scalar Array` or `unknown`.                                                                                              |
-| scope     | `valueof string`             | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name      | Type             | Description                                                                                                                                                                                            |
+| --------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| alternate | `unknown`        | The alternate type to apply to the target.                                                                                                                                                             |
+| scope     | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 #### Examples
 

@@ -959,49 +959,7 @@ export const $alternateType: AlternateTypeDecorator = (
   alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  let invalidAlternate = true;
-  let invalidSource = true;
-
-  // if alternate type is unknown, source type must be scalar
-  if (alternate.kind === "Intrinsic" && alternate.name === "unknown") {
-    invalidAlternate = false;
-    if (
-      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
-      source.kind === "Scalar"
-    ) {
-      invalidSource = false;
-    }
-  }
-
-  // if alternate type is scalar array, source type must be scalar array
-  if (
-    alternate.kind === "Model" &&
-    alternate.name === "Array" &&
-    alternate.indexer?.value.kind === "Scalar"
-  ) {
-    invalidAlternate = false;
-    if (
-      source.kind === "ModelProperty" &&
-      source.type.kind === "Model" &&
-      source.type.name === "Array" &&
-      source.type.indexer?.value.kind === "Scalar"
-    ) {
-      invalidSource = false;
-    }
-  }
-
-  // if alternate type is scalar, source type must be scalar
-  if (alternate.kind === "Scalar") {
-    invalidAlternate = false;
-    if (
-      (source.kind === "ModelProperty" && source.type.kind === "Scalar") ||
-      source.kind === "Scalar"
-    ) {
-      invalidSource = false;
-    }
-  }
-
-  if (invalidAlternate) {
+  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
     reportDiagnostic(context.program, {
       code: "invalid-alternate-type",
       format: {},
@@ -1009,19 +967,6 @@ export const $alternateType: AlternateTypeDecorator = (
     });
     return;
   }
-
-  if (invalidSource) {
-    const sourceTypeName = source.kind === "ModelProperty" ? source.type.kind : source.kind;
-    reportDiagnostic(context.program, {
-      code: "invalid-alternate-source-type",
-      format: {
-        typeName: sourceTypeName,
-      },
-      target: source,
-    });
-    return;
-  }
-
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
 };
 
