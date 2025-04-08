@@ -52,7 +52,7 @@ Scenarios.Azure_Core_Page_listWithCustomPageModel = passOnSuccess({
 Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
   {
     // First page request
-    uri: "/azure/core/page/parameterized-next-link",
+    uri: "/azure/core/page/with-parameterized-next-link",
     method: "get",
     request: {
       query: {
@@ -65,14 +65,14 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
       body: json({
         value: [{ id: 1, name: "User1" }],
         // Include the original query parameters in the nextLink
-        nextLink: "/azure/core/page/with-parameterized-next-link?select=name",
+        nextLink: "/azure/core/page/with-parameterized-next-link/second-page?select=name",
       }),
     },
     kind: "MockApiDefinition",
   },
   {
     // Follow-up page request
-    uri: "/azure/core/page/with-parameterized-next-link",
+    uri: "/azure/core/page/with-parameterized-next-link/second-page",
     method: "get",
     request: {
       query: {
