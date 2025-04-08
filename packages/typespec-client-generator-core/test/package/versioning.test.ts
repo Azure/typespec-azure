@@ -7,12 +7,7 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "../../src/decorators.js";
-import {
-  SdkClientType,
-  SdkHttpOperation,
-  SdkMethodResponse,
-  UsageFlags,
-} from "../../src/interfaces.js";
+import { SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -77,7 +72,7 @@ it("basic default version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -176,7 +171,7 @@ it("basic latest version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -274,7 +269,7 @@ it("basic v3 version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -372,7 +367,7 @@ it("basic v2 version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -473,7 +468,7 @@ it("basic v1 version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -559,7 +554,7 @@ it("basic all version", async () => {
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const apiVersionParam = sdkPackage.clients[0].initialization.properties.find(
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
     (x) => x.isApiVersionParam,
   );
   ok(apiVersionParam);
@@ -649,9 +644,11 @@ it("default api version for interface extends", async () => {
   `);
 
   const sdkPackage = runner.context.sdkPackage;
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
-  const apiVersionClientParam = client.initialization.properties.find((x) => x.isApiVersionParam);
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
+  const apiVersionClientParam = client.clientInitialization.parameters.find(
+    (x) => x.isApiVersionParam,
+  );
   ok(apiVersionClientParam);
   strictEqual(apiVersionClientParam.clientDefaultValue, "v2");
 
@@ -696,7 +693,9 @@ it("default api version for operation is", async () => {
   strictEqual(apiVersionParam.isApiVersionParam, true);
   strictEqual(apiVersionParam.clientDefaultValue, "v2");
   strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
-  const clientApiVersionParam = client.initialization.properties.find((x) => x.isApiVersionParam);
+  const clientApiVersionParam = client.clientInitialization.parameters.find(
+    (x) => x.isApiVersionParam,
+  );
   ok(clientApiVersionParam);
   strictEqual(apiVersionParam.correspondingMethodParams[0], clientApiVersionParam);
   strictEqual(clientApiVersionParam.clientDefaultValue, "v2");
@@ -856,10 +855,11 @@ it("add client", async () => {
   strictEqual(sdkPackage.clients.length, 1);
   const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
   ok(versioningClient);
-  strictEqual(versioningClient.methods.length, 2);
+  strictEqual(versioningClient.methods.length, 1);
+  strictEqual(versioningClient.children?.length, 1);
 
-  strictEqual(versioningClient.initialization.properties.length, 1);
-  const versioningClientEndpoint = versioningClient.initialization.properties.find(
+  strictEqual(versioningClient.clientInitialization.parameters.length, 1);
+  const versioningClientEndpoint = versioningClient.clientInitialization.parameters.find(
     (x) => x.kind === "endpoint",
   );
   ok(versioningClientEndpoint);
@@ -870,18 +870,12 @@ it("add client", async () => {
   strictEqual(serviceMethod.name, "test");
   deepStrictEqual(serviceMethod.apiVersions, ["v1", "v2"]);
 
-  const clientAccessor = versioningClient.methods.find((x) => x.kind === "clientaccessor");
-  ok(clientAccessor);
-  strictEqual(clientAccessor.name, "getInterfaceV2");
-  deepStrictEqual(clientAccessor.apiVersions, ["v2"]);
-
-  const interfaceV2 = versioningClient.methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const interfaceV2 = versioningClient.children?.[0];
   ok(interfaceV2);
   strictEqual(interfaceV2.methods.length, 1);
 
-  strictEqual(interfaceV2.initialization.properties.length, 1);
-  const interfaceV2Endpoint = interfaceV2.initialization.properties.find(
+  strictEqual(interfaceV2.clientInitialization.parameters.length, 1);
+  const interfaceV2Endpoint = interfaceV2.clientInitialization.parameters.find(
     (x) => x.kind === "endpoint",
   );
   ok(interfaceV2Endpoint);

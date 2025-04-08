@@ -1,4 +1,11 @@
-import { json, passOnCode, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { deepEquals } from "@typespec/compiler/utils";
+import {
+  json,
+  passOnCode,
+  passOnSuccess,
+  ScenarioMockApi,
+  ValidationError,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -88,6 +95,11 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSyste
     method: "put",
     request: {
       body: json({
+        location: "eastus",
+        tags: {
+          tagKey1: "tagValue1",
+        },
+        properties: {},
         identity: createExpectedIdentity,
       }),
       pathParams: {
@@ -104,6 +116,21 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_createWithSyste
       body: json(validSystemAssignedManagedIdentityResource),
     },
     kind: "MockApiDefinition",
+    handler: (req) => {
+      // .NET SDK would not send "properties" property, if it is empty.
+      // Hence here we only verify "identity" property.
+      if (!deepEquals(req.body["identity"], createExpectedIdentity)) {
+        throw new ValidationError(
+          "Body should contain 'identity' property",
+          createExpectedIdentity,
+          req.body,
+        );
+      }
+      return {
+        status: 200,
+        body: json(validSystemAssignedManagedIdentityResource),
+      };
+    },
   });
 
 Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserAssignedAndSystemAssigned =
@@ -114,9 +141,6 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
       body: json({
         identity: updateExpectedIdentity,
       }),
-      headers: {
-        "Content-Type": "application/merge-patch+json",
-      },
       pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
         resourceGroup: RESOURCE_GROUP_EXPECTED,
@@ -131,6 +155,19 @@ Scenarios.Azure_ResourceManager_CommonProperties_ManagedIdentity_updateWithUserA
       body: json(validUserAssignedAndSystemAssignedManagedIdentityResource),
     },
     kind: "MockApiDefinition",
+    handler: (req) => {
+      if (!deepEquals(req.body["identity"], updateExpectedIdentity)) {
+        throw new ValidationError(
+          "Body should contain 'identity' property",
+          updateExpectedIdentity,
+          req.body,
+        );
+      }
+      return {
+        status: 200,
+        body: json(validUserAssignedAndSystemAssignedManagedIdentityResource),
+      };
+    },
   });
 
 Scenarios.Azure_ResourceManager_CommonProperties_Error_getForPredefinedError = passOnCode(404, {
@@ -165,6 +202,7 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
   method: "put",
   request: {
     body: json({
+      location: "eastus",
       properties: {
         username: "00",
       },

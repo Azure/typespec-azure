@@ -777,7 +777,7 @@ it("filterOutCoreModels true", async () => {
   strictEqual(models[0].name, "User");
   strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-  for (const [type, sdkType] of runner.context.__referencedTypeCache?.entries() ?? []) {
+  for (const [type, sdkType] of runner.context.__referencedTypeCache.entries()) {
     if (isAzureCoreTspModel(type)) {
       ok(sdkType.usage !== UsageFlags.None);
     }
@@ -1053,7 +1053,7 @@ it("propagation", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const salmon = Array.from(runner.context.__referencedTypeCache?.values() ?? []).find(
+  const salmon = Array.from(runner.context.__referencedTypeCache.values()).find(
     (x) => x.kind === "model" && x.name === "Salmon",
   ) as SdkModelType;
   strictEqual(salmon?.serializationOptions.json, undefined);
@@ -1112,7 +1112,7 @@ it("propagation from subtype", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const types = Array.from(runner.context.__referencedTypeCache?.values() ?? []);
+  const types = Array.from(runner.context.__referencedTypeCache.values());
 
   const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
   strictEqual(shark?.serializationOptions.json, undefined);
@@ -1372,29 +1372,26 @@ it("additionalProperties of same type", async () => {
 
 it("additionalProperties usage", async () => {
   await runner.compileWithBuiltInService(`
-    @service
-    namespace MyService {
-      model AdditionalPropertiesModel extends Record<Test> {
-      }
-
-      model AdditionalPropertiesModel2 is Record<Test> {
-      }
-
-      model AdditionalPropertiesModel3 {
-        ...Record<Test2>;
-      }
-
-      model Test {
-      }
-
-      model Test2 {
-      }
-
-      @route("test")
-      op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
-      @route("test2")
-      op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
+    model AdditionalPropertiesModel extends Record<Test> {
     }
+
+    model AdditionalPropertiesModel2 is Record<Test> {
+    }
+
+    model AdditionalPropertiesModel3 {
+      ...Record<Test2>;
+    }
+
+    model Test {
+    }
+
+    model Test2 {
+    }
+
+    @route("test")
+    op test(@body input: AdditionalPropertiesModel): AdditionalPropertiesModel2;
+    @route("test2")
+    op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
   `);
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 5);
@@ -1630,14 +1627,18 @@ it("error model inheritance", async () => {
   `);
   const models = getAllModels(runner.context);
   strictEqual(models.length, 5);
-  const errorModels = models.filter((x) => x.kind === "model" && (x.usage & UsageFlags.Error) > 0);
+  const errorModels = models.filter(
+    (x) => x.kind === "model" && (x.usage & UsageFlags.Exception) > 0,
+  );
   deepStrictEqual(errorModels.map((x) => x.name).sort(), [
     "ApiError",
     "FiveHundredError",
     "FourHundredError",
     "FourZeroFourError",
   ]);
-  const validModel = models.filter((x) => x.kind === "model" && (x.usage & UsageFlags.Error) === 0);
+  const validModel = models.filter(
+    (x) => x.kind === "model" && (x.usage & UsageFlags.Exception) === 0,
+  );
   deepStrictEqual(
     validModel.map((x) => x.name),
     ["ValidResponse"],
@@ -1841,4 +1842,38 @@ it("discriminator from template", async function () {
   strictEqual(one.properties[1].name, "prop");
 
   expectDiagnosticEmpty(runner.context.diagnostics);
+});
+
+it("model sequence", async function () {
+  await runner.compileWithBuiltInService(`
+    model A {
+      prop: string;
+    }
+
+    model B {
+      prop: string;
+    }
+
+    model C {
+      prop: string;
+    }
+
+    namespace Foo {
+      @route("/foo")
+      op foo(): A;
+
+      interface Bar {
+        @route("/bar")
+        bar(): B;
+      }
+    }
+
+    interface Baz {
+      @route("/baz")
+      baz(): C;
+    }
+  `);
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 3);
+  strictEqual(models.map((x) => x.name).join(","), "A,C,B");
 });

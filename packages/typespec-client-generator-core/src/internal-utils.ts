@@ -28,19 +28,14 @@ import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
 } from "@typespec/compiler/experimental";
-import {
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationResponseContent,
-} from "@typespec/http";
+import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias, listOperationGroups } from "./decorators.js";
+import { getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -48,7 +43,6 @@ import {
   SdkEnumType,
   SdkHttpResponse,
   SdkModelPropertyType,
-  SdkOperationGroup,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -62,6 +56,28 @@ import {
 import { getClientTypeWithDiagnostics } from "./types.js";
 
 import { $ } from "@typespec/compiler/experimental/typekit";
+
+export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
+  "emitter-name"?: string;
+}
+
+export interface UnbrandedSdkEmitterOptionsInterface {
+  "generate-protocol-methods"?: boolean;
+  "generate-convenience-methods"?: boolean;
+  "api-version"?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
+}
+
+export interface BrandedSdkEmitterOptionsInterface extends UnbrandedSdkEmitterOptionsInterface {
+  "examples-dir"?: string;
+  namespace?: string;
+}
 
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
@@ -489,8 +505,8 @@ export function twoParamsEquivalent(
  * @param parameters
  * @returns
  */
-export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
-  return httpBody.property === undefined;
+export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
+  return httpBody.bodyKind !== "file" && httpBody.property === undefined;
 }
 
 /**
@@ -650,18 +666,37 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   return subgraph.type;
 }
 
-export function listRawSubClients(
+export function resolveDuplicateGenearatedName(
   context: TCGCContext,
-  client: SdkOperationGroup | SdkClient,
-): SdkOperationGroup[] {
-  const retval: SdkOperationGroup[] = [];
-  const queue: SdkOperationGroup[] = listOperationGroups(context, client);
-  while (queue.length > 0) {
-    const operationGroup = queue.pop()!;
-    retval.push(operationGroup);
-    if (operationGroup.subOperationGroups) {
-      queue.push(...operationGroup.subOperationGroups);
+  type: Union | Model | TspLiteralType,
+  createName: string,
+): string {
+  let duplicateCount = 1;
+  const rawCreateName = createName;
+  const generatedNames = [...context.__generatedNames.values()];
+  while (generatedNames.includes(createName)) {
+    createName = `${rawCreateName}${duplicateCount++}`;
+  }
+  context.__generatedNames.set(type, createName);
+  return createName;
+}
+
+export function resolveConflictGeneratedName(context: TCGCContext) {
+  const userDefinedNames = [...context.__referencedTypeCache.values()]
+    .filter((x) => !x.isGeneratedName)
+    .map((x) => x.name);
+  const generatedNames = [...context.__generatedNames.values()];
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
+      const rawName = sdkType.name;
+      let duplicateCount = 1;
+      let createName = `${rawName}${duplicateCount++}`;
+      while (userDefinedNames.includes(createName) || generatedNames.includes(createName)) {
+        createName = `${rawName}${duplicateCount++}`;
+      }
+      sdkType.name = createName;
+      context.__generatedNames.set(sdkType.__raw, createName);
+      generatedNames.push(createName);
     }
   }
-  return retval;
 }

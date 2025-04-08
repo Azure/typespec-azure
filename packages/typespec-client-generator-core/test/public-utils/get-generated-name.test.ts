@@ -818,4 +818,65 @@ describe("corner case", () => {
     );
     strictEqual(name, "TestResponse");
   });
+
+  it("generate name conflict with user defined name", async () => {
+    await runner.compileWithBuiltInService(`
+        model TestResponse {
+          prop: string;
+        }
+
+        model TestResponse1 {
+          prop: string;
+        }
+
+        @route("/test")
+        op test(): {prop: string};
+
+        @route("/foo")
+        op foo(): TestResponse;
+
+        @route("/bar")
+        op bar(): TestResponse1;
+    `);
+
+    const models = runner.context.sdkPackage.models;
+    strictEqual(models.length, 3);
+    const TestResponse = models.find((x) => x.name === "TestResponse");
+    ok(TestResponse);
+    strictEqual(TestResponse.kind, "model");
+    strictEqual(TestResponse.isGeneratedName, false);
+    strictEqual(TestResponse.crossLanguageDefinitionId, "TestService.TestResponse");
+    const TestResponse1 = models.find((x) => x.name === "TestResponse1");
+    ok(TestResponse1);
+    strictEqual(TestResponse1.kind, "model");
+    strictEqual(TestResponse1.isGeneratedName, false);
+    strictEqual(TestResponse1.crossLanguageDefinitionId, "TestService.TestResponse1");
+    const TestResponse2 = models.find((x) => x.name === "TestResponse2");
+    ok(TestResponse2);
+    strictEqual(TestResponse2.kind, "model");
+    strictEqual(TestResponse2.isGeneratedName, true);
+    strictEqual(TestResponse2.crossLanguageDefinitionId, "TestService.test.Response.anonymous");
+  });
+
+  it("generated name for body root anonymous model", async function () {
+    await runner.compileWithBuiltInService(`
+      model Test {
+        prop: string;
+      }
+      op test(@bodyRoot body: {@body body: Test}): void;
+    `);
+    const sdkPackage = runner.context.sdkPackage;
+    strictEqual(sdkPackage.models.length, 2);
+    const testModel = sdkPackage.models.find((m) => m.name === "Test");
+    ok(testModel);
+    strictEqual(testModel.properties.length, 1);
+    strictEqual(testModel.properties[0].name, "prop");
+
+    const anonymousModel = sdkPackage.models.find((m) => m.name === "TestParameterBody");
+    ok(anonymousModel);
+    strictEqual(anonymousModel.properties.length, 1);
+    strictEqual(anonymousModel.properties[0].kind, "body");
+    strictEqual(anonymousModel.properties[0].name, "body");
+    strictEqual(anonymousModel.properties[0].type, testModel);
+  });
 });

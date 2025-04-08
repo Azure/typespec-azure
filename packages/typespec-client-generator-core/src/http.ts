@@ -33,7 +33,7 @@ import {
 } from "@typespec/http";
 import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getParamAlias } from "./decorators.js";
+import { getParamAlias, getResponseAsBool } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -79,6 +79,7 @@ import {
 import {
   addEncodeInfo,
   getClientTypeWithDiagnostics,
+  getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
 } from "./types.js";
@@ -92,6 +93,38 @@ export function getSdkHttpOperation(
   const { responses, exceptions } = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation),
   );
+  if (getResponseAsBool(context, httpOperation.operation)) {
+    // we make sure valid responses and 404 responses are booleans
+    for (const response of responses) {
+      // all valid responses will return boolean
+      response.type = getSdkConstant(context, $.literal.createBoolean(true));
+    }
+    const fourOFourResponse = exceptions.find((e) => e.statusCodes === 404);
+    if (fourOFourResponse) {
+      fourOFourResponse.type = getSdkConstant(context, $.literal.createBoolean(false));
+      // move from exception to valid response with status code 404
+      responses.push({
+        ...fourOFourResponse,
+        statusCodes: 404,
+      });
+      exceptions.splice(exceptions.indexOf(fourOFourResponse), 1);
+      // remove the exception from the list
+    } else {
+      // add 404 response to the list of valid responses
+      responses.push({
+        kind: "http",
+        statusCodes: 404,
+        type: getSdkConstant(context, $.literal.createBoolean(false)),
+        apiVersions: getAvailableApiVersions(
+          context,
+          httpOperation.operation,
+          httpOperation.operation,
+        ),
+        headers: [],
+        __raw: (responses[0] || exceptions[0]).__raw,
+      });
+    }
+  }
   const responsesWithBodies = [...responses.values(), ...exceptions.values()].filter((r) => r.type);
   const parameters = diagnostics.pipe(
     getSdkHttpParameters(context, httpOperation, methodParameters, responsesWithBodies[0]),
@@ -150,6 +183,16 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: SdkModelPropertyType[] = [];
   if (tspBody) {
+    if (tspBody.bodyKind === "file") {
+      // file body is not supported yet
+      diagnostics.add(
+        createDiagnostic({
+          code: "unsupported-http-file-body",
+          target: tspBody.property ?? tspBody.type,
+        }),
+      );
+      return diagnostics.wrap(retval);
+    }
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
@@ -375,17 +418,21 @@ export function getSdkHttpParameter(
   const program = context.program;
   const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, param) || location === "path") {
-    // we don't url encode if the type can be assigned to url
-    const urlEncode = !ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(param.type, program.checker.getStdType("url"), param.type),
-    );
     return diagnostics.wrap({
       ...base,
       kind: "path",
-      urlEncode,
       explode: (httpParam as HttpOperationPathParameter)?.explode ?? false,
       style: (httpParam as HttpOperationPathParameter)?.style ?? "simple",
-      allowReserved: (httpParam as HttpOperationPathParameter)?.allowReserved ?? false,
+      // url type need allow reserved
+      allowReserved:
+        (httpParam as HttpOperationPathParameter)?.allowReserved ??
+        ignoreDiagnostics(
+          program.checker.isTypeAssignableTo(
+            param.type,
+            program.checker.getStdType("url"),
+            param.type,
+          ),
+        ),
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: false,
@@ -581,7 +628,7 @@ export function getCorrespondingMethodParams(
       diagnostics.add(
         createDiagnostic({
           code: "no-corresponding-method-param",
-          target: serviceParam.__raw!,
+          target: operation,
           format: {
             paramName: "apiVersion",
             methodName: operation.name,
@@ -600,7 +647,7 @@ export function getCorrespondingMethodParams(
       diagnostics.add(
         createDiagnostic({
           code: "no-corresponding-method-param",
-          target: serviceParam.__raw!,
+          target: operation,
           format: {
             paramName: "subscriptionId",
             methodName: operation.name,
@@ -621,13 +668,17 @@ export function getCorrespondingMethodParams(
   // 5. To see if all the property of the service parameter could be mapped to a method parameter or a property of a method parameter.
   if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
     const retVal = [];
+    let optionalSkip = 0;
     for (const serviceParamProp of serviceParam.type.properties) {
       const propertyMapping = findMapping(methodParameters, serviceParamProp);
       if (propertyMapping) {
         retVal.push(propertyMapping);
+      } else if (serviceParamProp.optional) {
+        // If the property is optional, we can skip the mapping.
+        optionalSkip++;
       }
     }
-    if (retVal.length === serviceParam.type.properties.length) {
+    if (retVal.length + optionalSkip === serviceParam.type.properties.length) {
       return diagnostics.wrap(retVal);
     }
   }
@@ -636,7 +687,7 @@ export function getCorrespondingMethodParams(
   diagnostics.add(
     createDiagnostic({
       code: "no-corresponding-method-param",
-      target: serviceParam.__raw!,
+      target: operation,
       format: {
         paramName: serviceParam.name,
         methodName: operation.name,
@@ -738,7 +789,11 @@ function getCollectionFormat(
       getHeaderFieldOptions(program, type).explode,
     );
   } else if (isQueryParam(program, type)) {
-    return getFormatFromExplodeOrEncode(context, type, getQueryParamOptions(program, type).explode);
+    return getFormatFromExplodeOrEncode(
+      context,
+      type,
+      getQueryParamOptions(program, type)?.explode,
+    );
   }
   return diagnostics.wrap(undefined);
 }

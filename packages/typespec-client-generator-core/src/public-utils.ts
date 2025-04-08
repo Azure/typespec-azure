@@ -31,7 +31,9 @@ import pluralize from "pluralize";
 import {
   getClientNameOverride,
   getIsApiVersion,
+  getOverriddenClientMethod,
   listClients,
+  listOperationGroups,
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
@@ -57,10 +59,9 @@ import {
   isAzureCoreTspModel,
   isHttpBodySpread,
   listAllUserDefinedNamespaces,
-  listRawSubClients,
   removeVersionsLargerThanExplicitlySpecified,
+  resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
-import { createDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -189,7 +190,7 @@ export function getLibraryName(
     type.kind === "Model" &&
     type.templateMapper?.args
   ) {
-    const generatedName = context.__generatedNames?.get(type);
+    const generatedName = context.__generatedNames.get(type);
     if (generatedName) return generatedName;
     return resolveDuplicateGenearatedName(
       context,
@@ -294,19 +295,7 @@ export function getCrossLanguagePackageId(context: TCGCContext): [string, readon
   const diagnostics = createDiagnosticCollector();
   const serviceNamespaces = listAllServiceNamespaces(context);
   if (serviceNamespaces.length === 0) return diagnostics.wrap("");
-  const serviceNamespace = getNamespaceFullName(serviceNamespaces[0]);
-  if (serviceNamespaces.length > 1) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "multiple-services",
-        target: serviceNamespaces[0],
-        format: {
-          service: serviceNamespace,
-        },
-      }),
-    );
-  }
-  return diagnostics.wrap(serviceNamespace);
+  return diagnostics.wrap(getNamespaceFullName(serviceNamespaces[0]));
 }
 
 /**
@@ -319,7 +308,7 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  const generatedName = context.__generatedNames?.get(type);
+  const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -359,7 +348,7 @@ function findContextPath(
         return result;
       }
     }
-    for (const og of listRawSubClients(context, client)) {
+    for (const og of listOperationGroups(context, client, true)) {
       for (const operation of listOperationsInOperationGroup(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
@@ -440,6 +429,13 @@ function getContextPath(
           }
         }
       }
+    }
+
+    const overriddenClientMethod = getOverriddenClientMethod(context, root);
+    visited.clear();
+    result = [{ name: root.name, type: root }];
+    if (dfsModelProperties(typeToFind, overriddenClientMethod ?? root.parameters, "Parameter")) {
+      return result;
     }
   } else {
     visited.clear();
@@ -636,21 +632,6 @@ function buildNameFromContextPaths(
   return createName;
 }
 
-function resolveDuplicateGenearatedName(
-  context: TCGCContext,
-  type: Union | Model | TspLiteralType,
-  createName: string,
-): string {
-  let duplicateCount = 1;
-  const rawCreateName = createName;
-  const generatedNames = [...(context.__generatedNames?.values() ?? [])];
-  while (generatedNames.includes(createName)) {
-    createName = `${rawCreateName}${duplicateCount++}`;
-  }
-  context.__generatedNames!.set(type, createName);
-  return createName;
-}
-
 export function getHttpOperationWithCache(
   context: TCGCContext,
   operation: Operation,
@@ -670,7 +651,7 @@ export function getHttpOperationExamples(
   context: TCGCContext,
   operation: HttpOperation,
 ): SdkHttpOperationExample[] {
-  return context.__httpOperationExamples?.get(operation) ?? [];
+  return context.__httpOperationExamples.get(operation) ?? [];
 }
 
 export function isAzureCoreModel(t: SdkType): boolean {

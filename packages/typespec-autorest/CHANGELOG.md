@@ -1,5 +1,21 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.54.0
+
+### Features
+
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2459](https://github.com/Azure/typespec-azure/pull/2459) Fix doc on HttpPart properties not being carried to `formData` parameter
+- [#2464](https://github.com/Azure/typespec-azure/pull/2464) Fix multipart not applying `x-ms-client-name` when using an explicit part name different from the property name
+
+
 ## 0.53.0
 
 ### Breaking Changes

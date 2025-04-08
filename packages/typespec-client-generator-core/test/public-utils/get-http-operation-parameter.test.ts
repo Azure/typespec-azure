@@ -1,11 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import {
-  SdkClientType,
-  SdkHttpOperation,
-  SdkMethodParameter,
-  SdkServiceMethod,
-} from "../../src/interfaces.js";
+import { SdkHttpOperation, SdkMethodParameter, SdkServiceMethod } from "../../src/interfaces.js";
 import { getHttpOperationParameter } from "../../src/public-utils.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
@@ -284,21 +279,20 @@ it("multipart case", async () => {
   await runner.compileWithBuiltInService(`
     @route("upload/{name}")
     @post
-    #suppress "deprecated" "For test"
     op uploadFile(
       @path name: string,
       @header contentType: "multipart/form-data",
-      file_data: bytes,
-
-      @visibility(Lifecycle.Read) readOnly: string,
-
-      constant: "constant",
+      @multipartBody body: {
+        file_data: HttpPart<bytes>,
+        @visibility(Lifecycle.Read) readOnly: HttpPart<string>,
+        constant: HttpPart<"constant">,
+      },
     ): OkResponse;
   `);
   const method = getServiceMethodOfClient(runner.context.sdkPackage);
   const parameters = method.parameters;
 
-  strictEqual(parameters.length, 5);
+  strictEqual(parameters.length, 3);
 
   for (const param of parameters) {
     if (param.name === "name") {
@@ -311,19 +305,11 @@ it("multipart case", async () => {
       ok(httpParam);
       strictEqual(httpParam.kind, "header");
       strictEqual(httpParam.serializedName, "content-type");
-    } else if (param.name === "file_data") {
+    } else if (param.name === "body") {
       const httpParam = getHttpOperationParameter(method, param);
       ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "file_data");
-    } else if (param.name === "readOnly") {
-      const httpParam = getHttpOperationParameter(method, param);
-      ok(!httpParam);
-    } else if (param.name === "constant") {
-      const httpParam = getHttpOperationParameter(method, param);
-      ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "constant");
+      strictEqual(httpParam.kind, "body");
+      strictEqual(httpParam.name, "body");
     }
   }
 });
@@ -362,8 +348,8 @@ it("template case", async () => {
         ExtensionResourceList<Checkup, Pet, PetStoreError> {}
   `);
   const sdkPackage = runner.context.sdkPackage;
-  const client = sdkPackage.clients[0].methods.find((x) => x.kind === "clientaccessor")
-    ?.response as SdkClientType<SdkHttpOperation>;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
   const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
   const parameters = method.parameters;
 
@@ -408,7 +394,7 @@ it("api version parameter", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   const httpParam = getHttpOperationParameter(
     method,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "query");
@@ -439,7 +425,7 @@ it("client parameter", async () => {
   const client = sdkPackage.clients[0];
   let httpParam = getHttpOperationParameter(
     client.methods[0] as SdkServiceMethod<SdkHttpOperation>,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "path");
@@ -447,7 +433,7 @@ it("client parameter", async () => {
 
   httpParam = getHttpOperationParameter(
     client.methods[1] as SdkServiceMethod<SdkHttpOperation>,
-    client.initialization.properties[1] as SdkMethodParameter,
+    client.clientInitialization.parameters[1] as SdkMethodParameter,
   );
   ok(httpParam);
   strictEqual(httpParam.kind, "path");
