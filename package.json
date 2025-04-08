@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@9.5.0",
+  "packageManager": "pnpm@10.8.0",
   "scripts": {
     "run-all": "pnpm -r --filter=!./core/",
     "run-azure-only": "pnpm -r --filter=\"!./core/**\"",
