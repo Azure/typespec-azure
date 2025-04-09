@@ -536,6 +536,51 @@ describe("namespace config flag", () => {
     strictEqual(aNamespace.unions.length, 0);
     strictEqual(aNamespace.namespaces.length, 0);
   });
+  it("Separate namespace references", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace Client.ClientNamespace;
+
+      interface First {
+        @route("/first")
+        @get
+        getFirst(): FirstModel.FirstClientResult;
+      }
+
+      namespace FirstModel {
+        model FirstClientResult {
+          name: string;
+        }
+      }
+
+    `,
+      `
+      namespace ClientNameSpaceClient;
+
+      @client({
+        name: "ClientNamespaceFirstClient",
+        service: Client.ClientNamespace,
+      })
+      @clientNamespace("client.clientnamespace.")
+      interface ClientNamespaceFirstClient {
+        getFirst is Client.ClientNamespace.First.getFirst;
+      }
+
+      @@clientNamespace(Client.ClientNamespace.FirstModel, "client.clientnamespace.first");
+    `,
+    );
+    const sdkPackage = (
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
+        namespace: "Azure.Foo",
+      })
+    ).sdkPackage;
+    const models = sdkPackage.models;
+    strictEqual(models.length, 1);
+    const model = models[0];
+    strictEqual(model.name, "FirstClientResult");
+    strictEqual(model.namespace, "client.clientnamespace.first");
+  });
 });
 
 it("customization with models from original namespace", async () => {
