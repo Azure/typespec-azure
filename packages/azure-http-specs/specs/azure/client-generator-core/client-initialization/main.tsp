@@ -32,11 +32,11 @@ model Input {
 interface HeaderParam {
   @route("/with-query")
   @get
-  withQuery(...NameHeaderParam, @query id: string): string;
+  withQuery(...NameHeaderParam, @query id: string): void;
 
   @route("/with-body")
   @post
-  withBody(...NameHeaderParam, @body body: Input): string;
+  withBody(...NameHeaderParam, @body body: Input): void;
 }
 
 // Scenario 2: Multiple parameters (header and query) moved to client level

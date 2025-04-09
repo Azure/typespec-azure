@@ -16,7 +16,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_HeaderParam = passOnSuc
       },
     },
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
@@ -32,7 +32,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_HeaderParam = passOnSuc
       }),
     },
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
@@ -53,7 +53,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MultipleParams = passOn
       },
     },
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
@@ -72,7 +72,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MultipleParams = passOn
       }),
     },
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
@@ -93,7 +93,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuc
       },
     },
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
@@ -112,7 +112,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuc
       }),
     },
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
@@ -121,7 +121,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuc
 // Mock responses for PathParam scenario
 Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/client-initialization/path/sample-blob/content",
+    uri: "/azure/client-generator-core/client-initialization/path/sample-blob/with-query",
     method: "get",
     request: {
       query: {
@@ -129,12 +129,12 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSucce
       },
     },
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/client-initialization/path/sample-blob/properties",
+    uri: "/azure/client-generator-core/client-initialization/path/sample-blob/get-standalone",
     method: "get",
     request: {},
     response: {
@@ -149,10 +149,13 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSucce
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/client-initialization/path/sample-blob/content",
+    uri: "/azure/client-generator-core/client-initialization/path/sample-blob/with-body",
     method: "put",
     request: {
-      body: json("New content for sample-blob"),
+      body: {
+        contentType: "text/plain",
+        rawContent: "New content for sample-blob",
+      },
     },
     response: {
       status: 204,
@@ -177,7 +180,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
     method: "get",
     request: {},
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
@@ -186,7 +189,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
     method: "get",
     request: {},
     response: {
-      status: 202,
+      status: 204,
     },
     kind: "MockApiDefinition",
   },
