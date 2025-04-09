@@ -154,7 +154,6 @@ interface MixedParams {
 interface PathParam {
   withQuery is Service.PathParam.withQuery;
   getStandalone is Service.PathParam.getStandalone;
-  withBody is Service.PathParam.withBody;
   deleteStandalone is Service.PathParam.deleteStandalone;
 }
 

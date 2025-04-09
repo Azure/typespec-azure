@@ -83,10 +83,6 @@ interface PathParam {
   @get
   getStandalone(@path blobName: string): BlobProperties;
 
-  @route("/{blobName}/with-body")
-  @put
-  withBody(@path blobName: string, @body content: string): void;
-
   @route("/{blobName}")
   @delete
   deleteStandalone(@path blobName: string): void;

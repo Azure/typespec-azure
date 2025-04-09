@@ -149,20 +149,6 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSucce
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/client-initialization/path/sample-blob/with-body",
-    method: "put",
-    request: {
-      body: {
-        contentType: "text/plain",
-        rawContent: "New content for sample-blob",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
     uri: "/azure/client-generator-core/client-initialization/path/sample-blob",
     method: "delete",
     request: {},
