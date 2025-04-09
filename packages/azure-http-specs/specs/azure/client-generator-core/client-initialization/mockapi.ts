@@ -16,8 +16,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_HeaderParam = passOnSuc
       },
     },
     response: {
-      status: 200,
-      body: json("Success with name header"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -33,8 +32,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_HeaderParam = passOnSuc
       }),
     },
     response: {
-      status: 200,
-      body: json("Success with name header"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -55,8 +53,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MultipleParams = passOn
       },
     },
     response: {
-      status: 200,
-      body: json("Success with name and region parameters"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -75,8 +72,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MultipleParams = passOn
       }),
     },
     response: {
-      status: 200,
-      body: json("Success with name and region parameters"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -97,8 +93,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuc
       },
     },
     response: {
-      status: 200,
-      body: json("Success with mixed client and method parameters"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -117,8 +112,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuc
       }),
     },
     response: {
-      status: 200,
-      body: json("Success with mixed client and method parameters"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -135,8 +129,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSucce
       },
     },
     response: {
-      status: 200,
-      body: json("This is the content of sample-blob"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -184,8 +177,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
     method: "get",
     request: {},
     response: {
-      status: 200,
-      body: json("Successfully used aliased parameter"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },
@@ -194,8 +186,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
     method: "get",
     request: {},
     response: {
-      status: 200,
-      body: json("Successfully used original parameter"),
+      status: 202,
     },
     kind: "MockApiDefinition",
   },

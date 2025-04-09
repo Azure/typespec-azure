@@ -45,11 +45,11 @@ interface HeaderParam {
 interface MultipleParams {
   @route("/with-query")
   @get
-  withQuery(...NameHeaderParam, ...RegionQueryParam, @query id: string): string;
+  withQuery(...NameHeaderParam, ...RegionQueryParam, @query id: string): void;
 
   @route("/with-body")
   @post
-  withBody(...NameHeaderParam, ...RegionQueryParam, @body body: Input): string;
+  withBody(...NameHeaderParam, ...RegionQueryParam, @body body: Input): void;
 }
 
 // Scenario 3: Mix of client-level and method-level parameters
@@ -58,7 +58,7 @@ interface MultipleParams {
 interface MixedParams {
   @route("/with-query")
   @get
-  withQuery(...NameHeaderParam, ...RegionQueryParam, @query id: string): string;
+  withQuery(...NameHeaderParam, ...RegionQueryParam, @query id: string): void;
 
   @route("/with-body")
   @post
@@ -68,7 +68,7 @@ interface MixedParams {
     @body body: {
       name: string;
     },
-  ): string;
+  ): void;
 }
 
 // Scenario 4: Path parameter moved to client level
@@ -77,7 +77,7 @@ interface MixedParams {
 interface PathParam {
   @route("/{blobName}/with-query")
   @get
-  withQuery(@path blobName: string, @query format?: string): string;
+  withQuery(@path blobName: string, @query format?: string): void;
 
   @route("/{blobName}/get-standalone")
   @get
@@ -101,7 +101,7 @@ interface ParamAlias {
   withAliasedName(
     @path
     blob: string,
-  ): string;
+  ): void;
 
   @route("/{blobName}/with-original-name")
   @get
