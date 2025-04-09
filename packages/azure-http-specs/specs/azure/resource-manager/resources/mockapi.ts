@@ -245,6 +245,28 @@ function getUri(resourceUri: string, extensionName: string, requestMethod: strin
   }
 }
 
+function getUriForTenant(
+  extensionName: string,
+  requestMethod: string,
+  isWithSlash: boolean = true,
+) {
+  if (isWithSlash) {
+    switch (requestMethod) {
+      case "list":
+        return `//providers/Azure.ResourceManager.Resources/extensionsResources`;
+      default:
+        return `//providers/Azure.ResourceManager.Resources/extensionsResources/${extensionName}`;
+    }
+  } else {
+    switch (requestMethod) {
+      case "list":
+        return `/providers/Azure.ResourceManager.Resources/extensionsResources`;
+      default:
+        return `/providers/Azure.ResourceManager.Resources/extensionsResources/${extensionName}`;
+    }
+  }
+}
+
 // extension tracked resource
 Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceKeys([
   "ResourceGroup",
@@ -317,7 +339,23 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "get", true),
+    method: "get",
+    request: {
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validTenantExtensionsResource),
+    },
+    handler: (req: MockRequest) =>
+      requestHandler(req, "get", TENANT_SCOPE_URI, validTenantExtensionsResource),
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "get", false),
     method: "get",
     request: {
       query: {
@@ -457,7 +495,28 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "put", true),
+    method: "put",
+    request: {
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        properties: {
+          description: "valid",
+        },
+      }),
+    },
+    response: {
+      status: 200,
+      body: json(validTenantExtensionsResource),
+    },
+    handler: (req: MockRequest) =>
+      requestHandler(req, "put", TENANT_SCOPE_URI, validTenantExtensionsResource),
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "put", false),
     method: "put",
     request: {
       query: {
@@ -636,7 +695,34 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "patch", true),
+    method: "patch",
+    request: {
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        properties: {
+          description: "valid2",
+        },
+      }),
+    },
+    response: {
+      status: 200,
+      body: json({
+        ...validTenantExtensionsResource,
+        properties: {
+          provisioningState: "Succeeded",
+          description: "valid2",
+        },
+      }),
+    },
+    handler: (req: MockRequest) =>
+      requestHandler(req, "patch", TENANT_SCOPE_URI, validTenantExtensionsResource),
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "patch", false),
     method: "patch",
     request: {
       query: {
@@ -781,7 +867,21 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "delete", true),
+    method: "delete",
+    request: {
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    handler: (req: MockRequest) => requestHandler(req, "delete", TENANT_SCOPE_URI, null),
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "delete", false),
     method: "delete",
     request: {
       query: {
@@ -903,7 +1003,25 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "list", true),
+    method: "get",
+    request: {
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [validTenantExtensionsResource],
+      }),
+    },
+    handler: (req: MockRequest) =>
+      requestHandler(req, "list", TENANT_SCOPE_URI, validTenantExtensionsResource),
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "list", false),
     method: "get",
     request: {
       query: {
