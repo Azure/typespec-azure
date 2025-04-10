@@ -3,7 +3,6 @@ import {
   DecoratorFunction,
   Enum,
   EnumMember,
-  EnumValue,
   Interface,
   Model,
   ModelProperty,
@@ -1398,22 +1397,25 @@ export const $clientDoc: ClientDocDecorator = (
     });
     return;
   }
-  
+
   const docData: ClientDocData = {
     documentation,
     mode: docMode,
   };
-  
+
   setScopedDecoratorData(context, $clientDoc, clientDocKey, target, docData, scope);
 };
 
 /**
  * Gets the client documentation data for a type.
- * 
+ *
  * @param context TCGCContext
  * @param target Type to get client documentation for
  * @returns ClientDocData or undefined if no client documentation exists
  */
-export function getClientDoc(context: TCGCContext, target: Type): ClientDocData | undefined {
+export function getClientDocExplicit(
+  context: TCGCContext,
+  target: Type,
+): ClientDocData | undefined {
   return getScopedDecoratorData(context, clientDocKey, target);
 }

@@ -680,7 +680,7 @@ enum DocumentationMode {
 }
 
 /**
- * Override documentation for a type in client libraries. This allows you to 
+ * Override documentation for a type in client libraries. This allows you to
  * provide client-specific documentation that differs from the service-definition documentation.
  * @param documentation The client-specific documentation to apply
  * @param mode Specifies how to apply the documentation (append or replace)
@@ -702,7 +702,7 @@ enum DocumentationMode {
  *   prop: string;
  * }
  * ```
- * 
+ *
  * @example Language-specific documentation
  * ```typespec
  * @doc("This is service documentation")
@@ -711,4 +711,9 @@ enum DocumentationMode {
  * op myOperation(): void;
  * ```
  */
-extern dec clientDoc(target: unknown, documentation: valueof string, mode: EnumMember, scope?: valueof string);
+extern dec clientDoc(
+  target: unknown,
+  documentation: valueof string,
+  mode: EnumMember,
+  scope?: valueof string
+);
