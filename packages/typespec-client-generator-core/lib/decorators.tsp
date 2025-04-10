@@ -663,3 +663,52 @@ extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof s
  * ```
  */
 extern dec responseAsBool(target: Operation, scope?: valueof string);
+
+/**
+ * Defines how client documentation should be applied
+ */
+enum DocumentationMode {
+  /**
+   * Append client documentation to the existing doc
+   */
+  append: "append",
+
+  /**
+   * Replace the existing doc with client documentation
+   */
+  replace: "replace",
+}
+
+/**
+ * Override documentation for a type in client libraries. This allows you to 
+ * provide client-specific documentation that differs from the service-definition documentation.
+ * @param documentation The client-specific documentation to apply
+ * @param mode Specifies how to apply the documentation (append or replace)
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ *
+ * @example Replacing documentation
+ * ```typespec
+ * @doc("This is service documentation")
+ * @clientDoc("This is client-specific documentation", DocumentationMode.replace)
+ * op myOperation(): void;
+ * ```
+ *
+ * @example Appending documentation
+ * ```typespec
+ * @doc("This is service documentation.")
+ * @clientDoc("This additional note is for client libraries only.", DocumentationMode.append)
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ * 
+ * @example Language-specific documentation
+ * ```typespec
+ * @doc("This is service documentation")
+ * @clientDoc("Python-specific documentation", DocumentationMode.replace, "python")
+ * @clientDoc("JavaScript-specific documentation", DocumentationMode.replace, "javascript")
+ * op myOperation(): void;
+ * ```
+ */
+extern dec clientDoc(target: unknown, documentation: valueof string, mode: EnumMember, scope?: valueof string);
