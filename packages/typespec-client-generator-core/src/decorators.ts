@@ -1174,21 +1174,17 @@ export const $clientNamespace: ClientNamespaceDecorator = (
  * @param userDefinedNamespaces
  * @returns
  */
-function findShortestNamespaceOverlap(
+function findNamespaceOverlapClosestToRoot(
   override: string,
   userDefinedNamespaces: Namespace[],
 ): Namespace | undefined {
-  let shortestNamespace: Namespace | undefined = undefined;
-
   for (const namespace of userDefinedNamespaces) {
     if (override.includes(namespace.name)) {
-      if (!shortestNamespace || namespace.name.length < shortestNamespace.name.length) {
-        shortestNamespace = namespace;
-      }
+      return namespace;
     }
   }
 
-  return shortestNamespace;
+  return undefined;
 }
 
 /**
@@ -1209,7 +1205,7 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
-    const userDefinedNamespace = findShortestNamespaceOverlap(
+    const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
     );
@@ -1231,23 +1227,30 @@ export function getClientNamespace(
 function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
   const segments = [];
   let current: Namespace | undefined = namespace;
+  let isOverridden: boolean = false;
   while (current && current.name !== "") {
     const override = getScopedDecoratorData(context, clientNamespaceKey, current);
     if (override) {
       segments.unshift(override);
+      isOverridden = true;
       break;
     }
     segments.unshift(current.name);
     current = current.namespace;
   }
   const joinedSegments = segments.join(".");
-  const userDefinedNamespace = findShortestNamespaceOverlap(
-    joinedSegments,
-    listAllUserDefinedNamespaces(context),
-  );
-  if (userDefinedNamespace && context.namespaceFlag) {
-    return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
+  if (isOverridden) {
+    // if it's overridden, and there's a `@clientNamespace` flag, we want to do the shortest namespace overlap replacement
+    const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
+      joinedSegments,
+      listAllUserDefinedNamespaces(context),
+    );
+    if (userDefinedNamespace && context.namespaceFlag) {
+      return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
+    }
+    return joinedSegments;
   }
+  if (context.namespaceFlag) return context.namespaceFlag;
   return joinedSegments;
 }
 
