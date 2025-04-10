@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.13
+
+### Bug Fixes
+
+- [#2485](https://github.com/Azure/typespec-azure/pull/2485) Escape scenario as this is now keyword
+
+
 ## 0.1.0-alpha.12
 
 ### Bug Fixes
