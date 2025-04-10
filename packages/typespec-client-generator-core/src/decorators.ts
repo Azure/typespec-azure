@@ -1207,47 +1207,48 @@ export function getClientNamespace(
   entity: Namespace | Interface | Model | Enum | Union,
 ): string {
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
-  const { namespace, isOverriddenInNamespace } = getNamespaceFullNameWithOverride(context, entity);
-  if (override || isOverriddenInNamespace) {
-    const overriddenNamespace = override || namespace;
+  if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
     const userDefinedNamespace = findShortestNamespaceOverlap(
-      overriddenNamespace,
+      override,
       listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
       // we still make sure to replace the root of the client namespace with the flag (if the flag exists)
       return override.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
-    return overriddenNamespace;
+    return override;
   }
-  if (context.namespaceFlag) {
-    return context.namespaceFlag;
+  if (!entity.namespace) {
+    return "";
   }
-  return namespace;
+  if (entity.kind === "Namespace") {
+    return getNamespaceFullNameWithOverride(context, entity);
+  }
+  return getNamespaceFullNameWithOverride(context, entity.namespace);
 }
 
-function getNamespaceFullNameWithOverride(
-  context: TCGCContext,
-  entity: Namespace | Interface | Model | Enum | Union,
-): { namespace: string; isOverriddenInNamespace: boolean } {
-  let isOverriddenInNamespace = false;
+function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
   const segments = [];
-  let current: Namespace | undefined = entity.kind === "Namespace" ? entity : entity.namespace;
+  let current: Namespace | undefined = namespace;
   while (current && current.name !== "") {
     const override = getScopedDecoratorData(context, clientNamespaceKey, current);
     if (override) {
       segments.unshift(override);
-      isOverriddenInNamespace = true;
       break;
     }
     segments.unshift(current.name);
     current = current.namespace;
   }
-  return {
-    namespace: segments.join("."),
-    isOverriddenInNamespace,
-  };
+  const joinedSegments = segments.join(".");
+  const userDefinedNamespace = findShortestNamespaceOverlap(
+    joinedSegments,
+    listAllUserDefinedNamespaces(context),
+  );
+  if (userDefinedNamespace && context.namespaceFlag) {
+    return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
+  }
+  return joinedSegments;
 }
 
 export const $scope: ScopeDecorator = (
