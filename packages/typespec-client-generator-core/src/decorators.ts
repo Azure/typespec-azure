@@ -480,10 +480,10 @@ export function getOperationGroup(
           groupPath: buildOperationGroupPath(context, type),
           service,
           hasOperations: hasOperations,
-        }
+        };
       }
     }
-    
+
     if (
       type.kind === "Namespace" &&
       !type.decorators.some((t) => t.decorator.name === "$service")
