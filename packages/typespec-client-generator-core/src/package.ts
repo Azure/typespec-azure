@@ -28,12 +28,9 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
-  const allClients: SdkClientType<TServiceOperation>[] = listClients(context).map((c) =>
-    diagnostics.pipe(createSdkClientType(context, c)),
-  );
 
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    clients: allClients.filter((c) => c.methods.length > 0 || c.children), // filter out clients without methods or children
+    clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
     unions: allReferencedTypes.filter(

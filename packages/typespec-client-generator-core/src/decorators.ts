@@ -467,17 +467,23 @@ export function getOperationGroup(
     if (operationGroup) {
       operationGroup.groupPath = buildOperationGroupPath(context, type);
       operationGroup.service = service;
+      operationGroup.hasOperations = type.operations.size > 0;
     }
   } else {
     // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
-    if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
-      operationGroup = {
-        kind: "SdkOperationGroup",
-        type,
-        groupPath: buildOperationGroupPath(context, type),
-        service,
-      };
+    if (type.kind === "Interface") {
+      const hasOperations = type.operations.size > 0;
+      if (!isTemplateDeclaration(type)) {
+        operationGroup = {
+          kind: "SdkOperationGroup",
+          type,
+          groupPath: buildOperationGroupPath(context, type),
+          service,
+          hasOperations: hasOperations,
+        }
+      }
     }
+    
     if (
       type.kind === "Namespace" &&
       !type.decorators.some((t) => t.decorator.name === "$service")
@@ -487,6 +493,7 @@ export function getOperationGroup(
         type,
         groupPath: buildOperationGroupPath(context, type),
         service,
+        hasOperations: type.operations.size > 0,
       };
     }
   }
@@ -549,9 +556,15 @@ export function listOperationGroups(
 
   while (queue.length > 0) {
     const operationGroup = queue.shift()!;
-    groups.push(operationGroup);
+    if (operationGroup.hasOperations || operationGroup.subOperationGroups) {
+      groups.push(operationGroup);
+    }
     if (ignoreHierarchy && operationGroup.subOperationGroups) {
-      queue.push(...operationGroup.subOperationGroups);
+      for (const subOperationGroup of operationGroup.subOperationGroups) {
+        if (subOperationGroup.hasOperations || subOperationGroup.subOperationGroups) {
+          queue.push(subOperationGroup);
+        }
+      }
     }
   }
 

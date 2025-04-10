@@ -727,13 +727,6 @@ export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
     const operationGroupClient = diagnostics.pipe(
       createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
     );
-    // skip if there is no operation or sub-client
-    if (
-      operationGroupClient.methods.length === 0 &&
-      (!operationGroupClient.children || operationGroupClient.children.length === 0)
-    ) {
-      continue;
-    }
     if (sdkClientType.children) {
       sdkClientType.children.push(operationGroupClient);
     } else {
