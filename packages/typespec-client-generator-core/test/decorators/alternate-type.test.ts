@@ -210,7 +210,7 @@ it("should not support source type is scalar but alternate type is string[]", as
     };
   `);
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/invalid-alternate-type",
+    code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
   });
 });
 
@@ -230,7 +230,7 @@ it("should not support source type is scalar but alternate type is unknown", asy
     };
   `);
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/invalid-alternate-type",
+    code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
   });
 });
 

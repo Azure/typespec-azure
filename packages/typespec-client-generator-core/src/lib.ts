@@ -315,13 +315,7 @@ export const $lib = createTypeSpecLibrary({
     "invalid-alternate-source-type": {
       severity: "error",
       messages: {
-        default: paramMessage`@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
-      },
-    },
-    "invalid-alternate-type": {
-      severity: "error",
-      messages: {
-        default: paramMessage`@alternateType only supports scalar types, scalar array or unknown as the alternate type.`,
+        default: paramMessage`Can't apply none-Scalar type alternate to Scalar type source. The alternate type kind is '${"kindName"}'`,
       },
     },
     "invalid-initialized-by": {

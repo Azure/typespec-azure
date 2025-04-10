@@ -961,8 +961,10 @@ export const $alternateType: AlternateTypeDecorator = (
 ) => {
   if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
     reportDiagnostic(context.program, {
-      code: "invalid-alternate-type",
-      format: {},
+      code: "invalid-alternate-source-type",
+      format: {
+        kindName: alternate.kind,
+      },
       target: alternate,
     });
     return;
