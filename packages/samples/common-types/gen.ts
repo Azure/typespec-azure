@@ -84,6 +84,7 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
   }
   document.paths = {};
 
+  document.info.version = getCommonTypeVersion(document.info.version);
   replaceUuidRefs(document, "Azure.Core.uuid");
   replaceUuidRefs(document, "Azure.Core.azureLocation");
   replaceUuidRefs(document, "Azure.Core.armResourceType");
@@ -119,4 +120,9 @@ function replaceParameterName(document: OpenAPI2Document, oldName: string, newNa
     document.parameters[newName.charAt(0).toUpperCase() + newName.slice(1)] = value;
     delete document.parameters[oldName];
   }
+}
+
+function getCommonTypeVersion(version: string): string {
+  const sanitizedVersion = version.startsWith("v") ? version.slice(1) : version;
+  return sanitizedVersion.includes(".") ? sanitizedVersion : `${sanitizedVersion}.0`;
 }
