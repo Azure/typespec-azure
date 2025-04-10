@@ -27,6 +27,9 @@ steps:
   - script: pnpm run regen-samples
     displayName: Regen samples
 
+  - script: pnpm run regen-common-types
+    displayName: Regen common-types
+
   - script: node eng/scripts/check-for-changed-files.js
     displayName: Check Git Status For Changed Files
 
