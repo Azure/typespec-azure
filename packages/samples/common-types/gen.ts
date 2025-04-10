@@ -10,7 +10,7 @@ import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
 const dir = dirname(fileURLToPath(import.meta.url));
-const outDir = resolve(dir, "openapi");
+const outDir = resolve(dir, "../../typespec-azure-resource-manager/lib/common-types/openapi");
 
 await rm(outDir, { recursive: true, force: true });
 await emitCommonTypesSwagger("customer-managed-keys");
