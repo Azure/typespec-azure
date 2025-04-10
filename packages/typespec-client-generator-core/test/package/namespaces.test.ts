@@ -276,15 +276,12 @@ describe("namespace config flag", () => {
         op get(): string;
       }
     `);
-    const context = await createSdkContextTestHelper(runner.context.program, {
-      namespace: "Azure.Foo",
-    });
-    // const sdkPackage = (
-    //   createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
-    //     namespace: "Azure.Foo",
-    //   })
-    // ).sdkPackage;
-    const sdkPackage = context.sdkPackage;
+
+    const sdkPackage = (
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
+        namespace: "Azure.Foo",
+      })
+    ).sdkPackage;
 
     const fooNamespace = sdkPackage.namespaces.find((x) => x.name === "Foo");
     ok(!fooNamespace);
@@ -376,13 +373,19 @@ describe("namespace config flag", () => {
       librariesToAdd: [AzureCoreTestLibrary],
       autoUsings: ["Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
-      namespace: "Azure.My.Service",
     });
     await runnerWithCore.compileWithBuiltInAzureCoreService(`
       op get(): string;
     `);
 
-    const sdkPackage = runnerWithCore.context.sdkPackage;
+    const sdkPackage = (
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(
+        runnerWithCore.context.program,
+        {
+          namespace: "Azure.My.Service",
+        },
+      )
+    ).sdkPackage;
 
     const myNamespace = sdkPackage.namespaces.find((x) => x.name === "My");
     ok(!myNamespace);
@@ -402,11 +405,7 @@ describe("namespace config flag", () => {
     strictEqual(myServiceAzureNamespace.clients[0].name, "ServiceClient");
   });
   it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
-    const runnerWithNamespace = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      namespace: "PetStoreFlagRenamed",
-    });
-    await runnerWithNamespace.compileWithCustomization(
+    await runner.compileWithCustomization(
       `
       @service(#{
         title: "Pet Store",
@@ -440,7 +439,11 @@ describe("namespace config flag", () => {
       }
     `,
     );
-    const sdkPackage = runnerWithNamespace.context.sdkPackage;
+    const sdkPackage = (
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
+        namespace: "PetStoreFlagRenamed",
+      })
+    ).sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
     ok(foodClient);
     strictEqual(foodClient.namespace, "PetStoreFlagRenamed");
@@ -462,11 +465,7 @@ describe("namespace config flag", () => {
   });
 
   it("restructure client hierarchy with namespace flag and nested client namespace", async () => {
-    const runnerWithNamespace = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      namespace: "PetStoreFlagRenamed",
-    });
-    await runnerWithNamespace.compile(
+    await runner.compile(
       `
         @clientNamespace("PetStore.CustomNamespace")
         @service
@@ -482,7 +481,11 @@ describe("namespace config flag", () => {
         }
       `,
     );
-    const sdkPackage = runnerWithNamespace.context.sdkPackage;
+    const sdkPackage = (
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
+        namespace: "PetStoreFlagRenamed",
+      })
+    ).sdkPackage;
     strictEqual(sdkPackage.namespaces.length, 1);
     const petStoreFlagRenamedNamespace = sdkPackage.namespaces[0];
     strictEqual(petStoreFlagRenamedNamespace.fullName, "PetStoreFlagRenamed");
@@ -495,11 +498,7 @@ describe("namespace config flag", () => {
   });
 
   it("complicated nested namespaces", async () => {
-    const runnerWithNamespace = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      namespace: "Azure.A",
-    });
-    await runnerWithNamespace.compile(`
+    await runner.compile(`
       @service
       @route("/a")
       namespace A {
@@ -519,7 +518,11 @@ describe("namespace config flag", () => {
       }
     `);
 
-    const sdkPackage = runnerWithNamespace.context.sdkPackage;
+    const sdkPackage = (
+      await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
+        namespace: "Azure.A",
+      })
+    ).sdkPackage;
     strictEqual(sdkPackage.namespaces.length, 1);
     const azureNamespace = sdkPackage.namespaces.find((x) => x.name === "Azure");
     ok(azureNamespace);
@@ -536,11 +539,7 @@ describe("namespace config flag", () => {
 });
 
 it("customization with models from original namespace", async () => {
-  const runnerWithNamespace = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
-    namespace: "Renamed",
-  });
-  await runnerWithNamespace.compileWithCustomization(
+  await runner.compileWithCustomization(
     `
       @service
       namespace Original {
@@ -558,7 +557,11 @@ it("customization with models from original namespace", async () => {
     `,
   );
 
-  const sdkPackage = runnerWithNamespace.context.sdkPackage;
+  const sdkPackage = (
+    await createSdkContextTestHelper<BrandedSdkEmitterOptionsInterface>(runner.context.program, {
+      namespace: "Renamed",
+    })
+  ).sdkPackage;
   strictEqual(sdkPackage.namespaces.length, 1);
   const ns = sdkPackage.namespaces[0];
   strictEqual(ns.fullName, "Renamed");
