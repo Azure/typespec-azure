@@ -50,6 +50,7 @@
   },
   "files": [
     "lib/**/*.tsp",
+    "lib/common-types/openapi/**/*.json",
     "dist/**",
     "!dist/test/**"
   ],
