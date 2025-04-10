@@ -4,7 +4,6 @@ import { createSdkClientType } from "./clients.js";
 import { listClients, listOperationGroups } from "./decorators.js";
 import {
   SdkClient,
-  SdkClientType,
   SdkEnumType,
   SdkModelType,
   SdkNamespace,
@@ -28,7 +27,6 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
-
   const sdkPackage: SdkPackage<TServiceOperation> = {
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
