@@ -175,10 +175,16 @@ The `@clientDoc` decorator lets you add documentation that will appear in genera
 
 ```typespec
 @doc("This internal model is the base class for shapes")
-@clientDoc("Base class for all shape objects that can be drawn on a canvas", DocumentationMode.replace)
+@clientDoc(
+  "Base class for all shape objects that can be drawn on a canvas",
+  DocumentationMode.replace
+)
 model Shape {
   @doc("The coordinates of the shape")
-  @clientDoc("The x,y coordinates where the shape will be positioned on the canvas", DocumentationMode.replace)
+  @clientDoc(
+    "The x,y coordinates where the shape will be positioned on the canvas",
+    DocumentationMode.replace
+  )
   position: Point;
 }
 
@@ -188,7 +194,7 @@ model Point {
   @doc("X coordinate")
   @clientDoc("The horizontal position (increases moving right)", DocumentationMode.replace)
   x: float32;
-  
+
   @doc("Y coordinate")
   @clientDoc("The vertical position (increases moving down)", DocumentationMode.replace)
   y: float32;
@@ -278,7 +284,7 @@ export interface Point {
    * The horizontal position (increases moving right)
    */
   x: number;
-  
+
   /**
    * The vertical position (increases moving down)
    */
@@ -302,7 +308,7 @@ public final class Shape {
 
     /**
      * Get the position property: The x,y coordinates where the shape will be positioned on the canvas.
-     * 
+     *
      * @return the position value.
      */
     public Point getPosition() {
@@ -311,7 +317,7 @@ public final class Shape {
 
     /**
      * Set the position property: The x,y coordinates where the shape will be positioned on the canvas.
-     * 
+     *
      * @param position the position value to set.
      * @return the Shape object itself.
      */
@@ -335,10 +341,10 @@ public final class Point {
      * The vertical position (increases moving down).
      */
     private float y;
-    
+
     /**
      * Get the x property: The horizontal position (increases moving right).
-     * 
+     *
      * @return the x value.
      */
     public float getX() {
@@ -347,7 +353,7 @@ public final class Point {
 
     /**
      * Set the x property: The horizontal position (increases moving right).
-     * 
+     *
      * @param x the x value to set.
      * @return the Point object itself.
      */
@@ -358,7 +364,7 @@ public final class Point {
 
     /**
      * Get the y property: The vertical position (increases moving down).
-     * 
+     *
      * @return the y value.
      */
     public float getY() {
@@ -367,7 +373,7 @@ public final class Point {
 
     /**
      * Set the y property: The vertical position (increases moving down).
-     * 
+     *
      * @param y the y value to set.
      * @return the Point object itself.
      */
@@ -392,7 +398,7 @@ type Shape struct {
 type Point struct {
 	// X - The horizontal position (increases moving right)
 	X *float32
-	
+
 	// Y - The vertical position (increases moving down)
 	Y *float32
 }
@@ -402,6 +408,7 @@ type Point struct {
 </ClientTabs>
 
 The `@clientDoc` decorator can be used on:
+
 - Models
 - Model properties
 - Operations
