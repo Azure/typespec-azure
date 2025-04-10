@@ -6,6 +6,15 @@ using Spector;
 
 namespace _Specs_.Azure.ClientGeneratorCore.ClientInitialization;
 
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGeneratorCore.ClientInitialization,
+  "azure.clientgenerator.core.clientinitialization",
+  "java"
+);
+@@global.Azure.ClientGenerator.Core.clientNamespace(Service,
+  "azure.clientgenerator.core.clientinitialization",
+  "java"
+);
+
 model HeaderParamClientOptions {
   @doc("The name of the client. This parameter is used as a header in all operations.")
   name: string;
