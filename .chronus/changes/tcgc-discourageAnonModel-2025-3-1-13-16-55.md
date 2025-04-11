@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-add `no-legacy-usage` rule to rules list
+add `no-unnamed-types` to data plane and arm rulesets

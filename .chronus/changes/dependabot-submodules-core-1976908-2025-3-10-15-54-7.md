@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Escape scenario as this is now keyword
+Update to express v5

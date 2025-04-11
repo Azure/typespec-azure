@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Simplely handle duplication for template instance.
+add linter rule `no-unnamed-types` to warn against generated anonymous types

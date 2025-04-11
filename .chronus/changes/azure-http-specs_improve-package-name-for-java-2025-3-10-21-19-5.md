@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-remove legacy config
+override package name for java
