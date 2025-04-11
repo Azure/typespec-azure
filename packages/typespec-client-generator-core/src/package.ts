@@ -1,9 +1,10 @@
-import { createDiagnosticCollector, Diagnostic } from "@typespec/compiler";
+import { createDiagnosticCollector, Diagnostic, DiagnosticCollector } from "@typespec/compiler";
 import { resolveVersions } from "@typespec/versioning";
 import { createSdkClientType } from "./clients.js";
 import { listClients, listOperationGroups } from "./decorators.js";
 import {
   SdkClient,
+  SdkClientType,
   SdkEnumType,
   SdkModelType,
   SdkNamespace,
@@ -14,7 +15,7 @@ import {
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
-import { filterApiVersionsWithDecorators } from "./internal-utils.js";
+import { filterApiVersionsWithDecorators, hasExplicitClientOrOperationGroup } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getDefaultApiVersion } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -28,7 +29,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
+    clients: filterClients(context, diagnostics),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
     unions: allReferencedTypes.filter(
@@ -40,6 +41,18 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);
+}
+
+function filterClients<TServiceOperation extends SdkServiceOperation>(context: TCGCContext, diagnostics: DiagnosticCollector) : SdkClientType<TServiceOperation>[] {
+  const allClients: SdkClientType<TServiceOperation>[] = listClients(context).map((c) =>
+    diagnostics.pipe(createSdkClientType(context, c)),
+  );
+  if (hasExplicitClientOrOperationGroup(context)) {
+    return allClients;
+  }
+  else {
+    return allClients.filter((c) => c.methods.length > 0 || (c.children && c.children.length > 0));
+  }
 }
 
 function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(

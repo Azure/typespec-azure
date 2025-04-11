@@ -613,7 +613,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AG,
       groupPath: "AClient.AG",
       service: A,
-      hasOperations: true,
     };
 
     const aag: SdkOperationGroup = {
@@ -621,7 +620,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AAG,
       groupPath: "AClient.AA.AAG",
       service: A,
-      hasOperations: true,
     };
 
     const aabGroup1: SdkOperationGroup = {
@@ -629,7 +627,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AABGroup1,
       groupPath: "AClient.AA.AAB.AABGroup1",
       service: A,
-      hasOperations: true,
     };
 
     const aabGroup2: SdkOperationGroup = {
@@ -637,7 +634,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AABGroup2,
       groupPath: "AClient.AA.AAB.AABGroup2",
       service: A,
-      hasOperations: true,
     };
 
     const aaa: SdkOperationGroup = {
@@ -645,7 +641,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AAA,
       groupPath: "AClient.AA.AAA",
       service: A,
-      hasOperations: true,
     };
 
     const aab: SdkOperationGroup = {
@@ -654,7 +649,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       subOperationGroups: [aabGroup1, aabGroup2],
       groupPath: "AClient.AA.AAB",
       service: A,
-      hasOperations: true,
     };
 
     const aa: SdkOperationGroup = {
@@ -663,7 +657,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       subOperationGroups: [aaa, aab, aag],
       groupPath: "AClient.AA",
       service: A,
-      hasOperations: true,
     };
 
     const client = getClient(runner.context, A);

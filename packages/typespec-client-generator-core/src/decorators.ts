@@ -54,12 +54,15 @@ import {
 } from "./interfaces.js";
 import {
   AllScopes,
+  clientKey,
   clientNameKey,
   clientNamespaceKey,
   findRootSourceProperty,
+  hasExplicitClientOrOperationGroup,
   listAllNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
+  operationGroupKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -91,15 +94,6 @@ function getScopedDecoratorData(
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
-}
-
-function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
-  const retval = [...context.program.stateMap(key).values()];
-  return retval
-    .filter((targetEntry) => {
-      return targetEntry[context.emitterName] || targetEntry[AllScopes];
-    })
-    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
 }
 
 function setScopedDecoratorData(
@@ -178,8 +172,6 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
   }
   return [negationScopes, scopes];
 }
-
-const clientKey = createStateSymbol("client");
 
 function isArm(service: Namespace): boolean {
   return service.decorators.some(
@@ -279,12 +271,6 @@ export function getClient(
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
-  return (
-    listScopedDecoratorData(context, clientKey).length > 0 ||
-    listScopedDecoratorData(context, operationGroupKey).length > 0
-  );
-}
 /**
  * List all the clients.
  *
@@ -348,8 +334,6 @@ export function listClients(context: TCGCContext): SdkClient[] {
 
   return context.__rawClients;
 }
-
-const operationGroupKey = createStateSymbol("operationGroup");
 
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
@@ -556,12 +540,12 @@ export function listOperationGroups(
 
   while (queue.length > 0) {
     const operationGroup = queue.shift()!;
-    if (operationGroup.hasOperations || operationGroup.subOperationGroups) {
+    if (operationGroup.hasOperations === true || operationGroup.subOperationGroups) {
       groups.push(operationGroup);
     }
     if (ignoreHierarchy && operationGroup.subOperationGroups) {
       for (const subOperationGroup of operationGroup.subOperationGroups) {
-        if (subOperationGroup.hasOperations || subOperationGroup.subOperationGroups) {
+        if (subOperationGroup.hasOperations === true || subOperationGroup.subOperationGroups) {
           queue.push(subOperationGroup);
         }
       }

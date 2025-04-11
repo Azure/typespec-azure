@@ -596,6 +596,7 @@ it("model-only namespace should be filtered out", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
+    @service
     namespace Foo {
       @usage(Usage.input)
       model B {}
@@ -613,15 +614,34 @@ it("empty namespace with empty subclient", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runnerWithCore.compile(`
+    @service
     namespace Foo {
       model B {}
       namespace Bar {
         model A {}
       }
+      interface Baz {}
     }
   `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
+});
+
+it("explicit clients with only models should not be filtered out", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
+    @client
+    @service
+    namespace Foo {
+      model B {}
+    }
+  `);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
 });
 
 it("operationGroup", async () => {
