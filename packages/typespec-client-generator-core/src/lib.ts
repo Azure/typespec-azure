@@ -312,10 +312,10 @@ export const $lib = createTypeSpecLibrary({
         default: `Operation is pageable but does not return a correct type.`,
       },
     },
-    "invalid-alternate-source-type": {
+    "invalid-alternate-type": {
       severity: "error",
       messages: {
-        default: paramMessage`Can't apply none-Scalar type alternate to Scalar type source. The alternate type kind is '${"kindName"}'`,
+        default: paramMessage`Invalid alternate type. If the source type is Scalar, the alternate type must also be Scalar. Found alternate type kind: '${"kindName"}'`,
       },
     },
     "invalid-initialized-by": {
