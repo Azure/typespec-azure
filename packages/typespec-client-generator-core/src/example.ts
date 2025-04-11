@@ -406,6 +406,10 @@ function getSdkTypeExample(
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
+  if (example === null && type.kind !== "nullable") {
+    return diagnostics.wrap(undefined);
+  }
+
   if (isSdkIntKind(type.kind) || isSdkFloatKind(type.kind)) {
     return getSdkBaseTypeExample("number", type as SdkType, example, relativePath);
   } else {
@@ -547,9 +551,6 @@ function getSdkDictionaryExample(
 ): [SdkDictionaryExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
-    if (example === null) {
-      return diagnostics.wrap(undefined);
-    }
     const dictionaryExample: Record<string, SdkExampleValue> = {};
     for (const key of Object.keys(example)) {
       const result = diagnostics.pipe(
@@ -577,9 +578,6 @@ function getSdkModelExample(
 ): [SdkModelExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
-    if (example === null) {
-      return diagnostics.wrap(undefined);
-    }
     // handle discriminated model
     if (type.discriminatorProperty) {
       if (
