@@ -79,6 +79,7 @@ describe("normal namespace", () => {
     await runner.compileWithBuiltInService(
       `
       namespace Inner {
+        op test(): void;
       }
       `,
     );
@@ -93,6 +94,7 @@ describe("normal namespace", () => {
     await runner.compileWithBuiltInService(
       `
       interface Inner {
+        op test(): void;
       }
       `,
     );
@@ -179,6 +181,7 @@ describe("namespace override", () => {
     await runner.compileWithBuiltInService(
       `
       namespace Inner {
+        op test(): void;
       }
 
       @@clientNamespace(Inner, "MyNamespace");
@@ -195,6 +198,7 @@ describe("namespace override", () => {
     await runner.compileWithBuiltInService(
       `
       interface Inner {
+        op test(): void;
       }
 
       @@clientNamespace(Inner, "MyNamespace");

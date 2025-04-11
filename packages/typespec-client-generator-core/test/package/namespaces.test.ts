@@ -141,18 +141,28 @@ describe("no namespace flag", () => {
   it("complicated namespaces", async () => {
     await runner.compile(`
       @service
-      @route("/a")
       namespace A {
         interface AG {
+        @route("/a")
+          op func1(): void;
         }
         namespace AA {
           interface AAG {
+            @route("/aa")
+            op func2(): void;
           }
-          namespace AAA{};
+          namespace AAA{
+            @route("/aaa")
+            op func3(): void;
+          };
           namespace AAB{
             interface AABGroup1 {
+              @route("/aab1")
+              op func4(): void;
             }
             interface AABGroup2 {
+              @route("/aab2")
+              op func5(): void;
             }
           }
         }
@@ -497,18 +507,28 @@ describe("namespace config flag", () => {
     });
     await runnerWithNamespace.compile(`
       @service
-      @route("/a")
       namespace A {
         interface AG {
+          @route("/a")
+          op func1(): void;
         }
         namespace AA {
           interface AAG {
+            @route("/aa")
+            op func2(): void;
           }
-          namespace AAA{};
+          namespace AAA{
+            @route("/aaa")
+            op func3(): void;
+          };
           namespace AAB{
             interface AABGroup1 {
+              @route("/aab1")
+              op func4(): void;
             }
             interface AABGroup2 {
+              @route("/aab2")
+              op func5(): void;
             }
           }
         }
