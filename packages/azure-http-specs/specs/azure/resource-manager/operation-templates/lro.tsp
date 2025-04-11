@@ -218,7 +218,7 @@ interface Lro {
     Order,
     ExportRequest,
     ExportResult,
-    LroHeaders = ArmCombinedLroHeaders & Azure.Core.Foundations.RetryAfterHeader
+    LroHeaders = ArmCombinedLroHeaders<FinalResult=ExportResult> & Azure.Core.Foundations.RetryAfterHeader
   >;
 
   @scenario
