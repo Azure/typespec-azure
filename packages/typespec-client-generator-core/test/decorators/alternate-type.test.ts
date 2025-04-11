@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkBuiltInType } from "../../src/interfaces.js";
+import { SdkArrayType, SdkBuiltInType } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -15,7 +15,7 @@ describe.each([
   ["utcDateTime", "string"],
   ["utcDateTime", "int64"],
   ["duration", "string"],
-])("supports replacing scalar types", (source: string, alternate: string) => {
+])("supports replacing scalar types with scalar types", (source: string, alternate: string) => {
   it("in global", async () => {
     await runner.compile(`
       @service
@@ -161,6 +161,102 @@ describe.each([
 });
 
 it.each([
+  ["string[]", "utcDateTime[]"],
+  ["int64[]", "utcDateTime[]"],
+  ["duration[]", "string[]"],
+])(
+  "supports both source type and alternate type are scalar array",
+  async (source: string, alternate: string) => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        model Model1 {
+          prop: ${source};
+          prop2: ${alternate};
+        };
+
+        @route("/func1")
+        op func1(@body body: Model1): void;
+
+        @@alternateType(Model1.prop, ${alternate});
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const model1 = models[0];
+    strictEqual(model1.kind, "model");
+    const childProperty1 = model1.properties[0];
+    const childProperty2 = model1.properties[1];
+    const type1 = childProperty1.type as SdkArrayType;
+    const type2 = childProperty2.type as SdkArrayType;
+    strictEqual(type1.kind, type2.kind);
+    strictEqual(type1.valueType.kind, type2.valueType.kind);
+  },
+);
+
+it("should not support source type is scalar but alternate type is string[]", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      scalar source extends string;
+      model Model1 {
+        prop: string;
+      }
+      
+      @route("/func1")
+      op func1(@body body: Model1): void;
+
+      @@alternateType(source, string[]);
+    };
+  `);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/invalid-alternate-type",
+  });
+});
+
+it("should not support source type is scalar but alternate type is unknown", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      scalar source extends string;
+      model Model1 {
+        prop: string;
+      }
+      
+      @route("/func1")
+      op func1(@body body: Model1): void;
+
+      @@alternateType(source, unknown);
+    };
+  `);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/invalid-alternate-type",
+  });
+});
+
+it("should support alternate type unknown on model property", async () => {
+  await runner.compile(`
+    @service
+    namespace MyService {
+      model Model1 {
+        prop: string;
+      }
+      
+      @route("/func1")
+      op func1(@body body: Model1): void;
+
+      @@alternateType(Model1.prop, unknown);
+    };
+  `);
+
+  const models = getAllModels(runner.context);
+  const model1 = models[0];
+  strictEqual(model1.kind, "model");
+  const prop = model1.properties[0];
+  strictEqual(prop.type.kind, "unknown");
+});
+
+it.each([
   ["ipV4", "string"],
   ["utc8", "utcDateTime"],
   ["timemillis", "int64"],
@@ -205,47 +301,3 @@ it.each([
   const param = method.parameters[0];
   strictEqual(param.type.kind, shouldReplace ? "string" : "utcDateTime");
 });
-
-describe.each(["null", "Array<string>", "Record<string>", "Model1", "Union1"])(
-  "doesn't support non-scalar source types",
-  (source: string) => {
-    it("of model properties", async () => {
-      const diagnostics = await runner.diagnose(`
-        @service
-        namespace MyService {
-          model Model1{};
-          alias Union1 = string | int32;
-
-          model Model2 {
-            @alternateType(string)
-            prop: ${source};
-          };
-
-          @route("/func1")
-          op func1(@body param: Model2): void;
-        };
-        `);
-
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
-      });
-    });
-
-    it("of operation parameters", async () => {
-      const diagnostics = await runner.diagnose(`
-        @service
-        namespace MyService {
-          model Model1{};
-          alias Union1 = string | int32;
-
-          @route("/func1")
-          op func1(@alternateType(string) param: ${source}): void;
-        };
-        `);
-
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-client-generator-core/invalid-alternate-source-type",
-      });
-    });
-  },
-);

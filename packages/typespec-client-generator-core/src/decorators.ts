@@ -956,16 +956,16 @@ const alternateTypeKey = createStateSymbol("alternateType");
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar,
-  alternate: Scalar,
+  alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "ModelProperty" && source.type.kind !== "Scalar") {
+  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
     reportDiagnostic(context.program, {
-      code: "invalid-alternate-source-type",
+      code: "invalid-alternate-type",
       format: {
-        typeName: source.type.kind,
+        kindName: alternate.kind,
       },
-      target: source,
+      target: alternate,
     });
     return;
   }
