@@ -377,6 +377,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The @clientApiVersions decorator is missing one or more versions defined in ${"serviceName"}. Client API must support all service versions to ensure compatibility. Missing versions: ${"missingVersions"}. Please update the client API to support all required service versions.`,
       },
     },
+    "invalid-client-doc-mode": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Invalid mode '${"mode"}' for @clientDoc decorator. Valid values are "append" or "replace".`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

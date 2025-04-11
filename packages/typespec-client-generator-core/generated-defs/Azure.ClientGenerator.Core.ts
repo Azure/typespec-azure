@@ -688,6 +688,44 @@ export type ResponseAsBoolDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Override documentation for a type in client libraries. This allows you to
+ * provide client-specific documentation that differs from the service-definition documentation.
+ *
+ * @param documentation The client-specific documentation to apply
+ * @param mode Specifies how to apply the documentation (append or replace)
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @example Replacing documentation
+ * ```typespec
+ * @doc("This is service documentation")
+ * @clientDoc("This is client-specific documentation", DocumentationMode.replace)
+ * op myOperation(): void;
+ * ```
+ * @example Appending documentation
+ * ```typespec
+ * @doc("This is service documentation.")
+ * @clientDoc("This additional note is for client libraries only.", DocumentationMode.append)
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ * @example Language-specific documentation
+ * ```typespec
+ * @doc("This is service documentation")
+ * @clientDoc("Python-specific documentation", DocumentationMode.replace, "python")
+ * @clientDoc("JavaScript-specific documentation", DocumentationMode.replace, "javascript")
+ * op myOperation(): void;
+ * ```
+ */
+export type ClientDocDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  documentation: string,
+  mode: EnumMember,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -708,4 +746,5 @@ export type AzureClientGeneratorCoreDecorators = {
   clientApiVersions: ClientApiVersionsDecorator;
   deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator;
   responseAsBool: ResponseAsBoolDecorator;
+  clientDoc: ClientDocDecorator;
 };

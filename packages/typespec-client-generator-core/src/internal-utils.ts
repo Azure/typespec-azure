@@ -4,6 +4,7 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
+  getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getVisibilityForClass,
@@ -35,7 +36,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getClientDocExplicit, getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -699,4 +700,20 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
       generatedNames.push(createName);
     }
   }
+}
+
+export function getClientDoc(context: TCGCContext, target: Type): string | undefined {
+  const clientDocExplicit = getClientDocExplicit(context, target);
+  const baseDoc = getDoc(context.program, target);
+  if (clientDocExplicit) {
+    switch (clientDocExplicit.mode) {
+      case "append":
+        return baseDoc
+          ? `${baseDoc}\n${clientDocExplicit.documentation}`
+          : clientDocExplicit.documentation;
+      case "replace":
+        return clientDocExplicit.documentation;
+    }
+  }
+  return baseDoc;
 }
