@@ -540,12 +540,20 @@ export function listOperationGroups(
 
   while (queue.length > 0) {
     const operationGroup = queue.shift()!;
-    if (operationGroup.hasOperations === true || operationGroup.subOperationGroups) {
+    if (
+      hasExplicitClientOrOperationGroup(context) ||
+      operationGroup.hasOperations === true ||
+      operationGroup.subOperationGroups
+    ) {
       groups.push(operationGroup);
     }
     if (ignoreHierarchy && operationGroup.subOperationGroups) {
       for (const subOperationGroup of operationGroup.subOperationGroups) {
-        if (subOperationGroup.hasOperations === true || subOperationGroup.subOperationGroups) {
+        if (
+          hasExplicitClientOrOperationGroup(context) ||
+          subOperationGroup.hasOperations === true ||
+          subOperationGroup.subOperationGroups
+        ) {
           queue.push(subOperationGroup);
         }
       }
