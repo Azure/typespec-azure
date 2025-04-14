@@ -26,13 +26,17 @@ async function replaceFolders(destinationRoot: string) {
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const args = process.argv.slice(2);
+const args = process.argv.slice(2);
+
+if (args.includes("--update")) {
   const pathArgIndex = args.indexOf("--path");
-  if (pathArgIndex === -1 || !args[pathArgIndex + 1]) {
-    console.error("Missing --path argument. Usage: pnpm update-common-types --path <destination>");
+  if (pathArgIndex !== -1 && args[pathArgIndex + 1]) {
+    const destinationRoot = resolve(args[pathArgIndex + 1]);
+    replaceFolders(destinationRoot);
+  } else {
+    console.error(
+      "Missing --path argument. Usage: npx update-common-types --update --path <destination>",
+    );
     process.exit(1);
   }
-  const destinationRoot = resolve(args[pathArgIndex + 1]);
-  replaceFolders(destinationRoot);
 }

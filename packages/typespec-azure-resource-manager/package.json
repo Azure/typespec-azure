@@ -85,6 +85,6 @@
     "vitest": "^3.0.9"
   },
   "bin": {
-    "update-common-types": "./dist/src/update-common-types.js"
+    "common-types": "./dist/src/update-common-types.js"
   }
 }
