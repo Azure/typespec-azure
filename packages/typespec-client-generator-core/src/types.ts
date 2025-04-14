@@ -653,14 +653,23 @@ function getSdkConstantWithDiagnostics(
     case "Number":
     case "String":
     case "Boolean":
+      let sdkType = context.__referencedTypeCache.get(type) as SdkConstantType | undefined;
+      if (sdkType) {
+        return diagnostics.wrap(sdkType);
+      }
       const valueType = getSdkTypeForLiteral(context, type);
-      return diagnostics.wrap({
+      sdkType = {
         ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "constant")),
         value: type.value,
         valueType,
         name: getGeneratedName(context, type, operation),
         isGeneratedName: true,
-      });
+        usage: UsageFlags.None,
+        access: "public",
+      };
+      updateReferencedTypeMap(context, type, sdkType);
+
+      return diagnostics.wrap(sdkType);
   }
 }
 
@@ -1441,7 +1450,8 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
     sdkType.kind !== "model" &&
     sdkType.kind !== "enum" &&
     sdkType.kind !== "union" &&
-    sdkType.kind !== "nullable"
+    sdkType.kind !== "nullable" &&
+    sdkType.kind !== "constant"
   ) {
     return;
   }
@@ -1488,7 +1498,8 @@ export function updateUsageOrAccess(
     type.kind !== "model" &&
     type.kind !== "enum" &&
     type.kind !== "union" &&
-    type.kind !== "nullable"
+    type.kind !== "nullable" &&
+    type.kind !== "constant"
   ) {
     return diagnostics.wrap(undefined);
   }
@@ -1544,7 +1555,7 @@ export function updateUsageOrAccess(
     }
   }
 
-  if (type.kind === "enum") return diagnostics.wrap(undefined);
+  if (type.kind === "enum" || type.kind === "constant") return diagnostics.wrap(undefined);
   if (type.kind === "union") {
     for (const unionType of type.variantTypes) {
       diagnostics.pipe(updateUsageOrAccess(context, value, unionType, options));
@@ -1849,8 +1860,8 @@ function handleServiceOrphanType(
 function filterOutTypes(
   context: TCGCContext,
   filter: number,
-): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
-  const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>();
+): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType | SdkConstantType)[] {
+  const result = new Array<SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType | SdkConstantType>();
   for (const sdkType of context.__referencedTypeCache.values()) {
     // filter models with unexpected usage
     if ((sdkType.usage & filter) === 0) {
@@ -1901,7 +1912,7 @@ function getFilterNumber(options: UsageFilteringOptions = {}): number {
 export function getAllReferencedTypes(
   context: TCGCContext,
   options: UsageFilteringOptions = {},
-): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType)[] {
+): (SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType | SdkConstantType)[] {
   return filterOutTypes(context, getFilterNumber(options));
 }
 
