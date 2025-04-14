@@ -57,6 +57,19 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_emptyUrl
+
+- Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/emptyUrl`
+
+This scenario tests if client code correctly deserializes empty url as null.
+Expected response body:
+
+```json
+{
+  "serviceUrl": ""
+}
+```
+
 ### Azure_ClientGenerator_Core_FlattenProperty_putFlattenModel
 
 - Endpoint: `put /azure/client-generator-core/flatten-property/flattenModel`
