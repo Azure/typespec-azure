@@ -407,14 +407,7 @@ type Point struct {
 </ClientTabItem>
 </ClientTabs>
 
-The `@clientDoc` decorator can be used on:
-
-- Models
-- Model properties
-- Operations
-- Operation parameters
-- Enums
-- Enum members
+The `@clientDoc` decorator can be used on everything that the `@doc` decorator can be applied to.
 
 When both `@doc` and `@clientDoc` are present, TCGC outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
