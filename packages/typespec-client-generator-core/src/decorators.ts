@@ -27,6 +27,7 @@ import {
   ApiVersionDecorator,
   ClientApiVersionsDecorator,
   ClientDecorator,
+  ClientDocDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
@@ -1375,4 +1376,54 @@ export const $responseAsBool: ResponseAsBoolDecorator = (
 
 export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
   return getScopedDecoratorData(context, responseAsBoolKey, target);
+}
+
+const clientDocKey = createStateSymbol("clientDoc");
+
+/**
+ * Type representing the client documentation data stored.
+ */
+interface ClientDocData {
+  documentation: string;
+  mode: string;
+}
+
+export const $clientDoc: ClientDocDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  documentation: string,
+  mode: EnumMember,
+  scope?: LanguageScopes,
+) => {
+  const docMode = mode.value as string;
+  // Validate the mode value
+  if (docMode !== "append" && docMode !== "replace") {
+    reportDiagnostic(context.program, {
+      code: "invalid-client-doc-mode",
+      format: { mode: docMode },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  const docData: ClientDocData = {
+    documentation,
+    mode: docMode,
+  };
+
+  setScopedDecoratorData(context, $clientDoc, clientDocKey, target, docData, scope);
+};
+
+/**
+ * Gets the client documentation data for a type.
+ *
+ * @param context TCGCContext
+ * @param target Type to get client documentation for
+ * @returns ClientDocData or undefined if no client documentation exists
+ */
+export function getClientDocExplicit(
+  context: TCGCContext,
+  target: Type,
+): ClientDocData | undefined {
+  return getScopedDecoratorData(context, clientDocKey, target);
 }
