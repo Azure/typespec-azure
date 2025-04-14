@@ -114,6 +114,5 @@ function isArmProviderActionOperation(operation: Operation): boolean {
     }
     operation = operation.sourceOperation;
   }
-
   return false;
 }
