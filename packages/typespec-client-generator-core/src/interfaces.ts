@@ -53,7 +53,7 @@ export interface TCGCContext {
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
 
-  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType | SdkConstantType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
@@ -412,6 +412,8 @@ export interface SdkConstantType extends SdkTypeBase {
   valueType: SdkBuiltInType;
   name: string;
   isGeneratedName: boolean;
+  usage: UsageFlags;
+  access: AccessFlags;
 }
 
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
@@ -864,6 +866,7 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   clients: SdkClientType<TServiceOperation>[];
   models: SdkModelType[];
   enums: SdkEnumType[];
+  constants: SdkConstantType[];
   unions: (SdkUnionType | SdkNullableType)[];
   crossLanguagePackageId: string;
   namespaces: SdkNamespace<TServiceOperation>[];

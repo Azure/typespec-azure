@@ -51,6 +51,7 @@ import {
   SdkServiceResponseHeader,
   SdkType,
   TCGCContext,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   findRootSourceProperty,
@@ -355,6 +356,8 @@ function createContentTypeOrAcceptHeader(
       valueType: type,
       name: `${httpOperation.operation.name}ContentType`,
       isGeneratedName: true,
+      usage: UsageFlags.None,
+      access: "public",
       decorators: [],
     };
   }

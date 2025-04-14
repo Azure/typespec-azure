@@ -4,6 +4,7 @@ import { createSdkClientType } from "./clients.js";
 import { listClients, listOperationGroups } from "./decorators.js";
 import {
   SdkClient,
+  SdkConstantType,
   SdkEnumType,
   SdkModelType,
   SdkNamespace,
@@ -31,6 +32,9 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
+    constants: allReferencedTypes.filter(
+      (x): x is SdkConstantType => x.kind === "constant",
+    ),
     unions: allReferencedTypes.filter(
       (x): x is SdkUnionType | SdkNullableType => x.kind === "union" || x.kind === "nullable",
     ),
