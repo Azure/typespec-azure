@@ -8,7 +8,10 @@ using Spector;
 
 @doc("Test for internal decorator.")
 @scenarioService("/azure/client-generator-core/access")
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.access", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "azure.clientgenerator.core.access",
+  "java,python"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.Access;
 
 @route("/publicOperation")

@@ -16,7 +16,7 @@ using Spector;
     versioned: Versions,
   }
 )
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.model", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.model", "java,python")
 namespace _Specs_.Azure.Core.Model;
 @doc("The version of the API.")
 enum Versions {

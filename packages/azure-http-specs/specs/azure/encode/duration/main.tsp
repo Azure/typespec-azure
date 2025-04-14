@@ -10,7 +10,7 @@ using Spector;
 @scenarioService("/azure/encode/duration")
 namespace _Specs_.Azure.Encode.Duration;
 
-@@clientNamespace(_Specs_.Azure.Encode.Duration, "azure.encode.duration", "java");
+@@clientNamespace(_Specs_.Azure.Encode.Duration, "azure.encode.duration", "java,python");
 
 model DurationModel {
   @encode("duration-constant")
