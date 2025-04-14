@@ -13,6 +13,7 @@ import {
 import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
+  getArmKeyIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
   isArmProviderNamespace,
@@ -1871,7 +1872,7 @@ export async function getOpenAPIForService(
   }
 
   function ifArmIdentifiersDefault(armIdentifiers: string[]) {
-    return armIdentifiers.every((identifier) => identifier === "id");
+    return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
   }
 
   function getSchemaForUnionVariant(
@@ -2425,16 +2426,32 @@ export async function getOpenAPIForService(
       };
 
       const armIdentifiers = getArmIdentifiers(program, typespecType);
-      if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
-        array["x-ms-identifiers"] = armIdentifiers;
+      const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
+      const identifiers = resolveIdentifiers(armIdentifiers, armKeyIdentifiers);
+
+      if (isArmProviderNamespace(program, namespace) && identifiers) {
+        array["x-ms-identifiers"] = identifiers;
       } else if (
-        !ifArrayItemContainsIdentifier(program, typespecType as any, armIdentifiers ?? [])
+        !ifArrayItemContainsIdentifier(program, typespecType as any, armKeyIdentifiers ?? [])
       ) {
         array["x-ms-identifiers"] = [];
       }
 
       return applyIntrinsicDecorators(typespecType, array);
     }
+    return undefined;
+  }
+
+  function resolveIdentifiers(
+    armIdentifiers: string[] | undefined,
+    armKeyIdentifiers: string[] | undefined,
+  ): string[] | undefined {
+    if (armIdentifiers && armIdentifiers.length > 0) {
+      return armIdentifiers;
+    } else if (hasValidArmIdentifiers(armKeyIdentifiers)) {
+      return armKeyIdentifiers;
+    }
+
     return undefined;
   }
 
