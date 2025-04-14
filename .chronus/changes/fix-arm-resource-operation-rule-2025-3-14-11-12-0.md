@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Fix `arm-resour-operation` rule to not stop for `ArmProviderActionAsync` and ArmProviderActionSync` operations as they are not resource operations 
+Fix the `arm-resource-operation` rule to exclude `ArmProviderActionAsync` and `ArmProviderActionSync` operations, as they are not considered resource operations.
