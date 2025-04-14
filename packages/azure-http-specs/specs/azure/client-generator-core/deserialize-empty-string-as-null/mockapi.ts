@@ -9,7 +9,7 @@ Scenarios.Azure_ClientGenerator_DeserializeEmptyStringAsNull_EmptyUrl = passOnSu
   response: {
     status: 200,
     body: json({
-        serviceUrl: "",
+      serviceUrl: "",
     }),
   },
   kind: "MockApiDefinition",
