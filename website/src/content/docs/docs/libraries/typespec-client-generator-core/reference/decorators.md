@@ -150,22 +150,23 @@ op func8(@body body: Test5): void;
 
 ### `@alternateType` {#@Azure.ClientGenerator.Core.alternateType}
 
-Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+When the source type is `Scalar`, the alternate type must be `Scalar`.
 
 ```typespec
-@Azure.ClientGenerator.Core.alternateType(alternate: Scalar, scope?: valueof string)
+@Azure.ClientGenerator.Core.alternateType(alternate: unknown, scope?: valueof string)
 ```
 
 #### Target
 
-The source type you want to apply the alternate type to. Only scalar types are supported.
+The source type to which the alternate type will be applied.
 `ModelProperty | Scalar`
 
 #### Parameters
 
 | Name      | Type             | Description                                                                                                                                                                                            |
 | --------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| alternate | `Scalar`         | The alternate type you want applied to the target. Only scalar types are supported.                                                                                                                    |
+| alternate | `unknown`        | The alternate type to apply to the target.                                                                                                                                                             |
 | scope     | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 #### Examples
@@ -184,6 +185,16 @@ scalar storageDateTime extends utcDataTime;
 
 ```typespec
 op test(@param @alternateType(string) date: utcDateTime): void;
+```
+
+```typespec
+model Test {
+  @alternateType(unknown)
+  thumbprint?: string;
+
+  @alternateType(AzureLocation[], "csharp")
+  locations: string[];
+}
 ```
 
 ### `@apiVersion` {#@Azure.ClientGenerator.Core.apiVersion}

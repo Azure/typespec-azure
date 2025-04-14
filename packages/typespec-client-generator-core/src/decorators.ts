@@ -953,16 +953,16 @@ const alternateTypeKey = createStateSymbol("alternateType");
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar,
-  alternate: Scalar,
+  alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "ModelProperty" && source.type.kind !== "Scalar") {
+  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
     reportDiagnostic(context.program, {
-      code: "invalid-alternate-source-type",
+      code: "invalid-alternate-type",
       format: {
-        typeName: source.type.kind,
+        kindName: alternate.kind,
       },
-      target: source,
+      target: alternate,
     });
     return;
   }
@@ -1171,21 +1171,17 @@ export const $clientNamespace: ClientNamespaceDecorator = (
  * @param userDefinedNamespaces
  * @returns
  */
-function findShortestNamespaceOverlap(
+function findNamespaceOverlapClosestToRoot(
   override: string,
   userDefinedNamespaces: Namespace[],
 ): Namespace | undefined {
-  let shortestNamespace: Namespace | undefined = undefined;
-
   for (const namespace of userDefinedNamespaces) {
     if (override.includes(namespace.name)) {
-      if (!shortestNamespace || namespace.name.length < shortestNamespace.name.length) {
-        shortestNamespace = namespace;
-      }
+      return namespace;
     }
   }
 
-  return shortestNamespace;
+  return undefined;
 }
 
 /**
@@ -1206,7 +1202,7 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
-    const userDefinedNamespace = findShortestNamespaceOverlap(
+    const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
     );
@@ -1215,9 +1211,6 @@ export function getClientNamespace(
       return override.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return override;
-  }
-  if (context.namespaceFlag) {
-    return context.namespaceFlag;
   }
   if (!entity.namespace) {
     return "";
@@ -1231,16 +1224,31 @@ export function getClientNamespace(
 function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
   const segments = [];
   let current: Namespace | undefined = namespace;
+  let isOverridden: boolean = false;
   while (current && current.name !== "") {
     const override = getScopedDecoratorData(context, clientNamespaceKey, current);
     if (override) {
       segments.unshift(override);
+      isOverridden = true;
       break;
     }
     segments.unshift(current.name);
     current = current.namespace;
   }
-  return segments.join(".");
+  const joinedSegments = segments.join(".");
+  if (isOverridden) {
+    // if it's overridden, and there's a `@clientNamespace` flag, we want to do the shortest namespace overlap replacement
+    const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
+      joinedSegments,
+      listAllUserDefinedNamespaces(context),
+    );
+    if (userDefinedNamespace && context.namespaceFlag) {
+      return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
+    }
+    return joinedSegments;
+  }
+  if (context.namespaceFlag) return context.namespaceFlag;
+  return joinedSegments;
 }
 
 export const $scope: ScopeDecorator = (
