@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { cp, mkdir, readdir, rm } from "fs/promises";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
