@@ -31,7 +31,8 @@ export const coreOperationsRule = createRule({
       operation: (operation: Operation) => {
         if (
           !isInternalTypeSpec(context.program, operation) &&
-          !isSourceOperationResourceManagerInternal(operation)
+          !isSourceOperationResourceManagerInternal(operation) &&
+          !isArmProviderActionOperation(operation)
         ) {
           const verb = getOperationVerb(context.program, operation);
           if (
@@ -103,4 +104,16 @@ function hasApiParameter(program: Program, model: Model): boolean {
     isApiParameter(program, i),
   );
   return apiVersionParams !== null && apiVersionParams.length === 1;
+}
+
+function isArmProviderActionOperation(operation: Operation): boolean {
+  const providerActionOperations = ["ArmProviderActionAsync", "ArmProviderActionSync"];
+  while (operation.sourceOperation) {
+    if (providerActionOperations.includes(operation.sourceOperation.name)) {
+      return true;
+    }
+    operation = operation.sourceOperation;
+  }
+
+  return false;
 }
