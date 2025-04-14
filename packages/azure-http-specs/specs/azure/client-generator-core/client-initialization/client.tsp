@@ -1,9 +1,12 @@
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 import "@typespec/spector";
+import "@typespec/http";
 
 using Spector;
+using Http;
 
+@route("/azure/client-generator-core/client-initialization")
 namespace _Specs_.Azure.ClientGeneratorCore.ClientInitialization;
 
 @@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGeneratorCore.ClientInitialization,
@@ -57,7 +60,7 @@ model ParamAliasClientOptions {
     name: "test-name-value"
   });
   
-  client.withQuery(id: "some-id");  // No need to pass name here
+  client.withQuery(id: "test-id");  // No need to pass name here
   client.withBody({ name: "test-name" });  // No need to pass name here
   ```
   """)
@@ -68,6 +71,7 @@ model ParamAliasClientOptions {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(HeaderParamClientOptions)
+@route("/header-param")
 interface HeaderParam {
   withQuery is Service.HeaderParam.withQuery;
   withBody is Service.HeaderParam.withBody;
@@ -88,7 +92,7 @@ interface HeaderParam {
     region: "us-west"
   });
   
-  client.withQuery(id: "some-id");  // No need to pass name or region here
+  client.withQuery(id: "test-id");  // No need to pass name or region here
   client.withBody({ name: "test-name" });  // No need to pass name or region here
   ```
   """)
@@ -98,6 +102,7 @@ interface HeaderParam {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MultipleParamsClientOptions)
+@route("/multiple-params")
 interface MultipleParams {
   withQuery is Service.MultipleParams.withQuery;
   withBody is Service.MultipleParams.withBody;
@@ -119,7 +124,7 @@ interface MultipleParams {
       name: "test-name-value"
     });
     
-    client.withQuery(region: "us-west");  // region stays as method param
+    client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
     client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
     ```
   """)
@@ -129,6 +134,7 @@ interface MultipleParams {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MixedParamsClientOptions)
+@route("/mixed-params")
 interface MixedParams {
   withQuery is Service.MixedParams.withQuery;
   withBody is Service.MixedParams.withBody;
@@ -150,7 +156,6 @@ interface MixedParams {
   // No need to pass blobName to any operations
   client.withQuery(format: "text");  
   client.getStandalone();
-  client.withBody("New content for sample-blob");
   client.deleteStandalone();
   ```
   """)
@@ -160,6 +165,7 @@ interface MixedParams {
   service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(PathParamClientOptions)
+@route("/path")
 interface PathParam {
   withQuery is Service.PathParam.withQuery;
   getStandalone is Service.PathParam.getStandalone;
@@ -188,6 +194,7 @@ interface PathParam {
   name: "ParamAliasClient",
   service: Service,
 })
+@route("/param-alias")
 interface ParamAlias {
   withAliasedName is Service.ParamAlias.withAliasedName;
   withOriginalName is Service.ParamAlias.withOriginalName;
