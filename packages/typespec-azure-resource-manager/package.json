@@ -50,6 +50,7 @@
   },
   "files": [
     "lib/**/*.tsp",
+    "lib/common-types/openapi/**/*.json",
     "dist/**",
     "!dist/test/**"
   ],
@@ -82,5 +83,8 @@
     "rimraf": "~6.0.1",
     "typescript": "~5.8.2",
     "vitest": "^3.0.9"
+  },
+  "bin": {
+    "common-types": "./dist/src/update-common-types.js"
   }
 }
