@@ -215,6 +215,7 @@ function getSdkHttpParameters(
     } else if (!isNeverOrVoidType(tspBody.type)) {
       const spread = isHttpBodySpread(tspBody);
       let type: SdkType;
+      let optional = false;
       if (spread) {
         type = diagnostics.pipe(
           getClientTypeWithDiagnostics(
@@ -223,10 +224,17 @@ function getSdkHttpParameters(
             httpOperation.operation,
           ),
         );
+        optional =
+          tspBody.type.kind === "Model"
+            ? [...tspBody.type.properties.values()].some((p) => !p.optional)
+              ? false
+              : true
+            : false;
       } else {
         type = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation),
         );
+        optional = tspBody.property?.optional ?? false;
       }
       const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
@@ -242,7 +250,7 @@ function getSdkHttpParameters(
         isApiVersionParam: false,
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
-        optional: false,
+        optional,
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
@@ -435,7 +443,7 @@ export function getSdkHttpParameter(
         ),
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
-      optional: false,
+      optional: param.optional,
     });
   }
   if (isCookieParam(context.program, param) || location === "cookie") {
