@@ -1871,7 +1871,7 @@ export async function getOpenAPIForService(
   }
 
   function ifArmIdentifiersDefault(armIdentifiers: string[]) {
-    return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
+    return armIdentifiers.every((identifier) => identifier === "id");
   }
 
   function getSchemaForUnionVariant(
