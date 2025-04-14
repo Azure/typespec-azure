@@ -15,7 +15,10 @@ import {
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
-import { filterApiVersionsWithDecorators, hasExplicitClientOrOperationGroup } from "./internal-utils.js";
+import {
+  filterApiVersionsWithDecorators,
+  hasExplicitClientOrOperationGroup,
+} from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getDefaultApiVersion } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -43,14 +46,16 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   return diagnostics.wrap(sdkPackage);
 }
 
-function filterClients<TServiceOperation extends SdkServiceOperation>(context: TCGCContext, diagnostics: DiagnosticCollector) : SdkClientType<TServiceOperation>[] {
+function filterClients<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  diagnostics: DiagnosticCollector,
+): SdkClientType<TServiceOperation>[] {
   const allClients: SdkClientType<TServiceOperation>[] = listClients(context).map((c) =>
     diagnostics.pipe(createSdkClientType(context, c)),
   );
   if (hasExplicitClientOrOperationGroup(context)) {
     return allClients;
-  }
-  else {
+  } else {
     return allClients.filter((c) => c.methods.length > 0 || (c.children && c.children.length > 0));
   }
 }
