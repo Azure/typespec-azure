@@ -273,6 +273,10 @@ export function getClient(
 
 /**
  * List all the clients.
+ * If the user has not explicitly defined any clients, we will treat the first namespace with service decorator as the root client.
+ * If this root client has no operations or sub-clients, we will still return this empty root client. This behavior is different from sdkContext.sdkPackage.clients, which will not include empty clients.
+ * TODO: We will consolidate SDKClientType and SDKOperationGroupType in the future. After that, we will list all clients and operation groups in this function instead and the behavior will be consistent.
+ *
  *
  * @param context TCGCContext
  * @returns Array of clients
