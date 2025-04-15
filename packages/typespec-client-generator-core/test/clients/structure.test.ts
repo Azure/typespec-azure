@@ -580,12 +580,68 @@ it("namespace", async () => {
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
     @service
-    namespace My.Service {};
+    namespace My.Service;
+    op func(): void;
   `);
   const sdkPackage = runnerWithCore.context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const clientOne = sdkPackage.clients.filter((c) => c.name === "ServiceClient")[0];
   strictEqual(clientOne.namespace, "My.Service");
+});
+
+it("model-only namespace should be filtered out", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
+    @service
+    namespace Foo {
+      @usage(Usage.input)
+      model B {}
+    }
+  `);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 0);
+  strictEqual(sdkPackage.models.length, 1);
+});
+
+it("empty namespace with empty subclient", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
+    @service
+    namespace Foo {
+      model B {}
+      namespace Bar {
+        model A {}
+      }
+      interface Baz {}
+    }
+  `);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 0);
+});
+
+it("explicit clients with only models should not be filtered out", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compile(`
+    @client
+    @service
+    namespace Foo {
+      model B {}
+    }
+  `);
+  const sdkPackage = runnerWithCore.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
 });
 
 it("operationGroup", async () => {

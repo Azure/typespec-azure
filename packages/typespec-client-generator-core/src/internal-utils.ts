@@ -86,6 +86,24 @@ export const clientNameKey = createStateSymbol("clientName");
 export const clientNamespaceKey = createStateSymbol("clientNamespace");
 export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
+export const clientKey = createStateSymbol("client");
+export const operationGroupKey = createStateSymbol("operationGroup");
+
+export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
+  return (
+    listScopedDecoratorData(context, clientKey).length > 0 ||
+    listScopedDecoratorData(context, operationGroupKey).length > 0
+  );
+}
+
+function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
+  const retval = [...context.program.stateMap(key).values()];
+  return retval
+    .filter((targetEntry) => {
+      return targetEntry[context.emitterName] || targetEntry[AllScopes];
+    })
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
+}
 
 /**
  *

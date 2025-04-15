@@ -55,12 +55,15 @@ import {
 } from "./interfaces.js";
 import {
   AllScopes,
+  clientKey,
   clientNameKey,
   clientNamespaceKey,
   findRootSourceProperty,
+  hasExplicitClientOrOperationGroup,
   listAllNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
+  operationGroupKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -92,15 +95,6 @@ function getScopedDecoratorData(
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
-}
-
-function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
-  const retval = [...context.program.stateMap(key).values()];
-  return retval
-    .filter((targetEntry) => {
-      return targetEntry[context.emitterName] || targetEntry[AllScopes];
-    })
-    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
 }
 
 function setScopedDecoratorData(
@@ -179,8 +173,6 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
   }
   return [negationScopes, scopes];
 }
-
-const clientKey = createStateSymbol("client");
 
 function isArm(service: Namespace): boolean {
   return service.decorators.some(
@@ -280,14 +272,12 @@ export function getClient(
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
-  return (
-    listScopedDecoratorData(context, clientKey).length > 0 ||
-    listScopedDecoratorData(context, operationGroupKey).length > 0
-  );
-}
 /**
  * List all the clients.
+ * If the user has not explicitly defined any clients, we will treat the first namespace with service decorator as the root client.
+ * If this root client has no operations or sub-clients, we will still return this empty root client. This behavior is different from sdkContext.sdkPackage.clients, which will not include empty clients.
+ * TODO: We will consolidate SDKClientType and SDKOperationGroupType in the future. After that, we will list all clients and operation groups in this function instead and the behavior will be consistent.
+ *
  *
  * @param context TCGCContext
  * @returns Array of clients
@@ -349,8 +339,6 @@ export function listClients(context: TCGCContext): SdkClient[] {
 
   return context.__rawClients;
 }
-
-const operationGroupKey = createStateSymbol("operationGroup");
 
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
@@ -468,17 +456,23 @@ export function getOperationGroup(
     if (operationGroup) {
       operationGroup.groupPath = buildOperationGroupPath(context, type);
       operationGroup.service = service;
+      operationGroup.hasOperations = type.operations.size > 0;
     }
   } else {
     // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
-    if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
-      operationGroup = {
-        kind: "SdkOperationGroup",
-        type,
-        groupPath: buildOperationGroupPath(context, type),
-        service,
-      };
+    if (type.kind === "Interface") {
+      const hasOperations = type.operations.size > 0;
+      if (!isTemplateDeclaration(type)) {
+        operationGroup = {
+          kind: "SdkOperationGroup",
+          type,
+          groupPath: buildOperationGroupPath(context, type),
+          service,
+          hasOperations: hasOperations,
+        };
+      }
     }
+
     if (
       type.kind === "Namespace" &&
       !type.decorators.some((t) => t.decorator.name === "$service")
@@ -488,6 +482,7 @@ export function getOperationGroup(
         type,
         groupPath: buildOperationGroupPath(context, type),
         service,
+        hasOperations: type.operations.size > 0,
       };
     }
   }
@@ -550,9 +545,23 @@ export function listOperationGroups(
 
   while (queue.length > 0) {
     const operationGroup = queue.shift()!;
-    groups.push(operationGroup);
+    if (
+      hasExplicitClientOrOperationGroup(context) ||
+      operationGroup.hasOperations === true ||
+      operationGroup.subOperationGroups
+    ) {
+      groups.push(operationGroup);
+    }
     if (ignoreHierarchy && operationGroup.subOperationGroups) {
-      queue.push(...operationGroup.subOperationGroups);
+      for (const subOperationGroup of operationGroup.subOperationGroups) {
+        if (
+          hasExplicitClientOrOperationGroup(context) ||
+          subOperationGroup.hasOperations === true ||
+          subOperationGroup.subOperationGroups
+        ) {
+          queue.push(subOperationGroup);
+        }
+      }
     }
   }
 

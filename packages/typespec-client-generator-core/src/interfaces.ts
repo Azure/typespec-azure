@@ -95,6 +95,7 @@ export interface SdkOperationGroup {
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
+  hasOperations?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
