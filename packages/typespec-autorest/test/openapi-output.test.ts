@@ -1031,4 +1031,28 @@ describe("identifiers decorator", () => {
       "cats/features/color",
     ]);
   });
+  it("`@identifiers` are assigned by model property", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        id: int32;
+      }
+      model PetList {
+        @identifiers(#["name"])
+        value: Pet[]
+      }
+      model PetList2 {
+        @identifiers(#["id"])
+        value: Pet[]
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
+    deepStrictEqual(oapi.definitions.PetList2.properties.value["x-ms-identifiers"], ["id"]);
+  });
 });

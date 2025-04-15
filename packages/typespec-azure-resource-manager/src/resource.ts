@@ -398,7 +398,7 @@ export const $identifiers: IdentifiersDecorator = (
     return;
   }
 
-  context.program.stateMap(ArmStateKeys.armIdentifiers).set(type.indexer.value, properties);
+  context.program.stateMap(ArmStateKeys.armIdentifiers).set(entity, properties);
 };
 
 /**
@@ -408,8 +408,8 @@ export const $identifiers: IdentifiersDecorator = (
  * @param entity The array model type to check.
  * @returns returns list of arm identifiers for the given array model type if any or undefined.
  */
-export function getArmIdentifiers(program: Program, entity: ArrayModelType): string[] | undefined {
-  return program.stateMap(ArmStateKeys.armIdentifiers).get(entity.indexer.value);
+export function getArmIdentifiers(program: Program, entity: ModelProperty): string[] | undefined {
+  return program.stateMap(ArmStateKeys.armIdentifiers).get(entity);
 }
 
 /**

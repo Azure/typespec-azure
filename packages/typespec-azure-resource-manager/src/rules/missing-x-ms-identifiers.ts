@@ -54,7 +54,7 @@ export const missingXmsIdentifiersRule = createRule({
       }
 
       const xmsIdentifiers = getExtensions(program, property ?? array).get("x-ms-identifiers");
-      const armIdentifiers = getArmIdentifiers(program, array);
+      const armIdentifiers = getArmIdentifiers(program, property);
       const armKeyIdentifiers = getArmKeyIdentifiers(program, array);
       const identifiers = armIdentifiers ?? armKeyIdentifiers ?? xmsIdentifiers;
 
