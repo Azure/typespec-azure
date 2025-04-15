@@ -2432,7 +2432,11 @@ export async function getOpenAPIForService(
       if (isArmProviderNamespace(program, namespace) && identifiers) {
         array["x-ms-identifiers"] = identifiers;
       } else if (
-        !ifArrayItemContainsIdentifier(program, typespecType as any, armKeyIdentifiers ?? [])
+        !ifArrayItemContainsIdentifier(
+          program,
+          typespecType as any,
+          armIdentifiers ?? armKeyIdentifiers ?? [],
+        )
       ) {
         array["x-ms-identifiers"] = [];
       }
@@ -2446,12 +2450,11 @@ export async function getOpenAPIForService(
     armIdentifiers: string[] | undefined,
     armKeyIdentifiers: string[] | undefined,
   ): string[] | undefined {
-    if (armIdentifiers && armIdentifiers.length > 0) {
+    if (armIdentifiers) {
       return armIdentifiers;
     } else if (hasValidArmIdentifiers(armKeyIdentifiers)) {
       return armKeyIdentifiers;
     }
-
     return undefined;
   }
 
