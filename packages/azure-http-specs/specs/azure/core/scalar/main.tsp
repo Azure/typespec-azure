@@ -16,7 +16,7 @@ using Spector;
     versioned: Versions,
   }
 )
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.scalar", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.scalar", "java,python")
 namespace _Specs_.Azure.Core.Scalar;
 @doc("The version of the API.")
 enum Versions {
