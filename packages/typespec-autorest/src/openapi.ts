@@ -2447,7 +2447,7 @@ export async function getOpenAPIForService(
       const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
       const identifiers = resolveIdentifiers(armIdentifiers, armKeyIdentifiers);
 
-      if (isArmProviderNamespace(program, namespace) && identifiers) {
+      if (isArrayTypeArmProviderNamespace(typespecType, namespace) && identifiers) {
         array["x-ms-identifiers"] = identifiers;
       } else if (
         !ifArrayItemContainsIdentifier(
@@ -2482,6 +2482,18 @@ export async function getOpenAPIForService(
       armIdentifiers.length > 0 &&
       !ifArmIdentifiersDefault(armIdentifiers)
     );
+  }
+
+  function isArrayTypeArmProviderNamespace(typespecType: Model, namespace?: Namespace): boolean {
+    if (isArmProviderNamespace(program, namespace)) {
+      return true;
+    }
+
+    if (typespecType.indexer?.value.kind === "Model") {
+      return isArmProviderNamespace(program, typespecType.indexer.value.namespace);
+    }
+
+    return false;
   }
 
   function getSchemaForScalar(scalar: Scalar): OpenAPI2Schema {

@@ -1055,4 +1055,47 @@ describe("identifiers decorator", () => {
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
     deepStrictEqual(oapi.definitions.PetList2.properties.value["x-ms-identifiers"], ["id"]);
   });
+  it("`@identifiers` are assigned to `armProviderNamespace` properties even when nested in another namespace", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model PetResource is TrackedResource<PetResourceProperties> {
+        @key("agriServiceResourceName")
+        @segment("agriServices")
+        name: string;
+      }
+
+      model PetResourceProperties {
+        @identifiers(#["key"])
+        pets?: PetTypes[];
+      }
+
+      model PetTypes {
+        key: string;
+        value: string;
+      }
+
+      @armResourceOperations(PetResource)
+      interface PetService {
+        update is ArmCustomPatchAsync<
+          PetResource,
+          Azure.ResourceManager.Foundations.ResourceUpdateModel<
+            PetResource,
+            PetResourceProperties
+          >
+        >;
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetResourceProperties.properties.pets["x-ms-identifiers"], [
+      "key",
+    ]);
+    deepStrictEqual(
+      oapi.definitions.PetResourceUpdateProperties.properties.pets["x-ms-identifiers"],
+      ["key"],
+    );
+  });
 });
