@@ -10,8 +10,8 @@ using Spector;
 @route("/azure/example/basic")
 namespace AzureExampleBasicClient;
 
-@@clientNamespace(AzureExampleBasicClient, "azure.example.basic", "java,python");
-@@clientNamespace(_Specs_.Azure.Example.Basic, "azure.example.basic", "java,python");
+@@clientNamespace(AzureExampleBasicClient, "azure.example.basic", "java");
+@@clientNamespace(_Specs_.Azure.Example.Basic, "azure.example.basic", "java");
 
 @client({
   name: "AzureExampleClient",
