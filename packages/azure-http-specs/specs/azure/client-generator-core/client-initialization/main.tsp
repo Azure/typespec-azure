@@ -115,7 +115,7 @@ model BlobProperties {
   createdOn: utcDateTime;
 }
 
-// Scenario 6: Client iniatialization on child client
+// Scenario 6: Client initialization on child client
 @doc("Blob operations with path parameter that should be moved to client level, in child client")
 @route("/child-client")
 interface ChildClient {

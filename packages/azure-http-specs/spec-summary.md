@@ -231,7 +231,7 @@ client.withAliasedName();
 client.withOriginalName();
 ```
 
-### Azure_ClientGeneratorCore_ClientInitialization_ParentClient
+### Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient
 
 - Endpoints:
   - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
@@ -239,6 +239,8 @@ client.withOriginalName();
   - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
 
 Client for testing a path parameter (blobName) moved to client level, in child client.
+
+The child client can be initialized individually, or via its parent client.
 
 Parameters elevated to client level:
 

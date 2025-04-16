@@ -181,8 +181,8 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
   },
 ]);
 
-// Mock responses for PathParam scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSuccess([
+// Mock responses for ParentClient/ChildClient scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/child-client/sample-blob/with-query",
     method: "get",

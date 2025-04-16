@@ -200,42 +200,44 @@ interface ParamAlias {
   withOriginalName is Service.ParamAlias.withOriginalName;
 }
 
-@scenarioDoc("""
-  Client for testing a path parameter (blobName) moved to client level, in child client.
-  
-  Parameters elevated to client level:
-  - blobName: "sample-blob" (path parameter)
-  
-  Expected client usage:
-  ```ts
-  // via ParentClient
-  const client = new ParentClient.getChildClient({
-    blobName: "sample-blob"
-  });
-  
-  // directly
-  const client = new ChildChild({
-    blobName: "sample-blob"
-  });
-  
-  // No need to pass blobName to any operations
-  client.withQuery(format: "text");  
-  client.getStandalone();
-  client.deleteStandalone();
-  ```
-  """)
-@scenario
 @global.Azure.ClientGenerator.Core.client({
   name: "ParentClient",
   service: Service,
 })
-@route("/child-client")
 namespace ParentClient {
+  @scenarioDoc("""
+    Client for testing a path parameter (blobName) moved to client level, in child client.
+    
+    The child client can be initialized individually, or via its parent client.
+    
+    Parameters elevated to client level:
+    - blobName: "sample-blob" (path parameter)
+    
+    Expected client usage:
+    ```ts
+    // via ParentClient
+    const client = new ParentClient.getChildClient({
+      blobName: "sample-blob"
+    });
+    
+    // directly
+    const client = new ChildChild({
+      blobName: "sample-blob"
+    });
+    
+    // No need to pass blobName to any operations
+    client.withQuery(format: "text");  
+    client.getStandalone();
+    client.deleteStandalone();
+    ```
+    """)
+  @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
   @global.Azure.ClientGenerator.Core.clientInitialization({
-    paramters: PathParamClientOptions,
+    parameters: PathParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
+  @route("/child-client")
   interface ChildClient {
     withQuery is Service.ChildClient.withQuery;
     getStandalone is Service.ChildClient.getStandalone;
