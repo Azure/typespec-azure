@@ -1063,8 +1063,8 @@ describe("identifiers decorator", () => {
       namespace Microsoft.Test;
       
       model PetResource is TrackedResource<PetResourceProperties> {
-        @key("agriServiceResourceName")
-        @segment("agriServices")
+        @key("petResourceName")
+        @segment("petServices")
         name: string;
       }
 
