@@ -630,3 +630,119 @@ it("customization with models from original namespace", async () => {
   strictEqual(ns.enums.length, 0);
   strictEqual(ns.namespaces.length, 0);
 });
+
+it("test cascading @clientNamespace", async () => {
+  await runner.compile(
+    `
+    @doc("Test for internal decorator.")
+    @global.Azure.ClientGenerator.Core.clientNamespace(
+      "azure.clientgenerator.core.access",
+    )
+    @service
+    namespace _Specs_.Azure.ClientGenerator.Core.Access;
+
+    @route("/publicOperation")
+    @global.Azure.ClientGenerator.Core.operationGroup
+    namespace PublicOperation {
+      @doc("Used in a public operation, should be generated and exported.")
+      model NoDecoratorModelInPublic {
+        name: string;
+      }
+
+      @doc("Used in a public operation, should be generated and exported.")
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
+      model PublicDecoratorModelInPublic {
+        name: string;
+      }
+
+      @route("/noDecoratorInPublic")
+      @get
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
+      op noDecoratorInPublic(@query name: string): NoDecoratorModelInPublic;
+
+      @route("/publicDecoratorInPublic")
+      @get
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
+      op publicDecoratorInPublic(@query name: string): PublicDecoratorModelInPublic;
+    }
+
+    @route("/internalOperation")
+    @global.Azure.ClientGenerator.Core.operationGroup
+    namespace InternalOperation {
+      @doc("Used in an internal operation, should be generated but not exported.")
+      model NoDecoratorModelInInternal {
+        name: string;
+      }
+
+      @doc("Used in an internal operation, should be generated but not exported.")
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.internal)
+      model InternalDecoratorModelInInternal {
+        name: string;
+      }
+
+      @doc("Used in an internal operation but with public decorator, should be generated and exported.")
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
+      model PublicDecoratorModelInInternal {
+        name: string;
+      }
+
+      @route("/noDecoratorInInternal")
+      @get
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.internal)
+      op noDecoratorInInternal(@query name: string): NoDecoratorModelInInternal;
+
+      @route("/internalDecoratorInInternal")
+      @get
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.internal)
+      op internalDecoratorInInternal(@query name: string): InternalDecoratorModelInInternal;
+
+      @route("/publicDecoratorInInternal")
+      @get
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.internal)
+      op publicDecoratorInInternal(@query name: string): PublicDecoratorModelInInternal;
+    }
+
+    @route("/relativeModelInOperation")
+    @global.Azure.ClientGenerator.Core.operationGroup
+    namespace RelativeModelInOperation {
+      @doc("Used in internal operations, should be generated but not exported.")
+      model OuterModel extends BaseModel {
+        inner: InnerModel;
+      }
+
+      @doc("Used in internal operations, should be generated but not exported.")
+      model InnerModel {
+        name: string;
+      }
+
+      @doc("Used in internal operations, should be generated but not exported.")
+      model BaseModel {
+        name: string;
+      }
+
+      @doc("Used in internal operations, should be generated but not exported.")
+      @discriminator("kind")
+      model AbstractModel {
+        name: string;
+      }
+
+      model RealModel extends AbstractModel {
+        kind: "real";
+      }
+
+      @route("/operation")
+      @get
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.internal)
+      op operation(@query name: string): OuterModel;
+
+      @route("/discriminator")
+      @get
+      @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.internal)
+      op discriminator(@query kind: string): AbstractModel;
+    }
+
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  const publicOperationNamespace = sdkPackage.namespaces.find((x) => x.name === "PublicOperation");
+});
