@@ -5,4 +5,7 @@ packages:
   - "@azure-tools/typespec-azure-resource-manager"
 ---
 
-Fix the `@identifiers` decorator on array models. When the `@identifiers` decorator is explicitly provided, it will take precedence. If the decorator is not present, the model properties with the `@key` decorator will be analyzed. If the keys are not TypeSpec defaults (`name` or `id`), a `x-ms-identifier` will be added for those `@key` values.
+Fixing gaps in the `@identifiers` decorator functionality:
+- The `@identifier` decorator should take priority when present, and its value should be respected.
+- The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+- The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
