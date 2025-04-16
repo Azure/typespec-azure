@@ -114,3 +114,20 @@ model BlobProperties {
   contentType: string;
   createdOn: utcDateTime;
 }
+
+// Scenario 6: Client iniatialization on child client
+@doc("Blob operations with path parameter that should be moved to client level, in child client")
+@route("/child-client")
+interface ChildClient {
+  @route("/{blobName}/with-query")
+  @get
+  withQuery(@path blobName: string, @query format?: string): void;
+
+  @route("/{blobName}/get-standalone")
+  @get
+  getStandalone(@path blobName: string): BlobProperties;
+
+  @route("/{blobName}")
+  @delete
+  deleteStandalone(@path blobName: string): void;
+}

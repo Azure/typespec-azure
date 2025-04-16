@@ -180,3 +180,44 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
     kind: "MockApiDefinition",
   },
 ]);
+
+// Mock responses for PathParam scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/child-client/sample-blob/with-query",
+    method: "get",
+    request: {
+      query: {
+        format: "text",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/child-client/sample-blob/get-standalone",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json({
+        name: "sample-blob",
+        size: 42,
+        contentType: "text/plain",
+        createdOn: "2025-04-01T12:00:00Z",
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/child-client/sample-blob",
+    method: "delete",
+    request: {},
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
