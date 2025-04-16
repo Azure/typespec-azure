@@ -221,7 +221,7 @@ namespace ParentClient {
     });
     
     // directly
-    const client = new ChildChild({
+    const client = new ChildClient({
       blobName: "sample-blob"
     });
     

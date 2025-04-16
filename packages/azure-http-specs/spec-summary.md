@@ -255,7 +255,7 @@ const client = new ParentClient.getChildClient({
 });
 
 // directly
-const client = new ChildChild({
+const client = new ChildClient({
   blobName: "sample-blob"
 });
 
