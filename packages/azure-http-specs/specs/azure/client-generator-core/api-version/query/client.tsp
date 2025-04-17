@@ -14,5 +14,5 @@ namespace Customizations;
 
 @@clientNamespace(Client.AlternateApiVersion.Service.Query,
   "azure.clientgenerator.core.apiversion.query",
-  "java,python"
+  "java"
 );

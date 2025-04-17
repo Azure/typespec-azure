@@ -10,7 +10,7 @@ using Spector;
 @scenarioService("/azure/client-generator-core/flatten-property")
 @global.Azure.ClientGenerator.Core.clientNamespace(
   "azure.clientgenerator.core.flattenproperty",
-  "java,python"
+  "java"
 )
 namespace _Specs_.Azure.ClientGenerator.Core.FlattenProperty;
 
