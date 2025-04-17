@@ -236,34 +236,18 @@ function requestHandler(
   }
 }
 
-function getUri(resourceUri: string, extensionName: string, requestMethod: string): string {
+function getUri(resourceUri: string, requestMethod: string): string {
   switch (requestMethod) {
     case "list":
+      if (resourceUri === "/" || resourceUri === "") {
+        return `${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources`;
+      }
       return `/${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources`;
     default:
-      return `/${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources/${extensionName}`;
-  }
-}
-
-function getUriForTenant(
-  extensionName: string,
-  requestMethod: string,
-  isWithSlash: boolean = true,
-) {
-  if (isWithSlash) {
-    switch (requestMethod) {
-      case "list":
-        return `//providers/Azure.ResourceManager.Resources/extensionsResources`;
-      default:
-        return `//providers/Azure.ResourceManager.Resources/extensionsResources/${extensionName}`;
-    }
-  } else {
-    switch (requestMethod) {
-      case "list":
-        return `/providers/Azure.ResourceManager.Resources/extensionsResources`;
-      default:
-        return `/providers/Azure.ResourceManager.Resources/extensionsResources/${extensionName}`;
-    }
+      if (resourceUri === "/" || resourceUri === "") {
+        return `${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`;
+      }
+      return `/${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`;
   }
 }
 
@@ -275,7 +259,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
   "Resource",
 ]).pass([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "get"),
     method: "get",
     request: {
       query: {
@@ -291,7 +275,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "get"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "get"),
     method: "get",
     request: {
       query: {
@@ -307,7 +291,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, "get"),
     method: "get",
     request: {
       query: {
@@ -323,7 +307,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "get"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "get"),
     method: "get",
     request: {
       query: {
@@ -339,7 +323,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "get", true),
+    uri: getUri("/", "get"),
     method: "get",
     request: {
       query: {
@@ -355,7 +339,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "get", false),
+    uri: getUri("", "get"),
     method: "get",
     request: {
       query: {
@@ -371,7 +355,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "get"),
+    uri: getUri(RESOURCE_SCOPE_URI, "get"),
     method: "get",
     request: {
       query: {
@@ -387,7 +371,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "get"),
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "get"),
     method: "get",
     request: {
       query: {
@@ -411,7 +395,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
   "Resource",
 ]).pass([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "put"),
     method: "put",
     request: {
       query: {
@@ -432,7 +416,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "put"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "put"),
     method: "put",
     request: {
       query: {
@@ -453,7 +437,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, "put"),
     method: "put",
     request: {
       query: {
@@ -474,7 +458,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "put"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "put"),
     method: "put",
     request: {
       query: {
@@ -495,7 +479,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "put", true),
+    uri: getUri("/", "put"),
     method: "put",
     request: {
       query: {
@@ -516,7 +500,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "put", false),
+    uri: getUri("", "put"),
     method: "put",
     request: {
       query: {
@@ -537,7 +521,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "put"),
+    uri: getUri(RESOURCE_SCOPE_URI, "put"),
     method: "put",
     request: {
       query: {
@@ -558,7 +542,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "put"),
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "put"),
     method: "put",
     request: {
       query: {
@@ -587,7 +571,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
   "Resource",
 ]).pass([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "patch"),
     method: "patch",
     request: {
       query: {
@@ -614,7 +598,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "patch"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "patch"),
     method: "patch",
     request: {
       query: {
@@ -641,7 +625,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, "patch"),
     method: "patch",
     request: {
       query: {
@@ -668,7 +652,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "patch"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "patch"),
     method: "patch",
     request: {
       query: {
@@ -695,7 +679,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "patch", true),
+    uri: getUri("/", "patch"),
     method: "patch",
     request: {
       query: {
@@ -722,7 +706,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "patch", false),
+    uri: getUri("", "patch"),
     method: "patch",
     request: {
       query: {
@@ -749,7 +733,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "patch"),
+    uri: getUri(RESOURCE_SCOPE_URI, "patch"),
     method: "patch",
     request: {
       query: {
@@ -776,7 +760,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "patch"),
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "patch"),
     method: "patch",
     request: {
       query: {
@@ -811,7 +795,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
   "Resource",
 ]).pass([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "delete"),
     method: "delete",
     request: {
       query: {
@@ -825,7 +809,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "delete"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "delete"),
     method: "delete",
     request: {
       query: {
@@ -839,7 +823,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, "delete"),
     method: "delete",
     request: {
       query: {
@@ -853,7 +837,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "delete"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "delete"),
     method: "delete",
     request: {
       query: {
@@ -867,7 +851,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "delete", true),
+    uri: getUri("/", "delete"),
     method: "delete",
     request: {
       query: {
@@ -881,7 +865,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "delete", false),
+    uri: getUri("", "delete"),
     method: "delete",
     request: {
       query: {
@@ -895,7 +879,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "delete"),
+    uri: getUri(RESOURCE_SCOPE_URI, "delete"),
     method: "delete",
     request: {
       query: {
@@ -909,7 +893,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "delete"),
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "delete"),
     method: "delete",
     request: {
       query: {
@@ -931,7 +915,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
   "Resource",
 ]).pass([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "list"),
     method: "get",
     request: {
       query: {
@@ -949,7 +933,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "list"),
+    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "list"),
     method: "get",
     request: {
       query: {
@@ -967,7 +951,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI, "list"),
     method: "get",
     request: {
       query: {
@@ -985,7 +969,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "list"),
+    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "list"),
     method: "get",
     request: {
       query: {
@@ -1003,7 +987,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "list", true),
+    uri: getUri("/", "list"),
     method: "get",
     request: {
       query: {
@@ -1021,7 +1005,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUriForTenant(EXTENSION_RESOURCE_NAME, "list", false),
+    uri: getUri("", "list"),
     method: "get",
     request: {
       query: {
@@ -1039,7 +1023,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI, EXTENSION_RESOURCE_NAME, "list"),
+    uri: getUri(RESOURCE_SCOPE_URI, "list"),
     method: "get",
     request: {
       query: {
@@ -1057,7 +1041,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), EXTENSION_RESOURCE_NAME, "list"),
+    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "list"),
     method: "get",
     request: {
       query: {
