@@ -971,12 +971,7 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
-  function getSchemaOrRef(
-    type: Type,
-    schemaContext: SchemaContext,
-    namespace?: Namespace,
-    property?: ModelProperty,
-  ): any {
+  function getSchemaOrRef(type: Type, schemaContext: SchemaContext): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
       undefined;
     const ref = resolveExternalRef(type);
@@ -1026,7 +1021,7 @@ export async function getOpenAPIForService(
     const name = getOpenAPITypeName(program, type, typeNameOptions);
 
     if (shouldInline(program, type)) {
-      const schema = getSchemaForInlineType(type, name, schemaContext, namespace, property);
+      const schema = getSchemaForInlineType(type, name, schemaContext);
 
       if (schema === undefined && isErrorType(type)) {
         // Exit early so that syntax errors are exposed.  This error will
@@ -1053,13 +1048,7 @@ export async function getOpenAPIForService(
       return { $ref: pending.ref };
     }
   }
-  function getSchemaForInlineType(
-    type: Type,
-    name: string,
-    context: SchemaContext,
-    namespace?: Namespace,
-    property?: ModelProperty,
-  ) {
+  function getSchemaForInlineType(type: Type, name: string, context: SchemaContext) {
     if (inProgressInlineTypes.has(type)) {
       reportDiagnostic(program, {
         code: "inline-cycle",
@@ -1069,7 +1058,7 @@ export async function getOpenAPIForService(
       return {};
     }
     inProgressInlineTypes.add(type);
-    const schema = getSchemaForType(type, context, namespace, property);
+    const schema = getSchemaForType(type, context);
     inProgressInlineTypes.delete(type);
     return schema;
   }
@@ -1654,12 +1643,7 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getSchemaForType(
-    type: Type,
-    schemaContext: SchemaContext,
-    namespace?: Namespace,
-    property?: ModelProperty,
-  ): OpenAPI2Schema | undefined {
+  function getSchemaForType(type: Type, schemaContext: SchemaContext): OpenAPI2Schema | undefined {
     const builtinType = getSchemaForLiterals(type);
     if (builtinType !== undefined) {
       return builtinType;
@@ -1668,7 +1652,7 @@ export async function getOpenAPIForService(
       case "Intrinsic":
         return getSchemaForIntrinsicType(type);
       case "Model":
-        return getSchemaForModel(type, schemaContext, namespace, property);
+        return getSchemaForModel(type, schemaContext);
       case "ModelProperty":
         return getSchemaForType(type.type, schemaContext);
       case "Scalar":
@@ -1926,13 +1910,8 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  function getSchemaForModel(
-    model: Model,
-    schemaContext: SchemaContext,
-    namespace?: Namespace,
-    property?: ModelProperty,
-  ) {
-    const array = getArrayType(model, schemaContext, namespace, property);
+  function getSchemaForModel(model: Model, schemaContext: SchemaContext) {
+    const array = getArrayType(model, schemaContext);
     if (array) {
       return array;
     }
@@ -2131,12 +2110,8 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(
-        prop.type,
-        context,
-        prop.model?.namespace,
-        prop?.kind === "ModelProperty" ? prop : undefined,
-      );
+      propSchema = getSchemaOrRef(prop.type, context);
+      setArmIdentifiers(prop.type, propSchema, prop, prop.model?.namespace);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2428,12 +2403,7 @@ export async function getOpenAPIForService(
   /**
    * If the model is an array model return the OpenAPI2Schema for the array type.
    */
-  function getArrayType(
-    typespecType: Model,
-    context: SchemaContext,
-    namespace?: Namespace,
-    property?: ModelProperty,
-  ): OpenAPI2Schema | undefined {
+  function getArrayType(typespecType: Model, context: SchemaContext): OpenAPI2Schema | undefined {
     if (isArrayModelType(program, typespecType)) {
       const array: OpenAPI2Schema = {
         type: "array",
@@ -2443,25 +2413,43 @@ export async function getOpenAPIForService(
         }),
       };
 
-      const armIdentifiers = property ? getArmIdentifiers(program, property) : undefined;
-      const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
-      const identifiers = resolveIdentifiers(armIdentifiers, armKeyIdentifiers);
-
-      if (isArrayTypeArmProviderNamespace(typespecType, namespace) && identifiers) {
-        array["x-ms-identifiers"] = identifiers;
-      } else if (
-        !ifArrayItemContainsIdentifier(
-          program,
-          typespecType as any,
-          armIdentifiers ?? armKeyIdentifiers ?? [],
-        )
-      ) {
-        array["x-ms-identifiers"] = [];
-      }
+      setArmIdentifiers(typespecType, array);
 
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;
+  }
+
+  function setArmIdentifiers(
+    typespecType: Type,
+    schema: OpenAPI2Schema,
+    property?: ModelProperty,
+    namespace?: Namespace,
+  ) {
+    if (typespecType.kind !== "Model" || !isArrayModelType(program, typespecType)) {
+      delete schema["x-ms-identifiers"];
+      return;
+    }
+
+    const armIdentifiers = property ? getArmIdentifiers(program, property) : undefined;
+    const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
+    const identifiers = resolveIdentifiers(armIdentifiers, armKeyIdentifiers);
+
+    if (isArrayTypeArmProviderNamespace(typespecType, namespace) && identifiers) {
+      schema["x-ms-identifiers"] = identifiers;
+      return;
+    } else if (
+      !ifArrayItemContainsIdentifier(
+        program,
+        typespecType as any,
+        armIdentifiers ?? armKeyIdentifiers ?? [],
+      )
+    ) {
+      schema["x-ms-identifiers"] = [];
+      return;
+    }
+
+    delete schema["x-ms-identifiers"];
   }
 
   function resolveIdentifiers(
@@ -2484,7 +2472,11 @@ export async function getOpenAPIForService(
     );
   }
 
-  function isArrayTypeArmProviderNamespace(typespecType: Model, namespace?: Namespace): boolean {
+  function isArrayTypeArmProviderNamespace(typespecType?: Model, namespace?: Namespace): boolean {
+    if (typespecType === undefined) {
+      return false;
+    }
+
     if (isArmProviderNamespace(program, namespace)) {
       return true;
     }
