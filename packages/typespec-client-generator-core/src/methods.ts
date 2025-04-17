@@ -573,7 +573,7 @@ function getSdkMethodResponse(
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (getResponseAsBool(context, operation)) {
-    type = getSdkBuiltInType(context, $.builtin.boolean);
+    type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
     if (responseTypes.size > 1) {
       // return union of all the different types
