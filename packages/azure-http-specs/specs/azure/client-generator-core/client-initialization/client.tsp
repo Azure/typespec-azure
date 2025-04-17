@@ -11,11 +11,11 @@ namespace _Specs_.Azure.ClientGeneratorCore.ClientInitialization;
 
 @@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGeneratorCore.ClientInitialization,
   "azure.clientgenerator.core.clientinitialization",
-  "java,python"
+  "java"
 );
 @@global.Azure.ClientGenerator.Core.clientNamespace(Service,
   "azure.clientgenerator.core.clientinitialization",
-  "java,python"
+  "java"
 );
 
 model HeaderParamClientOptions {

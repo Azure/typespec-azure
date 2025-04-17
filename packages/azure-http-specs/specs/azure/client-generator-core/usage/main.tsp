@@ -8,10 +8,7 @@ using Spector;
 
 @doc("Test for internal decorator.")
 @scenarioService("/azure/client-generator-core/usage")
-@global.Azure.ClientGenerator.Core.clientNamespace(
-  "azure.clientgenerator.core.usage",
-  "java,python"
-)
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
 namespace _Specs_.Azure.ClientGenerator.Core.Usage;
 
 @scenario
@@ -20,10 +17,7 @@ namespace _Specs_.Azure.ClientGenerator.Core.Usage;
   'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
   The other models are override to roundtrip, so they should be generated and exported as well.
   """)
-@global.Azure.ClientGenerator.Core.clientNamespace(
-  "azure.clientgenerator.core.usage",
-  "java,python"
-)
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
 namespace ModelInOperation {
   @doc("Usage override to roundtrip.")
   @global.Azure.ClientGenerator.Core.usage(
