@@ -18,14 +18,14 @@ model ResponseModel {
 
 @scenario
 @scenarioDoc("""
-This scenario will be used to test if client code can correctly deserializes an empty url as null.
-Expected response body:
-```json
-{
-  "serviceUrl": ""
-}
-```
-""")
+  This scenario will be used to test if client code can correctly deserializes an empty url as null.
+  Expected response body:
+  ```json
+  {
+    "serviceUrl": ""
+  }
+  ```
+  """)
 @route("/emptyUrl")
 @get
 op emptyUrl(): ResponseModel;
