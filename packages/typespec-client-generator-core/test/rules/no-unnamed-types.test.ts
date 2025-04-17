@@ -133,6 +133,20 @@ describe("models", () => {
       )
       .toBeValid();
   });
+
+  it("unused anonymous model", async () => {
+    await tester
+      .expect(
+        `
+          @service
+          namespace TestService;
+          model A {
+            prop: {prop: string};
+          };
+          `,
+      )
+      .toBeValid();
+  });
 });
 
 describe("unions", () => {

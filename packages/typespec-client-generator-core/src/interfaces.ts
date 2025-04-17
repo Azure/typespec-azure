@@ -95,6 +95,7 @@ export interface SdkOperationGroup {
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
+  hasOperations?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -612,7 +613,6 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   style: "simple" | "label" | "matrix" | "fragment" | "path";
   allowReserved: boolean;
   serializedName: string;
-  optional: false;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
@@ -625,7 +625,6 @@ export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
   serializedName: string;
-  optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
   correspondingMethodParams: SdkModelPropertyType[];

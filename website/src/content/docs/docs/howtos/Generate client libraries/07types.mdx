@@ -166,6 +166,252 @@ Foo foo = new Foo("hello");
 </ClientTabItem>
 </ClientTabs>
 
+## Client Documentation
+
+The `@clientDoc` decorator lets you add documentation that will appear in generated client libraries. This is useful for providing additional context, examples, or implementation notes that are only relevant for SDK consumers.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+@doc("This internal model is the base class for shapes")
+@clientDoc(
+  "Base class for all shape objects that can be drawn on a canvas",
+  DocumentationMode.replace
+)
+model Shape {
+  @doc("The coordinates of the shape")
+  @clientDoc(
+    "The x,y coordinates where the shape will be positioned on the canvas",
+    DocumentationMode.replace
+  )
+  position: Point;
+}
+
+@doc("A two-dimensional point")
+@clientDoc("Represents a position in a 2D coordinate system", DocumentationMode.replace)
+model Point {
+  @doc("X coordinate")
+  @clientDoc("The horizontal position (increases moving right)", DocumentationMode.replace)
+  x: float32;
+
+  @doc("Y coordinate")
+  @clientDoc("The vertical position (increases moving down)", DocumentationMode.replace)
+  y: float32;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+class Point(_model_base.Model):
+    """Represents a position in a 2D coordinate system.
+
+    :param x: The horizontal position (increases moving right)
+    :type x: float
+    :param y: The vertical position (increases moving down)
+    :type y: float
+    """
+
+    x: float = rest_field()
+    """The horizontal position (increases moving right)."""
+    y: float = rest_field()
+    """The vertical position (increases moving down)."""
+
+class Shape(_model_base.Model):
+    """Base class for all shape objects that can be drawn on a canvas.
+
+    :param position: The x,y coordinates where the shape will be positioned on the canvas
+    :type position: Point
+    """
+
+    position: Point = rest_field()
+    """The x,y coordinates where the shape will be positioned on the canvas."""
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+/// <summary>
+/// Base class for all shape objects that can be drawn on a canvas
+/// </summary>
+public partial class Shape
+{
+    /// <summary>
+    /// The x,y coordinates where the shape will be positioned on the canvas
+    /// </summary>
+    public Point Position { get; set; }
+}
+
+/// <summary>
+/// Represents a position in a 2D coordinate system
+/// </summary>
+public partial class Point
+{
+    /// <summary>
+    /// The horizontal position (increases moving right)
+    /// </summary>
+    public float X { get; set; }
+
+    /// <summary>
+    /// The vertical position (increases moving down)
+    /// </summary>
+    public float Y { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+/**
+ * Base class for all shape objects that can be drawn on a canvas
+ */
+export interface Shape {
+  /**
+   * The x,y coordinates where the shape will be positioned on the canvas
+   */
+  position: Point;
+}
+
+/**
+ * Represents a position in a 2D coordinate system
+ */
+export interface Point {
+  /**
+   * The horizontal position (increases moving right)
+   */
+  x: number;
+
+  /**
+   * The vertical position (increases moving down)
+   */
+  y: number;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+/**
+ * Base class for all shape objects that can be drawn on a canvas.
+ */
+@Fluent
+public final class Shape {
+    /**
+     * The x,y coordinates where the shape will be positioned on the canvas.
+     */
+    private Point position;
+
+    /**
+     * Get the position property: The x,y coordinates where the shape will be positioned on the canvas.
+     *
+     * @return the position value.
+     */
+    public Point getPosition() {
+        return this.position;
+    }
+
+    /**
+     * Set the position property: The x,y coordinates where the shape will be positioned on the canvas.
+     *
+     * @param position the position value to set.
+     * @return the Shape object itself.
+     */
+    public Shape setPosition(Point position) {
+        this.position = position;
+        return this;
+    }
+}
+
+/**
+ * Represents a position in a 2D coordinate system.
+ */
+@Fluent
+public final class Point {
+    /**
+     * The horizontal position (increases moving right).
+     */
+    private float x;
+
+    /**
+     * The vertical position (increases moving down).
+     */
+    private float y;
+
+    /**
+     * Get the x property: The horizontal position (increases moving right).
+     *
+     * @return the x value.
+     */
+    public float getX() {
+        return this.x;
+    }
+
+    /**
+     * Set the x property: The horizontal position (increases moving right).
+     *
+     * @param x the x value to set.
+     * @return the Point object itself.
+     */
+    public Point setX(float x) {
+        this.x = x;
+        return this;
+    }
+
+    /**
+     * Get the y property: The vertical position (increases moving down).
+     *
+     * @return the y value.
+     */
+    public float getY() {
+        return this.y;
+    }
+
+    /**
+     * Set the y property: The vertical position (increases moving down).
+     *
+     * @param y the y value to set.
+     * @return the Point object itself.
+     */
+    public Point setY(float y) {
+        this.y = y;
+        return this;
+    }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+// Shape - Base class for all shape objects that can be drawn on a canvas
+type Shape struct {
+	// Position - The x,y coordinates where the shape will be positioned on the canvas
+	Position *Point
+}
+
+// Point - Represents a position in a 2D coordinate system
+type Point struct {
+	// X - The horizontal position (increases moving right)
+	X *float32
+
+	// Y - The vertical position (increases moving down)
+	Y *float32
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+The `@clientDoc` decorator can be used on everything that the `@doc` decorator can be applied to.
+
+When both `@doc` and `@clientDoc` are present, TCGC outputs the final documentation depending on the mode that you called `@clientDoc` with.
+If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
+
 ## Models
 
 ### Flattening

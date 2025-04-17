@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromNone = passOnSuccess([
   {
-    uri: `${commonBase}/client[:]v1/service[:]v1/api-version[:]v1/add-optional-param/from-none`,
+    uri: `${commonBase}/client\\:v1/service\\:v1/api-version\\:v1/add-optional-param/from-none`,
     method: "head",
     request: {},
     response: {
@@ -15,7 +15,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromNone = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v1/service[:]v2/api-version[:]v1/add-optional-param/from-none`,
+    uri: `${commonBase}/client\\:v1/service\\:v2/api-version\\:v1/add-optional-param/from-none`,
     method: "head",
     request: {},
     response: {
@@ -24,7 +24,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromNone = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v1/add-optional-param/from-none`,
+    uri: `${commonBase}/client\\:v2/service\\:v2/api-version\\:v1/add-optional-param/from-none`,
     method: "head",
     request: {},
     response: {
@@ -45,7 +45,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromNone = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v2/add-optional-param/from-none`,
+    uri: `${commonBase}/client\\:v2/service\\:v2/api-version\\:v2/add-optional-param/from-none`,
     method: "head",
     request: {
       query: {
@@ -61,7 +61,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromNone = passOnSuccess([
 
 Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSuccess([
   {
-    uri: `${commonBase}/client[:]v1/service[:]v1/api-version[:]v1/add-optional-param/from-one-required`,
+    uri: `${commonBase}/client\\:v1/service\\:v1/api-version\\:v1/add-optional-param/from-one-required`,
     method: "get",
     request: {
       query: {
@@ -74,7 +74,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v1/service[:]v2/api-version[:]v1/add-optional-param/from-one-required`,
+    uri: `${commonBase}/client\\:v1/service\\:v2/api-version\\:v1/add-optional-param/from-one-required`,
     method: "get",
     request: {
       query: {
@@ -87,7 +87,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v1/add-optional-param/from-one-required`,
+    uri: `${commonBase}/client\\:v2/service\\:v2/api-version\\:v1/add-optional-param/from-one-required`,
     method: "get",
     request: {
       query: {
@@ -113,7 +113,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v2/add-optional-param/from-one-required`,
+    uri: `${commonBase}/client\\:v2/service\\:v2/api-version\\:v2/add-optional-param/from-one-required`,
     method: "get",
     request: {
       query: {
@@ -130,7 +130,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneRequired = passOnSucc
 
 Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSuccess([
   {
-    uri: `${commonBase}/client[:]v1/service[:]v1/api-version[:]v1/add-optional-param/from-one-optional`,
+    uri: `${commonBase}/client\\:v1/service\\:v1/api-version\\:v1/add-optional-param/from-one-optional`,
     method: "get",
     request: {
       query: {
@@ -143,7 +143,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v1/service[:]v2/api-version[:]v1/add-optional-param/from-one-optional`,
+    uri: `${commonBase}/client\\:v1/service\\:v2/api-version\\:v1/add-optional-param/from-one-optional`,
     method: "get",
     request: {
       query: {
@@ -156,7 +156,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v1/add-optional-param/from-one-optional`,
+    uri: `${commonBase}/client\\:v2/service\\:v2/api-version\\:v1/add-optional-param/from-one-optional`,
     method: "get",
     request: {
       query: {
@@ -182,7 +182,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
     kind: "MockApiDefinition",
   },
   {
-    uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v2/add-optional-param/from-one-optional`,
+    uri: `${commonBase}/client\\:v2/service\\:v2/api-version\\:v2/add-optional-param/from-one-optional`,
     method: "get",
     request: {
       query: {
@@ -198,7 +198,7 @@ Scenarios.Resiliency_ServiceDriven_AddOptionalParam_fromOneOptional = passOnSucc
 ]);
 
 Scenarios.Resiliency_ServiceDriven_breakTheGlass = passOnSuccess({
-  uri: `${commonBase}/client[:]v1/service[:]v2/api-version[:]v2/add-operation`,
+  uri: `${commonBase}/client\\:v1/service\\:v2/api-version\\:v2/add-operation`,
   method: "delete",
   request: {},
   response: {
@@ -208,7 +208,7 @@ Scenarios.Resiliency_ServiceDriven_breakTheGlass = passOnSuccess({
 });
 
 Scenarios.Resiliency_ServiceDriven_addOperation = passOnSuccess({
-  uri: `${commonBase}/client[:]v2/service[:]v2/api-version[:]v2/add-operation`,
+  uri: `${commonBase}/client\\:v2/service\\:v2/api-version\\:v2/add-operation`,
   method: "delete",
   request: {},
   response: {

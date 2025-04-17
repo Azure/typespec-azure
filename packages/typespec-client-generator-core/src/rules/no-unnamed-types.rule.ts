@@ -1,5 +1,6 @@
 import { createRule, Model, paramMessage, Union } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
+import { UsageFlags } from "../interfaces.js";
 import { createSdkPackage } from "../package.js";
 
 export const noUnnamedTypesRule = createRule({
@@ -20,7 +21,11 @@ export const noUnnamedTypesRule = createRule({
     return {
       model: (model: Model) => {
         const createdModel = tcgcContext.__referencedTypeCache.get(model);
-        if (createdModel && createdModel.isGeneratedName) {
+        if (
+          createdModel &&
+          createdModel.usage !== UsageFlags.None &&
+          createdModel.isGeneratedName
+        ) {
           context.reportDiagnostic({
             target: model,
             format: {
@@ -32,7 +37,11 @@ export const noUnnamedTypesRule = createRule({
       },
       union: (union: Union) => {
         const createdUnion = tcgcContext.__referencedTypeCache.get(union);
-        if (createdUnion && createdUnion.isGeneratedName) {
+        if (
+          createdUnion &&
+          createdUnion.usage !== UsageFlags.None &&
+          createdUnion.isGeneratedName
+        ) {
           context.reportDiagnostic({
             target: union,
             format: {

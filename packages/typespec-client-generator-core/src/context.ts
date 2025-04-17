@@ -47,7 +47,8 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
 
     previewStringRegex: /-preview$/,
     disableUsageAccessPropagationToBase: false,
-
+    generateProtocolMethods: true,
+    generateConvenienceMethods: true,
     __referencedTypeCache: new Map<
       Type,
       SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
@@ -108,12 +109,14 @@ export async function createSdkContext<
   options?: CreateSdkContextOptions,
 ): Promise<SdkContext<TOptions, TServiceOperation>> {
   const diagnostics = createDiagnosticCollector();
-  const generateProtocolMethods = context.options["generate-protocol-methods"] ?? true;
-  const generateConvenienceMethods = context.options["generate-convenience-methods"] ?? true;
   const tcgcContext = createTCGCContext(
     context.program,
     emitterName ?? context.options["emitter-name"],
   );
+  const generateProtocolMethods =
+    context.options["generate-protocol-methods"] ?? tcgcContext.generateProtocolMethods;
+  const generateConvenienceMethods =
+    context.options["generate-convenience-methods"] ?? tcgcContext.generateConvenienceMethods;
   const sdkContext: SdkContext<TOptions, TServiceOperation> = {
     ...tcgcContext,
     emitContext: context,

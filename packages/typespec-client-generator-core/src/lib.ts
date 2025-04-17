@@ -312,10 +312,10 @@ export const $lib = createTypeSpecLibrary({
         default: `Operation is pageable but does not return a correct type.`,
       },
     },
-    "invalid-alternate-source-type": {
+    "invalid-alternate-type": {
       severity: "error",
       messages: {
-        default: paramMessage`@alternateType only supports scalar types. The source type is '${"typeName"}'.`,
+        default: paramMessage`Invalid alternate type. If the source type is Scalar, the alternate type must also be Scalar. Found alternate type kind: '${"kindName"}'`,
       },
     },
     "invalid-initialized-by": {
@@ -375,6 +375,12 @@ export const $lib = createTypeSpecLibrary({
       description: "Missing service versions",
       messages: {
         default: paramMessage`The @clientApiVersions decorator is missing one or more versions defined in ${"serviceName"}. Client API must support all service versions to ensure compatibility. Missing versions: ${"missingVersions"}. Please update the client API to support all required service versions.`,
+      },
+    },
+    "invalid-client-doc-mode": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Invalid mode '${"mode"}' for @clientDoc decorator. Valid values are "append" or "replace".`,
       },
     },
   },

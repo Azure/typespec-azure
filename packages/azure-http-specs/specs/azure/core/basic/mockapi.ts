@@ -104,7 +104,7 @@ Scenarios.Azure_Core_Basic_delete = passOnSuccess({
 });
 
 Scenarios.Azure_Core_Basic_export = passOnSuccess({
-  uri: "/azure/core/basic/users/:id[:]export",
+  uri: "/azure/core/basic/users/:id\\:export",
   method: "post",
   request: {
     pathParams: {

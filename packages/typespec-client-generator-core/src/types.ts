@@ -21,7 +21,6 @@ import {
   Union,
   createDiagnosticCollector,
   getDiscriminator,
-  getDoc,
   getEncode,
   getLifecycleVisibilityEnum,
   getSummary,
@@ -92,6 +91,7 @@ import {
   createGeneratedName,
   filterApiVersionsInEnum,
   getAvailableApiVersions,
+  getClientDoc,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
@@ -248,7 +248,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     baseType:
       type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
@@ -316,7 +316,7 @@ function getSdkDateTimeType(
     encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
@@ -414,7 +414,7 @@ function getSdkDurationTypeWithDiagnostics(
     encode: (encode ?? "ISO8601") as DurationKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
@@ -818,7 +818,7 @@ export function getSdkModelWithDiagnostics(
       name: name,
       isGeneratedName: !type.name,
       namespace: getClientNamespace(context, type),
-      doc: getDoc(context.program, type),
+      doc: getClientDoc(context, type),
       summary: getSummary(context.program, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
@@ -925,7 +925,7 @@ function getSdkEnumValueWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
     value: type.value ?? type.name,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     enumType,
     valueType: enumType.valueType,
@@ -949,7 +949,7 @@ function getSdkEnumWithDiagnostics(
       name: getLibraryName(context, type),
       isGeneratedName: false,
       namespace: getClientNamespace(context, type),
-      doc: getDoc(context.program, type),
+      doc: getClientDoc(context, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
         getSdkEnumValueType(
@@ -988,7 +988,7 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
-      doc: getDoc(context.program, member.type),
+      doc: getClientDoc(context, member.type),
       summary: getSummary(context.program, member.type),
       value: member.value,
       valueType: enumType.valueType,
@@ -1015,7 +1015,7 @@ export function getSdkUnionEnumWithDiagnostics(
     name,
     isGeneratedName: !type.union.name,
     namespace: getClientNamespace(context, type.union),
-    doc: getDoc(context.program, union),
+    doc: getClientDoc(context, union),
     summary: getSummary(context.program, union),
     valueType:
       diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
@@ -1225,7 +1225,7 @@ export function getSdkModelPropertyTypeBase(
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   return diagnostics.wrap({
     __raw: type,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     apiVersions,
     type: propertyType,

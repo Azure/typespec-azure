@@ -76,7 +76,7 @@ Scenarios.Azure_Core_Traits_smokeTest = passOnSuccess({
 });
 
 Scenarios.Azure_Core_Traits_repeatableAction = passOnSuccess({
-  uri: "/azure/core/traits/user/:id:repeatableAction",
+  uri: "/azure/core/traits/user/:id\\:repeatableAction",
   method: "post",
   request: {
     body: json({
