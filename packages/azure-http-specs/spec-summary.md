@@ -61,7 +61,7 @@ Expected response body:
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/emptyUrl`
 
-This scenario tests if client code correctly deserializes empty url as null.
+This scenario will be used to test if client code can correctly deserializes an empty url as null.
 Expected response body:
 
 ```json

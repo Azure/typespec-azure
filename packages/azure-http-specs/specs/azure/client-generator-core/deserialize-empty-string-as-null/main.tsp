@@ -10,22 +10,22 @@ using Spector;
 @scenarioService("/azure/client-generator-core/deserialize-empty-string-as-null")
 namespace _Specs_.Azure.ClientGenerator.Core.DeserializeEmptyStringAsNull;
 
-@doc("This is the output Model.")
-model EmptyUrl {
+@doc("This is a Model contains a string-like property of type url.")
+model ResponseModel {
   @deserializeEmptyStringAsNull
   serviceUrl: url;
 }
 
 @scenario
-@route("/emptyUrl")
 @scenarioDoc("""
-  This scenario tests if client code correctly deserializes empty url as null.
-  Expected response body:
-  ```json
-  {
-    "serviceUrl": ""
-  }
-  ```
-  """)
+This scenario will be used to test if client code can correctly deserializes an empty url as null.
+Expected response body:
+```json
+{
+  "serviceUrl": ""
+}
+```
+""")
+@route("/emptyUrl")
 @get
-op emptyUrl(): EmptyUrl;
+op emptyUrl(): ResponseModel;
