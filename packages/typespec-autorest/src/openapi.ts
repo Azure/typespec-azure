@@ -2443,18 +2443,26 @@ export async function getOpenAPIForService(
     property: ModelProperty,
     namespace?: Namespace,
   ) {
+    const armIdentifiers = getArmIdentifiers(program, property);
     if (
       typespecType.kind !== "Model" ||
       !isArrayModelType(program, typespecType) ||
-      !isArrayTypeArmProviderNamespace(typespecType, namespace)
+      !armIdentifiers
     ) {
       return;
     }
 
-    const armIdentifiers = getArmIdentifiers(program, property);
-    if (armIdentifiers) {
-      schema["x-ms-identifiers"] = armIdentifiers;
+    if (!isArrayTypeArmProviderNamespace(typespecType, namespace)) {
+      reportDiagnostic(program, {
+        code: "invalid-identifiers-decorator-usage",
+        format: { name: property.name },
+        target: property,
+      });
+
+      return;
     }
+
+    schema["x-ms-identifiers"] = armIdentifiers;
   }
 
   function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
