@@ -89,6 +89,7 @@ export function getSdkHttpOperation(
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
 ): [SdkHttpOperation, readonly Diagnostic[]] {
+  const tk = $(context.program);
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
     getSdkHttpResponseAndExceptions(context, httpOperation),
@@ -97,11 +98,11 @@ export function getSdkHttpOperation(
     // we make sure valid responses and 404 responses are booleans
     for (const response of responses) {
       // all valid responses will return boolean
-      response.type = getSdkConstant(context, $.literal.createBoolean(true));
+      response.type = getSdkConstant(context, tk.literal.createBoolean(true));
     }
     const fourOFourResponse = exceptions.find((e) => e.statusCodes === 404);
     if (fourOFourResponse) {
-      fourOFourResponse.type = getSdkConstant(context, $.literal.createBoolean(false));
+      fourOFourResponse.type = getSdkConstant(context, tk.literal.createBoolean(false));
       // move from exception to valid response with status code 404
       responses.push({
         ...fourOFourResponse,
@@ -114,7 +115,7 @@ export function getSdkHttpOperation(
       responses.push({
         kind: "http",
         statusCodes: 404,
-        type: getSdkConstant(context, $.literal.createBoolean(false)),
+        type: getSdkConstant(context, tk.literal.createBoolean(false)),
         apiVersions: getAvailableApiVersions(
           context,
           httpOperation.operation,
@@ -812,7 +813,7 @@ function getFormatFromExplodeOrEncode(
   explode?: boolean,
 ): [CollectionFormat | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  if ($.array.is(type.type)) {
+  if ($(context.program).array.is(type.type)) {
     if (explode) {
       return diagnostics.wrap("multi");
     }
