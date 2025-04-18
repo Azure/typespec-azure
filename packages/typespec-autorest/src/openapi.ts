@@ -1857,17 +1857,13 @@ export async function getOpenAPIForService(
     }
   }
 
-  function ifArrayItemContainsIdentifier(
-    program: Program,
-    array: ArrayModelType,
-    armIdentifiers: string[],
-  ) {
+  function ifArrayItemContainsIdentifier(program: Program, array: ArrayModelType) {
     if (array.indexer.value?.kind !== "Model") {
       return true;
     }
     return (
       getExtensions(program, array).has("x-ms-identifiers") ||
-      (getProperty(array.indexer.value, "id") && armIdentifiers.includes("id"))
+      getProperty(array.indexer.value, "id")
     );
   }
 
@@ -2426,9 +2422,14 @@ export async function getOpenAPIForService(
         }),
       };
 
-      const armIdentifiers = getIdentifiers(typespecType, undefined, namespace);
-      if (armIdentifiers) {
-        array["x-ms-identifiers"] = armIdentifiers;
+      const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
+      if (
+        isArrayTypeArmProviderNamespace(typespecType, namespace) &&
+        hasValidArmIdentifiers(armKeyIdentifiers)
+      ) {
+        array["x-ms-identifiers"] = armKeyIdentifiers;
+      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
+        array["x-ms-identifiers"] = [];
       }
 
       return applyIntrinsicDecorators(typespecType, array);
@@ -2445,51 +2446,15 @@ export async function getOpenAPIForService(
     if (
       typespecType.kind !== "Model" ||
       !isArrayModelType(program, typespecType) ||
-      !getArmIdentifiers(program, property)
+      !isArrayTypeArmProviderNamespace(typespecType, namespace)
     ) {
       return;
     }
 
-    const armIdentifiers = getIdentifiers(typespecType, property, namespace);
+    const armIdentifiers = getArmIdentifiers(program, property);
     if (armIdentifiers) {
       schema["x-ms-identifiers"] = armIdentifiers;
     }
-  }
-
-  function getIdentifiers(
-    typespecType: ArrayModelType,
-    property?: ModelProperty,
-    namespace?: Namespace,
-  ) {
-    const armIdentifiers = property ? getArmIdentifiers(program, property) : undefined;
-    const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
-    const identifiers = resolveIdentifiers(armIdentifiers, armKeyIdentifiers);
-
-    if (isArrayTypeArmProviderNamespace(typespecType, namespace) && identifiers) {
-      return identifiers;
-    } else if (
-      !ifArrayItemContainsIdentifier(
-        program,
-        typespecType as any,
-        armIdentifiers ?? armKeyIdentifiers ?? [],
-      )
-    ) {
-      return [];
-    }
-
-    return undefined;
-  }
-
-  function resolveIdentifiers(
-    armIdentifiers: string[] | undefined,
-    armKeyIdentifiers: string[] | undefined,
-  ): string[] | undefined {
-    if (armIdentifiers) {
-      return armIdentifiers;
-    } else if (hasValidArmIdentifiers(armKeyIdentifiers)) {
-      return armKeyIdentifiers;
-    }
-    return undefined;
   }
 
   function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
