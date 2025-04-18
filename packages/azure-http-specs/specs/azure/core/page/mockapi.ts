@@ -65,7 +65,8 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
       body: json({
         value: [{ id: 1, name: "User1" }],
         // Include the original query parameters in the nextLink
-        nextLink: "/azure/core/page/with-parameterized-next-link/second-page?select=name",
+        nextLink:
+          "http://localhost:3000/azure/core/page/with-parameterized-next-link/second-page?select=name",
       }),
     },
     kind: "MockApiDefinition",
