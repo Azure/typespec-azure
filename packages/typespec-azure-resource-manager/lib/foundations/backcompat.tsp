@@ -30,7 +30,7 @@ namespace Azure.ResourceManager.Foundations {
   alias Origin = CommonTypes.Origin;
   alias ErrorDetail = CommonTypes.ErrorDetail;
   alias ErrorAdditionalInfo = CommonTypes.ErrorAdditionalInfo;
-  alias SystemData = CommonTypes.SystemData;
+  alias SystemData = CommonTypes.systemData;
   alias createdByType = CommonTypes.createdByType;
   alias Plan = CommonTypes.Plan;
   alias CheckNameAvailabilityRequest = CommonTypes.CheckNameAvailabilityRequest;

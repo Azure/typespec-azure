@@ -7,6 +7,7 @@ using Azure.Core;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** Common fields that are returned in the response for all Azure Resource Manager resources */
+@summary("Resource")
 model Resource {
   /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
   @typeChangedFrom(Versions.v4, string)
@@ -23,10 +24,11 @@ model Resource {
 
   /** Azure Resource Manager metadata containing createdBy and modifiedBy information. */
   @visibility(Lifecycle.Read)
-  systemData?: SystemData;
+  systemData?: systemData;
 }
 
 /** The resource model definition for an Azure Resource Manager resource with an etag. */
+@summary("Entity Resource")
 model AzureEntityResource extends Resource {
   /** Resource Etag. */
   @visibility(Lifecycle.Read)
@@ -36,6 +38,7 @@ model AzureEntityResource extends Resource {
 /**
  * The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'
  */
+@summary("Tracked Resource")
 model TrackedResource extends Resource {
   /** Resource tags. */
   tags?: Record<string>;
@@ -48,6 +51,7 @@ model TrackedResource extends Resource {
 /**
  * The resource model definition for a Azure Resource Manager proxy resource. It will not have tags and a location
  */
+@summary("Proxy Resource")
 model ProxyResource extends Resource {}
 
 /**
@@ -129,6 +133,7 @@ model OperationListResult is Azure.Core.Page<Operation>;
 /**
  * Details of a REST API operation, returned from the Resource Provider Operations API
  */
+@summary("REST API Operation")
 model Operation {
   /** 
     The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
@@ -276,6 +281,7 @@ model ErrorDetail {
 /**
  * Common error response for all Azure Resource Manager APIs to return error details for failed operations.
  */
+@summary("Error response")
 @error
 model ErrorResponse {
   /** The error object. */
@@ -298,7 +304,7 @@ model ErrorAdditionalInfo {
 /**
  * Metadata pertaining to creation and last modification of the resource.
  */
-model SystemData {
+model systemData {
   /** The identity that created the resource. */
   createdBy?: string;
 
@@ -439,7 +445,7 @@ union EncryptionStatus {
 /**
  * Configuration of key for data encryption
  */
-model EncryptionProperties {
+model encryptionProperties {
   /** Indicates whether or not the encryption is enabled for container registry. */
   status?: EncryptionStatus;
 
@@ -450,7 +456,7 @@ model EncryptionProperties {
 /**
  * Metadata pertaining to the geographic location of the resource.
  */
-model LocationData {
+model locationData {
   /** A canonical name for the geographic or physical location. */
   @maxLength(256)
   name: string;
@@ -517,6 +523,7 @@ model SubscriptionIdParameter {
   @typeChangedFrom(Versions.v4, string)
   @path
   @segment("subscriptions")
+  @minLength(1)
   subscriptionId: uuid;
 }
 
