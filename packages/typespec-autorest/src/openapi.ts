@@ -2111,7 +2111,7 @@ export async function getOpenAPIForService(
       }
     } else {
       propSchema = getSchemaOrRef(prop.type, context);
-      setArmIdentifiers(prop.type, propSchema, prop, prop.model?.namespace);
+      applyArmIdentifiersDecorator(prop.type, propSchema, prop, prop.model?.namespace);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2413,30 +2413,47 @@ export async function getOpenAPIForService(
         }),
       };
 
-      setArmIdentifiers(typespecType, array);
+      const armIdentifiers = getIdentifiers(typespecType);
+      if (armIdentifiers) {
+        array["x-ms-identifiers"] = armIdentifiers;
+      }
 
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;
   }
 
-  function setArmIdentifiers(
+  function applyArmIdentifiersDecorator(
     typespecType: Type,
     schema: OpenAPI2Schema,
-    property?: ModelProperty,
+    property: ModelProperty,
     namespace?: Namespace,
   ) {
-    if (typespecType.kind !== "Model" || !isArrayModelType(program, typespecType)) {
-      delete schema["x-ms-identifiers"];
+    if (
+      typespecType.kind !== "Model" ||
+      !isArrayModelType(program, typespecType) ||
+      !getArmIdentifiers(program, property)
+    ) {
       return;
     }
 
+    const armIdentifiers = getIdentifiers(typespecType, property, namespace);
+    if (armIdentifiers) {
+      schema["x-ms-identifiers"] = armIdentifiers;
+    }
+  }
+
+  function getIdentifiers(
+    typespecType: ArrayModelType,
+    property?: ModelProperty,
+    namespace?: Namespace,
+  ) {
     const armIdentifiers = property ? getArmIdentifiers(program, property) : undefined;
     const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
     const identifiers = resolveIdentifiers(armIdentifiers, armKeyIdentifiers);
 
     if (isArrayTypeArmProviderNamespace(typespecType, namespace) && identifiers) {
-      schema["x-ms-identifiers"] = identifiers;
+      return identifiers;
       return;
     } else if (
       !ifArrayItemContainsIdentifier(
@@ -2445,11 +2462,10 @@ export async function getOpenAPIForService(
         armIdentifiers ?? armKeyIdentifiers ?? [],
       )
     ) {
-      schema["x-ms-identifiers"] = [];
-      return;
+      return [];
     }
 
-    delete schema["x-ms-identifiers"];
+    return undefined;
   }
 
   function resolveIdentifiers(
