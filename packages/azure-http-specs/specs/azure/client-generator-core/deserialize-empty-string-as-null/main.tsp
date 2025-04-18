@@ -13,7 +13,7 @@ namespace _Specs_.Azure.ClientGenerator.Core.DeserializeEmptyStringAsNull;
 @doc("This is a Model contains a string-like property of type url.")
 model ResponseModel {
   @deserializeEmptyStringAsNull
-  serviceUrl: url;
+  sampleUrl: url;
 }
 
 @scenario
@@ -26,6 +26,6 @@ model ResponseModel {
   }
   ```
   """)
-@route("/emptyUrl")
+@route("/responseModel")
 @get
-op emptyUrl(): ResponseModel;
+op get(): ResponseModel;

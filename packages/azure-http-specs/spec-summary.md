@@ -57,9 +57,9 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_emptyUrl
+### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
-- Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/emptyUrl`
+- Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
 
 This scenario will be used to test if client code can correctly deserializes an empty url as null.
 Expected response body:
