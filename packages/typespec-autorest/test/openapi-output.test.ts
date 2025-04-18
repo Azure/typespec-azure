@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { diagnoseOpenApiFor, oapiForModel, openApiFor } from "./test-host.js";
+import { diagnoseOpenApiFor, ignoreDiagnostics, oapiForModel, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: definitions", () => {
   it("defines models", async () => {
@@ -894,6 +894,9 @@ describe("identifiers decorator", () => {
   it("prioritizes identifiers decorator over keys", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;      
       model Pet {
         name: string;
         @key
@@ -911,6 +914,10 @@ describe("identifiers decorator", () => {
   it("prioritizes identifiers decorator over id prop", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
       model Pet {
         name: string;
         id: string;
@@ -1029,6 +1036,92 @@ describe("identifiers decorator", () => {
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], [
       "dogs/breed",
       "cats/features/color",
+    ]);
+  });
+  it("`@identifiers` are assigned by model property", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        id: int32;
+      }
+      model PetList {
+        @identifiers(#["name"])
+        value: Pet[]
+      }
+      model PetList2 {
+        @identifiers(#["id"])
+        value: Pet[]
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
+    deepStrictEqual(oapi.definitions.PetList2.properties.value["x-ms-identifiers"], ["id"]);
+  });
+  it("`@identifiers` are assigned to `armProviderNamespace` properties even when nested in another namespace", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model PetResource is TrackedResource<PetResourceProperties> {
+        @key("petResourceName")
+        @segment("petServices")
+        name: string;
+      }
+
+      model PetResourceProperties {
+        @identifiers(#["key"])
+        pets?: PetTypes[];
+      }
+
+      model PetTypes {
+        key: string;
+        value: string;
+      }
+
+      @armResourceOperations(PetResource)
+      interface PetService {
+        update is ArmCustomPatchAsync<
+          PetResource,
+          Azure.ResourceManager.Foundations.ResourceUpdateModel<
+            PetResource,
+            PetResourceProperties
+          >
+        >;
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetResourceProperties.properties.pets["x-ms-identifiers"], [
+      "key",
+    ]);
+    deepStrictEqual(
+      oapi.definitions.PetResourceUpdateProperties.properties.pets["x-ms-identifiers"],
+      ["key"],
+    );
+  });
+  it("`@identifiers` are not supported outside @armProviderNamespace namespaces", async () => {
+    const diagnostics = await diagnoseOpenApiFor(
+      `
+      model Pet {
+        name: string;
+      }
+      model PetList {
+        @identifiers(#["name"])
+        value: Pet[];
+      }
+      `,
+    );
+
+    expectDiagnostics(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]), [
+      {
+        code: "@azure-tools/typespec-autorest/invalid-identifiers-decorator-usage",
+      },
     ]);
   });
 });

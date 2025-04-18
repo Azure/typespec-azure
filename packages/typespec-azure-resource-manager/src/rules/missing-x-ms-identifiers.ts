@@ -9,7 +9,7 @@ import {
 } from "@typespec/compiler";
 import { getExtensions } from "@typespec/openapi";
 import { isArmCommonType } from "../common-types.js";
-import { getArmIdentifiers } from "../resource.js";
+import { getArmIdentifiers, getArmKeyIdentifiers } from "../resource.js";
 
 export const missingXmsIdentifiersRule = createRule({
   name: "missing-x-ms-identifiers",
@@ -54,12 +54,13 @@ export const missingXmsIdentifiersRule = createRule({
       }
 
       const xmsIdentifiers = getExtensions(program, property ?? array).get("x-ms-identifiers");
-      const armIdentifiers = getArmIdentifiers(program, array);
-      if (xmsIdentifiers === undefined && armIdentifiers === undefined) {
+      const armIdentifiers = getArmIdentifiers(program, property);
+      const armKeyIdentifiers = getArmKeyIdentifiers(program, array);
+      const identifiers = armIdentifiers ?? armKeyIdentifiers ?? xmsIdentifiers;
+
+      if (identifiers === undefined) {
         return true;
       }
-
-      const identifiers = armIdentifiers ?? xmsIdentifiers;
 
       if (Array.isArray(identifiers)) {
         for (const propIdentifier of identifiers) {
