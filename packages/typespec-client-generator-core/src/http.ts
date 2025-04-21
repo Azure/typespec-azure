@@ -225,12 +225,6 @@ function getSdkHttpParameters(
             httpOperation.operation,
           ),
         );
-        optional =
-          tspBody.type.kind === "Model"
-            ? [...tspBody.type.properties.values()].some((p) => !p.optional)
-              ? false
-              : true
-            : false;
       } else {
         type = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation),
