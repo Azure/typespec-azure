@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Always ignore `null` example value for non-nullable type.
+Fix algorithm problem when omitting optional parameter with `@override`.

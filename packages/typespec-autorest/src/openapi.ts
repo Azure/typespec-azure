@@ -1408,7 +1408,7 @@ export async function getOpenAPIForService(
     type: ModelProperty,
     explode?: boolean,
   ): "csv" | "ssv" | "pipes" | "multi" | undefined {
-    if ($.array.is(type.type)) {
+    if ($(program).array.is(type.type)) {
       if (explode) {
         return "multi";
       }
