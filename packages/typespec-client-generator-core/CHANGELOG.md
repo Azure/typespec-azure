@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.54.2
+
+### Bug Fixes
+
+- [#2556](https://github.com/Azure/typespec-azure/pull/2556) Make spread body parameter always be required.
+- [#2552](https://github.com/Azure/typespec-azure/pull/2552) Fix algorithm problem when omitting optional parameter with `@override`.
+
+
 ## 0.54.1
 
 ### Features

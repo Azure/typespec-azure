@@ -47,28 +47,9 @@ it("required body parameter", async () => {
   strictEqual(bodyParam.type.kind, "string");
 });
 
-it("optional body parameter with spread", async () => {
+it("spread body always required", async () => {
   await runner.compileWithBuiltInService(`
     op myOp(foo?: string, bar?: string): void;
-    `);
-  const sdkPackage = runner.context.sdkPackage;
-  const method = getServiceMethodOfClient(sdkPackage);
-  const serviceOperation = method.operation;
-  const bodyParam = serviceOperation.bodyParam;
-  ok(bodyParam);
-
-  strictEqual(bodyParam.kind, "body");
-  strictEqual(bodyParam.serializedName, "");
-  strictEqual(bodyParam.name, "myOpRequest");
-  strictEqual(bodyParam.optional, true);
-  strictEqual(bodyParam.onClient, false);
-  strictEqual(bodyParam.isApiVersionParam, false);
-  strictEqual(bodyParam.type.kind, "model");
-});
-
-it("required body parameter with spread", async () => {
-  await runner.compileWithBuiltInService(`
-    op myOp(foo: string, bar: string): void;
     `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
