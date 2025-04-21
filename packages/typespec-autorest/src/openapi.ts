@@ -40,6 +40,7 @@ import {
   NumericLiteral,
   Operation,
   PagingOperation,
+  PagingProperty,
   Program,
   Scalar,
   StringLiteral,
@@ -531,11 +532,15 @@ export async function getOpenAPIForService(
     }
   }
 
+  function resolvePagableProperty(paging: PagingProperty): string {
+    return paging.path.length > 1 ? paging.path.map((p) => p.name).join(".") : paging.property.name;
+  }
+
   function getXmsPageableForPagingOperation(paging: PagingOperation): XmsPageable | undefined {
     if (paging.output.nextLink) {
-      const itemsName = paging.output.pageItems.property.name;
+      const itemsName = resolvePagableProperty(paging.output.pageItems);
       return {
-        nextLinkName: paging.output.nextLink.property.name,
+        nextLinkName: resolvePagableProperty(paging.output.nextLink),
         itemName: itemsName === "items" ? undefined : itemsName,
       };
     }

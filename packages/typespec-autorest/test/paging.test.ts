@@ -38,6 +38,28 @@ it("define a custom paged operation with custom next link", async () => {
   });
 });
 
+it("define a custom paged operation with nested next link and items", async () => {
+  const res = await openApiFor(
+    `
+    model CustomPageModel<T> {
+      results: { @pageItems myItems: T[] };
+      pagination: {
+        @TypeSpec.nextLink
+        \`@odata.nextLink\`?: string;
+      };
+    }
+    @list op list(): CustomPageModel<{}>;
+    `,
+  );
+
+  const listThings = res.paths["/"].get;
+  ok(listThings);
+  deepStrictEqual(listThings["x-ms-pageable"], {
+    nextLinkName: "pagination.@odata.nextLink",
+    itemName: "results.myItems",
+  });
+});
+
 describe("Legacy define paging operation using Azure.Core decorators", () => {
   it("define a custom paged operation with custom next link", async () => {
     const res = await openApiFor(
