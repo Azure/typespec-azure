@@ -1,5 +1,5 @@
 ---
-changeKind: fix
+changeKind: feature
 packages:
   - "@azure-tools/typespec-autorest"
 ---
