@@ -21,7 +21,6 @@ options:
     model-namespace: false
   "@azure-tools/typespec-ts":
     package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
-    generate-metadata: true
     generate-test: true
     package-details:
       name: "@azure-rest/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
