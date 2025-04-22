@@ -1,15 +1,12 @@
 import { createDiagnosticCollector, Diagnostic, DiagnosticCollector } from "@typespec/compiler";
-import { resolveVersions } from "@typespec/versioning";
 import { createSdkClientType } from "./clients.js";
 import { listClients, listOperationGroups } from "./decorators.js";
 import {
-  SdkClient,
   SdkClientType,
   SdkEnumType,
   SdkModelType,
   SdkNamespace,
   SdkNullableType,
-  SdkOperationGroup,
   SdkPackage,
   SdkServiceOperation,
   SdkUnionType,
@@ -20,7 +17,7 @@ import {
   hasExplicitClientOrOperationGroup,
 } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
-import { getCrossLanguagePackageId, getDefaultApiVersion } from "./public-utils.js";
+import { getCrossLanguagePackageId } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
 
 export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
@@ -31,6 +28,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
+  const versions = context.getPackageVersions();
   const sdkPackage: SdkPackage<TServiceOperation> = {
     clients: filterClients(context, diagnostics),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
@@ -41,6 +39,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     crossLanguagePackageId,
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
+    apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);
@@ -115,41 +114,27 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
 
 function populateApiVersionInformation(context: TCGCContext): void {
   for (const client of listClients(context)) {
-    let clientApiVersions = resolveVersions(context.program, client.service)
-      .filter((x) => x.rootVersion)
-      .map((x) => x.rootVersion!.value);
     context.setApiVersionsForType(
       client.type,
-      filterApiVersionsWithDecorators(context, client.type, clientApiVersions),
+      filterApiVersionsWithDecorators(context, client.type, context.getPackageVersions()),
     );
 
+    const clientApiVersions = context.getApiVersionsForType(client.type);
     context.__clientToApiVersionClientDefaultValue.set(
       client.type,
-      getClientDefaultApiVersion(context, client),
+      clientApiVersions[clientApiVersions.length - 1],
     );
     for (const sc of listOperationGroups(context, client, true)) {
-      clientApiVersions = resolveVersions(context.program, sc.service)
-        .filter((x) => x.rootVersion)
-        .map((x) => x.rootVersion!.value);
       context.setApiVersionsForType(
         sc.type,
-        filterApiVersionsWithDecorators(context, sc.type, clientApiVersions),
+        filterApiVersionsWithDecorators(context, sc.type, context.getPackageVersions()),
       );
 
+      const clientApiVersions = context.getApiVersionsForType(sc.type);
       context.__clientToApiVersionClientDefaultValue.set(
         sc.type,
-        getClientDefaultApiVersion(context, sc),
+        clientApiVersions[clientApiVersions.length - 1],
       );
     }
   }
-}
-
-function getClientDefaultApiVersion(
-  context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
-): string | undefined {
-  if (context.apiVersion && !["latest", "all"].includes(context.apiVersion)) {
-    return context.apiVersion;
-  }
-  return getDefaultApiVersion(context, client.service)?.value;
 }
