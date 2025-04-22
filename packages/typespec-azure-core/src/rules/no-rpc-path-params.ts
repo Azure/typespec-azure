@@ -17,7 +17,7 @@ export const noRpcPathParamsRule = createRule({
         // a templated operation signature (whether it's an instance or not)
         if (
           isExcludedCoreType(context.program, operation) ||
-          operation.node.templateParameters.length !== 0
+          operation.node?.templateParameters.length !== 0
         ) {
           return;
         }

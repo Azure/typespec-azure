@@ -9,6 +9,7 @@ import {
 import {
   type EnumMemberNode,
   type EnumSpreadMemberNode,
+  EnumStatementNode,
   type Node,
   SyntaxKind,
   type TypeSpecScriptNode,
@@ -30,17 +31,21 @@ export const noEnumRule = createRule({
           return;
         }
 
+        if (en.node === undefined) {
+          return;
+        }
+
         context.reportDiagnostic({
           format: { enumName: en.name },
           target: en,
-          codefixes: [createEnumToExtensibleUnionCodeFix(en)],
+          codefixes: [createEnumToExtensibleUnionCodeFix(en as Enum & { node: EnumStatementNode })],
         });
       },
     };
   },
 });
 
-function createEnumToExtensibleUnionCodeFix(en: Enum): CodeFix {
+function createEnumToExtensibleUnionCodeFix(en: Enum & { node: EnumStatementNode }): CodeFix {
   function convertEnumMemberToUnionVariant(node: EnumMemberNode | EnumSpreadMemberNode) {
     switch (node.kind) {
       case SyntaxKind.EnumSpreadMember:
