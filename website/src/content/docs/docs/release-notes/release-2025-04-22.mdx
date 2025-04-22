@@ -1,0 +1,27 @@
+---
+title: 0.55.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+:::danger
+TypeSpec core contains Breaking Changes
+:::
+
+<LinkCard
+  title="TypeSpec Core 1.0 Release Candidate 1"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2025-04-22"
+/>
+
+## Bug Fixes
+
+### @azure-tools/typespec-azure-core
+
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
+- [#2512](https://github.com/Azure/typespec-azure/pull/2512) Update the link documentation for `Azure.Core.Foundations.InnerError`
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#2435](https://github.com/Azure/typespec-azure/pull/2435) Change OperationStatusResult.resourceId to armResourceIdentifier
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
