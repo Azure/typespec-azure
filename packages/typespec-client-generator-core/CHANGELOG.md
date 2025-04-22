@@ -1,5 +1,9 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.55.0
+
+No changes, version bump only.
+
 ## 0.54.2
 
 ### Bug Fixes
