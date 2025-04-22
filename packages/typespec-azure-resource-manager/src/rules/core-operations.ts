@@ -36,7 +36,8 @@ export const coreOperationsRule = createRule({
           const verb = getOperationVerb(context.program, operation);
           if (
             !isTemplatedInterfaceOperation(operation) &&
-            (!operation.node.parent || operation.node.parent.kind !== SyntaxKind.InterfaceStatement)
+            (!operation.node?.parent ||
+              operation.node.parent.kind !== SyntaxKind.InterfaceStatement)
           ) {
             context.reportDiagnostic({
               messageId: "opOutsideInterface",

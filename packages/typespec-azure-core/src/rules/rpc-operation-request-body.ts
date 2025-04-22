@@ -14,7 +14,7 @@ export const rpcOperationRequestBodyRule = createRule({
     return {
       operation: (operation: Operation) => {
         if (isExcludedCoreType(context.program, operation)) return;
-        if (operation.node.templateParameters.length !== 0) return;
+        if (operation.node?.templateParameters.length !== 0) return;
         if (!isAzureSubNamespace(context.program, operation.namespace)) return;
 
         const originalOperation = operation;
