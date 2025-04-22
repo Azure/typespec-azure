@@ -406,7 +406,7 @@ function getSdkTypeExample(
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  if (example === null && type.kind !== "nullable") {
+  if (example === null && type.kind !== "nullable" && type.kind !== "unknown") {
     return diagnostics.wrap(undefined);
   }
 
