@@ -527,16 +527,6 @@ model SubscriptionIdParameter {
   subscriptionId: uuid;
 }
 
-/** The default location parameter type. */
-model LocationResourceParameter {
-  /** The name of the Azure region. */
-  @path
-  @minLength(1)
-  @segment("locations")
-  @key
-  location: azureLocation;
-}
-
 /**
  * The default ManagementGroupName parameter type.
  */
