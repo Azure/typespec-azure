@@ -756,7 +756,7 @@ describe("typespec-autorest: nullable", () => {
       "x-nullable": true,
     });
   });
-  it("nullable model property type object", async () => {
+  it("nullable record model property", async () => {
     const res = await openApiFor(
       `
       model Pet {
