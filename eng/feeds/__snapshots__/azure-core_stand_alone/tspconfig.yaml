@@ -2,7 +2,6 @@ parameters:
   "service-dir":
     default: "sdk/azure-core_stand_alone"
   "dependencies":
-    "additionalDirectories": []
     default: ""
 emit:
   - "@azure-tools/typespec-autorest"
@@ -21,9 +20,8 @@ options:
     model-namespace: false
   "@azure-tools/typespec-ts":
     package-dir: "azure-contoso-rest"
-    generateMetadata: true
-    generateTest: true
-    packageDetails:
+    generate-test: true
+    package-details:
       name: "@azure-rest/azure-contoso-rest"
       description: "Azure.Contoso Service"
   "@azure-tools/typespec-java":

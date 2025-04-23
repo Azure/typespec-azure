@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.55.0
+
+### Bug Fixes
+
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
+- [#2512](https://github.com/Azure/typespec-azure/pull/2512) Update the link documentation for `Azure.Core.Foundations.InnerError`
+
+
+## 0.54.0
+
+### Features
+
+- [#2396](https://github.com/Azure/typespec-azure/pull/2396) add internal scalar type `parameterizedNextLink` to handle next links that don't meet guidelines
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
 ## 0.53.0
 
 ### Breaking Changes

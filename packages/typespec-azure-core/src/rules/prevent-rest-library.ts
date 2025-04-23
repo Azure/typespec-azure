@@ -30,7 +30,7 @@ export const preventRestLibraryInterfaces = createRule({
         }
 
         // If any interface in the `extends` list comes from `TypeSpec.Rest.Resource`, mark it
-        const restInterface = interfaceContext.node.extends.find(
+        const restInterface = interfaceContext.node?.extends.find(
           (i) => getTypeReferenceNamespace(context.program, i) === "TypeSpec.Rest.Resource",
         );
 

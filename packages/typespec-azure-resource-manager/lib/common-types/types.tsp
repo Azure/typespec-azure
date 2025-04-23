@@ -223,9 +223,8 @@ model OperationStatusResult {
 
   /** Fully qualified ID of the resource against which the original async operation was started. */
   @visibility(Lifecycle.Read)
-  @format("arm-id")
   @added(Versions.v5)
-  resourceId?: string;
+  resourceId?: armResourceIdentifier;
 }
 
 /**

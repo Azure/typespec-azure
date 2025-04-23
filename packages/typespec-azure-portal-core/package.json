@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-portal-core",
-  "version": "0.53.0",
+  "version": "0.55.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Portal Core library",
   "license": "MIT",

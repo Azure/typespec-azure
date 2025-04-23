@@ -6,7 +6,6 @@ import {
 import {
   createDiagnosticCollector,
   Diagnostic,
-  getDoc,
   getPagingOperation,
   getSummary,
   isList,
@@ -53,6 +52,7 @@ import {
   findRootSourceProperty,
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
+  getClientDoc,
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
@@ -573,7 +573,7 @@ function getSdkMethodResponse(
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (getResponseAsBool(context, operation)) {
-    type = getSdkBuiltInType(context, $.builtin.boolean);
+    type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
     if (responseTypes.size > 1) {
       // return union of all the different types
@@ -669,7 +669,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     name,
     access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
-    doc: getDoc(context.program, operation),
+    doc: getClientDoc(context, operation),
     summary: getSummary(context.program, operation),
     operation: serviceOperation,
     response,

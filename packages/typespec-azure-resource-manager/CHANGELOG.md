@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.55.0
+
+### Bug Fixes
+
+- [#2435](https://github.com/Azure/typespec-azure/pull/2435) Change OperationStatusResult.resourceId to armResourceIdentifier
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
+
+
+## 0.54.0
+
+### Features
+
+- [#2470](https://github.com/Azure/typespec-azure/pull/2470) Relax `@enforceConstraint` to allow validation to pass when a resource is identified using the `@legacy.armCustomResource` decorator.
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
 ## 0.53.0
 
 ### Breaking Changes

@@ -1,4 +1,4 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import { createDiagnosticCollector, Diagnostic, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
@@ -27,6 +27,7 @@ import {
 import {
   createGeneratedName,
   getAvailableApiVersions,
+  getClientDoc,
   getTypeDecorators,
   getValueTypeValue,
   isSubscriptionId,
@@ -66,7 +67,7 @@ function getEndpointTypeFromSingleServer<
         optional: false,
         serializedName: "endpoint",
         correspondingMethodParams: [],
-        type: getSdkBuiltInType(context, $.builtin.url),
+        type: getSdkBuiltInType(context, $(context.program).builtin.url),
         isApiVersionParam: false,
         apiVersions: context.getApiVersionsForType(client.__raw.type),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
@@ -188,7 +189,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     __raw: client,
     kind: "client",
     name: client.kind === "SdkClient" ? client.name : getLibraryName(context, client.type),
-    doc: getDoc(context.program, client.type),
+    doc: getClientDoc(context, client.type),
     summary: getSummary(context.program, client.type),
     methods: [],
     apiVersions: context.getApiVersionsForType(client.type),

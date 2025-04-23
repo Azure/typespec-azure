@@ -35,6 +35,13 @@ options:
 
 ## Emitter options
 
+### `emitter-output-dir`
+
+**Type:** `absolutePath`
+
+Defines the emitter output directory. Defaults to `{output-dir}/@azure-tools/typespec-client-generator-core`
+See [Configuring output directory for more info](https://typespec.io/docs/handbook/configuration/configuration/#configuring-output-directory)
+
 ### `emitter-name`
 
 **Type:** `string`
@@ -100,6 +107,7 @@ Available ruleSets:
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | [`@azure-tools/typespec-client-generator-core/require-client-suffix`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/require-client-suffix)   | Client names should end with 'Client'.                                  |
 | [`@azure-tools/typespec-client-generator-core/property-name-conflict`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/property-name-conflict) | Avoid naming conflicts between a property and a model of the same name. |
+| [`@azure-tools/typespec-client-generator-core/no-unnamed-types`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/rules/no-unnamed-types)             | Requires types to be named rather than defined anonymously or inline.   |
 
 ## Decorators
 
@@ -110,6 +118,7 @@ Available ruleSets:
 - [`@apiVersion`](#@apiversion)
 - [`@client`](#@client)
 - [`@clientApiVersions`](#@clientapiversions)
+- [`@clientDoc`](#@clientdoc)
 - [`@clientInitialization`](#@clientinitialization)
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
@@ -269,22 +278,23 @@ op func8(@body body: Test5): void;
 
 #### `@alternateType`
 
-Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+When the source type is `Scalar`, the alternate type must be `Scalar`.
 
 ```typespec
-@Azure.ClientGenerator.Core.alternateType(alternate: Scalar, scope?: valueof string)
+@Azure.ClientGenerator.Core.alternateType(alternate: unknown, scope?: valueof string)
 ```
 
 ##### Target
 
-The source type you want to apply the alternate type to. Only scalar types are supported.
+The source type to which the alternate type will be applied.
 `ModelProperty | Scalar`
 
 ##### Parameters
 
 | Name      | Type             | Description                                                                                                                                                                                            |
 | --------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| alternate | `Scalar`         | The alternate type you want applied to the target. Only scalar types are supported.                                                                                                                    |
+| alternate | `unknown`        | The alternate type to apply to the target.                                                                                                                                                             |
 | scope     | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
@@ -303,6 +313,16 @@ scalar storageDateTime extends utcDataTime;
 
 ```typespec
 op test(@param @alternateType(string) date: utcDateTime): void;
+```
+
+```typespec
+model Test {
+  @alternateType(unknown)
+  thumbprint?: string;
+
+  @alternateType(AzureLocation[], "csharp")
+  locations: string[];
+}
 ```
 
 #### `@apiVersion`
@@ -433,6 +453,56 @@ enum ClientApiVersions {
 }
 
 @@clientApiVersions(Contoso, ClientApiVersions);
+```
+
+#### `@clientDoc`
+
+Override documentation for a type in client libraries. This allows you to
+provide client-specific documentation that differs from the service-definition documentation.
+
+```typespec
+@Azure.ClientGenerator.Core.clientDoc(documentation: valueof string, mode: EnumMember, scope?: valueof string)
+```
+
+##### Target
+
+`unknown`
+
+##### Parameters
+
+| Name          | Type             | Description                                                                                                                                                                                            |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| documentation | `valueof string` | The client-specific documentation to apply                                                                                                                                                             |
+| mode          | `EnumMember`     | Specifies how to apply the documentation (append or replace)                                                                                                                                           |
+| scope         | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+
+##### Examples
+
+###### Replacing documentation
+
+```typespec
+@doc("This is service documentation")
+@clientDoc("This is client-specific documentation", DocumentationMode.replace)
+op myOperation(): void;
+```
+
+###### Appending documentation
+
+```typespec
+@doc("This is service documentation.")
+@clientDoc("This additional note is for client libraries only.", DocumentationMode.append)
+model MyModel {
+  prop: string;
+}
+```
+
+###### Language-specific documentation
+
+```typespec
+@doc("This is service documentation")
+@clientDoc("Python-specific documentation", DocumentationMode.replace, "python")
+@clientDoc("JavaScript-specific documentation", DocumentationMode.replace, "javascript")
+op myOperation(): void;
 ```
 
 #### `@clientInitialization`

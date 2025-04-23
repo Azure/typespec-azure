@@ -4,6 +4,7 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
+  getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getVisibilityForClass,
@@ -35,7 +36,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getClientDocExplicit, getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -85,6 +86,24 @@ export const clientNameKey = createStateSymbol("clientName");
 export const clientNamespaceKey = createStateSymbol("clientNamespace");
 export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
+export const clientKey = createStateSymbol("client");
+export const operationGroupKey = createStateSymbol("operationGroup");
+
+export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
+  return (
+    listScopedDecoratorData(context, clientKey).length > 0 ||
+    listScopedDecoratorData(context, operationGroupKey).length > 0
+  );
+}
+
+function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
+  const retval = [...context.program.stateMap(key).values()];
+  return retval
+    .filter((targetEntry) => {
+      return targetEntry[context.emitterName] || targetEntry[AllScopes];
+    })
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
+}
 
 /**
  *
@@ -604,7 +623,7 @@ export function listAllNamespaces(
 
 export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
   return listAllNamespaces(context, context.getMutatedGlobalNamespace()).filter((ns) =>
-    $.type.isUserDefined(ns),
+    $(context.program).type.isUserDefined(ns),
   );
 }
 
@@ -699,4 +718,20 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
       generatedNames.push(createName);
     }
   }
+}
+
+export function getClientDoc(context: TCGCContext, target: Type): string | undefined {
+  const clientDocExplicit = getClientDocExplicit(context, target);
+  const baseDoc = getDoc(context.program, target);
+  if (clientDocExplicit) {
+    switch (clientDocExplicit.mode) {
+      case "append":
+        return baseDoc
+          ? `${baseDoc}\n${clientDocExplicit.documentation}`
+          : clientDocExplicit.documentation;
+      case "replace":
+        return clientDocExplicit.documentation;
+    }
+  }
+  return baseDoc;
 }

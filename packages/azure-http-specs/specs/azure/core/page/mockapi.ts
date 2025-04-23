@@ -1,4 +1,4 @@
-import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { json, MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 const validUser = { id: 1, name: "Madge", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" };
@@ -48,3 +48,48 @@ Scenarios.Azure_Core_Page_listWithCustomPageModel = passOnSuccess({
   response: { status: 200, body: json({ items: [validUser] }) },
   kind: "MockApiDefinition",
 });
+
+Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
+  {
+    // First page request
+    uri: "/azure/core/page/with-parameterized-next-link",
+    method: "get",
+    request: {
+      query: {
+        includePending: true,
+        select: "name",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      return {
+        status: 200,
+        body: json({
+          value: [{ id: 1, name: "User1" }],
+          nextLink: `${req.baseUrl}/azure/core/page/with-parameterized-next-link/second-page?select=${req.query.select}`,
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // Follow-up page request
+    uri: "/azure/core/page/with-parameterized-next-link/second-page",
+    method: "get",
+    request: {
+      query: {
+        includePending: true,
+        select: "name",
+      },
+    },
+    response: {
+      status: 200,
+      body: json({
+        value: [{ id: 2, name: "User2" }],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+]);

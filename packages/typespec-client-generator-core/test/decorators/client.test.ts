@@ -203,6 +203,7 @@ describe("@operationGroup", () => {
         type: MyGroup,
         groupPath: "MyClient.MyGroup",
         service: MyClient,
+        hasOperations: false,
       },
     ]);
   });
@@ -224,6 +225,7 @@ describe("@operationGroup", () => {
         type: MyGroup,
         groupPath: "MyClient.MyGroup",
         service: MyClient,
+        hasOperations: false,
       },
     ]);
   });
@@ -423,6 +425,7 @@ describe("@operationGroup", () => {
         @service
         @test
         namespace MyService;
+        op foo(): void;
       `);
 
     const clients = listClients(runner.context);
@@ -613,6 +616,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AG,
       groupPath: "AClient.AG",
       service: A,
+      hasOperations: true,
     };
 
     const aag: SdkOperationGroup = {
@@ -620,6 +624,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AAG,
       groupPath: "AClient.AA.AAG",
       service: A,
+      hasOperations: true,
     };
 
     const aabGroup1: SdkOperationGroup = {
@@ -627,6 +632,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AABGroup1,
       groupPath: "AClient.AA.AAB.AABGroup1",
       service: A,
+      hasOperations: true,
     };
 
     const aabGroup2: SdkOperationGroup = {
@@ -634,6 +640,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AABGroup2,
       groupPath: "AClient.AA.AAB.AABGroup2",
       service: A,
+      hasOperations: false,
     };
 
     const aaa: SdkOperationGroup = {
@@ -641,6 +648,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: AAA,
       groupPath: "AClient.AA.AAA",
       service: A,
+      hasOperations: false,
     };
 
     const aab: SdkOperationGroup = {
@@ -649,6 +657,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       subOperationGroups: [aabGroup1, aabGroup2],
       groupPath: "AClient.AA.AAB",
       service: A,
+      hasOperations: true,
     };
 
     const aa: SdkOperationGroup = {
@@ -657,6 +666,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       subOperationGroups: [aaa, aab, aag],
       groupPath: "AClient.AA",
       service: A,
+      hasOperations: true,
     };
 
     const client = getClient(runner.context, A);
@@ -718,11 +728,11 @@ describe("listOperationGroups without @client and @operationGroup", () => {
     let allOperationGroups = listOperationGroups(runner.context, client);
     deepStrictEqual(allOperationGroups, [aa, ag]);
     allOperationGroups = listOperationGroups(runner.context, aa);
-    deepStrictEqual(allOperationGroups, [aaa, aab, aag]);
+    deepStrictEqual(allOperationGroups, [aab, aag]);
     allOperationGroups = listOperationGroups(runner.context, aaa);
     deepStrictEqual(allOperationGroups, []);
     allOperationGroups = listOperationGroups(runner.context, aab);
-    deepStrictEqual(allOperationGroups, [aabGroup1, aabGroup2]);
+    deepStrictEqual(allOperationGroups, [aabGroup1]);
     allOperationGroups = listOperationGroups(runner.context, aag);
     deepStrictEqual(allOperationGroups, []);
     allOperationGroups = listOperationGroups(runner.context, aabGroup1);
@@ -732,13 +742,13 @@ describe("listOperationGroups without @client and @operationGroup", () => {
     deepStrictEqual(listOperationGroups(runner.context, ag), []);
 
     allOperationGroups = listOperationGroups(runner.context, client, true);
-    deepStrictEqual(allOperationGroups, [aa, ag, aaa, aab, aag, aabGroup1, aabGroup2]);
+    deepStrictEqual(allOperationGroups, [aa, ag, aab, aag, aabGroup1]);
     allOperationGroups = listOperationGroups(runner.context, aa, true);
-    deepStrictEqual(allOperationGroups, [aaa, aab, aag, aabGroup1, aabGroup2]);
+    deepStrictEqual(allOperationGroups, [aab, aag, aabGroup1]);
     allOperationGroups = listOperationGroups(runner.context, aaa, true);
     deepStrictEqual(allOperationGroups, []);
     allOperationGroups = listOperationGroups(runner.context, aab, true);
-    deepStrictEqual(allOperationGroups, [aabGroup1, aabGroup2]);
+    deepStrictEqual(allOperationGroups, [aabGroup1]);
     allOperationGroups = listOperationGroups(runner.context, aag, true);
     deepStrictEqual(allOperationGroups, []);
     allOperationGroups = listOperationGroups(runner.context, aabGroup1, true);
@@ -804,6 +814,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
         @route("/root1") op atRoot1(): void;
 
         @test interface MyGroup {
+          @route("/root2") op atRoot2(): void;
         }
       `)) as { MyGroup: Interface; MyClient: Namespace };
 
@@ -812,6 +823,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       type: MyGroup,
       groupPath: "MyClient.MyGroup",
       service: MyClient,
+      hasOperations: true,
     });
 
     const clients = listClients(runner.context);
@@ -826,23 +838,37 @@ describe("listOperationGroups without @client and @operationGroup", () => {
         namespace MyService {
           namespace A {
             namespace B {
-              interface B1 {}
-              interface B2 {}
+              interface B1 {
+                @route("/b1") op b1(): void;
+              }
+              interface B2 {
+                @route("/b2") op b2(): void;
+              }
             }
 
-            interface A1 {}
-            interface A2 {}
+            interface A1 {
+              @route("/a1") op a1(): void;
+            }
+            interface A2 {
+              @route("/a2") op a2(): void;
+            }
           }
           namespace C {
-            interface C1 {}
+            interface C1 {
+              @route("/c1") op c1(): void;
+            }
           }
           namespace D {}
           namespace E {
-            namespace F {}
+            namespace F {
+             @route("/f") op f(): void;
+            }
           }
           namespace G {
             namespace H {
-              interface H1 {}
+              interface H1 {
+                @route("/h1") op h1(): void;
+              }
             }
           }
         };
@@ -859,8 +885,8 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       countFromList += listOperationGroups(runner.context, og).length;
       q.push(...(og.subOperationGroups ?? []));
     }
-    deepStrictEqual(countFromProperty, 14);
-    deepStrictEqual(countFromList, 14);
+    deepStrictEqual(countFromProperty, 13);
+    deepStrictEqual(countFromList, 13);
   });
 });
 
@@ -982,6 +1008,7 @@ describe("client hierarchy", () => {
         namespace Test1Client {
           namespace B {
             interface C {
+              op y(): void;
             }
           }
         }
@@ -1008,7 +1035,7 @@ describe("client hierarchy", () => {
     strictEqual(c.subOperationGroups, undefined);
     strictEqual(listOperationGroups(runner.context, c).length, 0);
     strictEqual(c.groupPath, "Test1Client.B.C");
-    strictEqual(listOperationsInOperationGroup(runner.context, c).length, 0);
+    strictEqual(listOperationsInOperationGroup(runner.context, c).length, 1);
   });
 
   it("rename client name", async () => {
