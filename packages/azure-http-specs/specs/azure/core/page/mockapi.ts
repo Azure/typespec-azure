@@ -1,4 +1,4 @@
-import { dyn, json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import { dyn, dynItem, json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 const validUser = { id: 1, name: "Madge", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" };
@@ -64,7 +64,7 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
       status: 200,
       body: json({
         value: [{ id: 1, name: "User1" }],
-        nextLink: dyn`${"baseUrl"}/azure/core/page/with-parameterized-next-link/second-page?select=name`,
+        nextLink: dyn`${dynItem("baseUrl")}/azure/core/page/with-parameterized-next-link/second-page?select=name`,
       }),
     },
     kind: "MockApiDefinition",

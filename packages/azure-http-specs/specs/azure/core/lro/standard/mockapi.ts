@@ -1,4 +1,11 @@
-import { json, MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import {
+  dyn,
+  dynItem,
+  json,
+  MockRequest,
+  passOnSuccess,
+  ScenarioMockApi,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -54,7 +61,7 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
     response: {
       status: 201,
       headers: {
-        "operation-location": `/azure/core/lro/standard/users/madge/operations/operation1`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/standard/users/madge/operations/operation1`,
       },
       body: json(validUser),
     },
@@ -126,7 +133,7 @@ Scenarios.Azure_Core_Lro_Standard_delete = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        "operation-location": `/azure/core/lro/standard/users/madge/operations/operation2`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/standard/users/madge/operations/operation2`,
       },
       body: json({ id: "operation2", status: "InProgress" }),
     },
@@ -188,7 +195,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        "operation-location": `/azure/core/lro/standard/users/madge/operations/operation3`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/standard/users/madge/operations/operation3`,
       },
       body: json({ id: "operation3", status: "InProgress" }),
     },
