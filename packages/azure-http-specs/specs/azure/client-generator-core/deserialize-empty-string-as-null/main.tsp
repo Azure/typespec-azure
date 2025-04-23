@@ -9,7 +9,7 @@ using Spector;
 @doc("Test decorator @deserializeEmptyStringAsNull.")
 @scenarioService("/azure/client-generator-core/deserialize-empty-string-as-null")
 @global.Azure.ClientGenerator.Core.clientNamespace(
-  "azure.clientgenerator.core.deserializeemptystringasnull",
+  "azure.clientgenerator.core.deserialize.emptystringnull",
   "java"
 )
 namespace _Specs_.Azure.ClientGenerator.Core.DeserializeEmptyStringAsNull;
