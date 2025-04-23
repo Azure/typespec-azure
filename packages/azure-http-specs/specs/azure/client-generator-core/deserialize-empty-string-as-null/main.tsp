@@ -8,6 +8,10 @@ using Spector;
 
 @doc("Test decorator @deserializeEmptyStringAsNull.")
 @scenarioService("/azure/client-generator-core/deserialize-empty-string-as-null")
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "azure.clientgenerator.core.deserializeemptystringasnull",
+  "java"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.DeserializeEmptyStringAsNull;
 
 @doc("This is a Model contains a string-like property of type url.")
