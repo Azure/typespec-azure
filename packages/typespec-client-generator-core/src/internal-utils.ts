@@ -623,7 +623,7 @@ export function listAllNamespaces(
 
 export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
   return listAllNamespaces(context, context.getMutatedGlobalNamespace()).filter((ns) =>
-    $.type.isUserDefined(ns),
+    $(context.program).type.isUserDefined(ns),
   );
 }
 

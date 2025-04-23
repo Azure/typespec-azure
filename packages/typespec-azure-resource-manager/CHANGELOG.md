@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.55.0
+
+### Bug Fixes
+
+- [#2435](https://github.com/Azure/typespec-azure/pull/2435) Change OperationStatusResult.resourceId to armResourceIdentifier
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
+
+
 ## 0.54.0
 
 ### Features

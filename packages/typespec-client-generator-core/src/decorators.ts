@@ -910,8 +910,12 @@ export const $override = (
   let index = 0;
   for (const originalParam of originalParams) {
     if (index > overrideParams.length - 1) {
-      parametersMatch = false;
-      break;
+      if (!originalParam.optional) {
+        parametersMatch = false;
+        break;
+      } else {
+        continue;
+      }
     }
     if (!compareModelProperties(originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
