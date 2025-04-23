@@ -14,8 +14,7 @@ it("union with self reference model and null", async () => {
     `,
   );
   deepStrictEqual(res.definitions.Thing.properties.properties, {
-    type: "object",
-    allOf: [{ $ref: "#/definitions/Thing" }],
+    $ref: "#/definitions/Thing",
     "x-nullable": true,
   });
 });
