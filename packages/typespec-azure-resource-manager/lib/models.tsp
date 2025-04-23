@@ -447,7 +447,7 @@ model EncryptionProperty {
  * @example
  * ```typespec
  * model Foo is TrackedResource<FooProperties> {
- * ...AvailabilityZonesProperty;
+ *  ...AvailabilityZonesProperty;
  * }
  * ```
  */
