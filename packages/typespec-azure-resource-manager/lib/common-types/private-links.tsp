@@ -181,6 +181,7 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
 @removed(Versions.v6)
 model PrivateLinkResourceListResultV5 {
   /** Array of private link resources */
+  @OpenAPI.extension("x-ms-identifiers", #["id"])
   value?: CommonTypes.PrivateLinkResource[];
 }
 
