@@ -533,6 +533,20 @@ model Azure.ResourceManager.LocationParameter
 | -------- | -------- | ------------------ |
 | location | `string` | The location name. |
 
+### `LocationResourceParameter` {#Azure.ResourceManager.LocationResourceParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.LocationResourceParameter
+```
+
+#### Properties
+
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
+
 ### `ManagedByProperty` {#Azure.ResourceManager.ManagedByProperty}
 
 Model representing the standard `managedBy` envelope property for a resource.
@@ -1346,20 +1360,6 @@ model Azure.ResourceManager.CommonTypes.LocationParameter
 | Name     | Type     | Description               |
 | -------- | -------- | ------------------------- |
 | location | `string` | The name of Azure region. |
-
-### `LocationResourceParameter` {#Azure.ResourceManager.CommonTypes.LocationResourceParameter}
-
-The default location parameter type.
-
-```typespec
-model Azure.ResourceManager.CommonTypes.LocationResourceParameter
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ManagedOnBehalfOfConfiguration` {#Azure.ResourceManager.CommonTypes.ManagedOnBehalfOfConfiguration}
 
