@@ -738,46 +738,6 @@ describe("typespec-autorest: enums", () => {
   });
 });
 
-describe("typespec-autorest: nullable", () => {
-  it("nullable model property type object", async () => {
-    const res = await openApiFor(
-      `
-      model Pet {
-        name: string;
-      }
-
-      model Dog {
-        type: Pet | null;
-      }
-      `,
-    );
-    deepStrictEqual(res.definitions.Dog.properties.type, {
-      $ref: "#/definitions/Pet",
-      "x-nullable": true,
-    });
-  });
-  it("nullable record model property", async () => {
-    const res = await openApiFor(
-      `
-      model Pet {
-        name: string;
-      }
-
-      model Dog {
-        record: Record<Pet | null>;
-      }
-      `,
-    );
-    deepStrictEqual(res.definitions.Dog.properties.record, {
-      additionalProperties: {
-        $ref: "#/definitions/Pet",
-        "x-nullable": true,
-      },
-      type: "object",
-    });
-  });
-});
-
 describe("typespec-autorest: extension decorator", () => {
   it("adds an arbitrary extension to a model", async () => {
     const oapi = await openApiFor(`

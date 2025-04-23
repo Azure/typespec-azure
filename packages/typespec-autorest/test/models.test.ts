@@ -665,6 +665,45 @@ describe("typespec-autorest: model definitions", () => {
         },
       });
     });
+
+    it("defines nullable model", async () => {
+      const res = await openApiFor(
+        `
+        model Pet {
+          name: string;
+        }
+  
+        model Dog {
+          type: Pet | null;
+        }
+        `,
+      );
+      deepStrictEqual(res.definitions.Dog.properties.type, {
+        $ref: "#/definitions/Pet",
+        "x-nullable": true,
+      });
+    });
+
+    it("defines nullable record", async () => {
+      const res = await openApiFor(
+        `
+        model Pet {
+          name: string;
+        }
+  
+        model Dog {
+          record: Record<Pet | null>;
+        }
+        `,
+      );
+      deepStrictEqual(res.definitions.Dog.properties.record, {
+        additionalProperties: {
+          $ref: "#/definitions/Pet",
+          "x-nullable": true,
+        },
+        type: "object",
+      });
+    });
   });
 
   it("recovers logical type name", async () => {
