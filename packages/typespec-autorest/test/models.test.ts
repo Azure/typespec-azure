@@ -704,6 +704,27 @@ describe("typespec-autorest: model definitions", () => {
         type: "object",
       });
     });
+
+    it.only("defines nullable Array", async () => {
+      const res = await openApiFor(
+        `
+        model Pet {
+          name: string;
+        }
+  
+        model Dog {
+         arrayProp: Array<Pet | null>;
+        }
+        `,
+      );
+      deepStrictEqual(res.definitions.Dog.properties.arrayProp, {
+        items: {
+          $ref: "#/definitions/Pet",
+          "x-nullable": true,
+        },
+        type: "array",
+      });
+    });
   });
 
   it("recovers logical type name", async () => {
