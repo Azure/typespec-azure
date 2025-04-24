@@ -70,7 +70,7 @@ it("basic default version", async () => {
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
-  strictEqual(sdkPackage.apiVersion, "v3");
+  strictEqual(sdkPackage.metadata.apiVersion, "v3");
   deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -171,7 +171,7 @@ it("basic latest version", async () => {
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
-  strictEqual(sdkPackage.apiVersion, "v3");
+  strictEqual(sdkPackage.metadata.apiVersion, "v3");
   deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -271,7 +271,7 @@ it("basic v3 version", async () => {
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
-  strictEqual(sdkPackage.apiVersion, "v3");
+  strictEqual(sdkPackage.metadata.apiVersion, "v3");
   deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -371,7 +371,7 @@ it("basic v2 version", async () => {
   `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
-  strictEqual(sdkPackage.apiVersion, "v2");
+  strictEqual(sdkPackage.metadata.apiVersion, "v2");
   deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2"]);
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -474,7 +474,7 @@ it("basic v1 version", async () => {
 `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
-  strictEqual(sdkPackage.apiVersion, "v1");
+  strictEqual(sdkPackage.metadata.apiVersion, "v1");
   deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1"]);
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -562,7 +562,7 @@ it("basic all version", async () => {
 `);
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
-  strictEqual(sdkPackage.apiVersion, "all");
+  strictEqual(sdkPackage.metadata.apiVersion, "all");
   deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 

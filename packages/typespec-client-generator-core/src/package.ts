@@ -39,7 +39,9 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     crossLanguagePackageId,
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
-    apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
+    metadata: {
+      apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
+    },
   };
   organizeNamespaces(sdkPackage);
   return diagnostics.wrap(sdkPackage);

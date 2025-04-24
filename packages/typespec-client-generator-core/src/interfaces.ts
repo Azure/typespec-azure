@@ -871,13 +871,15 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   crossLanguagePackageId: string;
   namespaces: SdkNamespace<TServiceOperation>[];
   licenseInfo?: LicenseInfo;
-  /**
-   * The version of the package.
-   * If undefined, the package is not versioned.
-   * If `all`, the package is versioned with all versions.
-   * If a string, the package is versioned with the specified version.
-   */
-  apiVersion?: string;
+  metadata: {
+    /**
+     * The version of the package.
+     * If undefined, the package is not versioned.
+     * If `all`, the package is versioned with all versions.
+     * If a string, the package is versioned with the specified version.
+     */
+    apiVersion?: string;
+  };
 }
 
 export interface LicenseInfo {
