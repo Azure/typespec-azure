@@ -463,13 +463,7 @@ export async function getOpenAPIForService(
       );
       if (
         prop.type.kind === "Scalar" &&
-        ignoreDiagnostics(
-          program.checker.isTypeAssignableTo(
-            prop.type,
-            program.checker.getStdType("url"),
-            prop.type,
-          ),
-        )
+        $(program).type.isAssignableTo(prop.type, $(program).builtin.url, prop.type)
       ) {
         param["x-ms-skip-url-encoding"] = true;
       }
@@ -757,10 +751,7 @@ export async function getOpenAPIForService(
   }
 
   function isBytes(type: Type) {
-    const baseType = type;
-    return ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type),
-    );
+    return $(program).type.isAssignableTo(type, $(program).builtin.bytes, type);
   }
 
   function isBinaryPayload(body: Type, contentType: string | string[]) {
