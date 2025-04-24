@@ -1080,7 +1080,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Microsoft.OperationsTest.TestTrackedResource2Update"
+              "$ref": "#/definitions/TestTrackedResource2Update"
             }
           }
         ],
@@ -1841,24 +1841,6 @@
         }
       }
     },
-    "Azure.ResourceManager.CommonTypes.TrackedResourceUpdate": {
-      "type": "object",
-      "description": "The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Resource"
-        }
-      ]
-    },
     "Azure.ResourceManager.ResourceProvisioningState": {
       "type": "string",
       "description": "The provisioning state of a resource type.",
@@ -2056,22 +2038,6 @@
         }
       ]
     },
-    "Microsoft.OperationsTest.TestTrackedResource2Update": {
-      "type": "object",
-      "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/Microsoft.OperationsTest.TestTrackedProperties2",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"
-        }
-      ]
-    },
     "SystemEnvelopeProvisioningState": {
       "type": "string",
       "description": "Envelope provisioning state",
@@ -2236,6 +2202,35 @@
       "required": [
         "value"
       ]
+    },
+    "TestTrackedResource2Update": {
+      "type": "object",
+      "description": "The type used for update operations of the TestTrackedResource2.",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "$ref": "#/definitions/TestTrackedResource2UpdateProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "TestTrackedResource2UpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the TestTrackedResource2.",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource",
+          "default": "default"
+        }
+      }
     },
     "TestTrackedResourceListResult": {
       "type": "object",
