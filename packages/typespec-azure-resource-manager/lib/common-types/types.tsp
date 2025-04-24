@@ -24,7 +24,7 @@ model Resource {
 
   /** Azure Resource Manager metadata containing createdBy and modifiedBy information. */
   @visibility(Lifecycle.Read)
-  systemData?: systemData;
+  systemData?: SystemData;
 }
 
 /** The resource model definition for an Azure Resource Manager resource with an etag. */
@@ -304,7 +304,7 @@ model ErrorAdditionalInfo {
 /**
  * Metadata pertaining to creation and last modification of the resource.
  */
-model systemData {
+model SystemData {
   /** The identity that created the resource. */
   createdBy?: string;
 
@@ -445,7 +445,7 @@ union EncryptionStatus {
 /**
  * Configuration of key for data encryption
  */
-model encryptionProperties {
+model EncryptionProperties {
   /** Indicates whether or not the encryption is enabled for container registry. */
   status?: EncryptionStatus;
 
@@ -456,7 +456,7 @@ model encryptionProperties {
 /**
  * Metadata pertaining to the geographic location of the resource.
  */
-model locationData {
+model LocationData {
   /** A canonical name for the geographic or physical location. */
   @maxLength(256)
   name: string;
