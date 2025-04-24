@@ -1346,7 +1346,7 @@ export function isResourceOperation(program: Program, operation: Operation): boo
 export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => {
   // If the operation is not templated, add it to the list of operations to
   // check later
-  if (entity.node.templateParameters.length === 0) {
+  if (entity.node === undefined || entity.node.templateParameters.length === 0) {
     context.program.stateSet(AzureCoreStateKeys.needsRoute).add(entity);
   }
 };
@@ -1354,9 +1354,10 @@ export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, enti
 export function checkRpcRoutes(program: Program) {
   (program.stateSet(AzureCoreStateKeys.needsRoute) as Set<Operation>).forEach((op: Operation) => {
     if (
-      op.node.templateParameters.length === 0 &&
-      !isAutoRoute(program, op) &&
-      !getRoutePath(program, op)
+      op.node === undefined ||
+      (op.node.templateParameters.length === 0 &&
+        !isAutoRoute(program, op) &&
+        !getRoutePath(program, op))
     ) {
       reportDiagnostic(program, {
         code: "rpc-operation-needs-route",
