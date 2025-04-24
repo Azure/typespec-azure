@@ -705,7 +705,7 @@ describe("typespec-autorest: model definitions", () => {
       });
     });
 
-    it.only("defines nullable Array", async () => {
+    it("defines nullable Array", async () => {
       const res = await openApiFor(
         `
         model Pet {
