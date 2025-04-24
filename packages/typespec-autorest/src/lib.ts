@@ -364,12 +364,6 @@ export const $lib = createTypeSpecLibrary({
           "The emitter did not emit any files because the specified version option does not match any versions of the service.",
       },
     },
-    "invalid-identifiers-decorator-usage": {
-      severity: "warning",
-      messages: {
-        default: paramMessage`@identifiers decorator is only valid within namespaces marked with @armProviderNamespace.`,
-      },
-    },
   },
   emitter: {
     options: EmitterOptionsSchema as JSONSchemaType<AutorestEmitterOptions>,

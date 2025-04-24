@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { diagnoseOpenApiFor, ignoreDiagnostics, oapiForModel, openApiFor } from "./test-host.js";
+import { diagnoseOpenApiFor, oapiForModel, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: definitions", () => {
   it("defines models", async () => {
@@ -1104,24 +1104,5 @@ describe("identifiers decorator", () => {
       oapi.definitions.PetResourceUpdateProperties.properties.pets["x-ms-identifiers"],
       ["key"],
     );
-  });
-  it("`@identifiers` are not supported outside @armProviderNamespace namespaces", async () => {
-    const diagnostics = await diagnoseOpenApiFor(
-      `
-      model Pet {
-        name: string;
-      }
-      model PetList {
-        @identifiers(#["name"])
-        value: Pet[];
-      }
-      `,
-    );
-
-    expectDiagnostics(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]), [
-      {
-        code: "@azure-tools/typespec-autorest/invalid-identifiers-decorator-usage",
-      },
-    ]);
   });
 });

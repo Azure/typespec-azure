@@ -2116,7 +2116,7 @@ export async function getOpenAPIForService(
       }
     } else {
       propSchema = getSchemaOrRef(prop.type, context);
-      applyArmIdentifiersDecorator(prop.type, propSchema, prop, prop.model?.namespace);
+      applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2441,7 +2441,6 @@ export async function getOpenAPIForService(
     typespecType: Type,
     schema: OpenAPI2Schema,
     property: ModelProperty,
-    namespace?: Namespace,
   ) {
     const armIdentifiers = getArmIdentifiers(program, property);
     if (
@@ -2449,16 +2448,6 @@ export async function getOpenAPIForService(
       !isArrayModelType(program, typespecType) ||
       !armIdentifiers
     ) {
-      return;
-    }
-
-    if (!isArrayTypeArmProviderNamespace(typespecType, namespace)) {
-      reportDiagnostic(program, {
-        code: "invalid-identifiers-decorator-usage",
-        format: { name: property.name },
-        target: property,
-      });
-
       return;
     }
 
