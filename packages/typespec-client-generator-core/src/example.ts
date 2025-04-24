@@ -33,7 +33,6 @@ import {
   isSdkFloatKind,
   isSdkIntKind,
 } from "./interfaces.js";
-import { getValidApiVersion } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
 
@@ -168,8 +167,9 @@ export async function handleClientExamples(
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
+  const packageVersions = context.getPackageVersions();
   const examples = diagnostics.pipe(
-    await loadExamples(context, getValidApiVersion(context, client.apiVersions)),
+    await loadExamples(context, packageVersions[packageVersions.length - 1]),
   );
   const clientQueue = [client];
   while (clientQueue.length > 0) {
@@ -406,7 +406,7 @@ function getSdkTypeExample(
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  if (example === null && type.kind !== "nullable") {
+  if (example === null && type.kind !== "nullable" && type.kind !== "unknown") {
     return diagnostics.wrap(undefined);
   }
 
