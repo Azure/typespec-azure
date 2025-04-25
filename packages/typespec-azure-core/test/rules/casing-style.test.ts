@@ -62,7 +62,7 @@ describe("typespec-azure-core: casing rule", () => {
     it("is valid", async () => {
       await tester.expect(`model FooProperties {}`).toBeValid();
     });
-    it("is valid for accepted accronyms", async () => {
+    it("is valid for accepted acronyms", async () => {
       await tester.expect(`model ScaleSetVM {}`).toBeValid();
     });
 
