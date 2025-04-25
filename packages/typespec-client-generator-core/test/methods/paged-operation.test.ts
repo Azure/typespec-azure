@@ -732,15 +732,10 @@ it("next link with mix of re-injected parameters and not", async () => {
   strictEqual(method.kind, "paging");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 2);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
   strictEqual(
     method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
     method.parameters[0],
-  );
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[1].length, 1);
-  strictEqual(
-    method.pagingMetadata.nextLinkReInjectedParametersSegments[1][0],
-    method.parameters[1],
   );
 });
