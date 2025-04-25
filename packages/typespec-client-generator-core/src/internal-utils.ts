@@ -623,6 +623,15 @@ export function findRootSourceProperty(property: ModelProperty): ModelProperty {
   return property;
 }
 
+export function compareRootSourceProperty(
+  property1: ModelProperty,
+  property2: ModelProperty,
+): boolean {
+  const root1 = findRootSourceProperty(property1);
+  const root2 = findRootSourceProperty(property2);
+  return root1 && root1 === root2;
+}
+
 export function getStreamAsBytes(
   context: TCGCContext,
   type: Type,

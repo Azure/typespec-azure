@@ -48,8 +48,8 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  compareRootSourceProperty,
   createGeneratedName,
-  findRootSourceProperty,
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientDoc,
@@ -155,15 +155,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       responseType?.__raw,
       (p) =>
         p.kind === "ModelProperty" &&
-        findRootSourceProperty(p) ===
-          findRootSourceProperty(pagingOperation.output.pageItems.property),
+        compareRootSourceProperty(p, pagingOperation.output.pageItems.property),
     );
     baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
       responseType,
       (p) =>
         p.__raw?.kind === "ModelProperty" &&
-        findRootSourceProperty(p.__raw) ===
-          findRootSourceProperty(pagingOperation.output.pageItems.property),
+        compareRootSourceProperty(p.__raw, pagingOperation.output.pageItems.property),
     );
 
     let nextLinkPath = undefined;
@@ -176,8 +174,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           .filter(
             (h) =>
               h.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(h.__raw) ===
-                findRootSourceProperty(pagingOperation.output.nextLink!.property),
+              compareRootSourceProperty(h.__raw, pagingOperation.output.nextLink!.property),
           );
         nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
       } else {
@@ -186,15 +183,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           responseType?.__raw,
           (p) =>
             p.kind === "ModelProperty" &&
-            findRootSourceProperty(p) ===
-              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+            compareRootSourceProperty(p, pagingOperation.output.nextLink!.property),
         );
         nextLinkSegments = getPropertySegmentsFromModelOrParameters(
           responseType,
           (p) =>
             p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) ===
-              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+            compareRootSourceProperty(p.__raw, pagingOperation.output.nextLink!.property),
         );
       }
     }
@@ -206,8 +201,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         baseServiceMethod.parameters,
         (p) =>
           p.__raw?.kind === "ModelProperty" &&
-          findRootSourceProperty(p.__raw) ===
-            findRootSourceProperty(pagingOperation.input.continuationToken!.property),
+          compareRootSourceProperty(p.__raw, pagingOperation.input.continuationToken!.property),
       );
     }
     if (pagingOperation.output.continuationToken) {
@@ -218,16 +212,17 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           .filter(
             (h) =>
               h.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(h.__raw) ===
-                findRootSourceProperty(pagingOperation.output.continuationToken!.property),
+              compareRootSourceProperty(
+                h.__raw,
+                pagingOperation.output.continuationToken!.property,
+              ),
           );
       } else {
         continuationTokenResponseSegments = getPropertySegmentsFromModelOrParameters(
           responseType,
           (p) =>
             p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) ===
-              findRootSourceProperty(pagingOperation.output.continuationToken!.property),
+            compareRootSourceProperty(p.__raw, pagingOperation.output.continuationToken!.property),
         );
       }
     }
@@ -306,8 +301,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         .filter(
           (h) =>
             h.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(h.__raw) ===
-              findRootSourceProperty(pagedMetadata.nextLinkProperty!),
+            compareRootSourceProperty(h.__raw, pagedMetadata.nextLinkProperty!),
         );
       nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
     } else {
@@ -329,9 +323,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       ).map((t: ModelProperty) =>
         getPropertySegmentsFromModelOrParameters(
           baseServiceMethod.parameters,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+          (p) => p.__raw?.kind === "ModelProperty" && compareRootSourceProperty(p.__raw, t),
         ),
       );
     }
