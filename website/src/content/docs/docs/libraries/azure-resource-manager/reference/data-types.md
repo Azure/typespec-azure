@@ -1167,12 +1167,12 @@ model Azure.ResourceManager.CommonTypes.Encryption
 | infrastructureEncryption?     | [`InfrastructureEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.InfrastructureEncryption)         | Values are enabled and disabled.                                 |
 | customerManagedKeyEncryption? | [`CustomerManagedKeyEncryption`](./data-types.md#Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption) | All Customer-managed key encryption properties for the resource. |
 
-### `encryptionProperties` {#Azure.ResourceManager.CommonTypes.encryptionProperties}
+### `EncryptionProperties` {#Azure.ResourceManager.CommonTypes.EncryptionProperties}
 
 Configuration of key for data encryption
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.encryptionProperties
+model Azure.ResourceManager.CommonTypes.EncryptionProperties
 ```
 
 #### Properties
@@ -1330,12 +1330,12 @@ model Azure.ResourceManager.CommonTypes.KeyVaultProperties
 | keyIdentifier? | `string` | Key vault uri to access the encryption key.                           |
 | identity?      | `string` | The client ID of the identity which will be used to access key vault. |
 
-### `locationData` {#Azure.ResourceManager.CommonTypes.locationData}
+### `LocationData` {#Azure.ResourceManager.CommonTypes.LocationData}
 
 Metadata pertaining to the geographic location of the resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.locationData
+model Azure.ResourceManager.CommonTypes.LocationData
 ```
 
 #### Properties
@@ -1944,7 +1944,7 @@ model Azure.ResourceManager.CommonTypes.Resource
 | id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
 | name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
 | type?       | `Core.armResourceType`                                                       | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
-| systemData? | [`systemData`](./data-types.md#Azure.ResourceManager.CommonTypes.systemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
+| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
 
 ### `ResourceAssociation` {#Azure.ResourceManager.CommonTypes.ResourceAssociation}
 
@@ -2056,12 +2056,12 @@ model Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity
 | tenantId?    | `Core.uuid`                                                                                                                | The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity.            |
 | type         | [`SystemAssignedServiceIdentityType`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityType) | The type of managed identity assigned to this resource.                                                                       |
 
-### `systemData` {#Azure.ResourceManager.CommonTypes.systemData}
+### `SystemData` {#Azure.ResourceManager.CommonTypes.SystemData}
 
 Metadata pertaining to creation and last modification of the resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.systemData
+model Azure.ResourceManager.CommonTypes.SystemData
 ```
 
 #### Properties
