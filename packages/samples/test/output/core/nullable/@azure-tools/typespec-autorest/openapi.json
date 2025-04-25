@@ -36,13 +36,8 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "x-nullable": true,
-              "allOf": [
-                {
-                  "$ref": "#/definitions/AnotherModel"
-                }
-              ]
+              "$ref": "#/definitions/AnotherModel",
+              "x-nullable": true
             }
           }
         ],
@@ -85,13 +80,8 @@
           "x-nullable": true
         },
         "modelOrNull": {
-          "type": "object",
-          "x-nullable": true,
-          "allOf": [
-            {
-              "$ref": "#/definitions/AnotherModel"
-            }
-          ]
+          "$ref": "#/definitions/AnotherModel",
+          "x-nullable": true
         },
         "literalsOrNull": {
           "type": "string",

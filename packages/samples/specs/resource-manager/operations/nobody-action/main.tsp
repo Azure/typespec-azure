@@ -71,7 +71,10 @@ interface Operations extends Azure.ResourceManager.Operations {}
 interface Employees {
   get is ArmResourceRead<Employee>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
   delete is ArmResourceDeleteSync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;

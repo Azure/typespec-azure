@@ -90,7 +90,10 @@ model NotificationDetails {
 interface Users {
   get is ArmResourceRead<User>;
   create is ArmResourceCreateOrReplaceAsync<User>;
-  update is ArmResourcePatchSync<User, UserProperties>;
+  update is ArmCustomPatchSync<
+    User,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<User, UserProperties>
+  >;
   delete is ArmResourceDeleteSync<User>;
   listByResourceGroup is ArmResourceListByParent<User>;
   listBySubscription is ArmListBySubscription<User>;
@@ -127,7 +130,13 @@ model AddressResourceProperties {
 interface Addresses {
   get is ArmResourceRead<AddressResource>;
   create is ArmResourceCreateOrReplaceSync<AddressResource>;
-  update is ArmResourcePatchSync<AddressResource, AddressResourceProperties>;
+  update is ArmCustomPatchSync<
+    AddressResource,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      AddressResource,
+      AddressResourceProperties
+    >
+  >;
   delete is ArmResourceDeleteSync<AddressResource>;
   listByParent is ArmResourceListByParent<AddressResource>;
   checkGlobalName is checkGlobalNameAvailability;
