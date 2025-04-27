@@ -438,7 +438,7 @@ it("initializedBy.none can only be used independently", async () => {
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
-      "`InitializedBy.none` can only be used independently for sub client.",
+      "Invalid 'initializedBy' value. `InitializedBy.none` can only be used independently for sub client.",
   });
 });
 
