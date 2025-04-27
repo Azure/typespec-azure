@@ -44,6 +44,7 @@ import {
 import {
   AccessFlags,
   ClientInitializationOptions,
+  InitializedByFlags,
   LanguageScopes,
   SdkClient,
   SdkInitializationType,
@@ -1014,7 +1015,15 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 1 || value === 2 || value === 4;
+      // This checks if the value is a valid flag without enumerating specific values
+      // It ensures the value only contains bits from InitializedByFlags and is not zero
+      const isValidValue = (value: number): boolean => {
+        // Calculate the mask of all possible enum values
+        const allValidBits = Object.values(InitializedByFlags)
+          .filter((v) => typeof v === "number")
+          .reduce((acc, val) => acc | (val as number), 0);
+        return value !== 0 && (value & allValidBits) === value;
+      };
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
