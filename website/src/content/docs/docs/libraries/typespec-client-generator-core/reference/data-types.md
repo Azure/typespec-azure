@@ -57,7 +57,7 @@ enum Azure.ClientGenerator.Core.InitializedBy
 | ------------ | ----- | ------------------------------------------------- |
 | individually | `1`   | The client could be initialized individually.     |
 | parent       | `2`   | The client could be initialized by parent client. |
-| none         | `4`   | The client can't be initialized independently.    |
+| none         | `4`   | The client can't be initialized.                  |
 
 ### `Usage` {#Azure.ClientGenerator.Core.Usage}
 
