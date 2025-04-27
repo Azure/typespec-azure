@@ -448,7 +448,7 @@ enum InitializedBy {
   parent: 2,
 
   /**
-   * The client can't be initialized independently.
+   * The client can't be initialized.
    */
   none: 4,
 }
