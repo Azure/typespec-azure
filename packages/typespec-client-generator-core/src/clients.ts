@@ -294,7 +294,9 @@ function createSdkClientInitializationType(
   if (initializationOptions?.initializedBy) {
     if (
       client.kind === "SdkClient" &&
-      (initializationOptions.initializedBy & (InitializedByFlags.Parent | InitializedByFlags.None)) > 0
+      (initializationOptions.initializedBy &
+        (InitializedByFlags.Parent | InitializedByFlags.None)) >
+        0
     ) {
       diagnostics.add(
         createDiagnostic({
@@ -320,14 +322,17 @@ function createSdkClientInitializationType(
           },
         }),
       );
-    } else if (client.kind === "SdkOperationGroup" && (initializationOptions.initializedBy & InitializedByFlags.None) > 0 && (initializationOptions.initializedBy ^ InitializedByFlags.None) > 0) {
+    } else if (
+      client.kind === "SdkOperationGroup" &&
+      (initializationOptions.initializedBy & InitializedByFlags.None) > 0 &&
+      (initializationOptions.initializedBy ^ InitializedByFlags.None) > 0
+    ) {
       diagnostics.add(
         createDiagnostic({
           code: "invalid-initialized-by",
           target: client.type,
           format: {
-            message:
-              "`InitializedBy.none` can only be used independently for sub client.",
+            message: "`InitializedBy.none` can only be used independently for sub client.",
           },
         }),
       );
