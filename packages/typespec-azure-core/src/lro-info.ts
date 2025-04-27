@@ -14,6 +14,7 @@ import {
   isErrorType,
   isType,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/experimental/typekit";
 import {
   HttpOperationResponse,
   getHeaderFieldName,
@@ -113,7 +114,7 @@ export function extractStatusMonitorInfo(
     successType:
       successProperty?.type?.kind === "Intrinsic" || successProperty?.type?.kind === "Model"
         ? successProperty.type
-        : program.checker.voidType,
+        : $(program).intrinsic.void,
     terminationInfo: {
       kind: "model-property",
       property: statusProperty,

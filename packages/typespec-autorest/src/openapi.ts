@@ -1825,11 +1825,7 @@ export async function getOpenAPIForService(
       // Get the schema for the model type
       const schema = getSchemaOrRef(type, schemaContext);
       if (schema.$ref) {
-        if (type.kind === "Model") {
-          return { type: "object", allOf: [schema], "x-nullable": nullable };
-        } else {
-          return { ...schema, "x-nullable": nullable };
-        }
+        return { ...schema, "x-nullable": nullable };
       } else {
         schema["x-nullable"] = nullable;
         return schema;
