@@ -92,7 +92,7 @@ it("arm client with operation groups", async () => {
 
   const tests = client.children?.find((c) => c.name === "Tests");
   ok(tests);
-  strictEqual(tests.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(tests.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(tests.clientInitialization.parameters.length, 4);
   strictEqual(tests.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(tests.clientInitialization.parameters[1].name, "credential");
@@ -150,7 +150,7 @@ it("client with sub clients", async () => {
 
   const pets = client.children?.find((c) => c.name === "Pets");
   ok(pets);
-  strictEqual(pets.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(pets.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(pets.clientInitialization.parameters.length, 1);
   strictEqual(pets.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(pets?.methods.length, 0);
@@ -158,7 +158,7 @@ it("client with sub clients", async () => {
 
   const dogs = pets.children?.find((c) => c.name === "Dogs");
   ok(dogs);
-  strictEqual(dogs.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(dogs.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(dogs.clientInitialization.parameters.length, 1);
   strictEqual(dogs.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(dogs?.methods.length, 2);
@@ -167,7 +167,7 @@ it("client with sub clients", async () => {
 
   const cats = pets.children?.find((c) => c.name === "Cats");
   ok(cats);
-  strictEqual(cats.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(cats.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(cats.clientInitialization.parameters.length, 1);
   strictEqual(cats.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(cats?.methods.length, 2);
@@ -176,7 +176,7 @@ it("client with sub clients", async () => {
 
   const actions = client.children?.find((c) => c.name === "Actions");
   ok(actions);
-  strictEqual(actions.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(actions.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(actions.clientInitialization.parameters.length, 1);
   strictEqual(actions.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(actions?.methods.length, 2); // client accessor methods which have already deprecated
@@ -244,7 +244,7 @@ it("client with sub client and sub client has extra initialization paramters", a
 
   const largeFaceList = client.children?.find((c) => c.name === "LargeFaceList");
   ok(largeFaceList);
-  strictEqual(largeFaceList.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(largeFaceList.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(largeFaceList.clientInitialization.parameters.length, 2);
   strictEqual(largeFaceList.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(largeFaceList.clientInitialization.parameters[1].name, "largeFaceListId");
@@ -254,7 +254,7 @@ it("client with sub client and sub client has extra initialization paramters", a
 
   const largePersonGroup = client.children?.find((c) => c.name === "LargePersonGroup");
   ok(largePersonGroup);
-  strictEqual(largePersonGroup.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(largePersonGroup.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(largePersonGroup.clientInitialization.parameters.length, 2);
   strictEqual(largePersonGroup.clientInitialization.parameters[0].name, "endpoint");
   strictEqual(largePersonGroup.clientInitialization.parameters[1].name, "largePersonGroupId");
@@ -404,7 +404,7 @@ it("first level client could not be initialized by parent", async () => {
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
-      "Invalid 'initializedBy' value. First level client must have `InitializedBy.individually` specified in `initializedBy`.",
+      "Invalid 'initializedBy' value. First level client must only have `InitializedBy.individually` specified in `initializedBy`.",
   });
 });
 
@@ -421,9 +421,27 @@ it("sub client could not only be initialized individually", async () => {
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
-      "Invalid 'initializedBy' value. Sub client must have `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
+      "Invalid 'initializedBy' value. Sub client must have `InitializedBy.parent`, `InitializedBy.none` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
   });
 });
+
+it("initializedBy.none can only be used independently", async () => {
+  await runner.compileWithBuiltInService(
+    `
+    @route("/bump")
+    @clientInitialization({initializedBy: InitializedBy.parent | InitializedBy.none})
+    interface SubClient {
+        op test(): void;
+    }
+    `,
+  );
+  expectDiagnostics(runner.context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
+    message:
+      "`InitializedBy.none` can only be used independently for sub client.",
+  });
+});
+
 it("single with core", async () => {
   const runnerWithCore = await createSdkTestRunner({
     librariesToAdd: [AzureCoreTestLibrary],
@@ -668,7 +686,7 @@ it("operationGroup", async () => {
   strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
 
   strictEqual(operationGroup.clientInitialization.parameters.length, 1);
-  strictEqual(operationGroup.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(operationGroup.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(operationGroup.methods.length, 1);
   strictEqual(operationGroup.methods[0].name, "func");
   strictEqual(
@@ -713,13 +731,13 @@ it("operationGroup2", async () => {
   strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
 
   strictEqual(fooClient.clientInitialization.parameters.length, 1);
-  strictEqual(fooClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(fooClient.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(fooClient.methods.length, 0);
   strictEqual(fooClient.children?.length, 1);
   strictEqual(fooClient.crossLanguageDefinitionId, "TestService.Foo");
 
   strictEqual(fooBarClient.clientInitialization.parameters.length, 1);
-  strictEqual(fooBarClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(fooBarClient.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(fooBarClient.crossLanguageDefinitionId, "TestService.Foo.Bar");
   strictEqual(fooBarClient.methods.length, 1);
   strictEqual(fooBarClient.methods[0].kind, "basic");
@@ -727,7 +745,7 @@ it("operationGroup2", async () => {
   strictEqual(fooBarClient.methods[0].crossLanguageDefinitionId, "TestService.Foo.Bar.one");
 
   strictEqual(barClient.clientInitialization.parameters.length, 1);
-  strictEqual(barClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(barClient.clientInitialization.initializedBy, InitializedByFlags.None);
   strictEqual(barClient.crossLanguageDefinitionId, "TestService.Bar");
   strictEqual(barClient.methods.length, 1);
   strictEqual(barClient.methods[0].kind, "basic");

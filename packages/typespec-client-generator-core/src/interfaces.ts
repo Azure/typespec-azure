@@ -134,10 +134,12 @@ export enum UsageFlags {
  * Flags used to indicate how a client is initialized.
  * `Individually` means the client is initialized individually.
  * `Parent` means the client is initialized by its parent.
+ * `None` means the the client can't be initialized.
  */
 export enum InitializedByFlags {
   Individually = 1 << 0,
   Parent = 1 << 1,
+  None = 1 << 2,
 }
 
 /**

@@ -17,7 +17,7 @@ model Azure.ClientGenerator.Core.ClientInitializationOptions
 | Name           | Type                  | Description                                                                                                                                                                                                                                                                                     |
 | -------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | parameters?    | `Model`               | Redefine the client initialization parameters you would like to add to the client.<br />By default, we apply endpoint, credential, and api-version parameters. If you specify parameters model, we will append the properties of the model to the parameters list of the client initialization. |
-| initializedBy? | `EnumMember \| Union` | Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually \| InitializedBy.parent`.                                                                     |
+| initializedBy? | `EnumMember \| Union` | Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent`, `InitializedBy.none` or `InitializedBy.individually \| InitializedBy.parent`.                                               |
 
 ### `Access` {#Azure.ClientGenerator.Core.Access}
 
@@ -57,6 +57,7 @@ enum Azure.ClientGenerator.Core.InitializedBy
 | ------------ | ----- | ------------------------------------------------- |
 | individually | `1`   | The client could be initialized individually.     |
 | parent       | `2`   | The client could be initialized by parent client. |
+| none         | `4`   | The client can't be initialized independently.    |
 
 ### `Usage` {#Azure.ClientGenerator.Core.Usage}
 

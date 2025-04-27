@@ -265,7 +265,7 @@ function createSdkClientInitializationType(
     doc: "Initialization for the client",
     parameters: [],
     initializedBy:
-      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.Parent,
+      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.None,
     name,
     isGeneratedName: true,
     decorators: [],
@@ -294,8 +294,7 @@ function createSdkClientInitializationType(
   if (initializationOptions?.initializedBy) {
     if (
       client.kind === "SdkClient" &&
-      (initializationOptions.initializedBy & InitializedByFlags.Parent) ===
-        InitializedByFlags.Parent
+      (initializationOptions.initializedBy & (InitializedByFlags.Parent | InitializedByFlags.None)) > 0
     ) {
       diagnostics.add(
         createDiagnostic({
@@ -303,7 +302,7 @@ function createSdkClientInitializationType(
           target: client.type,
           format: {
             message:
-              "First level client must have `InitializedBy.individually` specified in `initializedBy`.",
+              "First level client must only have `InitializedBy.individually` specified in `initializedBy`.",
           },
         }),
       );
@@ -317,7 +316,18 @@ function createSdkClientInitializationType(
           target: client.type,
           format: {
             message:
-              "Sub client must have `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
+              "Sub client must have `InitializedBy.parent`, `InitializedBy.none` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
+          },
+        }),
+      );
+    } else if (client.kind === "SdkOperationGroup" && (initializationOptions.initializedBy & InitializedByFlags.None) > 0 && (initializationOptions.initializedBy ^ InitializedByFlags.None) > 0) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "invalid-initialized-by",
+          target: client.type,
+          format: {
+            message:
+              "`InitializedBy.none` can only be used independently for sub client.",
           },
         }),
       );
