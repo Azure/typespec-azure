@@ -634,6 +634,15 @@ export function findRootSourceProperty(property: ModelProperty): ModelProperty {
   return property;
 }
 
+export function compareRootSourceProperties(prop1: ModelProperty, prop2: ModelProperty): boolean {
+  const rootProp1 = findRootSourceProperty(prop1);
+  const rootProp2 = findRootSourceProperty(prop2);
+  if (rootProp1.node !== undefined && rootProp2.node !== undefined) {
+    return rootProp1.node !== undefined && rootProp1.node === rootProp2.node;
+  }
+  return rootProp1 === rootProp2;
+}
+
 export function getStreamAsBytes(
   context: TCGCContext,
   type: Type,
