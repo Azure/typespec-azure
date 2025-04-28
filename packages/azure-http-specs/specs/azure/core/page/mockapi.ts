@@ -63,7 +63,7 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        value: [{ id: 1, name: "User1" }],
+        values: [{ id: 1, name: "User1" }],
         nextLink: dyn`${dynItem("baseUrl")}/azure/core/page/with-parameterized-next-link/second-page?select=name`,
       }),
     },
@@ -82,7 +82,7 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        value: [{ id: 2, name: "User2" }],
+        values: [{ id: 2, name: "User2" }],
       }),
     },
     kind: "MockApiDefinition",
