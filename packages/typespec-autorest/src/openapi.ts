@@ -24,7 +24,6 @@ import {
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
-  ArrayModelType,
   BooleanLiteral,
   CompilerHost,
   Diagnostic,
@@ -1843,20 +1842,6 @@ export async function getOpenAPIForService(
     }
   }
 
-  function ifArrayItemContainsIdentifier(
-    program: Program,
-    array: ArrayModelType,
-    armIdentifiers: string[],
-  ) {
-    if (array.indexer.value?.kind !== "Model") {
-      return true;
-    }
-    return (
-      getExtensions(program, array).has("x-ms-identifiers") ||
-      (getProperty(array.indexer.value, "id") && armIdentifiers.includes("id"))
-    );
-  }
-
   function ifArmIdentifiersDefault(armIdentifiers: string[]) {
     return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
   }
@@ -2414,10 +2399,6 @@ export async function getOpenAPIForService(
       const armIdentifiers = getArmIdentifiers(program, typespecType);
       if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
         array["x-ms-identifiers"] = armIdentifiers;
-      } else if (
-        !ifArrayItemContainsIdentifier(program, typespecType as any, armIdentifiers ?? [])
-      ) {
-        array["x-ms-identifiers"] = [];
       }
 
       return applyIntrinsicDecorators(typespecType, array);
