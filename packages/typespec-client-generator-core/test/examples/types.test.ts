@@ -999,3 +999,85 @@ it("SdkModelExample with extra paramters", async () => {
 
   expectDiagnostics(runner.context.diagnostics, []);
 });
+
+it("unknown type with null example value", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getUnknownNull.json",
+    `${__dirname}/example-types/getUnknownNull.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        prop: unknown;
+      }
+
+      op getUnknownNull(): Test;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Test");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["prop"].value, null);
+  strictEqual(bodyValue.value["prop"].kind, "unknown");
+  strictEqual(bodyValue.value["prop"].type.kind, "unknown");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("unexpected null value", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getUnexpectedNull.json",
+    `${__dirname}/example-types/getUnexpectedNull.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        a: string;
+        b: int32;
+        c: {prop: string};
+        d: {prop: string} | null;
+        e: utcDateTime;
+        f: duration;
+        g: TestEnum;
+      }
+
+      enum TestEnum {
+          one,two,three
+      }
+
+      op getUnexpectedNull(): Test;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Test");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  ok(bodyValue.value["d"]);
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});

@@ -27,6 +27,7 @@ import {
   ApiVersionDecorator,
   ClientApiVersionsDecorator,
   ClientDecorator,
+  ClientDocDecorator,
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
@@ -54,12 +55,15 @@ import {
 } from "./interfaces.js";
 import {
   AllScopes,
+  clientKey,
   clientNameKey,
   clientNamespaceKey,
   findRootSourceProperty,
+  hasExplicitClientOrOperationGroup,
   listAllNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
+  operationGroupKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -91,15 +95,6 @@ function getScopedDecoratorData(
     }
   }
   return retval[AllScopes]; // in this case it applies to all languages
-}
-
-function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
-  const retval = [...context.program.stateMap(key).values()];
-  return retval
-    .filter((targetEntry) => {
-      return targetEntry[context.emitterName] || targetEntry[AllScopes];
-    })
-    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
 }
 
 function setScopedDecoratorData(
@@ -178,8 +173,6 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
   }
   return [negationScopes, scopes];
 }
-
-const clientKey = createStateSymbol("client");
 
 function isArm(service: Namespace): boolean {
   return service.decorators.some(
@@ -279,14 +272,12 @@ export function getClient(
   return undefined;
 }
 
-function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
-  return (
-    listScopedDecoratorData(context, clientKey).length > 0 ||
-    listScopedDecoratorData(context, operationGroupKey).length > 0
-  );
-}
 /**
  * List all the clients.
+ * If the user has not explicitly defined any clients, we will treat the first namespace with service decorator as the root client.
+ * If this root client has no operations or sub-clients, we will still return this empty root client. This behavior is different from sdkContext.sdkPackage.clients, which will not include empty clients.
+ * TODO: We will consolidate SDKClientType and SDKOperationGroupType in the future. After that, we will list all clients and operation groups in this function instead and the behavior will be consistent.
+ *
  *
  * @param context TCGCContext
  * @returns Array of clients
@@ -348,8 +339,6 @@ export function listClients(context: TCGCContext): SdkClient[] {
 
   return context.__rawClients;
 }
-
-const operationGroupKey = createStateSymbol("operationGroup");
 
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
@@ -467,17 +456,23 @@ export function getOperationGroup(
     if (operationGroup) {
       operationGroup.groupPath = buildOperationGroupPath(context, type);
       operationGroup.service = service;
+      operationGroup.hasOperations = type.operations.size > 0;
     }
   } else {
     // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
-    if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
-      operationGroup = {
-        kind: "SdkOperationGroup",
-        type,
-        groupPath: buildOperationGroupPath(context, type),
-        service,
-      };
+    if (type.kind === "Interface") {
+      const hasOperations = type.operations.size > 0;
+      if (!isTemplateDeclaration(type)) {
+        operationGroup = {
+          kind: "SdkOperationGroup",
+          type,
+          groupPath: buildOperationGroupPath(context, type),
+          service,
+          hasOperations: hasOperations,
+        };
+      }
     }
+
     if (
       type.kind === "Namespace" &&
       !type.decorators.some((t) => t.decorator.name === "$service")
@@ -487,6 +482,7 @@ export function getOperationGroup(
         type,
         groupPath: buildOperationGroupPath(context, type),
         service,
+        hasOperations: type.operations.size > 0,
       };
     }
   }
@@ -549,9 +545,23 @@ export function listOperationGroups(
 
   while (queue.length > 0) {
     const operationGroup = queue.shift()!;
-    groups.push(operationGroup);
+    if (
+      hasExplicitClientOrOperationGroup(context) ||
+      operationGroup.hasOperations === true ||
+      operationGroup.subOperationGroups
+    ) {
+      groups.push(operationGroup);
+    }
     if (ignoreHierarchy && operationGroup.subOperationGroups) {
-      queue.push(...operationGroup.subOperationGroups);
+      for (const subOperationGroup of operationGroup.subOperationGroups) {
+        if (
+          hasExplicitClientOrOperationGroup(context) ||
+          subOperationGroup.hasOperations === true ||
+          subOperationGroup.subOperationGroups
+        ) {
+          queue.push(subOperationGroup);
+        }
+      }
     }
   }
 
@@ -871,11 +881,7 @@ function collectParams(
 
 function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProperty): boolean {
   // can't rely fully on equals because the `.model` property may be different
-  return (
-    modelPropA.name === modelPropB.name &&
-    modelPropA.type === modelPropB.type &&
-    modelPropA.node === modelPropB.node
-  );
+  return modelPropA.name === modelPropB.name && modelPropA.type === modelPropB.type;
 }
 
 export const $override = (
@@ -900,8 +906,12 @@ export const $override = (
   let index = 0;
   for (const originalParam of originalParams) {
     if (index > overrideParams.length - 1) {
-      parametersMatch = false;
-      break;
+      if (!originalParam.optional) {
+        parametersMatch = false;
+        break;
+      } else {
+        continue;
+      }
     }
     if (!compareModelProperties(originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
@@ -956,16 +966,16 @@ const alternateTypeKey = createStateSymbol("alternateType");
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar,
-  alternate: Scalar,
+  alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "ModelProperty" && source.type.kind !== "Scalar") {
+  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
     reportDiagnostic(context.program, {
-      code: "invalid-alternate-source-type",
+      code: "invalid-alternate-type",
       format: {
-        typeName: source.type.kind,
+        kindName: alternate.kind,
       },
-      target: source,
+      target: alternate,
     });
     return;
   }
@@ -1174,21 +1184,17 @@ export const $clientNamespace: ClientNamespaceDecorator = (
  * @param userDefinedNamespaces
  * @returns
  */
-function findShortestNamespaceOverlap(
+function findNamespaceOverlapClosestToRoot(
   override: string,
   userDefinedNamespaces: Namespace[],
 ): Namespace | undefined {
-  let shortestNamespace: Namespace | undefined = undefined;
-
   for (const namespace of userDefinedNamespaces) {
     if (override.includes(namespace.name)) {
-      if (!shortestNamespace || namespace.name.length < shortestNamespace.name.length) {
-        shortestNamespace = namespace;
-      }
+      return namespace;
     }
   }
 
-  return shortestNamespace;
+  return undefined;
 }
 
 /**
@@ -1209,7 +1215,7 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
-    const userDefinedNamespace = findShortestNamespaceOverlap(
+    const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
     );
@@ -1218,9 +1224,6 @@ export function getClientNamespace(
       return override.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return override;
-  }
-  if (context.namespaceFlag) {
-    return context.namespaceFlag;
   }
   if (!entity.namespace) {
     return "";
@@ -1234,16 +1237,31 @@ export function getClientNamespace(
 function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
   const segments = [];
   let current: Namespace | undefined = namespace;
+  let isOverridden: boolean = false;
   while (current && current.name !== "") {
     const override = getScopedDecoratorData(context, clientNamespaceKey, current);
     if (override) {
       segments.unshift(override);
+      isOverridden = true;
       break;
     }
     segments.unshift(current.name);
     current = current.namespace;
   }
-  return segments.join(".");
+  const joinedSegments = segments.join(".");
+  if (isOverridden) {
+    // if it's overridden, and there's a `@clientNamespace` flag, we want to do the shortest namespace overlap replacement
+    const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
+      joinedSegments,
+      listAllUserDefinedNamespaces(context),
+    );
+    if (userDefinedNamespace && context.namespaceFlag) {
+      return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
+    }
+    return joinedSegments;
+  }
+  if (context.namespaceFlag) return context.namespaceFlag;
+  return joinedSegments;
 }
 
 export const $scope: ScopeDecorator = (
@@ -1367,4 +1385,54 @@ export const $responseAsBool: ResponseAsBoolDecorator = (
 
 export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
   return getScopedDecoratorData(context, responseAsBoolKey, target);
+}
+
+const clientDocKey = createStateSymbol("clientDoc");
+
+/**
+ * Type representing the client documentation data stored.
+ */
+interface ClientDocData {
+  documentation: string;
+  mode: string;
+}
+
+export const $clientDoc: ClientDocDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  documentation: string,
+  mode: EnumMember,
+  scope?: LanguageScopes,
+) => {
+  const docMode = mode.value as string;
+  // Validate the mode value
+  if (docMode !== "append" && docMode !== "replace") {
+    reportDiagnostic(context.program, {
+      code: "invalid-client-doc-mode",
+      format: { mode: docMode },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  const docData: ClientDocData = {
+    documentation,
+    mode: docMode,
+  };
+
+  setScopedDecoratorData(context, $clientDoc, clientDocKey, target, docData, scope);
+};
+
+/**
+ * Gets the client documentation data for a type.
+ *
+ * @param context TCGCContext
+ * @param target Type to get client documentation for
+ * @returns ClientDocData or undefined if no client documentation exists
+ */
+export function getClientDocExplicit(
+  context: TCGCContext,
+  target: Type,
+): ClientDocData | undefined {
+  return getScopedDecoratorData(context, clientDocKey, target);
 }

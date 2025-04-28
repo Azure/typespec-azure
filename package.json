@@ -39,8 +39,8 @@
     "regen-common-types": "pnpm --filter @azure-tools/typespec-samples run regen-common-types"
   },
   "devDependencies": {
-    "@chronus/chronus": "^1.0.0",
-    "@chronus/github": "^1.0.0",
+    "@chronus/chronus": "^1.0.1",
+    "@chronus/github": "^1.0.1",
     "@eslint/js": "^9.23.0",
     "@pnpm/workspace.find-packages": "^1000.0.17",
     "@types/node": "~22.13.11",

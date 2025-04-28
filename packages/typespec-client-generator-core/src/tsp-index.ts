@@ -5,6 +5,7 @@ import {
   $apiVersion,
   $client,
   $clientApiVersions,
+  $clientDoc,
   $clientInitialization,
   $clientName,
   $clientNamespace,
@@ -46,5 +47,6 @@ export const $decorators = {
     clientApiVersions: $clientApiVersions,
     deserializeEmptyStringAsNull: $deserializeEmptyStringAsNull,
     responseAsBool: $responseAsBool,
+    clientDoc: $clientDoc,
   } as AzureClientGeneratorCoreDecorators,
 };

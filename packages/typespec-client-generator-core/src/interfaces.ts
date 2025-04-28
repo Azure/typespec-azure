@@ -65,10 +65,12 @@ export interface TCGCContext {
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
+  __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
+  getPackageVersions(): string[];
 }
 
 export interface SdkContext<
@@ -95,6 +97,7 @@ export interface SdkOperationGroup {
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
+  hasOperations?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -612,7 +615,6 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   style: "simple" | "label" | "matrix" | "fragment" | "path";
   allowReserved: boolean;
   serializedName: string;
-  optional: false;
   correspondingMethodParams: SdkModelPropertyType[];
 }
 
@@ -625,7 +627,6 @@ export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
   serializedName: string;
-  optional: boolean;
   contentTypes: string[];
   defaultContentType: string;
   correspondingMethodParams: SdkModelPropertyType[];
@@ -870,6 +871,15 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   crossLanguagePackageId: string;
   namespaces: SdkNamespace<TServiceOperation>[];
   licenseInfo?: LicenseInfo;
+  metadata: {
+    /**
+     * The version of the package.
+     * If undefined, the package is not versioned.
+     * If `all`, the package is versioned with all versions.
+     * If a string, the package is versioned with the specified version.
+     */
+    apiVersion?: string;
+  };
 }
 
 export interface LicenseInfo {

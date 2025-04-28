@@ -135,7 +135,11 @@ function setResourceLifecycleOperation(
   decoratorName: string,
 ) {
   // Only register methods from non-templated interface types
-  if (target.interface === undefined || target.interface.node.templateParameters.length > 0) {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
     return;
   }
 
@@ -200,7 +204,11 @@ export const $armResourceList: ArmResourceListDecorator = (
   resourceType: Model,
 ) => {
   // Only register methods from non-templated interface types
-  if (target.interface === undefined || target.interface.node.templateParameters.length > 0) {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
     return;
   }
 
@@ -315,7 +323,11 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   const { program } = context;
 
   // Only register methods from non-templated interface types
-  if (target.interface === undefined || target.interface.node.templateParameters.length > 0) {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
     return;
   }
 

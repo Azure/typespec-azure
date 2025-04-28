@@ -1,5 +1,32 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.15
+
+### Features
+
+- [#2542](https://github.com/Azure/typespec-azure/pull/2542) Add test case of client initialization and child client
+- [#2535](https://github.com/Azure/typespec-azure/pull/2535) add test for `Azure.ClientGenerator.Core.DeserializeEmptyStringAsNull`
+
+### Bug Fixes
+
+- [#2522](https://github.com/Azure/typespec-azure/pull/2522) Update to express v5
+- [#2555](https://github.com/Azure/typespec-azure/pull/2555) Update next link to be fully qualified
+
+
+## 0.1.0-alpha.14
+
+### Features
+
+- [#2496](https://github.com/Azure/typespec-azure/pull/2496) add tests for `@clientInitialization` moving from method to client
+- [#2497](https://github.com/Azure/typespec-azure/pull/2497) add test for `Azure.Core.Legacy.parameterizedNextLink`
+
+### Bug Fixes
+
+- [#2527](https://github.com/Azure/typespec-azure/pull/2527) Fix FinalResult for POST LRO ArmCombinedLroHeaders.
+- [#2522](https://github.com/Azure/typespec-azure/pull/2522) Update to express v5
+- [#2530](https://github.com/Azure/typespec-azure/pull/2530) Fix client initialization spec issue.
+
+
 ## 0.1.0-alpha.13
 
 ### Bug Fixes

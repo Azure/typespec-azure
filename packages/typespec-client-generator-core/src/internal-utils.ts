@@ -4,6 +4,7 @@ import {
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
+  getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getVisibilityForClass,
@@ -35,7 +36,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+import { getClientDocExplicit, getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -85,6 +86,24 @@ export const clientNameKey = createStateSymbol("clientName");
 export const clientNamespaceKey = createStateSymbol("clientNamespace");
 export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
+export const clientKey = createStateSymbol("client");
+export const operationGroupKey = createStateSymbol("operationGroup");
+
+export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
+  return (
+    listScopedDecoratorData(context, clientKey).length > 0 ||
+    listScopedDecoratorData(context, operationGroupKey).length > 0
+  );
+}
+
+function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
+  const retval = [...context.program.stateMap(key).values()];
+  return retval
+    .filter((targetEntry) => {
+      return targetEntry[context.emitterName] || targetEntry[AllScopes];
+    })
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
+}
 
 /**
  *
@@ -432,17 +451,6 @@ export function getAnyType(
   });
 }
 
-export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
-  let apiVersion = context.apiVersion;
-  if (apiVersion === "all") {
-    return apiVersion;
-  }
-  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
-    apiVersion = versions[versions.length - 1];
-  }
-  return apiVersion;
-}
-
 export function getHttpOperationResponseHeaders(
   response: HttpOperationResponseContent,
 ): ModelProperty[] {
@@ -604,7 +612,7 @@ export function listAllNamespaces(
 
 export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
   return listAllNamespaces(context, context.getMutatedGlobalNamespace()).filter((ns) =>
-    $.type.isUserDefined(ns),
+    $(context.program).type.isUserDefined(ns),
   );
 }
 
@@ -650,17 +658,14 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const service = listServices(context.program)[0];
-  if (!service) return globalNamespace;
-  const allApiVersions = getVersions(context.program, service.type)[1]
-    ?.getVersions()
-    .map((x) => x.value);
-  if (!allApiVersions || context.apiVersion === "all") return globalNamespace;
+  const allApiVersions = context.getPackageVersions();
+  if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
 
-  const apiVersion = getValidApiVersion(context, allApiVersions);
-  if (apiVersion === undefined) return globalNamespace;
-
-  const mutator = getVersioningMutator(context, service.type, apiVersion);
+  const mutator = getVersioningMutator(
+    context,
+    listServices(context.program)[0].type,
+    allApiVersions[allApiVersions.length - 1],
+  );
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;
@@ -699,4 +704,20 @@ export function resolveConflictGeneratedName(context: TCGCContext) {
       generatedNames.push(createName);
     }
   }
+}
+
+export function getClientDoc(context: TCGCContext, target: Type): string | undefined {
+  const clientDocExplicit = getClientDocExplicit(context, target);
+  const baseDoc = getDoc(context.program, target);
+  if (clientDocExplicit) {
+    switch (clientDocExplicit.mode) {
+      case "append":
+        return baseDoc
+          ? `${baseDoc}\n${clientDocExplicit.documentation}`
+          : clientDocExplicit.documentation;
+      case "replace":
+        return clientDocExplicit.documentation;
+    }
+  }
+  return baseDoc;
 }

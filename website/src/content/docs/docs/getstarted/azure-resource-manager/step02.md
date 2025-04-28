@@ -54,7 +54,10 @@ model User is TrackedResource<UserProperties> {
 interface Users {
   get is ArmResourceRead<User>;
   create is ArmResourceCreateOrReplaceAsync<User>;
-  update is ArmResourcePatchSync<User, UserProperties>;
+  update is ArmCustomPatchSync<
+    User,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<User, UserProperties>
+  >;
   delete is ArmResourceDeleteSync<User>;
   listByResourceGroup is ArmResourceListByParent<User>;
   listBySubscription is ArmListBySubscription<User>;
@@ -73,30 +76,6 @@ The interface above creates the following operations for your service:
 | `PUT /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | create item                     |
 | `PATCH /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`  | patch item                      |
 | `DELETE /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}` | delete item                     |
-
-### Alternate (Legacy) Syntax for Operations
-
-Alternately, you can use interface templates, which define a set of operations in your resource operations interface. Interface templates are convenient if you want to conform to standard
-practices, but are less flexible than operation templates.
-
-To specify the standard set of TrackedResource operations for your resource, you can use the following code:
-
-```typespec
-@armResourceOperations
-interface Users extends TrackedResourceOperations<User, UserProperties> {}
-```
-
-This will now produce all the endpoints(`get`, `post`, `put`, `patch` and `delete`, listByResourceGroup, listBySubscription) for a resource called `Users` and the `operations` endpoint for the service:
-
-| Method & Path                                                                                                        | Description                          |
-| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `GET /providers/Contoso.Users/operations`                                                                            | List all operations for your service |
-| `GET /subscriptions/{subscriptionId}/providers/Contoso.Users/users`                                                  | list all User by subscription        |
-| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users`               | list all User by resource group      |
-| `GET /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | get item                             |
-| `PUT /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`    | insert item                          |
-| `PATCH /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}`  | patch item                           |
-| `DELETE /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Contoso.Users/users/{userName}` | delete item                          |
 
 #### Base Resource Types
 

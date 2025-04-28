@@ -533,6 +533,20 @@ model Azure.ResourceManager.LocationParameter
 | -------- | -------- | ------------------ |
 | location | `string` | The location name. |
 
+### `LocationResourceParameter` {#Azure.ResourceManager.LocationResourceParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.LocationResourceParameter
+```
+
+#### Properties
+
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
+
 ### `ManagedByProperty` {#Azure.ResourceManager.ManagedByProperty}
 
 Model representing the standard `managedBy` envelope property for a resource.
@@ -1347,20 +1361,6 @@ model Azure.ResourceManager.CommonTypes.LocationParameter
 | -------- | -------- | ------------------------- |
 | location | `string` | The name of Azure region. |
 
-### `LocationResourceParameter` {#Azure.ResourceManager.CommonTypes.LocationResourceParameter}
-
-The default location parameter type.
-
-```typespec
-model Azure.ResourceManager.CommonTypes.LocationResourceParameter
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
-
 ### `ManagedOnBehalfOfConfiguration` {#Azure.ResourceManager.CommonTypes.ManagedOnBehalfOfConfiguration}
 
 Managed-On-Behalf-Of configuration properties. This configuration exists for the resources where a resource provider manages those resources on behalf of the resource owner.
@@ -1635,7 +1635,7 @@ model Azure.ResourceManager.CommonTypes.Plan
 
 ### `PrivateEndpoint` {#Azure.ResourceManager.CommonTypes.PrivateEndpoint}
 
-The Private Endpoint resource.
+The private endpoint resource.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.PrivateEndpoint
@@ -1643,9 +1643,9 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpoint
 
 #### Properties
 
-| Name | Type                         | Description                                  |
-| ---- | ---------------------------- | -------------------------------------------- |
-| id?  | `Core.armResourceIdentifier` | The resource identifier for private endpoint |
+| Name | Type                         | Description                                     |
+| ---- | ---------------------------- | ----------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | The resource identifier of the private endpoint |
 
 ### `PrivateEndpointConnection` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnection}
 
@@ -1674,7 +1674,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 | Name      | Type                                                      | Description                                                           |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | value?    | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections.                                |
-| nextLink? | `string`                                                  | URL to get the next set of operation list results (if there are any). |
+| nextLink? | `url`                                                     | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateEndpointConnectionListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5}
 
@@ -1786,7 +1786,7 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
 | Name      | Type                                                | Description                                                           |
 | --------- | --------------------------------------------------- | --------------------------------------------------------------------- |
 | value?    | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources                                       |
-| nextLink? | `string`                                            | URL to get the next set of operation list results (if there are any). |
+| nextLink? | `url`                                               | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateLinkResourceListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5}
 
@@ -2134,8 +2134,8 @@ model Azure.ResourceManager.CommonTypes.UserAssignedIdentity
 
 | Name         | Type        | Description                                |
 | ------------ | ----------- | ------------------------------------------ |
-| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 | principalId? | `Core.uuid` | The principal ID of the assigned identity. |
+| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 
 ### `ResourceHome` {#Azure.ResourceManager.CommonTypes.ResourceHome}
 
