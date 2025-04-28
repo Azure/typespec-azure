@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.55.1
+
+### Bug Fixes
+
+- [#2591](https://github.com/Azure/typespec-azure/pull/2591) Update source property checks to look at node
+
+
 ## 0.55.0
 
 No changes, version bump only.
