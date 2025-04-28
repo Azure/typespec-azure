@@ -164,7 +164,7 @@ model Error {
   innererror?: InnerError;
 }
 
-@doc("An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.")
+@doc("An object containing more specific information about the error. As per Azure ReST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.")
 model InnerError {
   @doc("One of a server-defined set of error codes.")
   code?: string;
