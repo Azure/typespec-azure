@@ -13,6 +13,7 @@ import {
 import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
+  getArmKeyIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
   isArmProviderNamespace,
@@ -1843,17 +1844,13 @@ export async function getOpenAPIForService(
     }
   }
 
-  function ifArrayItemContainsIdentifier(
-    program: Program,
-    array: ArrayModelType,
-    armIdentifiers: string[],
-  ) {
+  function ifArrayItemContainsIdentifier(program: Program, array: ArrayModelType) {
     if (array.indexer.value?.kind !== "Model") {
       return true;
     }
     return (
       getExtensions(program, array).has("x-ms-identifiers") ||
-      (getProperty(array.indexer.value, "id") && armIdentifiers.includes("id"))
+      getProperty(array.indexer.value, "id")
     );
   }
 
@@ -2105,7 +2102,8 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context, prop.model?.namespace);
+      propSchema = getSchemaOrRef(prop.type, context);
+      applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2411,12 +2409,13 @@ export async function getOpenAPIForService(
         }),
       };
 
-      const armIdentifiers = getArmIdentifiers(program, typespecType);
-      if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
-        array["x-ms-identifiers"] = armIdentifiers;
-      } else if (
-        !ifArrayItemContainsIdentifier(program, typespecType as any, armIdentifiers ?? [])
+      const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
+      if (
+        isArrayTypeArmProviderNamespace(typespecType, namespace) &&
+        hasValidArmIdentifiers(armKeyIdentifiers)
       ) {
+        array["x-ms-identifiers"] = armKeyIdentifiers;
+      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];
       }
 
@@ -2425,12 +2424,45 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
+  function applyArmIdentifiersDecorator(
+    typespecType: Type,
+    schema: OpenAPI2Schema,
+    property: ModelProperty,
+  ) {
+    const armIdentifiers = getArmIdentifiers(program, property);
+    if (
+      typespecType.kind !== "Model" ||
+      !isArrayModelType(program, typespecType) ||
+      !armIdentifiers
+    ) {
+      return;
+    }
+
+    schema["x-ms-identifiers"] = armIdentifiers;
+  }
+
   function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
     return (
       armIdentifiers !== undefined &&
       armIdentifiers.length > 0 &&
       !ifArmIdentifiersDefault(armIdentifiers)
     );
+  }
+
+  function isArrayTypeArmProviderNamespace(typespecType?: Model, namespace?: Namespace): boolean {
+    if (typespecType === undefined) {
+      return false;
+    }
+
+    if (isArmProviderNamespace(program, namespace)) {
+      return true;
+    }
+
+    if (typespecType.indexer?.value.kind === "Model") {
+      return isArmProviderNamespace(program, typespecType.indexer.value.namespace);
+    }
+
+    return false;
   }
 
   function getSchemaForScalar(scalar: Scalar): OpenAPI2Schema {
