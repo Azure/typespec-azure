@@ -62,6 +62,7 @@
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/openapi": "workspace:^",
@@ -71,6 +72,7 @@
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "~22.13.11",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:^",

@@ -2943,6 +2943,9 @@ importers:
       '@azure-tools/typespec-azure-core':
         specifier: workspace:^
         version: link:../typespec-azure-core
+      '@azure-tools/typespec-client-generator-core':
+        specifier: workspace:^
+        version: link:../typespec-client-generator-core
       '@types/node':
         specifier: ~22.13.11
         version: 22.13.13
