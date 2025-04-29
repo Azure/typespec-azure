@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add `InitializedBy.none` for decorator `clientInitialization`
+Change default value of initializedBy for SdkOperationGroup from `InitializedByFlags.Parent` to `InitializedByFlags.Default`
