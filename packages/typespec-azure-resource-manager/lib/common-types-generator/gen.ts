@@ -10,16 +10,26 @@ import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
 const dir = dirname(fileURLToPath(import.meta.url));
-const outDir = resolve(dir, "openapi");
+let outDir = resolve(dir, "openapi");
 
-await rm(outDir, { recursive: true, force: true });
-await emitCommonTypesSwagger("customer-managed-keys");
-await emitCommonTypesSwagger("managed-identity");
-await emitCommonTypesSwagger("managed-identity-with-delegation");
-await emitCommonTypesSwagger("mobo");
-await emitCommonTypesSwagger("network-security-perimeter");
-await emitCommonTypesSwagger("private-links");
-await emitCommonTypesSwagger("types");
+export async function generateCommonTypes(outputDir: string) {
+  outDir = resolve(dir, outputDir);
+
+  await rm(outDir, { recursive: true, force: true });
+  const commonTypes = [
+    "customer-managed-keys",
+    "managed-identity",
+    "managed-identity-with-delegation",
+    "mobo",
+    "network-security-perimeter",
+    "private-links",
+    "types",
+  ];
+
+  for (const type of commonTypes) {
+    await emitCommonTypesSwagger(type);
+  }
+}
 
 function log(...args: any[]) {
   // eslint-disable-next-line no-console

@@ -2937,6 +2937,9 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
     devDependencies:
+      '@azure-tools/typespec-autorest':
+        specifier: workspace:^
+        version: link:../typespec-autorest
       '@azure-tools/typespec-azure-core':
         specifier: workspace:^
         version: link:../typespec-azure-core

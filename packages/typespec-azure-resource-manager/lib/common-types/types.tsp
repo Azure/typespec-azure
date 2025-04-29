@@ -139,7 +139,7 @@ model Operation {
     The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
      */
   @visibility(Lifecycle.Read)
-  test?: string;
+  name?: string;
 
   /** 
     Whether the operation applies to data-plane. This is "true" for data-plane operations and "false" for Azure Resource Manager/control-plane operations.
