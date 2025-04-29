@@ -35,8 +35,7 @@
     "validate-scenarios": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-scenarios",
     "validate-mock-apis": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-mock-apis",
     "generate-scenarios-summary": "pnpm -r --filter=@azure-tools/azure-http-specs run generate-scenarios-summary",
-    "upload-manifest": "pnpm -r --filter=@azure-tools/azure-http-specs run upload-manifest",
-    "regen-common-types": "pnpm --filter @azure-tools/typespec-samples run regen-common-types"
+    "upload-manifest": "pnpm -r --filter=@azure-tools/azure-http-specs run upload-manifest"
   },
   "devDependencies": {
     "@chronus/chronus": "^1.0.1",
