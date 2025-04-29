@@ -51,7 +51,6 @@
   },
   "files": [
     "lib/**/*.tsp",
-    "lib/common-types/openapi/**/*.json",
     "lib/common-types-generator/**",
     "dist/**",
     "!dist/test/**"
