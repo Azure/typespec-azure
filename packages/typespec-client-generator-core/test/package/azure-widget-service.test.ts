@@ -519,7 +519,7 @@ it("paging", async () => {
   );
   ok(apiVersionClientParam);
 
-  strictEqual(widgetClient.clientInitialization.initializedBy, InitializedByFlags.None);
+  strictEqual(widgetClient.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(widgetClient.methods.length, 1);
   const listManufacturers = widgetClient.methods[0];
 

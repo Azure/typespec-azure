@@ -446,11 +446,6 @@ enum InitializedBy {
    * The client could be initialized by parent client.
    */
   parent: 2,
-
-  /**
-   * The client can't be initialized.
-   */
-  none: 4,
 }
 
 /**
@@ -494,7 +489,7 @@ model ClientInitializationOptions {
   parameters?: Model;
 
   /**
-   * Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent`, `InitializedBy.none` or `InitializedBy.individually | InitializedBy.parent`.
+   * Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent`.
    */
   initializedBy?: EnumMember | Union;
 }
