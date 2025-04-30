@@ -47,19 +47,30 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 
 ### Review and adjust the TypeSpec
 
-You will compare the swagger generated from TypeSpec with your original swagger to make sure they are functional equivalent. 
+You will need to compare the Swagger generated from TypeSpec with your original Swagger specification(s) to ensure functional equivalence. 
 
-- Download the last specification as baseline. Your original specification will be located at `.\sparse-spec\specification\{service-name}`.
+- In your TypeSpec folder, compile your TypeSpec files to emit an auto-generated Swagger:
+  ```shell
+  tsp compile .
   ```
-  .\node_modules\swagger-check\src\download-main.ps1 {path\to\your\generate\swagger}
-  ```
-- At the end of console output, it prints your next command to do sorting, merging, messaging your original swaggers and generated swaggger, so that it would be easy for your to review your change. Just provide an `outputFolder` to hold the analysis results.
-  ```
-  node .\node_modules\swagger-check\dist\index.js {your\original\swagger\folder} {your\generated\typespec\file} {outputFolder}
-  ```
-- In the `{outoutFolder}`, `newSwagger.json` is the processed version of your generated swagger, while `oldSwagger.json` is the processed version of your original swaggers. In VScode, select both of them, right click and choose "Compare Selected".
 
-- Review and make appropriate changes to ensure minimal changes for swagger. You can run `node .\node_modules\swagger-check\dist\index.js` iteratively until you are satisfied with the updated differences.
+- From the root folder, download the last specification as baseline. Your original specification will be located at `.\sparse-spec\specification\{service-name}`:
+  ```shell
+  .\node_modules\@typespec-migration\swagger-compare\src\download-main.ps1 {path\to\your\generated\swagger}
+  ```
+
+- At the end of the console output, you'll see the next command to sort, merge, and normalize your original Swagger(s) and generated Swagger, making it easier to review changes. Provide an `outputFolder` to store the analysis results:
+  ```shell
+  node .\node_modules\@typespec-migration\swagger-compare\dist\index.js {your\original\swagger\folder} {your\generated\swagger\file} {outputFolder}
+  ```
+
+- In the `{outputFolder}`:
+  - `newSwagger.json` is the processed version of your generated Swagger
+  - `oldSwagger.json` is the processed version of your original Swagger(s)
+  
+  In VS Code, select both files, right-click and choose "Compare Selected" to see differences.
+
+- Review and make appropriate changes to ensure minimal changes for swagger. You can go thourgh the steps in this section iteratively until you are satisfied with the updated differences.
 
 ### Create Spec PR with new TypeSpec project
 
