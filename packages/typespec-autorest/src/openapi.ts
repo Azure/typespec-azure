@@ -13,12 +13,12 @@ import {
 import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
+  getArmKeyIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
   isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
-  getArmKeyIdentifiers
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
   getClientNameOverride,
@@ -140,7 +140,7 @@ import {
   shouldInline,
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
-\import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
+import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
 import { createDiagnostic, reportDiagnostic } from "./lib.js";
