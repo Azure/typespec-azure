@@ -1268,7 +1268,7 @@ export async function getOpenAPIForService(
       reportDiagnostic(program, {
         code: multipart ? "unsupported-multipart-type" : "unsupported-param-type",
         format: { part: paramName },
-        target: type,
+        target,
       });
       return { type: "string" };
     }
