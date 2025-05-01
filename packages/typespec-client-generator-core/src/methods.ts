@@ -13,7 +13,7 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import { isHeader } from "@typespec/http";
 import { createSdkClientType } from "./clients.js";
 import {
