@@ -2820,7 +2820,7 @@ importers:
         version: link:../../core/packages/xml
       '@vitejs/plugin-react':
         specifier: ~4.3.4
-        version: 4.3.4(vite@6.2.5(@types/node@22.13.13)(tsx@4.19.3)(yaml@2.7.1))
+        version: 4.3.4(vite@6.3.4(@types/node@22.13.13)(tsx@4.19.3)(yaml@2.7.1))
       es-module-shims:
         specifier: ~2.0.10
         version: 2.0.10
@@ -2831,8 +2831,8 @@ importers:
         specifier: ~18.3.1
         version: 18.3.1(react@18.3.1)
       vite:
-        specifier: ^6.2.4
-        version: 6.2.5(@types/node@22.13.13)(tsx@4.19.3)(yaml@2.7.1)
+        specifier: ^6.2.7
+        version: 6.3.4(@types/node@22.13.13)(tsx@4.19.3)(yaml@2.7.1)
     devDependencies:
       '@playwright/test':
         specifier: ^1.51.1
@@ -16916,7 +16916,7 @@ snapshots:
       '@pnpm/types': 1000.3.0
       '@pnpm/util.lex-comparator': 3.0.1
       p-filter: 2.1.0
-      tinyglobby: 0.2.12
+      tinyglobby: 0.2.13
 
   '@pnpm/git-utils@1000.0.0':
     dependencies:
@@ -17917,17 +17917,6 @@ snapshots:
       - supports-color
 
   '@ungap/structured-clone@1.3.0': {}
-
-  '@vitejs/plugin-react@4.3.4(vite@6.2.5(@types/node@22.13.13)(tsx@4.19.3)(yaml@2.7.1))':
-    dependencies:
-      '@babel/core': 7.26.10
-      '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.10)
-      '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.10)
-      '@types/babel__core': 7.20.5
-      react-refresh: 0.14.2
-      vite: 6.2.5(@types/node@22.13.13)(tsx@4.19.3)(yaml@2.7.1)
-    transitivePeerDependencies:
-      - supports-color
 
   '@vitejs/plugin-react@4.3.4(vite@6.3.4(@types/node@22.13.13)(tsx@4.19.3)(yaml@2.7.1))':
     dependencies:
