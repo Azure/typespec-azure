@@ -7,7 +7,7 @@
 - DO read descriptions of the input and output of existing tests and mockapis [here][spector-description].
 - DO run `pnpm install` to fully set up repo
 - DO only modify code in the `cspell.yaml` file OR `packages/azure-http-specs/specs` folder
-- DO add a `@scenario` and `@scenarioDoc` for every scenario you are adding. Keep in mind that the `@scenarioDoc` needs to clearly tell users what input and output to expect.
+- DO add a `@scenario` and `@scenarioDoc` for every scenario you are adding. Keep in mind that the `@scenarioDoc` needs to clearly and explicitly tell users exactly what values to input and what values to expect from output.
 - DO add a mockapi implementation of each scenario in the `mockapi.ts` file.
 - DO ensure that every scenario has a mockapi implementation,
 - DO see if there are existing spec files that you can add the specification to. If not, DO create new files and folders for the new scenario
