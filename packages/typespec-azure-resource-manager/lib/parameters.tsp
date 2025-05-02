@@ -169,3 +169,18 @@ model TenantActionScope {
   @segment("tenant")
   name: string;
 }
+
+/**
+ * Template used by ArmProviderAction templates. This produces following action route:
+ * `/{resourceUri}/providers/Microsoft.SomeRP/someAction`
+ */
+@armVirtualResource
+@extensionResource
+model ExtensionResourceActionScope {
+  @doc("Symbolic name of scope")
+  @path
+  @visibility(Lifecycle.Read)
+  @key
+  @segment("extensionresource")
+  name: string;
+}

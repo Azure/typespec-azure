@@ -500,6 +500,21 @@ model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
+### `ExtensionResourceActionScope` {#Azure.ResourceManager.ExtensionResourceActionScope}
+
+Template used by ArmProviderAction templates. This produces following action route:
+`/{resourceUri}/providers/Microsoft.SomeRP/someAction`
+
+```typespec
+model Azure.ResourceManager.ExtensionResourceActionScope
+```
+
+#### Properties
+
+| Name | Type     | Description            |
+| ---- | -------- | ---------------------- |
+| name | `string` | Symbolic name of scope |
+
 ### `KeysOf` {#Azure.ResourceManager.KeysOf}
 
 Extracts the key (path) parameters from a resource and its parents
