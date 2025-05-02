@@ -5,6 +5,7 @@
 - DO read the existing `main.tsp` and `client.tsp` files in the specs repo [here][spector-tests].
 - DO read the existing `mockapi.ts` mockapi files in the specs repo [here][spector-tests]. Follow the imports and overall structure from these test files to write your own mockapi tests
 - DO read descriptions of the input and output of existing tests and mockapis [here][spector-description].
+- DO run `pnpm install` to fully set up repo
 - DO only modify code in the `cspell.yaml` file OR `packages/azure-http-specs/specs` folder
 - DO add a `@scenario` and `@scenarioDoc` for every scenario you are adding. Keep in mind that the `@scenarioDoc` needs to clearly tell users what input and output to expect.
 - DO add a mockapi implementation of each scenario in the `mockapi.ts` file.
@@ -20,6 +21,7 @@
 - DO run `pnpm cspell` to find any spelling issues. If there are spelling issues and you believe the word is valid, please add it to `cspell.yaml`. If the word is invalid but you need to use it, use cspell disables to ignore that line. If the word is invalid and you don't need to use it, change the word.
 - DO run `pnpm format` to clean up any formatting issues.
 - DO run `pnpm lint` to find any linting issues. DO fix these linting issues to the best of your ability without impacting the quality of the tests.
+- DO run `pnpm change add` from the root and add a changeset for the touched package. DO select it as being a new feature.
 - DO only add the `lib:azure-http-specs` label to the PR you create.
 - DON'T remove or modify existing scenario docs
 
