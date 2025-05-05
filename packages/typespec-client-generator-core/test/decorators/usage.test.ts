@@ -243,11 +243,11 @@ it("patch usage", async () => {
         prop: string
       }
 
-      @patch
+      @patch(#{implicitOptionality: true})
       @route("/patch")
       op patchModel(@body body: PatchModel): void;
 
-      @patch
+      @patch(#{implicitOptionality: true})
       @route("/jsonMergePatch")
       op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
     }

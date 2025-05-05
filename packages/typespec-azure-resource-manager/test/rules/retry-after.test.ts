@@ -54,7 +54,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
         interface FooResources {
           @armResourceUpdate(FooResource)
           @OpenAPI.extension("x-ms-long-running-operation", true)
-          @patch
+          @patch(#{implicitOptionality: true})
           update(): UpdateFooResponse;
         }
       `,
@@ -79,7 +79,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
         interface FooResources {
           @armResourceUpdate(FooResource)
           @OpenAPI.extension("x-ms-long-running-operation", true)
-          @patch 
+          @patch(#{implicitOptionality: true}) 
           op update(): FooResource;
         }
       `,
