@@ -1,5 +1,5 @@
 import { createDiagnosticCollector, Diagnostic, getSummary } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
   getClientInitializationOptions,
