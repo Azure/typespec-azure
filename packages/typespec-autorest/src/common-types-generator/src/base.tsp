@@ -2,7 +2,8 @@ import "@azure-tools/typespec-azure-core";
 import "@typespec/openapi";
 
 // Load the current versions of Azure.ResourceManager.CommonTypes.
-import "../../common-types/versions.tsp";
+
+import "../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/versions.tsp";
 
 using Versioning;
 using Http;

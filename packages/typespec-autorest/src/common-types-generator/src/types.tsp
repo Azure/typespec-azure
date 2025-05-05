@@ -1,7 +1,7 @@
 import "@azure-tools/typespec-autorest";
 
 import "./base.tsp";
-import "../../common-types/types.tsp";
+import "../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/types.tsp";
 
 using OpenAPI;
 using Autorest;

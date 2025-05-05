@@ -11,6 +11,7 @@ if (args.includes("--update")) {
     const destinationRoot = resolve(args[pathArgIndex + 1]);
     generateCommonTypes(destinationRoot);
   } else {
+    console.error("Please provide a valid path with --path <path>");
     process.exit(1);
   }
 }

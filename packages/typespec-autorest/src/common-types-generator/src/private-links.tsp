@@ -1,7 +1,7 @@
 import "@azure-tools/typespec-autorest";
 
 import "./base.tsp";
-import "../../common-types/private-links.tsp";
+import "../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/private-links.tsp";
 
 using Autorest;
 

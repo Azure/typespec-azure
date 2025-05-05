@@ -46,12 +46,10 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
-    "regen-common-types": "tsx ./lib/common-types-generator/update-common-types.ts",
     "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/libraries/azure-resource-manager/reference"
   },
   "files": [
     "lib/**/*.tsp",
-    "lib/common-types-generator/**",
     "dist/**",
     "!dist/test/**"
   ],
@@ -61,8 +59,6 @@
   },
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
-    "@azure-tools/typespec-autorest": "workspace:^",
-    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/openapi": "workspace:^",
@@ -71,8 +67,6 @@
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
-    "@azure-tools/typespec-autorest": "workspace:^",
-    "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/node": "~22.13.11",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:^",
