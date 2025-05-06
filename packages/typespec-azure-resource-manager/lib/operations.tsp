@@ -311,7 +311,7 @@ op ArmResourcePatchAsync<
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch
+@patch(#{ implicitOptionality: true })
 op ArmCustomPatchAsync<
   Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
@@ -376,7 +376,7 @@ op ArmResourcePatchSync<
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch
+@patch(#{ implicitOptionality: true })
 op ArmCustomPatchSync<
   Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
