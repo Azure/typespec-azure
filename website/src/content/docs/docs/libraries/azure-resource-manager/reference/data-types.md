@@ -1119,7 +1119,7 @@ model Azure.ResourceManager.CommonTypes.CustomerManagedKeyEncryption
 | Name                      | Type                                                                                                     | Description                                                                                                                                                                                            |
 | ------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | keyEncryptionKeyIdentity? | [`KeyEncryptionKeyIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.KeyEncryptionKeyIdentity) | All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.                                                                              |
-| keyEncryptionKeyUrl?      | `string`                                                                                                 | key encryption key Url, versioned or non-versioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. |
+| keyEncryptionKeyUrl?      | `string`                                                                                                 | key encryption key URL, versioned or non-versioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek. |
 
 ### `DelegatedResource` {#Azure.ResourceManager.CommonTypes.DelegatedResource}
 
@@ -1357,9 +1357,9 @@ model Azure.ResourceManager.CommonTypes.LocationParameter
 
 #### Properties
 
-| Name     | Type     | Description               |
-| -------- | -------- | ------------------------- |
-| location | `string` | The name of Azure region. |
+| Name     | Type     | Description                   |
+| -------- | -------- | ----------------------------- |
+| location | `string` | The name of the Azure region. |
 
 ### `ManagedOnBehalfOfConfiguration` {#Azure.ResourceManager.CommonTypes.ManagedOnBehalfOfConfiguration}
 
@@ -1549,7 +1549,7 @@ model Azure.ResourceManager.CommonTypes.Operation
 
 ### `OperationDisplay` {#Azure.ResourceManager.CommonTypes.OperationDisplay}
 
-Localized display information for and operation.
+Localized display information for an operation.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.OperationDisplay
@@ -1673,7 +1673,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 
 | Name      | Type                                                      | Description                                                           |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
-| value?    | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections.                                |
+| value?    | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections                                 |
 | nextLink? | `url`                                                     | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateEndpointConnectionListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5}
@@ -1724,13 +1724,13 @@ interface Employees {
 
 #### Properties
 
-| Name   | Type                                                      | Description                            |
-| ------ | --------------------------------------------------------- | -------------------------------------- |
-| value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
+| Name   | Type                                                      | Description                           |
+| ------ | --------------------------------------------------------- | ------------------------------------- |
+| value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections |
 
 ### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
 
-The name of the private endpoint connection associated with the Azure resource.
+The name of the private endpoint connection associated with the Azure resource
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter
@@ -1738,9 +1738,9 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter
 
 #### Properties
 
-| Name | Type     | Description                                                                     |
-| ---- | -------- | ------------------------------------------------------------------------------- |
-| name | `string` | The name of the private endpoint connection associated with the Azure resource. |
+| Name | Type     | Description                                                                    |
+| ---- | -------- | ------------------------------------------------------------------------------ |
+| name | `string` | The name of the private endpoint connection associated with the Azure resource |
 
 ### `PrivateEndpointConnectionProperties` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties}
 
@@ -1761,7 +1761,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties
 
 ### `PrivateLinkResource` {#Azure.ResourceManager.CommonTypes.PrivateLinkResource}
 
-A private link resource.
+A private link resource
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.PrivateLinkResource
@@ -1939,12 +1939,12 @@ model Azure.ResourceManager.CommonTypes.Resource
 
 #### Properties
 
-| Name        | Type                                                                         | Description                                                                                                                                                                               |
-| ----------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
-| name?       | `string`                                                                     | The name of the resource                                                                                                                                                                  |
-| type?       | `Core.armResourceType`                                                       | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                 |
-| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                          |
+| Name        | Type                                                                         | Description                                                                                                                                                                                 |
+| ----------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id?         | `Core.armResourceIdentifier`                                                 | Fully qualified resource ID for the resource. E.g. - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} |
+| name?       | `string`                                                                     | The name of the resource                                                                                                                                                                    |
+| type?       | `Core.armResourceType`                                                       | The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"                                                                                   |
+| systemData? | [`SystemData`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemData) | Azure Resource Manager metadata containing createdBy and modifiedBy information.                                                                                                            |
 
 ### `ResourceAssociation` {#Azure.ResourceManager.CommonTypes.ResourceAssociation}
 
@@ -2020,7 +2020,7 @@ model Azure.ResourceManager.CommonTypes.Sku
 
 | Name      | Type                                                                   | Description                                                                                                                                          |
 | --------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| name      | `string`                                                               | The name of the SKU. Ex - P3. It is typically a letter+number code                                                                                   |
+| name      | `string`                                                               | The name of the SKU. E.g. - P3. It is typically a letter+number code                                                                                 |
 | tier?     | [`SkuTier`](./data-types.md#Azure.ResourceManager.CommonTypes.SkuTier) | This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT.               |
 | size?     | `string`                                                               | The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code.                                |
 | family?   | `string`                                                               | If the service has different generations of hardware, for the same SKU, then that can be captured here.                                              |
