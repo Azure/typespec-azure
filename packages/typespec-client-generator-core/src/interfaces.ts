@@ -54,6 +54,7 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;

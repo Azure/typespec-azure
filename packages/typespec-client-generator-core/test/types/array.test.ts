@@ -91,3 +91,33 @@ it("alias of EmbeddingVector", async () => {
   strictEqual(property.type.crossLanguageDefinitionId, "Azure.Core.EmbeddingVector");
   strictEqual(property.type.valueType.kind, "int32");
 });
+
+it("same type's array come to same type", async () => {
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        prop: string;
+      }
+
+      model TestArray {
+        prop1: Test[];
+        prop2: Test[];
+        prop3: string[];
+        prop4: string[];
+      }
+
+      op get(): TestArray;
+    }
+  `);
+  const testArrayModel = runner.context.sdkPackage.models[0];
+  strictEqual(testArrayModel.kind, "model");
+  strictEqual(testArrayModel.name, "TestArray");
+  strictEqual(testArrayModel.properties.length, 4);
+  const prop1 = testArrayModel.properties[0];
+  const prop2 = testArrayModel.properties[1];
+  const prop3 = testArrayModel.properties[2];
+  const prop4 = testArrayModel.properties[3];
+  strictEqual(prop1.type, prop2.type);
+  strictEqual(prop3.type, prop4.type);
+});
