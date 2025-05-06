@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.56.0
+
+### Features
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Add `metadata` property to `SdkPackage` type to export package related info.
+
+### Bug Fixes
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Support `null` example value for `unknown` type.
+- [#2584](https://github.com/Azure/typespec-azure/pull/2584) Loosen requirements for parameters in `@override` so they don't have to be exactly the same node
+
+
 ## 0.55.0
 
 No changes, version bump only.
