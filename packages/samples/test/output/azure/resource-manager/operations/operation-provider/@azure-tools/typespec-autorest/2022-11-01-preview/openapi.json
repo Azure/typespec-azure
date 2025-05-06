@@ -480,8 +480,7 @@
           "description": "The LogAnalyticsOperationResult items on this page",
           "items": {
             "$ref": "#/definitions/LogAnalyticsOperationResult"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "nextLink": {
           "type": "string",
@@ -528,8 +527,7 @@
           "description": "The VmSize items on this page",
           "items": {
             "$ref": "#/definitions/VmSize"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "nextLink": {
           "type": "string",

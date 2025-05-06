@@ -176,7 +176,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -220,7 +219,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -270,7 +268,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -308,7 +305,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -348,7 +344,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -387,7 +382,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",

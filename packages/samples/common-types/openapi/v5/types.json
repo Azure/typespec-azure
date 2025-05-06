@@ -174,8 +174,7 @@
           "items": {
             "$ref": "#/definitions/ErrorAdditionalInfo"
           },
-          "readOnly": true,
-          "x-ms-identifiers": []
+          "readOnly": true
         }
       }
     },

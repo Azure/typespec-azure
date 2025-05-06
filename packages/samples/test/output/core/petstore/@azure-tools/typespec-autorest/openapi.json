@@ -207,8 +207,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/Pet"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "nextLink": {
           "type": "string"
