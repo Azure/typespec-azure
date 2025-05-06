@@ -262,7 +262,7 @@
     },
     "WidgetMergePatchUpdate": {
       "type": "object",
-      "description": "Create a MergePatch Request body for updating the given resource Model.\nThe MergePatch request created by this template provides a TypeSpec description of a\nJSON MergePatch request that can successfully update the given resource.\nThe transformation follows the definition of JSON MergePatch requests in\nrfc 7396: https://www.rfc-editor.org/rfc/rfc7396,\napplying the merge-patch transform recursively to keyed types in the resource Model.\n\nUsing this template in a PATCH request body overrides the `implicitOptionality`\nsetting for PATCH operations and sets `application/merge-patch+json` as the request\ncontent-type.",
+      "description": "",
       "properties": {
         "weight": {
           "type": "integer",
