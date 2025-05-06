@@ -1122,14 +1122,14 @@ model Azure.ResourceManager.CommonTypes.BillingScheduleChange
 
 #### Properties
 
-| Name          | Type                                                                                             | Description                                                                                                                                                                                                                   |
-| ------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| productCode?  | `Core.uuid`                                                                                      | The new product identifier. When not specified, the resource's product code remains unchanged.                                                                                                                                |
-| productToken? | `string`                                                                                         | Product token (JWT) identifying a specific version of the scheduled product. Can only be<br />specified when productCode is specified also.                                                                                   |
-| quantity?     | `int64`                                                                                          | The new number of instances of the product. When not specified, the resource's quantity remains unchanged.                                                                                                                    |
-| endDate?      | `utcDateTime`                                                                                    | The new (coterminous) end date of the product. Can only be specified when effective = renewal.<br />When not specified, the resource's end date is calculated based on the renewal date and the<br />product's term duration. |
-| billingToken? | `string`                                                                                         | Billing token (JWT) representing additional billing context.                                                                                                                                                                  |
-| effective     | [`BillingEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingEffectiveType) | Indicates when the change is expected to become effective.                                                                                                                                                                    |
+| Name          | Type                                                                                                                         | Description                                                                                                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| productCode?  | `Core.uuid`                                                                                                                  | The new product identifier. When not specified, the resource's product code remains unchanged.                                                                                                                                |
+| productToken? | `string`                                                                                                                     | Product token (JWT) identifying a specific version of the scheduled product. Can only be<br />specified when productCode is specified also.                                                                                   |
+| quantity?     | `int64`                                                                                                                      | The new number of instances of the product. When not specified, the resource's quantity remains unchanged.                                                                                                                    |
+| endDate?      | `utcDateTime`                                                                                                                | The new (coterminous) end date of the product. Can only be specified when effective = renewal.<br />When not specified, the resource's end date is calculated based on the renewal date and the<br />product's term duration. |
+| billingToken? | `string`                                                                                                                     | Billing token (JWT) representing additional billing context.                                                                                                                                                                  |
+| effective     | [`BillingScheduleChangeEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType) | Indicates when the change is expected to become effective.                                                                                                                                                                    |
 
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest}
 
@@ -2240,20 +2240,20 @@ Extensible enum. Indicates the action type. "Internal" refers to actions that ar
 union Azure.ResourceManager.CommonTypes.ActionType
 ```
 
-### `BillingEffectiveType` {#Azure.ResourceManager.CommonTypes.BillingEffectiveType}
-
-When a scheduled change is expected to become effective.
-
-```typespec
-union Azure.ResourceManager.CommonTypes.BillingEffectiveType
-```
-
 ### `BillingRenewalType` {#Azure.ResourceManager.CommonTypes.BillingRenewalType}
 
 Type of renewal.
 
 ```typespec
 union Azure.ResourceManager.CommonTypes.BillingRenewalType
+```
+
+### `BillingScheduleChangeEffectiveType` {#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType}
+
+When a scheduled change is expected to become effective.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType
 ```
 
 ### `BillingState` {#Azure.ResourceManager.CommonTypes.BillingState}

@@ -109,36 +109,6 @@
         "quantity"
       ]
     },
-    "BillingEffectiveType": {
-      "type": "string",
-      "description": "When a scheduled change is expected to become effective.",
-      "enum": [
-        "Renewal",
-        "NextCycle",
-        "Absolute"
-      ],
-      "x-ms-enum": {
-        "name": "BillingEffectiveType",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Renewal",
-            "value": "Renewal",
-            "description": "At time of term renewal."
-          },
-          {
-            "name": "NextCycle",
-            "value": "NextCycle",
-            "description": "When the next billing plan cycle charge occurs."
-          },
-          {
-            "name": "Absolute",
-            "value": "Absolute",
-            "description": "At a specific, absolute date."
-          }
-        ]
-      }
-    },
     "BillingRenewalType": {
       "type": "string",
       "description": "Type of renewal.",
@@ -250,7 +220,7 @@
             "Absolute"
           ],
           "x-ms-enum": {
-            "name": "BillingEffectiveType",
+            "name": "BillingScheduleChangeEffectiveType",
             "modelAsString": true,
             "values": [
               {
@@ -275,6 +245,36 @@
       "required": [
         "effective"
       ]
+    },
+    "BillingScheduleChangeEffectiveType": {
+      "type": "string",
+      "description": "When a scheduled change is expected to become effective.",
+      "enum": [
+        "Renewal",
+        "NextCycle",
+        "Absolute"
+      ],
+      "x-ms-enum": {
+        "name": "BillingScheduleChangeEffectiveType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Renewal",
+            "value": "Renewal",
+            "description": "At time of term renewal."
+          },
+          {
+            "name": "NextCycle",
+            "value": "NextCycle",
+            "description": "When the next billing plan cycle charge occurs."
+          },
+          {
+            "name": "Absolute",
+            "value": "Absolute",
+            "description": "At a specific, absolute date."
+          }
+        ]
+      }
     },
     "BillingState": {
       "type": "string",

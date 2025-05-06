@@ -109,7 +109,7 @@ model BillingScheduleChange {
   /**
    * Indicates when the change is expected to become effective.
    */
-  effective: BillingEffectiveType = "Renewal";
+  effective: BillingScheduleChangeEffectiveType = "Renewal";
 }
 
 /**
@@ -159,7 +159,7 @@ union BillingRenewalType {
  * When a scheduled change is expected to become effective.
  */
 @added(Versions.v6)
-union BillingEffectiveType {
+union BillingScheduleChangeEffectiveType {
   /** At time of term renewal. */
   Renewal: "Renewal",
 
