@@ -38,7 +38,7 @@ function log(...args: any[]) {
 
 async function emitCommonTypesSwagger(name: string) {
   log("Generating common types for ", name);
-  const program = await compile(NodeHost, resolve(dir, `src/${name}.tsp`));
+  const program = await compile(NodeHost, resolve(dir, `common-types/${name}.tsp`));
 
   if (program.diagnostics.length > 0) {
     logDiagnostics(program.diagnostics, NodeHost.logSink);

@@ -1,7 +1,7 @@
 import "@azure-tools/typespec-autorest";
 
 import "./base.tsp";
-import "../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/network-security-perimeter.tsp";
+import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/network-security-perimeter.tsp";
 
 using Autorest;
 using OpenAPI;

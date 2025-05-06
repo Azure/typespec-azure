@@ -1,6 +1,6 @@
 import "./base.tsp";
 
-import "../../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/mobo.tsp";
+import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/mobo.tsp";
 
 using OpenAPI;
 
