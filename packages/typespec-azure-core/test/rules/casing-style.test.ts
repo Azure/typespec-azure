@@ -6,7 +6,11 @@ import {
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { casingRule } from "../../src/rules/casing-style.js";
-import { isCamelCaseNoAcronyms, isPascalCaseNoAcronyms } from "../../src/rules/utils.js";
+import {
+  isCamelCaseNoAcronyms,
+  isPascalCaseNoAcronyms,
+  isPascalCaseWithAcceptedAcronyms,
+} from "../../src/rules/utils.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: casing rule", () => {
@@ -27,6 +31,22 @@ describe("typespec-azure-core: casing rule", () => {
         assert.ok(!isPascalCaseNoAcronyms(name), `${name} should not be PascalCase`);
       });
     });
+    it("isPascalCaseWithAcceptedAcronyms works as expected", () => {
+      const acceptedTestAcronyms = ["AI"];
+      ["", "A", "PascalCase", "PascalCase123", "OpenAI", "OpenAIAgent", "AI", "AIPolicy"].forEach(
+        (name) =>
+          assert.ok(
+            isPascalCaseWithAcceptedAcronyms(name, acceptedTestAcronyms),
+            `${name} should be PascalCase`,
+          ),
+      );
+      ["a", "foo", "fooBar", "VMResource", "RP", "OpenAIAGent", "OpenAIAgentVM"].forEach((name) => {
+        assert.ok(
+          !isPascalCaseWithAcceptedAcronyms(name, acceptedTestAcronyms),
+          `${name} should not be PascalCase`,
+        );
+      });
+    });
 
     it("isCamelCaseNoAcronyms works as expected", () => {
       ["", "a", "foo", "fooBar", "office365", "signalR", "aRp", "$aRp", "_aRp"].forEach((name) =>
@@ -41,6 +61,9 @@ describe("typespec-azure-core: casing rule", () => {
   describe("model name must be PascalCase", () => {
     it("is valid", async () => {
       await tester.expect(`model FooProperties {}`).toBeValid();
+    });
+    it("is valid for accepted acronyms", async () => {
+      await tester.expect(`model ScaleSetVM {}`).toBeValid();
     });
 
     it("emit warnings if not PascalCase", async () => {
