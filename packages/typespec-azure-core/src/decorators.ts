@@ -30,7 +30,7 @@ import {
   UnionVariant,
   walkPropertiesInherited,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import {
   getHttpOperation,
   getRoutePath,

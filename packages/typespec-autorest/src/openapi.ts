@@ -101,7 +101,7 @@ import {
   serializeValueAsJson,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
@@ -1267,7 +1267,7 @@ export async function getOpenAPIForService(
       reportDiagnostic(program, {
         code: multipart ? "unsupported-multipart-type" : "unsupported-param-type",
         format: { part: paramName },
-        target: type,
+        target,
       });
       return { type: "string" };
     }
