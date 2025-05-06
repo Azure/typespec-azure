@@ -1075,6 +1075,61 @@ model Azure.ResourceManager.CommonTypes.AzureEntityResource
 | ----- | -------- | -------------- |
 | etag? | `string` | Resource Etag. |
 
+### `BillingData` {#Azure.ResourceManager.CommonTypes.BillingData}
+
+Billing Data
+
+```typespec
+model Azure.ResourceManager.CommonTypes.BillingData
+```
+
+#### Properties
+
+| Name          | Type          | Description                                                                        |
+| ------------- | ------------- | ---------------------------------------------------------------------------------- |
+| systemId      | `Core.uuid`   | The system ID of the resource. Globally unique per cloud.                          |
+| productCode   | `Core.uuid`   | The product identifier.                                                            |
+| productToken? | `string`      | Product token (JWT) identifying a specific version of the product.                 |
+| quantity      | `int64`       | The number of instances of the product.                                            |
+| startDate?    | `utcDateTime` | Start date indicating the beginning of the term for which the resource is prepaid. |
+| endDate?      | `utcDateTime` | End date indicating the end of the term for which the resource is prepaid.         |
+| billingToken? | `string`      | Billing token (JWT) representing additional billing context.                       |
+
+### `BillingSchedule` {#Azure.ResourceManager.CommonTypes.BillingSchedule}
+
+Billing schedule
+
+```typespec
+model Azure.ResourceManager.CommonTypes.BillingSchedule
+```
+
+#### Properties
+
+| Name            | Type                                                                                         | Description                                              |
+| --------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| nextInvoiceDate | `utcDateTime`                                                                                | Date when this resource is expected to be invoiced next. |
+| renewal         | [`BillingRenewalType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingRenewalType) | Indicates the renewal behavior of this resource.         |
+| changes?        | `ResourceManager.CommonTypes.BillingScheduleChange[]`                                        | Schedules billing changes for this resource.             |
+
+### `BillingScheduleChange` {#Azure.ResourceManager.CommonTypes.BillingScheduleChange}
+
+Billing schedule change
+
+```typespec
+model Azure.ResourceManager.CommonTypes.BillingScheduleChange
+```
+
+#### Properties
+
+| Name          | Type                                                                                             | Description                                                                                                                                                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| productCode?  | `Core.uuid`                                                                                      | The new product identifier. When not specified, the resource's product code remains unchanged.                                                                                                                                 |
+| productToken? | `string`                                                                                         | Product token (JWT) identifying a specific version of the scheduled product. Can only be <br />specified when productCode is specified also.                                                                                   |
+| quantity?     | `int64`                                                                                          | The new number of instances of the product. When not specified, the resource's quantity remains unchanged.                                                                                                                     |
+| endDate?      | `utcDateTime`                                                                                    | The new (coterminous) end date of the product. Can only be specified when effective = renewal.<br />When not specified, the resource's end date is calculated based on the renewal date and the <br />product's term duration. |
+| billingToken? | `string`                                                                                         | Billing token (JWT) representing additional billing context.                                                                                                                                                                   |
+| effective     | [`BillingEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingEffectiveType) | Indicates when the change is expected to become effective.                                                                                                                                                                     |
+
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest}
 
 The check availability request body.
@@ -2182,6 +2237,22 @@ Extensible enum. Indicates the action type. "Internal" refers to actions that ar
 
 ```typespec
 union Azure.ResourceManager.CommonTypes.ActionType
+```
+
+### `BillingEffectiveType` {#Azure.ResourceManager.CommonTypes.BillingEffectiveType}
+
+When a scheduled change is expected to become effective.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingEffectiveType
+```
+
+### `BillingRenewalType` {#Azure.ResourceManager.CommonTypes.BillingRenewalType}
+
+Type of renewal.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingRenewalType
 ```
 
 ### `CheckNameAvailabilityReason` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason}
