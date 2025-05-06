@@ -16,6 +16,62 @@
           "description": "The system ID of the resource. Globally unique per cloud.",
           "readOnly": true
         },
+        "state": {
+          "type": "string",
+          "description": "Indicates the billing state of the resource.",
+          "default": "Active",
+          "enum": [
+            "Pending",
+            "Active",
+            "Expired",
+            "Cancelled",
+            "Suspended",
+            "Terminated",
+            "Failed"
+          ],
+          "x-ms-enum": {
+            "name": "BillingState",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Pending",
+                "value": "Pending",
+                "description": "Resource's billing has not yet started."
+              },
+              {
+                "name": "Active",
+                "value": "Active",
+                "description": "Resource's billing is currently active."
+              },
+              {
+                "name": "Expired",
+                "value": "Expired",
+                "description": "Resource's billing has expired. Only applies to term-based products."
+              },
+              {
+                "name": "Cancelled",
+                "value": "Cancelled",
+                "description": "Resource's billing has been cancelled."
+              },
+              {
+                "name": "Suspended",
+                "value": "Suspended",
+                "description": "Resource's billing has been suspended."
+              },
+              {
+                "name": "Terminated",
+                "value": "Terminated",
+                "description": "Resource's billing has terminated permanently."
+              },
+              {
+                "name": "Failed",
+                "value": "Failed",
+                "description": "Resource's billing is in a failed state."
+              }
+            ]
+          },
+          "readOnly": true
+        },
         "productCode": {
           "type": "string",
           "format": "uuid",
@@ -48,6 +104,7 @@
       },
       "required": [
         "systemId",
+        "state",
         "productCode",
         "quantity"
       ]
@@ -113,7 +170,8 @@
         "nextInvoiceDate": {
           "type": "string",
           "format": "date-time",
-          "description": "Date when this resource is expected to be invoiced next."
+          "description": "Date when this resource is expected to be invoiced next.",
+          "readOnly": true
         },
         "renewal": {
           "type": "string",
@@ -165,7 +223,7 @@
         },
         "productToken": {
           "type": "string",
-          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be \nspecified when productCode is specified also."
+          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be\nspecified when productCode is specified also."
         },
         "quantity": {
           "type": "integer",
@@ -176,7 +234,7 @@
         "endDate": {
           "type": "string",
           "format": "date-time",
-          "description": "The new (coterminous) end date of the product. Can only be specified when effective = renewal.\nWhen not specified, the resource's end date is calculated based on the renewal date and the \nproduct's term duration."
+          "description": "The new (coterminous) end date of the product. Can only be specified when effective = renewal.\nWhen not specified, the resource's end date is calculated based on the renewal date and the\nproduct's term duration."
         },
         "billingToken": {
           "type": "string",
@@ -217,6 +275,60 @@
       "required": [
         "effective"
       ]
+    },
+    "BillingState": {
+      "type": "string",
+      "description": "Billing state.",
+      "enum": [
+        "Pending",
+        "Active",
+        "Expired",
+        "Cancelled",
+        "Suspended",
+        "Terminated",
+        "Failed"
+      ],
+      "x-ms-enum": {
+        "name": "BillingState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Pending",
+            "value": "Pending",
+            "description": "Resource's billing has not yet started."
+          },
+          {
+            "name": "Active",
+            "value": "Active",
+            "description": "Resource's billing is currently active."
+          },
+          {
+            "name": "Expired",
+            "value": "Expired",
+            "description": "Resource's billing has expired. Only applies to term-based products."
+          },
+          {
+            "name": "Cancelled",
+            "value": "Cancelled",
+            "description": "Resource's billing has been cancelled."
+          },
+          {
+            "name": "Suspended",
+            "value": "Suspended",
+            "description": "Resource's billing has been suspended."
+          },
+          {
+            "name": "Terminated",
+            "value": "Terminated",
+            "description": "Resource's billing has terminated permanently."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource's billing is in a failed state."
+          }
+        ]
+      }
     }
   }
 }

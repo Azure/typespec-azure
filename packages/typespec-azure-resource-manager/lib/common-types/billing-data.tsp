@@ -14,7 +14,13 @@ model BillingData {
   @visibility(Lifecycle.Read)
   systemId: uuid;
 
-  /** 
+  /**
+   * Indicates the billing state of the resource.
+   */
+  @visibility(Lifecycle.Read)
+  state: BillingState = "Active";
+
+  /**
    * The product identifier.
    */
   productCode: uuid;
@@ -24,7 +30,7 @@ model BillingData {
    */
   productToken?: string;
 
-  /** 
+  /**
    * The number of instances of the product.
    */
   quantity: int64 = 1;
@@ -53,6 +59,7 @@ model BillingSchedule {
   /**
    * Date when this resource is expected to be invoiced next.
    */
+  @visibility(Lifecycle.Read)
   nextInvoiceDate: utcDateTime;
 
   /**
@@ -71,25 +78,25 @@ model BillingSchedule {
  */
 @added(Versions.v6)
 model BillingScheduleChange {
-  /** 
+  /**
    * The new product identifier. When not specified, the resource's product code remains unchanged.
    */
   productCode?: uuid;
 
   /**
-   * Product token (JWT) identifying a specific version of the scheduled product. Can only be 
+   * Product token (JWT) identifying a specific version of the scheduled product. Can only be
    * specified when productCode is specified also.
    */
   productToken?: string;
 
-  /** 
+  /**
    * The new number of instances of the product. When not specified, the resource's quantity remains unchanged.
    */
   quantity?: int64 = 1;
 
   /**
    * The new (coterminous) end date of the product. Can only be specified when effective = renewal.
-   * When not specified, the resource's end date is calculated based on the renewal date and the 
+   * When not specified, the resource's end date is calculated based on the renewal date and the
    * product's term duration.
    */
   endDate?: utcDateTime;
@@ -106,8 +113,38 @@ model BillingScheduleChange {
 }
 
 /**
+ * Billing state.
+ */
+@added(Versions.v6)
+union BillingState {
+  /** Resource's billing has not yet started. */
+  Pending: "Pending",
+
+  /** Resource's billing is currently active. */
+  Active: "Active",
+
+  /** Resource's billing has expired. Only applies to term-based products. */
+  Expired: "Expired",
+
+  /** Resource's billing has been cancelled. */
+  Cancelled: "Cancelled",
+
+  /** Resource's billing has been suspended. */
+  Suspended: "Suspended",
+
+  /** Resource's billing has terminated permanently. */
+  Terminated: "Terminated",
+
+  /** Resource's billing is in a failed state. */
+  Failed: "Failed",
+
+  string,
+}
+
+/**
  * Type of renewal.
  */
+@added(Versions.v6)
 union BillingRenewalType {
   /** Automatically renew the product when its term ends. */
   Automatic: "Automatic",
@@ -121,6 +158,7 @@ union BillingRenewalType {
 /**
  * When a scheduled change is expected to become effective.
  */
+@added(Versions.v6)
 union BillingEffectiveType {
   /** At time of term renewal. */
   Renewal: "Renewal",
