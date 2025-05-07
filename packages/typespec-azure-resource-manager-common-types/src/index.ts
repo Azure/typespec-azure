@@ -9,7 +9,7 @@ if (args.includes("--update")) {
   const pathArgIndex = args.indexOf("--path");
   if (pathArgIndex !== -1 && args[pathArgIndex + 1]) {
     const destinationRoot = resolve(args[pathArgIndex + 1]);
-    generateCommonTypes(destinationRoot);
+    await generateCommonTypes(destinationRoot);
   } else {
     console.error("Please provide a valid path with --path <path>");
     process.exit(1);
