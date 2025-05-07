@@ -92,4 +92,20 @@ interface ProviderOperations {
     Response = ArmCombinedLroHeaders,
     Scope = SubscriptionActionScope
   >;
+
+  /** Sample operation to generate an extension resource based GET action */
+  @get
+  @action
+  getLogAnalytics is ArmProviderActionSync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionResourceActionScope
+  >;
+
+  /** Operation to generate an extension resource based POST action */
+  @post
+  @action("append")
+  appendLogAnalytics is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionResourceActionScope
+  >;
 }
