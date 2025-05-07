@@ -54,23 +54,36 @@ You will need to compare the Swagger generated from TypeSpec with your original 
   tsp compile .
   ```
 
-- From the root folder, download the last specification as baseline. Your original specification will be located at `.\sparse-spec\specification\{service-name}`:
+- From the root folder, download the latest specification as baseline. Your original specification will be located at `.\sparse-spec\specification\{service-name}`:
   ```shell
-  .\node_modules\@typespec-migration\swagger-compare\src\download-main.ps1 {path\to\your\generated\swagger}
+  .\eng\tools\typespec-migration-validation\scripts\download-main.ps1 {path\to\your\generated\swagger}
   ```
 
 - At the end of the console output, you'll see the next command to sort, merge, and normalize your original Swagger(s) and generated Swagger, making it easier to review changes. Provide an `outputFolder` to store the analysis results:
   ```shell
-  node .\node_modules\@typespec-migration\swagger-compare\dist\index.js {your\original\swagger\folder} {your\generated\swagger\file} {outputFolder}
+  npx tsmv {your\original\swagger\folder} {your\generated\swagger\file} {outputFolder}
   ```
 
 - In the `{outputFolder}`:
   - `newSwagger.json` is the processed version of your generated Swagger
   - `oldSwagger.json` is the processed version of your original Swagger(s)
   
-  In VS Code, select both files, right-click and choose "Compare Selected" to see differences.
+  In VS Code, select both files (select `oldSwagger.json` first, then `newSwagger.json`), right-click and choose "Compare Selected". Review these differences to understand their patterns.
 
-- Review and make appropriate changes to ensure minimal changes for swagger. You can go thourgh the steps in this section iteratively until you are satisfied with the updated differences.
+- Check out the output from `npx tsmv` execution. It prints suggested fixes and prompts if any. Please review them before any run.
+  
+  **Suggested fixes:** These provide exact TypeSpec code that you can apply directly by following the instructions.
+
+  **Suggested prompts:** To use these, drag all your TypeSpec files into GitHub Copilot context. Select "Agent" or "Edit" mode with the "Claude" model. Use the provided prompt to ask GitHub Copilot to generate fixes. Carefully review all changes before accepting or undoing them.
+
+- For remaining differences, follow this iterative process:
+  1. Recompile your TypeSpec files with `tsp compile .` in your TypeSpec folder.
+  2. Run the `npx tsmv` command again with the same parameters.
+  3. Review the updated differences in VS Code.
+  4. Make further adjustments as needed. For more effective visualization, fix differences in this recommended order:
+     - Path (route) differences first
+     - Definition (model) name differences next
+     - Detail differences within paths and definitions last
 
 ### Create Spec PR with new TypeSpec project
 
