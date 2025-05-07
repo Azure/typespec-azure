@@ -52,7 +52,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
-  findRootSourceProperty,
+  compareRootSourceProperties,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodySpreadModel,
@@ -711,7 +711,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      findRootSourceProperty(methodParam.__raw) === findRootSourceProperty(serviceParam.__raw)
+      compareRootSourceProperties(methodParam.__raw, serviceParam.__raw)
     ) {
       return methodParam;
     }

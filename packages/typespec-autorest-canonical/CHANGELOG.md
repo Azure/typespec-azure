@@ -1,5 +1,9 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.17.0
+
+No changes, version bump only.
+
 ## 0.16.0
 
 No changes, version bump only.
