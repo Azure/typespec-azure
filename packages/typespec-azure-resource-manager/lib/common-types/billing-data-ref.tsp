@@ -23,6 +23,15 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /**
+ * The billing state reason of this resource.
+ */
+@@armCommonDefinition(BillingStateReason,
+  "BillingStateReason",
+  Azure.ResourceManager.CommonTypes.Versions.v6,
+  "billingstatereason.json"
+);
+
+/**
  * The billing schedule of this resource.
  */
 @@armCommonDefinition(BillingSchedule,

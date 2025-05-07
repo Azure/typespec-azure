@@ -21,6 +21,12 @@ model BillingData {
   state: BillingState = "Active";
 
   /**
+   * Indicates reason(s) for the current billing state of the resource.
+   */
+  @visibility(Lifecycle.Read)
+  reasons: BillingStateReason[];
+
+  /**
    * The product identifier.
    */
   productCode: uuid;
@@ -120,23 +126,25 @@ union BillingState {
   /** Resource's billing has not yet started. */
   Pending: "Pending",
 
-  /** Resource's billing is currently active. */
+  /** Resource's billing is activated. */
   Active: "Active",
 
-  /** Resource's billing has expired. Only applies to term-based products. */
-  Expired: "Expired",
+  /** Resource's billing is deactivated. */
+  Inactive: "Inactive",
 
-  /** Resource's billing has been cancelled. */
-  Cancelled: "Cancelled",
+  string,
+}
 
-  /** Resource's billing has been suspended. */
+/**
+ * Billing state reason.
+ */
+@added(Versions.v6)
+union BillingStateReason {
+  /** Resource's billing has been suspended by Microsoft. */
   Suspended: "Suspended",
 
-  /** Resource's billing has terminated permanently. */
-  Terminated: "Terminated",
-
-  /** Resource's billing is in a failed state. */
-  Failed: "Failed",
+  /** Resource's billing has expired. */
+  Expired: "Expired",
 
   string,
 }

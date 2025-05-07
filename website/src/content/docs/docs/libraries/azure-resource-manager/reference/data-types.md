@@ -1089,6 +1089,7 @@ model Azure.ResourceManager.CommonTypes.BillingData
 | ------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | systemId      | `Core.uuid`                                                                      | The system ID of the resource. Globally unique per cloud.                          |
 | state         | [`BillingState`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingState) | Indicates the billing state of the resource.                                       |
+| reasons       | `ResourceManager.CommonTypes.BillingStateReason[]`                               | Indicates reason(s) for the current billing state of the resource.                 |
 | productCode   | `Core.uuid`                                                                      | The product identifier.                                                            |
 | productToken? | `string`                                                                         | Product token (JWT) identifying a specific version of the product.                 |
 | quantity      | `int64`                                                                          | The number of instances of the product.                                            |
@@ -2262,6 +2263,14 @@ Billing state.
 
 ```typespec
 union Azure.ResourceManager.CommonTypes.BillingState
+```
+
+### `BillingStateReason` {#Azure.ResourceManager.CommonTypes.BillingStateReason}
+
+Billing state reason.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingStateReason
 ```
 
 ### `CheckNameAvailabilityReason` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityReason}

@@ -23,11 +23,7 @@
           "enum": [
             "Pending",
             "Active",
-            "Expired",
-            "Cancelled",
-            "Suspended",
-            "Terminated",
-            "Failed"
+            "Inactive"
           ],
           "x-ms-enum": {
             "name": "BillingState",
@@ -41,34 +37,22 @@
               {
                 "name": "Active",
                 "value": "Active",
-                "description": "Resource's billing is currently active."
+                "description": "Resource's billing is activated."
               },
               {
-                "name": "Expired",
-                "value": "Expired",
-                "description": "Resource's billing has expired. Only applies to term-based products."
-              },
-              {
-                "name": "Cancelled",
-                "value": "Cancelled",
-                "description": "Resource's billing has been cancelled."
-              },
-              {
-                "name": "Suspended",
-                "value": "Suspended",
-                "description": "Resource's billing has been suspended."
-              },
-              {
-                "name": "Terminated",
-                "value": "Terminated",
-                "description": "Resource's billing has terminated permanently."
-              },
-              {
-                "name": "Failed",
-                "value": "Failed",
-                "description": "Resource's billing is in a failed state."
+                "name": "Inactive",
+                "value": "Inactive",
+                "description": "Resource's billing is deactivated."
               }
             ]
+          },
+          "readOnly": true
+        },
+        "reasons": {
+          "type": "array",
+          "description": "Indicates reason(s) for the current billing state of the resource.",
+          "items": {
+            "$ref": "#/definitions/BillingStateReason"
           },
           "readOnly": true
         },
@@ -105,6 +89,7 @@
       "required": [
         "systemId",
         "state",
+        "reasons",
         "productCode",
         "quantity"
       ]
@@ -282,11 +267,7 @@
       "enum": [
         "Pending",
         "Active",
-        "Expired",
-        "Cancelled",
-        "Suspended",
-        "Terminated",
-        "Failed"
+        "Inactive"
       ],
       "x-ms-enum": {
         "name": "BillingState",
@@ -300,32 +281,36 @@
           {
             "name": "Active",
             "value": "Active",
-            "description": "Resource's billing is currently active."
+            "description": "Resource's billing is activated."
+          },
+          {
+            "name": "Inactive",
+            "value": "Inactive",
+            "description": "Resource's billing is deactivated."
+          }
+        ]
+      }
+    },
+    "BillingStateReason": {
+      "type": "string",
+      "description": "Billing state reason.",
+      "enum": [
+        "Suspended",
+        "Expired"
+      ],
+      "x-ms-enum": {
+        "name": "BillingStateReason",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Suspended",
+            "value": "Suspended",
+            "description": "Resource's billing has been suspended by Microsoft."
           },
           {
             "name": "Expired",
             "value": "Expired",
-            "description": "Resource's billing has expired. Only applies to term-based products."
-          },
-          {
-            "name": "Cancelled",
-            "value": "Cancelled",
-            "description": "Resource's billing has been cancelled."
-          },
-          {
-            "name": "Suspended",
-            "value": "Suspended",
-            "description": "Resource's billing has been suspended."
-          },
-          {
-            "name": "Terminated",
-            "value": "Terminated",
-            "description": "Resource's billing has terminated permanently."
-          },
-          {
-            "name": "Failed",
-            "value": "Failed",
-            "description": "Resource's billing is in a failed state."
+            "description": "Resource's billing has expired."
           }
         ]
       }
