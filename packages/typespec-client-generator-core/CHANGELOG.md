@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.56.1
+
+### Features
+
+- [#2592](https://github.com/Azure/typespec-azure/pull/2592) Change default value of initializedBy for SdkOperationGroup from `InitializedByFlags.Parent` to `InitializedByFlags.Default`
+
+### Bug Fixes
+
+- [#2626](https://github.com/Azure/typespec-azure/pull/2626) Convert to same type for array or dictionary of same type.
+
+
 ## 0.56.0
 
 ### Features
