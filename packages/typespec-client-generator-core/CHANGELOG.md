@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.56.1
+
+### Features
+
+- [#2592](https://github.com/Azure/typespec-azure/pull/2592) Change default value of initializedBy for SdkOperationGroup from `InitializedByFlags.Parent` to `InitializedByFlags.Default`
+
+### Bug Fixes
+
+- [#2626](https://github.com/Azure/typespec-azure/pull/2626) Convert to same type for array or dictionary of same type.
+
+
 ## 0.56.0
 
 ### Features
@@ -10,6 +21,13 @@
 
 - [#2562](https://github.com/Azure/typespec-azure/pull/2562) Support `null` example value for `unknown` type.
 - [#2584](https://github.com/Azure/typespec-azure/pull/2584) Loosen requirements for parameters in `@override` so they don't have to be exactly the same node
+
+
+## 0.55.1
+
+### Bug Fixes
+
+- [#2591](https://github.com/Azure/typespec-azure/pull/2591) Update source property checks to look at node
 
 
 ## 0.55.0
