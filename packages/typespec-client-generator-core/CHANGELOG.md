@@ -12,6 +12,13 @@
 - [#2584](https://github.com/Azure/typespec-azure/pull/2584) Loosen requirements for parameters in `@override` so they don't have to be exactly the same node
 
 
+## 0.55.1
+
+### Bug Fixes
+
+- [#2591](https://github.com/Azure/typespec-azure/pull/2591) Update source property checks to look at node
+
+
 ## 0.55.0
 
 No changes, version bump only.
