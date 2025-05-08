@@ -93,7 +93,7 @@ const validLocationResource = {
 
 const validResourceGroupExtensionsResource = {
   id: `${RESOURCE_GROUP_SCOPE_URI}/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
-  name: `${EXTENSION_RESOURCE_NAME}`,
+  name: EXTENSION_RESOURCE_NAME,
   type: "Azure.ResourceManager.Resources/extensionsResources",
   properties: {
     description: "valid",
@@ -111,7 +111,7 @@ const validResourceGroupExtensionsResource = {
 
 const validSubscriptionExtensionsResource = {
   id: `${SUBSCRIPTION_SCOPE_URI}/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
-  name: `${EXTENSION_RESOURCE_NAME}`,
+  name: EXTENSION_RESOURCE_NAME,
   type: "Azure.ResourceManager.Resources/extensionsResources",
   properties: {
     description: "valid",
@@ -129,7 +129,7 @@ const validSubscriptionExtensionsResource = {
 
 const validTenantExtensionsResource = {
   id: `/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
-  name: `${EXTENSION_RESOURCE_NAME}`,
+  name: EXTENSION_RESOURCE_NAME,
   type: "Azure.ResourceManager.Resources/extensionsResources",
   properties: {
     description: "valid",
@@ -147,7 +147,7 @@ const validTenantExtensionsResource = {
 
 const validResourceExtensionsResource = {
   id: `${RESOURCE_SCOPE_URI}/providers/Azure.ResourceManager.Resources/extensionsResources/extension`,
-  name: `${EXTENSION_RESOURCE_NAME}`,
+  name: EXTENSION_RESOURCE_NAME,
   type: "Azure.ResourceManager.Resources/extensionsResources",
   properties: {
     description: "valid",
@@ -323,7 +323,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("/", "get"),
+    uri: getUri("/" + TENANT_SCOPE_URI, "get"),
     method: "get",
     request: {
       query: {
@@ -339,7 +339,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("", "get"),
+    uri: getUri(TENANT_SCOPE_URI, "get"),
     method: "get",
     request: {
       query: {
@@ -479,7 +479,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("/", "put"),
+    uri: getUri("/" + TENANT_SCOPE_URI, "put"),
     method: "put",
     request: {
       query: {
@@ -500,7 +500,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("", "put"),
+    uri: getUri(TENANT_SCOPE_URI, "put"),
     method: "put",
     request: {
       query: {
@@ -679,7 +679,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("/", "patch"),
+    uri: getUri("/" + TENANT_SCOPE_URI, "patch"),
     method: "patch",
     request: {
       query: {
@@ -706,7 +706,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("", "patch"),
+    uri: getUri(TENANT_SCOPE_URI, "patch"),
     method: "patch",
     request: {
       query: {
@@ -851,7 +851,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("/", "delete"),
+    uri: getUri("/" + TENANT_SCOPE_URI, "delete"),
     method: "delete",
     request: {
       query: {
@@ -865,7 +865,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("", "delete"),
+    uri: getUri(TENANT_SCOPE_URI, "delete"),
     method: "delete",
     request: {
       query: {
@@ -987,7 +987,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("/", "list"),
+    uri: getUri("/" + TENANT_SCOPE_URI, "list"),
     method: "get",
     request: {
       query: {
@@ -1005,7 +1005,7 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri("", "list"),
+    uri: getUri(TENANT_SCOPE_URI, "list"),
     method: "get",
     request: {
       query: {
