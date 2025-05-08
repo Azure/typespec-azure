@@ -256,7 +256,60 @@ it("remove optional parameter", async () => {
   strictEqual(httpOp.bodyParam.correspondingMethodParams[0], paramsParam.type.properties[0]);
 });
 
-it("params mismatch", async () => {
+it("remove optional parameter flip", async () => {
+  const mainCode = `
+    @service
+    namespace MyService;
+    model Params {
+      foo?: string;
+      bar: string;
+    }
+
+    op func(...Params): void;
+    `;
+
+  const customizationCode = `
+    namespace MyCustomizations;
+
+    model ParamsCustomized {
+      ...PickProperties<MyService.Params, "bar">;
+    }
+
+    op func(params: MyCustomizations.ParamsCustomized): void;
+
+    @@override(MyService.func, MyCustomizations.func);
+    `;
+  const diagnostics = (
+    await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
+  )[1];
+  expectDiagnosticEmpty(diagnostics);
+
+  ok(runner.context.sdkPackage.models.find((x) => x.name === "Params"));
+  const sdkPackage = runner.context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  strictEqual(client.methods.length, 1);
+  const method = client.methods[0];
+  strictEqual(method.kind, "basic");
+  strictEqual(method.name, "func");
+  strictEqual(method.parameters.length, 2);
+
+  const contentTypeParam = method.parameters.find((x) => x.name === "contentType");
+  ok(contentTypeParam);
+
+  const paramsParam = method.parameters.find((x) => x.name === "params");
+  ok(paramsParam);
+  strictEqual(paramsParam.type.kind, "model");
+
+  const httpOp = method.operation;
+  strictEqual(httpOp.parameters.length, 1);
+  strictEqual(httpOp.parameters[0].correspondingMethodParams[0], contentTypeParam);
+
+  ok(httpOp.bodyParam);
+  strictEqual(httpOp.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(httpOp.bodyParam.correspondingMethodParams[0], paramsParam.type.properties[0]);
+});
+
+it("params mismatch but same type", async () => {
   const mainCode = `
     @service
     namespace MyService;
@@ -274,6 +327,35 @@ it("params mismatch", async () => {
     model ParamsCustomized {
       foo: string;
       bar: string;
+    }
+
+    op func(params: MyCustomizations.ParamsCustomized): void;
+
+    @@override(MyService.func, MyCustomizations.func);
+    `;
+  const diagnostics = (
+    await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
+  )[1];
+  strictEqual(diagnostics.length, 0);
+});
+
+it("remove required parameter", async () => {
+  const mainCode = `
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+    }
+
+    op func(...Params): void;
+    `;
+
+  const customizationCode = `
+    namespace MyCustomizations;
+
+    model ParamsCustomized {
+      foo: string;
     }
 
     op func(params: MyCustomizations.ParamsCustomized): void;
@@ -348,7 +430,7 @@ it("core template", async () => {
     model Params {
       foo: string;
       params: Params[];
-    }
+}
 
     @route("/template")
     op templateOp is Azure.Core.RpcOperation<

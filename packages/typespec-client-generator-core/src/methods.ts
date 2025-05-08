@@ -6,7 +6,6 @@ import {
 import {
   createDiagnosticCollector,
   Diagnostic,
-  getDoc,
   getPagingOperation,
   getSummary,
   isList,
@@ -14,7 +13,7 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import { isHeader } from "@typespec/http";
 import { createSdkClientType } from "./clients.js";
 import {
@@ -49,10 +48,11 @@ import {
   UsageFlags,
 } from "./interfaces.js";
 import {
+  compareRootSourceProperties,
   createGeneratedName,
-  findRootSourceProperty,
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
+  getClientDoc,
   getHashForType,
   getLocationOfOperation,
   getTypeDecorators,
@@ -155,15 +155,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       responseType?.__raw,
       (p) =>
         p.kind === "ModelProperty" &&
-        findRootSourceProperty(p) ===
-          findRootSourceProperty(pagingOperation.output.pageItems.property),
+        compareRootSourceProperties(p, pagingOperation.output.pageItems.property),
     );
     baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
       responseType,
       (p) =>
         p.__raw?.kind === "ModelProperty" &&
-        findRootSourceProperty(p.__raw) ===
-          findRootSourceProperty(pagingOperation.output.pageItems.property),
+        compareRootSourceProperties(p.__raw, pagingOperation.output.pageItems.property),
     );
 
     let nextLinkPath = undefined;
@@ -176,8 +174,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           .filter(
             (h) =>
               h.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(h.__raw) ===
-                findRootSourceProperty(pagingOperation.output.nextLink!.property),
+              compareRootSourceProperties(h.__raw, pagingOperation.output.nextLink!.property),
           );
         nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
       } else {
@@ -186,15 +183,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           responseType?.__raw,
           (p) =>
             p.kind === "ModelProperty" &&
-            findRootSourceProperty(p) ===
-              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+            compareRootSourceProperties(p, pagingOperation.output.nextLink!.property),
         );
         nextLinkSegments = getPropertySegmentsFromModelOrParameters(
           responseType,
           (p) =>
             p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) ===
-              findRootSourceProperty(pagingOperation.output.nextLink!.property),
+            compareRootSourceProperties(p.__raw, pagingOperation.output.nextLink!.property),
         );
       }
     }
@@ -206,8 +201,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         baseServiceMethod.parameters,
         (p) =>
           p.__raw?.kind === "ModelProperty" &&
-          findRootSourceProperty(p.__raw) ===
-            findRootSourceProperty(pagingOperation.input.continuationToken!.property),
+          compareRootSourceProperties(p.__raw, pagingOperation.input.continuationToken!.property),
       );
     }
     if (pagingOperation.output.continuationToken) {
@@ -218,16 +212,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
           .filter(
             (h) =>
               h.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(h.__raw) ===
-                findRootSourceProperty(pagingOperation.output.continuationToken!.property),
+              compareRootSourceProperties(
+                h.__raw,
+                pagingOperation.output.continuationToken!.property,
+              ),
           );
       } else {
         continuationTokenResponseSegments = getPropertySegmentsFromModelOrParameters(
           responseType,
           (p) =>
             p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) ===
-              findRootSourceProperty(pagingOperation.output.continuationToken!.property),
+            compareRootSourceProperties(
+              p.__raw,
+              pagingOperation.output.continuationToken!.property,
+            ),
         );
       }
     }
@@ -306,8 +304,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         .filter(
           (h) =>
             h.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(h.__raw) ===
-              findRootSourceProperty(pagedMetadata.nextLinkProperty!),
+            compareRootSourceProperties(h.__raw, pagedMetadata.nextLinkProperty!),
         );
       nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
     } else {
@@ -329,9 +326,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       ).map((t: ModelProperty) =>
         getPropertySegmentsFromModelOrParameters(
           baseServiceMethod.parameters,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+          (p) => p.__raw?.kind === "ModelProperty" && compareRootSourceProperties(p.__raw, t),
         ),
       );
     }
@@ -573,7 +568,7 @@ function getSdkMethodResponse(
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (getResponseAsBool(context, operation)) {
-    type = getSdkBuiltInType(context, $.builtin.boolean);
+    type = getSdkBuiltInType(context, $(context.program).builtin.boolean);
   } else {
     if (responseTypes.size > 1) {
       // return union of all the different types
@@ -669,7 +664,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     name,
     access: getAccess(context, operation) ?? "public",
     parameters: methodParameters,
-    doc: getDoc(context.program, operation),
+    doc: getClientDoc(context, operation),
     summary: getSummary(context.program, operation),
     operation: serviceOperation,
     response,

@@ -65,7 +65,10 @@ interface Operations extends Azure.ResourceManager.Operations {}
 interface RoleAssignments {
   get is ArmResourceRead<RoleAssignment>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<RoleAssignment>;
-  update is ArmResourcePatchSync<RoleAssignment, RoleAssignmentProperties>;
+  update is ArmCustomPatchSync<
+    RoleAssignment,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<RoleAssignment, RoleAssignmentProperties>
+  >;
   delete is ArmResourceDeleteSync<RoleAssignment>;
   list is ArmResourceListByParent<RoleAssignment>;
 

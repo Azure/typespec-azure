@@ -11,7 +11,7 @@ options:
     output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-python":    
     package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
-    package-name: "{package-dir}"  
+    namespace: azure.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}} 
     package-mode: dataplane
   "@azure-tools/typespec-csharp":
     package-dir: "{{parameters.ServiceNamespace}}"
@@ -20,9 +20,8 @@ options:
     model-namespace: false
   "@azure-tools/typespec-ts":
     package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
-    generateMetadata: true
-    generateTest: true
-    packageDetails:
+    generate-test: true
+    package-details:
       name: "@azure-rest/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
       description: "{{parameters.ServiceNamespace}} Service"
   "@azure-tools/typespec-java":

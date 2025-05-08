@@ -1,5 +1,63 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.56.1
+
+### Features
+
+- [#2592](https://github.com/Azure/typespec-azure/pull/2592) Change default value of initializedBy for SdkOperationGroup from `InitializedByFlags.Parent` to `InitializedByFlags.Default`
+
+### Bug Fixes
+
+- [#2626](https://github.com/Azure/typespec-azure/pull/2626) Convert to same type for array or dictionary of same type.
+
+
+## 0.56.0
+
+### Features
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Add `metadata` property to `SdkPackage` type to export package related info.
+
+### Bug Fixes
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Support `null` example value for `unknown` type.
+- [#2584](https://github.com/Azure/typespec-azure/pull/2584) Loosen requirements for parameters in `@override` so they don't have to be exactly the same node
+
+
+## 0.55.1
+
+### Bug Fixes
+
+- [#2591](https://github.com/Azure/typespec-azure/pull/2591) Update source property checks to look at node
+
+
+## 0.55.0
+
+No changes, version bump only.
+
+## 0.54.2
+
+### Bug Fixes
+
+- [#2556](https://github.com/Azure/typespec-azure/pull/2556) Make spread body parameter always be required.
+- [#2552](https://github.com/Azure/typespec-azure/pull/2552) Fix algorithm problem when omitting optional parameter with `@override`.
+
+
+## 0.54.1
+
+### Features
+
+- [#2523](https://github.com/Azure/typespec-azure/pull/2523) Add `@clientDoc` decorator
+- [#2483](https://github.com/Azure/typespec-azure/pull/2483) Add linter rule `no-unnamed-types` to warn against generated anonymous types
+- [#2486](https://github.com/Azure/typespec-azure/pull/2486) Extend supported alternate type for decorator `@alternateType`
+
+### Bug Fixes
+
+- [#2479](https://github.com/Azure/typespec-azure/pull/2479) Filter out model-only clients
+- [#2526](https://github.com/Azure/typespec-azure/pull/2526) Always ignore `null` example value for non-nullable type.
+- [#2510](https://github.com/Azure/typespec-azure/pull/2510) Fix setting of `@clientNamespace` when it is overridden in the namespace path
+- [#2520](https://github.com/Azure/typespec-azure/pull/2520) Fix path and body optionality value to allow them to be optional.
+
+
 ## 0.54.0
 
 ### Breaking Changes

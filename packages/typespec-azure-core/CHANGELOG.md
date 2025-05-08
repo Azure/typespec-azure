@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.56.0
+
+### Features
+
+- [#2586](https://github.com/Azure/typespec-azure/pull/2586) Ease casing style validation for PascalCase with accepted acronyms (AI, VM, OS, IP, CPU, GPU, LRO)
+
+### Bug Fixes
+
+- [#2628](https://github.com/Azure/typespec-azure/pull/2628) Handle new behavior of `@patch` keeping old behavior
+
+
+## 0.55.0
+
+### Bug Fixes
+
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
+- [#2512](https://github.com/Azure/typespec-azure/pull/2512) Update the link documentation for `Azure.Core.Foundations.InnerError`
+
+
 ## 0.54.0
 
 ### Features

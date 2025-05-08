@@ -21,7 +21,6 @@ import {
   Union,
   createDiagnosticCollector,
   getDiscriminator,
-  getDoc,
   getEncode,
   getLifecycleVisibilityEnum,
   getSummary,
@@ -92,6 +91,7 @@ import {
   createGeneratedName,
   filterApiVersionsInEnum,
   getAvailableApiVersions,
+  getClientDoc,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   getLocationOfOperation,
@@ -248,7 +248,7 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     baseType:
       type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
@@ -316,7 +316,7 @@ function getSdkDateTimeType(
     encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
@@ -414,7 +414,7 @@ function getSdkDurationTypeWithDiagnostics(
     encode: (encode ?? "ISO8601") as DurationKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
@@ -437,32 +437,38 @@ export function getSdkArrayOrDictWithDiagnostics(
   // if model with both indexer and properties or name should be a model with additional properties
   if (type.indexer !== undefined && type.properties.size === 0) {
     if (!isNeverType(type.indexer.key)) {
-      const valueType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, type.indexer.value!, operation),
-      );
-      const name = type.indexer.key.name;
-      if (name === "string" && type.name === "Record") {
-        // model MyModel is Record<> {} should be model with additional properties
-        if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
-          return diagnostics.wrap(undefined);
+      let sdkType = context.__arrayDictionaryCache.get(type);
+      if (!sdkType) {
+        const valueType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, type.indexer.value!, operation),
+        );
+        const name = type.indexer.key.name;
+        if (name === "string" && type.name === "Record") {
+          // model MyModel is Record<> {} should be model with additional properties
+          if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
+            return diagnostics.wrap(undefined);
+          } else {
+            // other cases are dict
+            sdkType = {
+              ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "dict")),
+              keyType: diagnostics.pipe(
+                getClientTypeWithDiagnostics(context, type.indexer.key, operation),
+              ),
+              valueType: valueType,
+            };
+          }
+        } else if (name === "integer") {
+          // only array's index key name is integer
+          sdkType = {
+            ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
+            name: getLibraryName(context, type),
+            valueType: valueType,
+            crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
+          };
         }
-        // other cases are dict
-        return diagnostics.wrap({
-          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "dict")),
-          keyType: diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, type.indexer.key, operation),
-          ),
-          valueType: valueType,
-        });
-      } else if (name === "integer") {
-        // only array's index key name is integer
-        return diagnostics.wrap({
-          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
-          name: getLibraryName(context, type),
-          valueType: valueType,
-          crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
-        });
+        context.__arrayDictionaryCache.set(type, sdkType!);
       }
+      return diagnostics.wrap(sdkType);
     }
   }
   return diagnostics.wrap(undefined);
@@ -818,7 +824,7 @@ export function getSdkModelWithDiagnostics(
       name: name,
       isGeneratedName: !type.name,
       namespace: getClientNamespace(context, type),
-      doc: getDoc(context.program, type),
+      doc: getClientDoc(context, type),
       summary: getSummary(context.program, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
@@ -925,7 +931,7 @@ function getSdkEnumValueWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
     value: type.value ?? type.name,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     enumType,
     valueType: enumType.valueType,
@@ -949,7 +955,7 @@ function getSdkEnumWithDiagnostics(
       name: getLibraryName(context, type),
       isGeneratedName: false,
       namespace: getClientNamespace(context, type),
-      doc: getDoc(context.program, type),
+      doc: getClientDoc(context, type),
       summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
         getSdkEnumValueType(
@@ -988,7 +994,7 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
-      doc: getDoc(context.program, member.type),
+      doc: getClientDoc(context, member.type),
       summary: getSummary(context.program, member.type),
       value: member.value,
       valueType: enumType.valueType,
@@ -1015,7 +1021,7 @@ export function getSdkUnionEnumWithDiagnostics(
     name,
     isGeneratedName: !type.union.name,
     namespace: getClientNamespace(context, type.union),
-    doc: getDoc(context.program, union),
+    doc: getClientDoc(context, union),
     summary: getSummary(context.program, union),
     valueType:
       diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
@@ -1225,7 +1231,7 @@ export function getSdkModelPropertyTypeBase(
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   return diagnostics.wrap({
     __raw: type,
-    doc: getDoc(context.program, type),
+    doc: getClientDoc(context, type),
     summary: getSummary(context.program, type),
     apiVersions,
     type: propertyType,

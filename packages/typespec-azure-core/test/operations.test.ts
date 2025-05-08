@@ -1709,7 +1709,7 @@ op createJob(
         }
         
         @route("/simpleWidgets/{id}")
-        @patch op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
@@ -1767,7 +1767,7 @@ op createJob(
         }
         
         @route("/simpleWidgets/{id}")
-        @patch op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
             @pollingLocation(StatusMonitorPollingOptions<PollingStatus>) @header("Azure-AsyncOperation") opLink: string,
@@ -1817,7 +1817,7 @@ op createJob(
         }
         
         @route("/simpleWidgets/{id}")
-        @patch op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
+        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : SimpleWidget | 
           {
             @statusCode statusCode: 201;
             @finalLocation(SimpleWidget) @pollingLocation(StatusMonitorPollingOptions<SimpleWidget>) @header("location") opLink: string,
@@ -2405,7 +2405,7 @@ op createJob(
         @finalOperation(getWidget)
         @pollingOperation(getStatus, {id: ResponseProperty<"id">})
         @route("/simpleWidgets/{id}")
-        @patch op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @header("Operation-Location")opLink: string};
+        @patch(#{implicitOptionality: true}) op createWidget(@path id: string, body: SimpleWidget) : {@statusCode _: 202; @header id: string, @header("operation-id") operate: string, @header("Operation-Location")opLink: string};
   
         @route("/simpleWidgets/{id}/operations/{operationId}")
         @get op getStatus(@path id: string, @path operationId: string): PollingStatus;

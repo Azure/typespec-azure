@@ -57,6 +57,19 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
+
+- Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
+
+This scenario will be used to test if client code can correctly deserializes an empty url as null.
+Expected response body:
+
+```json
+{
+  "serviceUrl": ""
+}
+```
+
 ### Azure_ClientGenerator_Core_FlattenProperty_putFlattenModel
 
 - Endpoint: `put /azure/client-generator-core/flatten-property/flattenModel`
@@ -229,6 +242,40 @@ client.withAliasedName();
 
 // Elevated to client level via original name
 client.withOriginalName();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level, in child client.
+
+The child client can be initialized individually, or via its parent client.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentClient
+const client = new ParentClient.getChildClient({
+  blobName: "sample-blob"
+});
+
+// directly
+const client = new ChildClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
 ```
 
 ### Azure_ClientGeneratorCore_ClientInitialization_PathParam

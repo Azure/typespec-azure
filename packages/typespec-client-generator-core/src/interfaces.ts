@@ -54,6 +54,7 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
@@ -65,10 +66,12 @@ export interface TCGCContext {
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
+  __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
+  getPackageVersions(): string[];
 }
 
 export interface SdkContext<
@@ -95,6 +98,7 @@ export interface SdkOperationGroup {
   subOperationGroups?: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
+  hasOperations?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -129,10 +133,12 @@ export enum UsageFlags {
 
 /**
  * Flags used to indicate how a client is initialized.
+ * `Default` means author doesn't set initialization way for the client. It is only for internal usage and not exposed in decorator.
  * `Individually` means the client is initialized individually.
  * `Parent` means the client is initialized by its parent.
  */
 export enum InitializedByFlags {
+  Default = 0,
   Individually = 1 << 0,
   Parent = 1 << 1,
 }
@@ -868,6 +874,15 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   crossLanguagePackageId: string;
   namespaces: SdkNamespace<TServiceOperation>[];
   licenseInfo?: LicenseInfo;
+  metadata: {
+    /**
+     * The version of the package.
+     * If undefined, the package is not versioned.
+     * If `all`, the package is versioned with all versions.
+     * If a string, the package is versioned with the specified version.
+     */
+    apiVersion?: string;
+  };
 }
 
 export interface LicenseInfo {

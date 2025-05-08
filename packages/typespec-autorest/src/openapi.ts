@@ -13,6 +13,7 @@ import {
 import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
+  getArmKeyIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
   isArmProviderNamespace,
@@ -101,7 +102,7 @@ import {
   serializeValueAsJson,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
@@ -463,13 +464,7 @@ export async function getOpenAPIForService(
       );
       if (
         prop.type.kind === "Scalar" &&
-        ignoreDiagnostics(
-          program.checker.isTypeAssignableTo(
-            prop.type,
-            program.checker.getStdType("url"),
-            prop.type,
-          ),
-        )
+        $(program).type.isAssignableTo(prop.type, $(program).builtin.url, prop.type)
       ) {
         param["x-ms-skip-url-encoding"] = true;
       }
@@ -757,10 +752,7 @@ export async function getOpenAPIForService(
   }
 
   function isBytes(type: Type) {
-    const baseType = type;
-    return ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type),
-    );
+    return $(program).type.isAssignableTo(type, $(program).builtin.bytes, type);
   }
 
   function isBinaryPayload(body: Type, contentType: string | string[]) {
@@ -1276,7 +1268,7 @@ export async function getOpenAPIForService(
       reportDiagnostic(program, {
         code: multipart ? "unsupported-multipart-type" : "unsupported-param-type",
         format: { part: paramName },
-        target: type,
+        target,
       });
       return { type: "string" };
     }
@@ -1408,7 +1400,7 @@ export async function getOpenAPIForService(
     type: ModelProperty,
     explode?: boolean,
   ): "csv" | "ssv" | "pipes" | "multi" | undefined {
-    if ($.array.is(type.type)) {
+    if ($(program).array.is(type.type)) {
       if (explode) {
         return "multi";
       }
@@ -1834,11 +1826,7 @@ export async function getOpenAPIForService(
       // Get the schema for the model type
       const schema = getSchemaOrRef(type, schemaContext);
       if (schema.$ref) {
-        if (type.kind === "Model") {
-          return { type: "object", allOf: [schema], "x-nullable": nullable };
-        } else {
-          return { ...schema, "x-nullable": nullable };
-        }
+        return { ...schema, "x-nullable": nullable };
       } else {
         schema["x-nullable"] = nullable;
         return schema;
@@ -1856,17 +1844,13 @@ export async function getOpenAPIForService(
     }
   }
 
-  function ifArrayItemContainsIdentifier(
-    program: Program,
-    array: ArrayModelType,
-    armIdentifiers: string[],
-  ) {
+  function ifArrayItemContainsIdentifier(program: Program, array: ArrayModelType) {
     if (array.indexer.value?.kind !== "Model") {
       return true;
     }
     return (
       getExtensions(program, array).has("x-ms-identifiers") ||
-      (getProperty(array.indexer.value, "id") && armIdentifiers.includes("id"))
+      getProperty(array.indexer.value, "id")
     );
   }
 
@@ -2118,7 +2102,8 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context, prop.model?.namespace);
+      propSchema = getSchemaOrRef(prop.type, context);
+      applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2424,12 +2409,13 @@ export async function getOpenAPIForService(
         }),
       };
 
-      const armIdentifiers = getArmIdentifiers(program, typespecType);
-      if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
-        array["x-ms-identifiers"] = armIdentifiers;
-      } else if (
-        !ifArrayItemContainsIdentifier(program, typespecType as any, armIdentifiers ?? [])
+      const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
+      if (
+        isArrayTypeArmProviderNamespace(typespecType, namespace) &&
+        hasValidArmIdentifiers(armKeyIdentifiers)
       ) {
+        array["x-ms-identifiers"] = armKeyIdentifiers;
+      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];
       }
 
@@ -2438,12 +2424,45 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
+  function applyArmIdentifiersDecorator(
+    typespecType: Type,
+    schema: OpenAPI2Schema,
+    property: ModelProperty,
+  ) {
+    const armIdentifiers = getArmIdentifiers(program, property);
+    if (
+      typespecType.kind !== "Model" ||
+      !isArrayModelType(program, typespecType) ||
+      !armIdentifiers
+    ) {
+      return;
+    }
+
+    schema["x-ms-identifiers"] = armIdentifiers;
+  }
+
   function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
     return (
       armIdentifiers !== undefined &&
       armIdentifiers.length > 0 &&
       !ifArmIdentifiersDefault(armIdentifiers)
     );
+  }
+
+  function isArrayTypeArmProviderNamespace(typespecType?: Model, namespace?: Namespace): boolean {
+    if (typespecType === undefined) {
+      return false;
+    }
+
+    if (isArmProviderNamespace(program, namespace)) {
+      return true;
+    }
+
+    if (typespecType.indexer?.value.kind === "Model") {
+      return isArmProviderNamespace(program, typespecType.indexer.value.namespace);
+    }
+
+    return false;
   }
 
   function getSchemaForScalar(scalar: Scalar): OpenAPI2Schema {

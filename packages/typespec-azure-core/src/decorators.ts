@@ -30,6 +30,7 @@ import {
   UnionVariant,
   walkPropertiesInherited,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import {
   getHttpOperation,
   getRoutePath,
@@ -763,10 +764,11 @@ function extractPollingLocationInfo(
   } = { target: target };
   const pollingModel = options.properties.get(pollingModelKey)?.type;
   if (pollingModel && pollingModel.kind === "Model") pollingInfo.pollingModel = pollingModel;
-  if (pollingModel && isVoidType(pollingModel)) pollingInfo.pollingModel = program.checker.voidType;
+  if (pollingModel && isVoidType(pollingModel))
+    pollingInfo.pollingModel = $(program).intrinsic.void;
   const finalResult = options.properties.get(finalResultKey)?.type;
   if (finalResult && finalResult.kind === "Model") pollingInfo.finalResult = finalResult;
-  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = program.checker.voidType;
+  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = $(program).intrinsic.void;
   switch (kindValue) {
     case pollingOptionsKind.StatusMonitor:
       return extractStatusMonitorLocationInfo(program, options, pollingInfo);
@@ -810,7 +812,9 @@ function extractStatusMonitorLocationInfo(
   if (statusMonitor === undefined) return undefined;
   statusMonitor.successProperty = finalPropertyValue;
   baseInfo.finalResult =
-    finalPropertyValue?.type?.kind === "Model" ? finalPropertyValue.type : program.checker.voidType;
+    finalPropertyValue?.type?.kind === "Model"
+      ? finalPropertyValue.type
+      : $(program).intrinsic.void;
   return {
     kind: pollingOptionsKind.StatusMonitor,
     info: statusMonitor,
@@ -1346,7 +1350,7 @@ export function isResourceOperation(program: Program, operation: Operation): boo
 export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => {
   // If the operation is not templated, add it to the list of operations to
   // check later
-  if (entity.node.templateParameters.length === 0) {
+  if (entity.node === undefined || entity.node.templateParameters.length === 0) {
     context.program.stateSet(AzureCoreStateKeys.needsRoute).add(entity);
   }
 };
@@ -1354,9 +1358,10 @@ export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, enti
 export function checkRpcRoutes(program: Program) {
   (program.stateSet(AzureCoreStateKeys.needsRoute) as Set<Operation>).forEach((op: Operation) => {
     if (
-      op.node.templateParameters.length === 0 &&
-      !isAutoRoute(program, op) &&
-      !getRoutePath(program, op)
+      op.node === undefined ||
+      (op.node.templateParameters.length === 0 &&
+        !isAutoRoute(program, op) &&
+        !getRoutePath(program, op))
     ) {
       reportDiagnostic(program, {
         code: "rpc-operation-needs-route",
