@@ -28,6 +28,15 @@ namespace Azure.ResourceManager;
 
 /**
  * Supported versions of Azure.ResourceManager building blocks.
+ *
+ * @example
+ * ```typespec
+ * enum Versions {
+ *  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+ *  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+ *  `2021-10-01-preview`
+ * }
+ * ```
  */
 @doc("Supported versions of Azure.ResourceManager building blocks.")
 enum Versions {
