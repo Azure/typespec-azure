@@ -65,10 +65,10 @@ You will need to compare the Swagger generated from TypeSpec with your original 
   ```
 
 - In the `{outputFolder}`:
-  - `newSwagger.json` is the processed version of your generated Swagger
-  - `oldSwagger.json` is the processed version of your original Swagger(s)
+  - `newNormalizedSwagger.json` is the processed version of your generated Swagger
+  - `oldNormalizedSwagger.json` is the processed version of your original Swagger(s)
   
-  In VS Code, select both files (select `oldSwagger.json` first, then `newSwagger.json`), right-click and choose "Compare Selected". Review these differences to understand their patterns.
+  In VS Code, select both files (select `oldNormalizedSwagger.json` first, then `newNormalizedSwagger.json`), right-click and choose "Compare Selected". Review these differences to understand their patterns.
 
 - Check out the output from `npx tsmv` execution. It prints suggested fixes and prompts if any. Please review them before any run.
   
