@@ -14,7 +14,7 @@ model PrivateEndpoint {
   id?: Azure.Core.armResourceIdentifier;
 }
 
-/** A private link resource. */
+/** A private link resource */
 model PrivateLinkResource extends Resource {
   /** Resource properties. */
   properties?: PrivateLinkResourceProperties;
@@ -57,7 +57,7 @@ model PrivateEndpointConnection extends Resource {
 @added(Versions.v6)
 @pagedResult
 model PrivateEndpointConnectionListResult {
-  /** Array of private endpoint connections. */
+  /** Array of private endpoint connections */
   @OpenAPI.extension("x-ms-identifiers", #["id"])
   value?: PrivateEndpointConnection[];
 
@@ -128,10 +128,10 @@ union PrivateEndpointServiceConnectionStatus {
 }
 
 /**
- * The name of the private endpoint connection associated with the Azure resource.
+ * The name of the private endpoint connection associated with the Azure resource
  */
 model PrivateEndpointConnectionParameter {
-  /** The name of the private endpoint connection associated with the Azure resource. */
+  /** The name of the private endpoint connection associated with the Azure resource */
   @path
   @key("privateEndpointConnectionName")
   @TypeSpec.Rest.segment("privateEndpointConnections")
@@ -223,7 +223,7 @@ model PrivateLinkResourceListResultV5 {
 @friendlyName("PrivateEndpointConnectionListResult")
 @removed(Versions.v6)
 model PrivateEndpointConnectionListResultV5 {
-  /** Array of private endpoint connections. */
+  /** Array of private endpoint connections */
   @OpenAPI.extension("x-ms-identifiers", #["id"])
   value?: CommonTypes.PrivateEndpointConnection[];
 }
