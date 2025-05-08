@@ -2254,9 +2254,21 @@ importers:
       '@alloy-js/core':
         specifier: ^0.15.0
         version: 0.15.0
+      '@alloy-js/markdown':
+        specifier: ^0.15.1
+        version: 0.15.1
       '@alloy-js/typescript':
         specifier: ^0.15.0
         version: 0.15.0
+      '@microsoft/api-extractor-model':
+        specifier: ^7.30.6
+        version: 7.30.6(@types/node@22.13.13)
+      '@microsoft/tsdoc':
+        specifier: ^0.15.1
+        version: 0.15.1
+      '@microsoft/tsdoc-config':
+        specifier: ^0.17.1
+        version: 0.17.1
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
@@ -3378,6 +3390,9 @@ packages:
 
   '@alloy-js/core@0.15.0':
     resolution: {integrity: sha512-GfQZqaUqGBGFeFJbA9H7Iu+IJQiEQ2B3Hjh5C1N2YclEg5vtjSAb/pdqJ5x2BTqOq2iUCpFOJ44pJy5mhS116Q==}
+
+  '@alloy-js/markdown@0.15.1':
+    resolution: {integrity: sha512-drJbEo8DWDKGmJ/R2lUEyn8dVa3vKVpu9K0+1EJswQ7flgE0k1NgbXq3StIHAr8yd//VCgRHjVgV2R5E76ZjvQ==}
 
   '@alloy-js/rollup-plugin@0.1.0':
     resolution: {integrity: sha512-MXR8mBdSh/pxMP8kIXAcMYKsm5yOWZ+igxcaRX1vBXFiHU4eK7gE/5q6Fk8Vdydh+MItWtgekwIhUWvcszdNFQ==}
@@ -5528,6 +5543,9 @@ packages:
   '@microsoft/api-extractor-model@7.30.5':
     resolution: {integrity: sha512-0ic4rcbcDZHz833RaTZWTGu+NpNgrxVNjVaor0ZDUymfDFzjA/Uuk8hYziIUIOEOSTfmIQqyzVwlzxZxPe7tOA==}
 
+  '@microsoft/api-extractor-model@7.30.6':
+    resolution: {integrity: sha512-znmFn69wf/AIrwHya3fxX6uB5etSIn6vg4Q4RB/tb5VDDs1rqREc+AvMC/p19MUN13CZ7+V/8pkYPTj7q8tftg==}
+
   '@microsoft/api-extractor@7.52.2':
     resolution: {integrity: sha512-RX37V5uhBBPUvrrcmIxuQ8TPsohvr6zxo7SsLPOzBYcH9nbjbvtdXrts4cxHCXGOin9JR5ar37qfxtCOuEBTHA==}
     hasBin: true
@@ -6112,6 +6130,14 @@ packages:
 
   '@rushstack/node-core-library@5.13.0':
     resolution: {integrity: sha512-IGVhy+JgUacAdCGXKUrRhwHMTzqhWwZUI+qEPcdzsb80heOw0QPbhhoVsoiMF7Klp8eYsp7hzpScMXmOa3Uhfg==}
+    peerDependencies:
+      '@types/node': '*'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@rushstack/node-core-library@5.13.1':
+    resolution: {integrity: sha512-5yXhzPFGEkVc9Fu92wsNJ9jlvdwz4RNb2bMso+/+TH0nMm1jDDDsOIf4l8GAkPxGuwPw5DH24RliWVfSPhlW/Q==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
@@ -13350,6 +13376,10 @@ snapshots:
       picocolors: 1.1.1
       prettier: 3.5.3
 
+  '@alloy-js/markdown@0.15.1':
+    dependencies:
+      '@alloy-js/core': 0.15.0
+
   '@alloy-js/rollup-plugin@0.1.0(@babel/core@7.26.10)(@types/babel__core@7.20.5)(rollup@4.36.0)':
     dependencies:
       '@alloy-js/babel-preset': 0.2.0(@babel/core@7.26.10)
@@ -16456,6 +16486,14 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
+  '@microsoft/api-extractor-model@7.30.6(@types/node@22.13.13)':
+    dependencies:
+      '@microsoft/tsdoc': 0.15.1
+      '@microsoft/tsdoc-config': 0.17.1
+      '@rushstack/node-core-library': 5.13.1(@types/node@22.13.13)
+    transitivePeerDependencies:
+      - '@types/node'
+
   '@microsoft/api-extractor@7.52.2(@types/node@22.13.13)':
     dependencies:
       '@microsoft/api-extractor-model': 7.30.5(@types/node@22.13.13)
@@ -17178,6 +17216,19 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/node-core-library@5.13.0(@types/node@22.13.13)':
+    dependencies:
+      ajv: 8.13.0
+      ajv-draft-04: 1.0.0(ajv@8.13.0)
+      ajv-formats: 3.0.1(ajv@8.13.0)
+      fs-extra: 11.3.0
+      import-lazy: 4.0.0
+      jju: 1.4.0
+      resolve: 1.22.10
+      semver: 7.5.4
+    optionalDependencies:
+      '@types/node': 22.13.13
+
+  '@rushstack/node-core-library@5.13.1(@types/node@22.13.13)':
     dependencies:
       ajv: 8.13.0
       ajv-draft-04: 1.0.0(ajv@8.13.0)
