@@ -439,9 +439,6 @@ export function getSdkArrayOrDictWithDiagnostics(
     if (!isNeverType(type.indexer.key)) {
       let sdkType = context.__arrayDictionaryCache.get(type);
       if (!sdkType) {
-        const valueType = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, type.indexer.value!, operation),
-        );
         const name = type.indexer.key.name;
         if (name === "string" && type.name === "Record") {
           // model MyModel is Record<> {} should be model with additional properties
@@ -454,7 +451,7 @@ export function getSdkArrayOrDictWithDiagnostics(
               keyType: diagnostics.pipe(
                 getClientTypeWithDiagnostics(context, type.indexer.key, operation),
               ),
-              valueType: valueType,
+              valueType: diagnostics.pipe(getUnknownType(context, type)), // set unknown for cache
             };
           }
         } else if (name === "integer") {
@@ -462,11 +459,17 @@ export function getSdkArrayOrDictWithDiagnostics(
           sdkType = {
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
             name: getLibraryName(context, type),
-            valueType: valueType,
+            valueType: diagnostics.pipe(getUnknownType(context, type)), // set unknown for cache
             crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           };
+        } else {
+          // additional properties case
+          return diagnostics.wrap(undefined);
         }
         context.__arrayDictionaryCache.set(type, sdkType!);
+        sdkType!.valueType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, type.indexer.value!, operation),
+        );
       }
       return diagnostics.wrap(sdkType);
     }
