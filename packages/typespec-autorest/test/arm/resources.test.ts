@@ -513,20 +513,20 @@ it("allows resources with multiple endpoint using LegacyOperations", async () =>
       `);
   ok(
     openApi.paths[
-      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees"
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees"
     ].get,
   );
   ok(
     openApi.paths[
-      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees"
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees"
     ].get,
   );
   const resourceGroupOperations =
     openApi.paths[
-      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}"
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/employees/{employeeName}"
     ];
   const locationPath =
-    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}";
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees/{employeeName}";
 
   const locationOperations = openApi.paths[locationPath];
   ok(resourceGroupOperations);
