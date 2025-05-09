@@ -19,7 +19,7 @@ options:
   "@azure-tools/typespec-java":
     package-dir: "azure-resourcemanager-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     namespace: "com.azure.resourcemanager.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
-    service-name: "{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
+    service-name: "{{#toUpperCase}}{{parameters.ServiceNamespace}}{{/toUpperCase}}"
   "@azure-tools/typespec-ts":
     package-dir: "arm-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     is-modular-library: true
