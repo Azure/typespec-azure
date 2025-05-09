@@ -31,23 +31,50 @@ it("same type's dictionary come to same type", async () => {
       op get(): TestDictionary;
     }
   `);
-  const testArrayModel = runner.context.sdkPackage.models[0];
-  strictEqual(testArrayModel.kind, "model");
-  strictEqual(testArrayModel.name, "TestDictionary");
-  strictEqual(testArrayModel.properties.length, 10);
-  const prop1 = testArrayModel.properties[0];
-  const prop2 = testArrayModel.properties[1];
-  const prop3 = testArrayModel.properties[2];
-  const prop4 = testArrayModel.properties[3];
-  const prop5 = testArrayModel.properties[4];
-  const prop6 = testArrayModel.properties[5];
-  const prop7 = testArrayModel.properties[6];
-  const prop8 = testArrayModel.properties[7];
-  const prop9 = testArrayModel.properties[8];
-  const prop10 = testArrayModel.properties[9];
+  const testDictionaryModel = runner.context.sdkPackage.models[0];
+  strictEqual(testDictionaryModel.kind, "model");
+  strictEqual(testDictionaryModel.name, "TestDictionary");
+  strictEqual(testDictionaryModel.properties.length, 10);
+  const prop1 = testDictionaryModel.properties[0];
+  const prop2 = testDictionaryModel.properties[1];
+  const prop3 = testDictionaryModel.properties[2];
+  const prop4 = testDictionaryModel.properties[3];
+  const prop5 = testDictionaryModel.properties[4];
+  const prop6 = testDictionaryModel.properties[5];
+  const prop7 = testDictionaryModel.properties[6];
+  const prop8 = testDictionaryModel.properties[7];
+  const prop9 = testDictionaryModel.properties[8];
+  const prop10 = testDictionaryModel.properties[9];
   strictEqual(prop1.type, prop2.type);
   strictEqual(prop3.type, prop4.type);
   strictEqual(prop5.type, prop6.type);
   strictEqual(prop7.type, prop8.type);
   strictEqual(prop9.type, prop10.type);
+});
+
+it("recursive dictionary type", async () => {
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        prop?: Record<Test>;
+      }
+
+      model TestDictionary {
+        prop: Record<Test>;
+      }
+      op get(): TestDictionary;
+    }
+  `);
+  const testModel = runner.context.sdkPackage.models[1];
+  strictEqual(testModel.kind, "model");
+  strictEqual(testModel.name, "Test");
+  strictEqual(testModel.properties.length, 1);
+  const modelProp = testModel.properties[0];
+  const testDictionaryModel = runner.context.sdkPackage.models[0];
+  strictEqual(testDictionaryModel.kind, "model");
+  strictEqual(testDictionaryModel.name, "TestDictionary");
+  strictEqual(testDictionaryModel.properties.length, 1);
+  const prop = testDictionaryModel.properties[0];
+  strictEqual(prop.type, modelProp.type);
 });

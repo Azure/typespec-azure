@@ -136,3 +136,31 @@ it("same type's array come to same type", async () => {
   strictEqual(prop7.type, prop8.type);
   strictEqual(prop9.type, prop10.type);
 });
+
+it("recursive array type", async () => {
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      model Test {
+        prop?: Test[];
+      }
+
+      model TestArray {
+        prop: Test[];
+      }
+
+      op get(): TestArray;
+    }
+  `);
+  const testModel = runner.context.sdkPackage.models[1];
+  strictEqual(testModel.kind, "model");
+  strictEqual(testModel.name, "Test");
+  strictEqual(testModel.properties.length, 1);
+  const modelProp = testModel.properties[0];
+  const testArrayModel = runner.context.sdkPackage.models[0];
+  strictEqual(testArrayModel.kind, "model");
+  strictEqual(testArrayModel.name, "TestArray");
+  strictEqual(testArrayModel.properties.length, 1);
+  const prop = testArrayModel.properties[0];
+  strictEqual(prop.type, modelProp.type);
+});
