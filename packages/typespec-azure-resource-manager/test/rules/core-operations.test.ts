@@ -102,6 +102,55 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       .toBeValid();
   });
 
+  it("doesn't emit a diagnostic for armprovideroperation as it doesn't have a resource", async () => {
+    await tester
+      .expect(
+        `
+    @armProviderNamespace
+    @service(#{title: "Microsoft.Foo"})
+    @versioned(Versions)
+    namespace Microsoft.Foo;
+    enum Versions {
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        "2021-10-01-preview",
+      }
+
+    model Employee is TrackedResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    model EmployeeProperties {
+      @visibility(Lifecycle.Read)
+      provisioningState?: ProvisioningState;
+    }
+
+    union ProvisioningState {
+      string,
+      @doc(".") Succeeded: "Succeeded",
+      @doc(".") Failed: "Failed",
+      @doc(".") Canceled: "Canceled",
+    }
+
+    op ComputeProviderActionAsync<
+      Request extends {} | void = void,
+      Response extends {} | void = void
+    > is ArmProviderActionAsync<Request, Response>;
+
+    interface Operations extends Azure.ResourceManager.Operations {}
+
+    #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+    interface VirtualMachinesOperations {
+      @autoRoute
+      @get
+      @action("virtualMachines")
+      listByLocation is ComputeProviderActionAsync<Response = ResourceListResult<Employee>>;
+    }
+    `,
+      )
+      .toBeValid();
+  });
+
   it("Detects operations outside interfaces", async () => {
     await tester
       .expect(
