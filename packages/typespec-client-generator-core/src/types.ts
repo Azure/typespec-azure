@@ -462,6 +462,9 @@ export function getSdkArrayOrDictWithDiagnostics(
             valueType: diagnostics.pipe(getUnknownType(context, type)), // set unknown for cache
             crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
           };
+        } else {
+          // additional properties case
+          return diagnostics.wrap(undefined);
         }
         context.__arrayDictionaryCache.set(type, sdkType!);
         sdkType!.valueType = diagnostics.pipe(
