@@ -268,6 +268,10 @@ function handleHttpParameters(
   ) {
     for (const name of Object.keys(example.parameters)) {
       let parameter = parameters.find((p) => p.serializedName === name);
+      // fallback to use client name for any body parameter
+      if (!parameter) {
+        parameter = parameters.find((p) => p.name === name && p.kind === "body");
+      }
       // fallback to body in example for any body parameter
       if (!parameter && name === "body") {
         parameter = parameters.find((p) => p.kind === "body");
