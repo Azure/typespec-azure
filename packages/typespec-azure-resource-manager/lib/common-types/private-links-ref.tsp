@@ -163,17 +163,17 @@ namespace Azure.ResourceManager.CommonTypes;
 );
 
 /** PrivateLinkResourceListResult */
-@@armCommonDefinition(PrivateEndpointConnectionListResultV5,
+@@armCommonDefinition(PrivateLinkResourceListResultV5,
   "PrivateLinkResourceListResult",
   Azure.ResourceManager.CommonTypes.Versions.v3,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionListResultV5,
+@@armCommonDefinition(PrivateLinkResourceListResultV5,
   "PrivateLinkResourceListResult",
   Azure.ResourceManager.CommonTypes.Versions.v4,
   "privatelinks.json"
 );
-@@armCommonDefinition(PrivateEndpointConnectionListResultV5,
+@@armCommonDefinition(PrivateLinkResourceListResultV5,
   "PrivateLinkResourceListResult",
   Azure.ResourceManager.CommonTypes.Versions.v5,
   "privatelinks.json"
