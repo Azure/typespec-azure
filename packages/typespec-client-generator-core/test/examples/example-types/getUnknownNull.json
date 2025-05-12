@@ -1,0 +1,12 @@
+{
+  "operationId": "getUnknownNull",
+  "title": "getUnknownNull",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": {
+        "prop": null
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { createDiagnosticCollector, Diagnostic, getSummary } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
   getClientInitializationOptions,
@@ -265,7 +265,7 @@ function createSdkClientInitializationType(
     doc: "Initialization for the client",
     parameters: [],
     initializedBy:
-      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.Parent,
+      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
     decorators: [],

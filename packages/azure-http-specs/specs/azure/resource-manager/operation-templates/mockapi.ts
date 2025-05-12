@@ -1,4 +1,6 @@
 import {
+  dyn,
+  dynItem,
   json,
   MockRequest,
   passOnSuccess,
@@ -144,7 +146,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
     response: {
       status: 201,
       headers: {
-        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
+        "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
       },
       body: json({
         ...validOrder,
@@ -258,8 +260,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_location`,
-        "azure-asyncoperation": `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
+        location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_location`,
+        "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
       },
     },
     handler: (req: MockRequest) => {
@@ -358,7 +360,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        location: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/lro_delete_location`,
+        location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operationResults/lro_delete_location`,
       },
     },
     handler: (req: MockRequest) => {

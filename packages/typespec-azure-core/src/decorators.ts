@@ -30,6 +30,7 @@ import {
   UnionVariant,
   walkPropertiesInherited,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import {
   getHttpOperation,
   getRoutePath,
@@ -763,10 +764,11 @@ function extractPollingLocationInfo(
   } = { target: target };
   const pollingModel = options.properties.get(pollingModelKey)?.type;
   if (pollingModel && pollingModel.kind === "Model") pollingInfo.pollingModel = pollingModel;
-  if (pollingModel && isVoidType(pollingModel)) pollingInfo.pollingModel = program.checker.voidType;
+  if (pollingModel && isVoidType(pollingModel))
+    pollingInfo.pollingModel = $(program).intrinsic.void;
   const finalResult = options.properties.get(finalResultKey)?.type;
   if (finalResult && finalResult.kind === "Model") pollingInfo.finalResult = finalResult;
-  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = program.checker.voidType;
+  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = $(program).intrinsic.void;
   switch (kindValue) {
     case pollingOptionsKind.StatusMonitor:
       return extractStatusMonitorLocationInfo(program, options, pollingInfo);
@@ -810,7 +812,9 @@ function extractStatusMonitorLocationInfo(
   if (statusMonitor === undefined) return undefined;
   statusMonitor.successProperty = finalPropertyValue;
   baseInfo.finalResult =
-    finalPropertyValue?.type?.kind === "Model" ? finalPropertyValue.type : program.checker.voidType;
+    finalPropertyValue?.type?.kind === "Model"
+      ? finalPropertyValue.type
+      : $(program).intrinsic.void;
   return {
     kind: pollingOptionsKind.StatusMonitor,
     info: statusMonitor,

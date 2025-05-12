@@ -7,6 +7,7 @@ using Azure.Core;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** Common fields that are returned in the response for all Azure Resource Manager resources */
+@summary("Resource")
 model Resource {
   /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
   @typeChangedFrom(Versions.v4, string)
@@ -27,6 +28,7 @@ model Resource {
 }
 
 /** The resource model definition for an Azure Resource Manager resource with an etag. */
+@summary("Entity Resource")
 model AzureEntityResource extends Resource {
   /** Resource Etag. */
   @visibility(Lifecycle.Read)
@@ -36,6 +38,7 @@ model AzureEntityResource extends Resource {
 /**
  * The resource model definition for an Azure Resource Manager tracked top level resource which has 'tags' and a 'location'
  */
+@summary("Tracked Resource")
 model TrackedResource extends Resource {
   /** Resource tags. */
   tags?: Record<string>;
@@ -48,6 +51,7 @@ model TrackedResource extends Resource {
 /**
  * The resource model definition for a Azure Resource Manager proxy resource. It will not have tags and a location
  */
+@summary("Proxy Resource")
 model ProxyResource extends Resource {}
 
 /**
@@ -129,6 +133,7 @@ model OperationListResult is Azure.Core.Page<Operation>;
 /**
  * Details of a REST API operation, returned from the Resource Provider Operations API
  */
+@summary("REST API Operation")
 model Operation {
   /** 
     The name of the operation, as per Resource-Based Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"
@@ -276,6 +281,7 @@ model ErrorDetail {
 /**
  * Common error response for all Azure Resource Manager APIs to return error details for failed operations.
  */
+@summary("Error response")
 @error
 model ErrorResponse {
   /** The error object. */
@@ -517,17 +523,8 @@ model SubscriptionIdParameter {
   @typeChangedFrom(Versions.v4, string)
   @path
   @segment("subscriptions")
-  subscriptionId: uuid;
-}
-
-/** The default location parameter type. */
-model LocationResourceParameter {
-  /** The name of the Azure region. */
-  @path
   @minLength(1)
-  @segment("locations")
-  @key
-  location: azureLocation;
+  subscriptionId: uuid;
 }
 
 /**

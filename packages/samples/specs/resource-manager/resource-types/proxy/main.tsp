@@ -73,7 +73,10 @@ interface Operations extends Azure.ResourceManager.Operations {}
 interface Employees {
   get is ArmResourceRead<Employee>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
   delete is ArmResourceDeleteSync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
@@ -103,7 +106,10 @@ model MoveResponse {
 interface Dependents {
   get is ArmResourceRead<Dependent>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
-  update is ArmResourcePatchSync<Dependent, DependentProperties>;
+  update is ArmCustomPatchSync<
+    Dependent,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Dependent, DependentProperties>
+  >;
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
 }

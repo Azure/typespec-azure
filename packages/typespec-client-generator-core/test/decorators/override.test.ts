@@ -309,7 +309,7 @@ it("remove optional parameter flip", async () => {
   strictEqual(httpOp.bodyParam.correspondingMethodParams[0], paramsParam.type.properties[0]);
 });
 
-it("params mismatch", async () => {
+it("params mismatch but same type", async () => {
   const mainCode = `
     @service
     namespace MyService;
@@ -327,6 +327,35 @@ it("params mismatch", async () => {
     model ParamsCustomized {
       foo: string;
       bar: string;
+    }
+
+    op func(params: MyCustomizations.ParamsCustomized): void;
+
+    @@override(MyService.func, MyCustomizations.func);
+    `;
+  const diagnostics = (
+    await runner.compileAndDiagnoseWithCustomization(mainCode, customizationCode)
+  )[1];
+  strictEqual(diagnostics.length, 0);
+});
+
+it("remove required parameter", async () => {
+  const mainCode = `
+    @service
+    namespace MyService;
+    model Params {
+      foo: string;
+      bar: string;
+    }
+
+    op func(...Params): void;
+    `;
+
+  const customizationCode = `
+    namespace MyCustomizations;
+
+    model ParamsCustomized {
+      foo: string;
     }
 
     op func(params: MyCustomizations.ParamsCustomized): void;

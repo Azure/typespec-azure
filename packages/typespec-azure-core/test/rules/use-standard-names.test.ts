@@ -49,7 +49,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
         @put op wholeNewFoo(@body body: Foo): FooResponse<Foo, 200>;
         
         @route("5")
-        @patch op changeFoo(@body body: Foo): FooResponse<Foo, 201>;
+        @patch(#{implicitOptionality: true}) op changeFoo(@body body: Foo): FooResponse<Foo, 201>;
         
         @route("6")
         @delete op removeFoo(): void;        `,
@@ -126,7 +126,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
       @put op replaceFoo(@body body: Foo): FooResponse<Foo, 200>;
       
       @route("6")
-      @patch op createOrUpdateFoo(@body body: Foo): FooResponse<Foo, 201>;
+      @patch(#{implicitOptionality: true}) op createOrUpdateFoo(@body body: Foo): FooResponse<Foo, 201>;
       
       @route("7")
       @delete op deleteFoo(): void;        `,
