@@ -21,10 +21,10 @@ options:
     model-namespace: false
   "@azure-tools/typespec-ts":
     package-dir: "azure-contoso-rest"
-    generate-test: true
     package-details:
-      name: "@azure-rest/azure-contoso-rest"
+      name: "@azure-rest/azure-contoso"
       description: "Azure.Contoso Service"
+    flavor: azure
   "@azure-tools/typespec-java":
     package-dir: "azure-contoso"
     namespace: com.azure.contoso

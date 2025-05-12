@@ -20,10 +20,10 @@ options:
     model-namespace: false
   "@azure-tools/typespec-ts":
     package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
-    generate-test: true
     package-details:
-      name: "@azure-rest/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
+      name: "@azure-rest/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
       description: "{{parameters.ServiceNamespace}} Service"
+    flavor: azure
   "@azure-tools/typespec-java":
     package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
     namespace: com.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}
