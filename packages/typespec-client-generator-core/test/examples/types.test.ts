@@ -854,6 +854,212 @@ it("SdkModelExample from discriminated types", async () => {
   expectDiagnostics(runner.context.diagnostics, []);
 });
 
+it("SdkModelExample from discriminated types with string kind fallback", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorStringFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorStringFallback.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: string;
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "shark");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "string");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("SdkModelExample from discriminated types with string kind with extra property fallback", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorStringExtraPropertyFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorStringExtraPropertyFallback.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: string;
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "shark");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "string");
+
+  expectDiagnostics(runner.context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+    message: `Value in example file 'getModelDiscriminatorStringExtraPropertyFallback.json' does not follow its definition:\n{"extraProperty":"test"}`,
+  });
+});
+
+it("SdkModelExample from discriminated types with enum kind fallback", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorEnumFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorEnumFallback.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: FishKind;
+      }
+
+      enum FishKind {
+        "shark",
+        "salmon",
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "shark");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "enum");
+  strictEqual(bodyValue.value["kind"].type.isFixed, true);
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("SdkModelExample from discriminated types with enum kind with wrong kind fallback", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorEnumWrongKindFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorEnumWrongKindFallback.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: FishKind;
+      }
+
+      enum FishKind {
+        "shark",
+        "salmon",
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 0);
+
+  expectDiagnostics(runner.context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+    message: `Value in example file 'getModelDiscriminatorEnumWrongKindFallback.json' does not follow its definition:\n"goldfish"`,
+  });
+});
+
+it("SdkModelExample from discriminated types with union kind fallback", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getModelDiscriminatorUnionFallback.json",
+    `${__dirname}/example-types/getModelDiscriminatorUnionFallback.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      @discriminator("kind")
+      model Fish {
+        kind: FishKind;
+      }
+
+      union FishKind {
+        string,
+        "shark",
+        "salmon",
+      }
+
+      op getModelDiscriminator(): Fish;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  const bodyValue = response.bodyValue;
+  ok(bodyValue);
+  strictEqual(bodyValue.kind, "model");
+  strictEqual(bodyValue.type.kind, "model");
+  strictEqual(bodyValue.type.name, "Fish");
+  strictEqual(Object.keys(bodyValue.value).length, 1);
+  strictEqual(bodyValue.value["kind"].value, "goldfish");
+  strictEqual(bodyValue.value["kind"].kind, "string");
+  strictEqual(bodyValue.value["kind"].type.kind, "enum");
+  strictEqual(bodyValue.value["kind"].type.isFixed, false);
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
 it("SdkModelExample from discriminated types diagnostic", async () => {
   await runner.host.addRealTypeSpecFile(
     "./examples/getModelDiscriminatorDiagnostic.json",
