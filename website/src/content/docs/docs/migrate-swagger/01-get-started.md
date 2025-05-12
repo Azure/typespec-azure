@@ -47,31 +47,35 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 
 ### Review and adjust the TypeSpec
 
-You will need to compare the Swagger generated from TypeSpec with your original Swagger specification(s) to ensure functional equivalence. 
+You will need to compare the Swagger generated from TypeSpec with your original Swagger specification(s) to ensure functional equivalence.
 
 - In your TypeSpec folder, compile your TypeSpec files to emit an auto-generated Swagger:
+
   ```shell
   tsp compile .
   ```
 
 - From the root folder, download the latest specification as baseline. Your original specification will be located at `.\sparse-spec\specification\{service-name}`:
+
   ```shell
   .\eng\tools\typespec-migration-validation\scripts\download-main.ps1 {path\to\your\generated\swagger}
   ```
 
 - At the end of the console output, you'll see the next command to sort, merge, and normalize your original Swagger(s) and generated Swagger, making it easier to review changes. Provide an `outputFolder` to store the analysis results:
+
   ```shell
   npx tsmv {your\original\swagger\folder} {your\generated\swagger\file} {outputFolder}
   ```
 
 - In the `{outputFolder}`:
+
   - `newNormalizedSwagger.json` is the processed version of your generated Swagger
   - `oldNormalizedSwagger.json` is the processed version of your original Swagger(s)
-  
+
   In VS Code, select both files (select `oldNormalizedSwagger.json` first, then `newNormalizedSwagger.json`), right-click and choose "Compare Selected". Review these differences to understand their patterns.
 
 - Check out the output from `npx tsmv` execution. It prints suggested fixes and prompts if any. Please review them before any run.
-  
+
   **Suggested fixes:** These provide exact TypeSpec code that you can apply directly by following the instructions.
 
   **Suggested prompts:** To use these, drag all your TypeSpec files into GitHub Copilot context. Select "Agent" or "Edit" mode with the "Claude" model. Use the provided prompt to ask GitHub Copilot to generate fixes. Carefully review all changes before accepting or undoing them.
