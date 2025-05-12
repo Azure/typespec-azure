@@ -450,19 +450,25 @@
     },
     "RoleAssignmentUpdate": {
       "type": "object",
-      "description": "A ContosoProviderHub resource",
+      "description": "The type used for update operations of the RoleAssignment.",
       "properties": {
         "properties": {
-          "$ref": "#/definitions/RoleAssignmentProperties",
+          "$ref": "#/definitions/RoleAssignmentUpdateProperties",
           "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
+      }
+    },
+    "RoleAssignmentUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the RoleAssignment.",
+      "properties": {
+        "profile": {
+          "type": "string",
+          "format": "base64url",
+          "description": "Profile of roleAssignment"
         }
-      ]
+      }
     }
   },
   "parameters": {

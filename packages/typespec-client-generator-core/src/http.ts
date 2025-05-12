@@ -8,10 +8,9 @@ import {
   createDiagnosticCollector,
   getEncode,
   getSummary,
-  ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
@@ -53,7 +52,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
-  findRootSourceProperty,
+  compareRootSourceProperties,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodySpreadModel,
@@ -429,13 +428,7 @@ export function getSdkHttpParameter(
       // url type need allow reserved
       allowReserved:
         (httpParam as HttpOperationPathParameter)?.allowReserved ??
-        ignoreDiagnostics(
-          program.checker.isTypeAssignableTo(
-            param.type,
-            program.checker.getStdType("url"),
-            param.type,
-          ),
-        ),
+        $(program).type.isAssignableTo(param.type, $(program).builtin.url, param.type),
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: param.optional,
@@ -718,7 +711,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      findRootSourceProperty(methodParam.__raw) === findRootSourceProperty(serviceParam.__raw)
+      compareRootSourceProperties(methodParam.__raw, serviceParam.__raw)
     ) {
       return methodParam;
     }

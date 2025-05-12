@@ -29,6 +29,7 @@ import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
 } from "@typespec/compiler/experimental";
+import { $ } from "@typespec/compiler/typekit";
 import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
 import {
   getAddedOnVersions,
@@ -55,8 +56,6 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
-
-import { $ } from "@typespec/compiler/experimental/typekit";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -451,17 +450,6 @@ export function getAnyType(
   });
 }
 
-export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
-  let apiVersion = context.apiVersion;
-  if (apiVersion === "all") {
-    return apiVersion;
-  }
-  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
-    apiVersion = versions[versions.length - 1];
-  }
-  return apiVersion;
-}
-
 export function getHttpOperationResponseHeaders(
   response: HttpOperationResponseContent,
 ): ModelProperty[] {
@@ -634,6 +622,15 @@ export function findRootSourceProperty(property: ModelProperty): ModelProperty {
   return property;
 }
 
+export function compareRootSourceProperties(prop1: ModelProperty, prop2: ModelProperty): boolean {
+  const rootProp1 = findRootSourceProperty(prop1);
+  const rootProp2 = findRootSourceProperty(prop2);
+  if (rootProp1.node !== undefined && rootProp2.node !== undefined) {
+    return rootProp1.node !== undefined && rootProp1.node === rootProp2.node;
+  }
+  return rootProp1 === rootProp2;
+}
+
 export function getStreamAsBytes(
   context: TCGCContext,
   type: Type,
@@ -669,17 +666,14 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const service = listServices(context.program)[0];
-  if (!service) return globalNamespace;
-  const allApiVersions = getVersions(context.program, service.type)[1]
-    ?.getVersions()
-    .map((x) => x.value);
-  if (!allApiVersions || context.apiVersion === "all") return globalNamespace;
+  const allApiVersions = context.getPackageVersions();
+  if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
 
-  const apiVersion = getValidApiVersion(context, allApiVersions);
-  if (apiVersion === undefined) return globalNamespace;
-
-  const mutator = getVersioningMutator(context, service.type, apiVersion);
+  const mutator = getVersioningMutator(
+    context,
+    listServices(context.program)[0].type,
+    allApiVersions[allApiVersions.length - 1],
+  );
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;

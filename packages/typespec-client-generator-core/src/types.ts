@@ -437,32 +437,41 @@ export function getSdkArrayOrDictWithDiagnostics(
   // if model with both indexer and properties or name should be a model with additional properties
   if (type.indexer !== undefined && type.properties.size === 0) {
     if (!isNeverType(type.indexer.key)) {
-      const valueType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, type.indexer.value!, operation),
-      );
-      const name = type.indexer.key.name;
-      if (name === "string" && type.name === "Record") {
-        // model MyModel is Record<> {} should be model with additional properties
-        if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
+      let sdkType = context.__arrayDictionaryCache.get(type);
+      if (!sdkType) {
+        const name = type.indexer.key.name;
+        if (name === "string" && type.name === "Record") {
+          // model MyModel is Record<> {} should be model with additional properties
+          if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
+            return diagnostics.wrap(undefined);
+          } else {
+            // other cases are dict
+            sdkType = {
+              ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "dict")),
+              keyType: diagnostics.pipe(
+                getClientTypeWithDiagnostics(context, type.indexer.key, operation),
+              ),
+              valueType: diagnostics.pipe(getUnknownType(context, type)), // set unknown for cache
+            };
+          }
+        } else if (name === "integer") {
+          // only array's index key name is integer
+          sdkType = {
+            ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
+            name: getLibraryName(context, type),
+            valueType: diagnostics.pipe(getUnknownType(context, type)), // set unknown for cache
+            crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
+          };
+        } else {
+          // additional properties case
           return diagnostics.wrap(undefined);
         }
-        // other cases are dict
-        return diagnostics.wrap({
-          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "dict")),
-          keyType: diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, type.indexer.key, operation),
-          ),
-          valueType: valueType,
-        });
-      } else if (name === "integer") {
-        // only array's index key name is integer
-        return diagnostics.wrap({
-          ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "array")),
-          name: getLibraryName(context, type),
-          valueType: valueType,
-          crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
-        });
+        context.__arrayDictionaryCache.set(type, sdkType!);
+        sdkType!.valueType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, type.indexer.value!, operation),
+        );
       }
+      return diagnostics.wrap(sdkType);
     }
   }
   return diagnostics.wrap(undefined);
