@@ -22,7 +22,7 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 ### Generate TypeSpec with converter
 
 - Go to your `specification/{service-name}` folder in `azure-rest-api-specs`.
-- Create a directory holding TypeSpec files. See example for [control-plane](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/contosowidgetmanager/Contoso.Management) and [data-plane](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/contosowidgetmanager/Contoso.WidgetManager).
+- Create a directory holding TypeSpec files. See details [here](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
 - Run the tool from the directory.
 
   - Convert a **data-plane** specification:
