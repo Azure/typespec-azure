@@ -22,8 +22,8 @@ options:
     service-name: "{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
   "@azure-tools/typespec-ts":
     package-dir: "arm-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
-    is-modular-library: true
     experimental-extensible-enums: true
+    flavor: azure
     package-details:
       name: "@azure/{package-dir}"
   "@azure-tools/typespec-go":
