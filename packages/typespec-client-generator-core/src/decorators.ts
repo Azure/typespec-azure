@@ -1139,6 +1139,19 @@ export const $paramAlias: ParamAliasDecorator = (
   paramAlias: string,
   scope?: LanguageScopes,
 ) => {
+  const paramAliasDec = context.program.stateMap(paramAliasKey).get(original);
+  const paramAliasVal = paramAliasDec?.[scope || AllScopes] ?? paramAliasDec?.[AllScopes];
+  if (paramAliasVal) {
+    reportDiagnostic(context.program, {
+      code: "multiple-param-alias",
+      format: {
+        originalName: original.name,
+        firstParamAlias: paramAliasVal,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
   setScopedDecoratorData(context, $paramAlias, paramAliasKey, original, paramAlias, scope);
 };
 
