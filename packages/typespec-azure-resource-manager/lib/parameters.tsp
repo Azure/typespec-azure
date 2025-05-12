@@ -24,11 +24,6 @@ alias SubscriptionIdParameter = CommonTypes.SubscriptionIdParameter;
 alias ResourceGroupParameter = CommonTypes.ResourceGroupNameParameter;
 
 /**
- * The default LocationResource parameter type.
- */
-alias LocationResourceParameter = CommonTypes.LocationResourceParameter;
-
-/**
  * DEPRECATED - DO NOT USE
  * The default location parameter type.
  */
@@ -43,6 +38,16 @@ model LocationParameter {
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   @resourceParameterBaseFor([ResourceHome.Location])
   location: string;
+}
+
+/** The default location parameter type. */
+model LocationResourceParameter {
+  /** The name of the Azure region. */
+  @path
+  @minLength(1)
+  @segment("locations")
+  @key
+  location: Azure.Core.azureLocation;
 }
 
 /**

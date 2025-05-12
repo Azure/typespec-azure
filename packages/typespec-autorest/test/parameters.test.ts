@@ -1,4 +1,4 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, extractSquiggles } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import {
@@ -6,7 +6,12 @@ import {
   OpenAPI2PathParameter,
   OpenAPI2QueryParameter,
 } from "../src/openapi2-document.js";
-import { diagnoseOpenApiFor, ignoreUseStandardOps, openApiFor } from "./test-host.js";
+import {
+  createAutorestTestRunner,
+  diagnoseOpenApiFor,
+  ignoreUseStandardOps,
+  openApiFor,
+} from "./test-host.js";
 
 describe("path parameters", () => {
   async function getPathParam(code: string, name = "myParam"): Promise<OpenAPI2PathParameter> {
@@ -48,6 +53,21 @@ describe("path parameters", () => {
       expect(param).toMatchObject({
         "x-ms-skip-url-encoding": true,
       });
+    });
+  });
+
+  it("report unsupported-param-type diagnostic on the parameter when using unsupported types", async () => {
+    const { pos, end, source } = extractSquiggles(
+      `op test(~~~@path myParam: Record<string>~~~): void;`,
+    );
+    const runner = await createAutorestTestRunner();
+    const diagnostics = await runner.diagnose(source);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unsupported-param-type",
+      message:
+        "Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part 'myParam'.",
+      pos: pos + runner.autoCodeOffset,
+      end: end + runner.autoCodeOffset,
     });
   });
 });

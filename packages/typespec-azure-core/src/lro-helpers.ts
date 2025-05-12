@@ -18,6 +18,7 @@ import {
   Scalar,
   Type,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import {
   getHeaderFieldName,
   getHttpOperation,
@@ -646,14 +647,14 @@ function getFinalStateVia(
   ) {
     const info = getStatusMonitorInfo(program, context.statusMonitorStep.responseModel);
     if (info !== undefined) {
-      model = info.successType ?? program.checker.voidType;
+      model = info.successType ?? $(program).intrinsic.void;
       finalState = getStatusFromLinkOrReference(
         program,
         operation,
         context.statusMonitorStep?.target,
       );
       if (context.finalStep === undefined && info.successProperty === undefined) {
-        context.finalStep = { kind: "noPollingResult", responseModel: program.checker.voidType };
+        context.finalStep = { kind: "noPollingResult", responseModel: $(program).intrinsic.void };
       }
     }
   }

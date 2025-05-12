@@ -8,10 +8,9 @@ import {
   createDiagnosticCollector,
   getEncode,
   getSummary,
-  ignoreDiagnostics,
   isErrorModel,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
@@ -429,13 +428,7 @@ export function getSdkHttpParameter(
       // url type need allow reserved
       allowReserved:
         (httpParam as HttpOperationPathParameter)?.allowReserved ??
-        ignoreDiagnostics(
-          program.checker.isTypeAssignableTo(
-            param.type,
-            program.checker.getStdType("url"),
-            param.type,
-          ),
-        ),
+        $(program).type.isAssignableTo(param.type, $(program).builtin.url, param.type),
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams,
       optional: param.optional,
