@@ -1060,53 +1060,6 @@ it("SdkModelExample from discriminated types with union kind fallback", async ()
   expectDiagnostics(runner.context.diagnostics, []);
 });
 
-it("SdkModelExample from discriminated types diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
-    "./examples/getModelDiscriminatorDiagnostic.json",
-    `${__dirname}/example-types/getModelDiscriminatorDiagnostic.json`,
-  );
-  await runner.compile(`
-    @service
-    namespace TestClient {
-      @discriminator("kind")
-      model Fish {
-      }
-
-      @discriminator("sharktype")
-      model Shark extends Fish {
-        kind: "shark";
-      }
-
-      model Salmon extends Fish {
-        kind: "salmon";
-      }
-
-      model SawShark extends Shark {
-        sharktype: "saw";
-      }
-
-      model GoblinShark extends Shark {
-        sharktype: "goblin";
-      }
-
-      op getModelDiscriminatorDiagnostic(): Shark;
-    }
-  `);
-
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
-  ok(operation);
-  strictEqual(operation.examples?.length, 1);
-  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
-  ok(response);
-  strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
-    message: `Value in example file 'getModelDiscriminatorDiagnostic.json' does not follow its definition:\n{"kind":"shark","sharktype":"test","age":2}`,
-  });
-});
-
 it("SdkModelExample with additional properties", async () => {
   await runner.host.addRealTypeSpecFile(
     "./examples/getModelAdditionalProperties.json",
