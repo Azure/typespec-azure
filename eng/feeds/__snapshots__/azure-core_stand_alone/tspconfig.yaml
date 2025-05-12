@@ -23,6 +23,7 @@ options:
     package-details:
       name: "@azure-rest/azure-contoso"
       description: "Azure.Contoso Service"
+    flavor: azure
   "@azure-tools/typespec-java":
     package-dir: "azure-contoso"
     namespace: com.azure.contoso

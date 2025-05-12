@@ -23,6 +23,7 @@ options:
   "@azure-tools/typespec-ts":
     package-dir: "arm-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     experimental-extensible-enums: true
+    flavor: azure
     package-details:
       name: "@azure/{package-dir}"
   "@azure-tools/typespec-go":
