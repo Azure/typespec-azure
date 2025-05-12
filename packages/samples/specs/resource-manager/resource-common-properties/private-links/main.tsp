@@ -75,6 +75,13 @@ interface PrivateEndpointConnections {
   create is ArmResourceCreateOrReplaceSync<PrivateEndpointConnectionResource>;
   /** Delete the private endpoint connection */
   delete is ArmResourceDeleteSync<PrivateEndpointConnectionResource>;
+
+  #suppress "deprecated" "PrivateEndpointConnectionListResultV5 validation"
+  @route("test/v5")
+  listByResourceGroup is ArmResourceListByParent<
+    PrivateEndpointConnectionResource,
+    Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5>
+  >;
 }
 
 /** Private Links for TestRackedResource */
@@ -89,4 +96,11 @@ model PrivateLinkResource is ProxyResource<PrivateLinkResourceProperties> {
 interface PrivateLinks {
   /** list private links on the given resource */
   listByTestTrackedResource is ArmResourceListByParent<PrivateLinkResource>;
+
+  #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
+  @route("/test/v5")
+  listByLinkResult is ArmResourceListByParent<
+    PrivateLinkResource,
+    Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5>
+  >;
 }
