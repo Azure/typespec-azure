@@ -96,6 +96,7 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
   replaceDefintionName(document, "SystemData", "systemData");
   replaceDefintionName(document, "LocationData", "locationData");
   replaceDefintionName(document, "EncryptionProperties", "encryptionProperties");
+  applyCustomDocumentTransformations(document);
 
   return document;
 }
@@ -137,6 +138,13 @@ function replaceDefintionName(document: OpenAPI2Document, oldName: string, newNa
         }
       }
     }
+  }
+}
+
+function applyCustomDocumentTransformations(document: OpenAPI2Document) {
+  const errorAdditionalInfo = document.definitions?.["ErrorAdditionalInfo"];
+  if (errorAdditionalInfo?.properties?.info) {
+    delete (errorAdditionalInfo.properties.info as any)["additionalProperties"];
   }
 }
 

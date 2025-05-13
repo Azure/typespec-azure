@@ -298,7 +298,7 @@ model ErrorAdditionalInfo {
 
   /** The additional info. */
   @visibility(Lifecycle.Read)
-  info?: unknown;
+  info?: Record<unknown>;
 }
 
 /**
