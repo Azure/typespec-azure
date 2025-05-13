@@ -70,6 +70,8 @@ model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
 
 /**
  * Template for ARM location resources.  Use the parameter to specify
+ * the parent of the location resource.
+ * @template BaseType The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension".
  */
 @friendlyName("Location")
 @armVirtualResource
