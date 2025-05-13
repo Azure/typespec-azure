@@ -1192,10 +1192,10 @@ model Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo
 
 #### Properties
 
-| Name  | Type     | Description               |
-| ----- | -------- | ------------------------- |
-| type? | `string` | The additional info type. |
-| info? | `{}`     | The additional info.      |
+| Name  | Type              | Description               |
+| ----- | ----------------- | ------------------------- |
+| type? | `string`          | The additional info type. |
+| info? | `Record<unknown>` | The additional info.      |
 
 ### `ErrorDetail` {#Azure.ResourceManager.CommonTypes.ErrorDetail}
 
