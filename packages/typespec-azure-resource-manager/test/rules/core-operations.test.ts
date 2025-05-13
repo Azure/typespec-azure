@@ -245,4 +245,105 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models.",
       });
   });
+
+  describe("Provider operations", () => {
+    function providerOperationSetup(operation: string = "", content: string = ""): string {
+      return `
+      @armProviderNamespace
+      @service(#{title: "Microsoft.Foo"})
+      @versioned(Versions)
+      namespace Microsoft.Foo;
+  
+      enum Versions {
+        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+        "2021-10-01-preview",
+      }
+  
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+  
+      model EmployeeProperties {
+        @visibility(Lifecycle.Read)
+        provisioningState?: ProvisioningState;
+      }
+  
+      union ProvisioningState {
+        string,
+        @doc(".") Succeeded: "Succeeded",
+        @doc(".") Failed: "Failed",
+        @doc(".") Canceled: "Canceled",
+      }
+
+      op ComputeProviderActionAsync<
+        Request extends {} | void = void,
+        Response extends {} | void = void,
+        Parameters extends {} = {},
+      > is ArmProviderActionAsync<Request, Response, TenantActionScope, Parameters>;
+       
+      ${content}
+
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+      interface VirtualMachinesOperations {
+        ${operation}
+      }
+    `;
+    }
+
+    it("doesn't emit a diagnostic for provider operations", async () => {
+      const content = providerOperationSetup(
+        `
+        @autoRoute
+        @get
+        @action("virtualMachines")
+        listByLocation is ComputeProviderActionAsync<Response = ResourceListResult<Employee>>;
+        `,
+      );
+      await tester.expect(content).toBeValid();
+    });
+
+    it("doesn't emit a diagnostic for provider operations with location", async () => {
+      const content = providerOperationSetup(
+        `
+        @autoRoute
+        @get
+        @action("virtualMachinesGet")
+        get is ComputeProviderActionAsync<Response = ResourceListResult<Employee>, Parameters = LocationParameter>;
+        `,
+      );
+      await tester.expect(content).toBeValid();
+    });
+
+    it("emit diagnostic for provider operations if it has dynamic segments", async () => {
+      const content = providerOperationSetup(
+        `
+        @autoRoute
+        @get
+        @action("virtualMachines")
+        listByLocation is ComputeProviderActionAsync<
+          Response = ResourceListResult<Employee>,
+          Parameters = LocationParameter & MoveResponseParameter
+        >; 
+        `,
+        ` 
+        model MoveResponseParameter {
+          /** The name of Azure region. */
+          @path
+          @minLength(1)
+          @segment("moves")
+          move: string;
+        }
+        `,
+      );
+
+      await tester.expect(content).toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+        message:
+          "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
+      });
+    });
+  });
 });
