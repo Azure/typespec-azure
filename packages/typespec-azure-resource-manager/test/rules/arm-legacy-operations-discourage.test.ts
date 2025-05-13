@@ -23,13 +23,13 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.LegacyOperations",
   await tester
     .expect(
       `
-               @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.ContosoProviderhub;
+  @armProviderNamespace
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  namespace Microsoft.ContosoProviderhub;
 
-        using Azure.ResourceManager.Legacy;
+  using Azure.ResourceManager.Legacy;
 
-        /** A ContosoProviderHub resource */
+  /** A ContosoProviderHub resource */
   model Employee is TrackedResource<EmployeeProperties> {
     ...ResourceNameParameter<Employee>;
   }
@@ -123,8 +123,6 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.LegacyOperations",
       employeeName: string;
     }>;
   };
-
-
     `,
     )
     .toEmitDiagnostics({
