@@ -375,3 +375,168 @@ it("excludes properties marked @invisible from the resource payload", async () =
     required: ["size"],
   });
 });
+
+it("allows resources with multiple endpoint using LegacyOperations", async () => {
+  const openApi = await openApiFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.ContosoProviderhub;
+
+    using Azure.ResourceManager.Legacy;
+
+    /** A ContosoProviderHub resource */
+    model Employee is TrackedResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    /** Employee properties */
+    model EmployeeProperties {
+      /** Age of employee */
+      age?: int32;
+
+      /** City of employee */
+      city?: string;
+
+      /** Profile of employee */
+      @encode("base64url")
+      profile?: bytes;
+
+      /** The status of the last operation. */
+      @visibility(Lifecycle.Read)
+      provisioningState?: ProvisioningState;
+    }
+
+    /** The provisioning state of a resource. */
+    @lroStatus
+    union ProvisioningState {
+      string,
+
+      /** The resource create request has been accepted */
+      Accepted: "Accepted",
+
+      /** The resource is being provisioned */
+      Provisioning: "Provisioning",
+
+      /** The resource is updating */
+      Updating: "Updating",
+
+      /** Resource has been created. */
+      Succeeded: "Succeeded",
+
+      /** Resource creation failed. */
+      Failed: "Failed",
+
+      /** Resource creation was canceled. */
+      Canceled: "Canceled",
+
+      /** The resource is being deleted */
+      Deleting: "Deleting",
+    }
+
+    /** Employee move request */
+    model MoveRequest {
+      /** The moving from location */
+      from: string;
+
+      /** The moving to location */
+      to: string;
+    }
+
+    /** Employee move response */
+    model MoveResponse {
+      /** The status of the move */
+      movingStatus: string;
+    }
+
+    interface Operations extends Azure.ResourceManager.Operations {}
+
+    /** A custom error type */
+    @error
+    model MyErrorType {
+      /** error code */
+      code: string;
+
+      /** error message */
+      message: string;
+    }
+
+    @armResourceOperations
+    interface OtherOps
+      extends Azure.ResourceManager.Legacy.LegacyOperations<
+          ParentParameters = ParentScope,
+          ResourceTypeParameter = InstanceScope,
+          ErrorType = MyErrorType
+        > {}
+
+    alias BaseScope = {
+      ...ApiVersionParameter;
+      ...SubscriptionIdParameter;
+      ...Azure.ResourceManager.Legacy.Provider;
+      ...LocationParameter;
+    };
+
+    /** Experiments with scope */
+    alias InstanceScope = {
+      @doc("The employee name")
+      @path
+      @segment("employees")
+      employeeName: string;
+    };
+
+    /** The parent scope */
+    alias ParentScope = {
+      ...BaseScope;
+      ...ParentKeysOf<{
+        @doc("The employee name")
+        @path
+        @segment("employees")
+        @key
+        employeeName: string;
+      }>;
+    };
+
+    @armResourceOperations
+    interface Employees {
+      get is OtherOps.Read<Employee>;
+      otherCreateOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      createOrUpdate is OtherOps.CreateOrUpdateAsync<Employee>;
+      update is OtherOps.CustomPatchAsync<Employee, Employee>;
+      delete is OtherOps.DeleteAsync<Employee>;
+      list is OtherOps.List<Employee>;
+      listBySubscription is ArmListBySubscription<Employee>;
+
+      /** A sample resource action that move employee to different location */
+      move is OtherOps.ActionAsync<Employee, MoveRequest, MoveResponse>;
+
+      /** A sample HEAD operation to check resource existence */
+      checkExistence is ArmResourceCheckExistence<Employee>;
+    }
+      `);
+  ok(
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees"
+    ].get,
+  );
+  ok(
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees"
+    ].get,
+  );
+  const resourceGroupOperations =
+    openApi.paths[
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/employees/{employeeName}"
+    ];
+  const locationPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees/{employeeName}";
+
+  const locationOperations = openApi.paths[locationPath];
+  ok(resourceGroupOperations);
+  ok(locationOperations);
+  ok(locationOperations.get);
+  ok(locationOperations.put);
+  ok(locationOperations.patch);
+  ok(locationOperations.delete);
+  ok(openApi.paths[`${locationPath}/move`].post);
+  ok(resourceGroupOperations.put);
+  ok(resourceGroupOperations.head);
+});

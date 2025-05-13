@@ -2703,6 +2703,24 @@ model Foo is TrackedResource<FooProperties> {
 | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
 
+### `Provider` {#Azure.ResourceManager.Legacy.Provider}
+
+```typespec
+model Azure.ResourceManager.Legacy.Provider<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                               |
+| -------- | --------------------------------------------------------- |
+| Resource | Optional. The resource to get the provider namespace for. |
+
+#### Properties
+
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 
 Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).

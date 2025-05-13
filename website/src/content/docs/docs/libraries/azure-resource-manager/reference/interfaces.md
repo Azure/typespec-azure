@@ -1183,3 +1183,195 @@ op Azure.ResourceManager.Foundations.checkNameAvailability(apiVersion: string, b
 | Request          | The operation request body                                               |
 | Response         | The operation response                                                   |
 | AdditionalParams | A parameter model with properties representing non-path parameters       |
+
+## Azure.ResourceManager.Legacy
+
+### `LegacyOperations` {#Azure.ResourceManager.Legacy.LegacyOperations}
+
+An operation template used to build resource operations in which the same resource type
+is accessible at multiple, fixed resource paths.
+
+```typespec
+interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                                                      |
+| --------------------- | -------------------------------------------------------------------------------- |
+| ParentParameters      | The path parameters for the resource parent                                      |
+| ResourceTypeParameter | The path parameter for the resource name                                         |
+| ErrorType             | Optional. The type of error models used in operations created form this template |
+
+#### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                             |
+| ---------- | ----------------------------------------------------------------------- |
+| Resource   | the resource being created or updated                                   |
+| LroHeaders | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters | Optional. Additional parameters after the path parameters               |
+| Response   | Optional. The success response(s) for the PUT operation                 |
+| BodyParam  | Optional. The request body parameter for this operation                 |
+
+#### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync}
+
+A synchronous resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | the resource being created or updated                     |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response(s) for the PUT operation   |
+| BodyParam  | Optional. The request body parameter for this operation   |
+
+#### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync}
+
+A long-running resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                             |
+| ---------- | ----------------------------------------------------------------------- |
+| Resource   | the resource being created or updated                                   |
+| PatchModel | the PATCH request model                                                 |
+| LroHeaders | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters | Optional. Additional parameters after the path parameters               |
+| Response   | Optional. The success response(s) for the PATCH operation               |
+| BodyParam  | Optional. The request body parameter for this operation                 |
+
+#### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync}
+
+A synchronous resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | the resource being created or updated                     |
+| PatchModel | the PATCH request model                                   |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response(s) for the PATCH operation |
+| BodyParam  | Optional. The request body parameter for this operation   |
+
+#### `LegacyOperations.DeleteAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteAsync}
+
+Delete a resource asynchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteAsync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| LroHeaders | The lro headers for the operation                          |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+
+#### `LegacyOperations.DeleteSync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync}
+
+Delete a resource synchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+
+#### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations.Read}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.Read(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being read                                   |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response for a get operation.       |
+
+#### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations.List}
+
+List a resource
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being listed                                 |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The response returned by the list               |
+
+#### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionSync}
+
+A synchronous resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being acted upon                             |
+| Request    | The request model for the action                          |
+| Response   | The response model for the action                         |
+| Parameters | Optional. Additional parameters after the path parameters |
+| BodyParam  | Optional. The request body parameter for this operation   |
+
+#### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync}
+
+A long-running resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                               |
+| ---------- | ------------------------------------------------------------------------- |
+| Resource   | The resource being acted upon                                             |
+| Request    | The request model for the action                                          |
+| Result     |                                                                           |
+| LroHeaders | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters | Optional. Additional parameters after the path parameters                 |
+| Response   | The response model for the action                                         |
+| BodyParam  | Optional. The request body parameter for this operation                   |
