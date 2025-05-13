@@ -1385,7 +1385,6 @@ op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(): Response | Error
 | Response   | The response model for the action                                         |
 | BodyParam  | Optional. The request body parameter for this operation                   |
 
-
 ### `ArmCustomPatchAsync` {#Azure.ResourceManager.Legacy.ArmCustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous)
