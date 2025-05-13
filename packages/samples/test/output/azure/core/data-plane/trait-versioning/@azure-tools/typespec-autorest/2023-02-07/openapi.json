@@ -1090,7 +1090,7 @@
     },
     "Azure.Core.Foundations.InnerError": {
       "type": "object",
-      "description": "An object containing more specific information about the error. As per Azure ReST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.",
+      "description": "An object containing more specific information about the error. As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.",
       "properties": {
         "code": {
           "type": "string",

@@ -1425,7 +1425,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
           description: Inner error.
-      description: An object containing more specific information about the error. As per Azure ReST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
+      description: An object containing more specific information about the error. As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
     Azure.Core.Foundations.OperationState:
       anyOf:
         - type: string
