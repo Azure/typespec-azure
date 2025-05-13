@@ -233,7 +233,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
     }
 
     // Set route options for the whole namespace
-    setRouteOptionsForNamespace(program, entity, {
+    setRouteOptionsForNamespace(program, program.getGlobalNamespaceType(), {
       autoRouteOptions: {
         // Filter key parameters for singleton resource types to insert the
         // singleton key value
