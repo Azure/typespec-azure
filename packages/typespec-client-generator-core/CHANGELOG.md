@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.56.2
+
+### Bug Fixes
+
+- [#2658](https://github.com/Azure/typespec-azure/pull/2658) Add fallback logic for example mapping of discriminated type.
+- [#2651](https://github.com/Azure/typespec-azure/pull/2651) Use client name for body mapping as fall back logic.
+- [#2651](https://github.com/Azure/typespec-azure/pull/2651) Fix wrong cache logic for array or dictionary with self referenced value type.
+- [#2663](https://github.com/Azure/typespec-azure/pull/2663) Add linter warning against multiple param aliases for the same parameter
+- [#2665](https://github.com/Azure/typespec-azure/pull/2665) Fix error thrown when removing optional query parameters from method signature with the `@override` decorator
+- [#2666](https://github.com/Azure/typespec-azure/pull/2666) Check root source property to determine if two properties are the same
+
+
 ## 0.56.1
 
 ### Features
