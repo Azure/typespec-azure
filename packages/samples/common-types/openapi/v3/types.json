@@ -606,42 +606,6 @@
         }
       ]
     },
-    "createdByType": {
-      "type": "string",
-      "description": "The kind of entity that created the resource.",
-      "enum": [
-        "User",
-        "Application",
-        "ManagedIdentity",
-        "Key"
-      ],
-      "x-ms-enum": {
-        "name": "createdByType",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "User",
-            "value": "User",
-            "description": "The entity was created by a user."
-          },
-          {
-            "name": "Application",
-            "value": "Application",
-            "description": "The entity was created by an application."
-          },
-          {
-            "name": "ManagedIdentity",
-            "value": "ManagedIdentity",
-            "description": "The entity was created by a managed identity."
-          },
-          {
-            "name": "Key",
-            "value": "Key",
-            "description": "The entity was created by a key."
-          }
-        ]
-      }
-    },
     "encryptionProperties": {
       "type": "object",
       "description": "Configuration of key for data encryption",
@@ -691,8 +655,40 @@
           "description": "The identity that created the resource."
         },
         "createdByType": {
-          "$ref": "#/definitions/createdByType",
-          "description": "The type of identity that created the resource."
+          "type": "string",
+          "description": "The type of identity that created the resource.",
+          "enum": [
+            "User",
+            "Application",
+            "ManagedIdentity",
+            "Key"
+          ],
+          "x-ms-enum": {
+            "name": "createdByType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "User",
+                "value": "User",
+                "description": "The entity was created by a user."
+              },
+              {
+                "name": "Application",
+                "value": "Application",
+                "description": "The entity was created by an application."
+              },
+              {
+                "name": "ManagedIdentity",
+                "value": "ManagedIdentity",
+                "description": "The entity was created by a managed identity."
+              },
+              {
+                "name": "Key",
+                "value": "Key",
+                "description": "The entity was created by a key."
+              }
+            ]
+          }
         },
         "createdAt": {
           "type": "string",
@@ -704,8 +700,40 @@
           "description": "The identity that last modified the resource."
         },
         "lastModifiedByType": {
-          "$ref": "#/definitions/createdByType",
-          "description": "The type of identity that last modified the resource."
+          "type": "string",
+          "description": "The type of identity that last modified the resource.",
+          "enum": [
+            "User",
+            "Application",
+            "ManagedIdentity",
+            "Key"
+          ],
+          "x-ms-enum": {
+            "name": "createdByType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "User",
+                "value": "User",
+                "description": "The entity was created by a user."
+              },
+              {
+                "name": "Application",
+                "value": "Application",
+                "description": "The entity was created by an application."
+              },
+              {
+                "name": "ManagedIdentity",
+                "value": "ManagedIdentity",
+                "description": "The entity was created by a managed identity."
+              },
+              {
+                "name": "Key",
+                "value": "Key",
+                "description": "The entity was created by a key."
+              }
+            ]
+          }
         },
         "lastModifiedAt": {
           "type": "string",
