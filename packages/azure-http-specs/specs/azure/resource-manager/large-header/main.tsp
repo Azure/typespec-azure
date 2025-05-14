@@ -113,7 +113,7 @@ interface LargeHeaders {
     }
     ```
     """)
-  two8k is ArmResourceActionAsync<
+  two6k is ArmResourceActionAsync<
     LargeHeader,
     void,
     CancelResult,
