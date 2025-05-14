@@ -1,66 +1,21 @@
-import { getAsEmbeddingVector } from "@azure-tools/typespec-azure-core";
-import { Model, Namespace, Scalar, resolvePath } from "@typespec/compiler";
 import {
-  BasicTestRunner,
   expectDiagnosticEmpty,
   expectDiagnostics,
   resolveVirtualPath,
+  t,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { getRef } from "../src/decorators.js";
-import { AutorestTestLibrary } from "../src/testing/index.js";
-import {
-  createAutorestTestRunner,
-  ignoreDiagnostics,
-  ignoreUseStandardOps,
-  openApiFor,
-} from "./test-host.js";
+import { BasicTester, ignoreDiagnostics, ignoreUseStandardOps, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: decorators", () => {
-  let runner: BasicTestRunner;
-
-  beforeEach(async () => {
-    runner = await createAutorestTestRunner();
-  });
-
-  describe("@embeddingVector", () => {
-    it("returns embedding vector metadata for embedding vector models", async () => {
-      const [result, _] = await runner.compileAndDiagnose(`
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @test @service(#{title:"MyService"})
-      namespace MyNamespace;
-
-      model MyVector is EmbeddingVector<int64>;
-      `);
-      const ns = result["MyNamespace"] as Namespace;
-      const model = ns.models.get("MyVector") as Model;
-      const metadata = getAsEmbeddingVector(runner.program, model);
-      deepStrictEqual((metadata!.elementType as Scalar).name, "int64");
-    });
-
-    it("returns undefined for non-embedding vector models", async () => {
-      const [result, _] = await runner.compileAndDiagnose(`
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @test @service(#{title:"MyService"})
-      namespace MyNamespace;
-
-      model Foo {};
-      `);
-      const ns = result["MyNamespace"] as Namespace;
-      const model = ns.models.get("MyVector") as Model;
-      const metadata = getAsEmbeddingVector(runner.program, model);
-      strictEqual(metadata, undefined);
-    });
-  });
-
   describe("@useRef", () => {
     it("emit diagnostic if use on non model or property", async () => {
-      const diagnostics = await runner.diagnose(`
+      const diagnostics = await BasicTester.diagnose(`
         @useRef("foo")
         op foo(): string;
       `);
-
       expectDiagnostics(ignoreUseStandardOps(diagnostics), {
         code: "decorator-wrong-target",
         message:
@@ -69,22 +24,20 @@ describe("typespec-autorest: decorators", () => {
     });
 
     it("emit diagnostic if ref is not a string", async () => {
-      const diagnostics = await runner.diagnose(`
+      const diagnostics = await BasicTester.diagnose(`
         @useRef(123)
         model Foo {}
       `);
-
       expectDiagnostics(ignoreUseStandardOps(diagnostics), {
         code: "invalid-argument",
       });
     });
 
     it("emit diagnostic if ref is not passed", async () => {
-      const diagnostics = await runner.diagnose(`
+      const diagnostics = await BasicTester.diagnose(`
         @useRef
         model Foo {}
       `);
-
       expectDiagnostics(ignoreUseStandardOps(diagnostics), [
         {
           code: "invalid-argument-count",
@@ -94,54 +47,48 @@ describe("typespec-autorest: decorators", () => {
     });
 
     it("set external reference", async () => {
-      const [{ Foo }, diagnostics] = await runner.compileAndDiagnose(`
-        @test @useRef("../common.json#/definitions/Foo")
-        model Foo {}
+      const [{ Foo, program }, diagnostics] = await BasicTester.compileAndDiagnose(t.code`
+        @useRef("../common.json#/definitions/Foo")
+        model ${t.model("Foo")} {}
       `);
-
       expectDiagnosticEmpty(
         ignoreDiagnostics(diagnostics, [
           "@azure-tools/typespec-azure-core/use-standard-operations",
           "@typespec/http/no-service-found",
         ]),
       );
-
-      strictEqual(getRef(runner.program, Foo), "../common.json#/definitions/Foo");
+      strictEqual(getRef(program, Foo), "../common.json#/definitions/Foo");
     });
 
     describe("interpolate arm-types-dir", () => {
       async function testArmTypesDir(options?: any) {
         const code = `
-        @test @useRef("{arm-types-dir}/common.json#/definitions/Foo")
-        model Foo {}
+          @useRef("{arm-types-dir}/common.json#/definitions/Foo")
+          model Foo {}
 
-        model Bar {
-          foo: Foo;
-        }
-      `;
-        const runner = await createAutorestTestRunner();
+          model Bar {
+            foo: Foo;
+          }
+        `;
         const outputDir = resolveVirtualPath(`specification/org/service/output`);
-        const diagnostics = await runner.diagnose(code, {
-          noEmit: false,
-          config: resolveVirtualPath("specification/org/service/tspconfig.json"),
-          emit: ["@azure-tools/typespec-autorest"],
+        const [{ outputs }, diagnostics] = await BasicTester.emit(
+          "@azure-tools/typespec-autorest",
+          {
+            ...options,
+            "emitter-output-dir": outputDir,
+          },
+        ).compileAndDiagnose(code, {
           options: {
-            [AutorestTestLibrary.name]: {
-              ...options,
-              "emitter-output-dir": outputDir,
-            },
+            config: resolveVirtualPath("specification/org/service/tspconfig.json"),
           },
         });
-
         expectDiagnosticEmpty(
           ignoreDiagnostics(diagnostics, [
             "@azure-tools/typespec-azure-core/use-standard-operations",
             "@typespec/http/no-service-found",
           ]),
         );
-
-        const outPath = resolvePath(outputDir, "openapi.json");
-        const openAPI = JSON.parse(runner.fs.get(outPath)!);
+        const openAPI = JSON.parse(outputs["openapi.json"]);
         return openAPI.definitions.Bar.properties.foo.$ref;
       }
       // project-root resolve to "" in test
@@ -165,6 +112,7 @@ describe("typespec-autorest: decorators", () => {
       });
     });
   });
+
   describe("@operationId", () => {
     it("preserves casing of explicit @operationId decorator", async () => {
       const openapi = await openApiFor(`
@@ -172,7 +120,6 @@ describe("typespec-autorest: decorators", () => {
         @operationId("Pets_GET")
         op read(): string;
       `);
-
       deepStrictEqual(openapi.paths["/"].get.operationId, "Pets_GET");
     });
   });
