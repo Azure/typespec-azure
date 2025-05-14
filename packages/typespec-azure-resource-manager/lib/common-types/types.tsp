@@ -9,7 +9,7 @@ namespace Azure.ResourceManager.CommonTypes;
 /** Common fields that are returned in the response for all Azure Resource Manager resources */
 @summary("Resource")
 model Resource {
-  /** Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
+  /** Fully qualified resource ID for the resource. E.g. - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName} */
   @typeChangedFrom(Versions.v4, string)
   @visibility(Lifecycle.Read)
   id?: armResourceIdentifier;
@@ -91,7 +91,7 @@ model ResourceModelWithAllowedPropertySet extends TrackedResource {
  * The resource model definition representing SKU
  */
 model Sku {
-  /** The name of the SKU. Ex - P3. It is typically a letter+number code */
+  /** The name of the SKU. E.g. - P3. It is typically a letter+number code */
   name: string;
 
   /** This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT. */
@@ -164,7 +164,7 @@ model Operation {
 }
 
 /**
- * Localized display information for and operation.
+ * Localized display information for an operation.
  */
 model OperationDisplay {
   /** 
@@ -495,7 +495,7 @@ model OperationIdParameter {
  * The default location parameter type.
  */
 model LocationParameter {
-  /** The name of Azure region. */
+  /** The name of the Azure region. */
   @path
   @minLength(1)
   @segment("locations")

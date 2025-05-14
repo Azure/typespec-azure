@@ -36,5 +36,7 @@ interface RegisterParams {
 @@extension(ResourceModelWithAllowedPropertySet, "x-ms-azure-resource", true);
 @@extension(OperationListResult.value, "x-ms-identifiers", #["name"]);
 
+@@doc(OperationListResult.value, "List of operations supported by the resource provider");
+
 @useRef("./managedidentity.json#/definitions/ManagedServiceIdentity")
 model ManagedServiceIdentity {}

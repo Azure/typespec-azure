@@ -23,3 +23,5 @@ interface RegisterParams {
   @Versioning.added(Versions.v5)
   v5(...NetworkSecurityPerimeterConfigurationNameParameter): void;
 }
+
+@@doc(Azure.Core.armResourceIdentifier, "Fully qualified resource ID of the suggested resource");
