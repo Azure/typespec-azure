@@ -19,6 +19,7 @@ beforeEach(async () => {
 function compileOpenAPIWithOptions(code: string, options: AutorestEmitterOptions) {
   return compileOpenAPI(code, {
     options: { ...options, "output-file": "openapi.json" },
+    preset: "azure",
   });
 }
 

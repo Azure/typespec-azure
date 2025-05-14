@@ -27,12 +27,22 @@ export const BasicTester = ApiTester.import("@azure-tools/typespec-autorest").us
 const defaultOptions = {
   "emitter-output-dir": resolveVirtualPath("./tsp-output"),
 };
-export const Tester = ApiTester.importLibraries()
+export const Tester = BasicTester.import(
+  "@typespec/http",
+  "@typespec/rest",
+  "@typespec/openapi",
+  "@typespec/versioning",
+)
+  .using("Http", "Rest", "OpenAPI", "Versioning")
+  .emit("@azure-tools/typespec-autorest", defaultOptions);
+
+/** Tester that will load Azure libraries. Only use if needed, will slow down the tests */
+export const AzureTester = ApiTester.importLibraries()
   .using(
-    "TypeSpec.Versioning",
-    "TypeSpec.Http",
-    "TypeSpec.Rest",
-    "TypeSpec.OpenAPI",
+    "Versioning",
+    "Http",
+    "Rest",
+    "OpenAPI",
     "Autorest",
     "Azure.Core",
     "Azure.ResourceManager",
@@ -58,6 +68,7 @@ export async function emitOpenApiWithDiagnostics(
 }
 
 interface CompileOpenAPIOptions {
+  preset?: "simple" | "azure";
   tester?: EmitterTesterInstance;
   options?: AutorestEmitterOptions;
 }
@@ -66,7 +77,8 @@ export async function compileOpenAPI(
   code: string,
   options: CompileOpenAPIOptions = {},
 ): Promise<OpenAPI2Document> {
-  const tester = options?.tester ?? (await Tester.createInstance());
+  const tester =
+    options?.tester ?? (await (options.preset === "azure" ? AzureTester : Tester).createInstance());
   const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(code, {
     options: options?.options
       ? {
@@ -85,7 +97,15 @@ export async function compileVersionedOpenAPI<K extends string>(
   versions: K[],
   options: CompileOpenAPIOptions = {},
 ): Promise<Record<K, OpenAPI2Document>> {
-  const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code);
+  const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
+    options: options?.options
+      ? {
+          options: {
+            "@azure-tools/typespec-autorest": { ...defaultOptions, ...options.options },
+          },
+        }
+      : undefined,
+  });
   expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
 
   const output: any = {};

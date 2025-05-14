@@ -1,9 +1,9 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { openApiFor } from "../test-host.js";
+import { compileOpenAPI } from "../test-host.js";
 
 it("can share types with a library namespace", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armLibraryNamespace
@@ -40,6 +40,7 @@ it("can share types with a library namespace", async () => {
       interface TestTrackedOperations extends Microsoft.Library.TrackedOperations {}
       
     }`,
+    { preset: "azure" },
   );
 
   const listSubscriptionPath =
@@ -49,25 +50,25 @@ it("can share types with a library namespace", async () => {
   const itemPath =
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/trackedResources/{trackedResourceName}";
 
-  ok(openapi.definitions["Microsoft.Library.TestTrackedResource"]);
-  ok(openapi.definitions["Microsoft.Library.TestTrackedProperties"]);
-  ok(openapi.definitions.TestTrackedResourceListResult);
-  ok(openapi.definitions.TestTrackedResourceUpdate);
-  ok(!openapi.definitions.TestTrackedProperties);
-  ok(!openapi.definitions.TestTrackedResource);
-  ok(openapi.paths[listSubscriptionPath]);
-  ok(openapi.paths[listSubscriptionPath].get);
-  ok(openapi.paths[listResourceGroupPath]);
-  ok(openapi.paths[listResourceGroupPath].get);
-  ok(openapi.paths[itemPath]);
-  ok(openapi.paths[itemPath].get);
-  ok(openapi.paths[itemPath].put);
-  ok(openapi.paths[itemPath].patch);
-  ok(openapi.paths[itemPath].delete);
+  ok(openapi.definitions?.["Microsoft.Library.TestTrackedResource"]);
+  ok(openapi.definitions?.["Microsoft.Library.TestTrackedProperties"]);
+  ok(openapi.definitions?.TestTrackedResourceListResult);
+  ok(openapi.definitions?.TestTrackedResourceUpdate);
+  ok(!openapi.definitions?.TestTrackedProperties);
+  ok(!openapi.definitions?.TestTrackedResource);
+  ok(openapi.paths?.[listSubscriptionPath]);
+  ok(openapi.paths?.[listSubscriptionPath]?.get);
+  ok(openapi.paths?.[listResourceGroupPath]);
+  ok(openapi.paths?.[listResourceGroupPath]?.get);
+  ok(openapi.paths?.[itemPath]);
+  ok(openapi.paths?.[itemPath]?.get);
+  ok(openapi.paths?.[itemPath]?.put);
+  ok(openapi.paths?.[itemPath]?.patch);
+  ok(openapi.paths?.[itemPath]?.delete);
 });
 
 it("can use private links with common-types references", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
       @armProviderNamespace
@@ -105,22 +106,23 @@ it("can use private links with common-types references", async () => {
         endpoints?: PrivateEndpoint[];
       }
       `,
+    { preset: "azure" },
   );
 
   const createPath =
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/trackedResources/{trackedResourceName}/createConnection";
   const listPath =
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/trackedResources/{trackedResourceName}/listConnections";
-  ok(openapi.paths[createPath]);
-  deepStrictEqual(openapi.paths[createPath].post.parameters.length, 5);
-  ok(openapi.paths[createPath].post.parameters[4].schema);
-  ok(openapi.paths[createPath].post.responses["200"]);
-  ok(openapi.paths[listPath]);
-  ok(openapi.paths[listPath].post.responses["200"]);
+  ok(openapi.paths?.[createPath]);
+  deepStrictEqual(openapi.paths?.[createPath]?.post?.parameters?.length, 5);
+  ok(openapi.paths?.[createPath]?.post?.parameters?.[4]?.schema);
+  ok(openapi.paths?.[createPath]?.post?.responses?.["200"]);
+  ok(openapi.paths?.[listPath]);
+  ok(openapi.paths?.[listPath]?.post?.responses?.["200"]);
 });
 
 it("can use private endpoints with common-types references", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -142,26 +144,27 @@ it("can use private endpoints with common-types references", async () => {
         getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
       }
       `,
+    { preset: "azure" },
   );
 
   const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
   const privateEndpointGet =
     "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
-  ok(openapi.paths[privateEndpointList]);
-  ok(openapi.paths[privateEndpointList].get);
+  ok(openapi.paths?.[privateEndpointList]);
+  ok(openapi.paths?.[privateEndpointList]?.get);
   deepStrictEqual(
-    openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+    openapi.paths?.[privateEndpointList]?.get?.responses?.["200"]?.schema?.["$ref"],
     "#/definitions/PrivateEndpointConnectionResourceListResult",
   );
-  ok(openapi.definitions.PrivateEndpointConnectionResourceListResult.properties["value"]);
-  ok(openapi.paths[privateEndpointGet]);
-  ok(openapi.paths[privateEndpointGet].get);
-  deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
-  ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+  ok(openapi.definitions?.PrivateEndpointConnectionResourceListResult?.properties?.["value"]);
+  ok(openapi.paths?.[privateEndpointGet]);
+  ok(openapi.paths?.[privateEndpointGet]?.get);
+  deepStrictEqual(openapi.paths?.[privateEndpointGet]?.get?.parameters?.length, 2);
+  ok(openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]);
 });
 
 it("can use ResourceNameParameter for custom name parameter definition", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -181,27 +184,28 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
         getConnection is ArmResourceRead<PrivateEndpointConnectionResource>;
       }
       `,
+    { preset: "azure" },
   );
 
   const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
   const privateEndpointGet =
     "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
-  ok(openapi.paths[privateEndpointList]);
-  ok(openapi.paths[privateEndpointList].get);
+  ok(openapi.paths?.[privateEndpointList]);
+  ok(openapi.paths?.[privateEndpointList]?.get);
   deepStrictEqual(
-    openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+    openapi.paths?.[privateEndpointList]?.get?.responses?.["200"]?.schema?.["$ref"],
     "#/definitions/PrivateEndpointConnectionResourceListResult",
   );
-  ok(openapi.definitions.PrivateEndpointConnectionResourceListResult.properties["value"]);
-  ok(openapi.paths[privateEndpointGet]);
-  ok(openapi.paths[privateEndpointGet].get);
-  deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
-  strictEqual(openapi.paths[privateEndpointGet].get.parameters[1].pattern, "/[a-zA-Z]*");
-  ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+  ok(openapi.definitions?.PrivateEndpointConnectionResourceListResult?.properties?.["value"]);
+  ok(openapi.paths?.[privateEndpointGet]);
+  ok(openapi.paths?.[privateEndpointGet]?.get);
+  deepStrictEqual(openapi.paths?.[privateEndpointGet]?.get?.parameters?.length, 2);
+  strictEqual(openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]?.pattern, "/[a-zA-Z]*");
+  ok(openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]);
 });
 
 it("can use ResourceNameParameter for default name parameter definition", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -220,27 +224,31 @@ it("can use ResourceNameParameter for default name parameter definition", async 
         getConnection is ArmResourceRead<PrivateEndpointConnection>;
       }
       `,
+    { preset: "azure" },
   );
 
   const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
   const privateEndpointGet =
     "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections/{privateEndpointConnectionName}";
-  ok(openapi.paths[privateEndpointList]);
-  ok(openapi.paths[privateEndpointList].get);
+  ok(openapi.paths?.[privateEndpointList]);
+  ok(openapi.paths?.[privateEndpointList]?.get);
   deepStrictEqual(
-    openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+    openapi.paths?.[privateEndpointList]?.get?.responses?.["200"]?.schema?.["$ref"],
     "#/definitions/PrivateEndpointConnectionListResult",
   );
-  ok(openapi.definitions.PrivateEndpointConnectionListResult.properties["value"]);
-  ok(openapi.paths[privateEndpointGet]);
-  ok(openapi.paths[privateEndpointGet].get);
-  deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
-  strictEqual(openapi.paths[privateEndpointGet].get.parameters[1].pattern, "^[a-zA-Z0-9-]{3,24}$");
-  ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+  ok(openapi.definitions?.PrivateEndpointConnectionListResult?.properties?.["value"]);
+  ok(openapi.paths?.[privateEndpointGet]);
+  ok(openapi.paths?.[privateEndpointGet]?.get);
+  deepStrictEqual(openapi.paths?.[privateEndpointGet]?.get?.parameters?.length, 2);
+  strictEqual(
+    openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]?.pattern,
+    "^[a-zA-Z0-9-]{3,24}$",
+  );
+  ok(openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]);
 });
 
 it("can emit x-ms-client-flatten with optional configuration", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -263,18 +271,15 @@ it("can emit x-ms-client-flatten with optional configuration", async () => {
         age?: int32;
       }
       `,
-    undefined,
-    {
-      "arm-resource-flattening": true,
-    },
+    { preset: "azure", options: { "arm-resource-flattening": true } },
   );
 
-  ok(openapi.definitions.Employee.properties.properties["x-ms-client-flatten"]);
-  ok(openapi.definitions.Dependent.properties.properties["x-ms-client-flatten"]);
+  ok(openapi.definitions?.Employee?.properties?.properties?.["x-ms-client-flatten"]);
+  ok(openapi.definitions?.Dependent?.properties?.properties?.["x-ms-client-flatten"]);
 });
 
 it("no x-ms-client-flatten emitted with default configuration", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -297,16 +302,20 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
         age?: int32;
       }
       `,
+    { preset: "azure" },
   );
 
-  strictEqual(openapi.definitions.Employee.properties.properties["x-ms-client-flatten"], undefined);
   strictEqual(
-    openapi.definitions.Dependent.properties.properties["x-ms-client-flatten"],
+    openapi.definitions?.Employee?.properties?.properties?.["x-ms-client-flatten"],
+    undefined,
+  );
+  strictEqual(
+    openapi.definitions?.Dependent?.properties?.properties?.["x-ms-client-flatten"],
     undefined,
   );
 });
 it("generates PATCH bodies for custom patch of common resource envelope mixins", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -364,40 +373,43 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
       `,
+    { preset: "azure" },
   );
 
-  const all = openapi.definitions["AllPropertiesResourceUpdate"];
-  const system = openapi.definitions["SystemAssignedResourceUpdate"];
+  const all = openapi.definitions?.["AllPropertiesResourceUpdate"];
+  const system = openapi.definitions?.["SystemAssignedResourceUpdate"];
   ok(all);
   ok(system);
   deepStrictEqual(
-    all["properties"]["plan"]["$ref"],
+    all?.["properties"]?.["plan"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate",
   );
   deepStrictEqual(
-    all["properties"]["sku"]["$ref"],
+    all?.["properties"]?.["sku"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate",
   );
   deepStrictEqual(
-    all["properties"]["identity"]["$ref"],
+    all?.["properties"]?.["identity"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
   );
   deepStrictEqual(
-    system["properties"]["identity"]["$ref"],
+    system?.["properties"]?.["identity"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate",
   );
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"]);
+  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
+  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
+  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
+  ok(
+    openapi.definitions?.["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"],
+  );
+  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.TrackedResourceUpdate"]);
   deepStrictEqual(
-    openapi.definitions["Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet"],
+    openapi.definitions?.["Azure.ResourceManager.CommonTypes.ResourceModelWithAllowedPropertySet"],
     undefined,
   );
 });
 it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
@@ -455,30 +467,33 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
       `,
+    { preset: "azure" },
   );
 
-  const all = openapi.definitions["AllPropertiesResourceUpdate"];
-  const system = openapi.definitions["SystemAssignedResourceUpdate"];
+  const all = openapi.definitions?.["AllPropertiesResourceUpdate"];
+  const system = openapi.definitions?.["SystemAssignedResourceUpdate"];
   ok(all);
   ok(system);
   deepStrictEqual(
-    all["properties"]["plan"]["$ref"],
+    all?.["properties"]?.["plan"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate",
   );
   deepStrictEqual(
-    all["properties"]["sku"]["$ref"],
+    all?.["properties"]?.["sku"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate",
   );
   deepStrictEqual(
-    all["properties"]["identity"]["$ref"],
+    all?.["properties"]?.["identity"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
   );
   deepStrictEqual(
-    system["properties"]["identity"]["$ref"],
+    system?.["properties"]?.["identity"]?.["$ref"],
     "#/definitions/Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate",
   );
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
-  ok(openapi.definitions["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"]);
+  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.PlanUpdate"]);
+  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.SkuUpdate"]);
+  ok(openapi.definitions?.["Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate"]);
+  ok(
+    openapi.definitions?.["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"],
+  );
 });
