@@ -1,7 +1,7 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
-import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
+import { AzureTester, diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: format", () => {
   it("allows supported formats", async () => {
@@ -54,7 +54,7 @@ describe("typespec-autorest: format", () => {
   });
 
   it("does not emit diagnostic for Azure.Core scalars", async () => {
-    const diagnostics = await diagnoseOpenApiFor(
+    const diagnostics = await AzureTester.diagnose(
       `
       @service
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)

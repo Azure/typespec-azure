@@ -1,9 +1,9 @@
 import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { compileOpenAPI } from "./test-host.js";
 
 it("use Azure.Core.Page as the response", async () => {
-  const res = await openApiFor(
+  const res = await compileOpenAPI(
     `
     @service
     @useDependency(Azure.Core.Versions.v1_0_Preview_2)
@@ -11,6 +11,7 @@ it("use Azure.Core.Page as the response", async () => {
       op list(): Azure.Core.Page<{}>;
     }
     `,
+    { preset: "azure" },
   );
 
   const listThings = res.paths["/"].get;
@@ -19,7 +20,7 @@ it("use Azure.Core.Page as the response", async () => {
 });
 
 it("define a custom paged operation with custom next link", async () => {
-  const res = await openApiFor(
+  const res = await compileOpenAPI(
     `
     model CustomPageModel<T> {
       @pageItems myItems: T[];
@@ -28,6 +29,7 @@ it("define a custom paged operation with custom next link", async () => {
     }
     @list op list(): CustomPageModel<{}>;
     `,
+    { preset: "azure" },
   );
 
   const listThings = res.paths["/"].get;
@@ -40,7 +42,7 @@ it("define a custom paged operation with custom next link", async () => {
 
 describe("Legacy define paging operation using Azure.Core decorators", () => {
   it("define a custom paged operation with custom next link", async () => {
-    const res = await openApiFor(
+    const res = await compileOpenAPI(
       `
       @pagedResult
       model CustomPageModel<T> {
@@ -51,6 +53,7 @@ describe("Legacy define paging operation using Azure.Core decorators", () => {
       }
       op list(): CustomPageModel<{}>;
       `,
+      { preset: "azure" },
     );
 
     const listThings = res.paths["/"].get;
@@ -59,7 +62,7 @@ describe("Legacy define paging operation using Azure.Core decorators", () => {
   });
 
   it("define a custom paged operation with custom item name", async () => {
-    const res = await openApiFor(
+    const res = await compileOpenAPI(
       `
     @pagedResult
     model List {
@@ -72,6 +75,7 @@ describe("Legacy define paging operation using Azure.Core decorators", () => {
       
     op list(): List;
     `,
+      { preset: "azure" },
     );
 
     const listThings = res.paths["/"].get;

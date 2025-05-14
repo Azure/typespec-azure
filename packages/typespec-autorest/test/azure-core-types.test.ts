@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { compileOpenAPI } from "./test-host.js";
 
 const base = `
 @service
@@ -10,11 +10,14 @@ namespace MyService;
 
 describe("EmbeddingVector", () => {
   it("defines embedding vector models", async () => {
-    const result = await openApiFor(`
+    const result = await compileOpenAPI(
+      `
     ${base}
     model Foo is Azure.Core.EmbeddingVector<int32>;
-    `);
-    const model = result.definitions["Foo"];
+    `,
+      { preset: "azure" },
+    );
+    const model = result.definitions!["Foo"];
     deepStrictEqual(model, {
       type: "array",
       description: "A vector embedding frequently used in similarity search.",
@@ -29,11 +32,14 @@ describe("EmbeddingVector", () => {
 
 describe("armResourceIdentifier", () => {
   it("without config", async () => {
-    const result = await openApiFor(`
+    const result = await compileOpenAPI(
+      `
       ${base}
       scalar Foo extends Azure.Core.armResourceIdentifier;
-    `);
-    const model = result.definitions["Foo"];
+    `,
+      { preset: "azure" },
+    );
+    const model = result.definitions!["Foo"];
     deepStrictEqual(model, {
       type: "string",
       format: "arm-id",
@@ -42,11 +48,14 @@ describe("armResourceIdentifier", () => {
   });
 
   it("with config", async () => {
-    const result = await openApiFor(`
+    const result = await compileOpenAPI(
+      `
       ${base}
       scalar Foo extends Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
-    `);
-    const model = result.definitions["Foo"];
+    `,
+      { preset: "azure" },
+    );
+    const model = result.definitions!["Foo"];
     deepStrictEqual(model, {
       type: "string",
       format: "arm-id",

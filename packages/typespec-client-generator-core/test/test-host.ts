@@ -1,7 +1,6 @@
 import { Diagnostic, EmitContext, Program, Type } from "@typespec/compiler";
 import {
   BasicTestRunner,
-  StandardTestLibrary,
   TestHost,
   TypeSpecTestLibrary,
   createTestHost,
@@ -200,18 +199,12 @@ export async function createSdkTestRunner(
   };
 
   const mainAutoCode = [
-    ...host.libraries
-      .filter((x) => x !== StandardTestLibrary)
-      .map((x) => x.name)
-      .map((x) => `import "${x}";`),
+    ...host.libraries.map((x) => x.name).map((x) => `import "${x}";`),
     ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
 
   const clientAutoCode = [
-    ...host.libraries
-      .filter((x) => x !== StandardTestLibrary)
-      .map((x) => x.name)
-      .map((x) => `import "${x}";`),
+    ...host.libraries.map((x) => x.name).map((x) => `import "${x}";`),
     `import "./main.tsp";`,
     ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
