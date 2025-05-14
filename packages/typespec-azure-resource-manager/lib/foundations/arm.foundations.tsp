@@ -265,8 +265,8 @@ op ArmUpdateOperation<
   HttpParameters extends {},
   BodyParameter extends {},
   Response extends {},
-  ErrorResponse extends {},
-  RequestBody extends {} = {
-    @doc("The resource properties to be updated.") @bodyRoot properties: BodyParameter;
-  }
->(...HttpParameters, ...RequestBody): Response | ErrorResponse;
+  ErrorResponse extends {}
+>(
+  ...HttpParameters,
+  @doc("The resource properties to be updated.") @bodyRoot properties: BodyParameter,
+): Response | ErrorResponse;

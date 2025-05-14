@@ -36,7 +36,7 @@ model Widget is TrackedResource<WidgetProperties> {
 interface Widgets {
   get is ArmResourceRead<Widget>;
   createOrReplace is ArmResourceCreateOrReplaceAsync<Widget>;
-  update is Azure.ResourceManager.Legacy.ArmCustomPatchAsync<
+  update is Azure.ResourceManager.Legacy.CustomPatchAsync<
     Widget,
     Foundations.ResourceUpdateModel<Widget, WidgetProperties>,
     RequestBody = {

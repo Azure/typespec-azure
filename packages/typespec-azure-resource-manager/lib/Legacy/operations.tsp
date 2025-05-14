@@ -306,7 +306,7 @@ model Provider<Resource extends {} = TenantActionScope> {
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @patch(#{ implicitOptionality: true })
-op ArmCustomPatchAsync<
+op CustomPatchAsync<
   Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -325,7 +325,7 @@ op ArmCustomPatchAsync<
   RequestBody extends {} = {
     @doc("The resource properties to be updated.") @bodyRoot properties: PatchModel;
   }
-> is ArmUpdateOperation<
+> is UpdateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   PatchModel,
   Response,
@@ -348,7 +348,7 @@ op ArmCustomPatchAsync<
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @patch(#{ implicitOptionality: true })
-op ArmCustomPatchSync<
+op CustomPatchSync<
   Resource extends Foundations.Resource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -358,10 +358,28 @@ op ArmCustomPatchSync<
   RequestBody extends {} = {
     @doc("The resource properties to be updated.") @bodyRoot properties: PatchModel;
   }
-> is ArmUpdateOperation<
+> is UpdateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   PatchModel,
   Response,
   Error,
   RequestBody
 >;
+
+/**
+ * @dev The base template for Legacy Azure Resource Manager PATCH Operations.
+ * @template HttpParameters The parameter object for the operation.
+ * @template BodyParameter The body parameter
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
+ * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
+ */
+op UpdateOperation<
+  HttpParameters extends {},
+  BodyParameter extends {},
+  Response extends {},
+  ErrorResponse extends {},
+  RequestBody extends {} = {
+    @doc("The resource properties to be updated.") @bodyRoot properties: BodyParameter;
+  }
+>(...HttpParameters, ...RequestBody): Response | ErrorResponse;

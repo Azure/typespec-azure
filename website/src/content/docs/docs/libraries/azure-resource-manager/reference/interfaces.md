@@ -1161,18 +1161,17 @@ op Azure.ResourceManager.Foundations.ArmReadOperation(): Response | ErrorRespons
 ### `ArmUpdateOperation` {#Azure.ResourceManager.Foundations.ArmUpdateOperation}
 
 ```typespec
-op Azure.ResourceManager.Foundations.ArmUpdateOperation(): Response | ErrorResponse
+op Azure.ResourceManager.Foundations.ArmUpdateOperation(properties: BodyParameter): Response | ErrorResponse
 ```
 
 #### Template Parameters
 
-| Name           | Description                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| HttpParameters | The parameter object for the operation.                                                          |
-| BodyParameter  | The body parameter                                                                               |
-| Response       | The response or union of responses for success.                                                  |
-| ErrorResponse  | The error response.                                                                              |
-| RequestBody    | Optional. ENables changing the name, documentation, or optionality of the request body parameter |
+| Name           | Description                                     |
+| -------------- | ----------------------------------------------- |
+| HttpParameters | The parameter object for the operation.         |
+| BodyParameter  | The body parameter                              |
+| Response       | The response or union of responses for success. |
+| ErrorResponse  | The error response.                             |
 
 ### `checkNameAvailability` {#Azure.ResourceManager.Foundations.checkNameAvailability}
 
@@ -1385,12 +1384,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(): Response | Error
 | Response   | The response model for the action                                         |
 | BodyParam  | Optional. The request body parameter for this operation                   |
 
-### `ArmCustomPatchAsync` {#Azure.ResourceManager.Legacy.ArmCustomPatchAsync}
+### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.CustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ArmCustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Legacy.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -1406,12 +1405,12 @@ op Azure.ResourceManager.Legacy.ArmCustomPatchAsync(provider: "Microsoft.ThisWil
 | Error          | Optional. The error response, if non-standard.                                                   |
 | RequestBody    | Optional. ENables changing the name, documentation, or optionality of the request body parameter |
 
-### `ArmCustomPatchSync` {#Azure.ResourceManager.Legacy.ArmCustomPatchSync}
+### `CustomPatchSync` {#Azure.ResourceManager.Legacy.CustomPatchSync}
 
 A resource update using a custom PATCH payload (synchronous)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ArmCustomPatchSync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Legacy.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 #### Template Parameters
@@ -1424,4 +1423,20 @@ op Azure.ResourceManager.Legacy.ArmCustomPatchSync(provider: "Microsoft.ThisWill
 | Parameters     | Optional. Additional parameters after the path parameters                                        |
 | Response       | Optional. The success response for the patch operation                                           |
 | Error          | Optional. The error response, if non-standard.                                                   |
+| RequestBody    | Optional. ENables changing the name, documentation, or optionality of the request body parameter |
+
+### `UpdateOperation` {#Azure.ResourceManager.Legacy.UpdateOperation}
+
+```typespec
+op Azure.ResourceManager.Legacy.UpdateOperation(): Response | ErrorResponse
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| HttpParameters | The parameter object for the operation.                                                          |
+| BodyParameter  | The body parameter                                                                               |
+| Response       | The response or union of responses for success.                                                  |
+| ErrorResponse  | The error response.                                                                              |
 | RequestBody    | Optional. ENables changing the name, documentation, or optionality of the request body parameter |
