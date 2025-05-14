@@ -147,7 +147,7 @@ it("client accessor", async () => {
   const client = sdkPackage.clients[0];
 
   const bumpParameterClient = client.children![0] as SdkClientType<SdkHttpOperation>;
-  strictEqual(bumpParameterClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(bumpParameterClient.clientInitialization.initializedBy, InitializedByFlags.Default);
 
   const methods = bumpParameterClient.methods;
   strictEqual(methods.length, 2);
@@ -222,7 +222,7 @@ it("subclient", async () => {
 
   strictEqual(blobClient.kind, "client");
   strictEqual(blobClient.name, "BlobClient");
-  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(blobClient.clientInitialization.parameters.length, 2);
 
   const blobClientEndpoint = blobClient.clientInitialization.parameters.find(
@@ -456,7 +456,7 @@ it("@operationGroup with same model on parent client", async () => {
   const og = client.children![0] as SdkClientType<SdkHttpOperation>;
   strictEqual(og.kind, "client");
 
-  strictEqual(og.clientInitialization.initializedBy, InitializedByFlags.Parent);
+  strictEqual(og.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(og.clientInitialization.parameters.length, 3);
 
   ok(og.clientInitialization.parameters.find((x) => x.kind === "endpoint"));

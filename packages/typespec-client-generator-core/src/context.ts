@@ -19,7 +19,9 @@ import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
+  SdkArrayType,
   SdkContext,
+  SdkDictionaryType,
   SdkEnumType,
   SdkHttpOperation,
   SdkModelPropertyType,
@@ -56,6 +58,7 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
       Type,
       SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
     >(),
+    __arrayDictionaryCache: new Map<Type, SdkDictionaryType | SdkArrayType>(),
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),

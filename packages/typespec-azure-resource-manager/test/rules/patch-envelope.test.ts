@@ -72,7 +72,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
           @autoRoute
           @doc("Update a {name}", FooResource)
           @armResourceUpdate(FooResource)
-          @patch 
+          @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>,  
           @doc("The resource properties to be updated.")
           @bodyRoot 
@@ -142,7 +142,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
           @autoRoute
           @doc("Update a {name}", FooResource)
           @armResourceUpdate(FooResource)
-          @patch 
+          @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>
           ):TrackedResource<FooResource> | ErrorResponse;
       }
