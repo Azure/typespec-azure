@@ -823,6 +823,53 @@ describe("identifiers decorator", () => {
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
 
+  it("ignores name/id keys for x-ms-identifiers when nested", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      model Bar {
+        foo:Foo;
+      }
+      model BarList {
+        value: Bar[]
+      }
+      model Foo
+      {
+        @key
+        name:string;
+      }
+      `,
+    );
+    console.log(oapi.definitions.BarList.properties.value["x-ms-identifiers"]);
+    deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], []);
+  });
+
+  it("key decorator in x-ms-identifiers for nested scenarios ", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      model Bar {
+        foo:Foo;
+      }
+      model BarList {
+        value: Bar[]
+      }
+      model Foo
+      {
+        @key
+        value:string;
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], ["foo/value"]);
+  });
+
   it("ignores id property for x-ms-identifiers", async () => {
     const oapi = await openApiFor(
       `

@@ -428,9 +428,9 @@ export function getArmKeyIdentifiers(
   if (value.kind === "Model") {
     for (const property of value.properties.values()) {
       const pathToKey = getPathToKey(program, property);
-      if (pathToKey !== undefined) {
+      if (pathToKey !== undefined && !pathToKey.endsWith("/id") && !pathToKey.endsWith("/name")) {
         result.push(property.name + pathToKey);
-      } else if (getKeyName(program, property)) {
+      } else if (getKeyName(program, property) && !["id", "name"].includes(property.name)) {
         result.push(property.name);
       }
     }
