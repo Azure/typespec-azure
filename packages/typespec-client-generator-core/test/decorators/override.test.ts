@@ -478,3 +478,29 @@ it("remove optional query param", async () => {
   strictEqual(method.operation.parameters[0].name, "maxresults");
   strictEqual(method.operation.parameters[0].correspondingMethodParams.length, 0);
 });
+
+it("remove optional query param and add secret name", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    namespace KeyVault;
+
+    @route("/secrets/{secret-name}/versions")
+    op getSecretVersions(
+      @path("secret-name")
+      @clientName("name")
+      secretName: string,
+
+      @query("maxresults")
+      maxresults?: int32
+    ): void;
+    `,
+    `
+    @route("/secrets/{secret-name}/versions")
+    op listSecretPropertiesVersions(@path("secret-name") @clientName("name") secretName: string): void;
+    @@override(KeyVault.getSecretVersions, listSecretPropertiesVersions);
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+});

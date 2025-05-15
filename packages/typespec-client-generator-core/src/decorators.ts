@@ -58,6 +58,7 @@ import {
   clientKey,
   clientNameKey,
   clientNamespaceKey,
+  compareModelProperties,
   findRootSourceProperty,
   hasExplicitClientOrOperationGroup,
   listAllNamespaces,
@@ -877,11 +878,6 @@ function collectParams(
   });
 
   return params;
-}
-
-function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProperty): boolean {
-  // can't rely fully on equals because the `.model` property may be different
-  return modelPropA.name === modelPropB.name && modelPropA.type === modelPropB.type;
 }
 
 export const $override = (

@@ -52,6 +52,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
+  compareModelProperties,
   findRootSourceProperty,
   getAvailableApiVersions,
   getClientDoc,
@@ -65,7 +66,6 @@ import {
   isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
-  twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
@@ -610,7 +610,7 @@ export function getCorrespondingMethodParams(
 
   const correspondingClientParams = clientParams.filter(
     (x) =>
-      twoParamsEquivalent(context, x.__raw, serviceParam.__raw) ||
+      compareModelProperties(x.__raw, serviceParam.__raw) ||
       (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name),
   );
   if (correspondingClientParams.length > 0) {
