@@ -170,6 +170,7 @@ model Azure.ResourceManager.ArmDeletedResponse
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
 Template for ARM location resources. Use the parameter to specify
+the parent of the location resource.
 
 ```typespec
 model Azure.ResourceManager.ArmLocationResource<BaseType>
@@ -177,9 +178,9 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 
 #### Template Parameters
 
-| Name     | Description |
-| -------- | ----------- |
-| BaseType |             |
+| Name     | Description                                                                                   |
+| -------- | --------------------------------------------------------------------------------------------- |
+| BaseType | The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension". |
 
 #### Properties
 
