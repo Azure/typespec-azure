@@ -12,7 +12,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 const SUBSCRIPTION_ID_EXPECTED = "00000000-0000-0000-0000-000000000000";
 const RESOURCE_GROUP_EXPECTED = "test-rg";
-const SIX_KB_STRING = randomString(1024 * 6);
+const SIX_KB_STRING = "a".repeat(1024 * 6);
 let pollCount = 0;
 
 Scenarios.Azure_ResourceManager_LargeHeader_LargeHeaders_two6k = passOnSuccess([
@@ -114,13 +114,3 @@ Scenarios.Azure_ResourceManager_LargeHeader_LargeHeaders_two6k = passOnSuccess([
     kind: "MockApiDefinition",
   },
 ]);
-
-function randomString(length: number) {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters.charAt(randomIndex);
-  }
-  return result;
-}
