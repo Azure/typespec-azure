@@ -1,4 +1,4 @@
-import { deepEqual, ok, strictEqual } from "assert";
+import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { openApiFor } from "../test-host.js";
 
@@ -376,7 +376,7 @@ it("excludes properties marked @invisible from the resource payload", async () =
   });
 });
 
-it("allows resources with multiple endpoint using LegacyOperations", async () => {
+it("allows resources with multiple endpoints using LegacyOperations", async () => {
   const openApi = await openApiFor(`
     @armProviderNamespace
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -539,4 +539,114 @@ it("allows resources with multiple endpoint using LegacyOperations", async () =>
   ok(openApi.paths[`${locationPath}/move`].post);
   ok(resourceGroupOperations.put);
   ok(resourceGroupOperations.head);
+});
+it("allows action requests with optional body parameters", async () => {
+  const openApi = await openApiFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.ContosoProviderhub;
+
+    /** A ContosoProviderHub resource */
+    model Employee is TrackedResource<EmployeeProperties> {
+      ...ResourceNameParameter<Employee>;
+    }
+
+    /** Employee properties */
+    model EmployeeProperties {
+      /** Age of employee */
+      age?: int32;
+
+      /** City of employee */
+      city?: string;
+
+      /** Profile of employee */
+      @encode("base64url")
+      profile?: bytes;
+
+      /** The status of the last operation. */
+      @visibility(Lifecycle.Read)
+      provisioningState?: ProvisioningState;
+    }
+
+    /** The provisioning state of a resource. */
+    @lroStatus
+    union ProvisioningState {
+      string,
+
+      /** The resource create request has been accepted */
+      Accepted: "Accepted",
+
+      /** The resource is being provisioned */
+      Provisioning: "Provisioning",
+
+      /** The resource is updating */
+      Updating: "Updating",
+
+      /** Resource has been created. */
+      Succeeded: "Succeeded",
+
+      /** Resource creation failed. */
+      Failed: "Failed",
+
+      /** Resource creation was canceled. */
+      Canceled: "Canceled",
+
+      /** The resource is being deleted */
+      Deleting: "Deleting",
+    }
+
+    /** Employee move request */
+    model MoveRequest {
+      /** The moving from location */
+      from: string;
+
+      /** The moving to location */
+      to: string;
+    }
+
+    /** Employee move response */
+    model MoveResponse {
+      /** The status of the move */
+      movingStatus: string;
+    }
+
+    /** Create an optional request body parameter */
+    model OptionalBody<T extends {}> {
+      /** The request body */
+      @body body?: T;
+    }
+
+    interface Operations extends Azure.ResourceManager.Operations {}
+
+    @armResourceOperations
+    interface Employees {
+      get is ArmResourceRead<Employee>;
+      createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+      update is ArmResourcePatchAsync<Employee, Employee>;
+      delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+      list is ArmResourceListByParent<Employee>;
+      listBySubscription is ArmListBySubscription<Employee>;
+
+      /** A sample resource action that move employee to different location */
+      move is ArmResourceActionAsync<Employee, MoveRequest, MoveResponse, BodyParameter = OptionalBody<MoveRequest>>;
+
+    }
+      `);
+
+  const resourceGroupPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/employees/{employeeName}";
+
+  const movePath = `${resourceGroupPath}/move`;
+  const moveOperation = openApi.paths[movePath].post;
+  ok(moveOperation);
+  ok(moveOperation.parameters[4]);
+  deepStrictEqual(moveOperation.parameters[4], {
+    name: "body",
+    in: "body",
+    description: "The request body",
+    required: false,
+    schema: {
+      $ref: "#/definitions/MoveRequest",
+    },
+  });
 });
