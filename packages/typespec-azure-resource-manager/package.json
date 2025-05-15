@@ -31,8 +31,7 @@
     },
     "./common-types/*": {
       "typespec": "./lib/common-types/*",
-      "entrypoint": "./lib/common-types/common-types.tsp",
-      "default": "./"
+      "default": "./dist/src/index.js"
     }
   },
   "type": "module",
