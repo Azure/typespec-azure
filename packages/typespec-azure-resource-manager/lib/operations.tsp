@@ -699,7 +699,7 @@ op checkLocalNameAvailability<
  * @dev A provider action performed over a tenant
  * @template Request The request model for the action
  * @template Response The response type for the action
- * @template Scope The scope of the action (SubscriptionActionScope or TenantActionScope)
+ * @template Scope The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope)
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template Error Optional. The error response, if non-standard.
  */
@@ -726,7 +726,7 @@ op ArmProviderActionSync<
  * @dev A long-running provider action.
  * @template Request The request model for the action
  * @template Response The response type for the action
- * @template Scope The scope of the action (SubscriptionActionScope or TenantActionScope)
+ * @template Scope The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope)
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Error Optional. The error response, if non-standard.

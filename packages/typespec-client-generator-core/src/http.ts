@@ -52,7 +52,7 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
-  compareRootSourceProperties,
+  findRootSourceProperty,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodySpreadModel,
@@ -679,17 +679,20 @@ export function getCorrespondingMethodParams(
     }
   }
 
-  // If mapping could not be found,  TCGC will report error since we can't generate the client code without this mapping.
-  diagnostics.add(
-    createDiagnostic({
-      code: "no-corresponding-method-param",
-      target: operation,
-      format: {
-        paramName: serviceParam.name,
-        methodName: operation.name,
-      },
-    }),
-  );
+  // If mapping could not be found, and the service param is required, TCGC will report error since we can't generate the client code without this mapping.
+  if (!serviceParam.optional) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "no-corresponding-method-param",
+        target: operation,
+        format: {
+          paramName: serviceParam.name,
+          methodName: operation.name,
+        },
+      }),
+    );
+  }
+
   return diagnostics.wrap([]);
 }
 
@@ -711,7 +714,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      compareRootSourceProperties(methodParam.__raw, serviceParam.__raw)
+      findRootSourceProperty(methodParam.__raw) === findRootSourceProperty(serviceParam.__raw)
     ) {
       return methodParam;
     }

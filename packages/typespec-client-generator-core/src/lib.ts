@@ -383,6 +383,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Invalid mode '${"mode"}' for @clientDoc decorator. Valid values are "append" or "replace".`,
       },
     },
+    "multiple-param-alias": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
