@@ -252,8 +252,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/PersonRelativeMergePatchUpdateReplaceOnly"
-          },
-          "x-ms-identifiers": []
+          }
         }
       }
     },
@@ -273,8 +272,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/PersonRelativeMergePatchUpdateReplaceOnly"
-          },
-          "x-ms-identifiers": []
+          }
         }
       },
       "required": [
