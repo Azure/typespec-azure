@@ -720,3 +720,12 @@ export function getClientDoc(context: TCGCContext, target: Type): string | undef
   }
   return baseDoc;
 }
+
+export function compareModelProperties(
+  modelPropA: ModelProperty | undefined,
+  modelPropB: ModelProperty | undefined,
+): boolean {
+  if (!modelPropA || !modelPropB) return false;
+  // can't rely fully on equals because the `.model` property may be different
+  return modelPropA.name === modelPropB.name && modelPropA.type === modelPropB.type;
+}
