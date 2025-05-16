@@ -41,6 +41,7 @@ model WidgetResourceProperties {
   @doc("The widget color.")
   @visibility(Lifecycle.Create, Lifecycle.Read)
   color: string;
+
   ...DefaultProvisioningStateProperty;
   ...BillingDataProperty;
 }
