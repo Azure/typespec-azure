@@ -46,6 +46,92 @@
     }
   ],
   "paths": {
+    "/{resourceUri}/providers/Microsoft.OperationStatusSample/append": {
+      "post": {
+        "operationId": "ProviderOperations_AppendLogAnalytics",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "Operation to generate an extension resource based POST action",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/LogAnalyticsCollection"
+            }
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/{resourceUri}/providers/Microsoft.OperationStatusSample/getLogAnalytics": {
+      "get": {
+        "operationId": "ProviderOperations_GetLogAnalytics",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "Sample operation to generate an extension resource based GET action",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/LogAnalyticsCollection"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
     "/providers/Microsoft.OperationStatusSample/getVmSizesTenant": {
       "get": {
         "operationId": "ProviderOperations_GetVmSizesTenant",
@@ -540,5 +626,15 @@
       ]
     }
   },
-  "parameters": {}
+  "parameters": {
+    "Azure.ResourceManager.ResourceUriParameter": {
+      "name": "resourceUri",
+      "in": "path",
+      "description": "The fully qualified Azure Resource manager identifier of the resource.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-skip-url-encoding": true
+    }
+  }
 }

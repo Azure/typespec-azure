@@ -171,6 +171,36 @@ it("body fallback", async () => {
   expectDiagnostics(runner.context.diagnostics, []);
 });
 
+it("body fallback client name", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/parameters.json",
+    `${__dirname}/http-operation-examples/bodyFallbackClientName.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op bodyTest(@body @clientName("test") prop: string): void;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples[0].kind, "http");
+
+  const parameters = operation.examples[0].parameters;
+  ok(parameters);
+  strictEqual(parameters.length, 1);
+
+  strictEqual(parameters[0].value.kind, "string");
+  strictEqual(parameters[0].value.value, "body");
+  strictEqual(parameters[0].value.type.kind, "string");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
 it("parameters diagnostic", async () => {
   await runner.host.addRealTypeSpecFile(
     "./examples/parametersDiagnostic.json",

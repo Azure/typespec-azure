@@ -88,13 +88,16 @@
       },
       "patch": {
         "operationId": "Hello_UpdateRest",
+        "consumes": [
+          "application/merge-patch+json"
+        ],
         "parameters": [
           {
             "name": "person",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/PersonUpdate"
+              "$ref": "#/definitions/PersonMergePatchUpdate"
             }
           }
         ],
@@ -235,6 +238,52 @@
         "relatives"
       ]
     },
+    "PersonMergePatchUpdate": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "other": {
+          "type": "string"
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelativeMergePatchUpdateReplaceOnly"
+          },
+          "x-ms-identifiers": []
+        }
+      }
+    },
+    "PersonMergePatchUpdateReplaceOnly": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string"
+        },
+        "relatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PersonRelativeMergePatchUpdateReplaceOnly"
+          },
+          "x-ms-identifiers": []
+        }
+      },
+      "required": [
+        "secret",
+        "name",
+        "test",
+        "relatives"
+      ]
+    },
     "PersonRelative": {
       "type": "object",
       "properties": {
@@ -250,31 +299,20 @@
         "relationship"
       ]
     },
-    "PersonUpdate": {
+    "PersonRelativeMergePatchUpdateReplaceOnly": {
       "type": "object",
       "properties": {
-        "name": {
+        "person": {
+          "$ref": "#/definitions/PersonMergePatchUpdateReplaceOnly"
+        },
+        "relationship": {
           "type": "string"
-        },
-        "other": {
-          "type": "string",
-          "x-ms-mutability": [
-            "read",
-            "update"
-          ]
-        },
-        "relatives": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PersonRelative"
-          },
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
         }
-      }
+      },
+      "required": [
+        "person",
+        "relationship"
+      ]
     },
     "ReadablePerson": {
       "type": "object",

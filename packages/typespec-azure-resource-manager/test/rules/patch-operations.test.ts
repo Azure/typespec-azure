@@ -69,7 +69,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @doc("Updates my Foos")
          @armResourceUpdate(FooResource)
-         @patch myFooUpdate(...ResourceInstanceParameters<FooResource>, @doc("The body") @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @doc("The body") @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
         @doc("The state of the resource")
@@ -147,7 +147,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @doc("Updates my Foos")
          @armResourceUpdate(FooResource)
-         @patch myFooUpdate(...ResourceInstanceParameters<FooResource>, ...MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, ...MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
         @doc("The state of the resource")
@@ -209,7 +209,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           @autoRoute
           @doc("Update a {name}", FooResource)
           @armResourceUpdate(FooResource)
-          @patch 
+          @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>
           ):TrackedResource<FooResource> | ErrorResponse;
       }

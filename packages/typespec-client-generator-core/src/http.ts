@@ -10,7 +10,7 @@ import {
   getSummary,
   isErrorModel,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
   HttpOperationParameter,
@@ -679,17 +679,20 @@ export function getCorrespondingMethodParams(
     }
   }
 
-  // If mapping could not be found,  TCGC will report error since we can't generate the client code without this mapping.
-  diagnostics.add(
-    createDiagnostic({
-      code: "no-corresponding-method-param",
-      target: operation,
-      format: {
-        paramName: serviceParam.name,
-        methodName: operation.name,
-      },
-    }),
-  );
+  // If mapping could not be found, and the service param is required, TCGC will report error since we can't generate the client code without this mapping.
+  if (!serviceParam.optional) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "no-corresponding-method-param",
+        target: operation,
+        format: {
+          paramName: serviceParam.name,
+          methodName: operation.name,
+        },
+      }),
+    );
+  }
+
   return diagnostics.wrap([]);
 }
 

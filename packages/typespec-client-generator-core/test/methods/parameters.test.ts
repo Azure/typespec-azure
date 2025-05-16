@@ -720,7 +720,7 @@ it("parameter grouping", async () => {
 describe("content type", () => {
   it("content type will be added if not defined and there is body", async () => {
     await runner.compileWithBuiltInService(`
-      @patch op patchNull(@body body: string): void;
+      @patch(#{implicitOptionality: true}) op patchNull(@body body: string): void;
     `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
@@ -800,7 +800,7 @@ describe("content type", () => {
 
   it("content type should be optional if body is optional", async () => {
     await runner.compileWithBuiltInService(`
-      @patch op patchNull(@body body?: string): void;
+      @patch(#{implicitOptionality: true}) op patchNull(@body body?: string): void;
     `);
     const sdkPackage = runner.context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);

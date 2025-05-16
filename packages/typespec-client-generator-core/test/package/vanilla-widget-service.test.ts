@@ -150,7 +150,10 @@ it("vanilla widget read", async () => {
   strictEqual(pathParam.name, correspondingMethodParams[0].name);
 });
 it("vanilla widget update", async () => {
-  await compileVanillaWidgetService(runner, "@patch update(...Widget): Widget | Error;");
+  await compileVanillaWidgetService(
+    runner,
+    "@patch(#{implicitOptionality: true}) update(...Widget): Widget | Error;",
+  );
 
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
