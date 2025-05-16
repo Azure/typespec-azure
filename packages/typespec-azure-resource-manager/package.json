@@ -29,7 +29,7 @@
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
     },
-    "./common-types/*": {
+    "./common-types/": {
       "typespec": "./lib/common-types/*",
       "default": "./dist/src/index.js"
     }
