@@ -250,9 +250,9 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "name": "body",
+            "name": "properties",
             "in": "body",
-            "description": "The PATCH request body",
+            "description": "The resource properties to be updated.",
             "required": false,
             "schema": {
               "$ref": "#/definitions/WidgetUpdate"

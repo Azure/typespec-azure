@@ -39,10 +39,7 @@ interface Widgets {
   update is Azure.ResourceManager.Legacy.CustomPatchAsync<
     Widget,
     Foundations.ResourceUpdateModel<Widget, WidgetProperties>,
-    RequestBody = {
-      /** The PATCH request body */
-      @body body?: Foundations.ResourceUpdateModel<Widget, WidgetProperties>;
-    }
+    OptionalRequestBody = true
   >;
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
   list is ArmResourceListByParent<Widget>;
