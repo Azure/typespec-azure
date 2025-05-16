@@ -670,7 +670,7 @@ op Azure.ResourceManager.ArmListBySubscription(apiVersion: string, subscriptionI
 ### `ArmProviderActionAsync` {#Azure.ResourceManager.ArmProviderActionAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
+op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
 ```
 
 #### Template Parameters
@@ -688,7 +688,7 @@ op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscription
 ### `ArmProviderActionSync` {#Azure.ResourceManager.ArmProviderActionSync}
 
 ```typespec
-op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, location: string, resourceGroupName: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
 ```
 
 #### Template Parameters
@@ -705,7 +705,7 @@ op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionI
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionAsync(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
+op Azure.ResourceManager.ArmResourceActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
 ```
 
 #### Template Parameters
@@ -726,7 +726,7 @@ op Azure.ResourceManager.ArmResourceActionAsync(provider: "Microsoft.ThisWillBeR
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
 ```
 
 #### Template Parameters
@@ -744,7 +744,7 @@ op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: "Microsoft.ThisWil
 ### `ArmResourceActionNoContentAsync` {#Azure.ResourceManager.ArmResourceActionNoContentAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
+op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
 ```
 
 #### Template Parameters
@@ -764,7 +764,7 @@ op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: "Microsoft.Th
 A synchronous resource action that returns no content.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
+op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
 ```
 
 #### Template Parameters
@@ -781,7 +781,7 @@ op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: "Microsoft.Thi
 ### `ArmResourceActionNoResponseContentAsync` {#Azure.ResourceManager.ArmResourceActionNoResponseContentAsync}
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
+op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
 ```
 
 #### Template Parameters
@@ -801,7 +801,7 @@ op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: "Micr
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.ArmResourceActionSync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.ArmResourceActionSync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
 ```
 
 #### Template Parameters
