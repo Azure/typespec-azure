@@ -383,6 +383,29 @@ model Foo is TrackedResource<FooProperties> {
 | ------ | ---------- | ----------------------- |
 | zones? | `string[]` | The availability zones. |
 
+### `BillingDataProperty` {#Azure.ResourceManager.BillingDataProperty}
+
+Standard resource billing data model to represent the resource's current billing state.
+Spread this model directly into your resource property model when modeling e.g. prepaid resources.
+
+```typespec
+model Azure.ResourceManager.BillingDataProperty
+```
+
+#### Examples
+
+```typespec
+model FooProperties {
+  ...BillingDataProperty;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                           | Description                       |
+| ----------- | ------------------------------------------------------------------------------ | --------------------------------- |
+| billingData | [`BillingData`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingData) | The billing data of the resource. |
+
 ### `DefaultProvisioningStateProperty` {#Azure.ResourceManager.DefaultProvisioningStateProperty}
 
 Standard resource provisioning state model. If you do not have any custom provisioning state,
@@ -1085,21 +1108,23 @@ model Azure.ResourceManager.CommonTypes.BillingData
 
 #### Properties
 
-| Name          | Type                                                                             | Description                                                                        |
-| ------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| systemId      | `Core.uuid`                                                                      | The system ID of the resource. Globally unique per cloud.                          |
-| state         | [`BillingState`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingState) | Indicates the billing state of the resource.                                       |
-| reasons       | `ResourceManager.CommonTypes.BillingStateReason[]`                               | Indicates reason(s) for the current billing state of the resource.                 |
-| productCode   | `Core.uuid`                                                                      | The product identifier.                                                            |
-| productToken? | `string`                                                                         | Product token (JWT) identifying a specific version of the product.                 |
-| quantity      | `int64`                                                                          | The number of instances of the product.                                            |
-| startDate?    | `utcDateTime`                                                                    | Start date indicating the beginning of the term for which the resource is prepaid. |
-| endDate?      | `utcDateTime`                                                                    | End date indicating the end of the term for which the resource is prepaid.         |
-| billingToken? | `string`                                                                         | Billing token (JWT) representing additional billing context.                       |
+| Name          | Type                                                                                   | Description                                                                          |
+| ------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| systemId      | `Core.uuid`                                                                            | The system ID of the resource. Globally unique per cloud.                            |
+| state         | [`BillingState`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingState)       | Indicates the billing state of the resource.                                         |
+| reasons       | `ResourceManager.CommonTypes.BillingStateReason[]`                                     | Indicates reason(s) for the current billing state of the resource.                   |
+| productCode   | `Core.uuid`                                                                            | The product identifier referencing a product in the catalog.                         |
+| productToken? | `string`                                                                               | Product token (JWT) identifying a specific version of the product.                   |
+| quantity      | `int64`                                                                                | The number of instances of the product.                                              |
+| amount?       | `float64`                                                                              | A value indicating an amount of a configured unit of measure in the product.         |
+| startDate?    | `utcDateTime`                                                                          | Start date indicating the beginning of the term for which the resource is committed. |
+| endDate?      | `utcDateTime`                                                                          | End date indicating the end of the term for which the resource is committed.         |
+| billingToken? | `string`                                                                               | Billing token (JWT) representing additional billing context.                         |
+| schedule?     | [`BillingSchedule`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingSchedule) | The resource's billing schedule.                                                     |
 
 ### `BillingSchedule` {#Azure.ResourceManager.CommonTypes.BillingSchedule}
 
-Billing schedule
+Billing schedule.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.BillingSchedule
@@ -1115,7 +1140,7 @@ model Azure.ResourceManager.CommonTypes.BillingSchedule
 
 ### `BillingScheduleChange` {#Azure.ResourceManager.CommonTypes.BillingScheduleChange}
 
-Billing schedule change
+Billing schedule change.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.BillingScheduleChange
@@ -1123,14 +1148,15 @@ model Azure.ResourceManager.CommonTypes.BillingScheduleChange
 
 #### Properties
 
-| Name          | Type                                                                                                                         | Description                                                                                                                                                                                                                   |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| productCode?  | `Core.uuid`                                                                                                                  | The new product identifier. When not specified, the resource's product code remains unchanged.                                                                                                                                |
-| productToken? | `string`                                                                                                                     | Product token (JWT) identifying a specific version of the scheduled product. Can only be<br />specified when productCode is specified also.                                                                                   |
-| quantity?     | `int64`                                                                                                                      | The new number of instances of the product. When not specified, the resource's quantity remains unchanged.                                                                                                                    |
-| endDate?      | `utcDateTime`                                                                                                                | The new (coterminous) end date of the product. Can only be specified when effective = renewal.<br />When not specified, the resource's end date is calculated based on the renewal date and the<br />product's term duration. |
-| billingToken? | `string`                                                                                                                     | Billing token (JWT) representing additional billing context.                                                                                                                                                                  |
-| effective     | [`BillingScheduleChangeEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType) | Indicates when the change is expected to become effective.                                                                                                                                                                    |
+| Name           | Type                                                                                                                         | Description                                                                                                                                                                                                                   |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| productCode?   | `Core.uuid`                                                                                                                  | The new product identifier. When not specified, the resource's product code remains unchanged.                                                                                                                                |
+| productToken?  | `string`                                                                                                                     | Product token (JWT) identifying a specific version of the scheduled product. Can only be<br />specified when productCode is specified also.                                                                                   |
+| quantity?      | `int64`                                                                                                                      | The new number of instances of the product. When not specified, the resource's quantity remains unchanged.                                                                                                                    |
+| endDate?       | `utcDateTime`                                                                                                                | The new (coterminous) end date of the product. Can only be specified when effective = renewal.<br />When not specified, the resource's end date is calculated based on the renewal date and the<br />product's term duration. |
+| billingToken?  | `string`                                                                                                                     | Billing token (JWT) representing additional billing context.                                                                                                                                                                  |
+| effective?     | [`BillingScheduleChangeEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType) | Indicates when the change is expected to become effective. Mutually exclusive with `effectiveDate`.                                                                                                                           |
+| effectiveDate? | `utcDateTime`                                                                                                                | The absolute date when the change is expected to become effective. Mutually exclusive with `effective`.                                                                                                                       |
 
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest}
 
