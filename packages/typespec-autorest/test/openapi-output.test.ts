@@ -843,7 +843,6 @@ describe("identifiers decorator", () => {
       }
       `,
     );
-    console.log(oapi.definitions.BarList.properties.value["x-ms-identifiers"]);
     deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], []);
   });
 
