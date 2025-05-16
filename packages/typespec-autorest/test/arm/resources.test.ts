@@ -610,12 +610,6 @@ it("allows action requests with optional body parameters", async () => {
       movingStatus: string;
     }
 
-    /** Create an optional request body parameter */
-    model OptionalBody<T extends {}> {
-      /** The request body */
-      @body body?: T;
-    }
-
     interface Operations extends Azure.ResourceManager.Operations {}
 
     @armResourceOperations
@@ -628,7 +622,7 @@ it("allows action requests with optional body parameters", async () => {
       listBySubscription is ArmListBySubscription<Employee>;
 
       /** A sample resource action that move employee to different location */
-      move is ArmResourceActionAsync<Employee, MoveRequest, MoveResponse, BodyParameter = OptionalBody<MoveRequest>>;
+      move is ArmResourceActionAsync<Employee, MoveRequest, MoveResponse, OptionalRequestBody = true>;
 
     }
       `);
@@ -643,7 +637,7 @@ it("allows action requests with optional body parameters", async () => {
   deepStrictEqual(moveOperation.parameters[4], {
     name: "body",
     in: "body",
-    description: "The request body",
+    description: "The content of the action request",
     required: false,
     schema: {
       $ref: "#/definitions/MoveRequest",
