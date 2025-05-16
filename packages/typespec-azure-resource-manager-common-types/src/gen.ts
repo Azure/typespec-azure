@@ -10,7 +10,7 @@ import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
 const dir = dirname(fileURLToPath(import.meta.url));
-let outDir = resolve(dir, "openapi");
+let outDir: string;
 
 export async function generateCommonTypes(outputDir: string) {
   outDir = resolve(dir, outputDir);
@@ -72,7 +72,7 @@ async function emitCommonTypesSwagger(name: string) {
     const cleanedDocument = cleanupDocument(document);
     const sortedDocument = sortOpenAPIDocument(cleanedDocument);
 
-    const versionDir = resolve(outDir, version.version);
+    const versionDir = resolve(dir, outDir, version.version);
     await mkdir(versionDir, { recursive: true });
     const outputFile = resolve(versionDir, `${name.replaceAll("-", "")}.json`);
     await writeFile(outputFile, JSON.stringify(sortedDocument, null, 2), { encoding: "utf-8" });

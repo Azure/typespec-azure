@@ -53,8 +53,7 @@
     "lib/*.tsp",
     "schema/dist/schema.js",
     "dist/**",
-    "!dist/test/**",
-    "src/common-types-generator/**"
+    "!dist/test/**"
   ],
   "peerDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",

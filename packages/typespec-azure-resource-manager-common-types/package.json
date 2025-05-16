@@ -20,6 +20,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p .",
+    "watch": "tsc -p . --watch",
     "regen-common-types": "tsx ./src/index.ts"
   },
   "files": [
