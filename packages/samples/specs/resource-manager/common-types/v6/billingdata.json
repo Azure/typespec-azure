@@ -1,0 +1,324 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Common types",
+    "version": "6.0"
+  },
+  "paths": {},
+  "definitions": {
+    "BillingData": {
+      "type": "object",
+      "description": "Billing Data",
+      "properties": {
+        "systemId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The system ID of the resource. Globally unique per cloud.",
+          "readOnly": true
+        },
+        "state": {
+          "type": "string",
+          "description": "Indicates the billing state of the resource.",
+          "default": "Active",
+          "enum": [
+            "Pending",
+            "Active",
+            "Inactive"
+          ],
+          "x-ms-enum": {
+            "name": "BillingState",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Pending",
+                "value": "Pending",
+                "description": "Resource's billing has not yet started."
+              },
+              {
+                "name": "Active",
+                "value": "Active",
+                "description": "Resource's billing is activated."
+              },
+              {
+                "name": "Inactive",
+                "value": "Inactive",
+                "description": "Resource's billing is deactivated."
+              }
+            ]
+          },
+          "readOnly": true
+        },
+        "reasons": {
+          "type": "array",
+          "description": "Indicates reason(s) for the current billing state of the resource.",
+          "items": {
+            "$ref": "#/definitions/BillingStateReason"
+          },
+          "readOnly": true
+        },
+        "productCode": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The product identifier referencing a product in the catalog."
+        },
+        "productToken": {
+          "type": "string",
+          "description": "Product token (JWT) identifying a specific version of the product.",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The number of instances of the product.",
+          "default": 1
+        },
+        "amount": {
+          "type": "number",
+          "format": "double",
+          "description": "A value indicating an amount of a configured unit of measure in the product."
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start date indicating the beginning of the term for which the resource is committed."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End date indicating the end of the term for which the resource is committed."
+        },
+        "billingToken": {
+          "type": "string",
+          "description": "Billing token (JWT) representing additional billing context.",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "schedule": {
+          "$ref": "#/definitions/BillingSchedule",
+          "description": "The resource's billing schedule."
+        }
+      },
+      "required": [
+        "systemId",
+        "state",
+        "reasons",
+        "productCode",
+        "quantity"
+      ]
+    },
+    "BillingRenewalType": {
+      "type": "string",
+      "description": "Type of renewal.",
+      "enum": [
+        "Automatic",
+        "None"
+      ],
+      "x-ms-enum": {
+        "name": "BillingRenewalType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Automatic",
+            "value": "Automatic",
+            "description": "Automatically renew the product when its term ends."
+          },
+          {
+            "name": "None",
+            "value": "None",
+            "description": "Don't automatically renew the product."
+          }
+        ]
+      }
+    },
+    "BillingSchedule": {
+      "type": "object",
+      "description": "Billing schedule.",
+      "properties": {
+        "nextInvoiceDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date when this resource is expected to be invoiced next.",
+          "readOnly": true
+        },
+        "renewal": {
+          "type": "string",
+          "description": "Indicates the renewal behavior of this resource.",
+          "default": "Automatic",
+          "enum": [
+            "Automatic",
+            "None"
+          ],
+          "x-ms-enum": {
+            "name": "BillingRenewalType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Automatic",
+                "value": "Automatic",
+                "description": "Automatically renew the product when its term ends."
+              },
+              {
+                "name": "None",
+                "value": "None",
+                "description": "Don't automatically renew the product."
+              }
+            ]
+          }
+        },
+        "changes": {
+          "type": "array",
+          "description": "Schedules billing changes for this resource.",
+          "items": {
+            "$ref": "#/definitions/BillingScheduleChange"
+          },
+          "x-ms-identifiers": []
+        }
+      },
+      "required": [
+        "nextInvoiceDate",
+        "renewal"
+      ]
+    },
+    "BillingScheduleChange": {
+      "type": "object",
+      "description": "Billing schedule change.",
+      "properties": {
+        "productCode": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The new product identifier. When not specified, the resource's product code remains unchanged."
+        },
+        "productToken": {
+          "type": "string",
+          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be\nspecified when productCode is specified also."
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The new number of instances of the product. When not specified, the resource's quantity remains unchanged.",
+          "default": 1
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The new (coterminous) end date of the product. Can only be specified when effective = renewal.\nWhen not specified, the resource's end date is calculated based on the renewal date and the\nproduct's term duration."
+        },
+        "billingToken": {
+          "type": "string",
+          "description": "Billing token (JWT) representing additional billing context."
+        },
+        "effective": {
+          "type": "string",
+          "description": "Indicates when the change is expected to become effective. Mutually exclusive with `effectiveDate`.",
+          "default": "Renewal",
+          "enum": [
+            "Renewal",
+            "NextCycle"
+          ],
+          "x-ms-enum": {
+            "name": "BillingScheduleChangeEffectiveType",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Renewal",
+                "value": "Renewal",
+                "description": "At time of term renewal."
+              },
+              {
+                "name": "NextCycle",
+                "value": "NextCycle",
+                "description": "When the next billing plan cycle charge occurs."
+              }
+            ]
+          }
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The absolute date when the change is expected to become effective. Mutually exclusive with `effective`."
+        }
+      }
+    },
+    "BillingScheduleChangeEffectiveType": {
+      "type": "string",
+      "description": "When a scheduled change is expected to become effective.",
+      "enum": [
+        "Renewal",
+        "NextCycle"
+      ],
+      "x-ms-enum": {
+        "name": "BillingScheduleChangeEffectiveType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Renewal",
+            "value": "Renewal",
+            "description": "At time of term renewal."
+          },
+          {
+            "name": "NextCycle",
+            "value": "NextCycle",
+            "description": "When the next billing plan cycle charge occurs."
+          }
+        ]
+      }
+    },
+    "BillingState": {
+      "type": "string",
+      "description": "Billing state.",
+      "enum": [
+        "Pending",
+        "Active",
+        "Inactive"
+      ],
+      "x-ms-enum": {
+        "name": "BillingState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Pending",
+            "value": "Pending",
+            "description": "Resource's billing has not yet started."
+          },
+          {
+            "name": "Active",
+            "value": "Active",
+            "description": "Resource's billing is activated."
+          },
+          {
+            "name": "Inactive",
+            "value": "Inactive",
+            "description": "Resource's billing is deactivated."
+          }
+        ]
+      }
+    },
+    "BillingStateReason": {
+      "type": "string",
+      "description": "Billing state reason.",
+      "enum": [
+        "Suspended",
+        "Expired"
+      ],
+      "x-ms-enum": {
+        "name": "BillingStateReason",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Suspended",
+            "value": "Suspended",
+            "description": "Resource's billing has been suspended by Microsoft."
+          },
+          {
+            "name": "Expired",
+            "value": "Expired",
+            "description": "Resource's billing has expired."
+          }
+        ]
+      }
+    }
+  }
+}
