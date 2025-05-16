@@ -5,6 +5,7 @@ namespace Azure.ResourceManager.Legacy;
 
 using Http;
 using Azure.ResourceManager.Foundations;
+using Azure.ResourceManager.Private;
 using Rest;
 
 /**
@@ -26,7 +27,7 @@ interface LegacyOperations<
    * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PUT operation
-   * @template BodyParam Optional. The request body parameter for this operation
+   * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @autoRoute
   @doc("Create a {name}", Resource)
@@ -42,12 +43,12 @@ interface LegacyOperations<
       Resource,
       LroHeaders
     >,
-    BodyParam extends {} = {@doc("Resource create parameters.") @bodyRoot body: Resource}
+    OptionalRequestBody extends valueof boolean = false
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    ...BodyParam,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: Resource,
   ): Response | ErrorType;
 
   /**
@@ -55,7 +56,7 @@ interface LegacyOperations<
    * @template Resource the resource being created or updated
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PUT operation
-   * @template BodyParam Optional. The request body parameter for this operation
+   * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
   @autoRoute
@@ -66,12 +67,12 @@ interface LegacyOperations<
     Resource extends Azure.ResourceManager.CommonTypes.Resource,
     Parameters extends {} = {},
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
-    BodyParam extends {} = {@doc("Resource create parameters.") @bodyRoot body: Resource}
+    OptionalRequestBody extends valueof boolean = false
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    ...BodyParam,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: Resource,
   ): Response | ErrorType;
 
   /**
@@ -81,7 +82,7 @@ interface LegacyOperations<
    * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PATCH operation
-   * @template BodyParam Optional. The request body parameter for this operation
+   * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @autoRoute
   @doc("Update a {name}", Resource)
@@ -101,12 +102,12 @@ interface LegacyOperations<
       "Resource update request accepted.",
       LroHeaders
     >,
-    BodyParam extends {} = {@doc("Resource create parameters.") @bodyRoot body: PatchModel}
+    OptionalRequestBody extends valueof boolean = false
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    ...BodyParam,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: PatchModel,
   ): Response | ErrorType;
 
   /**
@@ -115,7 +116,7 @@ interface LegacyOperations<
    * @template PatchModel the PATCH request model
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PATCH operation
-   * @template BodyParam Optional. The request body parameter for this operation
+   * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @autoRoute
   @doc("Update a {name}", Resource)
@@ -126,12 +127,12 @@ interface LegacyOperations<
     PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
-    BodyParam extends {} = {@doc("Resource create parameters.") @bodyRoot body: PatchModel}
+    OptionalRequestBody extends valueof boolean = false
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    ...BodyParam,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: PatchModel,
   ): Response | ErrorType;
 
   /**
@@ -214,7 +215,7 @@ interface LegacyOperations<
    * @template Request The request model for the action
    * @template Response The response model for the action
    * @template Parameters Optional. Additional parameters after the path parameters
-   * @template BodyParam Optional. The request body parameter for this operation
+   * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("")
   @autoRoute
@@ -227,16 +228,15 @@ interface LegacyOperations<
     Request extends TypeSpec.Reflection.Model | void,
     Response extends TypeSpec.Reflection.Model | void,
     Parameters extends {} = {},
-    BodyParam = {
-      @doc("The content of the action request")
-      @bodyRoot
-      body: Request;
-    }
+    OptionalRequestBody extends valueof boolean = false
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    ...BodyParam,
+
+    @doc("The content of the action request")
+    @armBodyRoot(OptionalRequestBody)
+    body: Request,
   ): Response | ErrorType;
 
   /**
@@ -246,7 +246,7 @@ interface LegacyOperations<
    * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
    * @template Response The response model for the action
    * @template Parameters Optional. Additional parameters after the path parameters
-   * @template BodyParam Optional. The request body parameter for this operation
+   * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
@@ -270,16 +270,15 @@ interface LegacyOperations<
       "Resource operation accepted.",
       LroHeaders
     > | Result,
-    BodyParam = {
-      @doc("The content of the action request")
-      @bodyRoot
-      body: Request;
-    }
+    OptionalRequestBody extends valueof boolean = false
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    ...BodyParam,
+
+    @doc("The content of the action request")
+    @armBodyRoot(OptionalRequestBody)
+    body: Request,
   ): Response | ErrorType;
 }
 /**
@@ -299,7 +298,7 @@ model Provider<Resource extends {} = TenantActionScope> {
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
- * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
 @autoRoute
 @doc("Update a {name}", Resource)
@@ -322,15 +321,13 @@ op CustomPatchAsync<
     LroHeaders
   >,
   Error extends {} = ErrorResponse,
-  RequestBody extends {} = {
-    @doc("The resource properties to be updated.") @bodyRoot properties: PatchModel;
-  }
+  OptionalRequestBody extends valueof boolean = false
 > is UpdateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   PatchModel,
   Response,
   Error,
-  RequestBody
+  OptionalRequestBody
 >;
 
 /**
@@ -341,7 +338,7 @@ op CustomPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
- * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
 @autoRoute
 @doc("Update a {name}", Resource)
@@ -355,15 +352,13 @@ op CustomPatchSync<
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
   Error extends {} = ErrorResponse,
-  RequestBody extends {} = {
-    @doc("The resource properties to be updated.") @bodyRoot properties: PatchModel;
-  }
+  OptionalRequestBody extends valueof boolean = false
 > is UpdateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   PatchModel,
   Response,
   Error,
-  RequestBody
+  OptionalRequestBody
 >;
 
 /**
@@ -372,14 +367,18 @@ op CustomPatchSync<
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
- * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
 op UpdateOperation<
   HttpParameters extends {},
   BodyParameter extends {},
   Response extends {},
   ErrorResponse extends {},
-  RequestBody extends {} = {
-    @doc("The resource properties to be updated.") @bodyRoot properties: BodyParameter;
-  }
->(...HttpParameters, ...RequestBody): Response | ErrorResponse;
+  OptionalRequestBody extends valueof boolean = false
+>(
+  ...HttpParameters,
+
+  @doc("The resource properties to be updated.")
+  @armBodyRoot(OptionalRequestBody)
+  properties: BodyParameter,
+): Response | ErrorResponse;
