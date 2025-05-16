@@ -44,7 +44,7 @@ describe("armResourceIdentifier", () => {
   it("with config", async () => {
     const result = await openApiFor(`
       ${base}
-      scalar Foo extends Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
+      scalar Foo extends Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}]>;
     `);
     const model = result.definitions["Foo"];
     deepStrictEqual(model, {
@@ -54,7 +54,7 @@ describe("armResourceIdentifier", () => {
       "x-ms-arm-id-details": {
         allowedResources: [
           {
-            scopes: ["tenant", "resourceGroup"],
+            scopes: ["Tenant", "ResourceGroup"],
             type: "Microsoft.RP/type",
           },
         ],

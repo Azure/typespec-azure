@@ -383,19 +383,19 @@ scalar armResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierA
 
 // Consider replacing `*`
 union ArmResourceDeploymentScope {
-  "tenant",
-  "subscription",
-  "resourceGroup",
-  "managementGroup",
-  "extension",
+  "Tenant",
+  "Subscription",
+  "ResourceGroup",
+  "ManagementGroup",
+  "Extension",
 }
 
 alias AllArmResourceDeploymentScopes = [
-  "tenant",
-  "subscription",
-  "resourceGroup",
-  "managementGroup",
-  "extension"
+  "Tenant",
+  "Subscription",
+  "ResourceGroup",
+  "ManagementGroup",
+  "Extension"
 ];
 
 model ArmResourceIdentifierAllowedResource {
