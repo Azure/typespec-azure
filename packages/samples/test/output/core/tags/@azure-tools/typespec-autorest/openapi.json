@@ -57,8 +57,7 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Resp"
-              },
-              "x-ms-identifiers": []
+              }
             }
           }
         }

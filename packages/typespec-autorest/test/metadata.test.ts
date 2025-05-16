@@ -103,7 +103,6 @@ describe("typespec-autorest: metadata", () => {
         other: { type: "string", "x-ms-mutability": ["read", "update"] },
         relatives: {
           type: "array",
-          "x-ms-identifiers": [],
           "x-ms-mutability": ["read", "update", "create"],
           items: { $ref: "#/definitions/PersonRelative" },
         },
@@ -125,7 +124,6 @@ describe("typespec-autorest: metadata", () => {
         other: { type: "string", "x-ms-mutability": ["read", "update"] },
         relatives: {
           type: "array",
-          "x-ms-identifiers": [],
           "x-ms-mutability": ["read", "update", "create"],
           items: { $ref: "#/definitions/PersonRelative" },
         },
@@ -373,7 +371,6 @@ describe("typespec-autorest: metadata", () => {
               schema: {
                 type: "array",
                 items: { $ref: "#/definitions/Parameters" },
-                "x-ms-identifiers": [],
               },
             },
           ],
@@ -442,7 +439,6 @@ describe("typespec-autorest: metadata", () => {
     deepStrictEqual(response, {
       type: "array",
       items: { $ref: "#/definitions/ThingItem" },
-      "x-ms-identifiers": [],
     });
 
     deepStrictEqual(res.parameters, {
