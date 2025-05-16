@@ -59,11 +59,14 @@
         "productCode": {
           "type": "string",
           "format": "uuid",
-          "description": "The product identifier."
+          "description": "The product identifier referencing a product in the catalog."
         },
         "productToken": {
           "type": "string",
-          "description": "Product token (JWT) identifying a specific version of the product."
+          "description": "Product token (JWT) identifying a specific version of the product.",
+          "x-ms-mutability": [
+            "create"
+          ]
         },
         "quantity": {
           "type": "integer",
@@ -71,19 +74,31 @@
           "description": "The number of instances of the product.",
           "default": 1
         },
+        "amount": {
+          "type": "number",
+          "format": "double",
+          "description": "A value indicating an amount of a configured unit of measure in the product."
+        },
         "startDate": {
           "type": "string",
           "format": "date-time",
-          "description": "Start date indicating the beginning of the term for which the resource is prepaid."
+          "description": "Start date indicating the beginning of the term for which the resource is committed."
         },
         "endDate": {
           "type": "string",
           "format": "date-time",
-          "description": "End date indicating the end of the term for which the resource is prepaid."
+          "description": "End date indicating the end of the term for which the resource is committed."
         },
         "billingToken": {
           "type": "string",
-          "description": "Billing token (JWT) representing additional billing context."
+          "description": "Billing token (JWT) representing additional billing context.",
+          "x-ms-mutability": [
+            "create"
+          ]
+        },
+        "schedule": {
+          "$ref": "#/definitions/BillingSchedule",
+          "description": "The resource's billing schedule."
         }
       },
       "required": [
@@ -120,7 +135,7 @@
     },
     "BillingSchedule": {
       "type": "object",
-      "description": "Billing schedule",
+      "description": "Billing schedule.",
       "properties": {
         "nextInvoiceDate": {
           "type": "string",
@@ -169,7 +184,7 @@
     },
     "BillingScheduleChange": {
       "type": "object",
-      "description": "Billing schedule change",
+      "description": "Billing schedule change.",
       "properties": {
         "productCode": {
           "type": "string",
@@ -197,12 +212,11 @@
         },
         "effective": {
           "type": "string",
-          "description": "Indicates when the change is expected to become effective.",
+          "description": "Indicates when the change is expected to become effective. Mutually exclusive with `effectiveDate`.",
           "default": "Renewal",
           "enum": [
             "Renewal",
-            "NextCycle",
-            "Absolute"
+            "NextCycle"
           ],
           "x-ms-enum": {
             "name": "BillingScheduleChangeEffectiveType",
@@ -217,27 +231,23 @@
                 "name": "NextCycle",
                 "value": "NextCycle",
                 "description": "When the next billing plan cycle charge occurs."
-              },
-              {
-                "name": "Absolute",
-                "value": "Absolute",
-                "description": "At a specific, absolute date."
               }
             ]
           }
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The absolute date when the change is expected to become effective. Mutually exclusive with `effective`."
         }
-      },
-      "required": [
-        "effective"
-      ]
+      }
     },
     "BillingScheduleChangeEffectiveType": {
       "type": "string",
       "description": "When a scheduled change is expected to become effective.",
       "enum": [
         "Renewal",
-        "NextCycle",
-        "Absolute"
+        "NextCycle"
       ],
       "x-ms-enum": {
         "name": "BillingScheduleChangeEffectiveType",
@@ -252,11 +262,6 @@
             "name": "NextCycle",
             "value": "NextCycle",
             "description": "When the next billing plan cycle charge occurs."
-          },
-          {
-            "name": "Absolute",
-            "value": "Absolute",
-            "description": "At a specific, absolute date."
           }
         ]
       }

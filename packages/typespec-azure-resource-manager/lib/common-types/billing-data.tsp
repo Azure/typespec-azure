@@ -27,13 +27,14 @@ model BillingData {
   reasons: BillingStateReason[];
 
   /**
-   * The product identifier.
+   * The product identifier referencing a product in the catalog.
    */
   productCode: uuid;
 
   /**
    * Product token (JWT) identifying a specific version of the product.
    */
+  @visibility(Lifecycle.Create)
   productToken?: string;
 
   /**
@@ -42,23 +43,34 @@ model BillingData {
   quantity: int64 = 1;
 
   /**
-   * Start date indicating the beginning of the term for which the resource is prepaid.
+   * A value indicating an amount of a configured unit of measure in the product.
+   */
+  amount?: float64;
+
+  /**
+   * Start date indicating the beginning of the term for which the resource is committed.
    */
   startDate?: utcDateTime;
 
   /**
-   * End date indicating the end of the term for which the resource is prepaid.
+   * End date indicating the end of the term for which the resource is committed.
    */
   endDate?: utcDateTime;
 
   /**
    * Billing token (JWT) representing additional billing context.
    */
+  @visibility(Lifecycle.Create)
   billingToken?: string;
+
+  /**
+   * The resource's billing schedule.
+   */
+  schedule?: BillingSchedule;
 }
 
 /**
- * Billing schedule
+ * Billing schedule.
  */
 @added(Versions.v6)
 model BillingSchedule {
@@ -80,7 +92,7 @@ model BillingSchedule {
 }
 
 /**
- * Billing schedule change
+ * Billing schedule change.
  */
 @added(Versions.v6)
 model BillingScheduleChange {
@@ -113,9 +125,14 @@ model BillingScheduleChange {
   billingToken?: string;
 
   /**
-   * Indicates when the change is expected to become effective.
+   * Indicates when the change is expected to become effective. Mutually exclusive with `effectiveDate`.
    */
-  effective: BillingScheduleChangeEffectiveType = "Renewal";
+  effective?: BillingScheduleChangeEffectiveType = "Renewal";
+
+  /**
+   * The absolute date when the change is expected to become effective. Mutually exclusive with `effective`.
+   */
+  effectiveDate?: utcDateTime;
 }
 
 /**
@@ -173,9 +190,6 @@ union BillingScheduleChangeEffectiveType {
 
   /** When the next billing plan cycle charge occurs. */
   NextCycle: "NextCycle",
-
-  /** At a specific, absolute date. */
-  Absolute: "Absolute",
 
   string,
 }
