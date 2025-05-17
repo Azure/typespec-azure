@@ -232,8 +232,12 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
       });
     }
 
-    // Set route options for the whole namespace
-    setRouteOptionsForNamespace(program, entity, {
+    // Set route options for the top level namespace
+    let topLevelNamespace = entity;
+    while (topLevelNamespace.namespace) {
+      topLevelNamespace = topLevelNamespace.namespace;
+    }
+    setRouteOptionsForNamespace(program, topLevelNamespace, {
       autoRouteOptions: {
         // Filter key parameters for singleton resource types to insert the
         // singleton key value
