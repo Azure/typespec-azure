@@ -26,6 +26,7 @@
     "purge": "rimraf --glob \"packages/*/node_modules/\" --glob \"core/packages/*/node_modules/\"",
     "regen-docs": "pnpm run-all  --parallel --aggregate-output --reporter=append-only run regen-docs",
     "regen-samples": "pnpm run-all run regen-samples",
+    "regen-common-types": "pnpm run-all  run regen-common-types --path=$(pwd)/packages/samples/common-types/openapi",
     "test": "vitest run --workspace ./vitest.workspace.fast.ts",
     "test:ci": "vitest run --workspace ./vitest.workspace.fast.ts --coverage --reporter=junit --reporter=default",
     "test:e2e": "pnpm run-azure-only run test:e2e",
