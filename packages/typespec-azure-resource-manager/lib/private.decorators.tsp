@@ -103,3 +103,6 @@ extern dec armRenameListByOperation(
  * This decorator is used to adjust optionality on ARM Resource's `properties` field for brownfield service conversion.
  */
 extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: valueof boolean);
+
+/** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
+extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);

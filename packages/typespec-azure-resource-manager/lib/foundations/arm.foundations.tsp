@@ -228,9 +228,9 @@ op checkNameAvailability<
 
 /**
  * @dev The base template for Azure Resource Manager GET and HEAD Operations.
- * @param Parameters The parameter object for the operation.
- * @param Response The response or union of responses for success.
- * @param ErrorResponse The error response.
+ * @template Parameters The parameter object for the operation.
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
  */
 op ArmReadOperation<Parameters extends {}, Response extends {}, ErrorResponse extends {}>(
   ...Parameters,
@@ -238,10 +238,10 @@ op ArmReadOperation<Parameters extends {}, Response extends {}, ErrorResponse ex
 
 /**
  * @dev The base template for Azure Resource Manager PUT Operations.
- * @param HttpParameters The parameter object for the operation.
- * @param BodyParameter The body parameter
- * @param Response The response or union of responses for success.
- * @param ErrorResponse The error response.
+ * @template HttpParameters The parameter object for the operation.
+ * @template BodyParameter The body parameter
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
  */
 op ArmCreateOperation<
   HttpParameters extends {},
@@ -255,10 +255,11 @@ op ArmCreateOperation<
 
 /**
  * @dev The base template for Azure Resource Manager PATCH Operations.
- * @param HttpParameters The parameter object for the operation.
- * @param BodyParameter The body parameter
- * @param Response The response or union of responses for success.
- * @param ErrorResponse The error response.
+ * @template HttpParameters The parameter object for the operation.
+ * @template BodyParameter The body parameter
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
+ * @template RequestBody Optional. ENables changing the name, documentation, or optionality of the request body parameter
  */
 op ArmUpdateOperation<
   HttpParameters extends {},
