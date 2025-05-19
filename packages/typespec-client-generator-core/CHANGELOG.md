@@ -1,5 +1,47 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.56.2
+
+### Bug Fixes
+
+- [#2658](https://github.com/Azure/typespec-azure/pull/2658) Add fallback logic for example mapping of discriminated type.
+- [#2651](https://github.com/Azure/typespec-azure/pull/2651) Use client name for body mapping as fall back logic.
+- [#2651](https://github.com/Azure/typespec-azure/pull/2651) Fix wrong cache logic for array or dictionary with self referenced value type.
+- [#2663](https://github.com/Azure/typespec-azure/pull/2663) Add linter warning against multiple param aliases for the same parameter
+- [#2665](https://github.com/Azure/typespec-azure/pull/2665) Fix error thrown when removing optional query parameters from method signature with the `@override` decorator
+- [#2666](https://github.com/Azure/typespec-azure/pull/2666) Check root source property to determine if two properties are the same
+
+
+## 0.56.1
+
+### Features
+
+- [#2592](https://github.com/Azure/typespec-azure/pull/2592) Change default value of initializedBy for SdkOperationGroup from `InitializedByFlags.Parent` to `InitializedByFlags.Default`
+
+### Bug Fixes
+
+- [#2626](https://github.com/Azure/typespec-azure/pull/2626) Convert to same type for array or dictionary of same type.
+
+
+## 0.56.0
+
+### Features
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Add `metadata` property to `SdkPackage` type to export package related info.
+
+### Bug Fixes
+
+- [#2562](https://github.com/Azure/typespec-azure/pull/2562) Support `null` example value for `unknown` type.
+- [#2584](https://github.com/Azure/typespec-azure/pull/2584) Loosen requirements for parameters in `@override` so they don't have to be exactly the same node
+
+
+## 0.55.1
+
+### Bug Fixes
+
+- [#2591](https://github.com/Azure/typespec-azure/pull/2591) Update source property checks to look at node
+
+
 ## 0.55.0
 
 No changes, version bump only.

@@ -131,6 +131,20 @@ export function isPascalCaseNoAcronyms(name: string): boolean {
   return /^([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
 }
 
+export function isPascalCaseWithAcceptedAcronyms(
+  name: string,
+  acceptedAcronyms: string[],
+): boolean {
+  if (isPascalCaseNoAcronyms(name)) {
+    return true;
+  }
+
+  const acceptedAcronymsRegex = new RegExp(
+    `^([A-Z][a-z0-9]*)*(${acceptedAcronyms.join("|")})([A-Z][a-z0-9]*)?$`,
+  );
+  return acceptedAcronymsRegex.test(name);
+}
+
 /**
  * Checks whether a given name is in camelCase
  * @param name the name to check

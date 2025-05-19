@@ -8,8 +8,9 @@ import {
   isTemplateDeclarationOrInstance,
   paramMessage,
 } from "@typespec/compiler";
-import { isCamelCaseNoAcronyms, isPascalCaseNoAcronyms } from "./utils.js";
+import { isCamelCaseNoAcronyms, isPascalCaseWithAcceptedAcronyms } from "./utils.js";
 
+const acceptedAzureAcronyms = ["AI", "VM", "OS", "IP", "CPU", "GPU", "LRO"];
 export const casingRule = createRule({
   name: "casing-style",
   description: "Ensure proper casing style.",
@@ -21,7 +22,7 @@ export const casingRule = createRule({
   create(context) {
     return {
       model: (model: Model) => {
-        if (!isPascalCaseNoAcronyms(model.name)) {
+        if (!isPascalCaseWithAcceptedAcronyms(model.name, acceptedAzureAcronyms)) {
           context.reportDiagnostic({
             format: { type: "Model", casing: "PascalCase" },
             target: model,
@@ -39,7 +40,7 @@ export const casingRule = createRule({
       },
       operation: (operation: Operation) => {
         if (isTemplateDeclarationOrInstance(operation)) {
-          if (!isPascalCaseNoAcronyms(operation.name)) {
+          if (!isPascalCaseWithAcceptedAcronyms(operation.name, acceptedAzureAcronyms)) {
             context.reportDiagnostic({
               format: { type: "Operation Template", casing: "PascalCase" },
               target: operation,
@@ -53,7 +54,7 @@ export const casingRule = createRule({
         }
       },
       interface: (operationGroup: Interface) => {
-        if (!isPascalCaseNoAcronyms(operationGroup.name)) {
+        if (!isPascalCaseWithAcceptedAcronyms(operationGroup.name, acceptedAzureAcronyms)) {
           context.reportDiagnostic({
             format: { type: "Interface", casing: "PascalCase" },
             target: operationGroup,
@@ -61,7 +62,7 @@ export const casingRule = createRule({
         }
       },
       namespace: (namespace: Namespace) => {
-        if (!isPascalCaseNoAcronyms(namespace.name)) {
+        if (!isPascalCaseWithAcceptedAcronyms(namespace.name, acceptedAzureAcronyms)) {
           context.reportDiagnostic({
             format: { type: "Namespace", casing: "PascalCase" },
             target: namespace,

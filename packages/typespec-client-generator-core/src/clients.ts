@@ -265,7 +265,7 @@ function createSdkClientInitializationType(
     doc: "Initialization for the client",
     parameters: [],
     initializedBy:
-      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.Parent,
+      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
     decorators: [],

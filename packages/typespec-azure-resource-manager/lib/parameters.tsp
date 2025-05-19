@@ -70,6 +70,8 @@ model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
 
 /**
  * Template for ARM location resources.  Use the parameter to specify
+ * the parent of the location resource.
+ * @template BaseType The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension".
  */
 @friendlyName("Location")
 @armVirtualResource
@@ -167,5 +169,20 @@ model TenantActionScope {
   @visibility(Lifecycle.Read)
   @key
   @segment("tenant")
+  name: string;
+}
+
+/**
+ * Template used by ArmProviderAction templates. This produces following action route:
+ * `/{resourceUri}/providers/Microsoft.SomeRP/someAction`
+ */
+@armVirtualResource
+@extensionResource
+model ExtensionResourceActionScope {
+  @doc("Symbolic name of scope")
+  @path
+  @visibility(Lifecycle.Read)
+  @key
+  @segment("extensionresource")
   name: string;
 }

@@ -170,6 +170,7 @@ model Azure.ResourceManager.ArmDeletedResponse
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
 Template for ARM location resources. Use the parameter to specify
+the parent of the location resource.
 
 ```typespec
 model Azure.ResourceManager.ArmLocationResource<BaseType>
@@ -177,9 +178,9 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 
 #### Template Parameters
 
-| Name     | Description |
-| -------- | ----------- |
-| BaseType |             |
+| Name     | Description                                                                                   |
+| -------- | --------------------------------------------------------------------------------------------- |
+| BaseType | The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension". |
 
 #### Properties
 
@@ -522,6 +523,21 @@ model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 | Name        | Type         | Description |
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
+
+### `ExtensionResourceActionScope` {#Azure.ResourceManager.ExtensionResourceActionScope}
+
+Template used by ArmProviderAction templates. This produces following action route:
+`/{resourceUri}/providers/Microsoft.SomeRP/someAction`
+
+```typespec
+model Azure.ResourceManager.ExtensionResourceActionScope
+```
+
+#### Properties
+
+| Name | Type     | Description            |
+| ---- | -------- | ---------------------- |
+| name | `string` | Symbolic name of scope |
 
 ### `KeysOf` {#Azure.ResourceManager.KeysOf}
 
@@ -2802,6 +2818,24 @@ model Foo is TrackedResource<FooProperties> {
 | Name      | Type                                                                                                | Description                                               |
 | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
+
+### `Provider` {#Azure.ResourceManager.Legacy.Provider}
+
+```typespec
+model Azure.ResourceManager.Legacy.Provider<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                               |
+| -------- | --------------------------------------------------------- |
+| Resource | Optional. The resource to get the provider namespace for. |
+
+#### Properties
+
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 

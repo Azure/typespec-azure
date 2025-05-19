@@ -457,3 +457,24 @@ it("core template", async () => {
   strictEqual(paramsParam.type.kind, "model");
   strictEqual(paramsParam.type.name, "Params");
 });
+
+it("remove optional query param", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    namespace KeyVault;
+
+    op getSecrets(@query("maxresults") maxresults?: int32): void;
+    `,
+    `
+    op listSecretProperties(): void;
+    @@override(KeyVault.getSecrets, listSecretProperties);
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.parameters.length, 0);
+  strictEqual(method.operation.parameters.length, 1);
+  strictEqual(method.operation.parameters[0].name, "maxresults");
+  strictEqual(method.operation.parameters[0].correspondingMethodParams.length, 0);
+});

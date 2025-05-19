@@ -1,5 +1,9 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.17
+
+No changes, version bump only.
+
 ## 0.1.0-alpha.16
 
 ### Features
