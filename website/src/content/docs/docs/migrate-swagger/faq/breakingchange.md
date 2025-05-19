@@ -2,16 +2,44 @@
 title: Resolving Swagger Breaking Change Violations
 ---
 
-The Swagger Converter will not be able to accurately represent every part of every API in TypeSpec. This document
-outlines some common changes you might need to make to a converted TypeSpec to make it conform to your existing service API and  
-pass check-in validations.
+The Swagger Converter cannot perfectly represent every aspect of every API in TypeSpec. This document outlines common changes you might need to make to a converted TypeSpec to ensure compatibility with your existing service API and pass check-in validations.
 
-## Migrate ARM Specs
+## Using Resources from Common Types
 
-### Changing the Names of Request Payload Parameters
+If your resource definition already extends from a resource type in [common-types](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/common-types/resource-management), you can skip this section. Otherwise, you should understand how we identify resource models and select appropriate base models from the TypeSpec resource manager library.
 
-For operations with non-empty request bodies (PUT, POST, PATCH), the TypeSpec operation templates provide a default name for the
-request parameter corresponding to the request payload. You can use augment decorators to make changes to this parameter, and other parts of the operation signature.
+We identify a model as a resource when it meets all these criteria:
+
+1. There is a GET operation for it
+2. At least one operation returns a 200 response containing this model
+3. The model has properties named "id", "name", and "type"
+
+Once a model is identified as a resource, we represent it by extending an appropriate [resource model](../../howtos/ARM/resource-type.md#modeling-resources-in-typespec) from the TypeSpec library. This results in differences between your original Swagger and generated Swagger like:
+
+```diff
+"YourResource": {
+  "type": "object",
+  "properties": {
+    "properties": {
+      "$ref": "#/definitions/YourResourceProperties",
+    }
+  },
+  "allOf": [
+    {
+-      "$ref": "#/definitions/YourOwnProxyResourceDefinition"
++      "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ProxyResource"
+    }
+  ]
+}
+```
+
+We would suggest you to accept this expected change to align with ARM convention. However, if you have any strong business justification to keep original definition, you could use `@customAzureResource` to mark your model.
+
+## Migrating ARM Specifications
+
+### Customizing Request Payload Parameter Names
+
+For operations with request bodies (PUT, POST, PATCH), TypeSpec operation templates provide default names for request parameters. You can use augment decorators to customize these parameter names and other parts of the operation signature.
 
 The following sections show how to do this for each operation template.
 

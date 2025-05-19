@@ -16,7 +16,7 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 - Clone [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs).
 - Install dependencies:
   ```shell
-  npm install # Run at root
+  npm install # Run at root of the repository
   ```
 
 ### Generate TypeSpec with converter
@@ -84,14 +84,18 @@ You will need to compare the Swagger generated from TypeSpec with your original 
   1. Recompile your TypeSpec files with `tsp compile .` in your TypeSpec folder.
   2. Run the `npx tsmv` command again with the same parameters.
   3. Review the updated differences in VS Code.
-  4. Make further adjustments as needed. For more effective visualization, fix differences in this recommended order:
+  4. Make further adjustments as needed. Refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md) to understand expected breaking change and mitigation steps. For more effective visualization, fix differences in this recommended order:
      - Path (route) differences first
      - Definition (model) name differences next
      - Detail differences within paths and definitions last
 
 ### Create Spec PR with new TypeSpec project
 
-- Review CI checks such as breaking changes and other failures.
+- In your `readme.md` file, under your latest tag, change the `input-file` to the swagger generated from your TypeSpec.
+- Delete your previous swagger files if they are not referenced from the readme file.
+- Create PR with your TypeSpec files, changed swagger files (examples included) and readme file.
+- Check CI failures. Refer to 
+
 
 ## How to Get Help
 
