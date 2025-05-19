@@ -1126,9 +1126,9 @@ model Azure.ResourceManager.CommonTypes.BillingData
 
 | Name          | Type                                                                                   | Description                                                                          |
 | ------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| systemId      | `Core.uuid`                                                                            | The system ID of the resource. Globally unique per cloud.                            |
-| state         | [`BillingState`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingState)       | Indicates the billing state of the resource.                                         |
-| reasons       | `ResourceManager.CommonTypes.BillingStateReason[]`                                     | Indicates reason(s) for the current billing state of the resource.                   |
+| systemId?     | `Core.uuid`                                                                            | The system ID of the resource. Globally unique per cloud.                            |
+| state?        | [`BillingState`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingState)       | Indicates the billing state of the resource.                                         |
+| reasons?      | `ResourceManager.CommonTypes.BillingStateReason[]`                                     | Indicates reason(s) for the current billing state of the resource.                   |
 | productCode   | `Core.uuid`                                                                            | The product identifier referencing a product in the catalog.                         |
 | productToken? | `string`                                                                               | Product token (JWT) identifying a specific version of the product.                   |
 | quantity      | `int64`                                                                                | The number of instances of the product.                                              |
@@ -1148,11 +1148,11 @@ model Azure.ResourceManager.CommonTypes.BillingSchedule
 
 #### Properties
 
-| Name            | Type                                                                                         | Description                                              |
-| --------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| nextInvoiceDate | `utcDateTime`                                                                                | Date when this resource is expected to be invoiced next. |
-| renewal         | [`BillingRenewalType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingRenewalType) | Indicates the renewal behavior of this resource.         |
-| changes?        | `ResourceManager.CommonTypes.BillingScheduleChange[]`                                        | Schedules billing changes for this resource.             |
+| Name             | Type                                                                                         | Description                                              |
+| ---------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| nextInvoiceDate? | `utcDateTime`                                                                                | Date when this resource is expected to be invoiced next. |
+| renewal          | [`BillingRenewalType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingRenewalType) | Indicates the renewal behavior of this resource.         |
+| changes?         | `ResourceManager.CommonTypes.BillingScheduleChange[]`                                        | Schedules billing changes for this resource.             |
 
 ### `BillingScheduleChange` {#Azure.ResourceManager.CommonTypes.BillingScheduleChange}
 
