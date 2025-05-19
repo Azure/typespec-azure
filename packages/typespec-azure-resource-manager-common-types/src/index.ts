@@ -13,6 +13,7 @@ const args = parseArgs({
 const targetPath = args.values["path"];
 
 if (!targetPath) {
+  // eslint-disable-next-line no-console
   console.error("--path is required");
   process.exit(1);
 }
