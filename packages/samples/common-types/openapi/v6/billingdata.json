@@ -19,7 +19,7 @@
         "state": {
           "type": "string",
           "description": "Indicates the billing state of the resource.",
-          "default": "Active",
+          "default": "Pending",
           "enum": [
             "Pending",
             "Active",
@@ -102,9 +102,6 @@
         }
       },
       "required": [
-        "systemId",
-        "state",
-        "reasons",
         "productCode",
         "quantity"
       ]
@@ -178,7 +175,6 @@
         }
       },
       "required": [
-        "nextInvoiceDate",
         "renewal"
       ]
     },

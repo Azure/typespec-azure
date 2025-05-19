@@ -12,19 +12,19 @@ model BillingData {
    * The system ID of the resource. Globally unique per cloud.
    */
   @visibility(Lifecycle.Read)
-  systemId: uuid;
+  systemId?: uuid;
 
   /**
    * Indicates the billing state of the resource.
    */
   @visibility(Lifecycle.Read)
-  state: BillingState = "Active";
+  state?: BillingState = "Pending";
 
   /**
    * Indicates reason(s) for the current billing state of the resource.
    */
   @visibility(Lifecycle.Read)
-  reasons: BillingStateReason[];
+  reasons?: BillingStateReason[];
 
   /**
    * The product identifier referencing a product in the catalog.
@@ -78,7 +78,7 @@ model BillingSchedule {
    * Date when this resource is expected to be invoiced next.
    */
   @visibility(Lifecycle.Read)
-  nextInvoiceDate: utcDateTime;
+  nextInvoiceDate?: utcDateTime;
 
   /**
    * Indicates the renewal behavior of this resource.

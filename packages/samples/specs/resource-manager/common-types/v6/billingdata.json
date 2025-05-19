@@ -102,9 +102,6 @@
         }
       },
       "required": [
-        "systemId",
-        "state",
-        "reasons",
         "productCode",
         "quantity"
       ]
@@ -178,7 +175,6 @@
         }
       },
       "required": [
-        "nextInvoiceDate",
         "renewal"
       ]
     },
