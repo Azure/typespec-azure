@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.56.1
+
+### Bug Fixes
+
+- [#2676](https://github.com/Azure/typespec-azure/pull/2676) Corrected the references for `PrivateEndpointConnectionListResultV5` and `PrivateLinkResourceListResultV5` in `common-types`.
+- [#2675](https://github.com/Azure/typespec-azure/pull/2675) Add support for resources with multiple operation paths
+- [#2674](https://github.com/Azure/typespec-azure/pull/2674) Allow optional request bodies in Resource actions templates
+
+
 ## 0.56.0
 
 ### Bug Fixes

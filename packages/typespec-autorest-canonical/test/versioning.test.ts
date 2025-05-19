@@ -2,7 +2,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { it } from "vitest";
 import { canonicalVersion } from "../src/emitter.js";
-import { diagnoseOpenApiFor, ignoreUseStandardOps, openApiFor } from "./test-host.js";
+import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 it("works with models", async () => {
   const v = await openApiFor(
@@ -116,7 +116,7 @@ it("Diagnostics for unsupported versioning decorators.", async () => {
     }
   `,
   );
-  expectDiagnostics(ignoreUseStandardOps(diagnostics), [
+  expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-autorest-canonical/unsupported-versioning-decorator",
       message: "Decorator @renamedFrom is not supported in AutorestCanonical.",
