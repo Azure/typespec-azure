@@ -5,7 +5,7 @@
     { "path": "packages/typespec-autorest-canonical/tsconfig.json" },
     { "path": "packages/typespec-azure-core/tsconfig.json" },
     { "path": "packages/typespec-azure-resource-manager/tsconfig.json" },
-    {" path": "packages/typespec-azure-resource-manager-common-types/tsconfig.json" },
+    { "path": "packages/typespec-azure-resource-manager-common-types/tsconfig.json" },
     { "path": "packages/typespec-client-generator-core/tsconfig.json" },
     { "path": "packages/typespec-azure-rulesets/tsconfig.json" },
     { "path": "packages/azure-http-specs/tsconfig.json" },
