@@ -27,7 +27,7 @@ steps:
   - script: pnpm run regen-samples
     displayName: Regen samples
 
-  - script: pnpm run regen-common-types
+  - script: pnpm run regen-common-types --path "$(Build.SourcesDirectory)/packages/samples/common-types/openapi"
     displayName: Regen common types
 
   - script: node eng/scripts/check-for-changed-files.js
