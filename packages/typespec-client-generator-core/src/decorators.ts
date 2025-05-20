@@ -663,7 +663,8 @@ export const $usage: UsageDecorator = (
   value: EnumMember | Union,
   scope?: LanguageScopes,
 ) => {
-  const isValidValue = (value: number): boolean => value === 2 || value === 4;
+  // Validate that it is one of the publicly exposed values in the usage decorator defined in decorators.tsp.
+  const isValidValue = (value: number): boolean => value === UsageFlags.Input || value === UsageFlags.Output || value === UsageFlags.Json;
 
   if (value.kind === "EnumMember") {
     if (typeof value.value === "number" && isValidValue(value.value)) {

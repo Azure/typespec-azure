@@ -109,6 +109,12 @@ enum Usage {
    * Used in response
    */
   output: 4,
+
+  /**
+   * Used in JSON serialization. This should only be set for models that are not used in any JSON operations, but still
+   * should have JSON serialization. For instance, in models-only libraries. 
+   */ 
+  json: 256,
 }
 
 /**
