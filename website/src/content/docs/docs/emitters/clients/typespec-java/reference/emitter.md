@@ -100,7 +100,7 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 **Type:** `boolean`
 
-When set to `true`, the emitter will merge the generated code with existing code on `emitter-output-dir`, in post-process. Default value is `false`.
+When set to `true`, the emitter will merge the generated code with existing code on `emitter-output-dir`, during post-process. Default value is `false`.
 
 ### `models-subpackage`
 
@@ -124,7 +124,7 @@ Specify the package name for custom model classes.
 
 **Type:** `string`
 
-Specify the Java class that to be executed by emitter for customization by code, in post-process.
+Specify the Java class that to be executed by emitter for [code customization](https://github.com/Azure/autorest.java/blob/main/customization-base/README.md), during post-process.
 
 ### `skip-special-headers`
 
