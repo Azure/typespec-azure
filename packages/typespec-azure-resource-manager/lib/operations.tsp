@@ -1,6 +1,7 @@
 using Http;
 using Rest;
 using Azure.ResourceManager.Foundations;
+using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager;
 
@@ -251,6 +252,7 @@ op ArmResourceCreateOrReplaceAsync<
 /**
  * @dev A long-running resource update that only allows updating resource tags (the minimum)
  * @template Resource the resource being patched
+ * @template Properties Optional. Exists for parallelism with ArmResourcePatch.
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
@@ -482,6 +484,7 @@ op ArmResourceDeleteSync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @autoRoute
 @armResourceAction(Resource)
@@ -493,13 +496,14 @@ op ArmResourceActionAsyncBase<
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters extends TypeSpec.Reflection.Model,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
   ...Parameters,
 
   @doc("The content of the action request")
-  @bodyRoot
+  @armBodyRoot(OptionalRequestBody)
   body: Request,
 ): Response | Error;
 
@@ -512,6 +516,7 @@ op ArmResourceActionAsyncBase<
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
  */
 @returnsDoc("Azure operation completed successfully.")
 @Private.enforceConstraint(Resource, Foundations.Resource)
@@ -527,14 +532,16 @@ op ArmResourceActionAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response,
   BaseParameters,
   Parameters,
-  Error
+  Error,
+  OptionalRequestBody
 >;
 
 /**
@@ -545,6 +552,7 @@ op ArmResourceActionAsync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
  */
 @autoRoute
 @armResourceAction(Resource)
@@ -557,13 +565,14 @@ op ArmResourceActionSync<
   Response extends TypeSpec.Reflection.Model | void,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
   ...Parameters,
 
   @doc("The content of the action request")
-  @bodyRoot
+  @armBodyRoot(OptionalRequestBody)
   body: Request,
 ): Response | Error;
 
@@ -575,6 +584,7 @@ op ArmResourceActionSync<
  * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoContentAsync<
@@ -584,7 +594,8 @@ op ArmResourceActionNoContentAsync<
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
@@ -594,7 +605,8 @@ op ArmResourceActionNoContentAsync<
   > | ArmNoContentResponse<"Action completed successfully.">,
   BaseParameters,
   Parameters,
-  Error
+  Error,
+  OptionalRequestBody
 >;
 
 /**
@@ -602,9 +614,10 @@ op ArmResourceActionNoContentAsync<
  * @template Resource The resource being acted upon
  * @template Request The request model for the action
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
- * @template Headers Optional. Allows overriding the headers returned in the Accepted response
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
  */
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoResponseContentAsync<
@@ -618,14 +631,16 @@ op ArmResourceActionNoResponseContentAsync<
   > &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 > is ArmResourceActionAsyncBase<
   Resource,
   Request,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>,
   BaseParameters,
   Parameters,
-  Error
+  Error,
+  OptionalRequestBody
 >;
 
 /**
@@ -635,6 +650,7 @@ op ArmResourceActionNoResponseContentAsync<
  * @template BaseParameters Optional. Allows overriding the parameters for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @autoRoute
 @armResourceAction(Resource)
@@ -645,13 +661,14 @@ op ArmResourceActionNoContentSync<
   Request extends TypeSpec.Reflection.Model | void,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 >(
   ...ResourceInstanceParameters<Resource, BaseParameters>,
   ...Parameters,
 
   @doc("The content of the action request")
-  @bodyRoot
+  @armBodyRoot(OptionalRequestBody)
   body: Request,
 ): ArmNoContentResponse<"Action completed successfully."> | Error;
 
@@ -702,6 +719,7 @@ op checkLocalNameAvailability<
  * @template Scope The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope)
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @post
 @action
@@ -712,14 +730,15 @@ op ArmProviderActionSync<
   Response extends {} | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 
   /** The request body */
-  @bodyRoot body: Request,
+  @armBodyRoot(OptionalRequestBody) body: Request,
 ): Response | Error;
 
 /**
@@ -730,6 +749,7 @@ op ArmProviderActionSync<
  * @template Parameters Optional. Additional parameters after the path parameters (e.g. Location)
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
  */
 @post
 @action
@@ -746,12 +766,13 @@ op ArmProviderActionAsync<
     string
   > &
     Azure.Core.Foundations.RetryAfterHeader,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 
   /** The request body */
-  @bodyRoot body: Request,
+  @armBodyRoot(OptionalRequestBody) body: Request,
 ): ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response | Error;
