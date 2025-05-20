@@ -12,6 +12,7 @@ import {
   Type,
   Union,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import { HttpOperation } from "@typespec/http";
 import { getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
@@ -42,13 +43,14 @@ import {
 } from "./internal-utils.js";
 import { createStateSymbol } from "./lib.js";
 import { createSdkPackage } from "./package.js";
-import { $ } from "@typespec/compiler/typekit";
 
 const referencedTypeCacheKey = createStateSymbol("__referencedTypeCache");
 const rawClientsKey = createStateSymbol("__rawClients");
+const mutatedGlobalNamespaceKey = createStateSymbol("__mutatedGlobalNamespace");
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
   const diagnostics = createDiagnosticCollector();
+  const dummyKey = $(program).builtin.boolean;
   return {
     program,
     diagnostics: diagnostics.diagnostics,
@@ -93,10 +95,10 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     },
 
     getMutatedGlobalNamespace(): Namespace {
-      let globalNamespace = this.__mutatedGlobalNamespace;
+      let globalNamespace = this.program.stateMap(mutatedGlobalNamespaceKey).get(dummyKey);
       if (!globalNamespace) {
         globalNamespace = handleVersioningMutationForGlobalNamespace(this);
-        this.__mutatedGlobalNamespace = globalNamespace;
+        this.program.stateMap(mutatedGlobalNamespaceKey).set(dummyKey, globalNamespace);
       }
       return globalNamespace;
     },
@@ -135,13 +137,10 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
       return this.__packageVersions;
     },
     getRawClients(): SdkClient[] {
-      const tk = $(this.program);
-      // use boolean typekit as a hack
-      return this.program.stateMap(rawClientsKey).get(tk.builtin.boolean);
+      return this.program.stateMap(rawClientsKey).get(dummyKey);
     },
     setRawClients(clients: SdkClient[]): void {
-      const tk = $(this.program);
-      this.program.stateMap(rawClientsKey).set(tk.builtin.boolean, clients);
+      this.program.stateMap(rawClientsKey).set(dummyKey, clients);
     },
   };
 }

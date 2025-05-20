@@ -63,7 +63,6 @@ export interface TCGCContext {
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
-  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
 
   getMutatedGlobalNamespace(): Namespace;
