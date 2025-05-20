@@ -20,6 +20,7 @@ import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
   SdkArrayType,
+  SdkClient,
   SdkContext,
   SdkDictionaryType,
   SdkEnumType,
@@ -41,8 +42,10 @@ import {
 } from "./internal-utils.js";
 import { createStateSymbol } from "./lib.js";
 import { createSdkPackage } from "./package.js";
+import { $ } from "@typespec/compiler/typekit";
 
 const referencedTypeCacheKey = createStateSymbol("__referencedTypeCache");
+const rawClientsKey = createStateSymbol("__rawClients");
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
   const diagnostics = createDiagnosticCollector();
@@ -130,6 +133,15 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
 
       this.__packageVersions = versions.map((version) => version.value);
       return this.__packageVersions;
+    },
+    getRawClients(): SdkClient[] {
+      const tk = $(this.program);
+      // use boolean typekit as a hack
+      return this.program.stateMap(rawClientsKey).get(tk.builtin.boolean);
+    },
+    setRawClients(clients: SdkClient[]): void {
+      const tk = $(this.program);
+      this.program.stateMap(rawClientsKey).set(tk.builtin.boolean, clients);
     },
   };
 }

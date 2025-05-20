@@ -61,7 +61,6 @@ export interface TCGCContext {
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
-  __rawClients?: SdkClient[];
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
@@ -73,6 +72,8 @@ export interface TCGCContext {
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): string[];
+  getRawClients(): SdkClient[];
+  setRawClients(clients: SdkClient[]): void;
 }
 
 export interface SdkContext<
