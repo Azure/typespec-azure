@@ -53,7 +53,6 @@ import {
 } from "./interfaces.js";
 import {
   compareModelProperties,
-  findRootSourceProperty,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodySpreadModel,
@@ -714,7 +713,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      findRootSourceProperty(methodParam.__raw) === findRootSourceProperty(serviceParam.__raw)
+      compareModelProperties(methodParam.__raw, serviceParam.__raw)
     ) {
       return methodParam;
     }

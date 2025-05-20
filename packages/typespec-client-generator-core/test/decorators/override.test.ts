@@ -509,8 +509,8 @@ it("remove optional query param and add secret name", async () => {
   ok(secretNameParam);
   strictEqual(secretNameParam.correspondingMethodParams.length, 1);
   strictEqual(secretNameParam.correspondingMethodParams[0], method.parameters[0]);
-  const maxResultsParam = method.operation.parameters.find((x) => x.name === "maxResults");
+  const maxResultsParam = method.operation.parameters.find((x) => x.name === "maxresults");
   ok(maxResultsParam);
   strictEqual(maxResultsParam.correspondingMethodParams.length, 0);
-  strictEqual(maxResultsParam.name, "maxResults");
+  strictEqual(maxResultsParam.name, "maxresults");
 });
