@@ -39,7 +39,10 @@ import {
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
+import { createStateSymbol } from "./lib.js";
 import { createSdkPackage } from "./package.js";
+
+const referencedTypeCacheKey = createStateSymbol("__referencedTypeCache");
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
   const diagnostics = createDiagnosticCollector();
@@ -54,10 +57,6 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     disableUsageAccessPropagationToBase: false,
     generateProtocolMethods: true,
     generateConvenienceMethods: true,
-    __referencedTypeCache: new Map<
-      Type,
-      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
-    >(),
     __arrayDictionaryCache: new Map<Type, SdkDictionaryType | SdkArrayType>(),
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
@@ -68,6 +67,27 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     __knownScalars: getKnownScalars(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
+
+    getReferencedTypeCache(): Map<
+      Type,
+      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
+    > {
+      return this.program.stateMap(referencedTypeCacheKey) as Map<
+        Type,
+        SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
+      >;
+    },
+
+    setReferencedTypeCache(
+      type: Type,
+      sdkType: SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType,
+    ): void {
+      const referencedTypeCache = this.getReferencedTypeCache();
+      if (referencedTypeCache.has(type)) {
+        return;
+      }
+      referencedTypeCache.set(type, sdkType);
+    },
 
     getMutatedGlobalNamespace(): Namespace {
       let globalNamespace = this.__mutatedGlobalNamespace;

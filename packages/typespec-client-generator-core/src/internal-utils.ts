@@ -686,11 +686,12 @@ export function resolveDuplicateGenearatedName(
 }
 
 export function resolveConflictGeneratedName(context: TCGCContext) {
-  const userDefinedNames = [...context.__referencedTypeCache.values()]
+  const referencedTypeCache = context.getReferencedTypeCache();
+  const userDefinedNames = [...referencedTypeCache.values()]
     .filter((x) => !x.isGeneratedName)
     .map((x) => x.name);
   const generatedNames = [...context.__generatedNames.values()];
-  for (const sdkType of context.__referencedTypeCache.values()) {
+  for (const sdkType of referencedTypeCache.values()) {
     if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
       const rawName = sdkType.name;
       let duplicateCount = 1;

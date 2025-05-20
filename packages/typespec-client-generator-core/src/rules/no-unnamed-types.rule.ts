@@ -20,7 +20,7 @@ export const noUnnamedTypesRule = createRule({
     createSdkPackage(tcgcContext);
     return {
       model: (model: Model) => {
-        const createdModel = tcgcContext.__referencedTypeCache.get(model);
+        const createdModel = tcgcContext.getReferencedTypeCache().get(model);
         if (
           createdModel &&
           createdModel.usage !== UsageFlags.None &&
@@ -36,7 +36,7 @@ export const noUnnamedTypesRule = createRule({
         }
       },
       union: (union: Union) => {
-        const createdUnion = tcgcContext.__referencedTypeCache.get(union);
+        const createdUnion = tcgcContext.getReferencedTypeCache().get(union);
         if (
           createdUnion &&
           createdUnion.usage !== UsageFlags.None &&

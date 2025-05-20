@@ -53,7 +53,6 @@ export interface TCGCContext {
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
 
-  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
   __generatedNames: Map<Type, string>;
@@ -69,6 +68,8 @@ export interface TCGCContext {
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
 
   getMutatedGlobalNamespace(): Namespace;
+  getReferencedTypeCache(): Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  setReferencedTypeCache(type: Type, sdkType: SdkType): void;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): string[];
