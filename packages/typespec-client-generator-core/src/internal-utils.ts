@@ -728,13 +728,14 @@ export function compareModelProperties(
   modelPropB: ModelProperty | undefined,
 ): boolean {
   if (!modelPropA || !modelPropB) return false;
-  // can't rely fully on equals because the `.model` property may be different
-  if (modelPropA.name !== modelPropB.name) return false;
-  if (modelPropA.type.kind !== modelPropB.type.kind) return false;
-  if (!context) return false;
+  if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
+  if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
   const sdkA = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropA));
   const sdkB = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropB));
-  if (sdkA.kind !== sdkB.kind) return false;
+  if (sdkA.kind === "method" || sdkB.kind === "method") {
+    // if we're comparing method vs service param, we just need to check the name and type
+    return true;
+  }
   switch (sdkA.kind) {
     case "cookie":
     case "header":
@@ -742,36 +743,8 @@ export function compareModelProperties(
     case "path":
     case "responseheader":
     case "body":
-      // have to recheck kind because of typescript
-      return sdkB.kind === sdkA.kind && sdkA.serializedName === sdkB.serializedName;
-    case "endpoint":
-      if (sdkA.type.kind !== sdkB.type.kind) return false;
-      if (sdkA.type.kind === "endpoint" && sdkB.type.kind === "endpoint") {
-        if (sdkA.type.templateArguments.length !== sdkB.type.templateArguments.length) {
-          return false;
-        }
-        for (let i = 0; i < sdkA.type.templateArguments.length; i++) {
-          if (
-            !compareModelProperties(
-              context,
-              sdkA.type.templateArguments[i].__raw,
-              sdkB.type.templateArguments[i].__raw,
-            )
-          ) {
-            return false;
-          }
-        }
-        return true;
-      }
-      return false;
-    case "property":
-      if (sdkB.kind !== "property") return false;
-      return (
-        sdkA.serializationOptions.json === sdkB.serializationOptions.json &&
-        sdkA.serializationOptions.xml === sdkB.serializationOptions.xml &&
-        sdkA.serializationOptions.multipart === sdkB.serializationOptions.multipart
-      );
+      return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
     default:
-      return false;
+      return sdkA.kind === sdkB.kind;
   }
 }
