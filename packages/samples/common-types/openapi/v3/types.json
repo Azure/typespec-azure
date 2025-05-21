@@ -131,6 +131,7 @@
           "readOnly": true
         },
         "info": {
+          "type": "object",
           "description": "The additional info.",
           "readOnly": true
         }
