@@ -40,6 +40,7 @@ versionPolicies:
       - "@azure-tools/typespec-azure-core"
       - "@azure-tools/typespec-azure-portal-core"
       - "@azure-tools/typespec-azure-resource-manager"
+      - "@azure-tools/typespec-azure-resource-manager-common-types"
       - "@azure-tools/typespec-client-generator-core"
 
 changelog: ["@chronus/github/changelog", { repo: "azure/typespec-azure" }]
