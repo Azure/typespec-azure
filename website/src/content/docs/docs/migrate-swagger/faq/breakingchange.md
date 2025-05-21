@@ -198,3 +198,12 @@ You can generally choose an asynchronous operation template that matches your op
   ```tsp
   op createOrUpdate is ArmResourceDeleteAsync<Resource>;
   ```
+
+### Visibility changes for `nextLink` and `value` properties
+
+The issue is that some older specifications marked these values as read only. To fix, simply add the following augment decorator statements to the `main.tsp` file.
+
+```tsp
+@@visibility(Azure.Core.Page.value, "read");
+@@visibility(Azure.Core.Page.nextLink, "read");
+```

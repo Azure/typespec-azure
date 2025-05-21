@@ -94,8 +94,7 @@ You will need to compare the Swagger generated from TypeSpec with your original 
 - In your `readme.md` file, under your latest tag, change the `input-file` to the swagger generated from your TypeSpec.
 - Delete your previous swagger files if they are not referenced from the readme file.
 - Create PR with your TypeSpec files, changed swagger files (examples included) and readme file.
-- Check CI failures. Refer to 
-
+- Check CI failures. Refer to
 
 ## How to Get Help
 
