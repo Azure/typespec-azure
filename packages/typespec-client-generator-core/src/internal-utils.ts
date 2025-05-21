@@ -8,6 +8,7 @@ import {
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getVisibilityForClass,
+  ignoreDiagnostics,
   Interface,
   isNeverType,
   isNullType,
@@ -55,7 +56,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { getClientTypeWithDiagnostics } from "./types.js";
+import { getClientTypeWithDiagnostics, getSdkModelPropertyType } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -722,10 +723,55 @@ export function getClientDoc(context: TCGCContext, target: Type): string | undef
 }
 
 export function compareModelProperties(
+  context: TCGCContext | undefined,
   modelPropA: ModelProperty | undefined,
   modelPropB: ModelProperty | undefined,
 ): boolean {
   if (!modelPropA || !modelPropB) return false;
   // can't rely fully on equals because the `.model` property may be different
-  return modelPropA.name === modelPropB.name && modelPropA.type === modelPropB.type;
+  if (modelPropA.name !== modelPropB.name) return false;
+  if (modelPropA.type.kind !== modelPropB.type.kind) return false;
+  if (!context) return false;
+  const sdkA = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropA));
+  const sdkB = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropB));
+  if (sdkA.kind !== sdkB.kind) return false;
+  switch (sdkA.kind) {
+    case "cookie":
+    case "header":
+    case "query":
+    case "path":
+    case "responseheader":
+    case "body":
+      // have to recheck kind because of typescript
+      return sdkB.kind === sdkA.kind && sdkA.serializedName === sdkB.serializedName;
+    case "endpoint":
+      if (sdkA.type.kind !== sdkB.type.kind) return false;
+      if (sdkA.type.kind === "endpoint" && sdkB.type.kind === "endpoint") {
+        if (sdkA.type.templateArguments.length !== sdkB.type.templateArguments.length) {
+          return false;
+        }
+        for (let i = 0; i < sdkA.type.templateArguments.length; i++) {
+          if (
+            !compareModelProperties(
+              context,
+              sdkA.type.templateArguments[i].__raw,
+              sdkB.type.templateArguments[i].__raw,
+            )
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }
+      return false;
+    case "property":
+      if (sdkB.kind !== "property") return false;
+      return (
+        sdkA.serializationOptions.json === sdkB.serializationOptions.json &&
+        sdkA.serializationOptions.xml === sdkB.serializationOptions.xml &&
+        sdkA.serializationOptions.multipart === sdkB.serializationOptions.multipart
+      );
+    default:
+      return false;
+  }
 }
