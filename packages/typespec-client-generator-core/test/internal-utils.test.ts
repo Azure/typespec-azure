@@ -1,7 +1,7 @@
 import { Model } from "@typespec/compiler";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { getValueTypeValue } from "../src/internal-utils.js";
+import { compareModelProperties, getValueTypeValue } from "../src/internal-utils.js";
 import { SdkTestRunner, createSdkTestRunner } from "./test-host.js";
 
 let runner: SdkTestRunner;
@@ -167,5 +167,99 @@ describe("getValueTypeValue", () => {
       x: 0,
       y: 0,
     });
+  });
+});
+
+describe("compareModelProperties", () => {
+  it("should return true for equal properties", async () => {
+    const { A, B } = (await runner.compile(
+      `
+      @service
+      namespace My.Service;
+
+      @test
+      model A {
+        prop: string;
+      }
+
+      @test
+      model B {
+        prop: string;
+      }
+    `,
+    )) as { A: Model; B: Model };
+    strictEqual(
+      compareModelProperties(runner.context, A.properties.get("prop"), B.properties.get("prop")),
+      true,
+    );
+  });
+
+  it("should return false for different names", async () => {
+    const { A, B } = (await runner.compile(
+      `
+      @service
+      namespace My.Service;
+
+      @test
+      model A {
+        propA: string;
+      }
+
+      @test
+      model B {
+        propB: string;
+      }
+    `,
+    )) as { A: Model; B: Model };
+    strictEqual(
+      compareModelProperties(runner.context, A.properties.get("propA"), B.properties.get("propB")),
+      false,
+    );
+  });
+
+  it("should return false for different types", async () => {
+    const { A, B } = (await runner.compile(
+      `
+      @service
+      namespace My.Service;
+
+      @test
+      model A {
+        prop: string;
+      }
+
+      @test
+      model B {
+        prop: int32;
+      }
+    `,
+    )) as { A: Model; B: Model };
+    strictEqual(
+      compareModelProperties(runner.context, A.properties.get("prop"), B.properties.get("prop")),
+      false,
+    );
+  });
+
+  it("should return false for different query names", async () => {
+    const { A, B } = (await runner.compile(
+      `
+      @service
+      namespace My.Service;
+
+      @test
+      model A {
+        @query("aa") a: string;
+      }
+
+      @test
+      model B {
+        @query("bb") a: string;
+      }
+    `,
+    )) as { A: Model; B: Model };
+    strictEqual(
+      compareModelProperties(runner.context, A.properties.get("a"), B.properties.get("a")),
+      false,
+    );
   });
 });
