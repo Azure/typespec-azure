@@ -777,7 +777,7 @@ it("filterOutCoreModels true", async () => {
   strictEqual(models[0].name, "User");
   strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-  for (const [type, sdkType] of runner.context.__referencedTypeCache.entries()) {
+  for (const [type, sdkType] of runner.context.getReferencedTypeCache().entries()) {
     if (isAzureCoreTspModel(type)) {
       ok(sdkType.usage !== UsageFlags.None);
     }
@@ -1053,7 +1053,7 @@ it("propagation", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const salmon = Array.from(runner.context.__referencedTypeCache.values()).find(
+  const salmon = Array.from(runner.context.getReferencedTypeCache().values()).find(
     (x) => x.kind === "model" && x.name === "Salmon",
   ) as SdkModelType;
   strictEqual(salmon?.serializationOptions.json, undefined);
@@ -1112,7 +1112,7 @@ it("propagation from subtype", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const types = Array.from(runner.context.__referencedTypeCache.values());
+  const types = Array.from(runner.context.getReferencedTypeCache().values());
 
   const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
   strictEqual(shark?.serializationOptions.json, undefined);

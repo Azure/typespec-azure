@@ -283,7 +283,10 @@ export function getClient(
  * @returns Array of clients
  */
 export function listClients(context: TCGCContext): SdkClient[] {
-  if (context.__rawClients) return context.__rawClients;
+  const rawClients = context.getRawClients();
+  if (rawClients) {
+    return rawClients;
+  }
   const namespaces: Namespace[] = listAllNamespaces(context, context.getMutatedGlobalNamespace());
 
   const explicitClients = [];
@@ -298,11 +301,11 @@ export function listClients(context: TCGCContext): SdkClient[] {
     }
   }
   if (explicitClients.length > 0) {
-    context.__rawClients = explicitClients;
-    if (context.__rawClients.some((client) => isArm(client.service))) {
+    context.setRawClients(explicitClients);
+    if (context.getRawClients().some((client) => isArm(client.service))) {
       context.arm = true;
     }
-    return context.__rawClients;
+    return context.getRawClients();
   }
 
   // if there is no explicit client, we will treat the first namespace with service decorator as client
@@ -324,7 +327,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
     }
     const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
     context.arm = isArm(service);
-    context.__rawClients = [
+    context.setRawClients([
       {
         kind: "SdkClient",
         name: clientName,
@@ -332,12 +335,12 @@ export function listClients(context: TCGCContext): SdkClient[] {
         type: service,
         crossLanguageDefinitionId: getNamespaceFullName(service),
       },
-    ];
+    ]);
   } else {
-    context.__rawClients = [];
+    context.setRawClients([]);
   }
 
-  return context.__rawClients;
+  return context.getRawClients();
 }
 
 export const $operationGroup: OperationGroupDecorator = (

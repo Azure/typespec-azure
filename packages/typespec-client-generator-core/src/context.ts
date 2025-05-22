@@ -12,6 +12,7 @@ import {
   Type,
   Union,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import { HttpOperation } from "@typespec/http";
 import { getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
@@ -20,6 +21,7 @@ import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
   SdkArrayType,
+  SdkClient,
   SdkContext,
   SdkDictionaryType,
   SdkEnumType,
@@ -39,10 +41,16 @@ import {
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
+import { createStateSymbol } from "./lib.js";
 import { createSdkPackage } from "./package.js";
+
+const referencedTypeCacheKey = createStateSymbol("__referencedTypeCache");
+const rawClientsKey = createStateSymbol("__rawClients");
+const mutatedGlobalNamespaceKey = createStateSymbol("__mutatedGlobalNamespace");
 
 export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
   const diagnostics = createDiagnosticCollector();
+  const dummyKey = $(program).builtin.boolean;
   return {
     program,
     diagnostics: diagnostics.diagnostics,
@@ -54,10 +62,6 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     disableUsageAccessPropagationToBase: false,
     generateProtocolMethods: true,
     generateConvenienceMethods: true,
-    __referencedTypeCache: new Map<
-      Type,
-      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
-    >(),
     __arrayDictionaryCache: new Map<Type, SdkDictionaryType | SdkArrayType>(),
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
@@ -69,11 +73,32 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
 
+    getReferencedTypeCache(): Map<
+      Type,
+      SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
+    > {
+      return this.program.stateMap(referencedTypeCacheKey) as Map<
+        Type,
+        SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
+      >;
+    },
+
+    setReferencedTypeCache(
+      type: Type,
+      sdkType: SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType,
+    ): void {
+      const referencedTypeCache = this.getReferencedTypeCache();
+      if (referencedTypeCache.has(type)) {
+        return;
+      }
+      referencedTypeCache.set(type, sdkType);
+    },
+
     getMutatedGlobalNamespace(): Namespace {
-      let globalNamespace = this.__mutatedGlobalNamespace;
+      let globalNamespace = this.program.stateMap(mutatedGlobalNamespaceKey).get(dummyKey);
       if (!globalNamespace) {
         globalNamespace = handleVersioningMutationForGlobalNamespace(this);
-        this.__mutatedGlobalNamespace = globalNamespace;
+        this.program.stateMap(mutatedGlobalNamespaceKey).set(dummyKey, globalNamespace);
       }
       return globalNamespace;
     },
@@ -110,6 +135,12 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
 
       this.__packageVersions = versions.map((version) => version.value);
       return this.__packageVersions;
+    },
+    getRawClients(): SdkClient[] {
+      return this.program.stateMap(rawClientsKey).get(dummyKey);
+    },
+    setRawClients(clients: SdkClient[]): void {
+      this.program.stateMap(rawClientsKey).set(dummyKey, clients);
     },
   };
 }

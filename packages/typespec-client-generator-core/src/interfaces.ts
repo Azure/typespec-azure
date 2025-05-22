@@ -53,7 +53,6 @@ export interface TCGCContext {
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
 
-  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
   __generatedNames: Map<Type, string>;
@@ -62,16 +61,18 @@ export interface TCGCContext {
   __tspTypeToApiVersions: Map<Type, string[]>;
   __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
-  __rawClients?: SdkClient[];
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
-  __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
 
   getMutatedGlobalNamespace(): Namespace;
+  getReferencedTypeCache(): Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
+  setReferencedTypeCache(type: Type, sdkType: SdkType): void;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): string[];
+  getRawClients(): SdkClient[];
+  setRawClients(clients: SdkClient[]): void;
 }
 
 export interface SdkContext<
