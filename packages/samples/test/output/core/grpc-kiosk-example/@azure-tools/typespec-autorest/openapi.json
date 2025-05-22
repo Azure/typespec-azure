@@ -429,8 +429,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/ProtobufAny"
-          },
-          "x-ms-identifiers": []
+          }
         }
       }
     },

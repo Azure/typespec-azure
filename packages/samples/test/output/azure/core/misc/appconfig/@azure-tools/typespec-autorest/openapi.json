@@ -1062,8 +1062,7 @@
           "description": "The Key items on this page",
           "items": {
             "$ref": "#/definitions/Key"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "nextLink": {
           "type": "string",
@@ -1083,8 +1082,7 @@
           "description": "The KeyValue items on this page",
           "items": {
             "$ref": "#/definitions/KeyValue"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "nextLink": {
           "type": "string",
@@ -1104,8 +1102,7 @@
           "description": "The Label items on this page",
           "items": {
             "$ref": "#/definitions/Label"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "nextLink": {
           "type": "string",
