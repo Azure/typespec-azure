@@ -1,0 +1,46 @@
+{
+  "name": "@azure-tools/typespec-azure-resource-manager-common-types",
+  "version": "0.56.0",
+  "description": "Package for generating typespec azure resource manager common types",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "keywords": [
+    "typespec",
+    "common-types"
+  ],
+  "main": "dist/src/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "regen-common-types": "tsx ./src/index.ts"
+  },
+  "files": [
+    "src/**",
+    "dist/**"
+  ],
+  "peerDependencies": {
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@azure-tools/typespec-azure-core": "workspace:^"
+  },
+  "devDependencies": {
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "tsx": "^4.19.3",
+    "typescript": "~5.8.2"
+  }
+}
