@@ -501,7 +501,7 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       otherCreateOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
       createOrUpdate is OtherOps.CreateOrUpdateAsync<Employee>;
       update is OtherOps.CustomPatchAsync<Employee, Employee>;
-      delete is OtherOps.DeleteAsync<Employee>;
+      delete is OtherOps.DeleteWithoutOkAsync<Employee>;
       list is OtherOps.List<Employee>;
       listBySubscription is ArmListBySubscription<Employee>;
 
