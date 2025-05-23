@@ -1524,6 +1524,8 @@ const parameterizedNextLinkConfigDecorator: ParameterizedNextLinkConfigDecorator
   target,
   parameters,
 ) => {
+  // Workaround as it seems like decorators are called when missing template arguments
+  if (parameters.kind === "Model") return;
   compilerAssert(
     parameters.kind === "Tuple",
     "Using the defined internal scalar parameterizedNextLink will result in a Tuple template argument type",
