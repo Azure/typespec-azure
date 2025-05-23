@@ -5,7 +5,6 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   DecoratorContext,
-  DecoratorFunction,
   Diagnostic,
   DiagnosticCollector,
   Enum,
@@ -31,6 +30,7 @@ import {
   walkPropertiesInherited,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   getHttpOperation,
   getRoutePath,
@@ -1515,42 +1515,23 @@ export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
   }
 };
 
-function createMarkerDecorator<T extends DecoratorFunction>(
-  validate?: (...args: Parameters<T>) => boolean,
-) {
-  const getParameterizedNextLinkArguments = (program: Program, target: Parameters<T>[1]) =>
-    program.stateMap(AzureCoreStateKeys.parameterizedNextLinkConfig).get(target);
-  const markParameterizedNextLinkConfigTemplate = (program: Program, target: Parameters<T>[1]) => {
-    compilerAssert(
-      target.templateArguments[0].kind === "Tuple" || target.templateArguments[0].kind === "Model",
-      "Using the defined internal scalar parameterizedNextLink will result in a Tuple template argument type",
-    );
-
-    program
-      .stateMap(AzureCoreStateKeys.parameterizedNextLinkConfig)
-      .set(target, target.templateArguments[0].values);
-  };
-
-  const decorator = (...args: Parameters<T>) => {
-    if (validate && !validate(...args)) {
-      return;
-    }
-    const [context, target] = args;
-    markParameterizedNextLinkConfigTemplate(context.program, target);
-  };
-  return [
-    getParameterizedNextLinkArguments,
-    markParameterizedNextLinkConfigTemplate,
-    decorator as T,
-  ] as const;
-}
-
-const [
-  getParameterizedNextLinkArguments,
-  _markParameterizedNextLinkConfigTemplate,
-  /** {@inheritDoc ParameterizedNextLinkConfigDecorator} */
-  parameterizedNextLinkConfigDecorator,
-] = createMarkerDecorator<ParameterizedNextLinkConfigDecorator>();
+const [getParameterizedNextLinkArguments, markParameterizedNextLinkConfigTemplate] = useStateMap<
+  Scalar,
+  ModelProperty[]
+>(AzureCoreStateKeys.parameterizedNextLinkConfig);
+const parameterizedNextLinkConfigDecorator: ParameterizedNextLinkConfigDecorator = (
+  context,
+  target,
+  parameters,
+) => {
+  // Workaround as it seems like decorators are called when missing template arguments
+  if (parameters.kind === "Model") return;
+  compilerAssert(
+    parameters.kind === "Tuple",
+    "Using the defined internal scalar parameterizedNextLink will result in a Tuple template argument type",
+  );
+  markParameterizedNextLinkConfigTemplate(context.program, target, parameters.values as any);
+};
 
 export { getParameterizedNextLinkArguments, parameterizedNextLinkConfigDecorator };
 
