@@ -4,7 +4,6 @@
   "description": "the extension for azure typespec",
   "publisher": "typespec",
   "version": "0.0.1",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chunyu3/typespec-azure-vscode.git"
@@ -21,7 +20,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./dist/src/extension.js",
+  "main": "./dist/src/extension.cjs",
   "contributes": {
     "commands": [
       {
@@ -81,7 +80,7 @@
   },
   "devDependencies": {
     "@types/vscode": "^1.100.0",
-    "@types/mocha": "^11.1.0",
+    "@types/mocha": "^10.0.9",
     "@types/node": "~22.13.11",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
@@ -91,7 +90,8 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "~3.3.0",
     "prettier": "^3.3.3",
-    "esbuild": "^0.25.1"
+    "esbuild": "^0.25.1",
+    "mocha": "^11.1.0"
   }
 }
 

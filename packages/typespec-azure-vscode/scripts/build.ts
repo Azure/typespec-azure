@@ -4,11 +4,11 @@ import { context } from "esbuild";
 const nodeContext = await context({
   entryPoints: ["src/extension.ts"],
   bundle: true,
-  outfile: "dist/src/extension.js",
+  outfile: "dist/src/extension.cjs",
   platform: "node",
   mainFields: ["module", "main"], // app insights web https://www.npmjs.com/package/@microsoft/applicationinsights-web-basic uses module instead of exports...
   target: "node22",
-  format: "esm",
+  format: "cjs",
   sourcemap: true,
   external: ["vscode"],
 });
