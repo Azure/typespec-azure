@@ -1,0 +1,17 @@
+{
+  "extends": "../../core/tsconfig.base.json",
+	"compilerOptions": {
+    "incremental": false,
+    "composite": false,
+    "module": "ESNext",
+    "target": "ES2022",
+    "moduleResolution": "bundler",
+    "sourceMap": false,
+    "resolveJsonModule": true,
+    "noEmitOnError": true,
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "rootDir": "."
+  },
+  "exclude": ["dist", "templates", "vitest.config.ts"]
+}

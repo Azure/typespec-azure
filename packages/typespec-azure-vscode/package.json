@@ -1,0 +1,97 @@
+{
+  "name": "typespec-azure-vscode",
+  "displayName": "typespec azure",
+  "description": "the extension for azure typespec",
+  "publisher": "typespec",
+  "version": "0.0.1",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chunyu3/typespec-azure-vscode.git"
+  },
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "extensionDependencies": [
+    "typespec.typespec-vscode"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "typespec.azure.emitCode",
+        "title": "Emit from TypeSpec Azure",
+        "category": "TypeSpec-azure"
+      } 
+    ],
+    "languages": [
+      {
+        "id": "typespec",
+        "aliases": [
+          "TypeSpec",
+          "TYPESPEC"
+        ],
+        "extensions": [
+          ".tsp"
+        ],
+        "icon": {
+          "light": "./icons/tsp-file.light.svg",
+          "dark": "./icons/tsp-file.dark.svg"
+        },
+        "configuration": "./dist/language-configuration.json"
+      },
+      {
+        "id": "markdown-typespec"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "typespec.azure.emitCode",
+          "when": "explorerResourceIsFolder || resourceLangId == typespec || resourceFilename == 'tspconfig.yaml'",
+          "group": "typespec@1"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "typespec.azure.emitCode",
+          "when": "resourceLangId == typespec || resourceFilename == 'tspconfig.yaml'",
+          "group": "typespec@1"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsx ./scripts/build.ts",
+    "build": "npm run compile && npm run package-vsix",
+    "package-vsix": "vsce package",
+    "watch": "tsx ./scripts/build.ts --watch",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "prettier:fix": "prettier --write --config .prettierrc.json ./src/**/*.ts",
+    "prettier": "prettier --check --config .prettierrc.json ./src/**/*.ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "@types/mocha": "^11.1.0",
+    "@types/node": "~22.13.11",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "~3.3.0",
+    "prettier": "^3.3.3",
+    "esbuild": "^0.25.1"
+  }
+}
+
