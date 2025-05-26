@@ -43,3 +43,13 @@ model ResponseModel {
   nextLink?: string;
 }
 ```
+
+### INVALID_FORMAT: Object didn't pass validation for format arm-id
+
+#### Root cause
+
+It is possibly because your own defined resource is mapped to the resource defined in common-type. See [this](./breakingchange.md#using-resources-from-common-types) for details. The `id` type for `Resource` in common-types is of format `arm-id`.
+
+#### Mitigation
+
+Update the value in your example file to meet the format of `arm-id`. 
