@@ -6,16 +6,10 @@ import { TypespecExtensionId } from "./constant";
 export async function activate(context: vscode.ExtensionContext) {
   // load and activate typespec extension
   const typespecExtension = vscode.extensions.getExtension(TypespecExtensionId);
-  let typespecExtensionApis: any;
   if (typespecExtension) {
-    console.log("Typespec extension is installed.");
-
     await typespecExtension.activate();
-    typespecExtensionApis = typespecExtension.exports;
   } else {
-    console.log(
-      "Typespec extension is not installed. Please install it to use this extension."
-    );
+    vscode.window.showErrorMessage("Typespec extension is not installed. Please install it to use this extension.");
   }
 }
 

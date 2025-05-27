@@ -27,7 +27,7 @@
         "command": "typespec.azure.emitCode",
         "title": "Emit from TypeSpec Azure",
         "category": "TypeSpec-azure"
-      } 
+      }
     ],
     "languages": [
       {
@@ -74,25 +74,17 @@
     "watch": "tsx ./scripts/build.ts --watch",
     "pretest": "npm run compile && npm run lint",
     "test": "vscode-test",
-    "prettier:fix": "prettier --write --config .prettierrc.json ./src/**/*.ts",
-    "prettier": "prettier --check --config .prettierrc.json ./src/**/*.ts",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix "
   },
   "devDependencies": {
-    "@types/vscode": "^1.100.0",
+    "@types/vscode": "~1.100.0",
     "@types/mocha": "^10.0.9",
     "@types/node": "~22.13.11",
-    "@typescript-eslint/eslint-plugin": "^8.31.1",
-    "@typescript-eslint/parser": "^8.31.1",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "~3.3.0",
     "esbuild": "^0.25.1",
-    "eslint": "^9.25.1",
     "mocha": "^11.1.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.8.3"
+    "typescript": "~5.8.2"
   }
 }
-

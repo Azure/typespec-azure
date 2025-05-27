@@ -4,4 +4,4 @@ packages:
   - typespec-azure-vscode
 ---
 
-implement typespec-azure-vscode package
+Initialize the typespec-azure-vscode package

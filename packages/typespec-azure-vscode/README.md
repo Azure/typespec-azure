@@ -74,11 +74,11 @@ The extension allows to preview API documentation. The action appears in the con
 
 The extension provides the following commands:
 
-| **Command**                                        | **Description**                                                     |
-| -------------------------------------------------- | ------------------------------------------------------------------- |
-| `TypeSpec-azure: Create TypeSpec Project`          | Scaffold a new TypeSpec project.                                    |
-| `TypeSpec-azure: Emit From TypeSpec`               | Compile and generate from TypeSpec files into the specified output. |
-| `TypeSpec-azure: Preview API Documentation`        | Preview API documentation generated from TypeSpec in the workspace. |
+| **Command**                                 | **Description**                                                     |
+| ------------------------------------------- | ------------------------------------------------------------------- |
+| `TypeSpec-azure: Create TypeSpec Project`   | Scaffold a new TypeSpec project.                                    |
+| `TypeSpec-azure: Emit From TypeSpec`        | Compile and generate from TypeSpec files into the specified output. |
+| `TypeSpec-azure: Preview API Documentation` | Preview API documentation generated from TypeSpec in the workspace. |
 
 ## Configuration
 

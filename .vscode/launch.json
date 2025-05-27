@@ -214,14 +214,12 @@
       "skipFiles": ["<node_internals>/**/*.js"]
     },
     {
-			"name": "Run typespec azure Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}/packages/typespec-azure-vscode"
-			],
-			"sourceMaps": true,
-		}
+      "name": "Run typespec azure Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/typespec-azure-vscode"],
+      "sourceMaps": true
+    }
   ],
   "compounds": [
     {

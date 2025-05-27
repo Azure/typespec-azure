@@ -13,7 +13,6 @@ const nodeContext = await context({
   external: ["vscode"],
 });
 
-
 if (process.argv.includes("--watch")) {
   console.log("Watching for changes...");
   // Watch the extension

@@ -1,6 +1,6 @@
 {
   "extends": "../../core/tsconfig.base.json",
-	"compilerOptions": {
+  "compilerOptions": {
     "incremental": false,
     "composite": false,
     "module": "ESNext",
