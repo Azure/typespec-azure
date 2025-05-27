@@ -48,7 +48,7 @@ interface LegacyOperations<
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: Resource,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
   ): Response | ErrorType;
 
   /**
@@ -72,7 +72,7 @@ interface LegacyOperations<
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: Resource,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
   ): Response | ErrorType;
 
   /**
@@ -107,7 +107,7 @@ interface LegacyOperations<
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: PatchModel,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) properties: PatchModel,
   ): Response | ErrorType;
 
   /**
@@ -132,7 +132,7 @@ interface LegacyOperations<
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) body: PatchModel,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) properties: PatchModel,
   ): Response | ErrorType;
 
   /**
@@ -148,7 +148,7 @@ interface LegacyOperations<
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
-  DeleteAsync<
+  DeleteWithoutOkAsync<
     Resource extends Azure.ResourceManager.CommonTypes.Resource,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
       Azure.Core.Foundations.RetryAfterHeader,
