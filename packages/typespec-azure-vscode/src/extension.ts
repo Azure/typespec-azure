@@ -1,23 +1,23 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import { TypespecExtensionId } from './constant';
+import * as vscode from "vscode";
+import { TypespecExtensionId } from "./constant";
 
 export async function activate(context: vscode.ExtensionContext) {
   // load and activate typespec extension
-	const typespecExtension = vscode.extensions.getExtension(TypespecExtensionId);
-	let typespecExtensionApis: any;
-	if (typespecExtension) {
-		console.log('Typespec extension is installed.');
-		
-		await typespecExtension.activate();
-		typespecExtensionApis = typespecExtension.exports;
-		// await client.emitCodeFunc(undefined, PreDefinedEmitters);
-	} else {
-		console.log('Typespec extension is not installed. Please install it to use this extension.');
-	}
+  const typespecExtension = vscode.extensions.getExtension(TypespecExtensionId);
+  let typespecExtensionApis: any;
+  if (typespecExtension) {
+    console.log("Typespec extension is installed.");
+
+    await typespecExtension.activate();
+    typespecExtensionApis = typespecExtension.exports;
+  } else {
+    console.log(
+      "Typespec extension is not installed. Please install it to use this extension."
+    );
+  }
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {
-}
+export function deactivate() {}

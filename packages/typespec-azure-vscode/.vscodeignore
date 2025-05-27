@@ -1,11 +1,10 @@
-.vscode/**
-.vscode-test/**
-src/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/eslint.config.mjs
-**/*.map
-**/*.ts
-**/.vscode-test.*
+# This file determines what goes in the VSIX. We use an opt-in rather than
+# opt-out approach to avoid accidentally shipping unwanted files.
+
+# Exclude everything by default.
+**/*
+
+!README.md
+!LICENSE
+!icons/
+!snippets.json

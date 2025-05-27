@@ -73,10 +73,11 @@
     "package-vsix": "vsce package",
     "watch": "tsx ./scripts/build.ts --watch",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
     "test": "vscode-test",
     "prettier:fix": "prettier --write --config .prettierrc.json ./src/**/*.ts",
-    "prettier": "prettier --check --config .prettierrc.json ./src/**/*.ts"
+    "prettier": "prettier --check --config .prettierrc.json ./src/**/*.ts",
+    "lint": "eslint .  --max-warnings=0",
+    "lint:fix": "eslint . --fix "
   },
   "devDependencies": {
     "@types/vscode": "^1.100.0",
