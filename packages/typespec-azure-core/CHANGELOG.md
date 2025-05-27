@@ -1,5 +1,58 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.56.0
+
+### Features
+
+- [#2586](https://github.com/Azure/typespec-azure/pull/2586) Ease casing style validation for PascalCase with accepted acronyms (AI, VM, OS, IP, CPU, GPU, LRO)
+
+### Bug Fixes
+
+- [#2628](https://github.com/Azure/typespec-azure/pull/2628) Handle new behavior of `@patch` keeping old behavior
+
+
+## 0.55.0
+
+### Bug Fixes
+
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
+- [#2512](https://github.com/Azure/typespec-azure/pull/2512) Update the link documentation for `Azure.Core.Foundations.InnerError`
+
+
+## 0.54.0
+
+### Features
+
+- [#2396](https://github.com/Azure/typespec-azure/pull/2396) add internal scalar type `parameterizedNextLink` to handle next links that don't meet guidelines
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
+## 0.53.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Deprecations
+
+- [#1208](https://github.com/Azure/typespec-azure/pull/1208) Remove `property-name-conflict` from azure-core and move into tcgc
+
+### Features
+
+- [#2336](https://github.com/Azure/typespec-azure/pull/2336) Remove reference to deleted projection feature
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### Bug Fixes
+
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+
+
 ## 0.52.0
 
 ### Features

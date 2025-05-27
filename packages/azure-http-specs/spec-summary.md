@@ -57,6 +57,19 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
+
+- Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
+
+This scenario will be used to test if client code can correctly deserializes an empty url as null.
+Expected response body:
+
+```json
+{
+  "serviceUrl": ""
+}
+```
+
 ### Azure_ClientGenerator_Core_FlattenProperty_putFlattenModel
 
 - Endpoint: `put /azure/client-generator-core/flatten-property/flattenModel`
@@ -133,6 +146,164 @@ This scenario contains 4 public operations. All should be generated and exported
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
 The other models are override to roundtrip, so they should be generated and exported as well.
 
+### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
+  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
+
+Client for testing header parameter moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+const client = new HeaderParamClient({
+  name: "test-name-value"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name here
+client.withBody({ name: "test-name" });  // No need to pass name here
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
+
+- Endpoints:
+
+  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
+
+  Client for testing a mix of client-level and method-level parameters.
+
+  Parameters elevated to client level:
+
+  - name: "test-name-value" (header parameter)
+
+  Parameters remaining at method level:
+
+  - region: "us-west" (query parameter)
+
+  Expected client usage:
+
+  ```ts
+  const client = new MixedParamsClient({
+    name: "test-name-value"
+  });
+
+  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
+  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
+  ```
+
+### Azure_ClientGeneratorCore_ClientInitialization_MultipleParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
+
+Client for testing multiple parameters (header and query) moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new MultipleParamsClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name or region here
+client.withBody({ name: "test-name" });  // No need to pass name or region here
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_ParamAlias
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
+
+Client for testing the @paramAlias decorator for renaming parameters in client code.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// Elevated to client level via alias
+client.withAliasedName();
+
+// Elevated to client level via original name
+client.withOriginalName();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level, in child client.
+
+The child client can be initialized individually, or via its parent client.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentClient
+const client = new ParentClient.getChildClient({
+  blobName: "sample-blob"
+});
+
+// directly
+const client = new ChildClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_PathParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+const client = new PathParamClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
 ### Azure_Core_Basic_createOrReplace
 
 - Endpoint: `get /azure/core/basic`
@@ -162,7 +333,7 @@ Expected response body:
 
 ### Azure_Core_Basic_createOrUpdate
 
-- Endpoint: `get /azure/core/basic`
+- Endpoint: `patch /azure/core/basic`
 
 Should only generate models named User and UserOrder.
 
@@ -591,7 +762,7 @@ Expected response body:
 
 ### Azure_Core_Page_listWithParameters
 
-- Endpoint: `get /azure/core/page/parameters`
+- Endpoint: `post /azure/core/page/parameters`
 
 Expected query parameter: api-version=2022-12-01-preview&another=Second
 
@@ -618,6 +789,42 @@ Expected response body:
   - `get /azure/core/page/second-item`
 
 This scenario is to test two operations with two different page item types.
+
+### Azure_Core_Page_withParameterizedNextLink
+
+- Endpoint: `get /azure/core/page/with-parameterized-next-link`
+
+  This scenario tests the Azure.Core.Legacy.parameterizedNextLink decorator which ensures original request
+  parameters are maintained in next link URLs.
+
+  Expected query parameters on initial request:
+
+  - includePending=true
+  - select=name
+
+  Expected query parameters on next link request. Note: the SDK will need to re-inject this parameter:
+
+  - includePending=true (note: the client will need to manually re-inject this parameter into the next link)
+  - select=name (note: this is returned in the next link, the client does NOT need to manually re-inject this parameter)
+
+  Expected concatenation of the paged items:
+
+  ```json
+  {
+    "value": [
+      {
+        "id": 1,
+        "name": "User1"
+      },
+      {
+        "id": 2,
+        "name": "User2"
+      }
+    ]
+  }
+  ```
+
+  Note that the nextLink preserves the original filter and select parameters.
 
 ### Azure_Core_Scalar_AzureLocationScalar_get
 
@@ -722,13 +929,26 @@ Expected response body:
 }
 ```
 
+### Azure_Encode_Duration_durationConstant
+
+- Endpoint: `put /azure/encode/duration/duration-constant`
+
+Test case for azure specific encoding. SDK should generate correct serialization format according to the set encoding.
+Expected request body:
+
+```json
+{
+  "input": "1.02:59:59.5000000"
+}
+```
+
 ### Azure_Example_Basic
 
 - Endpoint: `post /azure/example/basic/basic`
 
 Expected request and response is same as the JSON example at examples/2022-12-01-preview/basic.json
 
-When generate the code, one need to set the "examples-directory" option.
+When generate the code, one need to set the "examples-dir" option.
 
 Expected query parameter: query-param=query&api-version=2022-12-01-preview
 Expected header parameter: header-param=header
@@ -968,6 +1188,52 @@ Expected response body:
   "properties": {
     "provisioningState": "Succeeded"
   }
+}
+```
+
+### Azure_ResourceManager_NonResource_NonResourceOperations_create
+
+- Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
+
+It's non-resource put operation operating on non-resource model, though the model has `id`, `name`, `type` properties.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected request body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
+}
+```
+
+### Azure_ResourceManager_NonResource_NonResourceOperations_get
+
+- Endpoint: `get https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
+
+It's non-resource get operation operating on non-resource model, though the model has `id`, `name`, `type` properties.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.NonResource/locations/eastus/otherParameters/hello
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "id",
+  "name": "hello",
+  "type": "nonResource"
 }
 ```
 

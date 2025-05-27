@@ -3,12 +3,12 @@ import {
   ModelProperty,
   Operation,
   Program,
-  SyntaxKind,
   createRule,
   paramMessage,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 import { HttpVerb, getOperationVerb } from "@typespec/http";
-
+import { getSegment } from "@typespec/rest";
 import {
   getNamespaceName,
   getSourceModel,
@@ -37,7 +37,8 @@ export const coreOperationsRule = createRule({
           const verb = getOperationVerb(context.program, operation);
           if (
             !isTemplatedInterfaceOperation(operation) &&
-            (!operation.node.parent || operation.node.parent.kind !== SyntaxKind.InterfaceStatement)
+            (!operation.node?.parent ||
+              operation.node.parent.kind !== SyntaxKind.InterfaceStatement)
           ) {
             context.reportDiagnostic({
               messageId: "opOutsideInterface",
@@ -60,7 +61,7 @@ export const coreOperationsRule = createRule({
               const decorator = operation.decorators.find(
                 (d) => requiredDecorators.indexOf(d.decorator.name) >= 0,
               );
-              if (!decorator) {
+              if (!decorator && !isArmProviderOperation(context.program, operation)) {
                 context.reportDiagnostic({
                   messageId: "opMissingDecorator",
                   target: operation,
@@ -104,4 +105,29 @@ function hasApiParameter(program: Program, model: Model): boolean {
     isApiParameter(program, i),
   );
   return apiVersionParams !== null && apiVersionParams.length === 1;
+}
+
+function isStaticSegment(segment: string | undefined, property: ModelProperty): boolean {
+  return segment === undefined || segment === "locations";
+}
+
+function isArmProviderOperation(program: Program, operation: Operation): boolean {
+  let isProviderAction = false;
+
+  for (const [index, [, property]] of [...operation.parameters.properties].entries()) {
+    const segment = getSegment(program, property);
+
+    if (segment === "providers") {
+      isProviderAction = true;
+    } else if (isProviderAction && !isStaticSegment(segment, property)) {
+      return false;
+    }
+
+    const isLastSegment = index === operation.parameters.properties.size - 1;
+    if (isLastSegment && !segment) {
+      return true;
+    }
+  }
+
+  return false;
 }

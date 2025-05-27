@@ -32,6 +32,19 @@ enum Azure.ClientGenerator.Core.Access
 | public   | `"public"`   | Open to user   |
 | internal | `"internal"` | Hide from user |
 
+### `DocumentationMode` {#Azure.ClientGenerator.Core.DocumentationMode}
+
+Defines how client documentation should be applied
+
+```typespec
+enum Azure.ClientGenerator.Core.DocumentationMode
+```
+
+| Name    | Value       | Description                                        |
+| ------- | ----------- | -------------------------------------------------- |
+| append  | `"append"`  | Append client documentation to the existing doc    |
+| replace | `"replace"` | Replace the existing doc with client documentation |
+
 ### `InitializedBy` {#Azure.ClientGenerator.Core.InitializedBy}
 
 InitializedBy value.

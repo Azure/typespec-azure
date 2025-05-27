@@ -23,7 +23,6 @@ import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
-  CustomAzureResourceDecorator,
   ExtensionResourceDecorator,
   IdentifiersDecorator,
   LocationResourceDecorator,
@@ -33,6 +32,7 @@ import {
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
+import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import { ArmResourceOperations, resolveResourceOperations } from "./operations.js";
@@ -380,7 +380,7 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
 export const $identifiers: IdentifiersDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
-  properties: string[],
+  properties: readonly string[],
 ) => {
   const { program } = context;
   const { type } = entity;
@@ -398,26 +398,32 @@ export const $identifiers: IdentifiersDecorator = (
     return;
   }
 
-  context.program.stateMap(ArmStateKeys.armIdentifiers).set(type.indexer.value, properties);
+  context.program.stateMap(ArmStateKeys.armIdentifiers).set(entity, properties);
 };
 
 /**
- * This function returns all arm identifiers for the given array model type
- * This includes the identifiers specified using the @identifiers decorator
- * and the identifiers using the @key decorator.
+ * This function returns identifiers using the @identifiers decorator
  *
  * @param program The program to process.
  * @param entity The array model type to check.
  * @returns returns list of arm identifiers for the given array model type if any or undefined.
  */
-export function getArmIdentifiers(program: Program, entity: ArrayModelType): string[] | undefined {
+export function getArmIdentifiers(program: Program, entity: ModelProperty): string[] | undefined {
+  return program.stateMap(ArmStateKeys.armIdentifiers).get(entity);
+}
+
+/**
+ * This function returns identifiers using the @key decorator.
+ *
+ * @param program The program to process.
+ * @param entity The array model type to check.
+ * @returns returns list of arm identifiers for the given array model type if any or undefined.
+ */
+export function getArmKeyIdentifiers(
+  program: Program,
+  entity: ArrayModelType,
+): string[] | undefined {
   const value = entity.indexer.value;
-
-  const getIdentifiers = program.stateMap(ArmStateKeys.armIdentifiers).get(value);
-  if (getIdentifiers !== undefined) {
-    return getIdentifiers;
-  }
-
   const result: string[] = [];
   if (value.kind === "Model") {
     for (const property of value.properties.values()) {

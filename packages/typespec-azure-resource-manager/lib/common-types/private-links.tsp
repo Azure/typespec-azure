@@ -1,14 +1,14 @@
-using TypeSpec.Http;
-using TypeSpec.Versioning;
+using Http;
+using Versioning;
 using OpenAPI;
 
 using Azure.Core;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-/** The Private Endpoint resource. */
+/** The private endpoint resource. */
 model PrivateEndpoint {
-  /** The resource identifier for private endpoint */
+  /** The resource identifier of the private endpoint */
   @visibility(Lifecycle.Read)
   @typeChangedFrom(CommonTypes.Versions.v4, string)
   id?: Azure.Core.armResourceIdentifier;
@@ -39,11 +39,12 @@ model PrivateLinkResourceProperties {
 @pagedResult
 model PrivateLinkResourceListResult {
   /** Array of private link resources */
+  @OpenAPI.extension("x-ms-identifiers", #["id"])
   value?: PrivateLinkResource[];
 
   /** URL to get the next set of operation list results (if there are any). */
   @visibility(Lifecycle.Read)
-  nextLink?: string;
+  nextLink?: url;
 }
 //#region
 /** The private endpoint connection resource */
@@ -57,11 +58,12 @@ model PrivateEndpointConnection extends Resource {
 @pagedResult
 model PrivateEndpointConnectionListResult {
   /** Array of private endpoint connections. */
+  @OpenAPI.extension("x-ms-identifiers", #["id"])
   value?: PrivateEndpointConnection[];
 
   /** URL to get the next set of operation list results (if there are any). */
   @visibility(Lifecycle.Read)
-  nextLink?: string;
+  nextLink?: url;
 }
 
 /** Properties of the private endpoint connection. */
@@ -113,7 +115,7 @@ union PrivateEndpointConnectionProvisioningState {
 
 /** The private endpoint connection status. */
 union PrivateEndpointServiceConnectionStatus {
-  /** Connectionaiting for approval or rejection */
+  /** Connection waiting for approval or rejection */
   Pending: "Pending",
 
   /** Connection approved */
@@ -179,6 +181,7 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
 @removed(Versions.v6)
 model PrivateLinkResourceListResultV5 {
   /** Array of private link resources */
+  @OpenAPI.extension("x-ms-identifiers", #["id"])
   value?: CommonTypes.PrivateLinkResource[];
 }
 
@@ -221,5 +224,6 @@ model PrivateLinkResourceListResultV5 {
 @removed(Versions.v6)
 model PrivateEndpointConnectionListResultV5 {
   /** Array of private endpoint connections. */
+  @OpenAPI.extension("x-ms-identifiers", #["id"])
   value?: CommonTypes.PrivateEndpointConnection[];
 }

@@ -58,11 +58,11 @@
         "description": "Create a widget",
         "parameters": [
           {
-            "name": "body",
+            "name": "widget",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetCreate"
+              "$ref": "#/definitions/Widget"
             }
           }
         ],
@@ -118,16 +118,22 @@
           "Widgets"
         ],
         "description": "Update a widget",
+        "consumes": [
+          "application/merge-patch+json"
+        ],
         "parameters": [
           {
-            "$ref": "#/parameters/Widget.id"
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           },
           {
-            "name": "body",
+            "name": "widget",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetUpdate"
+              "$ref": "#/definitions/WidgetMergePatchUpdate"
             }
           }
         ],
@@ -180,6 +186,10 @@
           "Widgets"
         ],
         "description": "Analyze a widget",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -227,10 +237,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "x-ms-mutability": [
-            "read",
-            "update"
-          ]
+          "readOnly": true
         },
         "weight": {
           "type": "integer",
@@ -253,31 +260,9 @@
         "color"
       ]
     },
-    "WidgetCreate": {
+    "WidgetMergePatchUpdate": {
       "type": "object",
-      "properties": {
-        "weight": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "color": {
-          "type": "string",
-          "enum": [
-            "red",
-            "blue"
-          ],
-          "x-ms-enum": {
-            "modelAsString": false
-          }
-        }
-      },
-      "required": [
-        "weight",
-        "color"
-      ]
-    },
-    "WidgetUpdate": {
-      "type": "object",
+      "description": "",
       "properties": {
         "weight": {
           "type": "integer",
@@ -296,13 +281,5 @@
       }
     }
   },
-  "parameters": {
-    "Widget.id": {
-      "name": "id",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "x-ms-parameter-location": "method"
-    }
-  }
+  "parameters": {}
 }

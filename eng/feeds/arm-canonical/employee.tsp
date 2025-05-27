@@ -3,8 +3,8 @@ import "@typespec/http";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Rest;
-using TypeSpec.Http;
+using Rest;
+using Http;
 using Azure.Core;
 using Azure.ResourceManager;
 
@@ -28,7 +28,7 @@ model EmployeeProperties {
   profile?: bytes;
 
   /** The status of the last operation. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
@@ -58,7 +58,10 @@ interface Operations extends Azure.ResourceManager.Operations {}
 interface Employees {
   get is ArmResourceRead<Employee>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+  update is ArmCustomPatchSync<
+    Employee, 
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
   delete is ArmResourceDeleteWithoutOkAsync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;

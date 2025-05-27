@@ -1,5 +1,87 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.56.0
+
+### Breaking Changes
+
+- [#2576](https://github.com/Azure/typespec-azure/pull/2576) Modify how `x-nullable` is resolved when a `$ref` is present.
+  
+  Previously, the `$ref` was placed inside an `allOf`. With this change, the `$ref` is now moved directly next to `x-nullable`.
+  
+  ```diff lang=json
+  "Dog": {
+    "type": "object",
+    "properties": {
+    "type": {
+      - "type": "object",
+        "x-nullable": true,
+      + "$ref": "#/definitions/Pet"
+      - "allOf": [
+      -   {
+      -     "$ref": "#/definitions/Pet"
+      -   }
+      - ]
+      }
+    },
+    "required": [
+      "type"
+    ]
+  }
+  ```
+
+### Bug Fixes
+
+- [#2538](https://github.com/Azure/typespec-azure/pull/2538) Fixing gaps in the `@identifiers` decorator functionality:
+  - The `@identifier` decorator should take priority when present, and its value should be respected.
+  - The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+  - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
+- [#2606](https://github.com/Azure/typespec-azure/pull/2606) Fix unsupported param type diagnostic to target the model property with the issue
+
+
+## 0.55.0
+
+No changes, version bump only.
+
+## 0.54.0
+
+### Features
+
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2459](https://github.com/Azure/typespec-azure/pull/2459) Fix doc on HttpPart properties not being carried to `formData` parameter
+- [#2464](https://github.com/Azure/typespec-azure/pull/2464) Fix multipart not applying `x-ms-client-name` when using an explicit part name different from the property name
+
+
+## 0.53.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Features
+
+- [#2336](https://github.com/Azure/typespec-azure/pull/2336) Remove reference to deleted projection feature
+- [#2382](https://github.com/Azure/typespec-azure/pull/2382) Add support for new `dryRun` option
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### Bug Fixes
+
+- [#2348](https://github.com/Azure/typespec-azure/pull/2348) Autorest Case insensitive check for http auth scheme
+- [#2297](https://github.com/Azure/typespec-azure/pull/2297) Fix using `@identifiers` on array of model with id not respected
+- [#2258](https://github.com/Azure/typespec-azure/pull/2258) Target param property when warn on unsupported parameter type
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+- [#2307](https://github.com/Azure/typespec-azure/pull/2307) Fixed a bug causing properties marked `@invisible(Lifecycle)` to remain included in payloads."
+
+
 ## 0.52.0
 
 ### Features

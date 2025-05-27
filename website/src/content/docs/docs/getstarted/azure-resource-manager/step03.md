@@ -34,7 +34,13 @@ model AddressResourceProperties {
 interface Addresses {
   get is ArmResourceRead<AddressResource>;
   create is ArmResourceCreateOrReplaceSync<AddressResource>;
-  update is ArmResourcePatchSync<AddressResource, AddressResourceProperties>;
+  update is ArmCustomPatchSync<
+    AddressResource,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      AddressResource,
+      AddressResourceProperties
+    >
+  >;
   delete is ArmResourceDeleteSync<AddressResource>;
   listByParent is ArmResourceListByParent<AddressResource>;
 }

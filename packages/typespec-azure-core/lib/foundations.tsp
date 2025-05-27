@@ -3,9 +3,9 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "./traits.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core.Traits;
 using Azure.Core.Traits.Private;
 
@@ -164,7 +164,7 @@ model Error {
   innererror?: InnerError;
 }
 
-@doc("An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.")
+@doc("An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.")
 model InnerError {
   @doc("One of a server-defined set of error codes.")
   code?: string;

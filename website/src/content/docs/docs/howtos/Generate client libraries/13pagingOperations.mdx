@@ -1,0 +1,316 @@
+---
+title: Paging Operations
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc details what emitters will generate for paging operations.
+
+## Using next link to indicate how to get the next page
+
+Next link is an absolute url returned by the paging operation, which indicates how to get the next page.
+If the response does not return a next link, it indicates the last page of results.
+Next link should be annotated in the response model with `@nextLink`.
+
+There are two ways to indicate a paging operation with `@nextLink`:
+
+1. Use `@pagedResult` and `@items` in `Azure.Core` lib.
+
+<ClientTabs>
+
+```typespec
+op listWithPage(): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+@pagedResult
+model UserList {
+  @items
+  value: User[];
+
+  @nextLink
+  nextLink?: url;
+}
+```
+
+```python
+class User(_model_base.Model):
+    id: str = rest_field()
+    name: str = rest_field()
+
+def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
+    ...
+```
+
+```csharp
+public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken = default);
+```
+
+```typescript
+// TODO
+```
+
+```java
+public PagedIterable<User> listWithPage();
+```
+
+</ClientTabs>
+
+2. Use the `@list` and `@pageItems` decorators from TypeSpec core.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+model UserList {
+  @pageItems
+  value: User[];
+
+  @nextLink
+  nextLink?: url;
+}
+```
+
+```python
+class User(_model_base.Model):
+    id: str = rest_field()
+    name: str = rest_field()
+
+def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
+    ...
+```
+
+```csharp
+public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken = default);
+```
+
+```typescript
+// TODO
+```
+
+```java
+public PagedIterable<User> listWithPage();
+```
+
+</ClientTabs>
+
+## Using continuation token to indicate how to get the next page
+
+A continuation token is a string returned by a paging operation, which is used as a parameter value for the paging operation to get the next page.
+If the response does not return a continuation token, it indicates the last page of results.
+The request parameter that corresponds to the continuation token value in the paging operation should be decorated with `@continuationToken`. Similarly, the response property that contains the continuation token value should also be decorated with `@continuationToken`.
+
+1. Continuation token in query parameter and response body.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@query @continuationToken continuationToken?: string): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+model UserList {
+  @pageItems
+  value: User[];
+
+  @continuationToken
+  continuationToken?: string;
+}
+```
+
+```python
+class User(_model_base.Model):
+    id: str = rest_field()
+    name: str = rest_field()
+
+def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
+    ...
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+2. Continuation token in header parameter and response body.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@header @continuationToken continuationToken?: string): UserList;
+
+model User {
+  id: string;
+  name: string;
+}
+
+model UserList {
+  @pageItems
+  value: User[];
+
+  @continuationToken
+  continuationToken?: string;
+}
+```
+
+```python
+class User(_model_base.Model):
+    id: str = rest_field()
+    name: str = rest_field()
+
+def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
+    ...
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+3. Continuation token in query parameter and response header.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@query @continuationToken continuationToken?: string): {
+  @header
+  @continuationToken
+  continuationToken?: string;
+
+  @pageItems
+  value: User[];
+};
+
+model User {
+  id: string;
+  name: string;
+}
+```
+
+```python
+class User(_model_base.Model):
+    id: str = rest_field()
+    name: str = rest_field()
+
+def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
+    ...
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+4. Continuation token in header parameter and response header.
+
+<ClientTabs>
+
+```typespec
+@list
+op listWithPage(@query @continuationToken continuationToken?: string): {
+  @header
+  @continuationToken
+  continuationToken?: string;
+
+  @pageItems
+  value: User[];
+};
+
+model User {
+  id: string;
+  name: string;
+}
+```
+
+```python
+class User(_model_base.Model):
+    id: str = rest_field()
+    name: str = rest_field()
+
+def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
+    ...
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+## Advanced
+
+### Parameterized next links (against guidelines)
+
+:::danger
+Parameterized next links are against guidelines. Please don't follow this unless explicitly told to do so
+:::
+
+In very rare cases, there are cases of next links that require parameterization. These cases exist outside of the Azure guidelines for paging, but must be supported for legacy reasons.
+
+In cases like this, you may use the special scalar type `Azure.Core.Legacy.parameterizedNextLink`. You can specify which parameters must be reformatted into the next link. Your emitted SDK will handle the reformatting based on the tsp definition
+
+```tsp
+model ListCertificateOptions {
+  includePending?: string;
+}
+model Certificate {
+  name: string;
+}
+model Page {
+  @items items: Certificate[];
+  @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
+    ListCertificateOptions.includePending
+  ]>;
+}
+```

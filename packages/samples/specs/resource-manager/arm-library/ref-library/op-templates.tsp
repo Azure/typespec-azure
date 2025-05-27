@@ -4,9 +4,9 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint" "cuz"
@@ -29,7 +29,13 @@ model TestTrackedResource2 is TrackedResource<TestTrackedProperties2> {
 interface Tracked2Operations {
   get is ArmResourceRead<TestTrackedResource2>;
   create is ArmResourceCreateOrReplaceSync<TestTrackedResource2>;
-  update is ArmResourcePatchSync<TestTrackedResource2, TestTrackedProperties2>;
+  update is ArmCustomPatchSync<
+    TestTrackedResource2,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      TestTrackedResource2,
+      TestTrackedProperties2
+    >
+  >;
   delete is ArmResourceDeleteSync<TestTrackedResource2>;
   listByResourceGroup is ArmResourceListByParent<TestTrackedResource2>;
   listBySubscription is ArmListBySubscription<TestTrackedResource2>;

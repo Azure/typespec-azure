@@ -587,11 +587,11 @@ describe("typespec-autorest: request", () => {
         @post op read(@body body: bytes): {};
       `);
       const operation = res.paths["/"].post;
-      deepStrictEqual(operation.consumes, undefined);
+      deepStrictEqual(operation.consumes, ["application/octet-stream"]);
       const requestBody = operation.parameters[0];
       ok(requestBody);
       strictEqual(requestBody.schema.type, "string");
-      strictEqual(requestBody.schema.format, "byte");
+      strictEqual(requestBody.schema.format, "binary");
     });
 
     it("bytes request should respect @header contentType", async () => {
@@ -894,6 +894,9 @@ describe("identifiers decorator", () => {
   it("prioritizes identifiers decorator over keys", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;      
       model Pet {
         name: string;
         @key
@@ -911,6 +914,10 @@ describe("identifiers decorator", () => {
   it("prioritizes identifiers decorator over id prop", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
       model Pet {
         name: string;
         id: string;
@@ -1031,38 +1038,71 @@ describe("identifiers decorator", () => {
       "cats/features/color",
     ]);
   });
-});
+  it("`@identifiers` are assigned by model property", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        id: int32;
+      }
+      model PetList {
+        @identifiers(#["name"])
+        value: Pet[]
+      }
+      model PetList2 {
+        @identifiers(#["id"])
+        value: Pet[]
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
+    deepStrictEqual(oapi.definitions.PetList2.properties.value["x-ms-identifiers"], ["id"]);
+  });
+  it("`@identifiers` are assigned to `armProviderNamespace` properties even when nested in another namespace", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model PetResource is TrackedResource<PetResourceProperties> {
+        @key("petResourceName")
+        @segment("petServices")
+        name: string;
+      }
 
-describe("typespec-autorest: multipart formData", () => {
-  it("expands model into formData parameters", async () => {
-    const oapi = await openApiFor(`
-    @service
-    namespace Widget;
+      model PetResourceProperties {
+        @identifiers(#["key"])
+        pets?: PetTypes[];
+      }
 
-    @doc("A widget.")
-    model Widget {
-      @key("widgetName")
-      name: string;
-      displayName: string;
-      description: string;
-      color: string;
-    }
+      model PetTypes {
+        key: string;
+        value: string;
+      }
 
-    model WidgetForm is Widget {
-      @header("content-type")
-      contentType: "multipart/form-data";
-    }
-
-    @route("/widgets")
-    interface Widgets {
-      @route(":upload")
-      @post
-      upload(...WidgetForm): Widget;
-    }
-    `);
-    for (const val of ["Widget.color", "Widget.description", "Widget.displayName", "Widget.name"]) {
-      const param = oapi.parameters[val];
-      strictEqual(param["in"], "formData");
-    }
+      @armResourceOperations(PetResource)
+      interface PetService {
+        update is ArmCustomPatchAsync<
+          PetResource,
+          Azure.ResourceManager.Foundations.ResourceUpdateModel<
+            PetResource,
+            PetResourceProperties
+          >
+        >;
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetResourceProperties.properties.pets["x-ms-identifiers"], [
+      "key",
+    ]);
+    deepStrictEqual(
+      oapi.definitions.PetResourceUpdateProperties.properties.pets["x-ms-identifiers"],
+      ["key"],
+    );
   });
 });

@@ -1,4 +1,11 @@
-import { json, MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import {
+  dyn,
+  dynItem,
+  json,
+  MockRequest,
+  passOnSuccess,
+  ScenarioMockApi,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -9,15 +16,15 @@ Scenarios.Azure_Core_Lro_Rpc_longRunningRpc = passOnSuccess([
     uri: "/azure/core/lro/rpc/generations:submit",
     method: "post",
     request: {
-      body: { prompt: "text" },
-      params: {
+      body: json({ prompt: "text" }),
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
     response: {
       status: 202,
       headers: {
-        "operation-location": `/azure/core/lro/rpc/generations/operations/operation1`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/rpc/generations/operations/operation1`,
       },
       body: json({ id: "operation1", status: "InProgress" }),
     },
@@ -39,7 +46,7 @@ Scenarios.Azure_Core_Lro_Rpc_longRunningRpc = passOnSuccess([
     uri: "/azure/core/lro/rpc/generations/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -54,7 +61,7 @@ Scenarios.Azure_Core_Lro_Rpc_longRunningRpc = passOnSuccess([
     uri: "/azure/core/lro/rpc/generations/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },

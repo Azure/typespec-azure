@@ -3,9 +3,9 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
@@ -65,7 +65,10 @@ interface Operations extends Azure.ResourceManager.Operations {}
 interface RoleAssignments {
   get is ArmResourceRead<RoleAssignment>;
   createOrUpdate is ArmResourceCreateOrReplaceAsync<RoleAssignment>;
-  update is ArmResourcePatchSync<RoleAssignment, RoleAssignmentProperties>;
+  update is ArmCustomPatchSync<
+    RoleAssignment,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<RoleAssignment, RoleAssignmentProperties>
+  >;
   delete is ArmResourceDeleteSync<RoleAssignment>;
   list is ArmResourceListByParent<RoleAssignment>;
 

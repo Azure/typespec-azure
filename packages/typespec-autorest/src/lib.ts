@@ -239,6 +239,9 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
 
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-autorest",
+  capabilities: {
+    dryRun: true,
+  },
   diagnostics: {
     "duplicate-body-types": {
       severity: "error",
@@ -288,7 +291,8 @@ export const $lib = createTypeSpecLibrary({
     "invalid-multi-collection-format": {
       severity: "error",
       messages: {
-        default: "The 'multi' should be applied to parameter in 'query', 'header' or 'formData'.",
+        default:
+          "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
       },
     },
     "inline-cycle": {

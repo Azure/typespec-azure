@@ -2,7 +2,7 @@ import "../../dist/src/commontypes.private.decorators.js";
 
 namespace Azure.ResourceManager.CommonTypes.Private;
 
-using TypeSpec.Reflection;
+using Reflection;
 
 /**
  * Describes the shape of model literals accepted by the `version` parameter of

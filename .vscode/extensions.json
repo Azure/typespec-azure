@@ -4,6 +4,7 @@
     "esbenp.prettier-vscode",
     "streetsidesoftware.code-spell-checker",
     "vitest.explorer",
-    "astro-build.astro-vscode"
+    "astro-build.astro-vscode",
+    "typespec.typespec-vscode"
   ]
 }

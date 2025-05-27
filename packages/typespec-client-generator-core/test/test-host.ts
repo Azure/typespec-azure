@@ -12,15 +12,11 @@ import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { CreateSdkContextOptions, createSdkContext } from "../src/context.js";
-import {
-  SdkContext,
-  SdkEmitterOptions,
-  SdkHttpOperation,
-  SdkServiceOperation,
-} from "../src/interfaces.js";
+import { SdkContext, SdkHttpOperation, SdkServiceOperation } from "../src/interfaces.js";
+import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 
-export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
+export interface CreateSdkTestRunnerOptions extends BrandedSdkEmitterOptionsInterface {
   emitterName?: string;
   librariesToAdd?: TypeSpecTestLibrary[];
   autoImports?: string[];
@@ -208,7 +204,7 @@ export async function createSdkTestRunner(
       .filter((x) => x !== StandardTestLibrary)
       .map((x) => x.name)
       .map((x) => `import "${x}";`),
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
+    ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
 
   const clientAutoCode = [
@@ -217,7 +213,7 @@ export async function createSdkTestRunner(
       .map((x) => x.name)
       .map((x) => `import "${x}";`),
     `import "./main.tsp";`,
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
+    ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
 
   // compile with client.tsp
@@ -281,8 +277,4 @@ export async function createSdkContextTestHelper<
     options.emitterName ?? "@azure-tools/typespec-csharp",
     sdkContextOption,
   );
-}
-
-export function hasFlag<T extends number>(value: T, flag: T): boolean {
-  return (value & flag) !== 0;
 }

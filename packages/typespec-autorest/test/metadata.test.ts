@@ -11,7 +11,7 @@ describe("typespec-autorest: metadata", () => {
         @visibility(Lifecycle.Read, Lifecycle.Update, Lifecycle.Create) ruc?: string;
       }
       @parameterVisibility(Lifecycle.Create, Lifecycle.Update)
-      @route("/") @patch op createOrUpdate(...M): M; 
+      @route("/") @patch(#{implicitOptionality: true}) op createOrUpdate(...M): M; 
     `);
 
     const response = res.paths["/"].patch.responses["200"].schema;
@@ -88,7 +88,7 @@ describe("typespec-autorest: metadata", () => {
         person: Person;
         relationship: string;
       }
-      @route("/") @patch op update(...Person): Person; 
+      @route("/") @patch(#{implicitOptionality: true}) op update(...Person): Person; 
     `);
 
     const response = res.paths["/"].patch.responses["200"].schema;
@@ -229,7 +229,7 @@ describe("typespec-autorest: metadata", () => {
       @get get(...M): M;
       @post create(...M): M;
       @put createOrUpdate(...M): M;
-      @patch update(...M): M;
+      @patch(#{implicitOptionality: true}) update(...M): M;
       @delete delete(...M): void; 
     }
 
@@ -238,7 +238,7 @@ describe("typespec-autorest: metadata", () => {
       @get get(...D): D;
       @post create(...D): D;
       @put createOrUpdate(...D): D;
-      @patch update(...D): D;
+      @patch(#{implicitOptionality: true}) update(...D): D;
       @delete delete(...D): void; 
     }
   
@@ -247,7 +247,7 @@ describe("typespec-autorest: metadata", () => {
       @get op get(id: string): R;
       @post op create(...R): R;
       @put op createOrUpdate(...R): R;
-      @patch op update(...R): R;
+      @patch(#{implicitOptionality: true}) op update(...R): R;
       @delete op delete(...D): void; 
     }
 
@@ -341,6 +341,7 @@ describe("typespec-autorest: metadata", () => {
       "/single/{p}": {
         get: {
           operationId: "Single",
+          produces: ["text/plain"],
           parameters: [
             { $ref: "#/parameters/Parameters.q" },
             { $ref: "#/parameters/Parameters.p" },
@@ -357,6 +358,7 @@ describe("typespec-autorest: metadata", () => {
       "/batch": {
         get: {
           operationId: "Batch",
+          produces: ["text/plain"],
           responses: {
             "200": {
               description: "The request has succeeded.",

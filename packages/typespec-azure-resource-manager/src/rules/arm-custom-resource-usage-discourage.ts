@@ -6,7 +6,7 @@ export const armCustomResourceUsageDiscourage = createRule({
   severity: "warning",
   description: "Verify the usage of @customAzureResource decorator.",
   messages: {
-    default: `Avoid using this decorator except when converting old APIs to TypeSpec, as it does not provide validation for ARM resources.`,
+    default: `Avoid using the @customAzureResource decorator. It doesn't provide validation for ARM resources, and its usage should be limited to brownfield services migration.`,
   },
   create(context) {
     return {

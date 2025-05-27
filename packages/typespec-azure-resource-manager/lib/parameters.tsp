@@ -1,6 +1,6 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
+using Http;
+using Rest;
+using OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 using Azure.ResourceManager.CommonTypes;
@@ -24,11 +24,6 @@ alias SubscriptionIdParameter = CommonTypes.SubscriptionIdParameter;
 alias ResourceGroupParameter = CommonTypes.ResourceGroupNameParameter;
 
 /**
- * The default LocationResource parameter type.
- */
-alias LocationResourceParameter = CommonTypes.LocationResourceParameter;
-
-/**
  * DEPRECATED - DO NOT USE
  * The default location parameter type.
  */
@@ -43,6 +38,16 @@ model LocationParameter {
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   @resourceParameterBaseFor([ResourceHome.Location])
   location: string;
+}
+
+/** The default location parameter type. */
+model LocationResourceParameter {
+  /** The name of the Azure region. */
+  @path
+  @minLength(1)
+  @segment("locations")
+  @key
+  location: Azure.Core.azureLocation;
 }
 
 /**
@@ -65,6 +70,8 @@ model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
 
 /**
  * Template for ARM location resources.  Use the parameter to specify
+ * the parent of the location resource.
+ * @template BaseType The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension".
  */
 @friendlyName("Location")
 @armVirtualResource
@@ -162,5 +169,20 @@ model TenantActionScope {
   @visibility(Lifecycle.Read)
   @key
   @segment("tenant")
+  name: string;
+}
+
+/**
+ * Template used by ArmProviderAction templates. This produces following action route:
+ * `/{resourceUri}/providers/Microsoft.SomeRP/someAction`
+ */
+@armVirtualResource
+@extensionResource
+model ExtensionResourceActionScope {
+  @doc("Symbolic name of scope")
+  @path
+  @visibility(Lifecycle.Read)
+  @key
+  @segment("extensionresource")
   name: string;
 }

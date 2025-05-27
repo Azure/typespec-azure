@@ -1,18 +1,17 @@
 import { LroMetadata, getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { Diagnostic, Model } from "@typespec/compiler";
 import { BasicTestRunner, expectDiagnosticEmpty } from "@typespec/compiler/testing";
-import { HttpOperation, RouteResolutionOptions, getAllHttpServices } from "@typespec/http";
+import { HttpOperation, getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
 import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
 async function getOperations(
   code: string,
-  routeOptions?: RouteResolutionOptions,
 ): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
   const runner = await createAzureResourceManagerTestRunner();
   await runner.compileAndDiagnose(code, { noEmit: true });
-  const [services] = getAllHttpServices(runner.program, routeOptions);
+  const [services] = getAllHttpServices(runner.program);
   return [services[0].operations, runner.program.diagnostics, runner];
 }
 

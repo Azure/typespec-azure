@@ -22,7 +22,6 @@ export default {
     "@azure-tools/typespec-azure-core/no-response-body": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,
-    "@azure-tools/typespec-azure-core/prefer-csv-collection-format": true,
     "@azure-tools/typespec-azure-core/no-format": true,
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
@@ -38,12 +37,15 @@ export default {
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
     "@azure-tools/typespec-azure-core/require-versioned": true,
     "@azure-tools/typespec-azure-core/no-private-usage": true,
+    "@azure-tools/typespec-azure-core/no-legacy-usage": true,
     "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/no-query-explode": true,
+    "@azure-tools/typespec-azure-core/no-header-explode": true,
 
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
+    "@azure-tools/typespec-client-generator-core/no-unnamed-types": true,
 
     // Azure core rules enabled via an optional rulesets
     "@azure-tools/typespec-azure-core/non-breaking-versioning": false,

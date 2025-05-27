@@ -135,7 +135,7 @@ model ListItemInputBody {
   }
   ```
   """)
-@get
+@post
 op listWithParameters is global.Azure.Core.Foundations.Operation<
   ListItemInput,
   global.Azure.Core.Page<User>
@@ -206,3 +206,55 @@ interface TwoModelsAsPageItem {
   @route("/second-item")
   listSecondItem is global.Azure.Core.Foundations.Operation<{}, global.Azure.Core.Page<SecondItem>>;
 }
+
+model IncludePendingOptions {
+  @query
+  includePending?: boolean;
+}
+
+@global.Azure.Core.pagedResult
+model ParameterizedNextLinkPagingResult {
+  @global.Azure.Core.items
+  values: User[];
+
+  @nextLink
+  nextLink: global.Azure.Core.Legacy.parameterizedNextLink<[IncludePendingOptions.includePending]>;
+}
+
+@scenario
+@doc("List with parameterized next link that re-injects parameters.")
+@route("/with-parameterized-next-link")
+@scenarioDoc("""
+    This scenario tests the Azure.Core.Legacy.parameterizedNextLink decorator which ensures original request
+    parameters are maintained in next link URLs.
+    
+    Expected query parameters on initial request:
+    - includePending=true
+    - select=name
+  
+    Expected query parameters on next link request. Note: the SDK will need to re-inject this parameter:
+    - includePending=true (note: the client will need to manually re-inject this parameter into the next link)
+    - select=name (note: this is returned in the next link, the client does NOT need to manually re-inject this parameter)
+    
+    Expected concatenation of the paged items:
+    ```json
+    {
+      "value":[
+         {
+            "id": 1,
+            "name": "User1",
+         },
+         {
+            "id": 2,
+            "name": "User2",
+         }
+      ]
+    }
+    ```
+    
+    Note that the nextLink preserves the original filter and select parameters.
+  """)
+op withParameterizedNextLink(
+  ...IncludePendingOptions,
+  @query select: string,
+): ParameterizedNextLinkPagingResult;

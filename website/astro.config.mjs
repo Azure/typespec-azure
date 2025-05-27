@@ -31,9 +31,9 @@ export default defineConfig({
       ),
       favicon: "/azure.svg",
       expressiveCode: false, // defined directly above
-      social: {
-        github: "https://github.com/Azure/typespec-azure",
-      },
+      social: [
+        { icon: "github", label: "GitHub", href: "https://github.com/Azure/typespec-azure" },
+      ],
       customCss: ["./src/css/custom.css"],
       components: {
         Header: "./src/components/header/header.astro",
@@ -45,10 +45,7 @@ export default defineConfig({
     // @ts-expect-error wrong type
     remarkPlugins: [remarkHeadingID],
     rehypePlugins: [
-      [
-        rehypeAstroRelativeMarkdownLinks,
-        { base, contentPath: "src/content/docs", trailingSlash: "always" },
-      ],
+      [rehypeAstroRelativeMarkdownLinks, { base, collectionBase: false, trailingSlash: "always" }],
     ],
     shikiConfig: {
       langs: [TypeSpecLang],

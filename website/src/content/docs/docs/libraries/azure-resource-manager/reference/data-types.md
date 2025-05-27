@@ -170,6 +170,7 @@ model Azure.ResourceManager.ArmDeletedResponse
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
 Template for ARM location resources. Use the parameter to specify
+the parent of the location resource.
 
 ```typespec
 model Azure.ResourceManager.ArmLocationResource<BaseType>
@@ -177,9 +178,9 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 
 #### Template Parameters
 
-| Name     | Description |
-| -------- | ----------- |
-| BaseType |             |
+| Name     | Description                                                                                   |
+| -------- | --------------------------------------------------------------------------------------------- |
+| BaseType | The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension". |
 
 #### Properties
 
@@ -500,6 +501,21 @@ model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
+### `ExtensionResourceActionScope` {#Azure.ResourceManager.ExtensionResourceActionScope}
+
+Template used by ArmProviderAction templates. This produces following action route:
+`/{resourceUri}/providers/Microsoft.SomeRP/someAction`
+
+```typespec
+model Azure.ResourceManager.ExtensionResourceActionScope
+```
+
+#### Properties
+
+| Name | Type     | Description            |
+| ---- | -------- | ---------------------- |
+| name | `string` | Symbolic name of scope |
+
 ### `KeysOf` {#Azure.ResourceManager.KeysOf}
 
 Extracts the key (path) parameters from a resource and its parents
@@ -532,6 +548,20 @@ model Azure.ResourceManager.LocationParameter
 | Name     | Type     | Description        |
 | -------- | -------- | ------------------ |
 | location | `string` | The location name. |
+
+### `LocationResourceParameter` {#Azure.ResourceManager.LocationResourceParameter}
+
+The default location parameter type.
+
+```typespec
+model Azure.ResourceManager.LocationResourceParameter
+```
+
+#### Properties
+
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| location | `Core.azureLocation` | The name of the Azure region. |
 
 ### `ManagedByProperty` {#Azure.ResourceManager.ManagedByProperty}
 
@@ -1347,20 +1377,6 @@ model Azure.ResourceManager.CommonTypes.LocationParameter
 | -------- | -------- | ------------------------- |
 | location | `string` | The name of Azure region. |
 
-### `LocationResourceParameter` {#Azure.ResourceManager.CommonTypes.LocationResourceParameter}
-
-The default location parameter type.
-
-```typespec
-model Azure.ResourceManager.CommonTypes.LocationResourceParameter
-```
-
-#### Properties
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| location | `Core.azureLocation` | The name of the Azure region. |
-
 ### `ManagedOnBehalfOfConfiguration` {#Azure.ResourceManager.CommonTypes.ManagedOnBehalfOfConfiguration}
 
 Managed-On-Behalf-Of configuration properties. This configuration exists for the resources where a resource provider manages those resources on behalf of the resource owner.
@@ -1613,7 +1629,7 @@ model Azure.ResourceManager.CommonTypes.OperationStatusResult
 | endTime?         | `utcDateTime`                                                                  | The end time of the operation.                                                             |
 | operations?      | `ResourceManager.CommonTypes.OperationStatusResult[]`                          | The operations list.                                                                       |
 | error?           | [`ErrorDetail`](./data-types.md#Azure.ResourceManager.CommonTypes.ErrorDetail) | If present, details of the operation error.                                                |
-| resourceId?      | `string`                                                                       | Fully qualified ID of the resource against which the original async operation was started. |
+| resourceId?      | `Core.armResourceIdentifier`                                                   | Fully qualified ID of the resource against which the original async operation was started. |
 
 ### `Plan` {#Azure.ResourceManager.CommonTypes.Plan}
 
@@ -1635,7 +1651,7 @@ model Azure.ResourceManager.CommonTypes.Plan
 
 ### `PrivateEndpoint` {#Azure.ResourceManager.CommonTypes.PrivateEndpoint}
 
-The Private Endpoint resource.
+The private endpoint resource.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.PrivateEndpoint
@@ -1643,9 +1659,9 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpoint
 
 #### Properties
 
-| Name | Type                         | Description                                  |
-| ---- | ---------------------------- | -------------------------------------------- |
-| id?  | `Core.armResourceIdentifier` | The resource identifier for private endpoint |
+| Name | Type                         | Description                                     |
+| ---- | ---------------------------- | ----------------------------------------------- |
+| id?  | `Core.armResourceIdentifier` | The resource identifier of the private endpoint |
 
 ### `PrivateEndpointConnection` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnection}
 
@@ -1674,7 +1690,7 @@ model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResult
 | Name      | Type                                                      | Description                                                           |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
 | value?    | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections.                                |
-| nextLink? | `string`                                                  | URL to get the next set of operation list results (if there are any). |
+| nextLink? | `url`                                                     | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateEndpointConnectionListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5}
 
@@ -1786,7 +1802,7 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResult
 | Name      | Type                                                | Description                                                           |
 | --------- | --------------------------------------------------- | --------------------------------------------------------------------- |
 | value?    | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources                                       |
-| nextLink? | `string`                                            | URL to get the next set of operation list results (if there are any). |
+| nextLink? | `url`                                               | URL to get the next set of operation list results (if there are any). |
 
 ### `PrivateLinkResourceListResultV5` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5}
 
@@ -2134,8 +2150,8 @@ model Azure.ResourceManager.CommonTypes.UserAssignedIdentity
 
 | Name         | Type        | Description                                |
 | ------------ | ----------- | ------------------------------------------ |
-| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 | principalId? | `Core.uuid` | The principal ID of the assigned identity. |
+| clientId?    | `Core.uuid` | The client ID of the assigned identity.    |
 
 ### `ResourceHome` {#Azure.ResourceManager.CommonTypes.ResourceHome}
 
@@ -2687,6 +2703,24 @@ model Foo is TrackedResource<FooProperties> {
 | Name      | Type                                                                                                | Description                                               |
 | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
+
+### `Provider` {#Azure.ResourceManager.Legacy.Provider}
+
+```typespec
+model Azure.ResourceManager.Legacy.Provider<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                               |
+| -------- | --------------------------------------------------------- |
+| Resource | Optional. The resource to get the provider namespace for. |
+
+#### Properties
+
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 

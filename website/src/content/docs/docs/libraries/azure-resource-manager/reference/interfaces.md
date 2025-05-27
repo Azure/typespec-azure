@@ -675,14 +675,15 @@ op Azure.ResourceManager.ArmProviderActionAsync(apiVersion: string, subscription
 
 #### Template Parameters
 
-| Name       | Description                                                                   |
-| ---------- | ----------------------------------------------------------------------------- |
-| Request    | The request model for the action                                              |
-| Response   | The response type for the action                                              |
-| Scope      | The scope of the action (SubscriptionActionScope or TenantActionScope)        |
-| Parameters | Optional. Additional parameters after the path parameters (e.g. Location)     |
-| LroHeaders | Optional. Allows overriding the lro headers returned in the Accepted response |
-| Error      | Optional. The error response, if non-standard.                                |
+| Name                | Description                                                                                           |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| Request             | The request model for the action                                                                      |
+| Response            | The response type for the action                                                                      |
+| Scope               | The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope) |
+| Parameters          | Optional. Additional parameters after the path parameters (e.g. Location)                             |
+| LroHeaders          | Optional. Allows overriding the lro headers returned in the Accepted response                         |
+| Error               | Optional. The error response, if non-standard.                                                        |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                             |
 
 ### `ArmProviderActionSync` {#Azure.ResourceManager.ArmProviderActionSync}
 
@@ -692,13 +693,14 @@ op Azure.ResourceManager.ArmProviderActionSync(apiVersion: string, subscriptionI
 
 #### Template Parameters
 
-| Name       | Description                                                               |
-| ---------- | ------------------------------------------------------------------------- |
-| Request    | The request model for the action                                          |
-| Response   | The response type for the action                                          |
-| Scope      | The scope of the action (SubscriptionActionScope or TenantActionScope)    |
-| Parameters | Optional. Additional parameters after the path parameters (e.g. Location) |
-| Error      | Optional. The error response, if non-standard.                            |
+| Name                | Description                                                                                           |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| Request             | The request model for the action                                                                      |
+| Response            | The response type for the action                                                                      |
+| Scope               | The scope of the action (SubscriptionActionScope, TenantActionScope, or ExtensionResourceActionScope) |
+| Parameters          | Optional. Additional parameters after the path parameters (e.g. Location)                             |
+| Error               | Optional. The error response, if non-standard.                                                        |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                             |
 
 ### `ArmResourceActionAsync` {#Azure.ResourceManager.ArmResourceActionAsync}
 
@@ -708,15 +710,16 @@ op Azure.ResourceManager.ArmResourceActionAsync(provider: "Microsoft.ThisWillBeR
 
 #### Template Parameters
 
-| Name           | Description                                                               |
-| -------------- | ------------------------------------------------------------------------- |
-| Resource       | The resource being acted upon                                             |
-| Request        | The request model for the action                                          |
-| Response       | The response model for the action                                         |
-| BaseParameters | Optional. Allows overriding the parameters for the operation              |
-| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response |
-| Parameters     | Optional. Additional parameters after the path parameters                 |
-| Error          | Optional. The error response, if non-standard.                            |
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| Response            | The response model for the action                                         |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Error               | Optional. The error response, if non-standard.                            |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
 
 ### `ArmResourceActionAsyncBase` {#Azure.ResourceManager.ArmResourceActionAsyncBase}
 
@@ -728,14 +731,15 @@ op Azure.ResourceManager.ArmResourceActionAsyncBase(provider: "Microsoft.ThisWil
 
 #### Template Parameters
 
-| Name           | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| Resource       | The resource being acted upon                                |
-| Request        | The request model for the action                             |
-| Response       | The response type for the action                             |
-| BaseParameters | Optional. Allows overriding the parameters for the operation |
-| Parameters     | Optional. Additional parameters after the path parameters    |
-| Error          | Optional. The error response, if non-standard.               |
+| Name                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                |
+| Request             | The request model for the action                             |
+| Response            | The response type for the action                             |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation |
+| Parameters          | Optional. Additional parameters after the path parameters    |
+| Error               | Optional. The error response, if non-standard.               |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.    |
 
 ### `ArmResourceActionNoContentAsync` {#Azure.ResourceManager.ArmResourceActionNoContentAsync}
 
@@ -745,14 +749,15 @@ op Azure.ResourceManager.ArmResourceActionNoContentAsync(provider: "Microsoft.Th
 
 #### Template Parameters
 
-| Name           | Description                                                               |
-| -------------- | ------------------------------------------------------------------------- |
-| Resource       | The resource being acted upon                                             |
-| Request        | The request model for the action                                          |
-| BaseParameters | Optional. Allows overriding the parameters for the operation              |
-| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response |
-| Parameters     | Optional. Additional parameters after the path parameters                 |
-| Error          | Optional. The error response, if non-standard.                            |
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Error               | Optional. The error response, if non-standard.                            |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
 
 ### `ArmResourceActionNoContentSync` {#Azure.ResourceManager.ArmResourceActionNoContentSync}
 
@@ -764,13 +769,14 @@ op Azure.ResourceManager.ArmResourceActionNoContentSync(provider: "Microsoft.Thi
 
 #### Template Parameters
 
-| Name           | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| Resource       | The resource being acted upon                                |
-| Request        | The request model for the action                             |
-| BaseParameters | Optional. Allows overriding the parameters for the operation |
-| Parameters     | Optional. Additional parameters after the path parameters    |
-| Error          | Optional. The error response, if non-standard.               |
+| Name                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                |
+| Request             | The request model for the action                             |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation |
+| Parameters          | Optional. Additional parameters after the path parameters    |
+| Error               | Optional. The error response, if non-standard.               |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.    |
 
 ### `ArmResourceActionNoResponseContentAsync` {#Azure.ResourceManager.ArmResourceActionNoResponseContentAsync}
 
@@ -780,14 +786,15 @@ op Azure.ResourceManager.ArmResourceActionNoResponseContentAsync(provider: "Micr
 
 #### Template Parameters
 
-| Name           | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| Resource       | The resource being acted upon                                |
-| Request        | The request model for the action                             |
-| BaseParameters | Optional. Allows overriding the parameters for the operation |
-| LroHeaders     |                                                              |
-| Parameters     | Optional. Additional parameters after the path parameters    |
-| Error          | Optional. The error response, if non-standard.               |
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Error               | Optional. The error response, if non-standard.                            |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.               |
 
 ### `ArmResourceActionSync` {#Azure.ResourceManager.ArmResourceActionSync}
 
@@ -799,14 +806,15 @@ op Azure.ResourceManager.ArmResourceActionSync(provider: "Microsoft.ThisWillBeRe
 
 #### Template Parameters
 
-| Name           | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| Resource       | The resource being acted upon                                |
-| Request        | The request model for the action                             |
-| Response       | The response model for the action                            |
-| BaseParameters | Optional. Allows overriding the parameters for the operation |
-| Parameters     | Optional. Additional parameters after the path parameters    |
-| Error          | Optional. The error response, if non-standard.               |
+| Name                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                |
+| Request             | The request model for the action                             |
+| Response            | The response model for the action                            |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation |
+| Parameters          | Optional. Additional parameters after the path parameters    |
+| Error               | Optional. The error response, if non-standard.               |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.  |
 
 ### `ArmResourceCheckExistence` {#Azure.ResourceManager.ArmResourceCheckExistence}
 
@@ -1072,7 +1080,7 @@ op Azure.ResourceManager.ArmTagsPatchAsync(provider: "Microsoft.ThisWillBeReplac
 | Name           | Description                                                                      |
 | -------------- | -------------------------------------------------------------------------------- |
 | Resource       | the resource being patched                                                       |
-| Properties     |                                                                                  |
+| Properties     | Optional. Exists for parallelism with ArmResourcePatch.                          |
 | BaseParameters | Optional. Allows overriding the operation parameters                             |
 | LroHeaders     | Optional. Allows overriding the lro headers that appear in the Accepted response |
 | Parameters     | Optional. Additional parameters after the path parameters                        |
@@ -1129,12 +1137,12 @@ op Azure.ResourceManager.Foundations.ArmCreateOperation(resource: BodyParameter)
 
 #### Template Parameters
 
-| Name           | Description |
-| -------------- | ----------- |
-| HttpParameters |             |
-| BodyParameter  |             |
-| Response       |             |
-| ErrorResponse  |             |
+| Name           | Description                                     |
+| -------------- | ----------------------------------------------- |
+| HttpParameters | The parameter object for the operation.         |
+| BodyParameter  | The body parameter                              |
+| Response       | The response or union of responses for success. |
+| ErrorResponse  | The error response.                             |
 
 ### `ArmReadOperation` {#Azure.ResourceManager.Foundations.ArmReadOperation}
 
@@ -1144,11 +1152,11 @@ op Azure.ResourceManager.Foundations.ArmReadOperation(): Response | ErrorRespons
 
 #### Template Parameters
 
-| Name          | Description |
-| ------------- | ----------- |
-| Parameters    |             |
-| Response      |             |
-| ErrorResponse |             |
+| Name          | Description                                     |
+| ------------- | ----------------------------------------------- |
+| Parameters    | The parameter object for the operation.         |
+| Response      | The response or union of responses for success. |
+| ErrorResponse | The error response.                             |
 
 ### `ArmUpdateOperation` {#Azure.ResourceManager.Foundations.ArmUpdateOperation}
 
@@ -1158,12 +1166,12 @@ op Azure.ResourceManager.Foundations.ArmUpdateOperation(properties: BodyParamete
 
 #### Template Parameters
 
-| Name           | Description |
-| -------------- | ----------- |
-| HttpParameters |             |
-| BodyParameter  |             |
-| Response       |             |
-| ErrorResponse  |             |
+| Name           | Description                                     |
+| -------------- | ----------------------------------------------- |
+| HttpParameters | The parameter object for the operation.         |
+| BodyParameter  | The body parameter                              |
+| Response       | The response or union of responses for success. |
+| ErrorResponse  | The error response.                             |
 
 ### `checkNameAvailability` {#Azure.ResourceManager.Foundations.checkNameAvailability}
 
@@ -1183,3 +1191,252 @@ op Azure.ResourceManager.Foundations.checkNameAvailability(apiVersion: string, b
 | Request          | The operation request body                                               |
 | Response         | The operation response                                                   |
 | AdditionalParams | A parameter model with properties representing non-path parameters       |
+
+## Azure.ResourceManager.Legacy
+
+### `LegacyOperations` {#Azure.ResourceManager.Legacy.LegacyOperations}
+
+An operation template used to build resource operations in which the same resource type
+is accessible at multiple, fixed resource paths.
+
+```typespec
+interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                                                      |
+| --------------------- | -------------------------------------------------------------------------------- |
+| ParentParameters      | The path parameters for the resource parent                                      |
+| ResourceTypeParameter | The path parameter for the resource name                                         |
+| ErrorType             | Optional. The type of error models used in operations created form this template |
+
+#### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(body: Resource): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                                             |
+| ------------------- | ----------------------------------------------------------------------- |
+| Resource            | the resource being created or updated                                   |
+| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters          | Optional. Additional parameters after the path parameters               |
+| Response            | Optional. The success response(s) for the PUT operation                 |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                |
+
+#### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync}
+
+A synchronous resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(body: Resource): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| Resource            | the resource being created or updated                     |
+| Parameters          | Optional. Additional parameters after the path parameters |
+| Response            | Optional. The success response(s) for the PUT operation   |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
+
+#### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync}
+
+A long-running resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(body: PatchModel): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                                             |
+| ------------------- | ----------------------------------------------------------------------- |
+| Resource            | the resource being created or updated                                   |
+| PatchModel          | the PATCH request model                                                 |
+| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters          | Optional. Additional parameters after the path parameters               |
+| Response            | Optional. The success response(s) for the PATCH operation               |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                |
+
+#### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync}
+
+A synchronous resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(body: PatchModel): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| Resource            | the resource being created or updated                     |
+| PatchModel          | the PATCH request model                                   |
+| Parameters          | Optional. Additional parameters after the path parameters |
+| Response            | Optional. The success response(s) for the PATCH operation |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
+
+#### `LegacyOperations.DeleteAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteAsync}
+
+Delete a resource asynchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteAsync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| LroHeaders | The lro headers for the operation                          |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+
+#### `LegacyOperations.DeleteSync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync}
+
+Delete a resource synchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+
+#### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations.Read}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.Read(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being read                                   |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response for a get operation.       |
+
+#### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations.List}
+
+List a resource
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being listed                                 |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The response returned by the list               |
+
+#### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionSync}
+
+A synchronous resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| Resource            | The resource being acted upon                             |
+| Request             | The request model for the action                          |
+| Response            | The response model for the action                         |
+| Parameters          | Optional. Additional parameters after the path parameters |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
+
+#### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync}
+
+A long-running resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| Result              |                                                                           |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Response            | The response model for the action                                         |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                  |
+
+### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.CustomPatchAsync}
+
+A long-running resource update using a custom PATCH payload (Asynchronous)
+
+```typespec
+op Azure.ResourceManager.Legacy.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                   |
+| ------------------- | ----------------------------------------------------------------------------- |
+| Resource            | the resource being patched                                                    |
+| PatchModel          | The input model for the PATCH request                                         |
+| BaseParameters      | Optional. Allows overriding the operation parameters                          |
+| LroHeaders          | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                     |
+| Response            | Optional. The success response for the patch operation                        |
+| Error               | Optional. The error response, if non-standard.                                |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                      |
+
+### `CustomPatchSync` {#Azure.ResourceManager.Legacy.CustomPatchSync}
+
+A resource update using a custom PATCH payload (synchronous)
+
+```typespec
+op Azure.ResourceManager.Legacy.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| Resource            | the resource being patched                                |
+| PatchModel          | The input model for the PATCH request                     |
+| BaseParameters      | Optional. Allows overriding the operation parameters      |
+| Parameters          | Optional. Additional parameters after the path parameters |
+| Response            | Optional. The success response for the patch operation    |
+| Error               | Optional. The error response, if non-standard.            |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
+
+### `UpdateOperation` {#Azure.ResourceManager.Legacy.UpdateOperation}
+
+```typespec
+op Azure.ResourceManager.Legacy.UpdateOperation(properties: BodyParameter): Response | ErrorResponse
+```
+
+#### Template Parameters
+
+| Name                | Description                                              |
+| ------------------- | -------------------------------------------------------- |
+| HttpParameters      | The parameter object for the operation.                  |
+| BodyParameter       | The body parameter                                       |
+| Response            | The response or union of responses for success.          |
+| ErrorResponse       | The error response.                                      |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional |

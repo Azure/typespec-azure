@@ -11,7 +11,7 @@ title: ARM Resource Operations
 | GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                              |
 | CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;`    |
 | Tags Update (PATCH)   | No          | Yes\*    | `update is ArmResourceTagsPatchSync<Resource>;`                  |
-| Full Update (PATCH)   | Yes         | No\*     | `update is ArmResourcePatchSync<Resource, ResourceProperties>;`  |
+| Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`          |
 | Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                     |
 | List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`      |
 | List by Subscription  | Yes         | Yes      | `listBySubscription is ArmResourceListBySubscription<Resource>;` |
@@ -20,13 +20,13 @@ title: ARM Resource Operations
 
 ### Proxy Resource
 
-| Operation            | Recommended | Required | TypeSpec Representation                                         |
-| -------------------- | ----------- | -------- | --------------------------------------------------------------- |
-| GET                  | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                             |
-| CreateOrUpdate (PUT) | Yes         | No\*     | `createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;`   |
-| Update (PATCH)       | Yes         | No       | `update is ArmResourcePatchSync<Resource, ResourceProperties>;` |
-| Delete               | Yes         | No\*     | `delete is ArmResourceDeleteSync<Resource>;`                    |
-| List by Parent       | Yes         | Yes      | `listByParent is ArmResourceListByParent<Resource>;`            |
+| Operation            | Recommended | Required | TypeSpec Representation                                       |
+| -------------------- | ----------- | -------- | ------------------------------------------------------------- |
+| GET                  | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                           |
+| CreateOrUpdate (PUT) | Yes         | No\*     | `createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;` |
+| Update (PATCH)       | Yes         | No       | `update is ArmCustomPatchSync<Resource, PatchRequest>;`       |
+| Delete               | Yes         | No\*     | `delete is ArmResourceDeleteSync<Resource>;`                  |
+| List by Parent       | Yes         | Yes      | `listByParent is ArmResourceListByParent<Resource>;`          |
 
 \* Note that, if a resource implements Create, it is highly recommended that it implement delete as well, and vice-versa.
 
@@ -44,10 +44,10 @@ By default, any property that occurs in your resource model will also appear in 
 
 #### Properties That Are Never Directly Set by the User
 
-It is common to have properties that are calculated by the service or otherwise not directly set by the user, examples include timestamps, dates, values that are only set by specific actions (on/off, enabled/disabled, provisioningState). You want to make sure that these properties are marked so that they will appear in responses and not requests. this is done using the `@visibility("read")` decorator instance:
+It is common to have properties that are calculated by the service or otherwise not directly set by the user, examples include timestamps, dates, values that are only set by specific actions (on/off, enabled/disabled, provisioningState). You want to make sure that these properties are marked so that they will appear in responses and not requests. this is done using the `@visibility(Lifecycle.Read)` decorator instance:
 
 ```typespec
-@visibility("read")
+@visibility(Lifecycle.Read)
 provisioningState: ProvisioningState;
 ```
 
@@ -80,16 +80,14 @@ In the TypeSpec in the table `createOrUpdate` is the name of the operation, whic
 
 ARM Requires that all `Tracked` resources implement PATCH for ARM tags, which are contained in the envelope of every `TrackedResource`. ARM recommends that you also allow PATCH of other envelope properties and resource-specific properties. Unless marked with a specific visibility, any property in your rp-specific properties will be automatically included in the PATCH schema.
 
-TypeSpec Provides both Synchronous and Asynchronous PATCH Operations, and allows you to specify a PATCH for Resource tags only, a PATCH for all updateable properties, or a custom patch. Generally, you should choose the patch for all updateable properties, unless you have a very good reason fro choosing another PATCH operation.
+TypeSpec Provides both Synchronous and Asynchronous PATCH Operations, and allows you to specify a PATCH for Resource tags only, a PATCH for all updateable properties, or a custom patch. Generally, you should choose the patch for all updateable properties, unless you have a very good reason for choosing another PATCH operation.
 
-| Operation Description             | TypeSpec                                                            |
-| --------------------------------- | ------------------------------------------------------------------- |
-| Sync Updateable Properties PATCH  | `update is ArmResourcePatchSync<ResourceType, ResourceProperties>`  |
-| Async Updateable Properties PATCH | `update is ArmResourcePatchAsync<ResourceType, ResourceProperties>` |
-| Sync TagsOnly PATCH               | `update is ArmTagsPatchSync<ResourceType>`                          |
-| Async TagsOnly PATCH              | `update is ArmTagsPatchAsync<ResourceType>`                         |
-| Sync Custom PATCH                 | `update is ArmCustomPatchSync<ResourceType, PatchRequest>`          |
-| Async Custom PATCH                | `update is ArmCustomPatchAsync<ResourceType, PatchRequest>`         |
+| Operation Description      | TypeSpec                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sync TagsOnly PATCH        | `update is ArmTagsPatchSync<ResourceType>`                                                                                                 |
+| Async TagsOnly PATCH       | `update is ArmTagsPatchAsync<ResourceType>`                                                                                                |
+| Sync All Properties PATCH  | `update is ArmCustomPatchSync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>`  |
+| Async All Properties PATCH | `update is ArmCustomPatchAsync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>` |
 
 The ArmResourcePatch\* templates take the resource type and the resource properties type as parameters.
 The ArmTagsPatch\* templates take the resource type as a parameter.

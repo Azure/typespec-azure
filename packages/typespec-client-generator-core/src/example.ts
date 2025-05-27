@@ -33,7 +33,6 @@ import {
   isSdkFloatKind,
   isSdkIntKind,
 } from "./interfaces.js";
-import { getValidApiVersion } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
 
@@ -168,15 +167,17 @@ export async function handleClientExamples(
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
+  const packageVersions = context.getPackageVersions();
   const examples = diagnostics.pipe(
-    await loadExamples(context, getValidApiVersion(context, client.apiVersions)),
+    await loadExamples(context, packageVersions[packageVersions.length - 1]),
   );
-  const methodQueue = [...client.methods];
-  while (methodQueue.length > 0) {
-    const method = methodQueue.pop()!;
-    if (method.kind === "clientaccessor") {
-      methodQueue.push(...method.response.methods);
-    } else {
+  const clientQueue = [client];
+  while (clientQueue.length > 0) {
+    const client = clientQueue.pop()!;
+    if (client.children) {
+      clientQueue.push(...client.children);
+    }
+    for (const method of client.methods) {
       // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
       let operation = method.__raw;
       while (operation && operation.templateMapper === undefined) {
@@ -209,10 +210,7 @@ function handleMethodExamples<TServiceOperation extends SdkServiceOperation>(
   if (method.operation.kind === "http") {
     diagnostics.pipe(handleHttpOperationExamples(method.operation, examples));
     if (method.operation.examples) {
-      if (!context.__httpOperationExamples) {
-        context.__httpOperationExamples = new Map();
-      }
-      context.__httpOperationExamples!.set(method.operation.__raw, method.operation.examples);
+      context.__httpOperationExamples.set(method.operation.__raw, method.operation.examples);
     }
   }
 
@@ -230,7 +228,6 @@ function handleHttpOperationExamples(
     const operationExample: SdkHttpOperationExample = {
       kind: "http",
       name: title,
-      description: title,
       doc: title,
       filePath: example.relativePath,
       parameters: diagnostics.pipe(
@@ -271,6 +268,10 @@ function handleHttpParameters(
   ) {
     for (const name of Object.keys(example.parameters)) {
       let parameter = parameters.find((p) => p.serializedName === name);
+      // fallback to use client name for any body parameter
+      if (!parameter) {
+        parameter = parameters.find((p) => p.name === name && p.kind === "body");
+      }
       // fallback to body in example for any body parameter
       if (!parameter && name === "body") {
         parameter = parameters.find((p) => p.kind === "body");
@@ -408,6 +409,10 @@ function getSdkTypeExample(
   relativePath: string,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+
+  if (example === null && type.kind !== "nullable" && type.kind !== "unknown") {
+    return diagnostics.wrap(undefined);
+  }
 
   if (isSdkIntKind(type.kind) || isSdkFloatKind(type.kind)) {
     return getSdkBaseTypeExample("number", type as SdkType, example, relativePath);
@@ -550,9 +555,6 @@ function getSdkDictionaryExample(
 ): [SdkDictionaryExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
-    if (example === null) {
-      return diagnostics.wrap(undefined);
-    }
     const dictionaryExample: Record<string, SdkExampleValue> = {};
     for (const key of Object.keys(example)) {
       const result = diagnostics.pipe(
@@ -580,20 +582,21 @@ function getSdkModelExample(
 ): [SdkModelExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   if (typeof example === "object") {
-    if (example === null) {
-      return diagnostics.wrap(undefined);
-    }
     // handle discriminated model
     if (type.discriminatorProperty) {
-      if (
-        type.discriminatorProperty.name in example &&
-        example[type.discriminatorProperty.name] in type.discriminatedSubtypes!
-      ) {
-        return getSdkModelExample(
-          type.discriminatedSubtypes![example[type.discriminatorProperty.name]],
-          example,
-          relativePath,
-        );
+      if (type.discriminatorProperty.name in example) {
+        if (
+          type.discriminatedSubtypes &&
+          example[type.discriminatorProperty.name] in type.discriminatedSubtypes
+        ) {
+          // handle example type that is defined in discriminated subtypes
+          // else, fallback to the base model, handle out of the discriminator if
+          return getSdkModelExample(
+            type.discriminatedSubtypes![example[type.discriminatorProperty.name]],
+            example,
+            relativePath,
+          );
+        }
       } else {
         addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
         return diagnostics.wrap(undefined);

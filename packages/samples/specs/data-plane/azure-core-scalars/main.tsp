@@ -4,8 +4,8 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 
 using Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Rest;
+using Versioning;
 using Azure.Core;
 using Azure.Core.Traits;
 

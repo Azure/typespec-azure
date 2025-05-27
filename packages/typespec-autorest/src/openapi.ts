@@ -13,6 +13,7 @@ import {
 import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
+  getArmKeyIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
   isArmProviderNamespace,
@@ -44,7 +45,6 @@ import {
   Scalar,
   StringLiteral,
   StringTemplate,
-  SyntaxKind,
   Type,
   TypeNameOptions,
   Union,
@@ -101,7 +101,8 @@ import {
   resolvePath,
   serializeValueAsJson,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { SyntaxKind } from "@typespec/compiler/ast";
+import { $ } from "@typespec/compiler/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   Authentication,
@@ -111,6 +112,7 @@ import {
   HttpOperationMultipartBody,
   HttpOperationParameters,
   HttpOperationResponse,
+  HttpPayloadBody,
   HttpProperty,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
@@ -147,7 +149,6 @@ import {
   OpenAPI2BodyParameter,
   OpenAPI2Document,
   OpenAPI2FileSchema,
-  OpenAPI2FormDataParameter,
   OpenAPI2HeaderDefinition,
   OpenAPI2HeaderParameter,
   OpenAPI2OAuth2FlowType,
@@ -454,7 +455,6 @@ export async function getOpenAPIForService(
             explode: false,
             style: "simple",
             name: prop.name,
-            type: "path",
           },
         },
         {
@@ -464,13 +464,7 @@ export async function getOpenAPIForService(
       );
       if (
         prop.type.kind === "Scalar" &&
-        ignoreDiagnostics(
-          program.checker.isTypeAssignableTo(
-            prop.type,
-            program.checker.getStdType("url"),
-            prop.type,
-          ),
-        )
+        $(program).type.isAssignableTo(prop.type, $(program).builtin.url, prop.type)
       ) {
         param["x-ms-skip-url-encoding"] = true;
       }
@@ -758,10 +752,7 @@ export async function getOpenAPIForService(
   }
 
   function isBytes(type: Type) {
-    const baseType = type;
-    return ignoreDiagnostics(
-      program.checker.isTypeAssignableTo(baseType, program.checker.getStdType("bytes"), type),
-    );
+    return $(program).type.isAssignableTo(type, $(program).builtin.bytes, type);
   }
 
   function isBinaryPayload(body: Type, contentType: string | string[]) {
@@ -857,7 +848,7 @@ export async function getOpenAPIForService(
       openapiResponse["x-ms-error-response"] = true;
     }
     const contentTypes: string[] = [];
-    let body: HttpOperationBody | HttpOperationMultipartBody | undefined;
+    let body: HttpPayloadBody | undefined;
     for (const data of response.responses) {
       if (data.headers && Object.keys(data.headers).length > 0) {
         openapiResponse.headers ??= {};
@@ -890,11 +881,11 @@ export async function getOpenAPIForService(
   }
 
   function getSchemaForResponseBody(
-    body: HttpOperationBody | HttpOperationMultipartBody,
+    body: HttpPayloadBody,
     contentTypes: string[],
   ): OpenAPI2Schema | OpenAPI2FileSchema {
     const isBinary = contentTypes.every((t) => isBinaryPayload(body!.type, t));
-    if (isBinary) {
+    if (body.bodyKind === "file" || isBinary) {
       return { type: "file" };
     }
     if (body.bodyKind === "multipart") {
@@ -1145,16 +1136,32 @@ export async function getOpenAPIForService(
     }
   }
 
-  function emitBodyParameters(
-    body: HttpOperationBody | HttpOperationMultipartBody,
-    visibility: Visibility,
-  ) {
+  function emitBodyParameters(body: HttpPayloadBody, visibility: Visibility) {
     switch (body.bodyKind) {
       case "single":
         emitSingleBodyParameters(body, visibility);
         break;
       case "multipart":
         emitMultipartBodyParameters(body, visibility);
+        break;
+      case "file":
+        const bodySchema = { type: "string", format: "binary" };
+        const { property } = body;
+        if (property) {
+          emitParameter(property, () =>
+            getOpenAPI2BodyParameter(property, property.name, bodySchema),
+          );
+        } else {
+          currentEndpoint.parameters.push({
+            name: "body",
+            in: "body",
+            schema: {
+              type: "string",
+              format: "binary",
+            },
+            required: true,
+          });
+        }
         break;
     }
   }
@@ -1169,18 +1176,7 @@ export async function getOpenAPIForService(
       ? { type: "string", format: "binary" }
       : getSchemaOrRef(body.type, schemaContext);
 
-    if (currentConsumes.has("multipart/form-data")) {
-      const bodyModelType = body.type;
-      // Assert, this should never happen. Rest library guard against that.
-      compilerAssert(bodyModelType.kind === "Model", "Body should always be a Model.");
-      if (bodyModelType) {
-        for (const param of bodyModelType.properties.values()) {
-          emitParameter(param, () =>
-            getOpenAPI2FormDataParameter(param, schemaContext, getJsonName(param)),
-          );
-        }
-      }
-    } else if (body.property) {
+    if (body.property) {
       const prop = body.property;
       emitParameter(prop, () => getOpenAPI2BodyParameter(prop, getJsonName(prop), schema));
     } else {
@@ -1209,12 +1205,20 @@ export async function getOpenAPIForService(
             items: schema.type === "file" ? { type: "string", format: "binary" } : schema,
           };
         }
-        currentEndpoint.parameters.push({
+
+        const param: OpenAPI2Parameter = {
           name: partName,
           in: "formData",
           required: !part.optional,
           ...schema,
-        });
+        };
+        if (part.property) {
+          param.description = getDoc(program, part.property);
+          if (part.property.name !== partName) {
+            param["x-ms-client-name"] = part.property.name;
+          }
+        }
+        currentEndpoint.parameters.push(param);
       }
     }
   }
@@ -1264,7 +1268,7 @@ export async function getOpenAPIForService(
       reportDiagnostic(program, {
         code: multipart ? "unsupported-multipart-type" : "unsupported-param-type",
         format: { part: paramName },
-        target: type,
+        target,
       });
       return { type: "string" };
     }
@@ -1367,30 +1371,6 @@ export async function getOpenAPIForService(
     return result;
   }
 
-  function getOpenAPI2FormDataParameter(
-    param: ModelProperty,
-    schemaContext: SchemaContext,
-    name?: string,
-  ): OpenAPI2FormDataParameter {
-    const base = getOpenAPI2ParameterBase(param, name);
-    const result = {
-      in: "formData",
-      ...base,
-      ...(getFormDataSchema(param.type, schemaContext, base.name, param) as any),
-      default: param.defaultValue && getDefaultValue(param.defaultValue, param),
-    };
-
-    Object.assign(
-      result,
-      applyIntrinsicDecorators(param, {
-        type: (result as any).type,
-        format: (result as any).format,
-      }),
-    );
-
-    return result;
-  }
-
   function getSimpleParameterSchema(
     param: ModelProperty,
     schemaContext: SchemaContext,
@@ -1416,38 +1396,40 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getQueryCollectionFormat(
-    httpProp: HttpProperty & { kind: "query" },
-  ): string | undefined {
-    if (httpProp.options.explode) {
-      return "multi";
+  function getCollectionFormat(
+    type: ModelProperty,
+    explode?: boolean,
+  ): "csv" | "ssv" | "pipes" | "multi" | undefined {
+    if ($(program).array.is(type.type)) {
+      if (explode) {
+        return "multi";
+      }
+      const encode = getEncode(context.program, type);
+      if (encode) {
+        if (encode?.encoding === "ArrayEncoding.pipeDelimited") {
+          return "pipes";
+        }
+        if (encode?.encoding === "ArrayEncoding.spaceDelimited") {
+          return "ssv";
+        }
+        reportDiagnostic(program, { code: "invalid-multi-collection-format", target: type });
+      }
+      return "csv";
     }
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = httpProp.options.format;
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes", "multi"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, {
-        code: "invalid-multi-collection-format",
-        target: httpProp.property,
-      });
-    }
-
-    return collectionFormat;
+    return undefined;
   }
+
   function getOpenAPI2QueryParameter(
     httpProp: HttpProperty & { kind: "query" },
     schemaContext: SchemaContext,
   ): OpenAPI2QueryParameter {
     const property = httpProp.property;
     const base = getOpenAPI2ParameterBase(property, httpProp.options.name);
-    const collectionFormat = getQueryCollectionFormat(httpProp);
+    const collectionFormat = getCollectionFormat(httpProp.property, httpProp.options.explode);
     const schema = getSimpleParameterSchema(property, schemaContext, base.name);
     return {
       in: "query",
-      collectionFormat:
-        collectionFormat === "csv" && schema.items === undefined // If csv
-          ? undefined
-          : (collectionFormat as any),
+      collectionFormat,
       default: property.defaultValue && getDefaultValue(property.defaultValue, property),
       ...base,
       ...schema,
@@ -1482,18 +1464,7 @@ export async function getOpenAPIForService(
   ): OpenAPI2HeaderParameter {
     const base = getOpenAPI2ParameterBase(prop, name);
     const headerOptions = getHeaderFieldOptions(program, prop);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    let collectionFormat = headerOptions.format;
-    if (
-      !collectionFormat &&
-      (typeof headerOptions.explode === "boolean" || $.array.is(prop.type))
-    ) {
-      collectionFormat = headerOptions.explode ? "multi" : "csv";
-    }
-    if (collectionFormat && !["csv", "ssv", "tsv", "pipes"].includes(collectionFormat)) {
-      collectionFormat = undefined;
-      reportDiagnostic(program, { code: "invalid-multi-collection-format", target: prop });
-    }
+    const collectionFormat = getCollectionFormat(prop, headerOptions.explode);
     return {
       in: "header",
       default: prop.defaultValue && getDefaultValue(prop.defaultValue, prop),
@@ -1855,11 +1826,7 @@ export async function getOpenAPIForService(
       // Get the schema for the model type
       const schema = getSchemaOrRef(type, schemaContext);
       if (schema.$ref) {
-        if (type.kind === "Model") {
-          return { type: "object", allOf: [schema], "x-nullable": nullable };
-        } else {
-          return { ...schema, "x-nullable": nullable };
-        }
+        return { ...schema, "x-nullable": nullable };
       } else {
         schema["x-nullable"] = nullable;
         return schema;
@@ -1877,17 +1844,13 @@ export async function getOpenAPIForService(
     }
   }
 
-  function ifArrayItemContainsIdentifier(
-    program: Program,
-    array: ArrayModelType,
-    armIdentifiers: string[],
-  ) {
+  function ifArrayItemContainsIdentifier(program: Program, array: ArrayModelType) {
     if (array.indexer.value?.kind !== "Model") {
       return true;
     }
     return (
       getExtensions(program, array).has("x-ms-identifiers") ||
-      (getProperty(array.indexer.value, "id") && armIdentifiers.includes("id"))
+      getProperty(array.indexer.value, "id")
     );
   }
 
@@ -2139,7 +2102,8 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context, prop.model?.namespace);
+      propSchema = getSchemaOrRef(prop.type, context);
+      applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2445,12 +2409,13 @@ export async function getOpenAPIForService(
         }),
       };
 
-      const armIdentifiers = getArmIdentifiers(program, typespecType);
-      if (isArmProviderNamespace(program, namespace) && hasValidArmIdentifiers(armIdentifiers)) {
-        array["x-ms-identifiers"] = armIdentifiers;
-      } else if (
-        !ifArrayItemContainsIdentifier(program, typespecType as any, armIdentifiers ?? [])
+      const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
+      if (
+        isArrayTypeArmProviderNamespace(typespecType, namespace) &&
+        hasValidArmIdentifiers(armKeyIdentifiers)
       ) {
+        array["x-ms-identifiers"] = armKeyIdentifiers;
+      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
         array["x-ms-identifiers"] = [];
       }
 
@@ -2459,12 +2424,45 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
+  function applyArmIdentifiersDecorator(
+    typespecType: Type,
+    schema: OpenAPI2Schema,
+    property: ModelProperty,
+  ) {
+    const armIdentifiers = getArmIdentifiers(program, property);
+    if (
+      typespecType.kind !== "Model" ||
+      !isArrayModelType(program, typespecType) ||
+      !armIdentifiers
+    ) {
+      return;
+    }
+
+    schema["x-ms-identifiers"] = armIdentifiers;
+  }
+
   function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
     return (
       armIdentifiers !== undefined &&
       armIdentifiers.length > 0 &&
       !ifArmIdentifiersDefault(armIdentifiers)
     );
+  }
+
+  function isArrayTypeArmProviderNamespace(typespecType?: Model, namespace?: Namespace): boolean {
+    if (typespecType === undefined) {
+      return false;
+    }
+
+    if (isArmProviderNamespace(program, namespace)) {
+      return true;
+    }
+
+    if (typespecType.indexer?.value.kind === "Model") {
+      return isArmProviderNamespace(program, typespecType.indexer.value.namespace);
+    }
+
+    return false;
   }
 
   function getSchemaForScalar(scalar: Scalar): OpenAPI2Schema {
