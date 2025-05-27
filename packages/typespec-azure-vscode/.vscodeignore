@@ -4,5 +4,13 @@
 # Exclude everything by default.
 **/*
 
+# Then explicitly include what we want to ship in VSIX
+!dist/src/**/*.js
+!dist/src/**/*.cjs
+!dist/src/**/*.js.map
+!dist/**/*.css
+
 !README.md
 !LICENSE
+!icons/
+!snippets.json

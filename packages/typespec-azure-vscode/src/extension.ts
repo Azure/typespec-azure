@@ -9,7 +9,9 @@ export async function activate(context: vscode.ExtensionContext) {
   if (typespecExtension) {
     await typespecExtension.activate();
   } else {
-    vscode.window.showErrorMessage("Typespec extension is not installed. Please install it to use this extension.");
+    vscode.window.showErrorMessage(
+      "Typespec extension is not installed. Please install it to use this extension.",
+    );
   }
 }
 
