@@ -58,7 +58,7 @@ export interface GetUser200Response extends HttpResponse {
 
 export type DemoServiceContext = Client & {
   path: {
-    /** Resource for '/analyze' has methods for the following verbs: post */
+    /** Resource for '/users' has methods for the following verbs: get */
     (path: "/users"): {
       get(
         options: RequestParameters,
@@ -158,7 +158,7 @@ public virtual Response Post(User user, CancellationToken cancellationToken = de
 
 export type DemoServiceContext = Client & {
   path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
+    /** Resource for '/users' has methods for the following verbs: post */
     (path: "/users"): {
       post(
         options: {
