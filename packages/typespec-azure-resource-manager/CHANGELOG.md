@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.56.2
+
+### Bug Fixes
+
+- [#2724](https://github.com/Azure/typespec-azure/pull/2724) Fix `ErrorAdditionalInfo.info` in common types by changing its type from `{}` to `unknown`.
+- [#2727](https://github.com/Azure/typespec-azure/pull/2727) Change the body name of legacy operations
+- [#2722](https://github.com/Azure/typespec-azure/pull/2722) Support singleton key replacement in auto route for reusing case.
+
+
 ## 0.56.1
 
 ### Bug Fixes
