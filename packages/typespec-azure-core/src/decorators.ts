@@ -1519,6 +1519,7 @@ const [getParameterizedNextLinkArguments, markParameterizedNextLinkConfigTemplat
   Scalar,
   ModelProperty[]
 >(AzureCoreStateKeys.parameterizedNextLinkConfig);
+
 const parameterizedNextLinkConfigDecorator: ParameterizedNextLinkConfigDecorator = (
   context,
   target,
