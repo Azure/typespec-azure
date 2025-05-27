@@ -1216,7 +1216,7 @@ interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, Resour
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(body: Resource): Response | ErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: Resource): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1234,7 +1234,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(body: Resou
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(body: Resource): Response | ErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Resource): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1251,7 +1251,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(body: Resour
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(body: PatchModel): Response | ErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: PatchModel): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1270,7 +1270,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(body: PatchMod
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(body: PatchModel): Response | ErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(properties: PatchModel): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1283,12 +1283,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(body: PatchMode
 | Response            | Optional. The success response(s) for the PATCH operation |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 
-#### `LegacyOperations.DeleteAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteAsync}
+#### `LegacyOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync}
 
 Delete a resource asynchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.DeleteAsync(): Response | ErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync(): Response | ErrorType
 ```
 
 ##### Template Parameters
