@@ -24,13 +24,6 @@
   "main": "./dist/src/extension.cjs",
   "preview": true,
   "contributes": {
-    "commands": [
-      {
-        "command": "typespec.azure.emitCode",
-        "title": "Emit from TypeSpec Azure",
-        "category": "TypeSpec-azure"
-      }
-    ],
     "languages": [
       {
         "id": "typespec",
@@ -50,23 +43,7 @@
       {
         "id": "markdown-typespec"
       }
-    ],
-    "menus": {
-      "explorer/context": [
-        {
-          "command": "typespec.azure.emitCode",
-          "when": "explorerResourceIsFolder || resourceLangId == typespec || resourceFilename == 'tspconfig.yaml'",
-          "group": "typespec@1"
-        }
-      ],
-      "editor/context": [
-        {
-          "command": "typespec.azure.emitCode",
-          "when": "resourceLangId == typespec || resourceFilename == 'tspconfig.yaml'",
-          "group": "typespec@1"
-        }
-      ]
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
