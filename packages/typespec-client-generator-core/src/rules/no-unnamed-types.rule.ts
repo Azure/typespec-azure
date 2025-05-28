@@ -21,11 +21,7 @@ export const noUnnamedTypesRule = createRule({
     return {
       model: (model: Model) => {
         const createdModel = tcgcContext.__referencedTypeCache.get(model);
-        if (
-          createdModel &&
-          createdModel.usage !== UsageFlags.None &&
-          createdModel.isGeneratedName
-        ) {
+        if (createdModel && createdModel.isGeneratedName) {
           context.reportDiagnostic({
             target: model,
             format: {

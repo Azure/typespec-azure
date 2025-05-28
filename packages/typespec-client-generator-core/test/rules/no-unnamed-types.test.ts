@@ -145,7 +145,42 @@ describe("models", () => {
           };
           `,
       )
-      .toBeValid();
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous model with generated name "AProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
+  });
+  it("discriminated model with nested anonymous model", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          @usage(Usage.input)
+          model JobModelProperties {
+            customProperties: JobModelCustomProperties;
+          }
+          @discriminator("instanceType")
+          model JobModelCustomProperties {
+            @visibility(Lifecycle.Read)
+            affectedObjectDetails?: {
+              description?: string;
+              type?: "object";
+            };
+          }
+        }
+          `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous model with generated name "JobModelCustomPropertiesAffectedObjectDetails" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
   });
 });
 
