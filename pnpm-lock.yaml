@@ -3057,9 +3057,6 @@ importers:
 
   packages/typespec-azure-vscode:
     devDependencies:
-      '@types/mocha':
-        specifier: ^10.0.9
-        version: 10.0.10
       '@types/node':
         specifier: ~22.13.11
         version: 22.13.17
@@ -3072,9 +3069,6 @@ importers:
       esbuild:
         specifier: ^0.25.1
         version: 0.25.4
-      mocha:
-        specifier: ^11.1.0
-        version: 11.2.2
       typescript:
         specifier: ~5.8.2
         version: 5.8.3

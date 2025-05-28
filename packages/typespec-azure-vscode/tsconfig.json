@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "rootDir": "."
   },
-  "exclude": ["dist", "templates", "vitest.config.ts"]
+  "exclude": ["dist"]
 }

@@ -22,6 +22,7 @@
     "workspaceContains:**/tspconfig.yaml"
   ],
   "main": "./dist/src/extension.cjs",
+  "preview": true,
   "contributes": {
     "commands": [
       {
@@ -69,7 +70,8 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsx ./scripts/build.ts",
+    "compile": "npm run check-types && tsx ./scripts/build.ts",
+    "check-types": "tsc --noEmit",
     "build": "npm run compile && npm run package-vsix",
     "package-vsix": "vsce package",
     "watch": "tsx ./scripts/build.ts --watch",
@@ -80,11 +82,9 @@
   },
   "devDependencies": {
     "@types/vscode": "~1.100.0",
-    "@types/mocha": "^10.0.9",
     "@types/node": "~22.13.11",
     "@vscode/vsce": "~3.3.0",
     "esbuild": "^0.25.1",
-    "mocha": "^11.1.0",
     "typescript": "~5.8.2"
   }
 }
