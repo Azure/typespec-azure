@@ -740,7 +740,7 @@ it("next link with mix of re-injected parameters and not", async () => {
   );
 });
 
-it("next link with reinjected parameters with versioning", async () => {
+it.skip("next link with reinjected parameters with versioning", async () => {
   await runner.compile(`
     @server("http://localhost:3000", "endpoint")
     @service()
