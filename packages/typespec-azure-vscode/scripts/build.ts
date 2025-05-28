@@ -6,7 +6,7 @@ const nodeContext = await context({
   bundle: true,
   outfile: "dist/src/extension.cjs",
   platform: "node",
-  mainFields: ["module", "main"], // app insights web https://www.npmjs.com/package/@microsoft/applicationinsights-web-basic uses module instead of exports...
+  mainFields: ["module", "main"],
   target: "node22",
   format: "cjs",
   sourcemap: true,
