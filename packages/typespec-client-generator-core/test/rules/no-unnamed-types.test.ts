@@ -145,21 +145,15 @@ describe("models", () => {
           };
           `,
       )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
-          severity: "warning",
-          message: `Anonymous model with generated name "AProp" detected. Define this model separately with a proper name to improve code readability and reusability.`,
-        },
-      ]);
+      .toBeValid();
   });
-  it("discriminated model with nested anonymous model", async () => {
+  it("discriminated model with nested anonymous model with readonly property", async () => {
     await tester
       .expect(
         `
         @service
         namespace TestService {
-          @usage(Usage.input)
+          @usage(Usage.output)
           model JobModelProperties {
             customProperties: JobModelCustomProperties;
           }
