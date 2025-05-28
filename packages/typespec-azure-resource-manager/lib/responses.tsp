@@ -208,7 +208,7 @@ model ArmNoContentResponse<Message extends valueof string = "Operation completed
  * @template Resource The resource being updated
  */
 @doc("Resource '{name}' update operation succeeded", Resource)
-model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundations.Resource>
+model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundations.SimpleResource>
   is ArmResponse<Resource>;
 
 /**
@@ -218,7 +218,7 @@ model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundati
  */
 @doc("Resource '{name}' create operation succeeded", Resource)
 model ArmResourceCreatedResponse<
-  Resource extends Azure.ResourceManager.Foundations.Resource,
+  Resource extends Azure.ResourceManager.Foundations.SimpleResource,
   LroHeaders extends TypeSpec.Reflection.Model = Azure.Core.Foundations.RetryAfterHeader
 > {
   ...CreatedResponse;
@@ -235,7 +235,7 @@ model ArmResourceCreatedResponse<
  * @template Resource The resource being updated
  */
 @doc("Resource '{name}' create operation succeeded", Resource)
-model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foundations.Resource> {
+model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foundations.SimpleResource> {
   ...CreatedResponse;
 
   @doc("The body type of the operation request or response.")

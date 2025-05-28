@@ -2565,6 +2565,24 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, 
 
 None
 
+### `SimpleResource` {#Azure.ResourceManager.Foundations.SimpleResource}
+
+A base definition of a resource using simple types. This
+model should only be used as a constraint for other models.
+
+```typespec
+model Azure.ResourceManager.Foundations.SimpleResource
+```
+
+#### Properties
+
+| Name        | Type      | Description                      |
+| ----------- | --------- | -------------------------------- |
+| id?         | `string`  | The resource identifier          |
+| name?       | `string`  | The resource name                |
+| type?       | `string`  | The resource type                |
+| systemData? | `unknown` | readonly data about the resource |
+
 ### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
 
 The static parameters for a subscription based resource
