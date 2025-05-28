@@ -62,6 +62,7 @@ import {
   hasExplicitClientOrOperationGroup,
   listAllNamespaces,
   listAllUserDefinedNamespaces,
+  moveToKey,
   negationScopesKey,
   operationGroupKey,
   scopeKey,
@@ -1450,8 +1451,6 @@ export function getClientDocExplicit(
   return getScopedDecoratorData(context, clientDocKey, target);
 }
 
-const moveToKey = createStateSymbol("moveTo");
-
 export const $moveTo = (
   context: DecoratorContext,
   source: Operation,
@@ -1472,6 +1471,10 @@ export function getMoveTo(
   context: TCGCContext,
   operation: Operation,
 ): Namespace | Interface | string | undefined {
+  // if there is `@client` or `@operationGroup` decorator, `@moveTo` will be ignored
+  if (hasExplicitClientOrOperationGroup(context)) {
+    return undefined;
+  }
   return getScopedDecoratorData(context, moveToKey, operation) as
     | Namespace
     | Interface

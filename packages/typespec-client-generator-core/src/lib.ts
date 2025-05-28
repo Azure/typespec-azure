@@ -389,6 +389,13 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
       },
     },
+    "no-move-to-with-client-or-operation-group": {
+      severity: "warning",
+      messages: {
+        default:
+          "When there is `@client` or `@operationGroup` decorator, `@moveTo` decorator will be ignored.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

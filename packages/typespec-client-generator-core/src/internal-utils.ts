@@ -87,6 +87,7 @@ export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
 export const clientKey = createStateSymbol("client");
 export const operationGroupKey = createStateSymbol("operationGroup");
+export const moveToKey = createStateSymbol("moveTo");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
