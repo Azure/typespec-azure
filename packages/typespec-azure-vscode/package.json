@@ -18,7 +18,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onLanguage:typespec",
+    "workspaceContains:**/tspconfig.yaml"
   ],
   "main": "./dist/src/extension.cjs",
   "contributes": {
