@@ -1449,3 +1449,32 @@ export function getClientDocExplicit(
 ): ClientDocData | undefined {
   return getScopedDecoratorData(context, clientDocKey, target);
 }
+
+const moveToKey = createStateSymbol("moveTo");
+
+export const $moveTo = (
+  context: DecoratorContext,
+  source: Operation,
+  target: Interface | Namespace | string,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $moveTo, moveToKey, source, target, scope);
+};
+
+/**
+ * Gets the `Namespace`, `Interface` or name of client where an operation moves to.
+ *
+ * @param context TCGCContext
+ * @param operation Operation to be moved
+ * @returns `Namespace`, `Interface`, `string` or undefined if no move to target is specified.
+ */
+export function getMoveTo(
+  context: TCGCContext,
+  operation: Operation,
+): Namespace | Interface | string | undefined {
+  return getScopedDecoratorData(context, moveToKey, operation) as
+    | Namespace
+    | Interface
+    | string
+    | undefined;
+}
