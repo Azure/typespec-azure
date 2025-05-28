@@ -6,7 +6,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chunyu3/typespec-azure-vscode.git"
+    "url": "git+https://github.com/Azure/typespec-azure.git"
   },
   "engines": {
     "vscode": "^1.100.0"
