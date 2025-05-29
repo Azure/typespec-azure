@@ -73,8 +73,14 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   `);
     expectDiagnostics(diagnostics, [
       {
-        code: "invalid-argument",
-        message: `Argument of type 'Microsoft.Contoso.Widget' is not assignable to parameter of type 'Azure.ResourceManager.CommonTypes.Resource'`,
+        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+        message:
+          'The template parameter "Widget" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+        message:
+          'The template parameter "Widget" for "create" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
       },
       {
         code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
@@ -101,10 +107,51 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     @Azure.ResourceManager.Legacy.customAzureResource
     model CustomAzureResource {
       name: string;
+      type: string;
     }
 
     interface Widgets {
       delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+    }
+  `);
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource when using Legacy Operations", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Custom Mix in resource")
+    model CustomResource is CustomAzureResource;
+
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model CustomAzureResource {
+      name: string;
+      type: string;
+    }
+
+    interface WidgetOps
+  extends Azure.ResourceManager.Legacy.LegacyOperations<
+      {
+        ...ResourceParentParameters<
+          CustomResource,
+          Azure.ResourceManager.Foundations.DefaultBaseParameters<CustomResource>
+        >,
+      },
+      {
+        @visibility(Lifecycle.Read)
+        @path
+        @key("widgetName")
+        @segment("widgets")
+        name: string,
+      },
+      ErrorResponse
+    > {}
+
+    interface Widgets {
+      create is WidgetOps.CreateOrUpdateAsync<CustomResource>;
     }
   `);
     expectDiagnosticEmpty(diagnostics);
