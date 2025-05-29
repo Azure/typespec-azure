@@ -48,9 +48,9 @@
     ]
   },
   "scripts": {
-    "compile": "npm run check-types && tsx ./scripts/build.ts",
+    "compile": "pnpm check-types && tsx ./scripts/build.ts",
     "check-types": "tsc --noEmit",
-    "build": "npm run compile && npm run package-vsix",
+    "build": "pnpm compile && pnpm package-vsix",
     "package-vsix": "vsce package",
     "watch": "tsx ./scripts/build.ts --watch",
     "lint": "eslint .  --max-warnings=0",
