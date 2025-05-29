@@ -1,5 +1,6 @@
 import {
   OpenAPI2Document,
+  OpenAPI2SchemaProperty,
   getAllServicesAtAllVersions,
   resolveAutorestOptions,
   sortOpenAPIDocument,
@@ -96,6 +97,7 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
   replaceDefintionName(document, "SystemData", "systemData");
   replaceDefintionName(document, "LocationData", "locationData");
   replaceDefintionName(document, "EncryptionProperties", "encryptionProperties");
+  setProperty(document.definitions?.["ErrorAdditionalInfo"]?.properties?.info, "type", "object");
 
   return document;
 }
@@ -143,4 +145,14 @@ function replaceDefintionName(document: OpenAPI2Document, oldName: string, newNa
 function getCommonTypeVersion(version: string): string {
   const sanitizedVersion = version.startsWith("v") ? version.slice(1) : version;
   return sanitizedVersion.includes(".") ? sanitizedVersion : `${sanitizedVersion}.0`;
+}
+
+function setProperty(
+  schemaProperty: OpenAPI2SchemaProperty | undefined,
+  propertyName: string,
+  value: any,
+) {
+  if (schemaProperty) {
+    (schemaProperty as any)[propertyName] = value;
+  }
 }
