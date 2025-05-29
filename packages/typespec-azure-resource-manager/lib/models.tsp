@@ -408,4 +408,22 @@ model AvailabilityZonesProperty {
   zones?: string[];
 }
 
+/**
+ * Standard resource billing data model to represent the resource's current billing state.
+ * Spread this model directly into your resource property model when modeling e.g. prepaid resources.
+ *
+ * @example
+ *
+ * ```typespec
+ * model FooProperties {
+ *   ...BillingDataProperty,
+ * }
+ * ```
+ */
+@doc("Contains a billing data property to be spread into resource property types")
+model BillingDataProperty {
+  @doc("The billing data of the resource.")
+  billingData: CommonTypes.BillingData;
+}
+
 //#endregion
