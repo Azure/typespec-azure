@@ -1113,6 +1113,8 @@ describe("client hierarchy", () => {
           }
         }`,
       `
+        namespace Customizations;
+        
         @client({name: "Test1Client", service: A})
         interface Test1Client {
           x is A.B.x;

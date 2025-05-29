@@ -212,6 +212,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     let continuationTokenParameterSegments = undefined;
     let continuationTokenResponseSegments = undefined;
+    ß;
     if (pagingOperation.input.continuationToken) {
       continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
         baseServiceMethod.parameters,
@@ -480,14 +481,14 @@ function getNextLinkReInjectedParametersSegments(
   parameters: SdkMethodParameter[],
   nextLinkPropertyType: any,
 ) {
-  return (getParameterizedNextLinkArguments(program, nextLinkPropertyType) || []).map(
+  return (getParameterizedNextLinkArguments(program, nextLinkPropertyType) ?? []).map(
     (t: ModelProperty) =>
       getPropertySegmentsFromModelOrParameters(
         parameters,
         (p) =>
           p.__raw?.kind === "ModelProperty" &&
           findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-      ),
+      )!,
   );
 }
 
