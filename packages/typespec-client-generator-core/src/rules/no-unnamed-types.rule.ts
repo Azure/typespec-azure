@@ -27,6 +27,7 @@ export const noUnnamedTypesRule = createRule({
         if (
           createdModel &&
           createdModel.usage !== UsageFlags.None &&
+          (createdModel.usage & UsageFlags.LroInitial) === 0 &&
           createdModel.isGeneratedName
         ) {
           context.reportDiagnostic({
