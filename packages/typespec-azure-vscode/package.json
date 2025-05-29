@@ -23,6 +23,8 @@
   ],
   "main": "./dist/src/extension.cjs",
   "preview": true,
+  "private": true,
+  "type": "module",
   "contributes": {
     "languages": [
       {
@@ -46,14 +48,11 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
     "compile": "npm run check-types && tsx ./scripts/build.ts",
     "check-types": "tsc --noEmit",
     "build": "npm run compile && npm run package-vsix",
     "package-vsix": "vsce package",
     "watch": "tsx ./scripts/build.ts --watch",
-    "pretest": "npm run compile && npm run lint",
-    "test": "vscode-test",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix "
   },
