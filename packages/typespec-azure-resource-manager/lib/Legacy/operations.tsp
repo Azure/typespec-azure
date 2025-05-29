@@ -35,7 +35,7 @@ interface LegacyOperations<
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
   @put
   CreateOrUpdateAsync<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
@@ -64,7 +64,7 @@ interface LegacyOperations<
   @armResourceCreateOrUpdate(Resource)
   @put
   CreateOrUpdateSync<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false
@@ -89,7 +89,7 @@ interface LegacyOperations<
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
       Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -123,7 +123,7 @@ interface LegacyOperations<
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
@@ -149,7 +149,7 @@ interface LegacyOperations<
   @deletesResource(Resource)
   @armResourceDelete(Resource)
   DeleteWithoutOkAsync<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
@@ -169,7 +169,7 @@ interface LegacyOperations<
   @deletesResource(Resource)
   @armResourceDelete(Resource)
   DeleteSync<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
@@ -186,7 +186,7 @@ interface LegacyOperations<
   @readsResource(Resource)
   @armResourceRead(Resource)
   Read<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
@@ -204,7 +204,7 @@ interface LegacyOperations<
   @segmentOf(Resource)
   @armResourceList(Resource)
   List<
-    Resource extends Azure.ResourceManager.CommonTypes.Resource,
+    Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>
   >(...ParentParameters, ...Parameters): Response | ErrorType;
@@ -224,7 +224,7 @@ interface LegacyOperations<
   @post
   @returnsDoc("Azure operation completed successfully.")
   ActionSync<
-    Resource extends Foundations.Resource,
+    Resource extends Foundations.SimpleResource,
     Request extends TypeSpec.Reflection.Model | void,
     Response extends TypeSpec.Reflection.Model | void,
     Parameters extends {} = {},
@@ -256,7 +256,7 @@ interface LegacyOperations<
   @post
   @returnsDoc("Azure operation completed successfully.")
   ActionAsync<
-    Resource extends Foundations.Resource,
+    Resource extends Foundations.SimpleResource,
     Request extends TypeSpec.Reflection.Model | void,
     Result extends TypeSpec.Reflection.Model | void,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -306,7 +306,7 @@ model Provider<Resource extends {} = TenantActionScope> {
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @patch(#{ implicitOptionality: true })
 op CustomPatchAsync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -346,7 +346,7 @@ op CustomPatchAsync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @patch(#{ implicitOptionality: true })
 op CustomPatchSync<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
