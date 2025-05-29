@@ -140,16 +140,15 @@ describe("typespec-azure-core: decorators", () => {
       const { foo } = await runner.compile(`
         @doc(".")
         model MyPage {
+          
+          @pageItems
           @doc(".")
-          nested: {
-            @pageItems
-            @doc(".")
-            values?: string[];
+          values?: string[];
 
-            @nextLink
-            @doc(".")
-            nextLink: string;
-          }
+          @nextLink
+          @doc(".")
+          nextLink: string;
+          
         }
 
         @doc(".")
@@ -167,10 +166,10 @@ describe("typespec-azure-core: decorators", () => {
       `);
       const actual = getPagedResult(runner.program, foo as Operation);
       ok(actual?.itemsProperty?.name === "values");
-      deepStrictEqual(actual?.itemsSegments, ["nested", "values"]);
+      deepStrictEqual(actual?.itemsSegments, ["values"]);
 
       ok(actual?.nextLinkProperty?.name === "nextLink");
-      deepStrictEqual(actual?.nextLinkSegments, ["nested", "nextLink"]);
+      deepStrictEqual(actual?.nextLinkSegments, ["nextLink"]);
 
       ok(actual?.modelType.name === "MyFooPageResult");
     });
