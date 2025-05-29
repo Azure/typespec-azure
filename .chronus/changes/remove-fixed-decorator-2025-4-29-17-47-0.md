@@ -1,8 +1,8 @@
 ---
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
-changeKind: fix
+changeKind: breaking
 packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Remove fixed decorator
+Remove deprecated `@fixed` decorator.
