@@ -18,7 +18,7 @@ it("is api version query", async () => {
 
   const queryParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
     .parameters[0];
-  ok(isApiVersion(runner.context, queryParam));
+  ok(isApiVersion(runner.context, queryParam.param));
 });
 
 it("is api version path", async () => {
@@ -28,7 +28,7 @@ it("is api version path", async () => {
 
   const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
     .parameters[0];
-  ok(isApiVersion(runner.context, pathParam));
+  ok(isApiVersion(runner.context, pathParam.param));
 });
 
 it("not api version param", async () => {
@@ -38,7 +38,7 @@ it("not api version param", async () => {
 
   const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
     .parameters[0];
-  ok(!isApiVersion(runner.context, pathParam));
+  ok(!isApiVersion(runner.context, pathParam.param));
 });
 
 it("api version in host param", async () => {
@@ -65,6 +65,32 @@ it("api version in host param", async () => {
   const serviceNamespace = getServiceNamespace(runner);
   const server = getServers(runner.context.program, serviceNamespace)?.[0];
   const hostParam = server?.parameters.get("ApiVersion");
+
+  ok(hostParam && isApiVersion(runner.context, hostParam));
+});
+
+it("api version in host param with versioning", async () => {
+  await runner.compile(`
+    @service
+    @versioned(Versions)
+    @server(
+      "{endpoint}/test/api-version:{version}",
+      "Testserver endpoint",
+      {
+        endpoint: url,
+        version: Versions,
+      }
+    )
+    namespace Test;
+
+    enum Versions {
+      v1: "v1",
+      v2: "v2",
+    }
+  `);
+  const serviceNamespace = getServiceNamespace(runner);
+  const server = getServers(runner.context.program, serviceNamespace)?.[0];
+  const hostParam = server?.parameters.get("version");
 
   ok(hostParam && isApiVersion(runner.context, hostParam));
 });

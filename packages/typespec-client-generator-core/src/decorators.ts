@@ -60,7 +60,6 @@ import {
   clientNamespaceKey,
   findRootSourceProperty,
   hasExplicitClientOrOperationGroup,
-  listAllNamespaces,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   operationGroupKey,
@@ -284,7 +283,7 @@ export function getClient(
  */
 export function listClients(context: TCGCContext): SdkClient[] {
   if (context.__rawClients) return context.__rawClients;
-  const namespaces: Namespace[] = listAllNamespaces(context, context.getMutatedGlobalNamespace());
+  const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
 
   const explicitClients = [];
   for (const ns of namespaces) {

@@ -101,6 +101,7 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
     }
   }
   return (
+    (isModelProperty(type) && type.type === context.getPackageVersionEnum()) ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );

@@ -140,7 +140,7 @@ export function parseEmitterName(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: { name: string },
+  type: ModelProperty,
   namespace?: Namespace | Interface,
 ): {
   isApiVersionParam: boolean;
@@ -593,7 +593,7 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   return visibility.size === 0;
 }
 
-export function listAllNamespaces(
+function listAllNamespaces(
   context: TCGCContext,
   namespace: Namespace,
   retval?: Namespace[],

@@ -619,7 +619,7 @@ export function getCorrespondingMethodParams(
 
   // 2. To see if the service parameter is api version parameter that has been elevated to client.
   if (serviceParam.isApiVersionParam && serviceParam.onClient) {
-    const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
+    const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x.__raw!));
     if (!existingApiVersion) {
       diagnostics.add(
         createDiagnostic({
