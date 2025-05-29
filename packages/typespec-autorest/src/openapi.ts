@@ -1443,11 +1443,20 @@ export async function getOpenAPIForService(
     const property = httpProp.property;
     const base = getOpenAPI2ParameterBase(property, httpProp.options.name);
 
+    if (base.required === false) {
+      reportDiagnostic(program, {
+        code: "unsupported-optional-path-param",
+        format: { name: property.name },
+        target: property,
+      });
+    }
+
     const result: OpenAPI2PathParameter = {
       in: "path",
       default: property.defaultValue && getDefaultValue(property.defaultValue, property),
       ...base,
       ...getSimpleParameterSchema(property, schemaContext, base.name),
+      required: true,
     };
 
     if (httpProp.options.allowReserved) {
