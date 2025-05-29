@@ -478,7 +478,6 @@ model LocationData {
  * ```typespec
  * model Employee is TrackedResource<EmployeeProperties> {
  *  ...ResourceNameParameter<Employee>;
- *  ...ApiVersionParameter;
  * }
  * ```
  */
@@ -504,10 +503,12 @@ model OperationIdParameter {
  *
  * @example
  * ```typespec
- * model Employee is TrackedResource<EmployeeProperties> {
- *  ...ResourceNameParameter<Employee>;
- *  ...LocationParameter;
- * }
+ * op employee is ArmProviderActionSync<
+ *  Request = Employee,
+ *  Response = Employee,
+ *  Scope = SubscriptionActionScope,
+ *  Parameters = LocationParameter
+ * >;
  * ```
  */
 model LocationParameter {

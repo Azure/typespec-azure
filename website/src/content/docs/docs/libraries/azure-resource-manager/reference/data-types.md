@@ -20,7 +20,8 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 #### Examples
 
 ```typespec
-op get(
+@post
+op post(
   ...ResourceInstanceParameters<Employee>,
 ): ArmAcceptedLroResponse<LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
   Azure.Core.Foundations.RetryAfterHeader> | ErrorResponse;
@@ -48,9 +49,11 @@ model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
 #### Examples
 
 ```typespec
-op action(
-  ...ResourceInstanceParameters<Employee>,
-): ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>;
+op post is ArmProviderActionSync<
+  Request = Employee,
+  Response = ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>,
+  Scope = SubscriptionActionScope
+>;
 ```
 
 #### Properties
@@ -78,8 +81,10 @@ model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue, Fin
 #### Examples
 
 ```typespec
-op createOrUpdate is ArmResourceActionAsync<
+op changeWidget is ArmResourceActionAsync<
   WidgetResource,
+  WidgetResourceRequest,
+  WidgetResourceResponse,
   LroHeaders = ArmAsyncOperationHeader<FinalResult = WidgetResource>
 >;
 ```
@@ -141,9 +146,12 @@ model Azure.ResourceManager.ArmCreatedResponse<ResponseBody, ExtraHeaders>
 #### Examples
 
 ```typespec
-op get(...ResourceInstanceParameters<Employee>): ArmCreatedResponse<
+@post
+op post(...ResourceInstanceParameters<Employee>): ArmCreatedResponse<
   Employee,
-  ExtraHeaders = ArmLroLocationHeader
+  ExtraHeaders = {
+    @header("x-ms-client-request-id") clientRequestId: string;
+  }
 >;
 ```
 
@@ -322,7 +330,8 @@ model Azure.ResourceManager.ArmNoContentResponse<Message>
 #### Examples
 
 ```typespec
-op get(...ResourceInstanceParameters<Employee>): ArmNoContentResponse;
+@delete
+op delete(@path id: string): ArmNoContentResponse;
 ```
 
 #### Properties
@@ -379,7 +388,8 @@ op createOrUpdate is ArmResourceCreateOrReplaceAsync<
   Employee,
   Response = ArmResponse<Employee> | ArmResourceCreatedResponse<
     Employee,
-    LroHeaders = ArmLroLocationHeader & Azure.Core.Foundations.RetryAfterHeader
+    LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
+      Azure.Core.Foundations.RetryAfterHeader
   >
 >;
 ```
@@ -428,7 +438,8 @@ model Azure.ResourceManager.ArmResourceExistsResponse
 #### Examples
 
 ```typespec
-op get(...ResourceInstanceParameters<Employee>): ArmResourceExistsResponse;
+@head
+op head(...ResourceInstanceParameters<Employee>): ArmResourceExistsResponse;
 ```
 
 #### Properties
@@ -464,9 +475,8 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 #### Examples
 
 ```typespec
-op createOrUpdate(
-  ...ResourceInstanceParameters<Employee>,
-): ArmResourceUpdatedResponse<Employee> | ArmResourceCreatedResponse<Employee>;
+@put
+op update(...ResourceInstanceParameters<Employee>): ArmResourceUpdatedResponse<Employee>;
 ```
 
 #### Properties
@@ -1101,8 +1111,7 @@ model Azure.ResourceManager.ResourceUriParameter
 #### Examples
 
 ```typespec
-model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
+model Employee {
   ...ResourceUriParameter;
 }
 ```
@@ -1251,6 +1260,9 @@ enum Versions {
   @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2021-10-01-preview`,
+
+  `2022-10-01-preview`,
+  `2023-10-01-preview`,
 }
 ```
 
@@ -1325,7 +1337,6 @@ model Azure.ResourceManager.CommonTypes.ApiVersionParameter
 ```typespec
 model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
-  ...ApiVersionParameter;
 }
 ```
 
@@ -1632,10 +1643,12 @@ model Azure.ResourceManager.CommonTypes.LocationParameter
 #### Examples
 
 ```typespec
-model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
-  ...LocationParameter;
-}
+op employee is ArmProviderActionSync<
+  Request = Employee,
+  Response = Employee,
+  Scope = SubscriptionActionScope,
+  Parameters = LocationParameter
+>;
 ```
 
 #### Properties

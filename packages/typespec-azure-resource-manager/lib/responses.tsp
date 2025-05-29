@@ -32,9 +32,10 @@ model ArmResponse<ResponseBody> {
  *
  * @example
  * ```typespec
- * op get(...ResourceInstanceParameters<Employee>): ArmCreatedResponse<
+ * @post
+ * op post(...ResourceInstanceParameters<Employee>): ArmCreatedResponse<
  *   Employee,
- *   ExtraHeaders = ArmLroLocationHeader
+ *   ExtraHeaders = {@header("x-ms-client-request-id") clientRequestId: string}
  * >;
  * ```
  */
@@ -93,9 +94,11 @@ model ArmDeleteAcceptedResponse is ArmAcceptedResponse<"Resource deletion accept
  *
  * @example
  * ```typespec
- * op action(
- *  ...ResourceInstanceParameters<Employee>,
- * ): ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>;
+ * op post is ArmProviderActionSync<
+ *  Request = Employee,
+ *  Response = ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>,
+ *  Scope = SubscriptionActionScope
+ * >;
  * ```
  */
 @doc(Message)
@@ -114,7 +117,8 @@ model ArmAcceptedResponse<
  *
  * @example
  * ```typespec
- * op get(
+ * @post
+ * op post(
  *  ...ResourceInstanceParameters<Employee>,
  * ): ArmAcceptedLroResponse<
  *    LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
@@ -184,8 +188,10 @@ model ArmOperationStatus<
  *
  * @example
  * ```typespec
- * op createOrUpdate is ArmResourceActionAsync<
+ * op changeWidget is ArmResourceActionAsync<
  *  WidgetResource,
+ *  WidgetResourceRequest,
+ *  WidgetResourceResponse,
  *  LroHeaders = ArmAsyncOperationHeader<FinalResult = WidgetResource>
  * >;
  * ```
@@ -284,7 +290,8 @@ model ArmDeletedNoContentResponse is ArmNoContentResponse<"Resource does not exi
  *
  * @example
  * ```typespec
- * op get(...ResourceInstanceParameters<Employee>): ArmNoContentResponse;
+ * @delete
+ * op delete(@path id:string): ArmNoContentResponse;
  * ```
  */
 @doc(Message)
@@ -298,9 +305,10 @@ model ArmNoContentResponse<Message extends valueof string = "Operation completed
  *
  * @example
  * ```typespec
- * op createOrUpdate(
+ * @put
+ * op update(
  *  ...ResourceInstanceParameters<Employee>,
- * ): ArmResourceUpdatedResponse<Employee> | ArmResourceCreatedResponse<Employee>;
+ * ): ArmResourceUpdatedResponse<Employee>;
  * ```
  */
 @doc("Resource '{name}' update operation succeeded", Resource)
@@ -318,7 +326,7 @@ model ArmResourceUpdatedResponse<Resource extends Azure.ResourceManager.Foundati
  *   Employee,
  *   Response = ArmResponse<Employee> | ArmResourceCreatedResponse<
  *     Employee,
- *     LroHeaders = ArmLroLocationHeader & Azure.Core.Foundations.RetryAfterHeader
+ *     LroHeaders = ArmLroLocationHeader<FinalResult = Employee> & Azure.Core.Foundations.RetryAfterHeader
  *   >
  * >;
  * ```
@@ -363,7 +371,8 @@ model ArmResourceCreatedSyncResponse<Resource extends Azure.ResourceManager.Foun
  *
  * @example
  * ```typespec
- * op get(...ResourceInstanceParameters<Employee>): ArmResourceExistsResponse;
+ * @head
+ * op head(...ResourceInstanceParameters<Employee>): ArmResourceExistsResponse;
  * ```
  */
 @doc("The Azure resource exists")
@@ -374,7 +383,8 @@ model ArmResourceExistsResponse {
 /**
  * @dev Resource is not found response
  * ```typespec
- * op get(...ResourceInstanceParameters<Employee>): ArmResponse<Employee>  | ArmResourceNotFoundResponse;
+ * @head
+ * op head(...ResourceInstanceParameters<Employee>): ArmResponse<Employee>  | ArmResourceNotFoundResponse;
  * ```
  */
 @doc("The Azure resource is not found")

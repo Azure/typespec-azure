@@ -114,8 +114,7 @@ model ArmLocationResource<BaseType extends
  *
  * @example
  * ```typespec
- * model Employee is TrackedResource<EmployeeProperties> {
- *  ...ResourceNameParameter<Employee>;
+ * model Employee {
  *  ...ResourceUriParameter;
  * }
  * ```
