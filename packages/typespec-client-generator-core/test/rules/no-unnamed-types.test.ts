@@ -176,6 +176,35 @@ describe("models", () => {
         },
       ]);
   });
+  it("anonymous model in versioned service", async () => {
+    await tester
+      .expect(
+        `
+        @versioned(Versions)
+        @service
+        namespace Test;
+
+        /** Contoso API versions */
+        enum Versions {
+          "2021-10-01-preview",
+        }
+
+        @usage(Usage.input)
+        model Temp {
+          foo: {
+            bar: string;
+          }
+        }
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous model with generated name "TempFoo" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
+  });
 });
 
 describe("unions", () => {
