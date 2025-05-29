@@ -16,7 +16,7 @@ import {
   getTypeName,
   sealVisibilityModifiers,
 } from "@typespec/compiler";
-import { $bodyRoot } from "@typespec/http";
+import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
@@ -69,6 +69,25 @@ const $omitIfEmpty: OmitIfEmptyDecorator = (
   }
 };
 
+function checkAllowedVirtualResource(
+  program: Program,
+  target: Model | Operation,
+  type: Model,
+): boolean {
+  if (target.kind === "Model") return false;
+  if (!isArmVirtualResource(program, type)) return false;
+  const [httpOp, _] = getHttpOperation(program, target);
+  if (httpOp === undefined) return false;
+  const method = httpOp.verb;
+  switch (method) {
+    case "post":
+    case "delete":
+      return true;
+    default:
+      return false;
+  }
+}
+
 const $enforceConstraint: EnforceConstraintDecorator = (
   context: DecoratorContext,
   entity: Operation | Model,
@@ -79,7 +98,12 @@ const $enforceConstraint: EnforceConstraintDecorator = (
     // walk the baseModel chain until find a match or fail
     let baseType: Model | undefined = sourceType;
     do {
-      if (baseType === constraintType || isCustomAzureResource(context.program, baseType)) return;
+      if (
+        baseType === constraintType ||
+        isCustomAzureResource(context.program, baseType) ||
+        checkAllowedVirtualResource(context.program, entity, baseType)
+      )
+        return;
     } while ((baseType = baseType.baseModel) !== undefined);
 
     reportDiagnostic(context.program, {
@@ -274,8 +298,11 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   resourceType: Model,
   propertiesType: Model,
 ) => {
-  const { program } = context;
+  registerArmResource(context, resourceType);
+};
 
+export function registerArmResource(context: DecoratorContext, resourceType: Model): void {
+  const { program } = context;
   if (resourceType.namespace && getTypeName(resourceType.namespace) === "Azure.ResourceManager") {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
@@ -359,7 +386,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   };
 
   program.stateMap(ArmStateKeys.armResources).set(resourceType, armResourceDetails);
-};
+}
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
   return [...program.stateMap(ArmStateKeys.armResources).values()];
