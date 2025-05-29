@@ -1,6 +1,6 @@
 import { createRule, Interface, Namespace, paramMessage } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
-import { listClients } from "../decorators.js";
+import { getClient } from "../decorators.js";
 
 export const requireClientSuffixRule = createRule({
   name: "require-client-suffix",
@@ -18,10 +18,9 @@ export const requireClientSuffixRule = createRule({
         mutateNamespace: false,
       },
     );
-    const clients = listClients(tcgcContext);
     return {
       namespace: (namespace: Namespace) => {
-        const sdkClient = clients.find((x) => x.service === namespace);
+        const sdkClient = getClient(tcgcContext, namespace);
         if (sdkClient && !sdkClient.name.endsWith("Client")) {
           context.reportDiagnostic({
             target: namespace,
@@ -32,7 +31,7 @@ export const requireClientSuffixRule = createRule({
         }
       },
       interface: (interfaceType: Interface) => {
-        const sdkClient = clients.find((x) => x.type === interfaceType);
+        const sdkClient = getClient(tcgcContext, interfaceType);
         if (sdkClient && !sdkClient.name.endsWith("Client")) {
           context.reportDiagnostic({
             target: interfaceType,

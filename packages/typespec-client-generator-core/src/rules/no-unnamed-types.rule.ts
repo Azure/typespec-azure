@@ -1,6 +1,7 @@
 import { createRule, Model, paramMessage, Union } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import { UsageFlags } from "../interfaces.js";
+import { createSdkPackage } from "../package.js";
 
 export const noUnnamedTypesRule = createRule({
   name: "no-unnamed-types",
@@ -18,10 +19,16 @@ export const noUnnamedTypesRule = createRule({
         mutateNamespace: false,
       },
     );
+    // we create the package to see if the model is used in the final output
+    createSdkPackage(tcgcContext);
     return {
       model: (model: Model) => {
         const createdModel = tcgcContext.__referencedTypeCache.get(model);
-        if (createdModel && createdModel.isGeneratedName) {
+        if (
+          createdModel &&
+          createdModel.usage !== UsageFlags.None &&
+          createdModel.isGeneratedName
+        ) {
           context.reportDiagnostic({
             target: model,
             format: {
