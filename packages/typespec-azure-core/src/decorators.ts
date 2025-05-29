@@ -53,7 +53,6 @@ import {
 import {
   FinalLocationDecorator,
   FinalOperationDecorator,
-  FixedDecorator,
   ItemsDecorator,
   LroCanceledDecorator,
   LroErrorResultDecorator,
@@ -83,16 +82,6 @@ import {
 
 export const PollingOperationKey: string = "polling";
 export const FinalOperationKey = "final";
-
-// @fixed
-
-export const $fixed: FixedDecorator = (context: DecoratorContext, target: Enum) => {
-  context.program.stateMap(AzureCoreStateKeys.fixed).set(target, true);
-};
-
-export function isFixed(program: Program, target: Enum): boolean {
-  return program.stateMap(AzureCoreStateKeys.fixed).get(target) !== undefined;
-}
 
 // pagedResult
 

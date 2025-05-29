@@ -2,12 +2,6 @@ using Reflection;
 
 namespace Azure.Core {
   /**
-   * Marks an Enum as being fixed since enums in Azure are
-   * assumed to be extensible.
-   */
-  extern dec fixed(target: Enum);
-
-  /**
    * Marks a Model as a paged collection.
    */
   extern dec pagedResult(entity: Model);
