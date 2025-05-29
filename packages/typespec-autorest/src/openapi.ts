@@ -126,6 +126,7 @@ import {
   getServers,
   getStatusCodeDescription,
   getVisibilitySuffix,
+  isHttpFile,
   isSharedRoute,
   reportIfNoRoutes,
   resolveRequestVisibility,
@@ -1282,7 +1283,7 @@ export async function getOpenAPIForService(
     paramName: string,
     target: DiagnosticTarget,
   ): PrimitiveItems | undefined {
-    if (isBytes(type)) {
+    if (isBytes(type) || isHttpFile(program, type)) {
       return { type: "file" };
     }
 
