@@ -8,7 +8,7 @@ TypeSpec Data Plane Generation library
 npm install @azure-tools/typespec-client-generator-core
 ```
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
