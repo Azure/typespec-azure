@@ -72,12 +72,16 @@ words:
   - pytest
   - qnas
   - regionality
+  - reinjected
   - Reranker
   - rpaasoneboxacr
   - rpass
   - SERVICERP
   - seti
   - tcgc
+  - tsmv
   - userrp
   - vnet
   - WINDOWSVMIMAGE
+  - azcore
+  - byval

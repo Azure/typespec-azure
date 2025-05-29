@@ -1,5 +1,6 @@
 import {
   OpenAPI2Document,
+  OpenAPI2SchemaProperty,
   getAllServicesAtAllVersions,
   resolveAutorestOptions,
   sortOpenAPIDocument,
@@ -84,6 +85,7 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
   }
   document.paths = {};
 
+  document.info.version = getCommonTypeVersion(document.info.version);
   replaceUuidRefs(document, "Azure.Core.uuid");
   replaceUuidRefs(document, "Azure.Core.azureLocation");
   replaceUuidRefs(document, "Azure.Core.armResourceType");
@@ -92,6 +94,10 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
     "PrivateEndpointConnectionParameter",
     "PrivateEndpointConnectionName",
   );
+  replaceDefintionName(document, "SystemData", "systemData");
+  replaceDefintionName(document, "LocationData", "locationData");
+  replaceDefintionName(document, "EncryptionProperties", "encryptionProperties");
+  setProperty(document.definitions?.["ErrorAdditionalInfo"]?.properties?.info, "type", "object");
 
   return document;
 }
@@ -118,5 +124,35 @@ function replaceParameterName(document: OpenAPI2Document, oldName: string, newNa
     value.name = newName.charAt(0).toLowerCase() + newName.slice(1);
     document.parameters[newName.charAt(0).toUpperCase() + newName.slice(1)] = value;
     delete document.parameters[oldName];
+  }
+}
+
+function replaceDefintionName(document: OpenAPI2Document, oldName: string, newName: string) {
+  if (document.definitions && oldName in document.definitions) {
+    document.definitions[newName] = document.definitions[oldName];
+    delete document.definitions[oldName];
+
+    for (const definition of Object.values(document.definitions)) {
+      for (const property of Object.values(definition.properties || {})) {
+        if ("$ref" in property && property.$ref === `#/definitions/${oldName}`) {
+          property.$ref = `#/definitions/${newName}`;
+        }
+      }
+    }
+  }
+}
+
+function getCommonTypeVersion(version: string): string {
+  const sanitizedVersion = version.startsWith("v") ? version.slice(1) : version;
+  return sanitizedVersion.includes(".") ? sanitizedVersion : `${sanitizedVersion}.0`;
+}
+
+function setProperty(
+  schemaProperty: OpenAPI2SchemaProperty | undefined,
+  propertyName: string,
+  value: any,
+) {
+  if (schemaProperty) {
+    (schemaProperty as any)[propertyName] = value;
   }
 }

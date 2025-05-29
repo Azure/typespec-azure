@@ -1,4 +1,11 @@
-import { json, MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import {
+  dyn,
+  dynItem,
+  json,
+  MockRequest,
+  passOnSuccess,
+  ScenarioMockApi,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -17,7 +24,7 @@ Scenarios.Azure_Core_Lro_Rpc_longRunningRpc = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        "operation-location": `/azure/core/lro/rpc/generations/operations/operation1`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/rpc/generations/operations/operation1`,
       },
       body: json({ id: "operation1", status: "InProgress" }),
     },

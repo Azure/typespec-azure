@@ -8,6 +8,7 @@ import {
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getVisibilityForClass,
+  ignoreDiagnostics,
   Interface,
   isNeverType,
   isNullType,
@@ -29,6 +30,7 @@ import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
 } from "@typespec/compiler/experimental";
+import { $ } from "@typespec/compiler/typekit";
 import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
 import {
   getAddedOnVersions,
@@ -54,9 +56,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { getClientTypeWithDiagnostics } from "./types.js";
-
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { getClientTypeWithDiagnostics, getSdkModelPropertyType } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -141,7 +141,7 @@ export function parseEmitterName(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: { name: string },
+  type: ModelProperty,
   namespace?: Namespace | Interface,
 ): {
   isApiVersionParam: boolean;
@@ -451,17 +451,6 @@ export function getAnyType(
   });
 }
 
-export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
-  let apiVersion = context.apiVersion;
-  if (apiVersion === "all") {
-    return apiVersion;
-  }
-  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
-    apiVersion = versions[versions.length - 1];
-  }
-  return apiVersion;
-}
-
 export function getHttpOperationResponseHeaders(
   response: HttpOperationResponseContent,
 ): ModelProperty[] {
@@ -605,7 +594,7 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   return visibility.size === 0;
 }
 
-export function listAllNamespaces(
+function listAllNamespaces(
   context: TCGCContext,
   namespace: Namespace,
   retval?: Namespace[],
@@ -669,17 +658,14 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const service = listServices(context.program)[0];
-  if (!service) return globalNamespace;
-  const allApiVersions = getVersions(context.program, service.type)[1]
-    ?.getVersions()
-    .map((x) => x.value);
-  if (!allApiVersions || context.apiVersion === "all") return globalNamespace;
+  const allApiVersions = context.getPackageVersions();
+  if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
 
-  const apiVersion = getValidApiVersion(context, allApiVersions);
-  if (apiVersion === undefined) return globalNamespace;
-
-  const mutator = getVersioningMutator(context, service.type, apiVersion);
+  const mutator = getVersioningMutator(
+    context,
+    listServices(context.program)[0].type,
+    allApiVersions[allApiVersions.length - 1],
+  );
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   return subgraph.type;
@@ -734,4 +720,31 @@ export function getClientDoc(context: TCGCContext, target: Type): string | undef
     }
   }
   return baseDoc;
+}
+
+export function compareModelProperties(
+  context: TCGCContext | undefined,
+  modelPropA: ModelProperty | undefined,
+  modelPropB: ModelProperty | undefined,
+): boolean {
+  if (!modelPropA || !modelPropB) return false;
+  if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
+  if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
+  const sdkA = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropA));
+  const sdkB = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropB));
+  if (sdkA.kind === "method" || sdkB.kind === "method") {
+    // if we're comparing method vs service param, we just need to check the name and type
+    return true;
+  }
+  switch (sdkA.kind) {
+    case "cookie":
+    case "header":
+    case "query":
+    case "path":
+    case "responseheader":
+    case "body":
+      return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
+    default:
+      return sdkA.kind === sdkB.kind;
+  }
 }

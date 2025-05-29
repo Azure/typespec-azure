@@ -8,7 +8,7 @@ TypeSpec Data Plane Generation library
 npm install @azure-tools/typespec-client-generator-core
 ```
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
@@ -58,7 +58,7 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 **Type:** `boolean`
 
-When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
+When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
 ### `api-version`
 

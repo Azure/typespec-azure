@@ -2,6 +2,8 @@ import {
   createDiagnosticCollector,
   EmitContext,
   emitFile,
+  Enum,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -12,12 +14,15 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
+import { getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
+  SdkArrayType,
   SdkContext,
+  SdkDictionaryType,
   SdkEnumType,
   SdkHttpOperation,
   SdkModelPropertyType,
@@ -31,12 +36,22 @@ import {
   BrandedSdkEmitterOptionsInterface,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
+  removeVersionsLargerThanExplicitlySpecified,
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
 import { createSdkPackage } from "./package.js";
+import { listAllServiceNamespaces } from "./public-utils.js";
 
-export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
+interface CreateTCGCContextOptions {
+  mutateNamespace?: boolean; // whether to mutate global namespace for versioning
+}
+
+export function createTCGCContext(
+  program: Program,
+  emitterName?: string,
+  options?: CreateTCGCContextOptions,
+): TCGCContext {
   const diagnostics = createDiagnosticCollector();
   return {
     program,
@@ -53,6 +68,7 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
       Type,
       SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
     >(),
+    __arrayDictionaryCache: new Map<Type, SdkDictionaryType | SdkArrayType>(),
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
@@ -64,6 +80,10 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     __pagedResultSet: new Set(),
 
     getMutatedGlobalNamespace(): Namespace {
+      if (options?.mutateNamespace === false) {
+        // If we are not mutating the global namespace, return the original global namespace type.
+        return program.getGlobalNamespaceType();
+      }
       let globalNamespace = this.__mutatedGlobalNamespace;
       if (!globalNamespace) {
         globalNamespace = handleVersioningMutationForGlobalNamespace(this);
@@ -84,11 +104,41 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
       }
       this.__tspTypeToApiVersions.set(type, mergedApiVersions);
     },
+    getPackageVersions(): string[] {
+      if (this.__packageVersions) {
+        return this.__packageVersions;
+      }
+      const service = listServices(program)[0];
+      if (!service) {
+        this.__packageVersions = [];
+        return this.__packageVersions;
+      }
+
+      const versions = getVersions(program, service.type)[1]?.getVersions();
+      if (!versions) {
+        this.__packageVersions = [];
+        return this.__packageVersions;
+      }
+
+      removeVersionsLargerThanExplicitlySpecified(this, versions);
+
+      this.__packageVersions = versions.map((version) => version.value);
+      return this.__packageVersions;
+    },
+    getPackageVersionEnum(): Enum | undefined {
+      if (this.__packageVersionEnum) {
+        return this.__packageVersionEnum;
+      }
+      const namespaces = listAllServiceNamespaces(this);
+      if (namespaces.length === 0) {
+        return undefined;
+      }
+      return getVersions(this.program, namespaces[0])[1]?.getVersions()?.[0].enumMember.enum;
+    },
   };
 }
 
 interface VersioningStrategy {
-  readonly strategy?: "ignore";
   readonly previewStringRegex?: RegExp; // regex to match preview versions
 }
 
@@ -125,7 +175,7 @@ export async function createSdkContext<
     generateConvenienceMethods: generateConvenienceMethods,
     examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
-    apiVersion: options?.versioning?.strategy === "ignore" ? "all" : context.options["api-version"],
+    apiVersion: context.options["api-version"],
     license: context.options["license"],
     decoratorsAllowList: [...defaultDecoratorsAllowList, ...(options?.additionalDecorators ?? [])],
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,

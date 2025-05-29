@@ -1,5 +1,16 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.56.1
+
+### Bug Fixes
+
+- [#2675](https://github.com/Azure/typespec-azure/pull/2675) Discourage use of legacy types outside brownfield conversions
+
+
+## 0.56.0
+
+No changes, version bump only.
+
 ## 0.55.0
 
 No changes, version bump only.

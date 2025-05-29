@@ -33,7 +33,7 @@ namespace Azure.ResourceManager;
  * ```
  */
 model ResourceNameParameter<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   KeyName extends valueof string = "",
   SegmentName extends valueof string = "",
   NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$",
@@ -340,7 +340,7 @@ model ResourceKindProperty {
  */
 @doc("The response of a {name} list operation.", Resource)
 @friendlyName("{name}ListResult", Resource)
-model ResourceListResult<Resource extends Foundations.Resource> is Azure.Core.Page<Resource>;
+model ResourceListResult<Resource extends Foundations.SimpleResource> is Azure.Core.Page<Resource>;
 
 /**
  * Paged response containing results

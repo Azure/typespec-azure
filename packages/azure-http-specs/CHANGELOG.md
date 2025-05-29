@@ -1,5 +1,33 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.18
+
+### Features
+
+- [#2677](https://github.com/Azure/typespec-azure/pull/2677) [azure-http-specs] add test for mgmt-plane large LRO header
+
+### Bug Fixes
+
+- [#2203](https://github.com/Azure/typespec-azure/pull/2203) Fix URL for ExtensionsResources in mockapi.
+
+
+## 0.1.0-alpha.17
+
+No changes, version bump only.
+
+## 0.1.0-alpha.16
+
+### Features
+
+- [#2577](https://github.com/Azure/typespec-azure/pull/2577) Make use of new `dyn` values in definitions
+
+### Bug Fixes
+
+- [#2609](https://github.com/Azure/typespec-azure/pull/2609) Fix handler
+- [#2571](https://github.com/Azure/typespec-azure/pull/2571) Add Java SDK namespace for _Specs_.Azure.ClientGenerator.Core.DeserializeEmptyStringAsNull
+- [#2598](https://github.com/Azure/typespec-azure/pull/2598) Fix `.values` return value from parameterized next links
+
+
 ## 0.1.0-alpha.15
 
 ### Features

@@ -14,6 +14,9 @@ export const requireClientSuffixRule = createRule({
     const tcgcContext = createTCGCContext(
       context.program,
       "@azure-tools/typespec-client-generator-core",
+      {
+        mutateNamespace: false,
+      },
     );
     return {
       namespace: (namespace: Namespace) => {

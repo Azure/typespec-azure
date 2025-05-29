@@ -13,7 +13,7 @@ import {
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { $ } from "@typespec/compiler/typekit";
 import { isHeader } from "@typespec/http";
 import { createSdkClientType } from "./clients.js";
 import {
@@ -324,15 +324,16 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
       nextLinkReInjectedParametersSegments = (
-        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ||
+        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ??
         []
-      ).map((t: ModelProperty) =>
-        getPropertySegmentsFromModelOrParameters(
-          baseServiceMethod.parameters,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-        ),
+      ).map(
+        (t: ModelProperty) =>
+          getPropertySegmentsFromModelOrParameters(
+            baseServiceMethod.parameters,
+            (p) =>
+              p.__raw?.kind === "ModelProperty" &&
+              findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+          )!,
       );
     }
   }

@@ -16,8 +16,8 @@ it("optional path parameter", async () => {
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
-  strictEqual(serviceOperation.path, "/{path}");
-  strictEqual(serviceOperation.uriTemplate, "/{/path}");
+  strictEqual(serviceOperation.path, "{path}");
+  strictEqual(serviceOperation.uriTemplate, "{/path}");
 
   strictEqual(serviceOperation.parameters.length, 1);
   const pathParam = serviceOperation.parameters[0];

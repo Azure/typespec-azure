@@ -19,7 +19,7 @@ export const UnbrandedSdkEmitterOptions = {
       type: "boolean",
       nullable: true,
       description:
-        "When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.",
+        "When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.",
     },
   },
   "api-version": {
@@ -381,6 +381,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Invalid mode '${"mode"}' for @clientDoc decorator. Valid values are "append" or "replace".`,
+      },
+    },
+    "multiple-param-alias": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
       },
     },
   },

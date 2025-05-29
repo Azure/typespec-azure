@@ -1,5 +1,43 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.56.0
+
+### Breaking Changes
+
+- [#2576](https://github.com/Azure/typespec-azure/pull/2576) Modify how `x-nullable` is resolved when a `$ref` is present.
+  
+  Previously, the `$ref` was placed inside an `allOf`. With this change, the `$ref` is now moved directly next to `x-nullable`.
+  
+  ```diff lang=json
+  "Dog": {
+    "type": "object",
+    "properties": {
+    "type": {
+      - "type": "object",
+        "x-nullable": true,
+      + "$ref": "#/definitions/Pet"
+      - "allOf": [
+      -   {
+      -     "$ref": "#/definitions/Pet"
+      -   }
+      - ]
+      }
+    },
+    "required": [
+      "type"
+    ]
+  }
+  ```
+
+### Bug Fixes
+
+- [#2538](https://github.com/Azure/typespec-azure/pull/2538) Fixing gaps in the `@identifiers` decorator functionality:
+  - The `@identifier` decorator should take priority when present, and its value should be respected.
+  - The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+  - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
+- [#2606](https://github.com/Azure/typespec-azure/pull/2606) Fix unsupported param type diagnostic to target the model property with the issue
+
+
 ## 0.55.0
 
 No changes, version bump only.

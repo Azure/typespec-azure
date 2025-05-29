@@ -24,11 +24,6 @@ alias SubscriptionIdParameter = CommonTypes.SubscriptionIdParameter;
 alias ResourceGroupParameter = CommonTypes.ResourceGroupNameParameter;
 
 /**
- * The default LocationResource parameter type.
- */
-alias LocationResourceParameter = CommonTypes.LocationResourceParameter;
-
-/**
  * DEPRECATED - DO NOT USE
  * The default location parameter type.
  */
@@ -43,6 +38,16 @@ model LocationParameter {
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
   @resourceParameterBaseFor([ResourceHome.Location])
   location: string;
+}
+
+/** The default location parameter type. */
+model LocationResourceParameter {
+  /** The name of the Azure region. */
+  @path
+  @minLength(1)
+  @segment("locations")
+  @key
+  location: Azure.Core.azureLocation;
 }
 
 /**
@@ -81,6 +86,8 @@ model ResourceGroupLocationResource is ArmLocationResource<"ResourceGroup">;
 
 /**
  * Template for ARM location resources.  Use the parameter to specify
+ * the parent of the location resource.
+ * @template BaseType The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension".
  *
  * @example
  * ```typespec
@@ -150,7 +157,7 @@ model ResourceInstanceParameters<
  * @template BaseParameters The parameters representing the base Uri of the resource
  */
 model ResourceParentParameters<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>
 > {
   ...BaseParameters;
@@ -162,7 +169,7 @@ model ResourceParentParameters<
  * The dynamic parameters of a list call for an extension resource instance.
  * @template Resource The extension resource
  */
-alias ExtensionResourceInstanceParameters<Resource extends Foundations.Resource> = ResourceInstanceParameters<
+alias ExtensionResourceInstanceParameters<Resource extends Foundations.SimpleResource> = ResourceInstanceParameters<
   Resource,
   ExtensionBaseParameters
 >;
@@ -171,7 +178,7 @@ alias ExtensionResourceInstanceParameters<Resource extends Foundations.Resource>
  * The dynamic parameters of a list call for a tenant resource instance.
  * @template Resource the tenant resource
  */
-alias TenantInstanceParameters<Resource extends Foundations.Resource> = ResourceInstanceParameters<
+alias TenantInstanceParameters<Resource extends Foundations.SimpleResource> = ResourceInstanceParameters<
   Resource,
   TenantBaseParameters
 >;
@@ -211,5 +218,20 @@ model TenantActionScope {
   @visibility(Lifecycle.Read)
   @key
   @segment("tenant")
+  name: string;
+}
+
+/**
+ * Template used by ArmProviderAction templates. This produces following action route:
+ * `/{resourceUri}/providers/Microsoft.SomeRP/someAction`
+ */
+@armVirtualResource
+@extensionResource
+model ExtensionResourceActionScope {
+  @doc("Symbolic name of scope")
+  @path
+  @visibility(Lifecycle.Read)
+  @key
+  @segment("extensionresource")
   name: string;
 }

@@ -15,8 +15,7 @@ describe("typespec-autorest: union schema", () => {
       `,
     );
     deepStrictEqual(res.definitions.Thing.properties.properties, {
-      type: "object",
-      allOf: [{ $ref: "#/definitions/Thing" }],
+      $ref: "#/definitions/Thing",
       "x-nullable": true,
     });
   });

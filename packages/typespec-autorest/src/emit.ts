@@ -87,6 +87,7 @@ export function resolveAutorestOptions(
     },
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   if (resolvedOptions["examples-directory"]) {
     reportDeprecated(
       program,
@@ -99,6 +100,7 @@ export function resolveAutorestOptions(
     outputFile: resolvedOptions["output-file"],
     outputDir: emitterOutputDir,
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     examplesDirectory: resolvedOptions["examples-dir"] ?? resolvedOptions["examples-directory"],
     version: resolvedOptions["version"],
     newLine: resolvedOptions["new-line"],

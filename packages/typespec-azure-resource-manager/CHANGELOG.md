@@ -1,5 +1,35 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.56.2
+
+### Bug Fixes
+
+- [#2724](https://github.com/Azure/typespec-azure/pull/2724) Fix `ErrorAdditionalInfo.info` in common types by changing its type from `{}` to `unknown`.
+- [#2727](https://github.com/Azure/typespec-azure/pull/2727) Change the body name of legacy operations
+- [#2722](https://github.com/Azure/typespec-azure/pull/2722) Support singleton key replacement in auto route for reusing case.
+
+
+## 0.56.1
+
+### Bug Fixes
+
+- [#2676](https://github.com/Azure/typespec-azure/pull/2676) Corrected the references for `PrivateEndpointConnectionListResultV5` and `PrivateLinkResourceListResultV5` in `common-types`.
+- [#2675](https://github.com/Azure/typespec-azure/pull/2675) Add support for resources with multiple operation paths
+- [#2674](https://github.com/Azure/typespec-azure/pull/2674) Allow optional request bodies in Resource actions templates
+
+
+## 0.56.0
+
+### Bug Fixes
+
+- [#2250](https://github.com/Azure/typespec-azure/pull/2250) Addressing common type differences with common types in azure-rest-api-specs, such as ordering of elements, lower/upper case in definition names, typos, and incorrect format on the next link.
+- [#2538](https://github.com/Azure/typespec-azure/pull/2538) Fixing gaps in the `@identifiers` decorator functionality:
+  - The `@identifier` decorator should take priority when present, and its value should be respected.
+  - The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+  - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
+- [#2625](https://github.com/Azure/typespec-azure/pull/2625) Make Patch templates specify implicitOptionality
+
+
 ## 0.55.0
 
 ### Bug Fixes
