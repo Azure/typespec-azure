@@ -22,10 +22,9 @@ beforeEach(async () => {
 
 it("azure paged result with encoded name", async () => {
   await runner.compileWithBuiltInService(`
-    op test(): ListTestResult;
-    @pagedResult
+    @list op test(): ListTestResult;
     model ListTestResult {
-      @items
+      @pageItems
       @clientName("values")
       tests: Test[];
       @nextLink
@@ -54,10 +53,9 @@ it("azure paged result with encoded name", async () => {
 
 it("azure paged result with next link in header", async () => {
   await runner.compileWithBuiltInService(`
-    op test(): ListTestResult;
-    @pagedResult
+    @list op test(): ListTestResult;
     model ListTestResult {
-      @items
+      @pageItems
       @clientName("values")
       tests: Test[];
       @nextLink
@@ -305,10 +303,10 @@ it("getPropertyPathFromModel test for nested case", async () => {
 
 it("azure page result with inheritance", async () => {
   await runner.compileWithBuiltInService(`
-    op test(): ExtendedListTestResult;
-    @pagedResult
+    @list op test(): ExtendedListTestResult;
+
     model ListTestResult {
-      @items
+      @pageItems
       values: Test[];
 
       @nextLink
@@ -662,11 +660,10 @@ it("next link with re-injected parameters", async () => {
       includeExpired?: boolean;
     }
 
-    op test(...TestOptions): ListTestResult;
+    @list op test(...TestOptions): ListTestResult;
 
-    @pagedResult
     model ListTestResult {
-      @items
+      @pageItems
       values: Test[];
       @nextLink
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending, TestOptions.includeExpired]>;
@@ -709,9 +706,8 @@ it("next link with mix of re-injected parameters and not", async () => {
       id: int32;
     }
 
-    @pagedResult
     model ParameterizedNextLinkPagingResult {
-      @items
+      @pageItems
       values: User[];
 
       @nextLink
@@ -720,6 +716,7 @@ it("next link with mix of re-injected parameters and not", async () => {
 
     @doc("List with parameterized next link that re-injects parameters.")
     @route("/with-parameterized-next-link")
+    @list 
     op test(
       ...IncludePendingOptions,
       @query select: string,

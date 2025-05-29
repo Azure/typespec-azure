@@ -12,6 +12,7 @@ import {
   Model,
   ModelProperty,
   Operation,
+  Program,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { isHeader } from "@typespec/http";
@@ -168,6 +169,16 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     let nextLinkPath = undefined;
     let nextLinkSegments = undefined;
+    let nextLinkReInjectedParametersSegments = undefined;
+
+    if (pagingOperation.output.nextLink?.property.type.kind === "Scalar") {
+      nextLinkReInjectedParametersSegments = getNextLinkReInjectedParametersSegments(
+        context.program,
+        baseServiceMethod.parameters,
+        pagingOperation.output.nextLink.property.type,
+      );
+    }
+
     if (pagingOperation.output.nextLink) {
       if (isHeader(context.program, pagingOperation.output.nextLink.property)) {
         nextLinkSegments = baseServiceMethod.operation.responses
@@ -247,6 +258,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         nextLinkSegments,
         continuationTokenParameterSegments,
         continuationTokenResponseSegments,
+        nextLinkReInjectedParametersSegments,
         pageItemsSegments: baseServiceMethod.response.resultSegments,
       },
     });
@@ -323,16 +335,10 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     }
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
-      nextLinkReInjectedParametersSegments = (
-        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ||
-        []
-      ).map((t: ModelProperty) =>
-        getPropertySegmentsFromModelOrParameters(
-          baseServiceMethod.parameters,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-        ),
+      nextLinkReInjectedParametersSegments = getNextLinkReInjectedParametersSegments(
+        context.program,
+        baseServiceMethod.parameters,
+        pagedMetadata.nextLinkProperty.type,
       );
     }
   }
@@ -467,6 +473,22 @@ function getPropertyPathFromSegment(
     current = property.type as Model;
   }
   return wireSegments.join(".");
+}
+
+function getNextLinkReInjectedParametersSegments(
+  program: Program,
+  parameters: SdkMethodParameter[],
+  nextLinkPropertyType: any,
+) {
+  return (getParameterizedNextLinkArguments(program, nextLinkPropertyType) || []).map(
+    (t: ModelProperty) =>
+      getPropertySegmentsFromModelOrParameters(
+        parameters,
+        (p) =>
+          p.__raw?.kind === "ModelProperty" &&
+          findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+      ),
+  );
 }
 
 function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(

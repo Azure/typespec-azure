@@ -489,25 +489,19 @@ export async function getOpenAPIForService(
 
   function extractPagedMetadataNested(
     program: Program,
-    type: Model,
+    type: Operation,
   ): PagedResultMetadata | undefined {
     // This only works for `is Page<T>` not `extends Page<T>`.
     let paged = getPagedResult(program, type);
     if (paged) {
       return paged;
     }
-    if (type.baseModel) {
-      paged = getPagedResult(program, type.baseModel);
-    }
-    if (paged) {
-      return paged;
-    }
     const templateArguments = type.templateMapper;
     if (templateArguments) {
       for (const argument of templateArguments.args) {
-        const modelArgument = argument as Model;
-        if (modelArgument) {
-          paged = extractPagedMetadataNested(program, modelArgument);
+        const operation = argument as Operation;
+        if (operation) {
+          paged = extractPagedMetadataNested(program, operation);
           if (paged) {
             return paged;
           }
@@ -538,21 +532,20 @@ export async function getOpenAPIForService(
   }
 
   function extractAzureCorePagedMetadata(program: Program, operation: HttpOperation) {
-    for (const response of operation.responses) {
-      const paged = extractPagedMetadataNested(program, response.type as Model);
-      if (paged) {
-        const nextLinkName = getLastSegment(paged.nextLinkSegments);
-        const itemName = getLastSegment(paged.itemsSegments);
-        if (nextLinkName) {
-          return {
-            nextLinkName,
-            itemName: itemName !== "value" ? itemName : undefined,
-          };
-        }
-        // Once we find paged metadata, we don't need to processes any further.
-        return undefined;
+    const paged = extractPagedMetadataNested(program, operation.operation);
+    if (paged) {
+      const nextLinkName = getLastSegment(paged.nextLinkSegments);
+      const itemName = getLastSegment(paged.itemsSegments);
+      if (nextLinkName) {
+        return {
+          nextLinkName,
+          itemName: itemName !== "value" ? itemName : undefined,
+        };
       }
+      // Once we find paged metadata, we don't need to processes any further.
+      return undefined;
     }
+
     return undefined;
   }
 

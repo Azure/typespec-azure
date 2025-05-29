@@ -14,11 +14,11 @@ namespace Azure.Core.Legacy;
  *   name: string;
  * }
  * model Page {
- *   @items items: Certificate[];
+ *   @pageItems items: Certificate[];
  *   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
  * }
  * ```
  */
-@Azure.Core.Foundations.Private.parameterizedNextLinkConfig(TypeSpec.Reflection.ModelProperty[])
+@Azure.Core.Foundations.Private.parameterizedNextLinkConfig(ParameterizedParams)
 scalar parameterizedNextLink<ParameterizedParams extends TypeSpec.Reflection.ModelProperty[]>
   extends url;

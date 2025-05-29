@@ -11,6 +11,7 @@ import {
   Enum,
   EnumMember,
   getNamespaceFullName,
+  getPagingOperation,
   getTypeName,
   ignoreDiagnostics,
   IntrinsicType,
@@ -54,7 +55,6 @@ import {
   FinalLocationDecorator,
   FinalOperationDecorator,
   FixedDecorator,
-  ItemsDecorator,
   LroCanceledDecorator,
   LroErrorResultDecorator,
   LroFailedDecorator,
@@ -62,7 +62,6 @@ import {
   LroSucceededDecorator,
   NextPageOperationDecorator,
   OperationLinkDecorator,
-  PagedResultDecorator,
   PollingLocationDecorator,
   PollingOperationDecorator,
   PollingOperationParameterDecorator,
@@ -94,12 +93,6 @@ export function isFixed(program: Program, target: Enum): boolean {
   return program.stateMap(AzureCoreStateKeys.fixed).get(target) !== undefined;
 }
 
-// pagedResult
-
-export const $pagedResult: PagedResultDecorator = (context: DecoratorContext, entity: Model) => {
-  context.program.stateMap(AzureCoreStateKeys.pagedResult).set(entity, true);
-};
-
 export interface PagedResultMetadata {
   modelType: Model;
   itemsProperty?: ModelProperty;
@@ -126,7 +119,11 @@ function findPathToProperty(
   entity: Model,
   condition: (prop: ModelProperty) => boolean,
   current: string[] = [],
+  visited: Set<Model> = new Set(),
 ): PropertyPath | undefined {
+  if (visited.has(entity)) return undefined;
+  visited.add(entity);
+
   for (const prop of entity.properties.values()) {
     const match = condition(prop);
     if (match) {
@@ -136,12 +133,16 @@ function findPathToProperty(
         path: segments.join("."),
         segments,
       };
-    } else {
-      if (prop.type.kind === "Model") {
-        const items = findPathToProperty(program, prop.type, condition, [...current, prop.name]);
-        if (items !== undefined) {
-          return items;
-        }
+    } else if (prop.type.kind === "Model") {
+      const items = findPathToProperty(
+        program,
+        prop.type,
+        condition,
+        [...current, prop.name],
+        visited,
+      );
+      if (items !== undefined) {
+        return items;
       }
     }
   }
@@ -149,7 +150,7 @@ function findPathToProperty(
 }
 
 function _getItems(program: Program, entity: Model): PropertyPath | undefined {
-  return findPathToProperty(program, entity, (prop) => getItems(program, prop) !== undefined);
+  return findPathToProperty(program, entity, (prop) => getItems(program, prop) === true);
 }
 
 function _getNextLink(program: Program, entity: Model): PropertyPath | undefined {
@@ -174,6 +175,13 @@ function getNamedSourceModels(property: ModelProperty): Set<Model> | undefined {
   return set;
 }
 
+function hasPagingProperties(program: Program, entity: Model): boolean {
+  if (_getItems(program, entity)) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Retrieves PagedResultMetadata for a model, if available. If passed an
  * operation, this will search the operations return type for any paged
@@ -186,7 +194,21 @@ export function getPagedResult(
   let metadata: PagedResultMetadata | undefined = undefined;
   switch (entity.kind) {
     case "Model":
-      if (program.stateMap(AzureCoreStateKeys.pagedResult).get(entity)) {
+      if (entity.name === "") {
+        // for anonymous models, get the effective type of the properties to see if any are paged
+        // if they are, then the anonymous model is probably paged too
+        for (const property of entity.properties.values()) {
+          const sources = getNamedSourceModels(property);
+          if (sources) {
+            for (const source of sources) {
+              const sourceMetadata = getPagedResult(program, source);
+              if (sourceMetadata) {
+                return sourceMetadata;
+              }
+            }
+          }
+        }
+      } else if (hasPagingProperties(program, entity)) {
         metadata = { modelType: entity };
         const items = _getItems(program, entity);
         if (items !== undefined) {
@@ -211,20 +233,6 @@ export function getPagedResult(
           }
         }
         break;
-      } else if (entity.name === "") {
-        // for anonymous models, get the effective type of the properties to see if any are paged
-        // if they are, then the anonymous model is probably paged too
-        for (const property of entity.properties.values()) {
-          const sources = getNamedSourceModels(property);
-          if (sources) {
-            for (const source of sources) {
-              const sourceMetadata = getPagedResult(program, source);
-              if (sourceMetadata) {
-                return sourceMetadata;
-              }
-            }
-          }
-        }
       }
       if (entity.baseModel) {
         const parentMetadata = getPagedResult(program, entity.baseModel);
@@ -235,6 +243,10 @@ export function getPagedResult(
       }
       break;
     case "Operation":
+      const pagedInfo = ignoreDiagnostics(getPagingOperation(program, entity));
+      if (pagedInfo === undefined) {
+        return undefined;
+      }
       switch (entity.returnType.kind) {
         case "Union":
           for (const variant of entity.returnType.variants.values()) {
@@ -248,25 +260,41 @@ export function getPagedResult(
           metadata = getPagedResult(program, entity.returnType as Model);
           break;
       }
-      if (metadata !== undefined) {
-        const nextLinkOperation = getOperationLink(program, entity, "nextPage");
-        if (nextLinkOperation !== undefined) {
-          metadata.nextLinkOperation = nextLinkOperation.linkedOperation;
-        }
+
+      if (metadata === undefined) {
+        return undefined;
+      }
+
+      if (pagedInfo.output.pageItems !== undefined) {
+        const items = pagedInfo.output.pageItems;
+        metadata.itemsProperty = items.property;
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        metadata.itemsPath = items.path.map((prop) => prop.name).join(".");
+        metadata.itemsSegments = items.path.map((prop) => prop.name);
+      }
+
+      if (pagedInfo.output.nextLink !== undefined) {
+        const nextLink = pagedInfo.output.nextLink;
+        metadata.nextLinkProperty = nextLink.property;
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        metadata.nextLinkPath = nextLink.path.map((prop) => prop.name).join(".");
+        metadata.nextLinkSegments = nextLink.path.map((prop) => prop.name);
+      }
+
+      const nextLinkOperation = getOperationLink(program, entity, "nextPage");
+      if (nextLinkOperation !== undefined) {
+        metadata.nextLinkOperation = nextLinkOperation.linkedOperation;
       }
   }
+
   return metadata;
 }
 
-export const $items: ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => {
-  context.program.stateMap(AzureCoreStateKeys.items).set(entity, true);
-};
-
 /**
- * Returns `true` if the property is marked with `@items`.
+ * Returns `true` if the property is marked with `@pageItems`.
  */
 export function getItems(program: Program, entity: Type): boolean | undefined {
-  return program.stateMap(AzureCoreStateKeys.items).get(entity);
+  return program.stateSet(Symbol.for(`TypeSpec.pageItems`)).has(entity);
 }
 
 /**

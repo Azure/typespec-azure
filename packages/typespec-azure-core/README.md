@@ -75,7 +75,6 @@ Available ruleSets:
 - [`@finalLocation`](#@finallocation)
 - [`@finalOperation`](#@finaloperation)
 - [`@fixed`](#@fixed)
-- [`@items`](#@items)
 - [`@lroCanceled`](#@lrocanceled)
 - [`@lroErrorResult`](#@lroerrorresult)
 - [`@lroFailed`](#@lrofailed)
@@ -84,7 +83,6 @@ Available ruleSets:
 - [`@lroSucceeded`](#@lrosucceeded)
 - [`@nextPageOperation`](#@nextpageoperation)
 - [`@operationLink`](#@operationlink)
-- [`@pagedResult`](#@pagedresult)
 - [`@pollingLocation`](#@pollinglocation)
 - [`@pollingOperation`](#@pollingoperation)
 - [`@pollingOperationParameter`](#@pollingoperationparameter)
@@ -139,22 +137,6 @@ assumed to be extensible.
 ##### Target
 
 `Enum`
-
-##### Parameters
-
-None
-
-#### `@items`
-
-Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.items
-```
-
-##### Target
-
-`ModelProperty`
 
 ##### Parameters
 
@@ -303,22 +285,6 @@ Identifies an operation that is linked to the target operation.
 | linkedOperation | `Operation`      | The linked Operation                                                                                                      |
 | linkType        | `valueof string` | A string indicating the role of the linked operation                                                                      |
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-#### `@pagedResult`
-
-Marks a Model as a paged collection.
-
-```typespec
-@Azure.Core.pagedResult
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-None
 
 #### `@pollingLocation`
 

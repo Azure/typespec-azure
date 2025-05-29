@@ -25,96 +25,34 @@ describe("typespec-azure-core: decorators", () => {
     runner = await createAzureCoreTestRunner();
   });
 
-  describe("@pagedResult", () => {
-    it("emit diagnostic if use on non model", async () => {
-      const diagnostics = await runner.diagnose(`
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-        @pagedResult
-        op foo(): Page<{}>;
-      `);
-
-      expectDiagnostics(diagnostics, {
-        code: "decorator-wrong-target",
-        message:
-          "Cannot apply @pagedResult decorator to Azure.MyService.foo since it is not assignable to Model",
-      });
-    });
-
-    it("marks model with @pagedResult", async () => {
-      const { Foo } = await runner.compile(`
-        @test @pagedResult
-        model Foo {
-          @items
-          foos: string[];
-
-          @nextLink
-          nextThing?: string;
-        }
-      `);
-      const actual = getPagedResult(runner.program, Foo as Model);
-      assert(actual?.itemsProperty?.name === "foos");
-      assert(actual?.itemsPath === "foos");
-      deepStrictEqual(actual?.itemsSegments, ["foos"]);
-      assert(actual?.nextLinkProperty?.name === "nextThing");
-      assert(actual?.nextLinkPath === "nextThing");
-      deepStrictEqual(actual?.nextLinkSegments, ["nextThing"]);
-    });
-
-    it("marks non-standard model with @pagedResult", async () => {
-      const { Foo } = await runner.compile(`
-        @test @pagedResult
-        model Foo {
-          boo: {
-            @items
-            things: string[];
-
-            doo: {
-              @nextLink
-              next?: string;  
-            }
-          }
-        }
-      `);
-      const actual = getPagedResult(runner.program, Foo as Model);
-      assert(actual?.itemsProperty?.name === "things");
-      assert(actual?.itemsPath === "boo.things");
-      deepStrictEqual(actual?.itemsSegments, ["boo", "things"]);
-      assert(actual?.nextLinkProperty?.name === "next");
-      assert(actual?.nextLinkPath === "boo.doo.next");
-      deepStrictEqual(actual?.nextLinkSegments, ["boo", "doo", "next"]);
-    });
-
+  describe("getPagedResult helper", () => {
     it("allows items and nextLink property to have `.` in name", async () => {
-      const { Foo } = await runner.compile(`
-        @test @pagedResult
-        model Foo {
-          @items
+      const { foo } = await runner.compile(`
+        model FooPage {
+          @pageItems
           \`base.things\`: string[];
 
           @nextLink
           \`base.next\`?: string;  
         }
+
+        @test
+        @list op foo(): FooPage;
       `);
-      const actual = getPagedResult(runner.program, Foo as Model);
+      const actual = getPagedResult(runner.program, foo as Operation);
       deepStrictEqual(actual?.itemsSegments, ["base.things"]);
       deepStrictEqual(actual?.nextLinkSegments, ["base.next"]);
     });
 
-    it("doesn't mark without @pagedResult", async () => {
-      const { Foo } = await runner.compile(`
-        @test
-        model Foo {}
-      `);
-
-      strictEqual(getPagedResult(runner.program, Foo as Model), undefined);
-    });
-
     it("supports Page<T> template", async () => {
-      const { Foo } = await runner.compile(`
+      const { foo } = await runner.compile(`
+        model FooPage is Page<{}> {}
+
         @test 
-        model Foo is Page<{}> {}
+        @list op foo(): FooPage;
       `);
-      const actual = getPagedResult(runner.program, Foo as Model);
+
+      const actual = getPagedResult(runner.program, foo as Operation);
       assert(actual?.itemsProperty?.name === "value");
       deepStrictEqual(actual?.itemsSegments, ["value"]);
 
@@ -162,10 +100,9 @@ describe("typespec-azure-core: decorators", () => {
 
     it("supports pagedMetadata on operation with intersected paged model return", async () => {
       const { foo } = await runner.compile(`
-        @pagedResult
         @doc(".")
         model MyPage {
-          @items
+          @pageItems
           @doc(".")
           value?: string[];
 
@@ -188,7 +125,7 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        op foo is Azure.Core.Foundations.Operation<{}, ETagParam & MyPage>;
+        @list op foo is Azure.Core.Foundations.Operation<{}, ETagParam & MyPage>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);
       ok(actual?.itemsProperty?.name === "value");
@@ -201,12 +138,11 @@ describe("typespec-azure-core: decorators", () => {
 
     it("supports pagedMetadata on operation with inherited paged model return", async () => {
       const { foo } = await runner.compile(`
-        @pagedResult
         @doc(".")
         model MyPage {
           @doc(".")
           nested: {
-            @items
+            @pageItems
             @doc(".")
             values?: string[];
 
@@ -227,7 +163,7 @@ describe("typespec-azure-core: decorators", () => {
         @test
         @doc(".")
         @route("/test")
-        op foo is Azure.Core.Foundations.Operation<{}, MyFooPageResult>;
+        @list op foo is Azure.Core.Foundations.Operation<{}, MyFooPageResult>;
       `);
       const actual = getPagedResult(runner.program, foo as Operation);
       ok(actual?.itemsProperty?.name === "values");
@@ -890,7 +826,7 @@ describe("typespec-azure-core: decorators", () => {
         }
         model Certificate {}
         model Page {
-          @items items: Certificate[];
+          @pageItems items: Certificate[];
           @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
         }
 `)) as { includePending: ModelProperty; nextLink: ModelProperty };
@@ -907,7 +843,7 @@ describe("typespec-azure-core: decorators", () => {
         }
         model Certificate {}
         model Page {
-          @items items: Certificate[];
+          @pageItems items: Certificate[];
           @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
             ListCertificateOptions.includePending,
             ListCertificateOptions.includeExpired
@@ -924,7 +860,7 @@ describe("typespec-azure-core: decorators", () => {
       const diagnostics = await runner.diagnose(`
         model Certificate {}
         model Page {
-          @items items: Certificate[];
+          @pageItems items: Certificate[];
           @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink;
         }
 `);

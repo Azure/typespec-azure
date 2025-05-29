@@ -8,16 +8,6 @@ namespace Azure.Core {
   extern dec fixed(target: Enum);
 
   /**
-   * Marks a Model as a paged collection.
-   */
-  extern dec pagedResult(entity: Model);
-
-  /**
-   * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-   */
-  extern dec items(entity: ModelProperty);
-
-  /**
    * Used for custom StatusMonitor implementation.
    * Identifies an Enum or ModelProperty as containing long-running operation
    * status.
