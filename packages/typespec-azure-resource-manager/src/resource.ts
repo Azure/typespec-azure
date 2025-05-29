@@ -36,7 +36,7 @@ import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceMa
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import { ArmResourceOperations, resolveResourceOperations } from "./operations.js";
-import { getArmResource, listArmResources } from "./private.decorators.js";
+import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom";
@@ -95,6 +95,8 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
     });
     return;
   }
+
+  registerArmResource(context, entity);
 };
 
 export const $customAzureResource: CustomAzureResourceDecorator = (
@@ -141,6 +143,21 @@ export function isCustomAzureResource(program: Program, target: Model): boolean 
   return false;
 }
 
+function getArmResourceItemPath(operations: ArmResourceOperations): string | undefined {
+  const returnPath =
+    operations.lifecycle.read?.path ||
+    operations.lifecycle.createOrUpdate?.path ||
+    operations.lifecycle.delete?.path;
+  if (returnPath !== undefined) return returnPath;
+  const actions = Object.values(operations.actions);
+  if (actions.length > 0) {
+    const longPath = actions[0].path;
+    return longPath.substring(0, longPath.lastIndexOf("/"));
+  }
+
+  return undefined;
+}
+
 function resolveArmResourceDetails(
   program: Program,
   resource: ArmResourceDetailsBase,
@@ -150,7 +167,7 @@ function resolveArmResourceDetails(
 
   // Calculate the resource type path from the itemPath
   // TODO: This is currently a problem!  We don't have a canonical path to use for the itemPath
-  const itemPath = (operations.lifecycle.read || operations.lifecycle.createOrUpdate)?.path;
+  const itemPath = getArmResourceItemPath(operations);
   const baseType = getResourceBaseType(program, resource.typespecType);
   const resourceTypePath = getResourceTypePath(resource, itemPath, baseType);
 
