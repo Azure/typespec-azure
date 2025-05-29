@@ -8,7 +8,7 @@ TypeSpec library for emitting openapi from the TypeSpec REST protocol binding
 npm install @azure-tools/typespec-autorest
 ```
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
