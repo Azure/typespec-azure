@@ -212,7 +212,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     let continuationTokenParameterSegments = undefined;
     let continuationTokenResponseSegments = undefined;
-    ß;
     if (pagingOperation.input.continuationToken) {
       continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
         baseServiceMethod.parameters,
