@@ -17,9 +17,8 @@ it("normal paged model", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
-    @pagedResult
     model TestResult {
-      @items
+      @pageItems
       value: Test[];
 
       @nextLink
@@ -30,7 +29,7 @@ it("normal paged model", async () => {
       prop: string;
     }
 
-    op test(): TestResult;
+    @list op test(): TestResult;
   `);
 
   const sdkPackage = runner.context.sdkPackage;

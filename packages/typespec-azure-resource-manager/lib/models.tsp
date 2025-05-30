@@ -348,10 +348,9 @@ model ResourceListResult<Resource extends Foundations.SimpleResource> is Azure.C
  */
 @doc("The custom response of a list operation.")
 @friendlyName("{name}ListResult", Result)
-@pagedResult
 model ResourceListCustomResult<Result> {
   /** The items on this page */
-  @items
+  @pageItems
   value: Result[];
 
   /** The link to the next page of items */

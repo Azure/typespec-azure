@@ -8,14 +8,14 @@ it("use Azure.Core.Page as the response", async () => {
     @service
     @useDependency(Azure.Core.Versions.v1_0_Preview_2)
     namespace Test {
-      op list(): Azure.Core.Page<{}>;
+      @list op list(): Azure.Core.Page<{}>;
     }
     `,
   );
 
   const listThings = res.paths["/"].get;
   ok(listThings);
-  deepStrictEqual(listThings["x-ms-pageable"], { nextLinkName: "nextLink" });
+  deepStrictEqual(listThings["x-ms-pageable"], { itemName: "value", nextLinkName: "nextLink" });
 });
 
 it("define a custom paged operation with custom next link", async () => {
@@ -42,14 +42,15 @@ describe("Legacy define paging operation using Azure.Core decorators", () => {
   it("define a custom paged operation with custom next link", async () => {
     const res = await openApiFor(
       `
-      @pagedResult
       model CustomPageModel<T> {
+        @pageItems
         items: T[];
 
         @nextLink
         \`@odata.nextLink\`?: string;
       }
-      op list(): CustomPageModel<{}>;
+        
+      @list op list(): CustomPageModel<{}>;
       `,
     );
 
@@ -61,16 +62,15 @@ describe("Legacy define paging operation using Azure.Core decorators", () => {
   it("define a custom paged operation with custom item name", async () => {
     const res = await openApiFor(
       `
-    @pagedResult
     model List {
-      @Azure.Core.items
+      @pageItems
       itemList?: string[];
 
       @nextLink
       nextLink?: string;
     }
       
-    op list(): List;
+    @list op list(): List;
     `,
     );
 

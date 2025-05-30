@@ -242,7 +242,6 @@ model CustomResponseFields<Custom extends TypeSpec.Reflection.Model> {}
  * @template Resource The type of the resource.
  * @template Traits Traits which apply to the page.
  */
-@pagedResult
 @friendlyName("Paged{name}", Resource)
 @doc("Paged collection of {name} items", Resource)
 model CustomPage<
@@ -250,7 +249,7 @@ model CustomPage<
   Traits extends TypeSpec.Reflection.Model = {}
 > {
   @doc("The {name} items on this page", Resource)
-  @items
+  @pageItems
   value: Resource[];
 
   @doc("The link to the next page of items")

@@ -38,6 +38,9 @@
               "$ref": "#/definitions/PetStoreError"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       }
     },
@@ -98,6 +101,9 @@
               "$ref": "#/definitions/PetStoreError"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       },
       "post": {
@@ -233,6 +239,9 @@
               "$ref": "#/definitions/PetStoreError"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       }
     },
@@ -352,6 +361,9 @@
               "$ref": "#/definitions/PetStoreError"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       },
       "post": {
@@ -487,6 +499,9 @@
               "$ref": "#/definitions/PetStoreError"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       }
     },
@@ -615,6 +630,9 @@
               "$ref": "#/definitions/PetStoreError"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       }
     },
