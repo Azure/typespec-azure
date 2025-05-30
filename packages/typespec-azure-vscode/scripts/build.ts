@@ -4,11 +4,11 @@ import { context } from "esbuild";
 const nodeContext = await context({
   entryPoints: ["src/extension.ts"],
   bundle: true,
-  outfile: "dist/src/extension.cjs",
+  outfile: "dist/src/extension.js",
   platform: "node",
   mainFields: ["module", "main"],
   target: "node22",
-  format: "cjs",
+  format: "esm",
   sourcemap: true,
   external: ["vscode"],
 });

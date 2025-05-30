@@ -21,7 +21,7 @@
     "onLanguage:typespec",
     "workspaceContains:**/tspconfig.yaml"
   ],
-  "main": "./dist/src/extension.cjs",
+  "main": "./dist/src/extension.js",
   "preview": true,
   "private": true,
   "type": "module",
