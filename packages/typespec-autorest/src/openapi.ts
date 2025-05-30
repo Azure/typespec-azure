@@ -525,7 +525,7 @@ export async function getOpenAPIForService(
       const itemsName = paging.output.pageItems.property.name;
       return {
         nextLinkName: paging.output.nextLink.property.name,
-        itemName: itemsName === "items" ? undefined : itemsName,
+        itemName: itemsName === "value" || itemsName === "items" ? undefined : itemsName,
       };
     }
     return undefined;
