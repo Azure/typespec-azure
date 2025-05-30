@@ -934,7 +934,7 @@ describe("identifiers decorator", () => {
       }
       `,
     );
-    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
 
   it("prioritizes identifiers decorator over keys", async () => {

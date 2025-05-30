@@ -15,6 +15,9 @@ export const noUnnamedTypesRule = createRule({
     const tcgcContext = createTCGCContext(
       context.program,
       "@azure-tools/typespec-client-generator-core",
+      {
+        mutateNamespace: false,
+      },
     );
     // we create the package to see if the model is used in the final output
     createSdkPackage(tcgcContext);
@@ -24,6 +27,7 @@ export const noUnnamedTypesRule = createRule({
         if (
           createdModel &&
           createdModel.usage !== UsageFlags.None &&
+          (createdModel.usage & UsageFlags.LroInitial) === 0 &&
           createdModel.isGeneratedName
         ) {
           context.reportDiagnostic({

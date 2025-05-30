@@ -324,15 +324,16 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
       nextLinkReInjectedParametersSegments = (
-        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ||
+        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ??
         []
-      ).map((t: ModelProperty) =>
-        getPropertySegmentsFromModelOrParameters(
-          baseServiceMethod.parameters,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-        ),
+      ).map(
+        (t: ModelProperty) =>
+          getPropertySegmentsFromModelOrParameters(
+            baseServiceMethod.parameters,
+            (p) =>
+              p.__raw?.kind === "ModelProperty" &&
+              findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+          )!,
       );
     }
   }

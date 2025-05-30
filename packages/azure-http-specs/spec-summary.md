@@ -333,7 +333,7 @@ Expected response body:
 
 ### Azure_Core_Basic_createOrUpdate
 
-- Endpoint: `get /azure/core/basic`
+- Endpoint: `patch /azure/core/basic`
 
 Should only generate models named User and UserOrder.
 
