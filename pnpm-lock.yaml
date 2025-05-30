@@ -537,7 +537,7 @@ importers:
         version: 3.1.3(@types/debug@4.1.12)(@types/node@22.13.17)(@vitest/ui@3.1.3)(happy-dom@17.4.7)(jsdom@25.0.1)(tsx@4.19.4)(yaml@2.7.1)
       web-tree-sitter:
         specifier: ^0.25.4
-        version: 0.25.4
+        version: 0.25.5
 
   core/packages/eslint-plugin-typespec:
     dependencies:
@@ -13506,8 +13506,8 @@ packages:
   web-namespaces@2.0.1:
     resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
 
-  web-tree-sitter@0.25.4:
-    resolution: {integrity: sha512-BNbAL2tgeuqpufHOM4TapD8evwq+J+X514rTL7zMgDSc+RN9LlByE3zVtTheucwQFkQ+FPU0Pz8Wn4Emz9itRg==}
+  web-tree-sitter@0.25.5:
+    resolution: {integrity: sha512-JXSE2AbBenAwD9fB0En0aDPRVd6/O//8dPKZrZm8L4aHskRrRamc0tPd1PKZxJluz5GeOAC3AD4WOvrSpV8AzQ==}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -27183,7 +27183,7 @@ snapshots:
 
   web-namespaces@2.0.1: {}
 
-  web-tree-sitter@0.25.4: {}
+  web-tree-sitter@0.25.5: {}
 
   webidl-conversions@3.0.1: {}
 

@@ -1208,10 +1208,10 @@ model Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo
 
 #### Properties
 
-| Name  | Type     | Description               |
-| ----- | -------- | ------------------------- |
-| type? | `string` | The additional info type. |
-| info? | `{}`     | The additional info.      |
+| Name  | Type      | Description               |
+| ----- | --------- | ------------------------- |
+| type? | `string`  | The additional info type. |
+| info? | `unknown` | The additional info.      |
 
 ### `ErrorDetail` {#Azure.ResourceManager.CommonTypes.ErrorDetail}
 
@@ -2564,6 +2564,24 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, 
 #### Properties
 
 None
+
+### `SimpleResource` {#Azure.ResourceManager.Foundations.SimpleResource}
+
+A base definition of a resource using simple types. This
+model should only be used as a constraint for other models.
+
+```typespec
+model Azure.ResourceManager.Foundations.SimpleResource
+```
+
+#### Properties
+
+| Name        | Type      | Description                      |
+| ----------- | --------- | -------------------------------- |
+| id?         | `string`  | The resource identifier          |
+| name?       | `string`  | The resource name                |
+| type?       | `string`  | The resource type                |
+| systemData? | `unknown` | readonly data about the resource |
 
 ### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
 
