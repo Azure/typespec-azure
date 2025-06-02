@@ -515,9 +515,8 @@ export async function getOpenAPIForService(
     if (isList(program, operation.operation)) {
       const pagedInfo = ignoreDiagnostics(getPagingOperation(program, operation.operation));
       return pagedInfo && getXmsPageableForPagingOperation(pagedInfo);
-    } else {
-      return extractAzureCorePagedMetadata(program, operation);
     }
+    return undefined;
   }
 
   function getXmsPageableForPagingOperation(paging: PagingOperation): XmsPageable | undefined {
@@ -528,24 +527,6 @@ export async function getOpenAPIForService(
         itemName: itemsName === "value" || itemsName === "items" ? undefined : itemsName,
       };
     }
-    return undefined;
-  }
-
-  function extractAzureCorePagedMetadata(program: Program, operation: HttpOperation) {
-    const paged = extractPagedMetadataNested(program, operation.operation);
-    if (paged) {
-      const nextLinkName = getLastSegment(paged.nextLinkSegments);
-      const itemName = getLastSegment(paged.itemsSegments);
-      if (nextLinkName) {
-        return {
-          nextLinkName,
-          itemName: itemName !== "value" ? itemName : undefined,
-        };
-      }
-      // Once we find paged metadata, we don't need to processes any further.
-      return undefined;
-    }
-
     return undefined;
   }
 

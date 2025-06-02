@@ -180,8 +180,11 @@ it("verify resolution of private endpoints and private links with v5 version", a
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
-        listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource,
-         Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5>>;
+        @get
+        @autoRoute
+        @segmentOf(PrivateEndpointConnectionResource)
+        @armResourceList(PrivateEndpointConnectionResource)
+        listConnections (): ArmResponse<Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5>;
       }
 
       model PrivateLinkResource is ProxyResource<PrivateLinkResourceProperties> {
@@ -191,23 +194,21 @@ it("verify resolution of private endpoints and private links with v5 version", a
       @armResourceOperations(PrivateLinkResource)
       interface PrivateLinkResources {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
-        listByLinkResult is ArmResourceListByParent< PrivateLinkResource,
-          Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5>
-        >;
+        @get
+        @autoRoute
+        @segmentOf(PrivateLinkResource)
+        @armResourceList(PrivateLinkResource)
+        listConnections (): ArmResponse<Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5>;
       }
       `,
   );
 
-  const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
-  const privateLinkList =
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/privateLinkResources";
-
   deepStrictEqual(
-    openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+    openapi.paths["/privateEndpointConnections"].get.responses["200"].schema["$ref"],
     "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateEndpointConnectionListResult",
   );
   deepStrictEqual(
-    openapi.paths[privateLinkList].get.responses["200"].schema["$ref"],
+    openapi.paths["/privateLinkResources"].get.responses["200"].schema["$ref"],
     "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateLinkResourceListResult",
   );
 });

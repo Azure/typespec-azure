@@ -358,6 +358,7 @@ interface ResourceOperations<
    * @template Traits Object describing the traits of the operation.
    */
   @Foundations.Private.ensureVerb("ResourceList", "GET")
+  @list
   ResourceList<
     Resource extends TypeSpec.Reflection.Model,
     Traits extends TypeSpec.Reflection.Model = {}

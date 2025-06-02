@@ -200,6 +200,7 @@ interface LegacyOperations<
   @autoRoute
   @doc("List a {name}", Resource)
   @get
+  @list
   @listsResource(Resource)
   @segmentOf(Resource)
   @armResourceList(Resource)

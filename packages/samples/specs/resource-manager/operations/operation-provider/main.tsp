@@ -46,12 +46,15 @@ model LogAnalyticsCollection is Page<LogAnalyticsOperationResult>;
 interface ProviderOperations {
   /** Operation to get virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/getVmSizes) */
   @get
+  @list
   getVmSizes is ArmProviderActionSync<Response = VmSizeCollection, Scope = SubscriptionActionScope>;
   /** Operation to get virtual machines for tenant (/providers/Microsoft.ContosoProviderHub/getVmSizesTenant) */
   @get
+  @list
   getVmSizesTenant is ArmProviderActionSync<Response = VmSizeCollection, Scope = TenantActionScope>;
   /** Operation to get virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/getVmSizesLocation) */
   @get
+  @list
   getVmSizesLocation is ArmProviderActionSync<
     Response = VmSizeCollection,
     Scope = SubscriptionActionScope,
@@ -59,6 +62,7 @@ interface ProviderOperations {
   >;
   /** Operation to get throttled requests sharing action (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
   @get
+  @list
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsSubscription is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
@@ -66,17 +70,20 @@ interface ProviderOperations {
   >;
   /** Operation to get throttled requests sharing action for tenant (/providers/Microsoft.ContosoProviderHub/logAnalytics/apiAccess/getThrottledRequests) */
   @get
+  @list
   @action("logAnalytics/apiAccess/getThrottledRequests")
   getThrottledRequestsTenant is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
     Scope = TenantActionScope
   >;
   /** Operation to post virtual machines for subscription (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/postVmSizes) */
+  @list
   postVmSizes is ArmProviderActionAsync<
     Response = LogAnalyticsCollection,
     Scope = SubscriptionActionScope
   >;
   /** Operation to post virtual machines for subscription for specific location (/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/postVmSizesLocation) */
+  @list
   postVmSizesLocation is ArmProviderActionAsync<
     Response = LogAnalyticsCollection,
     Scope = SubscriptionActionScope,
@@ -96,6 +103,7 @@ interface ProviderOperations {
   /** Sample operation to generate an extension resource based GET action */
   @get
   @action
+  @list
   getLogAnalytics is ArmProviderActionSync<
     Response = LogAnalyticsCollection,
     Scope = ExtensionResourceActionScope
@@ -103,6 +111,7 @@ interface ProviderOperations {
 
   /** Operation to generate an extension resource based POST action */
   @post
+  @list
   @action("append")
   appendLogAnalytics is ArmProviderActionAsync<
     Response = LogAnalyticsCollection,

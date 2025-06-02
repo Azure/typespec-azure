@@ -20,6 +20,7 @@ namespace Azure.ResourceManager;
 @segmentOf(Resource)
 @armResourceList(Resource)
 @get
+@list
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmListBySubscription<
   Resource extends Foundations.SimpleResource,
@@ -39,6 +40,7 @@ op ArmListBySubscription<
  * @template Error Optional. The error response, if non-standard.
  */
 @get
+@list
 @autoRoute
 @listsResource(Resource)
 @segmentOf(Resource)
@@ -68,6 +70,7 @@ op ArmResourceListByParent<
  * @template Error Optional. The error response, if non-standard.
  */
 @get
+@list
 @autoRoute
 @listsResource(Resource)
 @segmentOf(Resource)

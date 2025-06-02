@@ -15,7 +15,7 @@ it("use Azure.Core.Page as the response", async () => {
 
   const listThings = res.paths["/"].get;
   ok(listThings);
-  deepStrictEqual(listThings["x-ms-pageable"], { itemName: "value", nextLinkName: "nextLink" });
+  deepStrictEqual(listThings["x-ms-pageable"], { nextLinkName: "nextLink" });
 });
 
 it("define a custom paged operation with custom next link", async () => {

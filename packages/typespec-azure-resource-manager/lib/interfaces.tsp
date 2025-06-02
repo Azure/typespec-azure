@@ -18,6 +18,7 @@ interface Operations {
   @armUpdateProviderNamespace
   @doc("List the operations for the provider")
   @segment("operations")
+  @list
   @get
   list(
     ...ApiVersionParameter,
