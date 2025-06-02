@@ -387,6 +387,7 @@ op ResourceCollectionOperation<
  * @template Traits Traits which apply to the operation.
  * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
+@list
 @listsResource(Resource)
 @Private.ensureResourceType(Resource)
 op ResourceList<
@@ -405,11 +406,13 @@ op ResourceList<
  */
 #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This operation signature is not used in Azure Resource Manager operations (yet)"
 @autoRoute
+@listsResource(Resource)
+@Private.ensureResourceType(Resource)
 op NonPagedResourceList<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {},
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
-> is Foundations.ResourceList<
+> is ResourceCollectionOperation<
   Resource,
   TraitProperties<Traits, TraitLocation.Parameters, TraitContext.List>,
   Body<Resource[]> & TraitProperties<Traits, TraitLocation.Response, TraitContext.List>,
