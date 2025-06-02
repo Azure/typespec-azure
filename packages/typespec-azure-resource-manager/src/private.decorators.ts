@@ -14,6 +14,7 @@ import {
   getKeyName,
   getLifecycleVisibilityEnum,
   getTypeName,
+  isKey,
   sealVisibilityModifiers,
 } from "@typespec/compiler";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
@@ -301,6 +302,14 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   registerArmResource(context, resourceType);
 };
 
+function getPrimaryKeyProperty(program: Program, resource: Model): ModelProperty | undefined {
+  const nameProperty = resource.properties.get("name");
+  if (nameProperty !== undefined) return nameProperty;
+  const keyProps = [...resource.properties.values()].filter((prop) => isKey(program, prop));
+  if (keyProps.length !== 1) return undefined;
+  return keyProps[0];
+}
+
 export function registerArmResource(context: DecoratorContext, resourceType: Model): void {
   const { program } = context;
   if (resourceType.namespace && getTypeName(resourceType.namespace) === "Azure.ResourceManager") {
@@ -329,19 +338,21 @@ export function registerArmResource(context: DecoratorContext, resourceType: Mod
   }
 
   // Ensure the resource type has defined a name property that has a segment
-  const nameProperty = resourceType.properties.get("name");
-  if (!nameProperty) {
+  const primaryKeyProperty = getPrimaryKeyProperty(program, resourceType);
+  if (!primaryKeyProperty) {
     reportDiagnostic(program, { code: "arm-resource-missing-name-property", target: resourceType });
     return;
   }
 
   // Set the name property to be read only
-  const Lifecycle = getLifecycleVisibilityEnum(program);
-  clearVisibilityModifiersForClass(program, nameProperty, Lifecycle, context);
-  addVisibilityModifiers(program, nameProperty, [Lifecycle.members.get("Read")!], context);
-  sealVisibilityModifiers(program, nameProperty, Lifecycle);
+  if (primaryKeyProperty.name === "name") {
+    const Lifecycle = getLifecycleVisibilityEnum(program);
+    clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
+    addVisibilityModifiers(program, primaryKeyProperty, [Lifecycle.members.get("Read")!], context);
+    sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
+  }
 
-  const keyName = getKeyName(program, nameProperty);
+  const keyName = getKeyName(program, primaryKeyProperty);
   if (!keyName) {
     reportDiagnostic(program, {
       code: "arm-resource-missing-name-key-decorator",
@@ -350,7 +361,7 @@ export function registerArmResource(context: DecoratorContext, resourceType: Mod
     return;
   }
 
-  const collectionName = getSegment(program, nameProperty);
+  const collectionName = getSegment(program, primaryKeyProperty);
   if (!collectionName) {
     reportDiagnostic(program, {
       code: "arm-resource-missing-name-segment-decorator",
