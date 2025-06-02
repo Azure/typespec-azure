@@ -1,6 +1,13 @@
 import { createRule, Model, paramMessage, Union } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
-import { UsageFlags } from "../interfaces.js";
+import {
+  SdkEnumType,
+  SdkModelType,
+  SdkNullableType,
+  SdkType,
+  SdkUnionType,
+  UsageFlags,
+} from "../interfaces.js";
 import { createSdkPackage } from "../package.js";
 
 export const noUnnamedTypesRule = createRule({
@@ -43,9 +50,11 @@ export const noUnnamedTypesRule = createRule({
         const createdUnion = tcgcContext.__referencedTypeCache.get(union);
         if (
           createdUnion &&
+          isUnionType(createdUnion) &&
           createdUnion.usage !== UsageFlags.None &&
           createdUnion.isGeneratedName
         ) {
+          // report diagnostic for unions and nullable unions
           context.reportDiagnostic({
             target: union,
             format: {
@@ -58,3 +67,12 @@ export const noUnnamedTypesRule = createRule({
     };
   },
 });
+
+function isUnionType(
+  union: SdkModelType | SdkEnumType | SdkNullableType | SdkUnionType<SdkType>,
+): boolean {
+  if (union.kind === "nullable") {
+    return union.type.kind === "union";
+  }
+  return union.kind === "union" || union.kind === "enum";
+}
