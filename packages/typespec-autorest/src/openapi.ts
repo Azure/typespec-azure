@@ -1,13 +1,11 @@
 import {
   FinalStateValue,
   LroMetadata,
-  PagedResultMetadata,
   UnionEnum,
   extractLroStates,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
   getLroMetadata,
-  getPagedResult,
   getUnionAsEnum,
 } from "@azure-tools/typespec-azure-core";
 import {
@@ -478,37 +476,6 @@ export async function getOpenAPIForService(
         parameters,
       },
     };
-  }
-
-  function getLastSegment(segments: string[] | undefined): string | undefined {
-    if (segments) {
-      return segments[segments.length - 1];
-    }
-    return undefined;
-  }
-
-  function extractPagedMetadataNested(
-    program: Program,
-    type: Operation,
-  ): PagedResultMetadata | undefined {
-    // This only works for `is Page<T>` not `extends Page<T>`.
-    let paged = getPagedResult(program, type);
-    if (paged) {
-      return paged;
-    }
-    const templateArguments = type.templateMapper;
-    if (templateArguments) {
-      for (const argument of templateArguments.args) {
-        const operation = argument as Operation;
-        if (operation) {
-          paged = extractPagedMetadataNested(program, operation);
-          if (paged) {
-            return paged;
-          }
-        }
-      }
-    }
-    return paged;
   }
 
   function resolveXmsPageable(program: Program, operation: HttpOperation): XmsPageable | undefined {
