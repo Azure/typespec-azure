@@ -1,4 +1,11 @@
-import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Interface,
+  Model,
+  ModelProperty,
+  Operation,
+  Type,
+} from "@typespec/compiler";
 
 /**
  *
@@ -174,6 +181,19 @@ export type ArmBodyRootDecorator = (
   isOptional: boolean,
 ) => void;
 
+/**
+ * Sets the model associated with an interface, and optionally the route
+ *
+ * @param target The interface to associate the model with
+ * @param resource The model to associate with the interface
+ * @param route Optional route to associate with the interface
+ */
+export type ArmResourceRouteDecorator = (
+  context: DecoratorContext,
+  target: Interface,
+  route?: string,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -189,4 +209,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
+  armResourceRoute: ArmResourceRouteDecorator;
 };

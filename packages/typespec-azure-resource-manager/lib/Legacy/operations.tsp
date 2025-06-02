@@ -15,11 +15,28 @@ using Rest;
  * @template ResourceTypeParameter The path parameter for the resource name
  * @template ErrorType Optional. The type of error models used in operations created form this template
  */
-@doc("")
+@autoRoute
 interface LegacyOperations<
   ParentParameters extends {},
   ResourceTypeParameter extends {},
   ErrorType extends {} = ErrorResponse
+> extends RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType> {}
+
+/**
+ * An operation template used to build resource operations in which the same resource type
+ * is accessible at multiple, fixed resource paths. Can be used with static routes.
+ * @template ParentParameters The path parameters for the resource parent
+ * @template ResourceTypeParameter The path parameter for the resource name
+ * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ResourceRoute Optional. The resource route to use for operations in the interface.
+ */
+@doc("")
+@Private.armResourceRoute(ResourceRoute)
+interface RoutedOperations<
+  ParentParameters extends {},
+  ResourceTypeParameter extends {},
+  ErrorType extends {} = ErrorResponse,
+  ResourceRoute extends valueof string = ""
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
