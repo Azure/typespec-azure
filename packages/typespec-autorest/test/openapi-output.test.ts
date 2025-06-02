@@ -843,7 +843,7 @@ describe("identifiers decorator", () => {
       }
       `,
     );
-    deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], []);
+    deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], undefined);
   });
 
   it("key decorator in x-ms-identifiers for nested scenarios ", async () => {
