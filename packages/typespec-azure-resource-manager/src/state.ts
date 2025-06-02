@@ -32,4 +32,5 @@ export const ArmStateKeys = {
   armCommonDefinitions: azureResourceManagerCreateStateSymbol("armCommonDefinitions"),
   armCommonParameters: azureResourceManagerCreateStateSymbol("armCommonParameters"),
   armCommonTypesVersions: azureResourceManagerCreateStateSymbol("armCommonTypesVersions"),
+  armResourceRoute: azureResourceManagerCreateStateSymbol("armResourceRoute"),
 };
