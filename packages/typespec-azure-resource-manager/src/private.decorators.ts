@@ -23,6 +23,7 @@ import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import {
   ArmBodyRootDecorator,
+  ArmOperationRouteDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
   ArmResourcePropertiesOptionalityDecorator,
@@ -498,13 +499,26 @@ const $armResourceRoute: ArmResourceRouteDecorator = (
   target: Interface,
   route?: string,
 ) => {
+  if (route && route.length > 0) {
+    context.program.stateMap(ArmStateKeys.armResourceRoute).set(target, route);
+  }
+};
+
+const $armOperationRoute: ArmOperationRouteDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  route?: string,
+) => {
+  if (target.interface) {
+    route = route || context.program.stateMap(ArmStateKeys.armResourceRoute).get(target.interface);
+  }
   if (!route || route.length === 0) {
     context.call($autoRoute, target);
   } else {
     context.call($route, target, route);
-    context.program.stateMap(ArmStateKeys.armResourceRoute).set(target, route);
   }
 };
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -522,5 +536,6 @@ export const $decorators = {
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
     armResourceRoute: $armResourceRoute,
+    armOperationRoute: $armOperationRoute,
   } satisfies AzureResourceManagerPrivateDecorators,
 };

@@ -182,6 +182,19 @@ export type ArmResourceRouteDecorator = (
   route?: string,
 ) => void;
 
+/**
+ * Signifies that an operation is an Azure Resource Manager operation
+ * and optionally associates the operation with a route template.
+ *
+ * @param target The operation to associate the model with
+ * @param route Optional route to associate with the operation
+ */
+export type ArmOperationRouteDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  route?: string,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -197,4 +210,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
   armResourceRoute: ArmResourceRouteDecorator;
+  armOperationRoute: ArmOperationRouteDecorator;
 };

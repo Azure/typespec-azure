@@ -47,6 +47,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("Create a {name}", Resource)
+  @Private.armOperationRoute
   @armResourceCreateOrUpdate(Resource)
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
   @put
@@ -75,6 +76,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
+  @Private.armOperationRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
   @put
@@ -100,6 +102,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("Update a {name}", Resource)
+  @Private.armOperationRoute
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
@@ -133,6 +136,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("Update a {name}", Resource)
+  @Private.armOperationRoute
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
@@ -157,6 +161,7 @@ interface RoutedOperations<
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @doc("Delete a {name}", Resource)
+  @Private.armOperationRoute
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
@@ -176,6 +181,7 @@ interface RoutedOperations<
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @doc("Delete a {name}", Resource)
+  @Private.armOperationRoute
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
@@ -192,6 +198,7 @@ interface RoutedOperations<
    * @template Response Optional. The success response for a get operation.
    */
   @doc("Get a {name}", Resource)
+  @Private.armOperationRoute
   @get
   @readsResource(Resource)
   @armResourceRead(Resource)
@@ -211,6 +218,7 @@ interface RoutedOperations<
   @get
   @listsResource(Resource)
   @segmentOf(Resource)
+  @Private.armOperationRoute
   @armResourceList(Resource)
   List<
     Resource extends Foundations.SimpleResource,
@@ -228,6 +236,7 @@ interface RoutedOperations<
    */
   @doc("")
   @armResourceAction(Resource)
+  @Private.armOperationRoute
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
   @returnsDoc("Azure operation completed successfully.")
@@ -259,6 +268,7 @@ interface RoutedOperations<
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
   @armResourceAction(Resource)
+  @Private.armOperationRoute
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
   @returnsDoc("Azure operation completed successfully.")
