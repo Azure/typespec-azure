@@ -182,10 +182,10 @@ export type ArmBodyRootDecorator = (
 ) => void;
 
 /**
- * Sets the model associated with an interface, and optionally the route
+ * Signifies that an interface contains resource operations
+ * and optionally associates the operations with a route template.
  *
  * @param target The interface to associate the model with
- * @param resource The model to associate with the interface
  * @param route Optional route to associate with the interface
  */
 export type ArmResourceRouteDecorator = (
