@@ -339,6 +339,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part '${"part"}'.`,
       },
     },
+    "unsupported-optional-path-param": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Path parameter '${"name"}' is optional, but swagger 2.0 does not support optional path parameters. It will be emitted as required.`,
+      },
+    },
     "cookies-unsupported": {
       severity: "warning",
       messages: {

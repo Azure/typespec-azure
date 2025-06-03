@@ -179,7 +179,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -223,7 +222,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -254,8 +252,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/PersonRelativeMergePatchUpdateReplaceOnly"
-          },
-          "x-ms-identifiers": []
+          }
         }
       }
     },
@@ -275,8 +272,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/PersonRelativeMergePatchUpdateReplaceOnly"
-          },
-          "x-ms-identifiers": []
+          }
         }
       },
       "required": [
@@ -345,7 +341,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -385,7 +380,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",
@@ -424,7 +418,6 @@
           "items": {
             "$ref": "#/definitions/PersonRelative"
           },
-          "x-ms-identifiers": [],
           "x-ms-mutability": [
             "read",
             "update",

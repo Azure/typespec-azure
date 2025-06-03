@@ -25,7 +25,6 @@ import {
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
-  ArrayModelType,
   BooleanLiteral,
   CompilerHost,
   Diagnostic,
@@ -126,6 +125,7 @@ import {
   getServers,
   getStatusCodeDescription,
   getVisibilitySuffix,
+  isHttpFile,
   isSharedRoute,
   reportIfNoRoutes,
   resolveRequestVisibility,
@@ -1282,7 +1282,7 @@ export async function getOpenAPIForService(
     paramName: string,
     target: DiagnosticTarget,
   ): PrimitiveItems | undefined {
-    if (isBytes(type)) {
+    if (isBytes(type) || isHttpFile(program, type)) {
       return { type: "file" };
     }
 
@@ -1443,11 +1443,20 @@ export async function getOpenAPIForService(
     const property = httpProp.property;
     const base = getOpenAPI2ParameterBase(property, httpProp.options.name);
 
+    if (base.required === false) {
+      reportDiagnostic(program, {
+        code: "unsupported-optional-path-param",
+        format: { name: property.name },
+        target: property,
+      });
+    }
+
     const result: OpenAPI2PathParameter = {
       in: "path",
       default: property.defaultValue && getDefaultValue(property.defaultValue, property),
       ...base,
       ...getSimpleParameterSchema(property, schemaContext, base.name),
+      required: true,
     };
 
     if (httpProp.options.allowReserved) {
@@ -1842,16 +1851,6 @@ export async function getOpenAPIForService(
       });
       return {};
     }
-  }
-
-  function ifArrayItemContainsIdentifier(program: Program, array: ArrayModelType) {
-    if (array.indexer.value?.kind !== "Model") {
-      return true;
-    }
-    return (
-      getExtensions(program, array).has("x-ms-identifiers") ||
-      getProperty(array.indexer.value, "id")
-    );
   }
 
   function ifArmIdentifiersDefault(armIdentifiers: string[]) {
@@ -2415,8 +2414,6 @@ export async function getOpenAPIForService(
         hasValidArmIdentifiers(armKeyIdentifiers)
       ) {
         array["x-ms-identifiers"] = armKeyIdentifiers;
-      } else if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
-        array["x-ms-identifiers"] = [];
       }
 
       return applyIntrinsicDecorators(typespecType, array);
