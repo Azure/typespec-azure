@@ -343,9 +343,11 @@ export async function getOpenAPIForService(
   // this map.
   const params: Map<ModelProperty, OpenAPI2Parameter> = new Map();
 
-  // Keep track of models that have had properties spread into parameters. We won't
-  // consider these unreferenced when emitting unreferenced types.
-  const paramModels: Set<Type> = new Set();
+  // Keep track of types that were processed indirectly and shouldn't be added if `omit-unreachable-types` is not set.
+  // This include:
+  // - Models that have had properties spread into parameters.
+  // - Multipart models
+  const indirectlyProcessedTypes: Set<Type> = new Set();
 
   // De-dupe the per-endpoint tags that will be added into the #/tags
   const tags: Set<string> = new Set();
@@ -1087,7 +1089,7 @@ export async function getOpenAPIForService(
     // only parameters inherited by spreading from non-inlined type are shared in #/parameters
     if (spreadParam && property.model && !shouldInline(program, property.model)) {
       params.set(property, placeholder);
-      paramModels.add(property.model);
+      indirectlyProcessedTypes.add(property.model);
     }
 
     return placeholder;
@@ -1190,6 +1192,7 @@ export async function getOpenAPIForService(
   }
 
   function emitMultipartBodyParameters(body: HttpOperationMultipartBody, visibility: Visibility) {
+    indirectlyProcessedTypes.add(body.type);
     for (const [index, part] of body.parts.entries()) {
       const partName = part.name ?? `part${index}`;
       let schema = getFormDataSchema(
@@ -1601,7 +1604,7 @@ export async function getOpenAPIForService(
       const addSchema = (type: Type) => {
         if (
           !processedSchemas.has(type) &&
-          !paramModels.has(type) &&
+          !indirectlyProcessedTypes.has(type) &&
           !shouldInline(program, type) &&
           !shouldOmitThisUnreachableType(type)
         ) {
