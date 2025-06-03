@@ -290,4 +290,74 @@ describe("unions", () => {
         },
       ]);
   });
+  it("nullable scalar", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+        @usage(Usage.input)
+          model One {
+            prop?: string | null;
+          }
+        }
+        `,
+      )
+      .toBeValid();
+  });
+  it("nullable enum", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          enum Foo { one }
+          
+          op bar(param: Foo | null): void;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+  it("nullable model", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          model One {
+            prop: string;
+          }
+          op foo(param: One | null): void;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("nullable model union", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          model One {
+            prop: string;
+          }
+
+          model Two {
+            prop: string;
+          }
+          op foo(param: One | Two | null): void;
+        }
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
+  });
 });
