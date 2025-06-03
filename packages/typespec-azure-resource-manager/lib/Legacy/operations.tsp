@@ -46,7 +46,6 @@ interface RoutedOperations<
    * @template Response Optional. The success response(s) for the PUT operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
-  @autoRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
@@ -76,7 +75,6 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
-  @autoRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
   @put
@@ -101,7 +99,6 @@ interface RoutedOperations<
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
-  @autoRoute
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
@@ -135,7 +132,6 @@ interface RoutedOperations<
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
-  @autoRoute
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
@@ -160,7 +156,6 @@ interface RoutedOperations<
    * @template Response Optional. The success response(s) for the delete operation
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
-  @autoRoute
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
@@ -180,7 +175,6 @@ interface RoutedOperations<
    * @template Response Optional. The success response(s) for the delete operation
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
-  @autoRoute
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
@@ -197,7 +191,6 @@ interface RoutedOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.
    */
-  @autoRoute
   @doc("Get a {name}", Resource)
   @get
   @readsResource(Resource)
@@ -214,7 +207,6 @@ interface RoutedOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The response returned by the list
    */
-  @autoRoute
   @doc("List a {name}", Resource)
   @get
   @listsResource(Resource)
@@ -235,7 +227,6 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("")
-  @autoRoute
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
@@ -267,7 +258,6 @@ interface RoutedOperations<
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
-  @autoRoute
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
