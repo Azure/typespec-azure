@@ -1754,6 +1754,102 @@ A long-running resource CreateOrUpdate (PUT)
 op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: Resource): Response | ErrorType
 ```
 
+#### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync}
+
+A synchronous resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Resource): Response | ErrorType
+```
+
+#### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync}
+
+A long-running resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: PatchModel): Response | ErrorType
+```
+
+#### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync}
+
+A synchronous resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(properties: PatchModel): Response | ErrorType
+```
+
+#### `LegacyOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync}
+
+Delete a resource asynchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync(): Response | ErrorType
+```
+
+#### `LegacyOperations.DeleteSync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync}
+
+Delete a resource synchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync(): Response | ErrorType
+```
+
+#### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations.Read}
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.Read(): Response | ErrorType
+```
+
+#### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations.List}
+
+List a resource
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
+```
+
+#### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionSync}
+
+A synchronous resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Response | ErrorType
+```
+
+#### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync}
+
+A long-running resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Response | ErrorType
+```
+
+### `RoutedOperations` {#Azure.ResourceManager.Legacy.RoutedOperations}
+
+An operation template used to build resource operations in which the same resource type
+is accessible at multiple, fixed resource paths. Can be used with static routes.
+
+```typespec
+interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                                                      |
+| --------------------- | -------------------------------------------------------------------------------- |
+| ParentParameters      | The path parameters for the resource parent                                      |
+| ResourceTypeParameter | The path parameter for the resource name                                         |
+| ErrorType             | Optional. The type of error models used in operations created form this template |
+| ResourceRoute         | Optional. The resource route to use for operations in the interface.             |
+
+#### `RoutedOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: Resource): Response | ErrorType
+```
+
 ##### Template Parameters
 
 | Name                | Description                                                             |
@@ -1764,12 +1860,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: R
 | Response            | Optional. The success response(s) for the PUT operation                 |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                |
 
-#### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync}
+#### `RoutedOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync}
 
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Resource): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync(resource: Resource): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1781,12 +1877,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Re
 | Response            | Optional. The success response(s) for the PUT operation   |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 
-#### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync}
+#### `RoutedOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync}
 
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: PatchModel): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync(properties: PatchModel): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1800,12 +1896,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: Pa
 | Response            | Optional. The success response(s) for the PATCH operation               |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                |
 
-#### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync}
+#### `RoutedOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchSync}
 
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(properties: PatchModel): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchSync(properties: PatchModel): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1818,12 +1914,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(properties: Pat
 | Response            | Optional. The success response(s) for the PATCH operation |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 
-#### `LegacyOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync}
+#### `RoutedOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.DeleteWithoutOkAsync}
 
 Delete a resource asynchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync(): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.DeleteWithoutOkAsync(): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1835,12 +1931,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync(): Respons
 | Parameters | Optional. Additional parameters after the path parameters  |
 | Response   | Optional. The success response(s) for the delete operation |
 
-#### `LegacyOperations.DeleteSync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync}
+#### `RoutedOperations.DeleteSync` {#Azure.ResourceManager.Legacy.RoutedOperations.DeleteSync}
 
 Delete a resource synchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync(): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.DeleteSync(): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1851,10 +1947,10 @@ op Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync(): Response | ErrorT
 | Parameters | Optional. Additional parameters after the path parameters  |
 | Response   | Optional. The success response(s) for the delete operation |
 
-#### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations.Read}
+#### `RoutedOperations.Read` {#Azure.ResourceManager.Legacy.RoutedOperations.Read}
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.Read(): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.Read(): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1886,7 +1982,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence(): Response | Er
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.List(): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1897,12 +1993,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The response returned by the list               |
 
-#### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionSync}
+#### `RoutedOperations.ActionSync` {#Azure.ResourceManager.Legacy.RoutedOperations.ActionSync}
 
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.ActionSync(body: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1915,12 +2011,12 @@ op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Resp
 | Parameters          | Optional. Additional parameters after the path parameters |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 
-#### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync}
+#### `RoutedOperations.ActionAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync}
 
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync(body: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
