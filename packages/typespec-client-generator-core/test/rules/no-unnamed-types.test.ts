@@ -360,4 +360,19 @@ describe("unions", () => {
         },
       ]);
   });
+  it("union of scalars", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+
+        @usage(Usage.input)
+        model Foo {
+          prop: string | int32;
+        }
+        `,
+      )
+      .toBeValid();
+  });
 });
