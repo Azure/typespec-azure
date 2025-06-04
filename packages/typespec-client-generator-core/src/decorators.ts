@@ -57,6 +57,7 @@ import {
   clientKey,
   clientNameKey,
   clientNamespaceKey,
+  compareModelProperties,
   findRootSourceProperty,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
@@ -591,7 +592,7 @@ function collectParams(
 ): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
-    if (params.filter((x) => compareModelProperties(x, value)).length === 0) {
+    if (params.filter((x) => compareModelProperties(undefined, x, value)).length === 0) {
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
@@ -601,11 +602,6 @@ function collectParams(
   });
 
   return params;
-}
-
-function compareModelProperties(modelPropA: ModelProperty, modelPropB: ModelProperty): boolean {
-  // can't rely fully on equals because the `.model` property may be different
-  return modelPropA.name === modelPropB.name && modelPropA.type === modelPropB.type;
 }
 
 export const $override = (
@@ -637,7 +633,7 @@ export const $override = (
         continue;
       }
     }
-    if (!compareModelProperties(originalParam, overrideParams[index])) {
+    if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
         parametersMatch = false;
         break;

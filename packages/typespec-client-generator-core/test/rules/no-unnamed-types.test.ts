@@ -147,6 +147,64 @@ describe("models", () => {
       )
       .toBeValid();
   });
+  it("discriminated model with nested anonymous model with readonly property", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          @usage(Usage.output)
+          model JobModelProperties {
+            customProperties: JobModelCustomProperties;
+          }
+          @discriminator("instanceType")
+          model JobModelCustomProperties {
+            @visibility(Lifecycle.Read)
+            affectedObjectDetails?: {
+              description?: string;
+              type?: "object";
+            };
+          }
+        }
+          `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous model with generated name "JobModelCustomPropertiesAffectedObjectDetails" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
+  });
+  it("anonymous model in versioned service", async () => {
+    await tester
+      .expect(
+        `
+        @versioned(Versions)
+        @service
+        namespace Test;
+
+        /** Contoso API versions */
+        enum Versions {
+          "2021-10-01-preview",
+        }
+
+        @usage(Usage.input)
+        model Temp {
+          foo: {
+            bar: string;
+          }
+        }
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous model with generated name "TempFoo" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
+  });
 });
 
 describe("unions", () => {
@@ -231,5 +289,90 @@ describe("unions", () => {
           message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
+  });
+  it("nullable scalar", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+        @usage(Usage.input)
+          model One {
+            prop?: string | null;
+          }
+        }
+        `,
+      )
+      .toBeValid();
+  });
+  it("nullable enum", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          enum Foo { one }
+          
+          op bar(param: Foo | null): void;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+  it("nullable model", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          model One {
+            prop: string;
+          }
+          op foo(param: One | null): void;
+        }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("nullable model union", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService {
+          model One {
+            prop: string;
+          }
+
+          model Two {
+            prop: string;
+          }
+          op foo(param: One | Two | null): void;
+        }
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
+  });
+  it("union of scalars", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+
+        @usage(Usage.input)
+        model Foo {
+          prop: string | int32;
+        }
+        `,
+      )
+      .toBeValid();
   });
 });

@@ -85,7 +85,11 @@ const sidebar: SidebarItem[] = [
       createLibraryReferenceStructure("emitters/typespec-autorest", "Autorest / Swagger", false),
       {
         label: "Clients",
-        items: [createLibraryReferenceStructure("emitters/clients/typespec-java", "Java", false)],
+        items: [
+          createLibraryReferenceStructure("emitters/clients/typespec-java", "Java", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-go", "Go", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-python", "Python", false),
+        ],
       },
     ],
   },

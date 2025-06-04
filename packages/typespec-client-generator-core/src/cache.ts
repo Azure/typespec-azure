@@ -15,7 +15,7 @@ import {
   clientKey,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
-  listAllNamespaces,
+  listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   moveToKey,
   omitOperation,
@@ -171,7 +171,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
  * @returns
  */
 function getOrCreateClients(context: TCGCContext): SdkClient[] {
-  const namespaces: Namespace[] = listAllNamespaces(context, context.getMutatedGlobalNamespace());
+  const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
 
   const explicitClients = [];
   for (const ns of namespaces) {

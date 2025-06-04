@@ -19,9 +19,21 @@ namespace Azure.ResourceManager;
  * @template SegmentName Override default segment name of the resource.
  * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
  * @template Type The type of the name property. Default type is string. However you can pass an union with string values.
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ *  ...ResourceNameParameter<
+ *    Resource = Employee,
+ *    KeyName = "employeeName",
+ *    SegmentName = "employees",
+ *    NamePattern = "^[^<>%&:?#/\\\\]+$"
+ *  >;
+ * }
+ * ```
  */
 model ResourceNameParameter<
-  Resource extends Foundations.Resource,
+  Resource extends Foundations.SimpleResource,
   KeyName extends valueof string = "",
   SegmentName extends valueof string = "",
   NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$",
@@ -41,6 +53,13 @@ model ResourceNameParameter<
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
  * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ *  ...ResourceNameParameter<Employee>
+ * }
+ * ```
  */
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
@@ -59,6 +78,13 @@ model TrackedResource<Properties extends {}, PropertiesOptional extends valueof 
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
  * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
+ *
+ * @example
+ * ```typespec
+ * model Employee is ProxyResource<EmployeeProperties> {
+ *  ...ResourceNameParameter<Employee>;
+ * }
+ * ```
  */
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
@@ -77,6 +103,18 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  * @template Properties A model containing the provider-specific properties for this resource
  * @template PropertiesOptional A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended.
+ *
+ * @example
+ * ```typespec
+ * model PetInstance is ExtensionResource<PetProperties> {
+ *  @key
+ *  @path
+ *  @segment("petInstances")
+ *  @pattern("^[a-zA-Z0-9-]{3,24}$")
+ *  @visibility(Lifecycle.Read)
+ *  name: string;
+ * }
+ * ```
  */
 @extensionResource
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
@@ -290,10 +328,19 @@ model ResourceKindProperty {
 /**
  * Paged response containing resources
  * @template Resource The type of the values returned in the paged response (must be a resource)
+ *
+ * @example
+ * ```typespec
+ * op list is ArmResourceActionSync<
+ *  Resource = Employee,
+ *  Request = void,
+ *  Response = ResourceListResult<Employee>
+ * >;
+ * ```
  */
 @doc("The response of a {name} list operation.", Resource)
 @friendlyName("{name}ListResult", Resource)
-model ResourceListResult<Resource extends Foundations.Resource> is Azure.Core.Page<Resource>;
+model ResourceListResult<Resource extends Foundations.SimpleResource> is Azure.Core.Page<Resource>;
 
 /**
  * Paged response containing results
@@ -396,10 +443,11 @@ model EncryptionProperty {
 /**
  * Model representing the standard `zones` envelope property for a resource.
  * Spread this model into a resource Model if the resource supports ARM `zones`.
+ *
  * @example
- * ```typescript
+ * ```typespec
  * model Foo is TrackedResource<FooProperties> {
- *   ...AvailabilityZonesProperty;
+ *  ...AvailabilityZonesProperty;
  * }
  * ```
  */

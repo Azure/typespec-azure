@@ -17,6 +17,16 @@ model Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders>
 | Description | The description of the response status (defaults to `Resource operation accepted`) |
 | LroHeaders  | Optional. The lro headers that appear in the Accepted response                     |
 
+#### Examples
+
+```typespec
+@post
+op post(
+  ...ResourceInstanceParameters<Employee>,
+): ArmAcceptedLroResponse<LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
+  Azure.Core.Foundations.RetryAfterHeader> | ErrorResponse;
+```
+
 #### Properties
 
 | Name       | Type  | Description      |
@@ -35,6 +45,16 @@ model Azure.ResourceManager.ArmAcceptedResponse<Message, ExtraHeaders>
 | ------------ | ---------------------------------------------------------------------------------- |
 | Message      | The description of the response status (defaults to `Resource operation accepted`) |
 | ExtraHeaders | Additional headers in the response. Default includes Retry-After header            |
+
+#### Examples
+
+```typespec
+op post is ArmProviderActionSync<
+  Request = Employee,
+  Response = ArmAcceptedResponse<ExtraHeaders = ArmLroLocationHeader>,
+  Scope = SubscriptionActionScope
+>;
+```
 
 #### Properties
 
@@ -57,6 +77,17 @@ model Azure.ResourceManager.ArmAsyncOperationHeader<StatusMonitor, UrlValue, Fin
 | StatusMonitor | The status monitor type for lro polling           |
 | UrlValue      | The value type of the Azure-AsyncOperation header |
 | FinalResult   | The logical final result of the operation         |
+
+#### Examples
+
+```typespec
+op changeWidget is ArmResourceActionAsync<
+  WidgetResource,
+  WidgetResourceRequest,
+  WidgetResourceResponse,
+  LroHeaders = ArmAsyncOperationHeader<FinalResult = WidgetResource>
+>;
+```
 
 #### Properties
 
@@ -81,6 +112,15 @@ model Azure.ResourceManager.ArmCombinedLroHeaders<StatusMonitor, FinalResult, Po
 | PollingUrlValue | The value type of the link to the status monitor                                  |
 | FinalUrlValue   | The value type fo the link to the final result                                    |
 
+#### Examples
+
+```typespec
+op delete is ArmResourceDeleteWithoutOkAsync<
+  Employee,
+  LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, Employee>
+>;
+```
+
 #### Properties
 
 | Name                 | Type              | Description                                                                                         |
@@ -103,6 +143,18 @@ model Azure.ResourceManager.ArmCreatedResponse<ResponseBody, ExtraHeaders>
 | ResponseBody | The contents of the response body                                       |
 | ExtraHeaders | Additional headers in the response. Default includes Retry-After header |
 
+#### Examples
+
+```typespec
+@post
+op post(...ResourceInstanceParameters<Employee>): ArmCreatedResponse<
+  Employee,
+  ExtraHeaders = {
+    @header("x-ms-client-request-id") clientRequestId: string;
+  }
+>;
+```
+
 #### Properties
 
 | Name       | Type           | Description      |
@@ -121,6 +173,15 @@ model Azure.ResourceManager.ArmDeleteAcceptedLroResponse<LroHeaders>
 | Name       | Description                                                           |
 | ---------- | --------------------------------------------------------------------- |
 | LroHeaders | Optional. Allows overriding the Lro headers returned in the response. |
+
+#### Examples
+
+```typespec
+op delete is ArmResourceDeleteWithoutOkAsync<
+  Employee,
+  Response = ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
+>;
+```
 
 #### Properties
 
@@ -147,6 +208,15 @@ model Azure.ResourceManager.ArmDeleteAcceptedResponse
 model Azure.ResourceManager.ArmDeletedNoContentResponse
 ```
 
+#### Examples
+
+```typespec
+op delete is ArmResourceDeleteWithoutOkAsync<
+  Employee,
+  Response = ArmDeleteAcceptedLroResponse | ArmDeletedNoContentResponse
+>;
+```
+
 #### Properties
 
 | Name       | Type  | Description      |
@@ -159,6 +229,16 @@ The response for synchronous delete of a resource
 
 ```typespec
 model Azure.ResourceManager.ArmDeletedResponse
+```
+
+#### Examples
+
+```typespec
+@delete
+@armResourceDelete(Employee)
+op delete(
+  ...ResourceInstanceParameters<Employee>,
+): ArmDeletedResponse | ArmDeletedNoContentResponse | ErrorResponse;
 ```
 
 #### Properties
@@ -182,6 +262,15 @@ model Azure.ResourceManager.ArmLocationResource<BaseType>
 | -------- | --------------------------------------------------------------------------------------------- |
 | BaseType | The parent of the location, one of "Subscription", "Tenant", "ResourceGroup", or "Extension". |
 
+#### Examples
+
+```typespec
+@parentResource(ArmLocationResource<"ResourceGroup">)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
 #### Properties
 
 | Name     | Type                 | Description                   |
@@ -204,6 +293,20 @@ model Azure.ResourceManager.ArmLroLocationHeader<LroPollingOptions, FinalResult,
 | FinalResult       | The ultimate final result of the logical operation              |
 | UrlValue          | The value type for the location header                          |
 
+#### Examples
+
+```typespec
+op update is ArmResourceActionAsync<
+  Employee,
+  Employee,
+  OkResponse,
+  LroHeaders = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Employee
+  >
+>;
+```
+
 #### Properties
 
 | Name      | Type       | Description                                                                                         |
@@ -223,6 +326,13 @@ model Azure.ResourceManager.ArmNoContentResponse<Message>
 | Name    | Description                                                                             |
 | ------- | --------------------------------------------------------------------------------------- |
 | Message | The description of the response status (defaults to `Operation completed successfully`) |
+
+#### Examples
+
+```typespec
+@delete
+op delete(@path id: string): ArmNoContentResponse;
+```
 
 #### Properties
 
@@ -271,6 +381,19 @@ model Azure.ResourceManager.ArmResourceCreatedResponse<Resource, LroHeaders>
 | Resource   | The resource being updated                                 |
 | LroHeaders | Optional. The lro headers returned with a Created response |
 
+#### Examples
+
+```typespec
+op createOrUpdate is ArmResourceCreateOrReplaceAsync<
+  Employee,
+  Response = ArmResponse<Employee> | ArmResourceCreatedResponse<
+    Employee,
+    LroHeaders = ArmLroLocationHeader<FinalResult = Employee> &
+      Azure.Core.Foundations.RetryAfterHeader
+  >
+>;
+```
+
 #### Properties
 
 | Name       | Type       | Description      |
@@ -290,6 +413,15 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 | -------- | -------------------------- |
 | Resource | The resource being updated |
 
+#### Examples
+
+```typespec
+op createOrUpdate is ArmResourceCreateOrReplaceSync<
+  Employee,
+  Response = ArmResponse<Employee> | ArmResourceCreatedSyncResponse<Employee>
+>;
+```
+
 #### Properties
 
 | Name       | Type       | Description      |
@@ -301,6 +433,13 @@ model Azure.ResourceManager.ArmResourceCreatedSyncResponse<Resource>
 
 ```typespec
 model Azure.ResourceManager.ArmResourceExistsResponse
+```
+
+#### Examples
+
+```typespec
+@head
+op head(...ResourceInstanceParameters<Employee>): ArmResourceExistsResponse;
 ```
 
 #### Properties
@@ -333,6 +472,13 @@ model Azure.ResourceManager.ArmResourceUpdatedResponse<Resource>
 | -------- | -------------------------- |
 | Resource | The resource being updated |
 
+#### Examples
+
+```typespec
+@put
+op update(...ResourceInstanceParameters<Employee>): ArmResourceUpdatedResponse<Employee>;
+```
+
 #### Properties
 
 | Name       | Type       | Description      |
@@ -354,6 +500,12 @@ model Azure.ResourceManager.ArmResponse<ResponseBody>
 | ------------ | --------------------------------- |
 | ResponseBody | The contents of the response body |
 
+#### Examples
+
+```typespec
+op get is ArmResourceRead<Employee, Response = ArmResponse<Employee>>;
+```
+
 #### Properties
 
 | Name       | Type           | Description      |
@@ -372,7 +524,7 @@ model Azure.ResourceManager.AvailabilityZonesProperty
 
 #### Examples
 
-```typescript
+```typespec
 model Foo is TrackedResource<FooProperties> {
   ...AvailabilityZonesProperty;
 }
@@ -494,6 +646,19 @@ model Azure.ResourceManager.ExtensionResource<Properties, PropertiesOptional>
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Properties         | A model containing the provider-specific properties for this resource                                                                          |
 | PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+
+#### Examples
+
+```typespec
+model PetInstance is ExtensionResource<PetProperties> {
+  @key
+  @path
+  @segment("petInstances")
+  @pattern("^[a-zA-Z0-9-]{3,24}$")
+  @visibility(Lifecycle.Read)
+  name: string;
+}
+```
 
 #### Properties
 
@@ -691,6 +856,14 @@ model Azure.ResourceManager.ProxyResource<Properties, PropertiesOptional>
 | Properties         | A model containing the provider-specific properties for this resource                                                                          |
 | PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
+#### Examples
+
+```typespec
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
 #### Properties
 
 | Name        | Type         | Description |
@@ -727,6 +900,12 @@ model Azure.ResourceManager.ResourceInstanceParameters<Resource, BaseParameters>
 | -------------- | -------------------------------------------------------- |
 | Resource       | The resource to get parameters for                       |
 | BaseParameters | The parameters representing the base Uri of the resource |
+
+#### Examples
+
+```typespec
+op get(...ResourceInstanceParameters<Employee>): ArmResponse<EmployeeResponse> | ErrorResponse;
+```
 
 #### Properties
 
@@ -793,6 +972,16 @@ model Azure.ResourceManager.ResourceListResult<Resource>
 | -------- | -------------------------------------------------------------------------- |
 | Resource | The type of the values returned in the paged response (must be a resource) |
 
+#### Examples
+
+```typespec
+op list is ArmResourceActionSync<
+  Resource = Employee,
+  Request = void,
+  Response = ResourceListResult<Employee>
+>;
+```
+
 #### Properties
 
 | Name      | Type                             | Description |
@@ -821,6 +1010,19 @@ model Azure.ResourceManager.ResourceNameParameter<Resource, KeyName, SegmentName
 | SegmentName | Override default segment name of the resource.                                                           |
 | NamePattern | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                        |
 | Type        | The type of the name property. Default type is string. However you can pass an union with string values. |
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<
+    Resource = Employee,
+    KeyName = "employeeName",
+    SegmentName = "employees",
+    NamePattern = "^[^<>%&:?#/\\\\]+$"
+  >;
+}
+```
 
 #### Properties
 
@@ -906,6 +1108,14 @@ The default resourceUri parameter type.
 model Azure.ResourceManager.ResourceUriParameter
 ```
 
+#### Examples
+
+```typespec
+model Employee {
+  ...ResourceUriParameter;
+}
+```
+
 #### Properties
 
 | Name        | Type     | Description                                                            |
@@ -918,6 +1128,12 @@ Template used by ArmProviderAction templates.
 
 ```typespec
 model Azure.ResourceManager.SubscriptionActionScope
+```
+
+#### Examples
+
+```typespec
+op action is ArmProviderActionSync<Response = Employee, Scope = SubscriptionActionScope>;
 ```
 
 #### Properties
@@ -935,6 +1151,15 @@ resource for resource types that are homed in a subscription-based location.
 model Azure.ResourceManager.SubscriptionLocationResource
 ```
 
+#### Examples
+
+```typespec
+@parentResource(SubscriptionLocationResource)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
 #### Properties
 
 | Name     | Type                 | Description                   |
@@ -947,6 +1172,12 @@ Template used by ArmTenantAction templates.
 
 ```typespec
 model Azure.ResourceManager.TenantActionScope
+```
+
+#### Examples
+
+```typespec
+op action is ArmProviderActionSync<Response = Employee, Scope = TenantActionScope>;
 ```
 
 #### Properties
@@ -962,6 +1193,15 @@ resource for resource types that are homed in a tenant-based location.
 
 ```typespec
 model Azure.ResourceManager.TenantLocationResource
+```
+
+#### Examples
+
+```typespec
+@parentResource(TenantLocationResource)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
 ```
 
 #### Properties
@@ -987,6 +1227,14 @@ model Azure.ResourceManager.TrackedResource<Properties, PropertiesOptional>
 | Properties         | A model containing the provider-specific properties for this resource                                                                          |
 | PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
 
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
 #### Properties
 
 | Name        | Type         | Description |
@@ -1004,6 +1252,22 @@ enum Azure.ResourceManager.Versions
 | Name           | Value             | Description           |
 | -------------- | ----------------- | --------------------- |
 | v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
+
+#### Examples
+
+```typespec
+enum Versions {
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_10_01_preview: "2021-10-01-preview",
+
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_11_01: "2021-11-01",
+}
+```
 
 ### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
 
@@ -1069,6 +1333,14 @@ The default api-version parameter type.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.ApiVersionParameter
+```
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
 ```
 
 #### Properties
@@ -1208,10 +1480,10 @@ model Azure.ResourceManager.CommonTypes.ErrorAdditionalInfo
 
 #### Properties
 
-| Name  | Type     | Description               |
-| ----- | -------- | ------------------------- |
-| type? | `string` | The additional info type. |
-| info? | `{}`     | The additional info.      |
+| Name  | Type      | Description               |
+| ----- | --------- | ------------------------- |
+| type? | `string`  | The additional info type. |
+| info? | `unknown` | The additional info.      |
 
 ### `ErrorDetail` {#Azure.ResourceManager.CommonTypes.ErrorDetail}
 
@@ -1369,6 +1641,17 @@ The default location parameter type.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.LocationParameter
+```
+
+#### Examples
+
+```typespec
+op employee is ArmProviderActionSync<
+  Request = Employee,
+  Response = Employee,
+  Scope = SubscriptionActionScope,
+  Parameters = LocationParameter
+>;
 ```
 
 #### Properties
@@ -2564,6 +2847,24 @@ model Azure.ResourceManager.Foundations.ResourceUpdateModelProperties<Resource, 
 #### Properties
 
 None
+
+### `SimpleResource` {#Azure.ResourceManager.Foundations.SimpleResource}
+
+A base definition of a resource using simple types. This
+model should only be used as a constraint for other models.
+
+```typespec
+model Azure.ResourceManager.Foundations.SimpleResource
+```
+
+#### Properties
+
+| Name        | Type      | Description                      |
+| ----------- | --------- | -------------------------------- |
+| id?         | `string`  | The resource identifier          |
+| name?       | `string`  | The resource name                |
+| type?       | `string`  | The resource type                |
+| systemData? | `unknown` | readonly data about the resource |
 
 ### `SubscriptionBaseParameters` {#Azure.ResourceManager.Foundations.SubscriptionBaseParameters}
 

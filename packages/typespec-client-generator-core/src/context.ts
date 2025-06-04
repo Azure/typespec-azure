@@ -2,6 +2,7 @@ import {
   createDiagnosticCollector,
   EmitContext,
   emitFile,
+  Enum,
   Interface,
   listServices,
   Model,
@@ -44,8 +45,17 @@ import {
   TspLiteralType,
 } from "./internal-utils.js";
 import { createSdkPackage } from "./package.js";
+import { listAllServiceNamespaces } from "./public-utils.js";
 
-export function createTCGCContext(program: Program, emitterName?: string): TCGCContext {
+interface CreateTCGCContextOptions {
+  mutateNamespace?: boolean; // whether to mutate global namespace for versioning
+}
+
+export function createTCGCContext(
+  program: Program,
+  emitterName?: string,
+  options?: CreateTCGCContextOptions,
+): TCGCContext {
   const diagnostics = createDiagnosticCollector();
   return {
     program,
@@ -74,6 +84,10 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
     __pagedResultSet: new Set(),
 
     getMutatedGlobalNamespace(): Namespace {
+      if (options?.mutateNamespace === false) {
+        // If we are not mutating the global namespace, return the original global namespace type.
+        return program.getGlobalNamespaceType();
+      }
       let globalNamespace = this.__mutatedGlobalNamespace;
       if (!globalNamespace) {
         globalNamespace = handleVersioningMutationForGlobalNamespace(this);
@@ -114,6 +128,16 @@ export function createTCGCContext(program: Program, emitterName?: string): TCGCC
 
       this.__packageVersions = versions.map((version) => version.value);
       return this.__packageVersions;
+    },
+    getPackageVersionEnum(): Enum | undefined {
+      if (this.__packageVersionEnum) {
+        return this.__packageVersionEnum;
+      }
+      const namespaces = listAllServiceNamespaces(this);
+      if (namespaces.length === 0) {
+        return undefined;
+      }
+      return getVersions(this.program, namespaces[0])[1]?.getVersions()?.[0].enumMember.enum;
     },
     getClients(): SdkClient[] {
       if (!this.__rawClientsOperationGroupsCache) {
