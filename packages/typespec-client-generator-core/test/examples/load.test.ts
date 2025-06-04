@@ -275,3 +275,75 @@ it("ensure ordering for multiple examples", async () => {
   strictEqual(operation.examples![1].filePath, "a_b.json");
   strictEqual(operation.examples![2].filePath, "a_b_c.json");
 });
+
+it("load example with @moveTo existed interface", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/moveToAnotherInterface.json",
+    `${__dirname}/load/moveToAnotherInterface.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @moveTo(AnotherInterface)
+        op moveTo(): string;
+      }
+
+      interface AnotherInterface {
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const client = mainClient.children?.find((client) => client.name === "AnotherInterface");
+  ok(client);
+  const operation = (client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with @moveTo new operation group", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/moveToNewOperationGroup.json",
+    `${__dirname}/load/moveToNewOperationGroup.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @moveTo("NewOperationGroup")
+        op moveTo(): string;
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const client = mainClient.children?.find((client) => client.name === "NewOperationGroup");
+  ok(client);
+  const operation = (client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with @moveTo root client", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/moveToRootClient.json",
+    `${__dirname}/load/moveToRootClient.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @moveTo(TestClient)
+        op moveTo(): string;
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+  const operation = (mainClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});

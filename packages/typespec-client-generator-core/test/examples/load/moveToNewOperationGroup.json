@@ -1,0 +1,10 @@
+{
+  "operationId": "NewOperationGroup_moveTo",
+  "title": "NewOperationGroup_moveTo",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}
