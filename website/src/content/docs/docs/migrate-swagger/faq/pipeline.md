@@ -6,9 +6,9 @@ This document explains how to mitigate pipeline failures in TypeSpec migration P
 
 ## Swagger BreakingChange
 
-Skip this section if you only have one swagger file in your latest version.
-
 This pipeline will definitely fail if you have more than one swagger files in your latest version. See detailed explanation in the description of this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216). Therefore, we leverage "TypeSpec Migration Validation" pipeline to give us a signal if there is breaking change. Go to this pipeline and check the output from "Run TypeSpec Migration Validation". The output is expected to be exactly the same as this [step](../01-get-started.md#review-and-adjust-the-typespec) in your local machine. Review the changes to see if it's expected.
+
+However, if you have only one swagger file in your latest version, you should check out the results of this pipeline. Refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md) if it fails.
 
 ## Swagger ModelValidation
 

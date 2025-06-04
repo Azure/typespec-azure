@@ -84,7 +84,7 @@ You will need to compare the Swagger generated from TypeSpec with your original 
   1. Recompile your TypeSpec files with `tsp compile .` in your TypeSpec folder.
   2. Run the `npx tsmv` command again with the same parameters.
   3. Review the updated differences in VS Code.
-  4. Make further adjustments as needed. Refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md) to understand expected breaking change and mitigation steps. For more effective visualization, fix differences in this recommended order:
+  4. Make further adjustments as needed. Refer to [Understanding the Must-have Breaking Changes](./faq/mustread.md) to understand expected breaking change and mitigation steps. For more effective visualization, fix differences in this recommended order:
      - Path (route) differences first
      - Definition (model) name differences next
      - Detail differences within paths and definitions last
