@@ -396,6 +396,13 @@ export const $lib = createTypeSpecLibrary({
           "When there is `@client` or `@operationGroup` decorator, `@moveTo` decorator will be ignored.",
       },
     },
+    "move-to-wrong-type": {
+      severity: "warning",
+      messages: {
+        default:
+          "`@moveTo` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

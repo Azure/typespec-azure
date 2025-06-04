@@ -57,7 +57,6 @@ import {
   getClientDoc,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
-  getLocationOfOperation,
   getStreamAsBytes,
   getTypeDecorators,
   isAcceptHeader,
@@ -601,11 +600,11 @@ export function getCorrespondingMethodParams(
   const diagnostics = createDiagnosticCollector();
 
   // 1. To see if the service parameter is a client parameter.
-  const operationLocation = getLocationOfOperation(operation)!;
-  let clientParams = context.__clientToParameters.get(operationLocation);
+  const client = context.getClientForOperation(operation);
+  let clientParams = context.__clientParametersCache.get(client);
   if (!clientParams) {
     clientParams = [];
-    context.__clientToParameters.set(operationLocation, clientParams);
+    context.__clientParametersCache.set(client, clientParams);
   }
 
   const correspondingClientParams = clientParams.filter(
