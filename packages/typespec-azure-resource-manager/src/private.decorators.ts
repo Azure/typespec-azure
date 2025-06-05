@@ -509,6 +509,13 @@ const $armOperationRoute: ArmOperationRouteDecorator = (
   target: Operation,
   route?: string,
 ) => {
+  if (target.sourceOperation?.interface?.sourceInterfaces[0]) {
+    route =
+      route ||
+      context.program
+        .stateMap(ArmStateKeys.armResourceRoute)
+        .get(target.sourceOperation.interface.sourceInterfaces[0]);
+  }
   if (target.sourceOperation?.interface) {
     route =
       route ||
