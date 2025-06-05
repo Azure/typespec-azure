@@ -8,7 +8,7 @@ TypeSpec Data Plane Generation library
 npm install @azure-tools/typespec-client-generator-core
 ```
 
-## Emitter usage
+## Usage
 
 1. Via the command line
 
@@ -125,6 +125,7 @@ Available ruleSets:
 - [`@convenientAPI`](#@convenientapi)
 - [`@deserializeEmptyStringAsNull`](#@deserializeemptystringasnull)
 - [`@flattenProperty`](#@flattenproperty)
+- [`@moveTo`](#@moveto)
 - [`@operationGroup`](#@operationgroup)
 - [`@override`](#@override)
 - [`@paramAlias`](#@paramalias)
@@ -701,6 +702,26 @@ model Foo {
 }
 model Bar {}
 ```
+
+#### `@moveTo`
+
+Move an operation to a different client. If the target client is not defined, use `string` to indicate the client name.
+
+```typespec
+@Azure.ClientGenerator.Core.moveTo(target: Interface | Namespace | valueof string, scope?: valueof string)
+```
+
+##### Target
+
+The operation to move
+`Operation`
+
+##### Parameters
+
+| Name   | Type                                         | Description                                                                      |
+| ------ | -------------------------------------------- | -------------------------------------------------------------------------------- |
+| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which could indicate the client. |
+| scope  | `valueof string`                             | The language scope for this decorator                                            |
 
 #### `@operationGroup`
 

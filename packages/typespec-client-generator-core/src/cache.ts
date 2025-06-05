@@ -337,6 +337,3 @@ function isArm(service: Namespace): boolean {
     (decorator) => decorator.decorator.name === "$armProviderNamespace",
   );
 }
-function checkAndOmitEmptyOperationGroups(context: TCGCContext, clients: SdkClient[]): any {
-  throw new Error("Function not implemented.");
-}

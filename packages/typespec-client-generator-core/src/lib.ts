@@ -389,7 +389,7 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
       },
     },
-    "no-move-to-with-client-or-operation-group": {
+    "move-to-conflict": {
       severity: "warning",
       messages: {
         default:

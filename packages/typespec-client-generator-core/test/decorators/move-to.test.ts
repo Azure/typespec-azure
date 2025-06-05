@@ -30,7 +30,7 @@ it("@moveTo along with @client", async () => {
   )[1];
 
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/no-move-to-with-client-or-operation-group",
+    code: "@azure-tools/typespec-client-generator-core/move-to-conflict",
   });
 });
 
@@ -56,7 +56,7 @@ it("@moveTo along with @operationGroup", async () => {
   )[1];
 
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/no-move-to-with-client-or-operation-group",
+    code: "@azure-tools/typespec-client-generator-core/move-to-conflict",
   });
 });
 

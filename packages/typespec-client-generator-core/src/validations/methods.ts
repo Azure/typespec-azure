@@ -10,7 +10,7 @@ function validateNoMoveToWithClientOrOperationGroup(context: TCGCContext) {
   if (context.program.stateMap(moveToKey) && hasExplicitClientOrOperationGroup(context)) {
     for (const [op, _] of context.program.stateMap(moveToKey)) {
       reportDiagnostic(context.program, {
-        code: "no-move-to-with-client-or-operation-group",
+        code: "move-to-conflict",
         target: op,
       });
     }

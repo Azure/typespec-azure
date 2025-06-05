@@ -2,7 +2,7 @@
 title: "Emitter usage"
 ---
 
-## Emitter usage
+## Usage
 
 1. Via the command line
 
