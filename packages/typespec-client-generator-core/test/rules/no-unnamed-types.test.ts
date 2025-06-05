@@ -211,7 +211,7 @@ describe("models", () => {
       .expect(
         `
         @service
-        namespace TestService {
+        namespace TestService;
           model Test {
             prop: {};
           }
