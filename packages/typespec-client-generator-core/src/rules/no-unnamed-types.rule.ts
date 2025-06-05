@@ -34,6 +34,8 @@ export const noUnnamedTypesRule = createRule({
         const createdModel = tcgcContext.__referencedTypeCache.get(model);
         if (
           createdModel &&
+          createdModel.kind === "model" &&
+          createdModel.properties.length > 0 &&
           createdModel.usage !== UsageFlags.None &&
           (createdModel.usage & UsageFlags.LroInitial) === 0 &&
           (createdModel.usage & UsageFlags.MultipartFormData) === 0 &&
