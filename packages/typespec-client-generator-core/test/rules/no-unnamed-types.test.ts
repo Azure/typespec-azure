@@ -219,6 +219,20 @@ describe("models", () => {
       )
       .toBeValid();
   });
+
+  it("empty model array", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+          model Test {
+            prop: {}[];
+          }
+        `,
+      )
+      .toBeValid();
+  });
 });
 
 describe("unions", () => {
