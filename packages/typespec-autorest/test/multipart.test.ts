@@ -151,3 +151,13 @@ it("include x-ms-client-name if http part defines a different name from the prop
     "x-ms-client-name": "propName",
   });
 });
+
+it("doesn't emit a schema for the multipart body if a named model", async () => {
+  const res = await openApiFor(
+    `
+    model MyMultiPartBody { profileImage: HttpPart<bytes> }
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MyMultiPartBody): void;
+    `,
+  );
+  expect(res.definitions).toEqual({}); // No schema for multipart body
+});
