@@ -576,6 +576,26 @@ model Foo {
 model Bar {}
 ```
 
+### `@moveTo` {#@Azure.ClientGenerator.Core.moveTo}
+
+Move an operation to a different client. If the target client is not defined, use `string` to indicate the client name.
+
+```typespec
+@Azure.ClientGenerator.Core.moveTo(target: Interface | Namespace | valueof string, scope?: valueof string)
+```
+
+#### Target
+
+The operation to move
+`Operation`
+
+#### Parameters
+
+| Name   | Type                                         | Description                                                                      |
+| ------ | -------------------------------------------- | -------------------------------------------------------------------------------- |
+| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which could indicate the client. |
+| scope  | `valueof string`                             | The language scope for this decorator                                            |
+
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Create a ClientGenerator.Core operation group out of a namespace or interface

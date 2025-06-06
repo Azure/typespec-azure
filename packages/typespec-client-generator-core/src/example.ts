@@ -3,13 +3,9 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
-  Operation,
   createDiagnosticCollector,
-  isGlobalNamespace,
-  isService,
   resolvePath,
 } from "@typespec/compiler";
-import { getOperationId } from "@typespec/openapi";
 import {
   SdkArrayExampleValue,
   SdkArrayType,
@@ -34,7 +30,7 @@ import {
   isSdkIntKind,
 } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { resolveOperationId } from "./public-utils.js";
 
 interface LoadedExample {
   readonly relativePath: string;
@@ -135,30 +131,6 @@ async function loadExamples(
     }
   }
   return diagnostics.wrap(map);
-}
-
-function resolveOperationId(context: TCGCContext, operation: Operation, honorRenaming: boolean) {
-  const { program } = context;
-  // if @operationId was specified use that value
-  const explicitOperationId = getOperationId(program, operation);
-  if (explicitOperationId) {
-    return explicitOperationId;
-  }
-
-  const operationName = honorRenaming ? getLibraryName(context, operation) : operation.name;
-  if (operation.interface) {
-    return `${honorRenaming ? getLibraryName(context, operation.interface) : operation.interface.name}_${operationName}`;
-  }
-  const namespace = operation.namespace;
-  if (
-    namespace === undefined ||
-    isGlobalNamespace(program, namespace) ||
-    isService(program, namespace)
-  ) {
-    return operationName;
-  }
-
-  return `${honorRenaming ? getLibraryName(context, namespace) : namespace.name}_${operationName}`;
 }
 
 export async function handleClientExamples(

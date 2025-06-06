@@ -12,6 +12,7 @@ import {
   $convenientAPI,
   $deserializeEmptyStringAsNull,
   $flattenProperty,
+  $moveTo,
   $operationGroup,
   $override,
   $paramAlias,
@@ -49,5 +50,6 @@ export const $decorators = {
     deserializeEmptyStringAsNull: $deserializeEmptyStringAsNull,
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
+    moveTo: $moveTo,
   } as AzureClientGeneratorCoreDecorators,
 };

@@ -1,0 +1,10 @@
+{
+  "operationId": "AnotherInterface_moveTo",
+  "title": "AnotherInterface_moveTo",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}

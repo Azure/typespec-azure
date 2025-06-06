@@ -389,6 +389,27 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
       },
     },
+    "move-to-conflict": {
+      severity: "warning",
+      messages: {
+        default:
+          "When there is `@client` or `@operationGroup` decorator, `@moveTo` decorator will be ignored.",
+      },
+    },
+    "move-to-wrong-type": {
+      severity: "warning",
+      messages: {
+        default:
+          "`@moveTo` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
+      },
+    },
+    "move-to-duplicate": {
+      severity: "warning",
+      messages: {
+        default:
+          "You could not `@moveTo` a new operation group which has duplicate name of namespace or interface under `@service` namespace.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
