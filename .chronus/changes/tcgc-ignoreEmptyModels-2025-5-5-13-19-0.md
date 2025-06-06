@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Don't raise `no-unnamed-types` for nullable types
+Ignore empty `{}` definitions from `no-unnamed-types` rule
