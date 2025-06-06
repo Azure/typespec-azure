@@ -13,6 +13,7 @@ import { getOperationId } from "@typespec/openapi";
 import {
   SdkArrayExampleValue,
   SdkArrayType,
+  SdkBodyModelPropertyType,
   SdkClientType,
   SdkDictionaryExampleValue,
   SdkDictionaryType,
@@ -24,7 +25,6 @@ import {
   SdkHttpResponse,
   SdkHttpResponseExampleValue,
   SdkModelExampleValue,
-  SdkModelPropertyType,
   SdkModelType,
   SdkServiceMethod,
   SdkServiceOperation,
@@ -404,7 +404,7 @@ function handleHttpResponse(
 }
 
 function getSdkTypeExample(
-  type: SdkType | SdkModelPropertyType,
+  type: SdkType,
   example: any,
   relativePath: string,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
@@ -607,7 +607,7 @@ function getSdkModelExample(
     const additionalProperties: Record<string, any> = new Map();
     const additionalPropertiesExample: Record<string, SdkExampleValue> = {};
 
-    const properties: Map<string, SdkModelPropertyType> = new Map();
+    const properties: Map<string, SdkBodyModelPropertyType> = new Map();
     const propertiesExample: Record<string, SdkExampleValue> = {};
 
     // get all properties type and additional properties type if exist

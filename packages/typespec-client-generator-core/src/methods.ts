@@ -38,12 +38,12 @@ import {
   SdkMethod,
   SdkMethodParameter,
   SdkMethodResponse,
-  SdkModelPropertyType,
   SdkModelType,
   SdkOperationGroup,
   SdkPagingServiceMethod,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkServiceResponseHeader,
   SdkType,
   TCGCContext,
   UsageFlags,
@@ -59,6 +59,7 @@ import {
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
+  twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -69,7 +70,7 @@ import {
 import {
   getClientTypeWithDiagnostics,
   getSdkBuiltInType,
-  getSdkModelPropertyType,
+  getSdkModelPropertyTypeBase,
 } from "./types.js";
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
@@ -154,18 +155,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     const {
       continuationTokenParameterSegments,
       continuationTokenResponseSegments,
-      nextLinkPath,
       nextLinkSegments,
       resultSegments,
-      resultPath,
     } = clientPagingMetadata;
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    baseServiceMethod.response.resultPath = resultPath;
-    baseServiceMethod.response.resultSegments = modelPropertiesToSdkType(
-      context,
-      resultSegments,
-      operation,
+    baseServiceMethod.response.resultSegments = resultSegments?.map(
+      (segment) => context.__modelPropertyCache.get(segment)!,
     );
 
     context.__pagedResultSet.add(responseType!);
@@ -182,19 +177,20 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     return diagnostics.wrap({
       ...baseServiceMethod,
       kind: "paging",
-      nextLinkPath,
       pagingMetadata: {
         __raw: pagingOperation,
-        nextLinkSegments: modelPropertiesToSdkType(context, nextLinkSegments, operation),
-        continuationTokenParameterSegments: modelPropertiesToSdkType(
-          context,
-          continuationTokenParameterSegments,
-          operation,
+        nextLinkSegments: nextLinkSegments?.map(
+          (segment) =>
+            context.__responseHeaderCache.get(segment) ??
+            context.__modelPropertyCache.get(segment)!,
         ),
-        continuationTokenResponseSegments: modelPropertiesToSdkType(
-          context,
-          continuationTokenResponseSegments,
-          operation,
+        continuationTokenParameterSegments: continuationTokenParameterSegments?.map(
+          (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
+        ),
+        continuationTokenResponseSegments: continuationTokenResponseSegments?.map(
+          (segment) =>
+            context.__responseHeaderCache.get(segment) ??
+            context.__modelPropertyCache.get(segment)!,
         ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
       },
@@ -233,19 +229,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  baseServiceMethod.response.resultPath = getPropertyPathFromSegment(
-    context,
-    pagedMetadata.modelType,
-    pagedMetadata.itemsSegments,
-  );
   baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
     responseType,
     (p) => p.__raw === pagedMetadata.itemsProperty,
-  );
+  ) as SdkBodyModelPropertyType[] | undefined;
 
-  let nextLinkPath = undefined;
-  let nextLinkSegments = undefined;
+  let nextLinkSegments: (SdkServiceResponseHeader | SdkBodyModelPropertyType)[] | undefined =
+    undefined;
   let nextLinkReInjectedParametersSegments = undefined;
   if (pagedMetadata.nextLinkProperty) {
     if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
@@ -258,17 +248,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             findRootSourceProperty(h.__raw) ===
               findRootSourceProperty(pagedMetadata.nextLinkProperty!),
         );
-      nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
     } else {
-      nextLinkPath = getPropertyPathFromSegment(
-        context,
-        pagedMetadata.modelType,
-        pagedMetadata?.nextLinkSegments,
-      );
       nextLinkSegments = getPropertySegmentsFromModelOrParameters(
         responseType,
         (p) => p.__raw === pagedMetadata.nextLinkProperty,
-      );
+      ) as SdkBodyModelPropertyType[];
     }
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
@@ -291,7 +275,6 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     ...baseServiceMethod,
     __raw_paged_metadata: pagedMetadata,
     kind: "paging",
-    nextLinkPath,
     nextLinkOperation: pagedMetadata?.nextLinkOperation
       ? diagnostics.pipe(
           getSdkServiceOperation<TServiceOperation>(
@@ -319,50 +302,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   });
 }
 
-export function getPropertyPathFromModel(
-  context: TCGCContext,
-  model: Model,
-  predicate: (property: ModelProperty) => boolean,
-): string | undefined {
-  const queue: { model: Model; path: ModelProperty[] }[] = [];
-
-  if (model.baseModel) {
-    const baseResult = getPropertyPathFromModel(context, model.baseModel, predicate);
-    if (baseResult) return baseResult;
-  }
-
-  for (const prop of model.properties.values()) {
-    if (predicate(prop)) {
-      return getLibraryName(context, prop);
-    }
-    if (prop.type.kind === "Model") {
-      queue.push({ model: prop.type, path: [prop] });
-    }
-  }
-
-  while (queue.length > 0) {
-    const { model, path } = queue.shift()!;
-    for (const prop of model.properties.values()) {
-      if (predicate(prop)) {
-        return path
-          .concat(prop)
-          .map((s) => getLibraryName(context, s))
-          .join(".");
-      }
-      if (prop.type.kind === "Model") {
-        queue.push({ model: prop.type, path: path.concat(prop) });
-      }
-    }
-  }
-
-  return undefined;
-}
-
 export function getPropertySegmentsFromModelOrParameters(
   source: SdkModelType | SdkMethodParameter[],
-  predicate: (property: SdkModelPropertyType) => boolean,
-): SdkModelPropertyType[] | undefined {
-  const queue: { model: SdkModelType; path: SdkModelPropertyType[] }[] = [];
+  predicate: (property: SdkMethodParameter | SdkBodyModelPropertyType) => boolean,
+): (SdkMethodParameter | SdkBodyModelPropertyType)[] | undefined {
+  const queue: { model: SdkModelType; path: (SdkMethodParameter | SdkBodyModelPropertyType)[] }[] =
+    [];
 
   if (!Array.isArray(source)) {
     if (source.baseModel) {
@@ -395,30 +340,6 @@ export function getPropertySegmentsFromModelOrParameters(
   return undefined;
 }
 
-function getPropertyPathFromSegment(
-  context: TCGCContext,
-  type: Model,
-  segments?: string[],
-): string {
-  if (!segments || segments.length === 0) {
-    return "";
-  }
-  const wireSegments = [];
-  let current = type;
-  for (const segment of segments) {
-    const property = current.properties.get(segment);
-    if (!property) {
-      if (current.baseModel) {
-        return getPropertyPathFromSegment(context, current.baseModel, segments);
-      }
-      return "";
-    }
-    wireSegments.push(getLibraryName(context, property));
-    current = property.type as Model;
-  }
-  return wireSegments.join(".");
-}
-
 function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
@@ -431,9 +352,6 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   );
 
   baseServiceMethod.response.type = metadata.finalResponse?.result;
-
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  baseServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
   baseServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
 
   return diagnostics.wrap({
@@ -505,7 +423,6 @@ function getServiceMethodLroMetadata(
     return {
       envelopeResult,
       result,
-      resultPath,
       resultSegments: sdkProperty !== undefined ? [sdkProperty] : undefined,
     };
   }
@@ -655,10 +572,24 @@ function getSdkMethodParameter(
   operation: Operation,
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
-    kind: "method",
-  });
+
+  let property = context.__methodParameterCache?.get(type);
+
+  if (!property) {
+    const clientParams = operation
+      ? context.__clientToParameters.get(getLocationOfOperation(operation))
+      : undefined;
+    const correspondingClientParams = clientParams?.find((x) =>
+      twoParamsEquivalent(context, x.__raw, type),
+    );
+    if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
+
+    property = {
+      ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
+      kind: "method",
+    };
+  }
+  return diagnostics.wrap(property);
 }
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
@@ -684,16 +615,4 @@ export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
     }
   }
   return diagnostics.wrap(retval);
-}
-
-function modelPropertiesToSdkType(
-  context: TCGCContext,
-  modelProperties?: ModelProperty[],
-  operation?: Operation,
-): SdkModelPropertyType[] | undefined {
-  const diagnostics = createDiagnosticCollector();
-
-  return modelProperties?.map((r) =>
-    diagnostics.pipe(getSdkModelPropertyType(context, r, operation)),
-  );
 }

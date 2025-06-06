@@ -21,14 +21,16 @@ import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
   SdkArrayType,
+  SdkBodyModelPropertyType,
   SdkContext,
   SdkDictionaryType,
   SdkEnumType,
   SdkHttpOperation,
-  SdkModelPropertyType,
+  SdkMethodParameter,
   SdkModelType,
   SdkNullableType,
   SdkServiceOperation,
+  SdkServiceResponseHeader,
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
@@ -69,7 +71,9 @@ export function createTCGCContext(
       SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
     >(),
     __arrayDictionaryCache: new Map<Type, SdkDictionaryType | SdkArrayType>(),
-    __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
+    __methodParameterCache: new Map<ModelProperty, SdkMethodParameter>(),
+    __modelPropertyCache: new Map<ModelProperty, SdkBodyModelPropertyType>(),
+    __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
     __clientToParameters: new Map(),

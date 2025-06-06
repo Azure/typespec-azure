@@ -74,8 +74,6 @@ import {
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
-  SdkInitializationType,
-  SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkNullableType,
@@ -107,7 +105,6 @@ import {
   isOnClient,
   listAllUserDefinedNamespaces,
   resolveConflictGeneratedName,
-  twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -122,7 +119,6 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
-import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
@@ -764,7 +760,7 @@ function addDiscriminatorToModelType(
       discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
-    model.properties.splice(0, 0, {
+    const discriminatorPropertyType: SdkBodyModelPropertyType = {
       kind: "property",
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
@@ -786,8 +782,9 @@ function addDiscriminatorToModelType(
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
       decorators: [],
       access: "public",
-    });
-    model.discriminatorProperty = model.properties[0];
+    };
+    model.properties.splice(0, 0, discriminatorPropertyType);
+    model.discriminatorProperty = discriminatorPropertyType;
   }
   return diagnostics.wrap(undefined);
 }
@@ -798,18 +795,6 @@ export function getSdkModel(
   operation?: Operation,
 ): SdkModelType {
   return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
-}
-
-export function getInitializationType(
-  context: TCGCContext,
-  type: Model,
-  operation?: Operation,
-): SdkInitializationType {
-  const model = ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
-  for (const property of model.properties) {
-    property.kind = "method";
-  }
-  return model as SdkInitializationType;
 }
 
 export function getSdkModelWithDiagnostics(
@@ -1334,11 +1319,17 @@ function updateMultiPartInfo(
       isFilePart: isFilePart(context, base.type),
       isMulti: httpOperationPart.multi,
       filename: httpOperationPart.filename
-        ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
+        ? diagnostics.pipe(
+            getSdkBodyModelPropertyType(context, httpOperationPart.filename, operation),
+          )
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
+            getSdkBodyModelPropertyType(
+              context,
+              httpOperationPart.body.contentTypeProperty,
+              operation,
+            ),
           )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
@@ -1358,29 +1349,18 @@ function updateMultiPartInfo(
   return diagnostics.wrap(undefined);
 }
 
-export function getSdkModelPropertyType(
+export function getSdkBodyModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
   operation?: Operation,
-): [SdkModelPropertyType, readonly Diagnostic[]] {
+): [SdkBodyModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
   let property = context.__modelPropertyCache?.get(type);
 
   if (!property) {
-    const clientParams = operation
-      ? context.__clientToParameters.get(getLocationOfOperation(operation))
-      : undefined;
-    const correspondingClientParams = clientParams?.find((x) =>
-      twoParamsEquivalent(context, x.__raw, type),
-    );
-    if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
-    const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
-
-    if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
-
     property = {
-      ...base,
+      ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
       kind: "property",
       optional: type.optional,
       discriminator: false,
@@ -1389,7 +1369,7 @@ export function getSdkModelPropertyType(
       flatten: shouldFlattenProperty(context, type),
       serializationOptions: {},
     };
-    updateReferencedPropertyMap(context, type, property);
+    context.__modelPropertyCache.set(type, property);
     if (operation && type.model) {
       const httpOperation = getHttpOperationWithCache(context, operation);
       const httpBody = httpOperation.parameters.body;
@@ -1424,7 +1404,9 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+    const clientProperty = diagnostics.pipe(
+      getSdkBodyModelPropertyType(context, property, operation),
+    );
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
@@ -1432,17 +1414,6 @@ function addPropertiesToModelType(
     }
   }
   return diagnostics.wrap(undefined);
-}
-
-function updateReferencedPropertyMap(
-  context: TCGCContext,
-  type: ModelProperty,
-  sdkType: SdkModelPropertyType,
-) {
-  if (sdkType.kind !== "property") {
-    return;
-  }
-  context.__modelPropertyCache.set(type, sdkType);
 }
 
 function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkType) {

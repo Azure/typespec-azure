@@ -9,6 +9,7 @@ import {
 import { getSdkHttpParameter } from "./http.js";
 import {
   InitializedByFlags,
+  SdkBodyModelPropertyType,
   SdkClient,
   SdkClientInitializationType,
   SdkClientType,
@@ -16,7 +17,6 @@ import {
   SdkEndpointType,
   SdkHttpOperation,
   SdkMethodParameter,
-  SdkModelPropertyType,
   SdkOperationGroup,
   SdkPathParameter,
   SdkServiceOperation,
@@ -284,10 +284,13 @@ function createSdkClientInitializationType(
     result.decorators = model.decorators;
     result.__raw = model.__raw;
     result.parameters = model.properties.map(
-      (property: SdkModelPropertyType): SdkMethodParameter => {
-        property.onClient = true;
-        property.kind = "method";
-        return property as SdkMethodParameter;
+      (property: SdkBodyModelPropertyType): SdkMethodParameter => {
+        const param: SdkMethodParameter = {
+          ...property,
+          onClient: true,
+          kind: "method",
+        };
+        return param;
       },
     );
   }
@@ -333,7 +336,7 @@ function createSdkClientInitializationType(
       context.__clientToParameters.set(client.type, clientParams);
     }
     for (const param of result.parameters) {
-      clientParams.push(param);
+      if (param.kind === "method") clientParams.push(param);
     }
   }
 

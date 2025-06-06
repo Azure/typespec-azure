@@ -43,7 +43,7 @@ import {
   SdkHeaderParameter,
   SdkHttpOperation,
   SdkHttpOperationExample,
-  SdkModelPropertyType,
+  SdkMethodParameter,
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
@@ -679,7 +679,7 @@ export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
  */
 export function getHttpOperationParameter(
   method: SdkServiceMethod<SdkHttpOperation>,
-  param: SdkModelPropertyType,
+  param: SdkMethodParameter | SdkBodyModelPropertyType,
 ):
   | SdkPathParameter
   | SdkQueryParameter
