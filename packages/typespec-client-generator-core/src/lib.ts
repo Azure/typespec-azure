@@ -403,6 +403,13 @@ export const $lib = createTypeSpecLibrary({
           "`@moveTo` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
       },
     },
+    "move-to-duplicate": {
+      severity: "warning",
+      messages: {
+        default:
+          "You could not `@moveTo` a new operation group which has duplicate name of namespace or interface under `@service` namespace.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

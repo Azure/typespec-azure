@@ -60,6 +60,72 @@ it("@moveTo along with @operationGroup", async () => {
   });
 });
 
+it("@moveTo move-to-wrong-type", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnose(
+    `
+    @service
+    namespace TestService{
+      @moveTo(Test)
+      op test(): string;
+    }
+
+    namespace Test{
+    }
+  `,
+  );
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/move-to-wrong-type",
+  });
+  const sdkPackage = runner.context.sdkPackage;
+  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+  ok(rootClient);
+  strictEqual(rootClient.children, undefined);
+  strictEqual(rootClient.methods.length, 1);
+  strictEqual(rootClient.methods[0].name, "test");
+});
+
+it("@moveTo move-to-duplicate", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnose(
+    `
+    @service
+    namespace TestService;
+
+    interface A {
+      @route("/a1")
+      op a1(): void;
+
+      @route("/a2")
+      @moveTo("B")
+      op a2(): void;
+    }
+
+    interface B {
+      @route("/b")
+      op b(): void;
+    }
+  `,
+  );
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/move-to-duplicate",
+  });
+  const sdkPackage = runner.context.sdkPackage;
+  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+  ok(rootClient);
+  strictEqual(rootClient.children?.length, 2);
+  const aClient = rootClient.children.find((c) => c.name === "A");
+  ok(aClient);
+  strictEqual(aClient.methods.length, 2);
+  strictEqual(aClient.methods[0].name, "a1");
+  strictEqual(aClient.methods[1].name, "a2");
+
+  const bClient = rootClient.children.find((c) => c.name === "B");
+  ok(bClient);
+  strictEqual(bClient.methods.length, 1);
+  strictEqual(bClient.methods[0].name, "b");
+});
+
 it("move an operation to another operation group", async () => {
   await runner.compileWithBuiltInService(
     `

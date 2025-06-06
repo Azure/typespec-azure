@@ -77,6 +77,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     const newOperationGroupNames = new Set<string>();
     listScopedDecoratorData(context, moveToKey).map((target) => {
       if (typeof target === "string") {
+        if (
+          clients[0].subOperationGroups.some(
+            (og) => og.type && getLibraryName(context, og.type) === target,
+          )
+        ) {
+          // do not create a new operation group if it already exists
+          return;
+        }
         newOperationGroupNames.add(target);
       }
     });
@@ -118,10 +126,17 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             if (context.__rawClientsOperationGroupsCache.has(moveTo)) {
               pushGroup = context.__rawClientsOperationGroupsCache.get(moveTo)!;
             } else {
-              reportDiagnostic(context.program, {
-                code: "move-to-wrong-type",
-                target: op,
-              });
+              if (typeof moveTo !== "string") {
+                reportDiagnostic(context.program, {
+                  code: "move-to-wrong-type",
+                  target: op,
+                });
+              } else {
+                reportDiagnostic(context.program, {
+                  code: "move-to-duplicate",
+                  target: clients[0].type,
+                });
+              }
             }
           }
           context.__clientToOperationsCache.get(pushGroup)!.push(op);
