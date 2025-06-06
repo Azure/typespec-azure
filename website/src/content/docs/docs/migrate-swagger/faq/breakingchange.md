@@ -2,9 +2,44 @@
 title: Resolving Swagger Breaking Change Violations
 ---
 
-The Swagger Converter cannot perfectly represent every aspect of every API in TypeSpec. This document outlines common changes you might need to make to a converted TypeSpec to ensure compatibility with your existing service API and pass check-in validations.
+The Swagger Converter cannot perfectly represent every aspect of every API in TypeSpec. This document outlines common changes you may need to make to a converted TypeSpec to ensure compatibility with your existing service API and to pass check-in validations.
 
 ## Migrating ARM Specifications
+
+### Customizing Route for Action (POST) Operations
+
+By default, the last segment of a POST action operation route is the operation name. For example:
+
+```tsp
+move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+```
+
+This produces the route:  
+`/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/move`
+
+To customize the action segment, use the `@action` decorator:
+
+```tsp
+@action("customizedAction")
+move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+```
+
+This produces the route:  
+`/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/customizedAction`
+
+By default, the `@action` decorator converts the segment to camel case. If you want to preserve the exact casing, use `@Rest.Private.actionSegment`:
+
+```tsp
+@Rest.Private.actionSegment("UpperCase")
+move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+```
+
+This produces the route:  
+`/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/UpperCase`
+
+### Customizing Scope Parameter Name for Extension Resources
+
+// TO-DO
 
 ### Customizing Request Payload Parameter Names
 
@@ -22,13 +57,13 @@ interface Widgets {
 }
 ```
 
-The name of the request body parameter is `resource` so you can change the name in clients using an augment decorator
+The name of the request body parameter is `resource`. You can change the name in clients using an augment decorator:
 
 ```tsp
 @@clientName(Widgets.createOrUpdate::parameters.resource, "<desired-request-body-parameter-name>");
 ```
 
-Note that this works for _any_ PUT operation template.
+This works for any PUT operation template.
 
 #### Update (PATCH) APIs
 
@@ -40,15 +75,15 @@ interface Widgets {
 }
 ```
 
-The name of the request body parameter is `properties` so you can change the name in clients using an augment decorator
+The name of the request body parameter is `properties`. You can change the name in clients using an augment decorator:
 
 ```tsp
 @@clientName(Widgets.update::parameters.properties, "<desired-request-body-parameter-name>");
 ```
 
-Note that this works for _any_ PATCH operation template.
+This works for any PATCH operation template.
 
-### Action (POST) APIs
+#### Action (POST) APIs
 
 Given a POST operation, for example:
 
@@ -58,26 +93,26 @@ interface Widgets {
 }
 ```
 
-The name of the request body parameter is `body` so you can change the name in clients using an augment decorator
+The name of the request body parameter is `body`. You can change the name in clients using an augment decorator:
 
 ```tsp
 @@clientName(Widgets.mungeWidget::parameters.body, "<desired-request-body-parameter-name>");
 ```
 
-Note that this works for _any_ POST operation template.
+This works for any POST operation template.
 
 ### Adding Request Query or Header Parameters
 
 The `Parameters` template parameter allows you to specify additional parameters after the operation path (for example, query and header parameters) in the form of a model, with each model property corresponding to a parameter. You may use intersection to combine multiple separate parameters.
 
 ```tsp
-// all list query params
+// All list query params
 op listBySubscription is ArmListBySubscription<
   Widget,
   Parameters = Azure.Core.StandardListQueryParameters
 >;
 
-// intersecting individual parameters
+// Intersecting individual parameters
 op listBySubscription is ArmListBySubscription<
   Widget,
   Parameters = Azure.Core.TopQueryParameter & Azure.Core.SkipQueryParameter
@@ -89,7 +124,6 @@ op listBySubscription is ArmListBySubscription<
 The `Response` parameter allows you to specify non-error responses to the operation.
 
 ```tsp
-// all list query params
 op listBySubscription is ArmListBySubscription<Widget, Response = MyCustomCollectionType>;
 ```
 
@@ -98,7 +132,6 @@ op listBySubscription is ArmListBySubscription<Widget, Response = MyCustomCollec
 The `Error` parameter allows you to change the default error type used in an operation.
 
 ```tsp
-// all list query params
 op listBySubscription is ArmListBySubscription<Widget, Error = MyCustomError>;
 ```
 
@@ -108,13 +141,13 @@ You can generally choose an asynchronous operation template that matches your op
 
 #### Templates for Async PUT Operations
 
-- `ArmCreateOrReplaceAsync` is a PUT operation that uses the 'resource' definition in the request body, and return a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains 'Location` LRO header.
+- `ArmCreateOrReplaceAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains a `Location` LRO header.
 
   ```tsp
   op createOrUpdate is ArmCreateOrReplaceAsync<Resource>;
   ```
 
-- `ArmCreateOrUpdateAsync`is a PUT operation that uses the 'resource' definition in the request body, and return a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains 'Azure-AsyncOperation` LRO header.
+- `ArmCreateOrUpdateAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains an `Azure-AsyncOperation` LRO header.
 
   ```tsp
   op createOrUpdate is ArmCreateOrUpdateAsync<Resource>;
@@ -128,13 +161,13 @@ You can generally choose an asynchronous operation template that matches your op
   op update is ArmTagsPatchAsync<Resource>;
   ```
 
-- `ArmResourcePatchAsync`is a PATCH operation that uses the visibility settings to select properties for the PATCH request body(any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
+- `ArmResourcePatchAsync` is a PATCH operation that uses the visibility settings to select properties for the PATCH request body (any property with no visibility setting, or including visibility "update"). It follows the required 202 pattern to resolve the LRO via location, although this can be customized using the `LroHeaders` parameter.
 
   ```tsp
   op update is ArmResourcePatchAsync<Resource, ResourceProperties>;
   ```
 
-- `ArmCustomPatchAsync`is a PATCH operation that allows you to customize the PATCH request body.
+- `ArmCustomPatchAsync` is a PATCH operation that allows you to customize the PATCH request body.
 
   ```tsp
   op update is ArmCustomPatchAsync<Resource, PatchRequestBody>;
@@ -147,30 +180,30 @@ You can generally choose an asynchronous operation template that matches your op
   ```tsp
   op doStuff is ArmResourceActionAsync<Resource, ActionRequest, ActionResponse>;
 
-  // with no request body
+  // With no request body
   op doStuffNoRequest is ArmResourceActionAsync<Resource, void, ActionResponse>;
 
-  // with no response body
+  // With no response body
   op doStuffCommand is ArmResourceActionAsync<Resource, ActionRequest, void>;
   ```
 
 #### Templates for Async DELETE Operations
 
-- `ArmResourceDeleteWithoutOKAsync` is a DELETE operation that uses no request body, will return a `202` response in the case of an Asynchronous delete operation, and a `204` response in case the resource does not exist.
+- `ArmResourceDeleteWithoutOKAsync` is a DELETE operation that uses no request body, will return a `202` response in the case of an asynchronous delete operation, and a `204` response in case the resource does not exist.
 
   ```tsp
   op delete is ArmResourceDeleteWithoutOKAsync<Resource>;
   ```
 
-- `ArmResourceDeleteAsync`iis a DELETE operation that uses no request body, and return a `200` response in the case of a successful synchronous delete, a `202` response in the case of an Asynchronous delete operation, and a `204` response in case the resource does not exist.
+- `ArmResourceDeleteAsync` is a DELETE operation that uses no request body, and returns a `200` response in the case of a successful synchronous delete, a `202` response in the case of an asynchronous delete operation, and a `204` response in case the resource does not exist.
 
   ```tsp
-  op createOrUpdate is ArmResourceDeleteAsync<Resource>;
+  op delete is ArmResourceDeleteAsync<Resource>;
   ```
 
-### Visibility changes for `nextLink` and `value` properties
+### Visibility Changes for `nextLink` and `value` Properties
 
-The issue is that some older specifications marked these values as read only. To fix, simply add the following augment decorator statements to the `main.tsp` file.
+Some older specifications marked these values as `readOnly`. To fix, simply add the following augment decorator statements to your `main.tsp` file:
 
 ```tsp
 @@visibility(Azure.Core.Page.value, "read");

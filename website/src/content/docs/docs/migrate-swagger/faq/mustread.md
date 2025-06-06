@@ -48,3 +48,41 @@ model YourOwnProxyResourceDefinition {
   name: string;
 }
 ```
+
+## Using Page Model from Azure.Core Library
+
+For all pageable response models, we highly recommend using `Azure.Core.Page` to align with ARM conventions:
+
+```tsp
+model YourPageableModel is Azure.Core.Page<YourItemType>;
+```
+
+This makes the `value` property in `YourPageableModel` required, and the type of the `nextLink` property becomes `url`. If you need to keep the previous shape, define `YourPageableModel` as a regular model.
+
+## Misuse of "readOnly" on Model
+
+The `"readOnly": true` property should only be used on properties, not on models. If you mistakenly mark a model as readOnly and have other models refer to it, like:
+
+```json
+"ReadOnlyModel": {
+  "readOnly": true
+},
+"ReferToReadOnlyModel": {
+  "properties": {
+    "property": {
+      "$ref": "#/definitions/ReadOnlyModel"
+    }
+  }
+}
+```
+
+This is equivalent to marking the referring property as read-only in TypeSpec:
+
+```tsp
+model ReadOnlyModel {}
+
+model ReferToReadOnlyModel {
+  @visibility(Lifecycle.Read)
+  property: ReadOnlyModel;
+}
+```
