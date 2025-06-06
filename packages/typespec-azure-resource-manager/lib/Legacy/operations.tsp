@@ -15,11 +15,28 @@ using Rest;
  * @template ResourceTypeParameter The path parameter for the resource name
  * @template ErrorType Optional. The type of error models used in operations created form this template
  */
-@doc("")
+@autoRoute
 interface LegacyOperations<
   ParentParameters extends {},
   ResourceTypeParameter extends {},
   ErrorType extends {} = ErrorResponse
+> extends RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType> {}
+
+/**
+ * An operation template used to build resource operations in which the same resource type
+ * is accessible at multiple, fixed resource paths. Can be used with static routes.
+ * @template ParentParameters The path parameters for the resource parent
+ * @template ResourceTypeParameter The path parameter for the resource name
+ * @template ErrorType Optional. The type of error models used in operations created form this template
+ * @template ResourceRoute Optional. The resource route to use for operations in the interface.
+ */
+@doc("")
+@Private.armResourceRoute(ResourceRoute)
+interface RoutedOperations<
+  ParentParameters extends {},
+  ResourceTypeParameter extends {},
+  ErrorType extends {} = ErrorResponse,
+  ResourceRoute extends valueof string = ""
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
@@ -29,8 +46,8 @@ interface LegacyOperations<
    * @template Response Optional. The success response(s) for the PUT operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
-  @autoRoute
   @doc("Create a {name}", Resource)
+  @Private.armOperationRoute
   @armResourceCreateOrUpdate(Resource)
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
   @put
@@ -59,7 +76,7 @@ interface LegacyOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
-  @autoRoute
+  @Private.armOperationRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
   @put
@@ -84,8 +101,8 @@ interface LegacyOperations<
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
-  @autoRoute
   @doc("Update a {name}", Resource)
+  @Private.armOperationRoute
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
@@ -118,8 +135,8 @@ interface LegacyOperations<
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
-  @autoRoute
   @doc("Update a {name}", Resource)
+  @Private.armOperationRoute
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
@@ -143,8 +160,8 @@ interface LegacyOperations<
    * @template Response Optional. The success response(s) for the delete operation
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
-  @autoRoute
   @doc("Delete a {name}", Resource)
+  @Private.armOperationRoute
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
@@ -163,8 +180,8 @@ interface LegacyOperations<
    * @template Response Optional. The success response(s) for the delete operation
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
-  @autoRoute
   @doc("Delete a {name}", Resource)
+  @Private.armOperationRoute
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
@@ -180,8 +197,8 @@ interface LegacyOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.
    */
-  @autoRoute
   @doc("Get a {name}", Resource)
+  @Private.armOperationRoute
   @get
   @readsResource(Resource)
   @armResourceRead(Resource)
@@ -197,11 +214,11 @@ interface LegacyOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The response returned by the list
    */
-  @autoRoute
   @doc("List a {name}", Resource)
   @get
   @listsResource(Resource)
   @segmentOf(Resource)
+  @Private.armOperationRoute
   @armResourceList(Resource)
   List<
     Resource extends Foundations.SimpleResource,
@@ -218,8 +235,8 @@ interface LegacyOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("")
-  @autoRoute
   @armResourceAction(Resource)
+  @Private.armOperationRoute
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
   @returnsDoc("Azure operation completed successfully.")
@@ -250,8 +267,8 @@ interface LegacyOperations<
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
-  @autoRoute
   @armResourceAction(Resource)
+  @Private.armOperationRoute
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
   @returnsDoc("Azure operation completed successfully.")
