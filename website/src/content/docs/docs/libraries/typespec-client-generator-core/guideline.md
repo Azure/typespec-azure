@@ -84,7 +84,7 @@ Unlike TCGC raw types and helpers. Client type graph is a calculated complete ty
 - The `crossLanguageDefinitionId` property in TCGC types indicates a unique ID for a TCGC type that could be use to do output mapping for different emitters.
 - The `name` property, and sometimes along with `isGeneratedName` in TCGC types indicates the type's name, and whether the name is created by TCGC.
 - The `access` property in TCGC types indicates whether the type has public or private accessibility.
-- The `usage` property in TCGC types indicates the type's all kinds of usage info, including
+- The `usage` property in TCGC types indicates the type's all kinds of usage info; its value is a bit map of [`UsageFlags`](../reference/enumerations/usageflags/) enumeration.
 
 ### Package
 
@@ -135,8 +135,38 @@ TCGC has supported four kinds of methods: [`SdkBasicServiceMethod`](../reference
 TCGC separate the client level operation and the protocol level operation. This way, TCGC are able to abstract away the protocol used to call the service (i.e. `HTTP` or `gRPC`).
 Emitter could get the protocol level operation from `SdkServiceMethod.operation`. An [`SdkServiceOperation`](../reference/js-api/type-aliases/sdkserviceoperation/) represent a protocol operation.
 
-TCGC has supported one kind of operation: [`SdkHttpOperation`](../reference/js-api/interfaces/sdkhttpoperation/)
+TCGC has supported one kind of operation: [`SdkHttpOperation`](../reference/js-api/interfaces/sdkhttpoperation/).
 
 ### Type
 
-TODO
+## Client Type Calculation Logic
+
+### Client Detection
+
+### Client Initialization Creation
+
+### Method Detection
+
+### Method Parameters Handling
+
+### Basic Method Return Type Calculation
+
+### Paging Method Return Type Calculation
+
+### LRO Method Return Type Calculation
+
+### Http Operation Parameters Handling
+
+### Http Operation Body Parameter Handling
+
+### Http Operation Response Calculation
+
+### Http Operation Exception Calculation
+
+### Type Traversal Logic
+
+### Access Calculation
+
+### Usage Calculation
+
+### Naming Logic for Anonymous Model
