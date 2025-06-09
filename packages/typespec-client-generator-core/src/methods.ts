@@ -11,7 +11,6 @@ import {
   Model,
   ModelProperty,
   Operation,
-  Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { isHeader } from "@typespec/http";
@@ -126,13 +125,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
   // normal paging
   if (isList(context.program, operation)) {
-    const clientPagingMetadata = $(context.program).operation.getPagingClientMetadata(operation, {
-      getName: (t: Type & { name?: string | symbol }) => {
-        return getLibraryName(context, t);
-      },
-    });
-
-    // const pagingOperation = diagnostics.pipe(getPagingOperation(context.program, operation));
+    const clientPagingMetadata = $(context.program).operation.getPagingClientMetadata(
+      getOverriddenClientMethod(context, operation) ?? operation,
+    );
 
     if (!clientPagingMetadata) {
       diagnostics.add(
@@ -152,24 +147,30 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       });
     }
 
-    const {
-      continuationTokenParameterSegments,
-      continuationTokenResponseSegments,
-      nextLinkSegments,
-      resultSegments,
-    } = clientPagingMetadata;
+    const resultSegments = mapFirstSegmentForResultSegments(
+      clientPagingMetadata.pageItemsSegments,
+      baseServiceMethod.response,
+    );
+    const nextLinkSegments = mapFirstSegmentForResultSegments(
+      clientPagingMetadata.nextLinkSegments,
+      baseServiceMethod.response,
+    );
+    const continuationTokenResponseSegments = mapFirstSegmentForResultSegments(
+      clientPagingMetadata.continuationTokenResponseSegments,
+      baseServiceMethod.response,
+    );
 
     baseServiceMethod.response.resultSegments = resultSegments?.map(
-      (segment) => context.__modelPropertyCache.get(segment)!,
+      (resultSegment) => context.__modelPropertyCache.get(resultSegment)!,
     );
 
     context.__pagedResultSet.add(responseType!);
-    const pagingOperation = $(context.program).operation.getPagingMetadata(operation);
+    const pagingMetadata = $(context.program).operation.getPagingMetadata(operation);
     // tcgc will let all paging method return a list of items
     baseServiceMethod.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(
         context,
-        pagingOperation!.output.pageItems.property.type,
+        pagingMetadata!.output.pageItems.property.type,
         operation,
       ),
     );
@@ -178,15 +179,16 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       ...baseServiceMethod,
       kind: "paging",
       pagingMetadata: {
-        __raw: pagingOperation,
+        __raw: pagingMetadata,
         nextLinkSegments: nextLinkSegments?.map(
           (segment) =>
             context.__responseHeaderCache.get(segment) ??
             context.__modelPropertyCache.get(segment)!,
         ),
-        continuationTokenParameterSegments: continuationTokenParameterSegments?.map(
-          (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
-        ),
+        continuationTokenParameterSegments:
+          clientPagingMetadata.continuationTokenParameterSegments?.map(
+            (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
+          ),
         continuationTokenResponseSegments: continuationTokenResponseSegments?.map(
           (segment) =>
             context.__responseHeaderCache.get(segment) ??
@@ -300,6 +302,30 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       pageItemsSegments: baseServiceMethod.response.resultSegments,
     },
   });
+}
+
+function mapFirstSegmentForResultSegments(
+  resultSegments: ModelProperty[] | undefined,
+  response: SdkMethodResponse,
+): ModelProperty[] | undefined {
+  if (resultSegments === undefined || response === undefined) return undefined;
+  // TCGC use Http response type as the return type
+  // For implicit body response, we need to map the first segment to the derived model property
+  const responseModel =
+    response.type?.kind === "model"
+      ? response.type
+      : response.type?.kind === "nullable" && response.type.type.kind === "model"
+        ? response.type.type
+        : undefined;
+  if (resultSegments.length > 0 && responseModel) {
+    const firstSegment = resultSegments[0];
+    for (const property of responseModel.properties ?? []) {
+      if (property.__raw && property.__raw?.sourceProperty === firstSegment) {
+        return [property.__raw, ...resultSegments.slice(1)];
+      }
+    }
+  }
+  return resultSegments;
 }
 
 export function getPropertySegmentsFromModelOrParameters(
@@ -566,28 +592,32 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   return getSdkBasicServiceMethod<TServiceOperation>(context, operation, client);
 }
 
-function getSdkMethodParameter(
+export function getSdkMethodParameter(
   context: TCGCContext,
   type: ModelProperty,
-  operation: Operation,
+  operation?: Operation,
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
   let property = context.__methodParameterCache?.get(type);
 
   if (!property) {
-    const clientParams = operation
-      ? context.__clientToParameters.get(getLocationOfOperation(operation))
-      : undefined;
-    const correspondingClientParams = clientParams?.find((x) =>
-      twoParamsEquivalent(context, x.__raw, type),
-    );
-    if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
+    if (operation) {
+      const clientParams = operation
+        ? context.__clientToParameters.get(getLocationOfOperation(operation))
+        : undefined;
+      const correspondingClientParams = clientParams?.find((x) =>
+        twoParamsEquivalent(context, x.__raw, type),
+      );
+      if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
+    }
 
     property = {
       ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
       kind: "method",
     };
+
+    context.__methodParameterCache.set(type, property);
   }
   return diagnostics.wrap(property);
 }
