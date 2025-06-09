@@ -734,3 +734,13 @@ export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
   }
   return serviceNamespaces;
 }
+
+/**
+ * Judge whether a model's property is an HTTP metadata.
+ * @param context TCGC context
+ * @param property
+ * @returns
+ */
+export function isHttpMetadata(context: TCGCContext, property: SdkBodyModelPropertyType): boolean {
+  return property.__raw !== undefined && isMetadata(context.program, property.__raw);
+}
