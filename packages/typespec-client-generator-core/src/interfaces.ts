@@ -464,7 +464,7 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   kind: "clientinitialization";
   name: string;
   isGeneratedName: boolean;
-  parameters: SdkParameter[];
+  parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
   initializedBy: InitializedByFlags;
 }
 
@@ -679,8 +679,6 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
 }
 
 interface SdkServiceOperationBase {}
-
-export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
 export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;

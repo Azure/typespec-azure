@@ -129,7 +129,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       getOverriddenClientMethod(context, operation) ?? operation,
     );
 
-    if (!clientPagingMetadata) {
+    if (
+      responseType?.__raw?.kind !== "Model" ||
+      responseType.kind !== "model" ||
+      !clientPagingMetadata
+    ) {
       diagnostics.add(
         createDiagnostic({
           code: "unexpected-pageable-operation-return-type",
@@ -164,7 +168,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       (resultSegment) => context.__modelPropertyCache.get(resultSegment)!,
     );
 
-    context.__pagedResultSet.add(responseType!);
+    context.__pagedResultSet.add(responseType);
     const pagingMetadata = $(context.program).operation.getPagingMetadata(operation);
     // tcgc will let all paging method return a list of items
     baseServiceMethod.response.type = diagnostics.pipe(
