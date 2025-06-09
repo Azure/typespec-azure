@@ -62,9 +62,31 @@ Use the [TCGC Playground](https://azure.github.io/typespec-azure/playground/?e=%
 
 TCGC provides flags to control the client type graph style, such as enabling or disabling convenience APIs. See the [documentation](../reference/emitter/#emitter-options) for details.
 
+## TCGC Raw Types and Helpers
+
+In order to introduce the client concept in TCGC, we introduced some raw types and helper functions in TCGC.
+
+[`SdkClient`](../reference/js-api/interfaces/sdkclient/) represent a client and [`SdkOperationGroup`](../reference/js-api/interfaces/sdkoperationgroup/) represents a sub client.
+Emitter could use [`listClients`](../reference/functions/listclients/) to get all the root clients calculated from current spec. Then emitter could use [`listOperationGroups`](../reference/functions/listoperationgroups/) to get all the sub clients under one root client or sub client. Finally emitter could use [`listOperationsInOperationGroup`](../reference/functions/listoperationsinoperationgroup/) to get all the operations under one client or sub client.
+
+For these helper functions, the return type is either TCGC raw types or TypeSpec core types.
+
 ## Client Type Graph
 
-### Namespace
+Unlike TCGC raw types and helpers. Client type graph is a calculated complete type graph represents your spec. Emitter could use it to get all client info without calling any extra works. It is recommended to use this type graph instead of calculating all client related logic with TCGC raw types or TypeSpec core types.
+
+### Common Properties
+
+- The `namespace` property in TCGC types indicates the type's namespace.
+- The `doc` and `summary` properties in TCGC types indicates the doc related info.
+- The `apiVersions` property in TCGC types indicates for which versions the type is exist.
+- The `decorators` property in TCGC types stores all TypeSpec decorator info for advanced use cases.
+- The `crossLanguageDefinitionId` property in TCGC types indicates a unique ID for a TCGC type that could be use to do output mapping for different emitters.
+- The `name` property, and sometimes along with `isGeneratedName` in TCGC types indicates the type's name, and whether the name is created by TCGC.
+- The `access` property in TCGC types indicates whether the type has public or private accessibility.
+- The `usage` property in TCGC types indicates the type's all kinds of usage info, including
+
+### Package
 
 [`SdkPackage`](../reference/js-api/interfaces/sdkpackage/) represents a client package, containing all clients, operations, and types.
 
@@ -73,15 +95,13 @@ Clients, models, enums, and unions include namespace information. Emitters can u
 - A flattened structure (`SdkPackage.clients`, `SdkPackage.enums`, `SdkPackage.models`, `SdkPackage.unions`)
 - A hierarchical structure (`SdkPackage.namespaces`) requiring iteration through nested namespaces.
 
-The `namespace` property in TCGC types indicates the type's namespace.
-
 ### License Information
 
-The `licenseInfo` property in [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
+Emitter could get package license info from `SdkPackage.clients`. The [`LicenseInfo`](../reference/js-api/interfaces/licenseinfo/) contains license details for client code comments or license file generation.
 
 If `licenseInfo` is `undefined`, omit license information in the generated code or files.
 
-Use `licenseInfo.name` (license name), `licenseInfo.company` (company name), `licenseInfo.link` (license document link), `licenseInfo.header` (header comments), and `licenseInfo.description` (license file content) directly when generating license-related content.
+Use `LicenseInfo.name` (license name), `LicenseInfo.company` (company name), `LicenseInfo.link` (license document link), `LicenseInfo.header` (header comments), and `LicenseInfo.description` (license file content) directly when generating license-related content.
 
 For Azure services, emitters should hard-code the license configuration as follows:
 
@@ -98,15 +118,24 @@ export async function $onEmit(context: EmitContext<SdkEmitterOptions>) {
 
 ### Client
 
-An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a single client in the package.
+Emitter could get first level clients of a client package from `SdkPackage.clients`. An [`SdkClientType`](../reference/js-api/interfaces/sdkclienttype/) represents a client in the package. Emitter could use `SdkClientType.children` to get nested sub clients, and use `SdkClientType.parent` to trace back.
+
+`SdkClientType.clientInitialization` tells emitter how to initialize the client. [`SdkClientInitializationType`](../reference/js-api/interfaces/sdkclientinitializationtype/) contains info about the client's initialization parameters and how the client could be initialized: by parent client or by self.
 
 ### Method
 
-TODO
+Emitter get all methods belong to a client with `SdkClientType.method`. An [`SdkServiceMethod`](../reference/js-api/type-aliases/sdkmethod/) represent a client's method.
+
+TCGC has supported four kinds of methods: [`SdkBasicServiceMethod`](../reference/js-api/interfaces/sdkbasicservicemethod/), [`SdkPagingServiceMethod`](../reference/js-api/interfaces/sdkbasicservicemethod/), [`SdkLroServiceMethod`](../reference/js-api/interfaces/sdkbasicservicemethod/), and [`SdkLroPagingServiceMethod`](../reference/js-api/interfaces/sdkbasicservicemethod/).
+
+`SdkBasicServiceMethod` is a basic client method that call a synchronous server side API.
 
 ### Operation
 
-TODO
+TCGC separate the client level operation and the protocol level operation. This way, TCGC are able to abstract away the protocol used to call the service (i.e. `HTTP` or `gRPC`).
+Emitter could get the protocol level operation from `SdkServiceMethod.operation`. An [`SdkServiceOperation`](../reference/js-api/type-aliases/sdkserviceoperation/) represent a protocol operation.
+
+TCGC has supported one kind of operation: [`SdkHttpOperation`](../reference/js-api/interfaces/sdkhttpoperation/)
 
 ### Type
 
