@@ -13,7 +13,7 @@ async function generateSDK(lang, swagger) {
           `--version=${AUTOREST_CORE_VERSION}`,
           "--python",
           "--track2",
-          "--use=@autorest/python@5.16.0",
+          "--use=@autorest/python@6.35.0",
           "--python-sdks-folder=sdk/python",
           "--python-mode=update",
           "--input-file=" + swagger,
@@ -24,7 +24,7 @@ async function generateSDK(lang, swagger) {
         await runOrExit(autorest, [
           `--version=${AUTOREST_CORE_VERSION}`,
           "--typescript",
-          "--use=@autorest/typescript@6.0.0-rc.1",
+          "--use=@autorest/typescript@6.0.42",
           "--azure-arm",
           "--generate-metadata",
           "--output-folder=sdk/javascript",
