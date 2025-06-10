@@ -39,6 +39,20 @@ describe("path parameters", () => {
     });
   });
 
+  it("is always required", async () => {
+    const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/unsupported-optional-path-param" "For tests"
+      op test(@path myParam?: string): void;
+    `);
+    const param = res.paths[`{myParam}`].get.parameters[0];
+    expect(param).toMatchObject({
+      in: "path",
+      name: "myParam",
+      required: true,
+      type: "string",
+    });
+  });
+
   describe("setting reserved expansion attribute applies the x-ms-skip-url-encoding property", () => {
     it("with option", async () => {
       const param = await getPathParam(
@@ -66,6 +80,19 @@ describe("path parameters", () => {
       code: "@azure-tools/typespec-autorest/unsupported-param-type",
       message:
         "Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part 'myParam'.",
+      pos: pos + runner.autoCodeOffset,
+      end: end + runner.autoCodeOffset,
+    });
+  });
+
+  it("report unsupported-optional-path-param diagnostic on the parameter when using optional path parameters", async () => {
+    const { pos, end, source } = extractSquiggles(`op test(~~~@path myParam?: string~~~): void;`);
+    const runner = await createAutorestTestRunner();
+    const diagnostics = await runner.diagnose(source);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unsupported-optional-path-param",
+      message:
+        "Path parameter 'myParam' is optional, but swagger 2.0 does not support optional path parameters. It will be emitted as required.",
       pos: pos + runner.autoCodeOffset,
       end: end + runner.autoCodeOffset,
     });

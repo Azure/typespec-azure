@@ -65,8 +65,8 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
       `
       @service(#{title: "My service"})
       @server("https://{account}.{region}.example.com", "Regional account endpoint", {
-        region?: string = "westus", 
-        account?: string = "default",
+        region: string = "westus", 
+        account: string = "default",
       })
       namespace MyService {}
       `,
@@ -76,8 +76,8 @@ describe("typespec-autorest: host/x-ms-parameterized-host", () => {
       hostTemplate: "https://{account}.{region}.example.com",
       useSchemePrefix: false,
       parameters: [
-        { in: "path", name: "region", required: false, type: "string", default: "westus" },
-        { in: "path", name: "account", required: false, type: "string", default: "default" },
+        { in: "path", name: "region", required: true, type: "string", default: "westus" },
+        { in: "path", name: "account", required: true, type: "string", default: "default" },
       ],
     });
   });

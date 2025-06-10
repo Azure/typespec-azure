@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.56.4
+
+### Bug Fixes
+
+- [#2796](https://github.com/Azure/typespec-azure/pull/2796) Ignore empty `{}` definitions from `no-unnamed-types` rule
+
+
+## 0.56.3
+
+### Bump dependencies
+
+- [#2667](https://github.com/Azure/typespec-azure/pull/2667) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2750](https://github.com/Azure/typespec-azure/pull/2750) Refine API version parameter judgement with checking the service's API version enum.
+- [#2755](https://github.com/Azure/typespec-azure/pull/2755) Fix `no-unnamed-types` linter warning not being applied to versioned namespaces
+- [#2755](https://github.com/Azure/typespec-azure/pull/2755) Fix linter perf for `@azure-tools/typespec-client-generator-core` linter warnings
+- [#2770](https://github.com/Azure/typespec-azure/pull/2770) Don't raise `no-unnamed-types` for nullable types
+- [#2690](https://github.com/Azure/typespec-azure/pull/2690) loosen requirements to link method to service params
+- [#2707](https://github.com/Azure/typespec-azure/pull/2707) Fix documentation on generate-convenience-methods option.
+
+
 ## 0.56.2
 
 ### Bug Fixes

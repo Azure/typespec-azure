@@ -8,6 +8,7 @@ import {
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getVisibilityForClass,
+  ignoreDiagnostics,
   Interface,
   isNeverType,
   isNullType,
@@ -55,7 +56,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { getClientTypeWithDiagnostics } from "./types.js";
+import { getClientTypeWithDiagnostics, getSdkModelPropertyType } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -140,7 +141,7 @@ export function parseEmitterName(
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
-  type: { name: string },
+  type: ModelProperty,
   namespace?: Namespace | Interface,
 ): {
   isApiVersionParam: boolean;
@@ -593,7 +594,7 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   return visibility.size === 0;
 }
 
-export function listAllNamespaces(
+function listAllNamespaces(
   context: TCGCContext,
   namespace: Namespace,
   retval?: Namespace[],
@@ -719,4 +720,31 @@ export function getClientDoc(context: TCGCContext, target: Type): string | undef
     }
   }
   return baseDoc;
+}
+
+export function compareModelProperties(
+  context: TCGCContext | undefined,
+  modelPropA: ModelProperty | undefined,
+  modelPropB: ModelProperty | undefined,
+): boolean {
+  if (!modelPropA || !modelPropB) return false;
+  if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
+  if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
+  const sdkA = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropA));
+  const sdkB = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropB));
+  if (sdkA.kind === "method" || sdkB.kind === "method") {
+    // if we're comparing method vs service param, we just need to check the name and type
+    return true;
+  }
+  switch (sdkA.kind) {
+    case "cookie":
+    case "header":
+    case "query":
+    case "path":
+    case "responseheader":
+    case "body":
+      return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
+    default:
+      return sdkA.kind === sdkB.kind;
+  }
 }

@@ -8,6 +8,7 @@ import {
   Diagnostic,
   DurationKnownEncoding,
   EmitContext,
+  Enum,
   Interface,
   IntrinsicScalarName,
   Model,
@@ -67,11 +68,13 @@ export interface TCGCContext {
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
+  __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): string[];
+  getPackageVersionEnum(): Enum | undefined;
 }
 
 export interface SdkContext<
