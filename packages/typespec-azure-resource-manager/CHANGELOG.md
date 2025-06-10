@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.57.0
+
+### Features
+
+- [#2621](https://github.com/Azure/typespec-azure/pull/2621) Adding a new `ExtensionResourceActionScope`. You can use it in `ArmProviderAction` operation template to describe an action operation for extension resource provider.
+- [#2763](https://github.com/Azure/typespec-azure/pull/2763) Add support for external resources #1428
+
+### Bug Fixes
+
+- [#2536](https://github.com/Azure/typespec-azure/pull/2536) Fix the `arm-resource-operation` rule to exclude `ArmProviderActionAsync` and `ArmProviderActionSync` operations, as they are not considered resource operations.
+- [#2691](https://github.com/Azure/typespec-azure/pull/2691) Fix `@key` decorator resolution for `x-ms-identifiers`: when `@key` is applied to a property named `id` or `name`, it will no longer add an identifier.
+- [#2749](https://github.com/Azure/typespec-azure/pull/2749) Relax constraints to allow resources that override properties of Foundations.Resource
+
+
 ## 0.56.2
 
 ### Bug Fixes
