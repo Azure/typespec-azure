@@ -129,7 +129,7 @@ export function getTypeSpecBuiltInType(
   context: TCGCContext,
   kind: IntrinsicScalarName,
 ): SdkBuiltInType {
-  const global = context.getMutatedGlobalNamespace();
+  const global = context.getMutatedGlobalNamespace(); // since other build in types have been mutated, we need to use the mutated global namespace
   const typeSpecNamespace = global.namespaces!.get("TypeSpec");
   const type = typeSpecNamespace!.scalars.get(kind)!;
 

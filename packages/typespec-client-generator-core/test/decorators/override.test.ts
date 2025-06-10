@@ -478,3 +478,39 @@ it("remove optional query param", async () => {
   strictEqual(method.operation.parameters[0].name, "maxresults");
   strictEqual(method.operation.parameters[0].correspondingMethodParams.length, 0);
 });
+
+it("remove optional query param and add secret name", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    namespace KeyVault;
+
+    @route("/secrets/{secret-name}/versions")
+    op getSecretVersions(
+      @path("secret-name")
+      secretName: string,
+
+      @query("maxresults")
+      maxresults?: int32
+    ): void;
+    `,
+    `
+    @route("/secrets/{secret-name}/versions")
+    op listSecretPropertiesVersions(@path("secret-name") secretName: string): void;
+    @@override(KeyVault.getSecretVersions, listSecretPropertiesVersions);
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.parameters.length, 1);
+  strictEqual(method.parameters[0].name, "secretName");
+  strictEqual(method.operation.parameters.length, 2);
+  const secretNameParam = method.operation.parameters.find((x) => x.name === "secretName");
+  ok(secretNameParam);
+  strictEqual(secretNameParam.correspondingMethodParams.length, 1);
+  strictEqual(secretNameParam.correspondingMethodParams[0], method.parameters[0]);
+  const maxResultsParam = method.operation.parameters.find((x) => x.name === "maxresults");
+  ok(maxResultsParam);
+  strictEqual(maxResultsParam.correspondingMethodParams.length, 0);
+  strictEqual(maxResultsParam.name, "maxresults");
+});
