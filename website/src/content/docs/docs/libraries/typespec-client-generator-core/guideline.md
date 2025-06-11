@@ -165,21 +165,21 @@ Each parameter for an Http operation has a `correspondingMethodParams` to indica
 
 For types in TypeSpec, TCGC has a couple of client types to represent them to make the type more similar to client languages.
 
-A [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a built-in scalar TypeSpec type or scalar type that derives from a built-in scalar TypeSpec type, but `utcDateTime`, `offsetDateTime` and `duration` are not included. We add `encode` onto these types if `@encode` decorator exists, telling us how to encode when sending to the service.
+A [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a [built-in TypeSpec type](https://typespec.io/docs/language-basics/built-in-types/) or a [`scalar`](https://typespec.io/docs/language-basics/scalars/) type that derives from a built-in TypeSpec type, but `utcDateTime`, `offsetDateTime` and `duration` are not included. We add `encode` onto these types if `@encode` decorator exists, telling us how to encode when sending to the service.
 
 [`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) types converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types. The datetime encoding info is in `encode` property.
 
-[`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) types converted from TypeSpec `Array`, `Tuple` and `Record` types.
+[`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) types converted from TypeSpec [`Array`](https://typespec.io/docs/language-basics/models/#array), [`Tuple`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/tuple/) and [`Record`](https://typespec.io/docs/language-basics/models/#record) types.
 
 [`SdkNullableType`](../reference/js-api/interfaces/sdknullabletype/) type represents a type whose value could be null. The actual type for it is in `SdkNullableType.type`.
 
-[`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) types represent TCGC enumeration types. They are typically converted from TypeSpec `enum` types or `union` types (for extensible enumeration cases).
+[`SdkEnumType`](../reference/js-api/interfaces/sdkenumtype/) and [`SdkEnumValueType`](../reference/js-api/interfaces/sdkenumvaluetype/) types represent TCGC enumeration types. They are typically converted from TypeSpec [`Enum`](https://typespec.io/docs/language-basics/enums/) types or [`Union`](https://typespec.io/docs/language-basics/unions/) types (for extensible enumeration cases).
 
-[`SdkConstantType`](../reference/js-api/interfaces/sdkconstanttype/) type represents a literal type in TypeSpec (`StringLiteral`, `NumericLiteral`, or `BooleanLiteral`).
+[`SdkConstantType`](../reference/js-api/interfaces/sdkconstanttype/) type represents a literal type in TypeSpec ([`StringLiteral`](https://typespec.io/docs/language-basics/type-literals/#string-literals), [`NumericLiteral`](https://typespec.io/docs/language-basics/type-literals/#numeric-literal), or [`BooleanLiteral`](https://typespec.io/docs/language-basics/type-literals/#boolean-literal)).
 
-[`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) type represents a TCGC union type. It is typically converted from a TypeSpec `union` type.
+[`SdkUnionType`](../reference/js-api/interfaces/sdkuniontype/) type represents a TCGC union type. It is typically converted from a TypeSpec [`Union`](https://typespec.io/docs/language-basics/unions/) type.
 
-[`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) type represents a TCGC model type. It is typically converted from a TypeSpec `model` type.
+[`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) type represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
 
 ### Example types
 
