@@ -40,10 +40,12 @@ model PrivateLinkResourceProperties {
 model PrivateLinkResourceListResult {
   /** Array of private link resources */
   @OpenAPI.extension("x-ms-identifiers", #["id"])
+  @items
   value?: PrivateLinkResource[];
 
   /** URL to get the next set of operation list results (if there are any). */
   @visibility(Lifecycle.Read)
+  @nextLink
   nextLink?: url;
 }
 //#region
@@ -59,10 +61,12 @@ model PrivateEndpointConnection extends Resource {
 model PrivateEndpointConnectionListResult {
   /** Array of private endpoint connections. */
   @OpenAPI.extension("x-ms-identifiers", #["id"])
+  @items
   value?: PrivateEndpointConnection[];
 
   /** URL to get the next set of operation list results (if there are any). */
   @visibility(Lifecycle.Read)
+  @nextLink
   nextLink?: url;
 }
 
