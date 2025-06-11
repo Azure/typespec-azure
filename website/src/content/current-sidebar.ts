@@ -89,6 +89,8 @@ const sidebar: SidebarItem[] = [
           createLibraryReferenceStructure("emitters/clients/typespec-java", "Java", false),
           createLibraryReferenceStructure("emitters/clients/typespec-go", "Go", false),
           createLibraryReferenceStructure("emitters/clients/typespec-python", "Python", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-csharp", "CSharp", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-ts", "JavaScript", false),
         ],
       },
     ],

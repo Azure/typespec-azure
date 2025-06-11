@@ -205,6 +205,34 @@ describe("models", () => {
         },
       ]);
   });
+
+  it("empty model", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+          model Test {
+            prop: {};
+          }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("empty model array", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+          model Test {
+            prop: {}[];
+          }
+        `,
+      )
+      .toBeValid();
+  });
 });
 
 describe("unions", () => {
@@ -359,5 +387,20 @@ describe("unions", () => {
           message: `Anonymous union with generated name "FooRequestParam" detected. Define this union separately with a proper name to improve code readability and reusability.`,
         },
       ]);
+  });
+  it("union of scalars", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+
+        @usage(Usage.input)
+        model Foo {
+          prop: string | int32;
+        }
+        `,
+      )
+      .toBeValid();
   });
 });

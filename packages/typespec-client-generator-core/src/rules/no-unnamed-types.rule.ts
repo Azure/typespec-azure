@@ -1,6 +1,7 @@
 import { createRule, Model, paramMessage, Union } from "@typespec/compiler";
 import { createTCGCContext } from "../context.js";
 import {
+  isSdkBuiltInKind,
   SdkEnumType,
   SdkModelType,
   SdkNullableType,
@@ -33,8 +34,11 @@ export const noUnnamedTypesRule = createRule({
         const createdModel = tcgcContext.__referencedTypeCache.get(model);
         if (
           createdModel &&
+          createdModel.kind === "model" &&
+          createdModel.properties.length > 0 &&
           createdModel.usage !== UsageFlags.None &&
           (createdModel.usage & UsageFlags.LroInitial) === 0 &&
+          (createdModel.usage & UsageFlags.MultipartFormData) === 0 &&
           createdModel.isGeneratedName
         ) {
           context.reportDiagnostic({
@@ -48,18 +52,19 @@ export const noUnnamedTypesRule = createRule({
       },
       union: (union: Union) => {
         const createdUnion = tcgcContext.__referencedTypeCache.get(union);
+        const unionToCheck = getUnionType(createdUnion);
         if (
-          createdUnion &&
-          isUnionType(createdUnion) &&
-          createdUnion.usage !== UsageFlags.None &&
-          createdUnion.isGeneratedName
+          unionToCheck &&
+          unionToCheck.usage !== UsageFlags.None &&
+          unionToCheck.isGeneratedName &&
+          !allVariantsBuiltIn(unionToCheck)
         ) {
           // report diagnostic for unions and nullable unions
           context.reportDiagnostic({
             target: union,
             format: {
               type: "union",
-              generatedName: createdUnion.name,
+              generatedName: unionToCheck.name,
             },
           });
         }
@@ -68,11 +73,29 @@ export const noUnnamedTypesRule = createRule({
   },
 });
 
-function isUnionType(
+function getUnionType(
+  union: SdkModelType | SdkEnumType | SdkNullableType | SdkUnionType<SdkType> | undefined,
+): SdkModelType | SdkEnumType | SdkNullableType | SdkUnionType<SdkType> | undefined {
+  if (!union) {
+    return undefined;
+  }
+  if (union.kind === "nullable") {
+    const inner = union.type;
+    if (inner.kind === "union" || inner.kind === "model" || inner.kind === "enum") {
+      return inner;
+    }
+    return undefined;
+  }
+  return union;
+}
+
+function allVariantsBuiltIn(
   union: SdkModelType | SdkEnumType | SdkNullableType | SdkUnionType<SdkType>,
 ): boolean {
-  if (union.kind === "nullable") {
-    return union.type.kind === "union";
+  if (union.kind !== "union") {
+    return false;
   }
-  return union.kind === "union" || union.kind === "enum";
+  return union.variantTypes.every((variant) => {
+    return isSdkBuiltInKind(variant.kind);
+  });
 }
