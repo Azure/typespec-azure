@@ -167,7 +167,7 @@ For types in TypeSpec, TCGC has a couple of client types to represent them to ma
 
 A [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents a built-in scalar TypeSpec type or scalar type that derives from a built-in scalar TypeSpec type, but `utcDateTime`, `offsetDateTime` and `duration` are not included. We add `encode` onto these types if `@encode` decorator exists, telling us how to encode when sending to the service.
 
-[`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) types converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types.
+[`SdkDateTimeType`](../reference/js-api/type-aliases/sdkdatetimetype/) and [`SdkDurationType`](../reference/js-api/interfaces/sdkdurationtype/) types converted from TypeSpec `utcDateTime`, `offsetDateTime` and `duration` types. The datetime encoding info is in `encode` property.
 
 [`SdkArrayType`](../reference/js-api/interfaces/sdkarraytype/), [`SdkTupleType`](../reference/js-api/interfaces/sdktupletype/) and [`SdkDictionaryType`](../reference/js-api/interfaces/sdkdictionarytype/) types converted from TypeSpec `Array`, `Tuple` and `Record` types.
 
@@ -254,7 +254,7 @@ The LRO method's return type is the final response type. It is inferred from `Lr
 
 The Http operation's parameters is inferred from TypeSpec Http lib type [`HttpOperationParameters`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationparameters/). Different Http parameter is handled by specific logic based on the info from TypeSpec Http lib type [`HttpOperationParameter`](https://typespec.io/docs/libraries/http/reference/js-api/type-aliases/httpoperationparameter/).
 
-TCGC inferred the body parameter type from TypeSpec Http lib type [`HttpOperationBody`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationbody/). If the body is explicitly defined, TCGC uses the type directly as the body type. If not, TCGC treats the body parameter as spread case. For such body type, TCGC tries to get back the original model if all the spread properties is from one model. Otherwise, TCGC create a new model type for the body parameter.
+TCGC inferred the body parameter type from TypeSpec Http lib type [`HttpOperationBody`](https://typespec.io/docs/libraries/http/reference/js-api/interfaces/httpoperationbody/). If the body is explicitly defined (with `@body` or `@bodyRoot`), TCGC uses the type directly as the body type. If not, TCGC treats the body parameter as spread case. For such body type, TCGC tries to get back the original model if all the spread properties is from one model. Otherwise, TCGC create a new model type for the body parameter.
 
 TCGC creates the `Content-Type` header parameter for any operation with body parameter if not exist, and crates the `Accept` header parameter for any operation with response that contains body. TCGC also create corresponding method parameter for the operation's upper layer method for each cases.
 
@@ -263,8 +263,8 @@ TCGC uses several ways to find an Http operation's parameter's corresponding met
 - To see if the parameter is a client level method parameter.
 - To see if the parameter is API version parameter that has been elevated to client.
 - To see if the parameter is subscription parameter that has been elevated to client (only for ARM service).
-- To see if the parameter is a method parameter or a property of a method parameter (nested Http metadata case when using `@bodyRoot`).
-- To see if all the property of the parameter could be mapped to a method parameter or a property of a method parameter (spread).
+- To see if the parameter is a method parameter or a nested model property of a method parameter (nested Http metadata case when using `@bodyRoot`).
+- To see if all the property of the parameter could be mapped to a method parameter or a nested model property of a method parameter (spread).
 
 ### Http Operation Response Calculation
 
@@ -274,10 +274,51 @@ For each response, TCGC will check the response's content. If contents from diff
 
 If `@responseAsBool` is on the operation's upper level method, the `404` status code is always recognized as normal response.
 
-### Type Traversal Logic
+### Type Detection
+
+TCGC uses the following steps to detect all the types in one spec:
+
+1. Starts from the root clients and iterate all nested clients to find the methods.
+2. For all methods, iterates all method's parameter to find types.
+3. For all methods' underlying operation, iterates all operation's parameters, body parameter, response body, response header to find types.
+4. If type is a `Union`, iterates all union variants to find types.
+5. If type is a `Model`, iterates all model properties to find types, finds types for additional properties if exist and finds types for model's base model.
+6. If type is a `Model` with `@discriminator`, iterates all sub-types belong to it.
+7. If type is a `Array` or `Record`, finds types for the value type.
+8. If type is a `Tuple`, iterates all values to find types.
+9. If type is a `EnumMember`, finds types for the enum the member belong to.
+10. If type is a `UnionVariant`, finds types for the union the variant belong to.
+11. Iterates parameters defined in `@server` and find types.
+12. Iterates user defined namespace for `Model`, `Enum` and `Union` to find orphan types (not referred by `Operation`).
+13. Handle API version `Enum` used in `@versioned`.
 
 ### Access Calculation
 
+If there is no `@access` used in the spec, all model properties, types, and methods in TCGC have `public` accessibility.
+If `@access` is decorated on either `Namespace`, `Operation`, types, or model properties, the accessibility is overridden with the new [logic](../reference/jdecorators/#@Azure.ClientGenerator.Core.access).
+
 ### Usage Calculation
 
-### Naming Logic for Anonymous Model
+If there is no `@usage` used in the spec, all types' usage in TCGC is calculated by the place where the type is used. The `@usage` decorator can extend the usage for one type or all types under one namespace. The calculation logic is [here](../reference/jdecorators/#@Azure.ClientGenerator.Core.usage).
+
+### Naming Logic for Anonymous Types
+
+`SdkModelType`, `SdkEnumType`, `SdkUnionType`, and `SdkConstantType` always have names. If the original TypeSpec type does not have a name, TCGC creates a name for it. The naming logic follows these steps:
+
+1. Find the place where the type is used:
+
+- Find if the type is used in the method's underlying operation: either in parameters, body parameter, response header, or response body.
+- Find if the type is used in the method's parameters.
+- Find if the type is used in orphan types.
+
+2. With the path of where the type is used:
+
+- Reversely look up the first path segment whose name is not empty and the segment is a model, union, or method.
+- Create the name with the model, union, or method's name, concatenating with all segments' names starting after that segment.
+- If a segment is an HTTP parameter, the concatenated name is `Request` + parameter name in PascalCase.
+- If a segment is an HTTP body parameter, the concatenated name is `Request`.
+- If a segment is an HTTP response header, the concatenated name is `Response` + header name in PascalCase.
+- If a segment is an HTTP response body, the concatenated name is `Response`.
+- If a segment is a method's parameter, the concatenated name is `Parameter` + parameter name in PascalCase.
+- If a segment is a model's additional property, the concatenated name is `AdditionalProperty`.
+- If a segment is a model's property, the concatenated name is the property name in PascalCase, and the property name is converted to singular if the property type is an array or dictionary.
