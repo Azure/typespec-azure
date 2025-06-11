@@ -908,21 +908,18 @@ op test: void;
 
 #### `@usage`
 
-Override usage for models/enums.
+Add usage for models/enums.
 A model/enum's default usage info is always calculated by the operations that use it.
-You could use this decorator to override the default usage info.
+You could use this decorator to add additional usage info.
 When setting usage for namespaces,
 the usage info will be propagated to the models defined in the namespace.
 If the model has an usage override, the model override takes precedence.
 For example, with operation definition `op test(): OutputModel`,
 the model `OutputModel` has default usage `Usage.output`.
-After adding decorator `@@usage(OutputModel, Usage.input | Usage.output)`,
-the final usage result for `OutputModel` is `Usage.input | Usage.output`.
+After adding decorator `@@usage(OutputModel, Usage.input | Usage.json)`,
+the final usage result for `OutputModel` is `Usage.input | Usage.output | Usage.json`.
 The usage info for models will be propagated to models' properties,
 parent models, discriminated sub models.
-The override usage should not be narrow than the usage calculated by operation,
-and different override usage should not conflict with each other,
-otherwise a warning will be added to diagnostics list.
 
 ```typespec
 @Azure.ClientGenerator.Core.usage(value: EnumMember | Union, scope?: valueof string)
@@ -936,18 +933,18 @@ otherwise a warning will be added to diagnostics list.
 
 | Name  | Type                  | Description                                                                                                                                                                                            |
 | ----- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `EnumMember \| Union` | The usage info you want to set for this model.                                                                                                                                                         |
+| value | `EnumMember \| Union` | The usage info you want to add for this model.                                                                                                                                                         |
 | scope | `valueof string`      | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
 
 ##### Examples
 
-###### Expand usage for model
+###### Add usage for model
 
 ```typespec
 op test(): OutputModel;
 
-// usage result for `OutputModel` is `Usage.input | Usage.output`
-@usage(Usage.input)
+// usage result for `OutputModel` is `Usage.input | Usage.output | Usage.json`
+@usage(Usage.input | Usage.json)
 model OutputModel {
   prop: string;
 }
@@ -962,9 +959,9 @@ model Fish {
   age: int32;
 }
 
-// Usage.input | Usage.output
+// Usage.input | Usage.output | Usage.json
 @discriminator("sharktype")
-@usage(Usage.input)
+@usage(Usage.input | Usage.json)
 model Shark extends Fish {
   kind: "shark";
   origin: Origin;

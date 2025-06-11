@@ -162,7 +162,7 @@ export const $lib = createTypeSpecLibrary({
     "invalid-usage": {
       severity: "error",
       messages: {
-        default: `Usage value must be 2 ("input") or 4 ("output").`,
+        default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
     "conflicting-multipart-model-usage": {

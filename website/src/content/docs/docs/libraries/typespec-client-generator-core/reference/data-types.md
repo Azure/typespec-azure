@@ -66,7 +66,9 @@ Usage value.
 enum Azure.ClientGenerator.Core.Usage
 ```
 
-| Name   | Value | Description      |
-| ------ | ----- | ---------------- |
-| input  | `2`   | Used in request  |
-| output | `4`   | Used in response |
+| Name   | Value | Description                 |
+| ------ | ----- | --------------------------- |
+| input  | `2`   | Used in request             |
+| output | `4`   | Used in response            |
+| json   | `256` | Used with JSON content type |
+| xml    | `512` | Used with XML content type  |
