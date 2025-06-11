@@ -1191,6 +1191,80 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation with long LRO headers(> 6KB + 6KB = 12KB).
+To pass the test, client should accept both:
+
+1. Single header size that's more than 6KB. 7KB is sure to pass the test.
+2. Total headers size that's more than 12KB. 13KB is sure to pass the test.
+
+Service returns both Location and Azure-AsyncOperation header on initial request.
+final-state-via: location
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.LargeHeader/largeHeaders/header1/two6k
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response headers:
+
+- Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post?userContext=<6KB-string>
+- Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/operations/post?userContext=<6KB-string>
+  Expected no response body
+
+Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+
+AAO first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "InProgress",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00"
+}
+```
+
+AAO second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "Succeeded",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00",
+  "endTime": "2024-11-08T01:42:41.5354192+00:00"
+}
+```
+
+Location first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 202
+Expected no response body
+
+Location second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "succeeded": true
+}
+```
+
 ### Azure_ResourceManager_NonResource_NonResourceOperations_create
 
 - Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
