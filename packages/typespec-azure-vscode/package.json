@@ -25,6 +25,14 @@
   "preview": true,
   "private": true,
   "type": "module",
+  "contributes": {
+    "snippets": [
+      {
+        "language": "typespec",
+        "path": "./snippets.json"
+      }
+    ]
+  },
   "scripts": {
     "compile": "pnpm check-types && tsx ./scripts/build.ts",
     "check-types": "tsc --noEmit",
