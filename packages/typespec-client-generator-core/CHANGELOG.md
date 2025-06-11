@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.57.0
+
+No changes, version bump only.
+
+## 0.56.4
+
+### Bug Fixes
+
+- [#2796](https://github.com/Azure/typespec-azure/pull/2796) Ignore empty `{}` definitions from `no-unnamed-types` rule
+
+
 ## 0.56.3
 
 ### Bump dependencies
