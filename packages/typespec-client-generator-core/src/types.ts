@@ -1801,11 +1801,11 @@ function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]
     const usageOverride = getUsageOverride(context, sdkType.__raw as any);
     if (usageOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, usageOverride, sdkType, { isOverride: true }));
-      if (usageOverride | UsageFlags.Json) {
+      if (usageOverride & UsageFlags.Json) {
         // if a type has Json usage, then it should have serialization options
         updateSerializationOptions(context, sdkType, ["application/json"]);
       }
-      if (usageOverride | UsageFlags.Xml) {
+      if (usageOverride & UsageFlags.Xml) {
         // if a type has Xml usage, then it should have serialization options
         updateSerializationOptions(context, sdkType, ["application/xml"]);
       }
