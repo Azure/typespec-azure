@@ -689,13 +689,13 @@ export type ResponseAsBoolDecorator = (
 ) => void;
 
 /**
- * Move an operation to a different client. If the target client is not defined, use `string` to indicate the client name.
+ * Change the operation location in client. If the target client is not defined, use `string` to indicate the client name.
  *
- * @param source The operation to move
+ * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which could indicate the client.
  * @param scope The language scope for this decorator
  */
-export type MoveToDecorator = (
+export type ClientLocationDecorator = (
   context: DecoratorContext,
   source: Operation,
   target: Interface | Namespace | string,
@@ -760,6 +760,6 @@ export type AzureClientGeneratorCoreDecorators = {
   clientApiVersions: ClientApiVersionsDecorator;
   deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator;
   responseAsBool: ResponseAsBoolDecorator;
-  moveTo: MoveToDecorator;
+  clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
 };

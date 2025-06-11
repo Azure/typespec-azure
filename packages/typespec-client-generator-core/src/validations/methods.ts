@@ -1,16 +1,16 @@
 import { TCGCContext } from "../interfaces.js";
-import { hasExplicitClientOrOperationGroup, moveToKey } from "../internal-utils.js";
+import { clientLocationKey, hasExplicitClientOrOperationGroup } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validateMethods(context: TCGCContext) {
-  validateNoMoveToWithClientOrOperationGroup(context);
+  validateNoClientLocationWithClientOrOperationGroup(context);
 }
 
-function validateNoMoveToWithClientOrOperationGroup(context: TCGCContext) {
-  if (context.program.stateMap(moveToKey) && hasExplicitClientOrOperationGroup(context)) {
-    for (const [op, _] of context.program.stateMap(moveToKey)) {
+function validateNoClientLocationWithClientOrOperationGroup(context: TCGCContext) {
+  if (context.program.stateMap(clientLocationKey) && hasExplicitClientOrOperationGroup(context)) {
+    for (const [op, _] of context.program.stateMap(clientLocationKey)) {
       reportDiagnostic(context.program, {
-        code: "move-to-conflict",
+        code: "client-location-conflict",
         target: op,
       });
     }

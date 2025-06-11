@@ -55,6 +55,7 @@ import {
 import {
   AllScopes,
   clientKey,
+  clientLocationKey,
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
@@ -62,7 +63,6 @@ import {
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
   listAllUserDefinedNamespaces,
-  moveToKey,
   negationScopesKey,
   omitOperation,
   operationGroupKey,
@@ -1157,31 +1157,31 @@ export function getClientDocExplicit(
   return getScopedDecoratorData(context, clientDocKey, target);
 }
 
-export const $moveTo = (
+export const $clientLocation = (
   context: DecoratorContext,
   source: Operation,
   target: Interface | Namespace | string,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $moveTo, moveToKey, source, target, scope);
+  setScopedDecoratorData(context, $clientLocation, clientLocationKey, source, target, scope);
 };
 
 /**
- * Gets the `Namespace`, `Interface` or name of client where an operation moves to.
+ * Gets the `Namespace`, `Interface` or name of client where an operation change the location to.
  *
  * @param context TCGCContext
  * @param operation Operation to be moved
- * @returns `Namespace`, `Interface`, `string` or undefined if no move to target is specified.
+ * @returns `Namespace`, `Interface`, `string` target or undefined if no location change.
  */
-export function getMoveTo(
+export function getClientLocation(
   context: TCGCContext,
   operation: Operation,
 ): Namespace | Interface | string | undefined {
-  // if there is `@client` or `@operationGroup` decorator, `@moveTo` will be ignored
+  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` will be ignored
   if (hasExplicitClientOrOperationGroup(context)) {
     return undefined;
   }
-  return getScopedDecoratorData(context, moveToKey, operation) as
+  return getScopedDecoratorData(context, clientLocationKey, operation) as
     | Namespace
     | Interface
     | string

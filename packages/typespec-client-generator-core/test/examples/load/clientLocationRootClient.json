@@ -1,6 +1,6 @@
 {
-  "operationId": "moveTo",
-  "title": "moveTo",
+  "operationId": "clientLocation",
+  "title": "clientLocation",
   "parameters": {},
   "responses": {
     "200": {

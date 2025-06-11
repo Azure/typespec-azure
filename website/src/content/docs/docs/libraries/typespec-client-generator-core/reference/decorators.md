@@ -416,6 +416,26 @@ model MyServiceClientOptions {
 // elevate the existing `blobName` parameter from method level to client level.
 ```
 
+### `@clientLocation` {#@Azure.ClientGenerator.Core.clientLocation}
+
+Change the operation location in client. If the target client is not defined, use `string` to indicate the client name.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLocation(target: Interface | Namespace | valueof string, scope?: valueof string)
+```
+
+#### Target
+
+The operation to change location for.
+`Operation`
+
+#### Parameters
+
+| Name   | Type                                         | Description                                                                      |
+| ------ | -------------------------------------------- | -------------------------------------------------------------------------------- |
+| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which could indicate the client. |
+| scope  | `valueof string`                             | The language scope for this decorator                                            |
+
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
 
 Changes the name of a method, parameter, property, or model generated in the client SDK
@@ -575,26 +595,6 @@ model Foo {
 }
 model Bar {}
 ```
-
-### `@moveTo` {#@Azure.ClientGenerator.Core.moveTo}
-
-Move an operation to a different client. If the target client is not defined, use `string` to indicate the client name.
-
-```typespec
-@Azure.ClientGenerator.Core.moveTo(target: Interface | Namespace | valueof string, scope?: valueof string)
-```
-
-#### Target
-
-The operation to move
-`Operation`
-
-#### Parameters
-
-| Name   | Type                                         | Description                                                                      |
-| ------ | -------------------------------------------- | -------------------------------------------------------------------------------- |
-| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which could indicate the client. |
-| scope  | `valueof string`                             | The language scope for this decorator                                            |
 
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 

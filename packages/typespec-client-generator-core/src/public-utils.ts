@@ -31,9 +31,9 @@ import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
+  getClientLocation,
   getClientNameOverride,
   getIsApiVersion,
-  getMoveTo,
   getOverriddenClientMethod,
   listClients,
   listOperationGroups,
@@ -764,17 +764,17 @@ export function resolveOperationId(
   let operationInterface: Interface | undefined = operation.interface;
   let operationNamespace: Namespace | undefined = operation.namespace;
 
-  const moveTo = getMoveTo(context, operation);
+  const clientLocation = getClientLocation(context, operation);
 
-  if (!hasExplicitClientOrOperationGroup(context) && moveTo) {
-    if (typeof moveTo === "string") {
-      return `${moveTo}_${operationName}`;
+  if (!hasExplicitClientOrOperationGroup(context) && clientLocation) {
+    if (typeof clientLocation === "string") {
+      return `${clientLocation}_${operationName}`;
     }
-    if (moveTo.kind === "Interface") {
-      operationInterface = moveTo;
+    if (clientLocation.kind === "Interface") {
+      operationInterface = clientLocation;
     } else {
       operationInterface = undefined;
-      operationNamespace = moveTo;
+      operationNamespace = clientLocation;
     }
   }
 

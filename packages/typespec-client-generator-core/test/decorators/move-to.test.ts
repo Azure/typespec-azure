@@ -10,7 +10,7 @@ beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
 
-it("@moveTo along with @client", async () => {
+it("@clientLocation along with @client", async () => {
   const diagnostics = (
     await runner.compileAndDiagnoseWithCustomization(
       `
@@ -23,18 +23,18 @@ it("@moveTo along with @client", async () => {
     @client({service: MyService})
     namespace MyServiceClient;
 
-    @moveTo("Inner")
+    @clientLocation("Inner")
     op test is MyService.test;
   `,
     )
   )[1];
 
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/move-to-conflict",
+    code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
   });
 });
 
-it("@moveTo along with @operationGroup", async () => {
+it("@clientLocation along with @operationGroup", async () => {
   const diagnostics = (
     await runner.compileAndDiagnoseWithCustomization(
       `
@@ -48,7 +48,7 @@ it("@moveTo along with @operationGroup", async () => {
 
     @operationGroup
     interface MyOperationGroup {
-      @moveTo("Inner")
+      @clientLocation("Inner")
       op test is MyService.test;
     }
   `,
@@ -56,16 +56,16 @@ it("@moveTo along with @operationGroup", async () => {
   )[1];
 
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/move-to-conflict",
+    code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
   });
 });
 
-it("@moveTo move-to-wrong-type", async () => {
+it("@clientLocation client-location-wrong-type", async () => {
   const [_, diagnostics] = await runner.compileAndDiagnose(
     `
     @service
     namespace TestService{
-      @moveTo(Test)
+      @clientLocation(Test)
       op test(): string;
     }
 
@@ -75,7 +75,7 @@ it("@moveTo move-to-wrong-type", async () => {
   );
 
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/move-to-wrong-type",
+    code: "@azure-tools/typespec-client-generator-core/client-location-wrong-type",
   });
   const sdkPackage = runner.context.sdkPackage;
   const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
@@ -85,7 +85,7 @@ it("@moveTo move-to-wrong-type", async () => {
   strictEqual(rootClient.methods[0].name, "test");
 });
 
-it("@moveTo move-to-duplicate", async () => {
+it("@clientLocation client-location-duplicate", async () => {
   const [_, diagnostics] = await runner.compileAndDiagnose(
     `
     @service
@@ -96,7 +96,7 @@ it("@moveTo move-to-duplicate", async () => {
       op a1(): void;
 
       @route("/a2")
-      @moveTo("B")
+      @clientLocation("B")
       op a2(): void;
     }
 
@@ -108,7 +108,7 @@ it("@moveTo move-to-duplicate", async () => {
   );
 
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/move-to-duplicate",
+    code: "@azure-tools/typespec-client-generator-core/client-location-duplicate",
   });
   const sdkPackage = runner.context.sdkPackage;
   const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
@@ -134,7 +134,7 @@ it("move an operation to another operation group", async () => {
       op a1(): void;
 
       @route("/a2")
-      @moveTo(B)
+      @clientLocation(B)
       op a2(): void;
     }
 
@@ -165,7 +165,7 @@ it("move an operation to another operation group and omit the original operation
     `
     interface A {
       @route("/a")
-      @moveTo(B)
+      @clientLocation(B)
       op a(): void;
     }
 
@@ -195,7 +195,7 @@ it("move an operation to a new opeartion group", async () => {
       op a1(): void;
 
       @route("/a2")
-      @moveTo("B")
+      @clientLocation("B")
       op a2(): void;
     }
   `,
@@ -220,7 +220,7 @@ it("move an operation to a new operation group and omit the original operation g
     `
     interface A {
       @route("/a")
-      @moveTo("B")
+      @clientLocation("B")
       op a(): void;
     }
   `,
@@ -244,7 +244,7 @@ it("move an operation to root client", async () => {
       op a1(): void;
 
       @route("/a2")
-      @moveTo(TestService)
+      @clientLocation(TestService)
       op a2(): void;
     }
   `,
@@ -267,7 +267,7 @@ it("move an operation to root client and omit the original operation group", asy
     `
     interface A {
       @route("/a")
-      @moveTo(TestService)
+      @clientLocation(TestService)
       op a(): void;
     }
   `,
@@ -297,7 +297,7 @@ it("move an operation to another operation group with api version", async () => 
       op a1(@query apiVersion: string): void;
 
       @route("/a2")
-      @moveTo(B)
+      @clientLocation(B)
       op a2(@query apiVersion: string): void;
     }
 
@@ -349,7 +349,7 @@ it("move an operation to a new opeartion group with api version", async () => {
       op a1(@query apiVersion: string): void;
 
       @route("/a2")
-      @moveTo("B")
+      @clientLocation("B")
       op a2(@query apiVersion: string): void;
     }
   `,
@@ -396,7 +396,7 @@ it("move an operation to root client with api version", async () => {
       op a1(@query apiVersion: string): void;
 
       @route("/a2")
-      @moveTo(TestService)
+      @clientLocation(TestService)
       op a2(@query apiVersion: string): void;
     }
   `,

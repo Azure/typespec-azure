@@ -8,16 +8,16 @@ import {
   Operation,
   Program,
 } from "@typespec/compiler";
-import { getClientNameOverride, getMoveTo, isInScope } from "./decorators.js";
+import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
 import { LanguageScopes, SdkClient, SdkOperationGroup, TCGCContext } from "./interfaces.js";
 import {
   AllScopes,
   clientKey,
+  clientLocationKey,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
-  moveToKey,
   omitOperation,
   operationGroupKey,
 } from "./internal-utils.js";
@@ -71,11 +71,11 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     context.__clientToOperationsCache.set(client, []);
   }
 
-  // create operation group for `@moveTo` a new operation group
+  // create operation group for `@clientLocation` of  string value
   // if no explicit `@client` or `@operationGroup`
   if (!hasExplicitClientOrOperationGroup(context)) {
     const newOperationGroupNames = new Set<string>();
-    listScopedDecoratorData(context, moveToKey).map((target) => {
+    listScopedDecoratorData(context, clientLocationKey).map((target) => {
       if (typeof target === "string") {
         if (
           clients[0].subOperationGroups.some(
@@ -120,20 +120,20 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           !context.program.stateMap(omitOperation).get(op)
         ) {
           let pushGroup: SdkClient | SdkOperationGroup = group;
-          const moveTo = getMoveTo(context, op);
-          if (moveTo) {
-            // operation with `@moveTo` decorator will be moved to another operation group
-            if (context.__rawClientsOperationGroupsCache.has(moveTo)) {
-              pushGroup = context.__rawClientsOperationGroupsCache.get(moveTo)!;
+          const clientLocation = getClientLocation(context, op);
+          if (clientLocation) {
+            // operation with `@clientLocation` decorator is placed in another operation group
+            if (context.__rawClientsOperationGroupsCache.has(clientLocation)) {
+              pushGroup = context.__rawClientsOperationGroupsCache.get(clientLocation)!;
             } else {
-              if (typeof moveTo !== "string") {
+              if (typeof clientLocation !== "string") {
                 reportDiagnostic(context.program, {
-                  code: "move-to-wrong-type",
+                  code: "client-location-wrong-type",
                   target: op,
                 });
               } else {
                 reportDiagnostic(context.program, {
-                  code: "move-to-duplicate",
+                  code: "client-location-duplicate",
                   target: clients[0].type,
                 });
               }

@@ -276,17 +276,17 @@ it("ensure ordering for multiple examples", async () => {
   strictEqual(operation.examples![2].filePath, "a_b_c.json");
 });
 
-it("load example with @moveTo existed interface", async () => {
+it("load example with @clientLocation existed interface", async () => {
   await runner.host.addRealTypeSpecFile(
-    "./examples/moveToAnotherInterface.json",
-    `${__dirname}/load/moveToAnotherInterface.json`,
+    "./examples/clientLocationAnotherInterface.json",
+    `${__dirname}/load/clientLocationAnotherInterface.json`,
   );
   await runner.compile(`
     @service
     namespace TestClient {
       interface OriginalInterface {
-        @moveTo(AnotherInterface)
-        op moveTo(): string;
+        @clientLocation(AnotherInterface)
+        op clientLocation(): string;
       }
 
       interface AnotherInterface {
@@ -303,17 +303,17 @@ it("load example with @moveTo existed interface", async () => {
   strictEqual(operation.examples?.length, 1);
 });
 
-it("load example with @moveTo new operation group", async () => {
+it("load example with @clientLocation new operation group", async () => {
   await runner.host.addRealTypeSpecFile(
-    "./examples/moveToNewOperationGroup.json",
-    `${__dirname}/load/moveToNewOperationGroup.json`,
+    "./examples/clientLocationNewOperationGroup.json",
+    `${__dirname}/load/clientLocationNewOperationGroup.json`,
   );
   await runner.compile(`
     @service
     namespace TestClient {
       interface OriginalInterface {
-        @moveTo("NewOperationGroup")
-        op moveTo(): string;
+        @clientLocation("NewOperationGroup")
+        op clientLocation(): string;
       }
     }
   `);
@@ -327,17 +327,17 @@ it("load example with @moveTo new operation group", async () => {
   strictEqual(operation.examples?.length, 1);
 });
 
-it("load example with @moveTo root client", async () => {
+it("load example with @clientLocation root client", async () => {
   await runner.host.addRealTypeSpecFile(
-    "./examples/moveToRootClient.json",
-    `${__dirname}/load/moveToRootClient.json`,
+    "./examples/clientLocationRootClient.json",
+    `${__dirname}/load/clientLocationRootClient.json`,
   );
   await runner.compile(`
     @service
     namespace TestClient {
       interface OriginalInterface {
-        @moveTo(TestClient)
-        op moveTo(): string;
+        @clientLocation(TestClient)
+        op clientLocation(): string;
       }
     }
   `);
