@@ -875,7 +875,7 @@ describe("corner case", () => {
     const anonymousModel = sdkPackage.models.find((m) => m.name === "TestParameterBody");
     ok(anonymousModel);
     strictEqual(anonymousModel.properties.length, 1);
-    strictEqual(anonymousModel.properties[0].kind, "body");
+    strictEqual(anonymousModel.properties[0].kind, "property");
     strictEqual(anonymousModel.properties[0].name, "body");
     strictEqual(anonymousModel.properties[0].type, testModel);
   });

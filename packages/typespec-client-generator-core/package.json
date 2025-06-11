@@ -79,6 +79,7 @@
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
+    "@typespec/http-client": "workspace:^",
     "@typespec/library-linter": "workspace:^",
     "@typespec/openapi": "workspace:^",
     "@typespec/prettier-plugin-typespec": "workspace:^",
