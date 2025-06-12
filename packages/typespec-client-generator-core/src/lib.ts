@@ -389,6 +389,27 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
       },
     },
+    "client-location-conflict": {
+      severity: "warning",
+      messages: {
+        default:
+          "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+      },
+    },
+    "client-location-wrong-type": {
+      severity: "warning",
+      messages: {
+        default:
+          "`@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
+      },
+    },
+    "client-location-duplicate": {
+      severity: "warning",
+      messages: {
+        default:
+          "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

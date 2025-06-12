@@ -94,7 +94,6 @@ import {
   getClientDoc,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
-  getLocationOfOperation,
   getNonNullOptions,
   getNullOption,
   getSdkTypeBaseHelper,
@@ -1244,7 +1243,7 @@ export function getSdkModelPropertyTypeBase(
     ...updateWithApiVersionInformation(
       context,
       type,
-      operation ? getLocationOfOperation(operation) : undefined,
+      operation ? context.getClientForOperation(operation) : undefined,
     ),
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -1369,7 +1368,7 @@ export function getSdkModelPropertyType(
 
   if (!property) {
     const clientParams = operation
-      ? context.__clientToParameters.get(getLocationOfOperation(operation))
+      ? context.__clientParametersCache.get(context.getClientForOperation(operation))
       : undefined;
     const correspondingClientParams = clientParams?.find((x) =>
       twoParamsEquivalent(context, x.__raw, type),

@@ -689,6 +689,20 @@ export type ResponseAsBoolDecorator = (
 ) => void;
 
 /**
+ * Change the operation location in client. If the target client is not defined, use `string` to indicate the client name.
+ *
+ * @param source The operation to change location for.
+ * @param target The target `Namespace`, `Interface` or a string which could indicate the client.
+ * @param scope The language scope for this decorator
+ */
+export type ClientLocationDecorator = (
+  context: DecoratorContext,
+  source: Operation,
+  target: Interface | Namespace | string,
+  scope?: string,
+) => void;
+
+/**
  * Override documentation for a type in client libraries. This allows you to
  * provide client-specific documentation that differs from the service-definition documentation.
  *
@@ -746,5 +760,6 @@ export type AzureClientGeneratorCoreDecorators = {
   clientApiVersions: ClientApiVersionsDecorator;
   deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator;
   responseAsBool: ResponseAsBoolDecorator;
+  clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
 };
