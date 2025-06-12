@@ -12,5 +12,6 @@ import "./commontypes.private.decorators.tsp";
 import "./versions.tsp";
 import "./mobo-ref.tsp";
 import "./network-security-perimeter-ref.tsp";
+import "./billing-data-ref.tsp";
 
 namespace Azure.ResourceManager.CommonTypes;
