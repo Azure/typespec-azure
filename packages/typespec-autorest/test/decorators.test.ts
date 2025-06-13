@@ -129,6 +129,7 @@ describe("typespec-autorest: decorators", () => {
             [AutorestTestLibrary.name]: {
               ...options,
               "emitter-output-dir": outputDir,
+              "output-file": "openapi.json",
             },
           },
         });
