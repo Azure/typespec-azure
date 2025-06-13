@@ -26,4 +26,9 @@ jobs:
       - script: pnpm test:e2e
         displayName: E2E Tests
         # E2E test have issue in publish branch due to version being bumped but package not published yet.
-        condition: and(succeeded(), eq(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/'), false))
+        # E2E tests also fail in merge queue from publish branches due to the same reason.
+        # Possible future alternative: parse merge queue branch for PR number, query GitHub and use that to determine if the branch is a publish branch.
+        condition: and(succeeded(), and(
+          eq(startsWith(variables['Build.SourceBranch'], 'refs/heads/gh-readonly-queue/'), false),
+          eq(startsWith(variables['System.PullRequest.SourceBranch'], 'publish/'), false))
+          )

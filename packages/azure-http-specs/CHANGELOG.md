@@ -1,5 +1,23 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.19
+
+### Features
+
+- [#2773](https://github.com/Azure/typespec-azure/pull/2773) [azure-http-specs] unscope paging with re-injection parameters test for go
+
+
+## 0.1.0-alpha.18
+
+### Features
+
+- [#2677](https://github.com/Azure/typespec-azure/pull/2677) [azure-http-specs] add test for mgmt-plane large LRO header
+
+### Bug Fixes
+
+- [#2203](https://github.com/Azure/typespec-azure/pull/2203) Fix URL for ExtensionsResources in mockapi.
+
+
 ## 0.1.0-alpha.17
 
 No changes, version bump only.

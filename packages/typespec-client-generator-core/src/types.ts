@@ -94,7 +94,6 @@ import {
   getClientDoc,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
-  getLocationOfOperation,
   getNonNullOptions,
   getNullOption,
   getSdkTypeBaseHelper,
@@ -129,7 +128,7 @@ export function getTypeSpecBuiltInType(
   context: TCGCContext,
   kind: IntrinsicScalarName,
 ): SdkBuiltInType {
-  const global = context.getMutatedGlobalNamespace();
+  const global = context.getMutatedGlobalNamespace(); // since other build in types have been mutated, we need to use the mutated global namespace
   const typeSpecNamespace = global.namespaces!.get("TypeSpec");
   const type = typeSpecNamespace!.scalars.get(kind)!;
 
@@ -1244,7 +1243,7 @@ export function getSdkModelPropertyTypeBase(
     ...updateWithApiVersionInformation(
       context,
       type,
-      operation ? getLocationOfOperation(operation) : undefined,
+      operation ? context.getClientForOperation(operation) : undefined,
     ),
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -1369,7 +1368,7 @@ export function getSdkModelPropertyType(
 
   if (!property) {
     const clientParams = operation
-      ? context.__clientToParameters.get(getLocationOfOperation(operation))
+      ? context.__clientParametersCache.get(context.getClientForOperation(operation))
       : undefined;
     const correspondingClientParams = clientParams?.find((x) =>
       twoParamsEquivalent(context, x.__raw, type),

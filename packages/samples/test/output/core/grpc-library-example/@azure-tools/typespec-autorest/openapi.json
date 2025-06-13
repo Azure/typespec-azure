@@ -320,8 +320,7 @@
           "description": "The list of books.",
           "items": {
             "$ref": "#/definitions/Book"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "next_page_token": {
           "type": "string",
@@ -350,8 +349,7 @@
           "description": "The list of shelves.",
           "items": {
             "$ref": "#/definitions/Shelf"
-          },
-          "x-ms-identifiers": []
+          }
         },
         "next_page_token": {
           "type": "string",
@@ -406,8 +404,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/ProtobufAny"
-          },
-          "x-ms-identifiers": []
+          }
         }
       }
     },
