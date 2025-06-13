@@ -25,14 +25,6 @@ export type ResourceBaseParametersOfDecorator = (
 ) => void;
 
 /**
- * This decorator is used to identify Azure Resource Manager resource. In generated
- * swagger definition, it will be marked with `x-ms-azure-resource`.
- *
- * It is *not* meant to be used directly by a spec author,
- */
-export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Model) => void;
-
-/**
  * Please DO NOT USE in RestAPI specs.
  * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
  * It will programatically enabled/disable client flattening with
@@ -70,6 +62,14 @@ export type AssignProviderNameValueDecorator = (
   target: ModelProperty,
   resource: Model,
 ) => void;
+
+/**
+ * This decorator is used to identify Azure Resource Manager resource. In generated
+ * swagger definition, it will be marked with `x-ms-azure-resource`.
+ *
+ * It is *not* meant to be used directly by a spec author,
+ */
+export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Model) => void;
 
 /**
  * Update the Azure Resource Manager provider namespace for a given entity.
@@ -114,7 +114,7 @@ export type DefaultResourceKeySegmentNameDecorator = (
  * Provides strict contraint type check.
  *
  * Due to TypeSpec language and all optional properties of `Foundations.Resource`,
- * the `Resource extends Foundations.Resource` on many of the standard ARM templates is
+ * the `Resource extends Foundations.SimpleResource` on many of the standard ARM templates is
  * essentially equal to `Resource extends {}` and does not enforce the containt.
  *
  * Note, this is intended for internal use only for now.
@@ -165,10 +165,10 @@ export type ArmBodyRootDecorator = (
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
-  azureResourceBase: AzureResourceBaseDecorator;
   conditionalClientFlatten: ConditionalClientFlattenDecorator;
   omitIfEmpty: OmitIfEmptyDecorator;
   assignProviderNameValue: AssignProviderNameValueDecorator;
+  azureResourceBase: AzureResourceBaseDecorator;
   armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator;
   armResourceInternal: ArmResourceInternalDecorator;
   defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator;

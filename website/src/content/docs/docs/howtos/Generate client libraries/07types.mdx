@@ -15,7 +15,7 @@ The namespace for models, enums, and unions will follow the namespace they belon
 <ClientTabs>
 <ClientTabItem lang="typespec" >
 
-```tsp
+```typespec
 namespace Service;
 
 model Foo {
@@ -66,7 +66,7 @@ Foo foo = new Foo("hello");
 <ClientTabs>
 <ClientTabItem lang="typespec" >
 
-```tsp
+```typespec
 namespace Service;
 
 namespace Container {
@@ -119,7 +119,7 @@ Foo foo = new Foo("hello");
 <ClientTabs>
 <ClientTabItem lang="typespec" >
 
-```tsp
+```typespec
 namespace Service;
 
 @clientNamespace("Service.Container")
@@ -953,14 +953,6 @@ public final class Animal implements JsonSerializable<Animal> {
 model Animal {
   name: string;
   kind: string;
-  ...Record<string | int32>;
-}
-```
-
-```typespec
-model Animal {
-  name: string;
-  kind: string;
   ...Record<string>;
   ...Record<int32>;
 }
@@ -1209,7 +1201,7 @@ TypeSpec uses `@discriminator` decorator to add a discriminator to a model.
 <ClientTabs>
 <ClientTabItem lang="typespec" >
 
-TypeSpec now has two ways to represent a discriminated set.
+Client emitters now only support a single way to represent a discriminated set in TypeSpec.
 
 1. Use model
 
@@ -1249,20 +1241,6 @@ model Siamese extends Cat {
 model Ragdoll extends Cat {
   kind: CatKind.Ragdoll;
 }
-```
-
-2. Use union
-
-```typespec
-@discriminator("kind")
-union Cat {
-  Siamese,
-  Ragdoll,
-}
-
-model Siamese {}
-
-model Ragdoll {}
 ```
 
 </ClientTabItem>
@@ -1496,16 +1474,11 @@ about nullability by inspecting the type of a property.
 model Foo {
   basicNullableProperty: string | null;
   modelNullableProperty: Bar | null;
-  unionNullableProperty: Bar | Baz | null;
   enumNullableProperty: LR | null;
 }
 
 model Bar {
   prop: string;
-}
-
-model Baz {
-  prop: int32;
 }
 
 enum LR {
@@ -1564,52 +1537,6 @@ A nullable type has kind `nullable` and property `valueType`. The kind of the ty
     },
     {
       "kind": "property",
-      "name": "unionNullableProperty",
-      "serializedName": "unionNullableProperty",
-      "optional": false,
-      "type": {
-        "kind": "nullable",
-        "valueType": {
-          "kind": "union",
-          "values": [
-            {
-              "kind": "model",
-              "name": "Bar",
-              "properties": [
-                {
-                  "kind": "property",
-                  "name": "prop",
-                  "serializedName": "prop",
-                  "optional": false,
-                  "type": {
-                    "kind": "string",
-                    "encode": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "model",
-              "name": "Baz",
-              "properties": [
-                {
-                  "kind": "property",
-                  "name": "prop",
-                  "serializedName": "prop",
-                  "optional": false,
-                  "type": {
-                    "kind": "int32",
-                    "encode": "int32"
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
-    {
-      "kind": "property",
       "name": "enumNullableProperty",
       "serializedName": "enumNullableProperty",
       "optional": false,
@@ -1655,9 +1582,6 @@ from corehttp.utils import CaseInsensitiveEnumMeta
 class Bar(_model_base.Model):
   prop: Optional[str] = rest_field()
 
-class Baz(_model_base.Model):
-  prop: Optional[str] = rest_field()
-
 class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
   LEFT = "left"
   RIGHT = "right"
@@ -1665,7 +1589,6 @@ class LR(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 class Foo(_model_base.Model):
   basicNullableProperty: Optional[str] = rest_field()
   modelNullableProperty: Optional["_models.Bar"] = rest_field()
-  unionNullableProperty: Optional[Union["_models.Bar", "_models.Baz"]] = rest_field()
   enumNullableProperty: Optional["LR"] = rest_field()
 
 ```
@@ -2560,108 +2483,6 @@ public enum WidgetOrientation {
 </ClientTabItem>
 </ClientTabs>
 
-### Union with multiple types
-
-These are unions where the values don't share same type.
-
-<ClientTabs>
-<ClientTabItem lang="typespec" >
-
-```typespec
-model Shirt {
-  sizing: 32 | 34 | int32 | "small" | "medium" | string;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "union",
-  "name": "ShirtSizings",
-  "generatedName": true,
-  "values": [
-    {
-      "kind": "constant",
-      "value": 32,
-      "valueType": {
-        "kind": "int32"
-      }
-    },
-    {
-      "kind": "constant",
-      "value": 34,
-      "valueType": {
-        "kind": "int32"
-      }
-    },
-    {
-      "kind": "constant",
-      "value": "small",
-      "valueType": {
-        "kind": "string"
-      }
-    },
-    {
-      "kind": "constant",
-      "value": "medium",
-      "valueType": {
-        "kind": "string"
-      }
-    },
-    {
-      "kind": "string"
-    }
-  ]
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="python">
-
-Python will generate this as a union since these entries don't share the same type
-
-```python
-from typing import Literal
-
-type ShirtSizing = Literal[32] | Literal[34] | int | Literal["small"] | Literal["medium"] | str
-
-model Shirt:
-  sizing: ShirtSizing
-```
-
-</ClientTabItem>
-<ClientTabItem lang="csharp" >
-
-```csharp
-public partial class Shirt
-{
-  public BinaryData Shirt;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="typescript" >
-
-```typescript
-export interface Shirt {
-  sizing: 32 | 34 | number | "small" | "medium" | string;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="java" >
-
-```java
-public final class Shirt {
-    private BinaryData sizing;
-}
-```
-
-</ClientTabItem>
-</ClientTabs>
-
 ## Enums
 
 ### Standard
@@ -2952,7 +2773,7 @@ We will take the `@encode` decorator into account, determining how we serialize 
 <ClientTabs>
 <ClientTabItem lang="typespec" >
 
-```tsp
+```typespec
 model Test {
   @encode(DateTimeKnownEncoding.rfc3339)
   prop: utcDateTime;
@@ -3015,7 +2836,7 @@ When you specify an encoding type, say that you want to encode an integer as a s
 <ClientTabs>
 <ClientTabItem lang="typespec" >
 
-```tsp
+```typespec
 model Test {
   @encode(string)
   prop: int64;

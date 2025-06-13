@@ -8,7 +8,7 @@ TypeSpec library for emitting canonical swagger
 npm install @azure-tools/typespec-autorest-canonical
 ```
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
