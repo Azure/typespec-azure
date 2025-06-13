@@ -11,14 +11,10 @@ This page documents the default client hierarchy behavior as well as how to cust
 ## Default Behavior
 
 ### Basic Rules
-Each namespace with `@service` decorator will automatically be generated as a root client by default. The client's name will be the namespace name with `Client` added as suffix.
 
-By default, the namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
+By default, each namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
 
-Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure.
-
-The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
-Code generators for different languages will organize clients and operation groups in various ways. Please refer the following examples:
+Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure. The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
 
 The root client's SDK namespace corresponds to the namespace decorated with `@service`. If an operation group originates from a sub-namespace, its SDK namespace corresponds to that sub-namespace. If it originates from an interface, its SDK namespace corresponds to the namespace containing the interface.
 
@@ -168,7 +164,7 @@ catsClient.pet();
 
 <ClientTabs>
 
-```typespec title="main.tsp"
+```typespec
 @versioned(Versions)
 @service(#{ title: "Pet Store", version: "v1" })
 namespace PetStore;
