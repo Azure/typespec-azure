@@ -288,12 +288,6 @@ export const $lib = createTypeSpecLibrary({
         default: `@access override conflicts with the access calculated from operation or other @access override.`,
       },
     },
-    "conflict-usage-override": {
-      severity: "warning",
-      messages: {
-        default: `@usage override conflicts with the usage calculated from operation or other @usage override.`,
-      },
-    },
     "duplicate-decorator": {
       severity: "warning",
       messages: {

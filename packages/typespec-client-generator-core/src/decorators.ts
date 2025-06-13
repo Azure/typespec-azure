@@ -394,6 +394,8 @@ export const $usage: UsageDecorator = (
     return (
       value === UsageFlags.Input ||
       value === UsageFlags.Output ||
+      value === UsageFlags.JsonMergePatch ||
+      value === UsageFlags.MultipartFormData ||
       value === UsageFlags.Json ||
       value === UsageFlags.Xml
     );
