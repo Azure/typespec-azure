@@ -8,7 +8,6 @@ import {
   getService,
   interpolatePath,
   listServices,
-  normalizePath,
   NoTarget,
   Program,
   reportDeprecated,
