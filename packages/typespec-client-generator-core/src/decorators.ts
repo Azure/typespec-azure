@@ -390,12 +390,10 @@ export const $usage: UsageDecorator = (
   scope?: LanguageScopes,
 ) => {
   const isValidValue = (value: number): boolean => {
-    // Allow the new usage values: input(2), output(4), jsonMergePatch(16), multipartFormData(32), json(256), xml(512)
+    // Allow the new usage values: input(2), output(4), json(256), xml(512)
     return (
       value === UsageFlags.Input ||
       value === UsageFlags.Output ||
-      value === UsageFlags.JsonMergePatch ||
-      value === UsageFlags.MultipartFormData ||
       value === UsageFlags.Json ||
       value === UsageFlags.Xml
     );
