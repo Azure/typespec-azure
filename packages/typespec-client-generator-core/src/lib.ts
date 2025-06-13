@@ -162,7 +162,7 @@ export const $lib = createTypeSpecLibrary({
     "invalid-usage": {
       severity: "error",
       messages: {
-        default: `Usage value must be 2 ("input") or 4 ("output").`,
+        default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
     "conflicting-multipart-model-usage": {
@@ -286,12 +286,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: `@access override conflicts with the access calculated from operation or other @access override.`,
-      },
-    },
-    "conflict-usage-override": {
-      severity: "warning",
-      messages: {
-        default: `@usage override conflicts with the usage calculated from operation or other @usage override.`,
       },
     },
     "duplicate-decorator": {
