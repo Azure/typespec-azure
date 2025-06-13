@@ -18,7 +18,6 @@ import {
   ignoreDiagnostics,
   isService,
   isTemplateDeclaration,
-  isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
@@ -56,46 +55,23 @@ import {
 import {
   AllScopes,
   clientKey,
+  clientLocationKey,
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
   findRootSourceProperty,
+  getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
   listAllUserDefinedNamespaces,
   negationScopesKey,
+  omitOperation,
   operationGroupKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
-import { getLibraryName, listAllServiceNamespaces } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
-
-function getScopedDecoratorData(
-  context: TCGCContext,
-  key: symbol,
-  target: Type,
-  languageScope?: string | typeof AllScopes,
-): any {
-  const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
-  if (retval === undefined) return retval;
-  if (languageScope === AllScopes) {
-    return retval[languageScope];
-  }
-  if (languageScope === undefined || typeof languageScope === "string") {
-    const scope = languageScope ?? context.emitterName;
-    if (Object.keys(retval).includes(scope)) return retval[scope];
-
-    // if the scope is negated, we should return undefined
-    // if the scope is not negated, we should return the value for AllScopes
-    const negationScopes = retval[negationScopesKey];
-    if (negationScopes !== undefined && negationScopes.includes(scope)) {
-      return undefined;
-    }
-  }
-  return retval[AllScopes]; // in this case it applies to all languages
-}
 
 function setScopedDecoratorData(
   context: DecoratorContext,
@@ -174,12 +150,6 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
   return [negationScopes, scopes];
 }
 
-function isArm(service: Namespace): boolean {
-  return service.decorators.some(
-    (decorator) => decorator.decorator.name === "$armProviderNamespace",
-  );
-}
-
 export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -215,6 +185,7 @@ export const $client: ClientDecorator = (
     service,
     type: target,
     crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
+    subOperationGroups: [],
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
@@ -227,26 +198,6 @@ function findClientService(
   while (current) {
     if (isService(program, current)) {
       return current;
-    }
-    current = current.namespace;
-  }
-  return undefined;
-}
-
-function findOperationGroupService(
-  program: Program,
-  client: Namespace | Interface,
-  scope: LanguageScopes,
-): Namespace | Interface | undefined {
-  let current: Namespace | undefined = client as any;
-  while (current) {
-    if (isService(program, current)) {
-      // we don't check scoped clients here, because we want to find the service for the client
-      return current;
-    }
-    const client = program.stateMap(clientKey).get(current);
-    if (client && (client[scope] || client[AllScopes])) {
-      return (client[scope] ?? client[AllScopes]).service;
     }
     current = current.namespace;
   }
@@ -274,70 +225,12 @@ export function getClient(
 
 /**
  * List all the clients.
- * If the user has not explicitly defined any clients, we will treat the first namespace with service decorator as the root client.
- * If this root client has no operations or sub-clients, we will still return this empty root client. This behavior is different from sdkContext.sdkPackage.clients, which will not include empty clients.
- * TODO: We will consolidate SDKClientType and SDKOperationGroupType in the future. After that, we will list all clients and operation groups in this function instead and the behavior will be consistent.
- *
  *
  * @param context TCGCContext
  * @returns Array of clients
  */
 export function listClients(context: TCGCContext): SdkClient[] {
-  if (context.__rawClients) return context.__rawClients;
-  const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
-
-  const explicitClients = [];
-  for (const ns of namespaces) {
-    if (getScopedDecoratorData(context, clientKey, ns)) {
-      explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
-    }
-    for (const i of ns.interfaces.values()) {
-      if (getScopedDecoratorData(context, clientKey, i)) {
-        explicitClients.push(getScopedDecoratorData(context, clientKey, i));
-      }
-    }
-  }
-  if (explicitClients.length > 0) {
-    context.__rawClients = explicitClients;
-    if (context.__rawClients.some((client) => isArm(client.service))) {
-      context.arm = true;
-    }
-    return context.__rawClients;
-  }
-
-  // if there is no explicit client, we will treat the first namespace with service decorator as client
-  const serviceNamespaces: Namespace[] = listAllServiceNamespaces(context);
-  if (serviceNamespaces.length >= 1) {
-    const service = serviceNamespaces.shift()!;
-    serviceNamespaces.map((ns) => {
-      reportDiagnostic(context.program, {
-        code: "multiple-services",
-        target: ns,
-      });
-    });
-    let originalName = service.name;
-    const clientNameOverride = getClientNameOverride(context, service);
-    if (clientNameOverride) {
-      originalName = clientNameOverride;
-    } else {
-      originalName = service.name;
-    }
-    const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-    context.arm = isArm(service);
-    context.__rawClients = [
-      {
-        kind: "SdkClient",
-        name: clientName,
-        service: service,
-        type: service,
-        crossLanguageDefinitionId: getNamespaceFullName(service),
-      },
-    ];
-  } else {
-    context.__rawClients = [];
-  }
-
-  return context.__rawClients;
+  return context.getClients();
 }
 
 export const $operationGroup: OperationGroupDecorator = (
@@ -385,51 +278,6 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   }
   return false;
 }
-/**
- * Check an operation is in an operation group.
- * @param context TCGCContext
- * @param type Type to check
- * @returns boolean
- */
-export function isInOperationGroup(
-  context: TCGCContext,
-  type: Namespace | Interface | Operation,
-): boolean {
-  switch (type.kind) {
-    case "Operation":
-      return type.interface
-        ? isInOperationGroup(context, type.interface)
-        : type.namespace
-          ? isInOperationGroup(context, type.namespace)
-          : false;
-    case "Interface":
-    case "Namespace":
-      return (
-        isOperationGroup(context, type) ||
-        (type.namespace ? isInOperationGroup(context, type.namespace) : false)
-      );
-  }
-}
-
-function buildOperationGroupPath(context: TCGCContext, type: Namespace | Interface): string {
-  const path = [];
-  while (true) {
-    const client = getClient(context, type);
-    if (client) {
-      path.push(client.name);
-      break;
-    }
-    if (isOperationGroup(context, type)) {
-      path.push(getLibraryName(context, type));
-    }
-    if (type.namespace) {
-      type = type.namespace;
-    } else {
-      break;
-    }
-  }
-  return path.reverse().join(".");
-}
 
 /**
  * Return the operation group object for the given namespace or interface or undefined is not an operation group.
@@ -441,73 +289,9 @@ export function getOperationGroup(
   context: TCGCContext,
   type: Namespace | Interface,
 ): SdkOperationGroup | undefined {
-  let operationGroup: SdkOperationGroup | undefined;
-  const service =
-    findOperationGroupService(context.program, type, context.emitterName) ?? (type as any);
-  if (!isService(context.program, service)) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name: type.name },
-      target: type,
-    });
-  }
-  if (hasExplicitClientOrOperationGroup(context)) {
-    operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
-    if (operationGroup) {
-      operationGroup.groupPath = buildOperationGroupPath(context, type);
-      operationGroup.service = service;
-      operationGroup.hasOperations = type.operations.size > 0;
-    }
-  } else {
-    // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
-    if (type.kind === "Interface") {
-      const hasOperations = type.operations.size > 0;
-      if (!isTemplateDeclaration(type)) {
-        operationGroup = {
-          kind: "SdkOperationGroup",
-          type,
-          groupPath: buildOperationGroupPath(context, type),
-          service,
-          hasOperations: hasOperations,
-        };
-      }
-    }
+  const operationGroup = context.getClientOrOperationGroup(type);
 
-    if (
-      type.kind === "Namespace" &&
-      !type.decorators.some((t) => t.decorator.name === "$service")
-    ) {
-      operationGroup = {
-        kind: "SdkOperationGroup",
-        type,
-        groupPath: buildOperationGroupPath(context, type),
-        service,
-        hasOperations: type.operations.size > 0,
-      };
-    }
-  }
-
-  // build hierarchy of operation group
-  if (operationGroup && type.kind === "Namespace") {
-    const subOperationGroups: SdkOperationGroup[] = [];
-    type.namespaces.forEach((ns) => {
-      const subOperationGroup = getOperationGroup(context, ns);
-      if (subOperationGroup) {
-        subOperationGroups.push(subOperationGroup);
-      }
-    });
-    type.interfaces.forEach((i) => {
-      const subOperationGroup = getOperationGroup(context, i);
-      if (subOperationGroup) {
-        subOperationGroups.push(subOperationGroup);
-      }
-    });
-    if (subOperationGroups.length > 0) {
-      operationGroup.subOperationGroups = subOperationGroups;
-    }
-  }
-
-  return operationGroup;
+  return operationGroup?.kind === "SdkOperationGroup" ? operationGroup : undefined;
 }
 
 /**
@@ -523,46 +307,16 @@ export function listOperationGroups(
   group: SdkClient | SdkOperationGroup,
   ignoreHierarchy = false,
 ): SdkOperationGroup[] {
-  const groups: SdkOperationGroup[] = [];
-  const queue: SdkOperationGroup[] = [];
+  if (!ignoreHierarchy) return group.subOperationGroups;
 
-  if (group.type.kind === "Interface") {
-    return groups;
-  }
-
-  for (const subItem of group.type.namespaces.values()) {
-    const og = getOperationGroup(context, subItem);
-    if (og) {
-      queue.push(og);
+  const groups: SdkOperationGroup[] = [...group.subOperationGroups];
+  let current = 0;
+  while (current < groups.length) {
+    const operationGroup = groups[current];
+    if (operationGroup.subOperationGroups) {
+      groups.push(...operationGroup.subOperationGroups);
     }
-  }
-  for (const subItem of group.type.interfaces.values()) {
-    const og = getOperationGroup(context, subItem);
-    if (og) {
-      queue.push(og);
-    }
-  }
-
-  while (queue.length > 0) {
-    const operationGroup = queue.shift()!;
-    if (
-      hasExplicitClientOrOperationGroup(context) ||
-      operationGroup.hasOperations === true ||
-      operationGroup.subOperationGroups
-    ) {
-      groups.push(operationGroup);
-    }
-    if (ignoreHierarchy && operationGroup.subOperationGroups) {
-      for (const subOperationGroup of operationGroup.subOperationGroups) {
-        if (
-          hasExplicitClientOrOperationGroup(context) ||
-          subOperationGroup.hasOperations === true ||
-          subOperationGroup.subOperationGroups
-        ) {
-          queue.push(subOperationGroup);
-        }
-      }
-    }
+    current++;
   }
 
   return groups;
@@ -580,46 +334,18 @@ export function listOperationsInOperationGroup(
   group: SdkOperationGroup | SdkClient,
   ignoreHierarchy = false,
 ): Operation[] {
-  const operations: Operation[] = [];
+  if (!ignoreHierarchy) return context.getOperationsForClient(group);
 
-  function addOperations(current: Namespace | Interface) {
-    if (
-      current !== group.type &&
-      !ignoreHierarchy &&
-      (getClient(context, current) || isOperationGroup(context, current))
-    ) {
-      return;
+  const groups: SdkOperationGroup[] = [...group.subOperationGroups];
+  const operations: Operation[] = [...context.getOperationsForClient(group)];
+  while (groups.length > 0) {
+    const operationGroup = groups.shift()!;
+    if (operationGroup.subOperationGroups) {
+      groups.push(...operationGroup.subOperationGroups);
     }
-    if (current.kind === "Interface" && isTemplateDeclaration(current)) {
-      // Skip template interface operations
-      return;
-    }
-
-    for (const op of current.operations.values()) {
-      if (!IsInScope(context, op)) {
-        continue;
-      }
-
-      // Skip templated operations and omit operations
-      if (
-        !isTemplateDeclarationOrInstance(op) &&
-        !context.program.stateMap(omitOperation).get(op)
-      ) {
-        operations.push(op);
-      }
-    }
-
-    if (current.kind === "Namespace") {
-      for (const subItem of current.namespaces.values()) {
-        addOperations(subItem);
-      }
-      for (const subItem of current.interfaces.values()) {
-        addOperations(subItem);
-      }
-    }
+    operations.push(...context.getOperationsForClient(operationGroup));
   }
 
-  addOperations(group.type);
   return operations;
 }
 
@@ -882,7 +608,6 @@ export function getClientNameOverride(
 }
 
 const overrideKey = createStateSymbol("override");
-const omitOperation = createStateSymbol("omitOperation");
 
 // Recursive function to collect parameter names
 function collectParams(
@@ -1319,19 +1044,6 @@ export const $scope: ScopeDecorator = (
   }
 };
 
-function IsInScope(context: TCGCContext, entity: Operation): boolean {
-  const scopes = getScopedDecoratorData(context, scopeKey, entity);
-  if (scopes !== undefined && scopes.includes(context.emitterName)) {
-    return true;
-  }
-
-  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
-  if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
-    return false;
-  }
-  return true;
-}
-
 const clientApiVersionsKey = createStateSymbol("clientApiVersions");
 
 /**
@@ -1467,4 +1179,54 @@ export function getClientDocExplicit(
   target: Type,
 ): ClientDocData | undefined {
   return getScopedDecoratorData(context, clientDocKey, target);
+}
+
+export const $clientLocation = (
+  context: DecoratorContext,
+  source: Operation,
+  target: Interface | Namespace | string,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $clientLocation, clientLocationKey, source, target, scope);
+};
+
+/**
+ * Gets the `Namespace`, `Interface` or name of client where an operation change the location to.
+ *
+ * @param context TCGCContext
+ * @param operation Operation to be moved
+ * @returns `Namespace`, `Interface`, `string` target or undefined if no location change.
+ */
+export function getClientLocation(
+  context: TCGCContext,
+  operation: Operation,
+): Namespace | Interface | string | undefined {
+  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` will be ignored
+  if (hasExplicitClientOrOperationGroup(context)) {
+    return undefined;
+  }
+  return getScopedDecoratorData(context, clientLocationKey, operation) as
+    | Namespace
+    | Interface
+    | string
+    | undefined;
+}
+
+/**
+ * Check if an operation is in scope for the current emitter.
+ * @param context TCGCContext
+ * @param entity Operation to check if it is in scope
+ * @returns
+ */
+export function isInScope(context: TCGCContext, entity: Operation): boolean {
+  const scopes = getScopedDecoratorData(context, scopeKey, entity);
+  if (scopes !== undefined && scopes.includes(context.emitterName)) {
+    return true;
+  }
+
+  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+  if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
+    return false;
+  }
+  return true;
 }

@@ -120,6 +120,7 @@ Available ruleSets:
 - [`@clientApiVersions`](#@clientapiversions)
 - [`@clientDoc`](#@clientdoc)
 - [`@clientInitialization`](#@clientinitialization)
+- [`@clientLocation`](#@clientlocation)
 - [`@clientName`](#@clientname)
 - [`@clientNamespace`](#@clientnamespace)
 - [`@convenientAPI`](#@convenientapi)
@@ -543,6 +544,26 @@ model MyServiceClientOptions {
 // The generated client will have `blobName` on its initialization method. We will also
 // elevate the existing `blobName` parameter from method level to client level.
 ```
+
+#### `@clientLocation`
+
+Change the operation location in client. If the target client is not defined, use `string` to indicate the client name.
+
+```typespec
+@Azure.ClientGenerator.Core.clientLocation(target: Interface | Namespace | valueof string, scope?: valueof string)
+```
+
+##### Target
+
+The operation to change location for.
+`Operation`
+
+##### Parameters
+
+| Name   | Type                                         | Description                                                                      |
+| ------ | -------------------------------------------- | -------------------------------------------------------------------------------- |
+| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which could indicate the client. |
+| scope  | `valueof string`                             | The language scope for this decorator                                            |
 
 #### `@clientName`
 
