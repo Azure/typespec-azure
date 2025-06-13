@@ -13,18 +13,25 @@ import {
   getEffectiveModelType,
   getFriendlyName,
   getNamespaceFullName,
-  getProjectedName,
   ignoreDiagnostics,
-  listServices,
+  isService,
   resolveEncodedName,
 } from "@typespec/compiler";
-import { HttpOperation, getHttpOperation, getHttpPart, isMetadata } from "@typespec/http";
+import {
+  HttpOperation,
+  Visibility,
+  getHttpOperation,
+  getHttpPart,
+  isMetadata,
+  isVisible,
+} from "@typespec/http";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
   getClientNameOverride,
   getIsApiVersion,
+  getOverriddenClientMethod,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -32,7 +39,6 @@ import {
 import {
   SdkBodyModelPropertyType,
   SdkBodyParameter,
-  SdkClientType,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
@@ -41,21 +47,21 @@ import {
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
-  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import {
+  AllScopes,
   TspLiteralType,
-  getClientNamespaceStringHelper,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
+  listAllUserDefinedNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
+  resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
-import { createDiagnostic } from "./lib.js";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -101,26 +107,20 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
 }
 
 /**
- * Get the client's namespace for generation. If package-name is passed in config, we return
- * that value as our namespace. Otherwise, we default to the TypeSpec service namespace.
- * @param program
- * @param context
- * @returns
- */
-export function getClientNamespaceString(context: TCGCContext): string | undefined {
-  return getClientNamespaceStringHelper(context, listServices(context.program)[0]?.type);
-}
-
-/**
- * If the given type is an anonymous model and all of its properties excluding
- * header/query/path/status-code are sourced from a named model, returns that original named model.
- * Otherwise the given type is returned unchanged.
+ * If the given type is an anonymous model, returns a named model with same shape.
+ * The finding logic will ignore all the properties of header/query/path/status-code metadata,
+ * as well as the properties that are not visible in the given visibility if provided.
+ * If the model found is also anonymous, the input type is returned unchanged.
  *
  * @param context
  * @param type
  * @returns
  */
-export function getEffectivePayloadType(context: TCGCContext, type: Model): Model {
+export function getEffectivePayloadType(
+  context: TCGCContext,
+  type: Model,
+  visibility?: Visibility,
+): Model {
   const program = context.program;
 
   // if a type has name, we should resolve the name
@@ -135,7 +135,10 @@ export function getEffectivePayloadType(context: TCGCContext, type: Model): Mode
   const effective = getEffectiveModelType(
     program,
     type,
-    (t) => !isMetadata(context.program, t) && !hasNoneVisibility(context, t),
+    (t) =>
+      !isMetadata(context.program, t) &&
+      !hasNoneVisibility(context, t) &&
+      (visibility === undefined || isVisible(program, t, visibility)),
   );
   if (effective.name) {
     return effective;
@@ -170,42 +173,39 @@ export function getPropertyNames(context: TCGCContext, property: ModelProperty):
 export function getLibraryName(
   context: TCGCContext,
   type: Type & { name?: string | symbol },
+  scope?: string | typeof AllScopes,
 ): string {
   // 1. check if there's a client name
-  let emitterSpecificName = getClientNameOverride(context, type);
+  const emitterSpecificName = getClientNameOverride(context, type, scope);
   if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
 
-  // 2. check if there's a specific name for our language with deprecated @projectedName
-  emitterSpecificName = getProjectedName(context.program, type, context.emitterName);
-  if (emitterSpecificName && emitterSpecificName !== type.name) return emitterSpecificName;
-
-  // 3. check if there's a client name with deprecated @projectedName
-  const clientSpecificName = getProjectedName(context.program, type, "client");
-  if (clientSpecificName && emitterSpecificName !== type.name) return clientSpecificName;
-
-  // 4. check if there's a friendly name, if so return friendly name
+  // 2. check if there's a friendly name, if so return friendly name
   const friendlyName = getFriendlyName(context.program, type);
   if (friendlyName) return friendlyName;
 
-  // 5. if type is derived from template and name is the same as template, add template parameters' name as suffix
+  // 3. if type is derived from template and name is the same as template, add template parameters' name as suffix
   if (
     typeof type.name === "string" &&
     type.name !== "" &&
     type.kind === "Model" &&
     type.templateMapper?.args
   ) {
-    return (
+    const generatedName = context.__generatedNames.get(type);
+    if (generatedName) return generatedName;
+    return resolveDuplicateGenearatedName(
+      context,
+      type,
       type.name +
-      type.templateMapper.args
-        .filter(
-          (arg): arg is Model | Enum =>
-            "kind" in arg &&
-            (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
-            arg.name !== undefined &&
-            arg.name.length > 0,
-        )
-        .map((arg) => pascalCase(arg.name))
-        .join("")
+        type.templateMapper.args
+          .filter(
+            (arg): arg is Model | Enum =>
+              "kind" in arg &&
+              (arg.kind === "Model" || arg.kind === "Enum" || arg.kind === "Union") &&
+              arg.name !== undefined &&
+              arg.name.length > 0,
+          )
+          .map((arg) => pascalCase(arg.name))
+          .join(""),
     );
   }
 
@@ -219,11 +219,9 @@ export function getLibraryName(
  * @returns
  */
 export function getWireName(context: TCGCContext, type: Type & { name: string }) {
-  // 1. Check if there's an encoded name
   const encodedName = resolveEncodedName(context.program, type, "application/json");
   if (encodedName !== type.name) return encodedName;
-  // 2. Check if there's deprecated language projection
-  return getProjectedName(context.program, type, "json") ?? type.name;
+  return type.name;
 }
 
 /**
@@ -295,21 +293,9 @@ export function getCrossLanguageDefinitionId(
  */
 export function getCrossLanguagePackageId(context: TCGCContext): [string, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const services = listServices(context.program);
-  if (services.length === 0) return diagnostics.wrap("");
-  const serviceNamespace = getNamespaceFullName(services[0].type);
-  if (services.length > 1) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "multiple-services",
-        target: services[0].type,
-        format: {
-          service: serviceNamespace,
-        },
-      }),
-    );
-  }
-  return diagnostics.wrap(serviceNamespace);
+  const serviceNamespaces = listAllServiceNamespaces(context);
+  if (serviceNamespaces.length === 0) return diagnostics.wrap("");
+  return diagnostics.wrap(getNamespaceFullName(serviceNamespaces[0]));
 }
 
 /**
@@ -322,10 +308,7 @@ export function getGeneratedName(
   type: Model | Union | TspLiteralType,
   operation?: Operation,
 ): string {
-  if (!context.generatedNames) {
-    context.generatedNames = new Map<Union | Model | TspLiteralType, string>();
-  }
-  const generatedName = context.generatedNames.get(type);
+  const generatedName = context.__generatedNames.get(type);
   if (generatedName) return generatedName;
 
   const contextPath = operation
@@ -345,37 +328,32 @@ function findContextPath(
   context: TCGCContext,
   type: Model | Union | TspLiteralType,
 ): ContextNode[] {
-  for (const client of listClients(context)) {
-    // orphan models
-    if (client.service) {
-      for (const model of client.service.models.values()) {
-        if (
-          [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
-        )
-          continue;
-        const result = getContextPath(context, model, type);
-        if (result.length > 0) {
-          return result;
-        }
+  // orphan models
+  for (const currNamespace of listAllUserDefinedNamespaces(context)) {
+    for (const model of currNamespace.models.values()) {
+      if (
+        [...model.properties.values()].filter((p) => !isMetadata(context.program, p)).length === 0
+      )
+        continue;
+      const result = getContextPath(context, model, type);
+      if (result.length > 0) {
+        return result;
       }
     }
+  }
+  for (const client of listClients(context)) {
     for (const operation of listOperationsInOperationGroup(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
         return result;
       }
     }
-    const ogs = listOperationGroups(context, client);
-    while (ogs.length) {
-      const operationGroup = ogs.pop();
-      for (const operation of listOperationsInOperationGroup(context, operationGroup!)) {
+    for (const og of listOperationGroups(context, client, true)) {
+      for (const operation of listOperationsInOperationGroup(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
         }
-      }
-      if (operationGroup?.subOperationGroups) {
-        ogs.push(...operationGroup.subOperationGroups);
       }
     }
   }
@@ -451,6 +429,13 @@ function getContextPath(
           }
         }
       }
+    }
+
+    const overriddenClientMethod = getOverriddenClientMethod(context, root);
+    visited.clear();
+    result = [{ name: root.name, type: root }];
+    if (dfsModelProperties(typeToFind, overriddenClientMethod ?? root.parameters, "Parameter")) {
+      return result;
     }
   } else {
     visited.clear();
@@ -643,17 +628,7 @@ function buildNameFromContextPaths(
     }
   }
   // 3. simplely handle duplication
-  let duplicateCount = 1;
-  const rawCreateName = createName;
-  const generatedNames = [...(context.generatedNames?.values() ?? [])];
-  while (generatedNames.includes(createName)) {
-    createName = `${rawCreateName}${duplicateCount++}`;
-  }
-  if (context.generatedNames) {
-    context.generatedNames.set(type, createName);
-  } else {
-    context.generatedNames = new Map<Union | Model | TspLiteralType, string>([[type, createName]]);
-  }
+  createName = resolveDuplicateGenearatedName(context, type, createName);
   return createName;
 }
 
@@ -661,11 +636,11 @@ export function getHttpOperationWithCache(
   context: TCGCContext,
   operation: Operation,
 ): HttpOperation {
-  if (context.httpOperationCache?.has(operation)) {
-    return context.httpOperationCache.get(operation)!;
+  if (context.__httpOperationCache?.has(operation)) {
+    return context.__httpOperationCache.get(operation)!;
   }
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, operation));
-  context.httpOperationCache?.set(operation, httpOperation);
+  context.__httpOperationCache!.set(operation, httpOperation);
   return httpOperation;
 }
 
@@ -676,29 +651,7 @@ export function getHttpOperationExamples(
   context: TCGCContext,
   operation: HttpOperation,
 ): SdkHttpOperationExample[] {
-  return context.__httpOperationExamples?.get(operation) ?? [];
-}
-
-/**
- * Get all the sub clients from current client.
- *
- * @param client
- * @param listNestedClients determine if nested clients should be listed
- * @returns
- */
-export function listSubClients<TServiceOperation extends SdkServiceOperation>(
-  client: SdkClientType<TServiceOperation>,
-  listNestedClients: boolean = false,
-): SdkClientType<TServiceOperation>[] {
-  const subClients: SdkClientType<TServiceOperation>[] = client.methods
-    .filter((c) => c.kind === "clientaccessor")
-    .map((c) => c.response as SdkClientType<TServiceOperation>);
-  if (listNestedClients) {
-    for (const subClient of [...subClients]) {
-      subClients.push(...listSubClients(subClient, listNestedClients));
-    }
-  }
-  return subClients;
+  return context.__httpOperationExamples.get(operation) ?? [];
 }
 
 export function isAzureCoreModel(t: SdkType): boolean {
@@ -759,4 +712,24 @@ export function getHttpOperationParameter(
     }
   }
   return undefined;
+}
+
+/**
+ * Currently, listServices can only be called from a program instance. This doesn't work well if we're doing mutation,
+ * because we want to just mutate the global namespace once, then find all of the services in the program, since we aren't
+ * able to explicitly tell listServices to iterate over our specific mutated global namespace. We're going to use this function
+ * instead to list all of the services in the global namespace.
+ *
+ * See https://github.com/microsoft/typespec/issues/6247
+ *
+ * @param context
+ */
+export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
+  const serviceNamespaces: Namespace[] = [];
+  for (const ns of listAllUserDefinedNamespaces(context)) {
+    if (isService(context.program, ns)) {
+      serviceNamespaces.push(ns);
+    }
+  }
+  return serviceNamespaces;
 }

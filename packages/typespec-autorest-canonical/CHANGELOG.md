@@ -1,5 +1,35 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.17.0
+
+No changes, version bump only.
+
+## 0.16.0
+
+No changes, version bump only.
+
+## 0.15.0
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
+## 0.14.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+
+## 0.13.0
+
+No changes, version bump only.
+
 ## 0.12.0
 
 ### Bump dependencies

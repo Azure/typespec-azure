@@ -1,5 +1,70 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.56.1
+
+### Bug Fixes
+
+- [#2676](https://github.com/Azure/typespec-azure/pull/2676) Corrected the references for `PrivateEndpointConnectionListResultV5` and `PrivateLinkResourceListResultV5` in `common-types`.
+- [#2675](https://github.com/Azure/typespec-azure/pull/2675) Add support for resources with multiple operation paths
+- [#2674](https://github.com/Azure/typespec-azure/pull/2674) Allow optional request bodies in Resource actions templates
+
+
+## 0.56.0
+
+### Bug Fixes
+
+- [#2250](https://github.com/Azure/typespec-azure/pull/2250) Addressing common type differences with common types in azure-rest-api-specs, such as ordering of elements, lower/upper case in definition names, typos, and incorrect format on the next link.
+- [#2538](https://github.com/Azure/typespec-azure/pull/2538) Fixing gaps in the `@identifiers` decorator functionality:
+  - The `@identifier` decorator should take priority when present, and its value should be respected.
+  - The value of the `@identifier` decorator is determined by the `ModelProperty`, not the array type.
+  - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
+- [#2625](https://github.com/Azure/typespec-azure/pull/2625) Make Patch templates specify implicitOptionality
+
+
+## 0.55.0
+
+### Bug Fixes
+
+- [#2435](https://github.com/Azure/typespec-azure/pull/2435) Change OperationStatusResult.resourceId to armResourceIdentifier
+- [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
+
+
+## 0.54.0
+
+### Features
+
+- [#2470](https://github.com/Azure/typespec-azure/pull/2470) Relax `@enforceConstraint` to allow validation to pass when a resource is identified using the `@legacy.armCustomResource` decorator.
+- [#2428](https://github.com/Azure/typespec-azure/pull/2428) Add support for new core HTTP bodyKind: "file".
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
+## 0.53.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+### Bug Fixes
+
+- [#2297](https://github.com/Azure/typespec-azure/pull/2297) Fix using `@identifiers` on array of model with id not respected
+- [#2328](https://github.com/Azure/typespec-azure/pull/2328) Fix `ArmProviderActionAsync` and `ArmProviderActionSync` operations as both operations were returning `ErrorResponse` and not accepting changes to the error response type.
+- [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
+
+
+## 0.52.0
+
+### Features
+
+- [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
+
+
 ## 0.51.0
 
 ### Bug Fixes

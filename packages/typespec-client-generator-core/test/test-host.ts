@@ -12,17 +12,14 @@ import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { CreateSdkContextOptions, createSdkContext } from "../src/context.js";
-import {
-  SdkContext,
-  SdkEmitterOptions,
-  SdkHttpOperation,
-  SdkServiceOperation,
-} from "../src/interfaces.js";
+import { SdkContext, SdkHttpOperation, SdkServiceOperation } from "../src/interfaces.js";
+import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 import { SdkTestLibrary } from "../src/testing/index.js";
 
-export interface CreateSdkTestRunnerOptions extends SdkEmitterOptions {
+export interface CreateSdkTestRunnerOptions extends BrandedSdkEmitterOptionsInterface {
   emitterName?: string;
   librariesToAdd?: TypeSpecTestLibrary[];
+  autoImports?: string[];
   autoUsings?: string[];
   packageName?: string;
 }
@@ -51,8 +48,15 @@ export async function createSdkTestRunner(
   if (options.autoUsings) {
     autoUsings = autoUsings.concat(options.autoUsings);
   }
+  let autoImports = host.libraries
+    .filter((x) => x.name !== "@typespec/compiler")
+    .map((x) => x.name);
+  if (options.autoImports) {
+    autoImports = autoImports.concat(options.autoImports);
+  }
   const sdkTestRunner = createTestWrapper(host, {
-    autoUsings: autoUsings,
+    autoImports,
+    autoUsings,
   }) as SdkTestRunner;
 
   sdkTestRunner.host = host;
@@ -97,7 +101,7 @@ export async function createSdkTestRunner(
   // compile with dummy service definition
   sdkTestRunner.compileWithBuiltInService = async (code) => {
     const result = await baseCompile(
-      `@service({title: "Test Service"}) namespace TestService;
+      `@service(#{title: "Test Service"}) namespace TestService;
     ${code}`,
       {
         noEmit: true,
@@ -138,7 +142,7 @@ export async function createSdkTestRunner(
       `
     @armProviderNamespace("My.Service")
     @server("http://localhost:3000", "endpoint")
-    @service({title: "My.Service"})
+    @service(#{title: "My.Service"})
     @versioned(Versions)
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
@@ -200,7 +204,7 @@ export async function createSdkTestRunner(
       .filter((x) => x !== StandardTestLibrary)
       .map((x) => x.name)
       .map((x) => `import "${x}";`),
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
+    ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
 
   const clientAutoCode = [
@@ -209,7 +213,7 @@ export async function createSdkTestRunner(
       .map((x) => x.name)
       .map((x) => `import "${x}";`),
     `import "./main.tsp";`,
-    ...(autoUsings ?? []).map((x) => `using ${x};`),
+    ...autoUsings.map((x) => `using ${x};`),
   ].join("\n");
 
   // compile with client.tsp
@@ -267,15 +271,10 @@ export async function createSdkContextTestHelper<
     program: program,
     emitterOutputDir: resolveVirtualPath("tsp-output"),
     options: options,
-    getAssetEmitter: null as any,
   };
   return await createSdkContext(
     emitContext,
     options.emitterName ?? "@azure-tools/typespec-csharp",
     sdkContextOption,
   );
-}
-
-export function hasFlag<T extends number>(value: T, flag: T): boolean {
-  return (value & flag) !== 0;
 }

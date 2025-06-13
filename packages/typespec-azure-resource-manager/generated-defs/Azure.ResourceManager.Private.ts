@@ -153,6 +153,15 @@ export type ArmResourcePropertiesOptionalityDecorator = (
   isOptional: boolean,
 ) => void;
 
+/**
+ * designates a parameter as an explicit bodyRoot and sets the optionality of the parameter
+ */
+export type ArmBodyRootDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isOptional: boolean,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -166,4 +175,5 @@ export type AzureResourceManagerPrivateDecorators = {
   enforceConstraint: EnforceConstraintDecorator;
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
+  armBodyRoot: ArmBodyRootDecorator;
 };

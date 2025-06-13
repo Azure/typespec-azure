@@ -1,4 +1,4 @@
-import { Enum, Interface, Model, Operation } from "@typespec/compiler";
+import { Enum, Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
 import {
   BasicTestRunner,
   expectDiagnosticEmpty,
@@ -12,6 +12,7 @@ import {
   getLongRunningStates,
   getOperationLinks,
   getPagedResult,
+  getParameterizedNextLinkArguments,
   isFixed,
 } from "../src/decorators.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
@@ -240,7 +241,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("supports @nextPageOperation", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
 
       model MyResource {
         @key
@@ -517,7 +518,7 @@ describe("typespec-azure-core: decorators", () => {
   describe("@operationLink", () => {
     it("works for sample usage", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model MyResource {
         @key("resourceName")
@@ -565,7 +566,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if RequestParameter or ResponseProperty are not used", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -592,7 +593,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if parameter does not exist on linked operation", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -619,7 +620,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if requestParameter does not exist", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -646,7 +647,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("passes if requestParameter exists", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -672,7 +673,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("raises diagnostic if responseProperty does not exist", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -700,7 +701,7 @@ describe("typespec-azure-core: decorators", () => {
 
     it("passes if responseProperty exists", async () => {
       const code = `
-      using TypeSpec.Rest.Resource;
+      using Rest.Resource;
       
       model FooBody {
         id: string;
@@ -878,6 +879,68 @@ describe("typespec-azure-core: decorators", () => {
       );
 
       ok(isFixed(runner.program, result.FixedEnum as Enum), "Expected fixed enum");
+    });
+  });
+
+  describe("@parameterizedNextLinkConfig", () => {
+    it("single parameter", async () => {
+      const { includePending, nextLink } = (await runner.compile(`
+        model ListCertificateOptions {
+          @test includePending?: string;
+        }
+        model Certificate {}
+        model Page {
+          @items items: Certificate[];
+          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
+        }
+`)) as { includePending: ModelProperty; nextLink: ModelProperty };
+      assert.strictEqual(nextLink.type.kind, "Scalar");
+      const templateArgs = getParameterizedNextLinkArguments(runner.program, nextLink.type);
+      assert.strictEqual(templateArgs?.length, 1);
+      assert.strictEqual(templateArgs[0], includePending);
+    });
+    it("multiple parameter", async () => {
+      const { includePending, includeExpired, nextLink } = (await runner.compile(`
+        model ListCertificateOptions {
+          @test includePending?: string;
+          @test includeExpired?: string;
+        }
+        model Certificate {}
+        model Page {
+          @items items: Certificate[];
+          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
+            ListCertificateOptions.includePending,
+            ListCertificateOptions.includeExpired
+          ]>;
+        }
+`)) as { includePending: ModelProperty; includeExpired: ModelProperty; nextLink: ModelProperty };
+      assert.strictEqual(nextLink.type.kind, "Scalar");
+      const templateArgs = getParameterizedNextLinkArguments(runner.program, nextLink.type);
+      assert.strictEqual(templateArgs?.length, 2);
+      assert.strictEqual(templateArgs[0], includePending);
+      assert.strictEqual(templateArgs[1], includeExpired);
+    });
+    it("no parameter", async () => {
+      const diagnostics = await runner.diagnose(`
+        model Certificate {}
+        model Page {
+          @items items: Certificate[];
+          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink;
+        }
+`);
+      expectDiagnostics(diagnostics, {
+        code: "invalid-template-args",
+        message: "Template argument 'ParameterizedParams' is required and not specified.",
+      });
+    });
+    it("call getParameterizedNextLinkArguments on unrelated type", async () => {
+      const { includePending } = (await runner.compile(`
+        model ListCertificateOptions {
+          @test includePending?: string;
+      }
+`)) as { includePending: ModelProperty };
+      assert.strictEqual(includePending.type.kind, "Scalar");
+      assert.ok(!getParameterizedNextLinkArguments(runner.program, includePending.type));
     });
   });
 });

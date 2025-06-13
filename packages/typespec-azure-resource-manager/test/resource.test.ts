@@ -81,7 +81,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("allows overriding armProviderNamespace", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test"})
+      @service(#{title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test {
@@ -129,7 +129,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about ProxyResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service({title: "Microsoft.Test"})
+      @service(#{title: "Microsoft.Test"})
       
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Test;
@@ -524,8 +524,8 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       model FooResourceProperties {
         simpleArmId: Azure.Core.armResourceIdentifier;
         armIdWithType: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
-        armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
-        armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
+        armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}]>;
+        armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["Tenant", "ResourceGroup"]}]>;
         provisioningState: ResourceState;
       }
 
@@ -730,7 +730,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         /** Employee properties */
         model EmployeeProperties {
           /** The status of the last operation. */
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: ProvisioningState;
         }
       
@@ -761,7 +761,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         model Person {
           /** The parent name */
           @path
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @segment("parents")
           @key
           name: string;
@@ -846,7 +846,7 @@ it("recognizes resource with customResource identifier", async () => {
       /** Employee properties */
       model EmployeeProperties {
         /** The status of the last operation. */
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ProvisioningState;
       }
     

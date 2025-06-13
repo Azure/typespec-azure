@@ -28,74 +28,6 @@ describe("typespec-autorest: model definitions", () => {
     expect(res.definitions).not.toHaveProperty("Foo");
   });
 
-  it(`@projectedName("json", <>) updates the property name and set "x-ms-client-name" with the original name  - (LEGACY)`, async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `model Foo {
-        #suppress "deprecated" "for testing"
-        @projectedName("json", "xJson")
-        x: int32;
-      };`,
-    );
-
-    expect(res.defs.Foo).toMatchObject({
-      properties: {
-        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
-      },
-    });
-  });
-
-  it(`@projectedName("client", <>) set the "x-ms-client-name" with the original name (recommended to use @projectedName("json", <>) instead) - (LEGACY)`, async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `model Foo {
-        #suppress "deprecated" "for testing"
-        @projectedName("client", "x")
-        xJson: int32;
-      };`,
-    );
-
-    expect(res.defs.Foo).toMatchObject({
-      properties: {
-        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
-      },
-    });
-  });
-
-  it(`@clientName(<>) set the "x-ms-client-name" with the original name`, async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `model Foo {
-        @clientName("x")
-        xJson: int32;
-      };`,
-    );
-
-    expect(res.defs.Foo).toMatchObject({
-      properties: {
-        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
-      },
-    });
-  });
-
-  it(`@clientName(<>) wins over @projectedName("client", <>)`, async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `model Foo {
-        #suppress "deprecated" "for testing"
-        @clientName("x")
-        @projectedName("client", "y")
-        xJson: int32;
-      };`,
-    );
-
-    expect(res.defs.Foo).toMatchObject({
-      properties: {
-        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
-      },
-    });
-  });
-
   it("using @summary sets the title on definitions and properties", async () => {
     const res = await oapiForModel(
       "Foo",
@@ -116,24 +48,6 @@ describe("typespec-autorest: model definitions", () => {
       "Foo",
       `model Foo {
         @encodedName("application/json", "xJson")
-        x: int32;
-      };`,
-    );
-
-    expect(res.defs.Foo).toMatchObject({
-      properties: {
-        xJson: { type: "integer", format: "int32", "x-ms-client-name": "x" },
-      },
-    });
-  });
-
-  it("uses json name specified via @encodedName even if @projectedName is provided", async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `model Foo {
-        #suppress "deprecated" "for testing"
-        @encodedName("application/json", "xJson")
-        @projectedName("json", "projectedJson")
         x: int32;
       };`,
     );
@@ -749,6 +663,66 @@ describe("typespec-autorest: model definitions", () => {
           modelAsString: false,
           name: "PetKind",
         },
+      });
+    });
+
+    it("defines nullable model", async () => {
+      const res = await openApiFor(
+        `
+        model Pet {
+          name: string;
+        }
+  
+        model Dog {
+          type: Pet | null;
+        }
+        `,
+      );
+      deepStrictEqual(res.definitions.Dog.properties.type, {
+        $ref: "#/definitions/Pet",
+        "x-nullable": true,
+      });
+    });
+
+    it("defines nullable record", async () => {
+      const res = await openApiFor(
+        `
+        model Pet {
+          name: string;
+        }
+  
+        model Dog {
+          record: Record<Pet | null>;
+        }
+        `,
+      );
+      deepStrictEqual(res.definitions.Dog.properties.record, {
+        additionalProperties: {
+          $ref: "#/definitions/Pet",
+          "x-nullable": true,
+        },
+        type: "object",
+      });
+    });
+
+    it("defines nullable Array", async () => {
+      const res = await openApiFor(
+        `
+        model Pet {
+          name: string;
+        }
+  
+        model Dog {
+         arrayProp: Array<Pet | null>;
+        }
+        `,
+      );
+      deepStrictEqual(res.definitions.Dog.properties.arrayProp, {
+        items: {
+          $ref: "#/definitions/Pet",
+          "x-nullable": true,
+        },
+        type: "array",
       });
     });
   });

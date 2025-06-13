@@ -1,5 +1,54 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.56.1
+
+### Bug Fixes
+
+- [#2675](https://github.com/Azure/typespec-azure/pull/2675) Discourage use of legacy types outside brownfield conversions
+
+
+## 0.56.0
+
+No changes, version bump only.
+
+## 0.55.0
+
+No changes, version bump only.
+
+## 0.54.0
+
+### Features
+
+- [#2396](https://github.com/Azure/typespec-azure/pull/2396) add `no-legacy-usage` rule to rules list
+
+### Bump dependencies
+
+- [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
+
+
+## 0.53.0
+
+### Breaking Changes
+
+- [#2309](https://github.com/Azure/typespec-azure/pull/2309) Minimum node version is now 20
+
+### Deprecations
+
+- [#2349](https://github.com/Azure/typespec-azure/pull/2349) `@azure-tools/typespec-azure-core/prefer-csv-collection-format` rule has been replaced by `@azure-tools/typespec-azure-core/no-header-explode` rule.
+
+### Features
+
+- [#1208](https://github.com/Azure/typespec-azure/pull/1208) add some tcgc rules to the list
+
+### Bump dependencies
+
+- [#2308](https://github.com/Azure/typespec-azure/pull/2308) Update dependencies
+
+
+## 0.52.0
+
+No changes, version bump only.
+
 ## 0.51.0
 
 ### Bump dependencies

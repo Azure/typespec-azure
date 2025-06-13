@@ -1,4 +1,4 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, extractSquiggles } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import {
@@ -6,7 +6,12 @@ import {
   OpenAPI2PathParameter,
   OpenAPI2QueryParameter,
 } from "../src/openapi2-document.js";
-import { diagnoseOpenApiFor, ignoreUseStandardOps, openApiFor } from "./test-host.js";
+import {
+  createAutorestTestRunner,
+  diagnoseOpenApiFor,
+  ignoreUseStandardOps,
+  openApiFor,
+} from "./test-host.js";
 
 describe("path parameters", () => {
   async function getPathParam(code: string, name = "myParam"): Promise<OpenAPI2PathParameter> {
@@ -48,6 +53,21 @@ describe("path parameters", () => {
       expect(param).toMatchObject({
         "x-ms-skip-url-encoding": true,
       });
+    });
+  });
+
+  it("report unsupported-param-type diagnostic on the parameter when using unsupported types", async () => {
+    const { pos, end, source } = extractSquiggles(
+      `op test(~~~@path myParam: Record<string>~~~): void;`,
+    );
+    const runner = await createAutorestTestRunner();
+    const diagnostics = await runner.diagnose(source);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unsupported-param-type",
+      message:
+        "Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part 'myParam'.",
+      pos: pos + runner.autoCodeOffset,
+      end: end + runner.autoCodeOffset,
     });
   });
 });
@@ -109,28 +129,39 @@ describe("query parameters", () => {
     });
   });
 
-  it("LEGACY specify the format", async () => {
-    const res = await openApiFor(
-      `
-      #suppress "deprecated" "test"
-      op test(@query({format: "multi"}) arg1: string[], @query({format: "csv"}) arg2: string[]): void;
-      `,
-    );
-    deepStrictEqual(res.paths["/"].get.parameters[0], {
-      in: "query",
-      name: "arg1",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "multi",
+  describe("setting parameter collectionFormat", () => {
+    it("with option", async () => {
+      const param = await getQueryParam(`op test(@query myParam: string[]): void;`);
+      expect(param).toMatchObject({
+        collectionFormat: "csv",
+      });
     });
-    deepStrictEqual(res.paths["/"].get.parameters[1], {
-      in: "query",
-      name: "arg2",
-      required: true,
-      type: "array",
-      items: { type: "string" },
-      collectionFormat: "csv",
+
+    it("pipeDelimited", async () => {
+      const param = await getQueryParam(
+        `op test(@query @encode(ArrayEncoding.pipeDelimited) myParam: string[]): void;`,
+      );
+      expect(param).toMatchObject({
+        collectionFormat: "pipes",
+      });
+    });
+
+    it("spaceDelimited", async () => {
+      const param = await getQueryParam(
+        `op test(@query @encode(ArrayEncoding.spaceDelimited) myParam: string[]): void;`,
+      );
+      expect(param).toMatchObject({
+        collectionFormat: "ssv",
+      });
+    });
+
+    it("wrong encode", async () => {
+      const diagnostics = await diagnoseOpenApiFor(
+        `op test(@query @encode("tsv") myParam: string[]): void;`,
+      );
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-autorest/invalid-multi-collection-format",
+      });
     });
   });
 
@@ -174,10 +205,10 @@ describe("query parameters", () => {
 });
 
 describe("header parameters", () => {
-  it("create a header param of array type", async () => {
+  it("create a header param of array", async () => {
     const res = await openApiFor(
       `
-      op test(@header({format: "csv"}) arg1: string[]): void;
+      op test(@header arg1: string[]): void;
       `,
     );
     deepStrictEqual(res.paths["/"].get.parameters[0], {
@@ -296,6 +327,49 @@ describe("header parameters", () => {
       "x-ms-client-name": "myParamClient",
     });
   });
+
+  describe("setting parameter collectionFormat", () => {
+    async function getHeaderParam(code: string): Promise<OpenAPI2QueryParameter> {
+      const res = await openApiFor(code);
+      const param = res.paths[`/`].get.parameters[0];
+      strictEqual(param.in, "header");
+      return param;
+    }
+
+    it("with option", async () => {
+      const param = await getHeaderParam(`op test(@header myParam: string[]): void;`);
+      expect(param).toMatchObject({
+        collectionFormat: "csv",
+      });
+    });
+
+    it("pipeDelimited", async () => {
+      const param = await getHeaderParam(
+        `op test(@header @encode(ArrayEncoding.pipeDelimited) myParam: string[]): void;`,
+      );
+      expect(param).toMatchObject({
+        collectionFormat: "pipes",
+      });
+    });
+
+    it("spaceDelimited", async () => {
+      const param = await getHeaderParam(
+        `op test(@header @encode(ArrayEncoding.spaceDelimited) myParam: string[]): void;`,
+      );
+      expect(param).toMatchObject({
+        collectionFormat: "ssv",
+      });
+    });
+
+    it("wrong encode", async () => {
+      const diagnostics = await diagnoseOpenApiFor(
+        `op test(@header @encode("tsv") myParam: string[]): void;`,
+      );
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-autorest/invalid-multi-collection-format",
+      });
+    });
+  });
 });
 
 describe("body parameters", () => {
@@ -345,7 +419,7 @@ describe("body parameters", () => {
   });
 
   describe("request parameters resolving to no property in the body produce no body", () => {
-    it.each(["()", "(@header prop: string)", `(@visibility("none") prop: string)`])(
+    it.each(["()", "(@header prop: string)", `(@invisible(Lifecycle) prop: string)`])(
       "%s",
       async (params) => {
         const res = await openApiFor(`op test${params}: void;`);
@@ -424,7 +498,7 @@ describe("content type parameter", () => {
       ): void;
       `,
     );
-    strictEqual(res.paths["/"].post.consumes, undefined);
+    deepStrictEqual(res.paths["/"].post.consumes, ["text/plain"]);
   });
 });
 
@@ -455,29 +529,6 @@ describe("misc", () => {
             enum: ["one", "two"],
             "x-ms-enum": { modelAsString: false, name: "Foo" },
           });
-        });
-
-        it("array of enum is kept inline", async () => {
-          deepStrictEqual(
-            await testParameter(
-              `
-            #suppress "deprecated" "For tests"
-            @${kind}({format: "csv"})`,
-              "Foo[]",
-            ),
-            {
-              in: kind,
-              name: "arg1",
-              required: true,
-              collectionFormat: "csv",
-              type: "array",
-              items: {
-                type: "string",
-                enum: ["one", "two"],
-                "x-ms-enum": { modelAsString: false, name: "Foo" },
-              },
-            },
-          );
         });
 
         it("named union is kept inline", async () => {

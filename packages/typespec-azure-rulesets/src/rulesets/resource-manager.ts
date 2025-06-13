@@ -22,12 +22,10 @@ export default {
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,
-    "@azure-tools/typespec-azure-core/prefer-csv-collection-format": true,
     "@azure-tools/typespec-azure-core/no-format": true,
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
     "@azure-tools/typespec-azure-core/no-unknown": true,
-    "@azure-tools/typespec-azure-core/property-name-conflict": true,
     "@azure-tools/typespec-azure-core/documentation-required": true,
     "@azure-tools/typespec-azure-core/key-visibility-required": true,
     "@azure-tools/typespec-azure-core/response-schema-problem": true,
@@ -36,8 +34,10 @@ export default {
     "@azure-tools/typespec-azure-core/no-string-discriminator": true,
     "@azure-tools/typespec-azure-core/require-versioned": true,
     "@azure-tools/typespec-azure-core/no-private-usage": true,
+    "@azure-tools/typespec-azure-core/no-legacy-usage": true,
     "@azure-tools/typespec-azure-core/friendly-name": true,
     "@azure-tools/typespec-azure-core/no-query-explode": true,
+    "@azure-tools/typespec-azure-core/no-header-explode": true,
 
     // Azure core not enable - Arm has its own conflicting rule
     "@azure-tools/typespec-azure-core/no-response-body": false,
@@ -66,6 +66,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": true,
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-legacy-operations-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
@@ -85,5 +86,10 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/resource-name": true,
     "@azure-tools/typespec-azure-resource-manager/retry-after": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
+
+    // TCGC rules
+    "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
+    "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
+    "@azure-tools/typespec-client-generator-core/no-unnamed-types": true,
   },
 } satisfies LinterRuleSet;

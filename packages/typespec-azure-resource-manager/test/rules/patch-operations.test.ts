@@ -25,7 +25,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
     namespace Microsoft.Foo;
@@ -45,7 +45,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
 
       @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
@@ -69,7 +69,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @doc("Updates my Foos")
          @armResourceUpdate(FooResource)
-         @patch myFooUpdate(...ResourceInstanceParameters<FooResource>, @doc("The body") @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @doc("The body") @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
         @doc("The state of the resource")
@@ -99,7 +99,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
     namespace Microsoft.Foo;
@@ -120,7 +120,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
 
       @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
@@ -147,7 +147,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @doc("Updates my Foos")
          @armResourceUpdate(FooResource)
-         @patch myFooUpdate(...ResourceInstanceParameters<FooResource>, ...MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, ...MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
         @doc("The state of the resource")
@@ -209,7 +209,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           @autoRoute
           @doc("Update a {name}", FooResource)
           @armResourceUpdate(FooResource)
-          @patch 
+          @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>
           ):TrackedResource<FooResource> | ErrorResponse;
       }

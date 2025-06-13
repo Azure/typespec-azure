@@ -40,19 +40,19 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       @doc("Widget resource")
       model Widget {
         @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         id?: string;
       
         @doc("The name of the resource")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name?: string;
       
         @doc("The type of the resource.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         type?: string;
       
         @doc("Azure Resource Manager metadata containing createdBy and modifiedBy information.")
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         systemData?: Foundations.SystemData;
 
         properties? : WidgetProperties;
@@ -86,6 +86,50 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
         message:
           'The template parameter "CustomResource" for "delete" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
       },
+    ]);
+  });
+
+  it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Custom Mix in resource")
+    model CustomResource is CustomAzureResource;
+
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model CustomAzureResource {
+      name: string;
+    }
+
+    interface Widgets {
+      delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+    }
+  `);
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("emits error when template is extended from Resource or from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Custom Mix in resource")
+    model CustomResource is CustomAzureResource;
+
+    model CustomAzureResource {
+      name: string;
+    }
+
+    interface Widgets {
+      delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
+      { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
     ]);
   });
 });

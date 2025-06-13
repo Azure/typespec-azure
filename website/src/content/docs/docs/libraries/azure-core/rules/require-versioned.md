@@ -16,9 +16,7 @@ namespace Azure.MyService;
 ```
 
 ```tsp
-@service({
-  version: "2021-01-01",
-})
+@service(#{ version: "2021-01-01" })
 namespace Azure.MyService;
 ```
 

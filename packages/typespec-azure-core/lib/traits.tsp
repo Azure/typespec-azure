@@ -2,8 +2,8 @@ import "@typespec/versioning";
 
 namespace Azure.Core.Traits;
 
-using TypeSpec.Reflection;
-using TypeSpec.Versioning;
+using Reflection;
+using Versioning;
 
 /**
  * Enumerates the standard trait locations for Azure.Core operations.
@@ -220,7 +220,7 @@ model NoRepeatableRequests {
  * @param traitName An optional name to uniquely identify the trait.  If unspecified,
  *        the model type name is used.
  */
-extern dec trait(target: Model, traitName?: valueof string);
+extern dec `trait`(target: Model, traitName?: valueof string);
 
 /**
  * `@traitContext` sets the applicable context for a trait on its envelope property.

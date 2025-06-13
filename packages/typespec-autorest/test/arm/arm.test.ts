@@ -11,7 +11,7 @@ it("can share types with a library namespace", async () => {
         model TestTrackedResource is TrackedResource<TestTrackedProperties> {
           @key("trackedResourceName")
           @segment("trackedResources")
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           @path
           name: string;
         }
@@ -21,10 +21,10 @@ it("can share types with a library namespace", async () => {
           extends TrackedResourceOperations<TestTrackedResource, TestTrackedProperties> {}
         
         model TestTrackedProperties {
-          @visibility("read")
+          @visibility(Lifecycle.Read)
           provisioningState?: ResourceProvisioningState;
         
-          @visibility("create", "read")
+          @visibility(Lifecycle.Create, Lifecycle.Read)
           displayName?: string = "default";
         }
       }
@@ -96,10 +96,10 @@ it("can use private links with common-types references", async () => {
       }
       
       model TestTrackedProperties {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ResourceProvisioningState;
       
-        @visibility("create", "read")
+        @visibility(Lifecycle.Create, Lifecycle.Read)
         displayName?: string = "default";
       
         endpoints?: PrivateEndpoint[];
@@ -158,6 +158,58 @@ it("can use private endpoints with common-types references", async () => {
   ok(openapi.paths[privateEndpointGet].get);
   deepStrictEqual(openapi.paths[privateEndpointGet].get.parameters.length, 2);
   ok(openapi.paths[privateEndpointGet].get.parameters[1]);
+});
+
+it("verify resolution of private endpoints and private links with v5 version", async () => {
+  const openapi = await openApiFor(
+    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      namespace Microsoft.PrivateLinkTest;
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      @tenantResource
+      model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
+        @path
+        @segment("privateEndpointConnections")
+        @key("privateEndpointConnectionName")
+        name: string;
+      }
+      
+      @armResourceOperations(PrivateEndpointConnectionResource)
+      interface PrivateEndpointConnections {
+        #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
+        listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource,
+         Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5>>;
+      }
+
+      model PrivateLinkResource is ProxyResource<PrivateLinkResourceProperties> {
+        ...PrivateLinkResourceParameter;
+      }
+
+      @armResourceOperations(PrivateLinkResource)
+      interface PrivateLinkResources {
+        #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
+        listByLinkResult is ArmResourceListByParent< PrivateLinkResource,
+          Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5>
+        >;
+      }
+      `,
+  );
+
+  const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
+  const privateLinkList =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/privateLinkResources";
+
+  deepStrictEqual(
+    openapi.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+    "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateEndpointConnectionListResult",
+  );
+  deepStrictEqual(
+    openapi.paths[privateLinkList].get.responses["200"].schema["$ref"],
+    "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateLinkResourceListResult",
+  );
 });
 
 it("can use ResourceNameParameter for custom name parameter definition", async () => {
@@ -252,7 +304,7 @@ it("can emit x-ms-client-flatten with optional configuration", async () => {
       model EmployeeProperties {
         age?: int32;
         city?: string;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ResourceProvisioningState;
       }
       @parentResource(Employee)
@@ -286,7 +338,7 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
       model EmployeeProperties {
         age?: int32;
         city?: string;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         provisioningState?: ResourceProvisioningState;
       }
       @parentResource(Employee)

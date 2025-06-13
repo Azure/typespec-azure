@@ -1,0 +1,285 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Widget Service",
+    "version": "0000-00-00",
+    "x-typespec-generated": [
+      {
+        "emitter": "@azure-tools/typespec-autorest"
+      }
+    ]
+  },
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "Widgets"
+    }
+  ],
+  "paths": {
+    "/widgets": {
+      "get": {
+        "operationId": "Widgets_List",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "List widgets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Widget"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "Widgets_Create",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Create a widget",
+        "parameters": [
+          {
+            "name": "widget",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/widgets/{id}": {
+      "get": {
+        "operationId": "Widgets_Read",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Read widgets",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "Widgets_Update",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Update a widget",
+        "consumes": [
+          "application/merge-patch+json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "widget",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/WidgetMergePatchUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Widgets_Delete",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Delete a widget",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "There is no content to send for this request, but the headers may be useful. "
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/widgets/{id}/analyze": {
+      "post": {
+        "operationId": "Widgets_Analyze",
+        "tags": [
+          "Widgets"
+        ],
+        "description": "Analyze a widget",
+        "produces": [
+          "text/plain",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
+    },
+    "Widget": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "color": {
+          "type": "string",
+          "enum": [
+            "red",
+            "blue"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "weight",
+        "color"
+      ]
+    },
+    "WidgetMergePatchUpdate": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "weight": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "color": {
+          "type": "string",
+          "enum": [
+            "red",
+            "blue"
+          ],
+          "x-ms-enum": {
+            "modelAsString": false
+          }
+        }
+      }
+    }
+  },
+  "parameters": {}
+}

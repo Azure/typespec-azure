@@ -561,27 +561,6 @@ describe("typespec-autorest: operations", () => {
     strictEqual(res.paths["/"].get.deprecated, true);
   });
 
-  it(`@projectedName("client", <>) updates the operationId (LEGACY)`, async () => {
-    const res = await openApiFor(`
-      @service namespace MyService;
-      #suppress "deprecated" "for testing"
-      @route("/op-only") @projectedName("client", "clientCall") op serviceName(): void;
-
-      #suppress "deprecated" "for testing"
-      @projectedName("client", "ClientInterfaceName") 
-      interface ServiceInterfaceName {
-        @route("/interface-only") same(): void;
-        #suppress "deprecated" "for testing"
-        @route("/interface-and-op") @projectedName("client", "clientCall") serviceName(): void;
-      }
-     
-      `);
-
-    strictEqual(res.paths["/op-only"].get.operationId, "ClientCall");
-    strictEqual(res.paths["/interface-only"].get.operationId, "ClientInterfaceName_Same");
-    strictEqual(res.paths["/interface-and-op"].get.operationId, "ClientInterfaceName_ClientCall");
-  });
-
   it(`@clientName(<>) updates the operationId`, async () => {
     const res = await openApiFor(`
       @service namespace MyService;
@@ -608,11 +587,11 @@ describe("typespec-autorest: request", () => {
         @post op read(@body body: bytes): {};
       `);
       const operation = res.paths["/"].post;
-      deepStrictEqual(operation.consumes, undefined);
+      deepStrictEqual(operation.consumes, ["application/octet-stream"]);
       const requestBody = operation.parameters[0];
       ok(requestBody);
       strictEqual(requestBody.schema.type, "string");
-      strictEqual(requestBody.schema.format, "byte");
+      strictEqual(requestBody.schema.format, "binary");
     });
 
     it("bytes request should respect @header contentType", async () => {
@@ -752,27 +731,6 @@ describe("typespec-autorest: enums", () => {
     });
   });
 
-  it("defines known values (modelAsString enums)", async () => {
-    const res = await oapiForModel(
-      "PetType",
-      `
-      enum KnownPetType {
-        Dog, Cat
-      }
-
-      #suppress "deprecated" "for testing"
-      @knownValues(KnownPetType)
-      scalar PetType extends string;
-      `,
-    );
-    ok(res.isRef);
-    deepStrictEqual(res.defs.PetType, {
-      type: "string",
-      enum: ["Dog", "Cat"],
-      "x-ms-enum": { name: "PetType", modelAsString: true },
-    });
-  });
-
   it("overrides x-ms-enum.name with @clientName", async () => {
     const res = await oapiForModel("Foo", `@clientName("RenamedFoo") enum Foo {foo, bar}`);
     const schema = res.defs.RenamedFoo;
@@ -847,7 +805,7 @@ describe("typespec-autorest: extension decorator", () => {
   });
 });
 
-describe("typespec-azure: identifiers decorator", () => {
+describe("identifiers decorator", () => {
   it("ignores name/id keys for x-ms-identifiers", async () => {
     const oapi = await openApiFor(
       `
@@ -860,11 +818,23 @@ describe("typespec-azure: identifiers decorator", () => {
       model PetList {
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
+  });
+
+  it("ignores id property for x-ms-identifiers", async () => {
+    const oapi = await openApiFor(
+      `
+      model Pet {
+        name: string;
+        id: int32;
+      }
+      model PetList {
+        value: Pet[]
+      }
+      `,
+    );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
   it("uses identifiers decorator for properties", async () => {
@@ -882,11 +852,8 @@ describe("typespec-azure: identifiers decorator", () => {
         @identifiers(#["age"])
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
   it("identifies keys correctly as x-ms-identifiers", async () => {
@@ -904,11 +871,8 @@ describe("typespec-azure: identifiers decorator", () => {
       model PetList {
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
   it("x-ms-identifiers ignores keys for non armProviderNamespace", async () => {
@@ -922,17 +886,17 @@ describe("typespec-azure: identifiers decorator", () => {
       model PetList {
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
   });
 
   it("prioritizes identifiers decorator over keys", async () => {
     const oapi = await openApiFor(
       `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;      
       model Pet {
         name: string;
         @key
@@ -942,13 +906,31 @@ describe("typespec-azure: identifiers decorator", () => {
         @identifiers(#[])
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
   });
+
+  it("prioritizes identifiers decorator over id prop", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        id: string;
+      }
+      model PetList {
+        @identifiers(#[])
+        value: Pet[]
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+  });
+
   it("supports multiple identifiers", async () => {
     const oapi = await openApiFor(
       `
@@ -964,11 +946,8 @@ describe("typespec-azure: identifiers decorator", () => {
         @identifiers(#["name", "age"])
         value: Pet[]
       }
-      @route("/Pets")
-      @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name", "age"]);
   });
   it("supports inner properties in identifiers decorator", async () => {
@@ -990,11 +969,8 @@ describe("typespec-azure: identifiers decorator", () => {
           @identifiers(#["dogs/breed"])
           pets: Pet[]
         }
-        @route("/Pets")
-        @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/breed"]);
   });
   it("support inner models in different namespace but route models should be on armProviderNamespace", async () => {
@@ -1022,7 +998,6 @@ describe("typespec-azure: identifiers decorator", () => {
         }
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["age"]);
   });
   it("supports inner properties for keys", async () => {
@@ -1056,51 +1031,78 @@ describe("typespec-azure: identifiers decorator", () => {
         model PetList {
           pets: Pet[]
         }
-        
-        @route("/Pets")
-        @get op list(): PetList;
       `,
     );
-    ok(oapi.paths["/Pets"].get);
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], [
       "dogs/breed",
       "cats/features/color",
     ]);
   });
-});
+  it("`@identifiers` are assigned by model property", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model Pet {
+        name: string;
+        id: int32;
+      }
+      model PetList {
+        @identifiers(#["name"])
+        value: Pet[]
+      }
+      model PetList2 {
+        @identifiers(#["id"])
+        value: Pet[]
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
+    deepStrictEqual(oapi.definitions.PetList2.properties.value["x-ms-identifiers"], ["id"]);
+  });
+  it("`@identifiers` are assigned to `armProviderNamespace` properties even when nested in another namespace", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+      
+      model PetResource is TrackedResource<PetResourceProperties> {
+        @key("petResourceName")
+        @segment("petServices")
+        name: string;
+      }
 
-describe("typespec-autorest: multipart formData", () => {
-  it("expands model into formData parameters", async () => {
-    const oapi = await openApiFor(`
-    @service({
-      name: "Widget",
-    })
-    namespace Widget;
+      model PetResourceProperties {
+        @identifiers(#["key"])
+        pets?: PetTypes[];
+      }
 
-    @doc("A widget.")
-    model Widget {
-      @key("widgetName")
-      name: string;
-      displayName: string;
-      description: string;
-      color: string;
-    }
+      model PetTypes {
+        key: string;
+        value: string;
+      }
 
-    model WidgetForm is Widget {
-      @header("content-type")
-      contentType: "multipart/form-data";
-    }
-
-    @route("/widgets")
-    interface Widgets {
-      @route(":upload")
-      @post
-      upload(...WidgetForm): Widget;
-    }
-    `);
-    for (const val of ["Widget.color", "Widget.description", "Widget.displayName", "Widget.name"]) {
-      const param = oapi.parameters[val];
-      strictEqual(param["in"], "formData");
-    }
+      @armResourceOperations(PetResource)
+      interface PetService {
+        update is ArmCustomPatchAsync<
+          PetResource,
+          Azure.ResourceManager.Foundations.ResourceUpdateModel<
+            PetResource,
+            PetResourceProperties
+          >
+        >;
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.PetResourceProperties.properties.pets["x-ms-identifiers"], [
+      "key",
+    ]);
+    deepStrictEqual(
+      oapi.definitions.PetResourceUpdateProperties.properties.pets["x-ms-identifiers"],
+      ["key"],
+    );
   });
 });

@@ -6,7 +6,7 @@ describe("typespec-autorest: Property schema tests", () => {
   it("produces standard schema for lro status by default", async () => {
     const result = await openApiFor(
       `
-      @service({title: "Test"}) 
+      @service(#{title: "Test"}) 
       namespace Test;
 
       model Bar {propB: int32;}
@@ -18,11 +18,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
       }
 
@@ -39,7 +39,7 @@ describe("typespec-autorest: Property schema tests", () => {
   it("produces normal status schema when use-read-only-status-schema is false", async () => {
     const result = await openApiFor(
       `
-      @service({title: "Test"}) 
+      @service(#{title: "Test"}) 
       namespace Test;
 
       model Bar {propB: int32;}
@@ -51,11 +51,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
       }
 
@@ -74,7 +74,7 @@ describe("typespec-autorest: Property schema tests", () => {
   it("creates readOnly schema for status properties when set to 'use-read-only-status-schema': true", async () => {
     const result = await openApiFor(
       `
-      @service({title: "Test"}) 
+      @service(#{title: "Test"}) 
       namespace Test;
 
       model Bar {propB: int32;}
@@ -86,11 +86,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
         otherProp: FooPrime;
       }
@@ -110,7 +110,7 @@ describe("typespec-autorest: Property schema tests", () => {
   it("creates readOnly schema for status properties when set to 'use-read-only-status-schema': true for unions", async () => {
     const result = await openApiFor(
       `
-      @service({title: "Test"}) 
+      @service(#{title: "Test"}) 
       namespace Test;
 
       model Bar {propB: int32;}
@@ -122,11 +122,11 @@ describe("typespec-autorest: Property schema tests", () => {
       scalar BarPrime extends string;
 
       model UsesAll {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         fooProp: Foo;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         primeProp: FooPrime;
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         barPrimeProp: BarPrime;
         otherProp: FooPrime;
       }

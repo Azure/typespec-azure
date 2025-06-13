@@ -809,7 +809,7 @@ model Azure.Core.Foundations.ErrorResponseBase<Error>
 
 ### `InnerError` {#Azure.Core.Foundations.InnerError}
 
-An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.
+An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.
 
 ```typespec
 model Azure.Core.Foundations.InnerError
@@ -1020,6 +1020,33 @@ Enum describing allowed operation states.
 
 ```typespec
 union Azure.Core.Foundations.OperationState
+```
+
+## Azure.Core.Legacy
+
+### `parameterizedNextLink` {#Azure.Core.Legacy.parameterizedNextLink}
+
+A scalar type representing a next link that requires formatting with parameters to be used.
+
+```typespec
+scalar Azure.Core.Legacy.parameterizedNextLink
+```
+
+#### Examples
+
+```typespec
+model ListCertificateOptions {
+  includePending?: string;
+}
+model Certificate {
+  name: string;
+}
+model Page {
+  @items items: Certificate[];
+  @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
+    ListCertificateOptions.includePending
+  ]>;
+}
 ```
 
 ## Azure.Core.Traits

@@ -1,6 +1,5 @@
 import {
   $key,
-  $visibility,
   DecoratorContext,
   Interface,
   Model,
@@ -10,13 +9,19 @@ import {
   StringLiteral,
   Tuple,
   Type,
+  addVisibilityModifiers,
+  clearVisibilityModifiersForClass,
   getKeyName,
+  getLifecycleVisibilityEnum,
   getTypeName,
+  sealVisibilityModifiers,
 } from "@typespec/compiler";
+import { $bodyRoot } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import {
+  ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
   ArmResourcePropertiesOptionalityDecorator,
@@ -74,7 +79,7 @@ const $enforceConstraint: EnforceConstraintDecorator = (
     // walk the baseModel chain until find a match or fail
     let baseType: Model | undefined = sourceType;
     do {
-      if (baseType === constraintType) return;
+      if (baseType === constraintType || isCustomAzureResource(context.program, baseType)) return;
     } while ((baseType = baseType.baseModel) !== undefined);
 
     reportDiagnostic(context.program, {
@@ -304,7 +309,10 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   }
 
   // Set the name property to be read only
-  context.call($visibility, nameProperty, "read");
+  const Lifecycle = getLifecycleVisibilityEnum(program);
+  clearVisibilityModifiersForClass(program, nameProperty, Lifecycle, context);
+  addVisibilityModifiers(program, nameProperty, [Lifecycle.members.get("Read")!], context);
+  sealVisibilityModifiers(program, nameProperty, Lifecycle);
 
   const keyName = getKeyName(program, nameProperty);
   if (!keyName) {
@@ -437,6 +445,15 @@ const $armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorat
   }
 };
 
+const $armBodyRoot: ArmBodyRootDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  isOptional: boolean,
+) => {
+  target.optional = isOptional;
+  context.call($bodyRoot, target);
+};
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -452,5 +469,6 @@ export const $decorators = {
     enforceConstraint: $enforceConstraint,
     armRenameListByOperation: $armRenameListByOperation,
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
+    armBodyRoot: $armBodyRoot,
   } satisfies AzureResourceManagerPrivateDecorators,
 };

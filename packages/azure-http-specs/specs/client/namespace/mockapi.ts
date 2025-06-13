@@ -6,9 +6,6 @@ Scenarios.Client_ClientNamespace = passOnSuccess([
   {
     uri: "/client/client-namespace/first",
     method: "get",
-    request: {
-      body: {},
-    },
     response: {
       status: 200,
       body: json({ name: "first" }),
@@ -18,9 +15,6 @@ Scenarios.Client_ClientNamespace = passOnSuccess([
   {
     uri: "/client/client-namespace/second",
     method: "get",
-    request: {
-      body: {},
-    },
     response: {
       status: 200,
       body: json({ type: "second" }),

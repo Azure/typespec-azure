@@ -1,0 +1,223 @@
+---
+title: Common Behavior for Client Packages
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This page documents the common behavior for a client package, including the service, namespace, license, and more.
+
+## Service
+
+The service acts as the entry point for a client library. Currently, only one service per package is supported. The service is defined using the `@service` decorator. If multiple services are defined, the first one will be used as the entry point.
+
+## Namespace
+
+Clients, models, enums, and unions in TypeSpec include namespace information. Code generators for different languages use this information to organize the generated code.
+
+### Basic Example
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+@route("/feed")
+op feed(food: Food): void;
+
+model Food {
+  name: string;
+  quantity: int32;
+}
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+### Customization
+
+You can use the `@clientNamespace` decorator to customize the namespace for specific clients, enums, models, or unions.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service(#{ title: "Pet Store" })
+namespace PetStore;
+
+@route("/feed")
+op feed(food: Food): void;
+
+model Food {
+  name: string;
+  quantity: int32;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+namespace Customization;
+
+@@clientNamespace(PetStore.Food, "PetStore.Models");
+```
+
+```python
+# TODO
+```
+
+```csharp
+// TODO
+```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+</ClientTabs>
+
+## License
+
+License information is automatically generated in the client code header and the `LICENSE` file, depending on the language's emitter.
+
+### Azure License
+
+For Azure scenarios, client code always uses the MIT license. The license information is included in the header of the generated code or in a separate file, depending on the language.
+
+For example, here is the license comment in the generated code of a Java client:
+
+```java
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+```
+
+And here is the `LICENSE` file for a Python client library:
+
+```text
+Copyright (c) Microsoft Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
+### Unbranded License
+
+For unbranded scenarios, client code will not include license information unless it is configured in `tspconfig.yaml`. Spec authors can define license information using the `license` configuration in `tspconfig.yaml` as shown below:
+
+```yaml
+license:
+  name: <License name. This is required. We support built-in licenses such as "MIT License", "Apache License 2.0", "BSD 3-Clause License", "MPL 2.0", "GPL-3.0", and "LGPL-3.0". For custom licenses, you must provide the name, company, link, header, and description manually.>
+  company: <Company name. Optional. For built-in licenses, this affects the copyright statement.>
+  link: <License link. Optional. Required for custom licenses.>
+  header: <License header in the generated code. Optional. Required for custom licenses.>
+  description: <License description in the separate license file. Optional. Required for custom licenses.>
+```
+
+#### Example: Built-in License
+
+```yaml
+emit:
+  - "@azure-tools/typespec-python"
+  - "@azure-tools/typespec-java"
+options:
+  "@azure-tools/typespec-python":
+    license:
+      name: "Apache License 2.0"
+      company: "Microsoft Corporation"
+  "@azure-tools/typespec-java":
+    license:
+      name: "Apache License 2.0"
+      company: "Microsoft Corporation"
+```
+
+Generated license comment in Java client code:
+
+```java
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the Apache License, Version 2.0.
+```
+
+Generated `LICENSE` file for Python client library:
+
+```text
+Copyright (c) Microsoft Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+#### Example: Custom License
+
+```yaml
+emit:
+  - "@azure-tools/typespec-python"
+  - "@azure-tools/typespec-java"
+options:
+  "@azure-tools/typespec-python":
+    license:
+      name: "Mozilla Public License 2.0"
+      link: "https://www.mozilla.org/en-US/MPL/2.0/"
+      header: "This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/."
+      description: "This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/."
+  "@azure-tools/typespec-java":
+    license:
+      name: "Mozilla Public License 2.0"
+      link: "https://www.mozilla.org/en-US/MPL/2.0/"
+      header: "This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/."
+      description: "This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/."
+```
+
+Generated license comment in Java client code:
+
+```java
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+```
+
+Generated `LICENSE` file for Python client library:
+
+```text
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+```

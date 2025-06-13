@@ -14,11 +14,11 @@ import {
   Operation,
   paramMessage,
   Scalar,
-  SyntaxKind,
   Type,
   Union,
   UnionVariant,
 } from "@typespec/compiler";
+import { SyntaxKind } from "@typespec/compiler/ast";
 
 export const friendlyNameRule = createRule({
   name: "friendly-name",

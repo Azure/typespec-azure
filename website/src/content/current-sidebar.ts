@@ -74,6 +74,7 @@ const sidebar: SidebarItem[] = [
         "libraries/typespec-client-generator-core",
         "Azure.ClientGenerator.Core",
         false,
+        ["libraries/typespec-client-generator-core/guideline"],
       ),
       createLibraryReferenceStructure("libraries/azure-portal-core", "Azure.Portal", false),
     ],
@@ -82,6 +83,10 @@ const sidebar: SidebarItem[] = [
     label: "🖨️ Emitters",
     items: [
       createLibraryReferenceStructure("emitters/typespec-autorest", "Autorest / Swagger", false),
+      {
+        label: "Clients",
+        items: [createLibraryReferenceStructure("emitters/clients/typespec-java", "Java", false)],
+      },
     ],
   },
   {

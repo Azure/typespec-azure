@@ -5,15 +5,15 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "./employee.tsp";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
 /** Microsoft.Contoso Resource Provider management API. */
 @armProviderNamespace
-@service({
+@service(#{
   title: "Microsoft.Contoso management service",
 })
 @versioned(Microsoft.Contoso.Versions)

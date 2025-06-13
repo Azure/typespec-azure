@@ -1,10 +1,11 @@
 using Azure.Core;
-using TypeSpec.Versioning;
+using Versioning;
 
 namespace Azure.ResourceManager.CommonTypes;
 
 /** The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests. */
 #deprecated "Do not use this model. Instead, use Record<UserAssignedIdentity | null> directly. Using this model will result in a different client SDK when generated from TypeSpec compared to the Swagger."
+@summary("User-Assigned Identities")
 @removed(Versions.v6)
 model UserAssignedIdentities is Record<UserAssignedIdentity | null>;
 
@@ -13,11 +14,11 @@ model UserAssignedIdentities is Record<UserAssignedIdentity | null>;
  */
 model ManagedServiceIdentity {
   /** The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
 
   /** The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   tenantId?: uuid;
 
   /** The type of managed identity assigned to this resource. */
@@ -33,11 +34,11 @@ model ManagedServiceIdentity {
  */
 model SystemAssignedServiceIdentity {
   /** The service principal ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
 
   /** The tenant ID of the system assigned identity. This property will only be provided for a system assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   tenantId?: uuid;
 
   /** The type of managed identity assigned to this resource. */
@@ -48,13 +49,13 @@ model SystemAssignedServiceIdentity {
  * User assigned identity properties
  */
 model UserAssignedIdentity {
-  /** The client ID of the assigned identity. */
-  @visibility("read")
-  clientId?: uuid;
-
   /** The principal ID of the assigned identity. */
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   principalId?: uuid;
+
+  /** The client ID of the assigned identity. */
+  @visibility(Lifecycle.Read)
+  clientId?: uuid;
 }
 
 /**

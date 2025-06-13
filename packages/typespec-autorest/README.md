@@ -35,6 +35,13 @@ options:
 
 ## Emitter options
 
+### `emitter-output-dir`
+
+**Type:** `absolutePath`
+
+Defines the emitter output directory. Defaults to `{output-dir}/@azure-tools/typespec-autorest`
+See [Configuring output directory for more info](https://typespec.io/docs/handbook/configuration/configuration/#configuring-output-directory)
+
 ### `output-dir`
 
 **Type:** `string`

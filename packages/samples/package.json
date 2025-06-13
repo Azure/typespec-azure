@@ -20,7 +20,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
@@ -39,28 +39,28 @@
     "!dist/test/**"
   ],
   "dependencies": {
-    "@azure-tools/typespec-autorest": "workspace:~",
-    "@azure-tools/typespec-azure-core": "workspace:~",
-    "@azure-tools/typespec-azure-resource-manager": "workspace:~",
-    "@azure-tools/typespec-azure-rulesets": "workspace:~",
-    "@azure-tools/typespec-client-generator-core": "workspace:~",
-    "@typespec/compiler": "workspace:~",
-    "@typespec/http": "workspace:~",
-    "@typespec/openapi": "workspace:~",
-    "@typespec/openapi3": "workspace:~",
-    "@typespec/rest": "workspace:~",
-    "@typespec/versioning": "workspace:~"
+    "@azure-tools/typespec-autorest": "workspace:^",
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@azure-tools/typespec-azure-resource-manager": "workspace:^",
+    "@azure-tools/typespec-azure-rulesets": "workspace:^",
+    "@azure-tools/typespec-client-generator-core": "workspace:^",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/openapi": "workspace:^",
+    "@typespec/openapi3": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/versioning": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "~22.10.10",
-    "@typespec/internal-build-utils": "workspace:~",
-    "@typespec/samples": "workspace:~",
-    "@vitest/coverage-v8": "^3.0.4",
-    "@vitest/ui": "^3.0.3",
+    "@types/node": "~22.13.11",
+    "@typespec/internal-build-utils": "workspace:^",
+    "@typespec/samples": "workspace:^",
+    "@vitest/coverage-v8": "^3.1.2",
+    "@vitest/ui": "^3.1.2",
     "autorest": "~3.7.1",
     "cross-env": "~7.0.3",
     "rimraf": "~6.0.1",
-    "typescript": "~5.7.3",
-    "vitest": "^3.0.5"
+    "typescript": "~5.8.2",
+    "vitest": "^3.1.2"
   }
 }

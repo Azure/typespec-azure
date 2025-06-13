@@ -27,7 +27,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
     namespace Microsoft.Foo;
@@ -48,7 +48,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
 
       @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
@@ -93,7 +93,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       .expect(
         `
     @armProviderNamespace
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     namespace Microsoft.Foo;
     enum Versions {
@@ -126,7 +126,7 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
       .expect(
         `
     @armProviderNamespace
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     namespace Microsoft.Foo;
     enum Versions {
@@ -176,7 +176,7 @@ describe("typespec-azure-resource-manager: generates armResourceAction paths cor
         @key("widgetName")
         @segment("widgets")
         @path
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         name: string;
       }
 
@@ -229,7 +229,7 @@ describe("typespec-azure-resource-manager: generates provider paths correctly", 
     const [results, _] = await runner.compileAndDiagnose(
       `
     @armProviderNamespace
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     namespace Microsoft.Contoso;
     enum Versions {
@@ -298,7 +298,7 @@ describe("typespec-azure-resource-manager: generates tenant paths correctly", ()
     const [results, _] = await runner.compileAndDiagnose(
       `
     @armProviderNamespace
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     namespace Microsoft.Contoso;
     enum Versions {
@@ -350,7 +350,7 @@ describe("typespec-azure-resource-manager: improper list by subscription operati
     await tester
       .expect(
         `
-    @service({title: "Microsoft.Foo"})
+    @service(#{title: "Microsoft.Foo"})
     
     @armProviderNamespace
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -362,7 +362,7 @@ describe("typespec-azure-resource-manager: improper list by subscription operati
       @doc("Foo resource")
       @tenantResource
       model FooResource is ProxyResource<FooProperties> {
-        @visibility("read")
+        @visibility(Lifecycle.Read)
         @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")

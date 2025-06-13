@@ -1,4 +1,11 @@
-import { json, MockRequest, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
+import {
+  dyn,
+  dynItem,
+  json,
+  MockRequest,
+  passOnSuccess,
+  ScenarioMockApi,
+} from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -46,15 +53,15 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge",
     method: "put",
     request: {
-      body: { role: "contributor" },
-      params: {
+      body: json({ role: "contributor" }),
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
     response: {
       status: 201,
       headers: {
-        "operation-location": `/azure/core/lro/standard/users/madge/operations/operation1`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/standard/users/madge/operations/operation1`,
       },
       body: json(validUser),
     },
@@ -76,7 +83,7 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -91,7 +98,7 @@ Scenarios.Azure_Core_Lro_Standard_createOrReplace = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation1",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -119,14 +126,14 @@ Scenarios.Azure_Core_Lro_Standard_delete = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge",
     method: "delete",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
     response: {
       status: 202,
       headers: {
-        "operation-location": `/azure/core/lro/standard/users/madge/operations/operation2`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/standard/users/madge/operations/operation2`,
       },
       body: json({ id: "operation2", status: "InProgress" }),
     },
@@ -147,7 +154,7 @@ Scenarios.Azure_Core_Lro_Standard_delete = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation2",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -162,7 +169,7 @@ Scenarios.Azure_Core_Lro_Standard_delete = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation2",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -180,7 +187,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge:export",
     method: "post",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
         format: "json",
       },
@@ -188,7 +195,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     response: {
       status: 202,
       headers: {
-        "operation-location": `/azure/core/lro/standard/users/madge/operations/operation3`,
+        "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/standard/users/madge/operations/operation3`,
       },
       body: json({ id: "operation3", status: "InProgress" }),
     },
@@ -210,7 +217,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation3",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },
@@ -225,7 +232,7 @@ Scenarios.Azure_Core_Lro_Standard_export = passOnSuccess([
     uri: "/azure/core/lro/standard/users/madge/operations/operation3",
     method: "get",
     request: {
-      params: {
+      query: {
         "api-version": "2022-12-01-preview",
       },
     },

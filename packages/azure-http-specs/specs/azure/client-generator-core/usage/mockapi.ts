@@ -7,9 +7,9 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
     uri: "/azure/client-generator-core/usage/inputToInputOutput",
     method: "post",
     request: {
-      body: {
+      body: json({
         name: "Madge",
-      },
+      }),
     },
     response: {
       status: 204,
@@ -33,6 +33,20 @@ Scenarios.Azure_ClientGenerator_Core_Usage_ModelInOperation = passOnSuccess([
     response: {
       status: 200,
       body: json({ result: { name: "Madge" } }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/usage/orphanModelSerializable",
+    method: "put",
+    request: {
+      body: json({
+        name: "name",
+        desc: "desc",
+      }),
+    },
+    response: {
+      status: 204,
     },
     kind: "MockApiDefinition",
   },

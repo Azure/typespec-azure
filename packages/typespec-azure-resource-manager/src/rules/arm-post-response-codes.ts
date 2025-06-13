@@ -1,11 +1,7 @@
 import { Program, createRule } from "@typespec/compiler";
 
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
-import {
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationResponse,
-} from "@typespec/http";
+import { HttpOperationResponse, HttpPayloadBody } from "@typespec/http";
 import { ArmResourceOperation } from "../operations.js";
 import { getArmResources } from "../resource.js";
 
@@ -24,7 +20,7 @@ export const armPostResponseCodesRule = createRule({
   create(context) {
     function getResponseBody(
       response: HttpOperationResponse | undefined,
-    ): HttpOperationBody | HttpOperationMultipartBody | undefined {
+    ): HttpPayloadBody | undefined {
       if (response === undefined) return undefined;
       if (response.responses.length > 1) {
         throw new Error("Multiple responses are not supported.");

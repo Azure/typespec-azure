@@ -1,4 +1,4 @@
-using TypeSpec.Reflection;
+using Reflection;
 
 namespace Azure.ClientGenerator.Core;
 
@@ -201,7 +201,7 @@ enum Access {
 }
 
 /**
- * Override access for operations, models and enums.
+ * Override access for operations, models, enums and model property.
  * When setting access for namespaces,
  * the access info will be propagated to the models and operations defined in the namespace.
  * If the model has an access override, the model override takes precedence.
@@ -214,6 +214,7 @@ enum Access {
  * The override access should not be narrow than the access calculated by operation,
  * and different override access should not conflict with each other,
  * otherwise a warning will be added to diagnostics list.
+ * Model property's access will default to public unless there is an override.
  * @param value The access info you want to set for this model or operation.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
@@ -343,7 +344,7 @@ enum Access {
  * ```
  */
 extern dec access(
-  target: Model | Operation | Enum | Union | Namespace,
+  target: ModelProperty | Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
   scope?: valueof string
 );
@@ -549,10 +550,11 @@ extern dec clientNamespace(
 );
 
 /**
- * Set an alternate type for a model property, scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ * When the source type is `Scalar`, the alternate type must be `Scalar`.
  *
- * @param source The source type you want to apply the alternate type to. Only scalar types are supported.
- * @param alternate The alternate type you want applied to the target. Only scalar types are supported.
+ * @param source The source type to which the alternate type will be applied.
+ * @param alternate The alternate type to apply to the target.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
@@ -571,8 +573,22 @@ extern dec clientNamespace(
  * ```typespec
  * op test(@param @alternateType(string) date: utcDateTime): void;
  * ```
+ * @example
+ * ```typespec
+ * model Test {
+ *   @alternateType(unknown)
+ *   thumbprint?: string;
+ *
+ *   @alternateType(AzureLocation[], "csharp")
+ *   locations: string[];
+ * }
+ * ```
  */
-extern dec alternateType(source: ModelProperty | Scalar, alternate: Scalar, scope?: valueof string);
+extern dec alternateType(
+  source: ModelProperty | Scalar,
+  alternate: unknown,
+  scope?: valueof string
+);
 
 /**
  * To define the client scope of an operation.
@@ -607,3 +623,112 @@ extern dec scope(target: Operation, scope?: valueof string);
  * ```
  */
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
+
+/**
+ * Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
+ * This decorator is useful for extending the API version enum exposed by the client.
+ * It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
+ *
+ * @example
+ * ```typespec
+ * // main.tsp
+ * @versioned(Versions)
+ * namespace Contoso {
+ *  enum Versions { v4, v5 }
+ * }
+ *
+ * // client.tsp
+ *
+ * enum ClientApiVersions { v1, v2, v3, ...Contoso.Versions }
+ *
+ * @@clientApiVersions(Contoso, ClientApiVersions)
+ * ```
+ */
+extern dec clientApiVersions(target: Namespace, value: Enum, scope?: valueof string);
+/**
+ * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ *
+ * @example
+ * ```typespec
+ *
+ * model MyModel {
+ *   scalar stringlike extends string;
+ *
+ *   @deserializeEmptyStringAsNull
+ *   prop: string;
+ *
+ *   @deserializeEmptyStringAsNull
+ *   prop: stringlike;
+ * }
+ * ```
+ */
+extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof string);
+
+/**
+ * Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+ *
+ * @example
+ * ```typespec
+ *
+ * @responseAsBool
+ * @head
+ * op headOperation(): void;
+ * ```
+ */
+extern dec responseAsBool(target: Operation, scope?: valueof string);
+
+/**
+ * Defines how client documentation should be applied
+ */
+enum DocumentationMode {
+  /**
+   * Append client documentation to the existing doc
+   */
+  append: "append",
+
+  /**
+   * Replace the existing doc with client documentation
+   */
+  replace: "replace",
+}
+
+/**
+ * Override documentation for a type in client libraries. This allows you to
+ * provide client-specific documentation that differs from the service-definition documentation.
+ * @param documentation The client-specific documentation to apply
+ * @param mode Specifies how to apply the documentation (append or replace)
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ *
+ * @example Replacing documentation
+ * ```typespec
+ * @doc("This is service documentation")
+ * @clientDoc("This is client-specific documentation", DocumentationMode.replace)
+ * op myOperation(): void;
+ * ```
+ *
+ * @example Appending documentation
+ * ```typespec
+ * @doc("This is service documentation.")
+ * @clientDoc("This additional note is for client libraries only.", DocumentationMode.append)
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ *
+ * @example Language-specific documentation
+ * ```typespec
+ * @doc("This is service documentation")
+ * @clientDoc("Python-specific documentation", DocumentationMode.replace, "python")
+ * @clientDoc("JavaScript-specific documentation", DocumentationMode.replace, "javascript")
+ * op myOperation(): void;
+ * ```
+ */
+extern dec clientDoc(
+  target: unknown,
+  documentation: valueof string,
+  mode: EnumMember,
+  scope?: valueof string
+);

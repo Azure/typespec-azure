@@ -26,7 +26,10 @@ export type ArmCommonParameterDecorator = (
   definitionName?: string,
   version?:
     | EnumValue
-    | { readonly version: string | EnumValue; readonly isDefault: boolean }
+    | {
+        readonly version: string | EnumValue;
+        readonly isDefault: boolean;
+      }
     | string,
   referenceFile?: string,
 ) => void;
@@ -45,7 +48,10 @@ export type ArmCommonDefinitionDecorator = (
   definitionName?: string,
   version?:
     | EnumValue
-    | { readonly version: string | EnumValue; readonly isDefault: boolean }
+    | {
+        readonly version: string | EnumValue;
+        readonly isDefault: boolean;
+      }
     | string,
   referenceFile?: string,
 ) => void;

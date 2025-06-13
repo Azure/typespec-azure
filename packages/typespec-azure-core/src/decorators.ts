@@ -2,20 +2,19 @@ import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js
 import { getAllProperties } from "./utils.js";
 
 import {
+  compilerAssert,
   createDiagnosticCollector,
   DecoratorContext,
   Diagnostic,
   DiagnosticCollector,
   Enum,
   EnumMember,
-  getKnownValues,
   getNamespaceFullName,
   getTypeName,
   ignoreDiagnostics,
   IntrinsicType,
   isKey,
   isNeverType,
-  isStringType,
   isTemplateDeclarationOrInstance,
   isVoidType,
   Model,
@@ -30,6 +29,8 @@ import {
   UnionVariant,
   walkPropertiesInherited,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   getHttpOperation,
   getRoutePath,
@@ -45,6 +46,7 @@ import {
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
   NeedsRouteDecorator,
+  ParameterizedNextLinkConfigDecorator,
   SpreadCustomParametersDecorator,
   SpreadCustomResponsePropertiesDecorator,
 } from "../generated-defs/Azure.Core.Foundations.Private.js";
@@ -443,13 +445,6 @@ export function getLongRunningStates(
   program: Program,
   entity: Enum | Model | Scalar | ModelProperty,
 ): LongRunningStates | undefined {
-  // Is the type a string with known values?
-  if (isStringType(program, entity)) {
-    // Check the known values enum for LRO states
-    const knownValues = getKnownValues(program, entity as Scalar);
-    return knownValues ? getLongRunningStates(program, knownValues) : undefined;
-  }
-
   // Otherwise just check the type itself
   return program.stateMap(AzureCoreStateKeys.lroStatus).get(entity);
 }
@@ -769,10 +764,11 @@ function extractPollingLocationInfo(
   } = { target: target };
   const pollingModel = options.properties.get(pollingModelKey)?.type;
   if (pollingModel && pollingModel.kind === "Model") pollingInfo.pollingModel = pollingModel;
-  if (pollingModel && isVoidType(pollingModel)) pollingInfo.pollingModel = program.checker.voidType;
+  if (pollingModel && isVoidType(pollingModel))
+    pollingInfo.pollingModel = $(program).intrinsic.void;
   const finalResult = options.properties.get(finalResultKey)?.type;
   if (finalResult && finalResult.kind === "Model") pollingInfo.finalResult = finalResult;
-  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = program.checker.voidType;
+  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = $(program).intrinsic.void;
   switch (kindValue) {
     case pollingOptionsKind.StatusMonitor:
       return extractStatusMonitorLocationInfo(program, options, pollingInfo);
@@ -816,7 +812,9 @@ function extractStatusMonitorLocationInfo(
   if (statusMonitor === undefined) return undefined;
   statusMonitor.successProperty = finalPropertyValue;
   baseInfo.finalResult =
-    finalPropertyValue?.type?.kind === "Model" ? finalPropertyValue.type : program.checker.voidType;
+    finalPropertyValue?.type?.kind === "Model"
+      ? finalPropertyValue.type
+      : $(program).intrinsic.void;
   return {
     kind: pollingOptionsKind.StatusMonitor,
     info: statusMonitor,
@@ -1352,7 +1350,7 @@ export function isResourceOperation(program: Program, operation: Operation): boo
 export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => {
   // If the operation is not templated, add it to the list of operations to
   // check later
-  if (entity.node.templateParameters.length === 0) {
+  if (entity.node === undefined || entity.node.templateParameters.length === 0) {
     context.program.stateSet(AzureCoreStateKeys.needsRoute).add(entity);
   }
 };
@@ -1360,9 +1358,10 @@ export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, enti
 export function checkRpcRoutes(program: Program) {
   (program.stateSet(AzureCoreStateKeys.needsRoute) as Set<Operation>).forEach((op: Operation) => {
     if (
-      op.node.templateParameters.length === 0 &&
-      !isAutoRoute(program, op) &&
-      !getRoutePath(program, op)
+      op.node === undefined ||
+      (op.node.templateParameters.length === 0 &&
+        !isAutoRoute(program, op) &&
+        !getRoutePath(program, op))
     ) {
       reportDiagnostic(program, {
         code: "rpc-operation-needs-route",
@@ -1516,6 +1515,26 @@ export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
   }
 };
 
+const [getParameterizedNextLinkArguments, markParameterizedNextLinkConfigTemplate] = useStateMap<
+  Scalar,
+  ModelProperty[]
+>(AzureCoreStateKeys.parameterizedNextLinkConfig);
+const parameterizedNextLinkConfigDecorator: ParameterizedNextLinkConfigDecorator = (
+  context,
+  target,
+  parameters,
+) => {
+  // Workaround as it seems like decorators are called when missing template arguments
+  if (parameters.kind === "Model") return;
+  compilerAssert(
+    parameters.kind === "Tuple",
+    "Using the defined internal scalar parameterizedNextLink will result in a Tuple template argument type",
+  );
+  markParameterizedNextLinkConfigTemplate(context.program, target, parameters.values as any);
+};
+
+export { getParameterizedNextLinkArguments, parameterizedNextLinkConfigDecorator };
+
 setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
 setTypeSpecNamespace(
   "Foundations.Private",
@@ -1527,4 +1546,5 @@ setTypeSpecNamespace(
   $embeddingVector,
   $armResourceIdentifierConfig,
   $defaultFinalStateVia,
+  parameterizedNextLinkConfigDecorator,
 );

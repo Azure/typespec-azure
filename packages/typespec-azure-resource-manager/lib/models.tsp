@@ -1,6 +1,6 @@
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.OpenAPI;
+using Http;
+using Rest;
+using OpenAPI;
 using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
@@ -44,7 +44,7 @@ model ResourceNameParameter<
  */
 @doc("Concrete tracked resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
-@includeInapplicableMetadataInPayload(false)
+@Http.Private.includeInapplicableMetadataInPayload(false)
 model TrackedResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
@@ -62,7 +62,7 @@ model TrackedResource<Properties extends {}, PropertiesOptional extends valueof 
  */
 @doc("Concrete proxy resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
-@includeInapplicableMetadataInPayload(false)
+@Http.Private.includeInapplicableMetadataInPayload(false)
 model ProxyResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
@@ -81,7 +81,7 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
 @extensionResource
 @doc("Concrete extension resource types can be created by aliasing this type using a specific property type.")
 @armResourceInternal(Properties)
-@includeInapplicableMetadataInPayload(false)
+@Http.Private.includeInapplicableMetadataInPayload(false)
 model ExtensionResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
@@ -178,7 +178,7 @@ union ResourceProvisioningState {
 @doc("Contains a default provisioningState property to be spread into resource property types")
 model DefaultProvisioningStateProperty {
   @doc("The provisioning state of the resource.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
 }
 
@@ -195,7 +195,7 @@ model DefaultProvisioningStateProperty {
  * ```
  */
 model ExtendedLocationProperty {
-  @visibility("read", "create")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
   extendedLocation?: Foundations.ExtendedLocation;
 }
 
@@ -260,7 +260,7 @@ alias EntityTag = EntityTagProperty;
 @doc("The eTag property envelope.")
 model EntityTagProperty {
   @doc("If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.")
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   eTag?: string;
 }
 
@@ -283,7 +283,7 @@ alias ResourceKind = ResourceKindProperty;
 model ResourceKindProperty {
   @doc("Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.")
   @pattern("^[-\\w\\._,\\(\\\\\\)]+$")
-  @visibility("read", "create")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
   kind?: string;
 }
 

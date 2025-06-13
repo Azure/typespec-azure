@@ -13,7 +13,8 @@ import {
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import * as http from "@typespec/http";
-import { getAuthentication, setAuthentication, setRouteOptionsForNamespace } from "@typespec/http";
+import { getAuthentication, setAuthentication } from "@typespec/http";
+import { unsafe_setRouteOptionsForNamespace as setRouteOptionsForNamespace } from "@typespec/http/experimental";
 import { getResourceTypeForKeyParam } from "@typespec/rest";
 import {
   ArmLibraryNamespaceDecorator,
@@ -231,8 +232,12 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
       });
     }
 
-    // Set route options for the whole namespace
-    setRouteOptionsForNamespace(program, entity, {
+    // Set route options for the top level namespace
+    let topLevelNamespace = entity;
+    while (topLevelNamespace.namespace) {
+      topLevelNamespace = topLevelNamespace.namespace;
+    }
+    setRouteOptionsForNamespace(program, topLevelNamespace, {
       autoRouteOptions: {
         // Filter key parameters for singleton resource types to insert the
         // singleton key value

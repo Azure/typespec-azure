@@ -321,7 +321,7 @@ components:
       description: The request should only proceed if the entity was modified after this time.
       schema:
         type: string
-        format: date-time
+        format: http-date
     Azure.Core.ConditionalRequestHeaders.ifNoneMatch:
       name: If-None-Match
       in: header
@@ -336,7 +336,7 @@ components:
       description: The request should only proceed if the entity was not modified after this time.
       schema:
         type: string
-        format: date-time
+        format: http-date
     Azure.Core.Foundations.ApiVersionParameter:
       name: api-version
       in: query
@@ -362,7 +362,7 @@ components:
       description: Specifies the date and time at which the request was first created.
       schema:
         type: string
-        format: date-time
+        format: http-date
     Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId:
       name: Repeatability-Request-ID
       in: header
@@ -434,7 +434,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
           description: Inner error.
-      description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/Microsoft/api-guidelines/blob/vNext/Guidelines.md#7102-error-condition-responses.
+      description: An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.
     Azure.Core.Foundations.OperationState:
       anyOf:
         - type: string

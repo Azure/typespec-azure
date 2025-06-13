@@ -4,15 +4,13 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 using Azure.Core;
 
-@service({
-  title: "Microsoft.OperationsTest",
-})
+@service(#{ title: "Microsoft.OperationsTest" })
 @versioned(Versions)
 @armProviderNamespace
 namespace Microsoft.OperationStatusSample;
@@ -93,5 +91,21 @@ interface ProviderOperations {
   postVmSizesArmCombined is ArmProviderActionAsync<
     Response = ArmCombinedLroHeaders,
     Scope = SubscriptionActionScope
+  >;
+
+  /** Sample operation to generate an extension resource based GET action */
+  @get
+  @action
+  getLogAnalytics is ArmProviderActionSync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionResourceActionScope
+  >;
+
+  /** Operation to generate an extension resource based POST action */
+  @post
+  @action("append")
+  appendLogAnalytics is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionResourceActionScope
   >;
 }

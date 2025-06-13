@@ -13,7 +13,7 @@ options:
     namespace: "{package-dir}"
   "@azure-tools/typespec-python":
     package-dir: "azure-mgmt-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
-    package-name: "{package-dir}"
+    namespace: "azure.mgmt.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     generate-test: true
     generate-sample: true
   "@azure-tools/typespec-java":
@@ -22,20 +22,16 @@ options:
     service-name: "{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
   "@azure-tools/typespec-ts":
     package-dir: "arm-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
-    azureSdkForJs: true
-    isModularLibrary: true
-    generateMetadata: true
-    hierarchyClient: false
-    experimentalExtensibleEnums: true
-    enableOperationGroup: true
-    packageDetails:
+    experimental-extensible-enums: true
+    flavor: azure
+    package-details:
       name: "@azure/{package-dir}"
   "@azure-tools/typespec-go":
     service-dir: "sdk/resourcemanager/{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     package-dir: "arm{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     module: "github.com/Azure/azure-sdk-for-go/{service-dir}/{package-dir}"
     fix-const-stuttering: true
-    generate-examples: true
+    generate-samples: true
     generate-fakes: true
     head-as-boolean: true
     inject-spans: true

@@ -4,15 +4,13 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Http;
+using Rest;
+using Versioning;
 using Azure.ResourceManager;
 
 @armProviderNamespace
-@service({
-  title: "ContosoProviderHubClient",
-})
+@service(#{ title: "ContosoProviderHubClient" })
 @versioned(Versions)
 @doc("Contoso Resource Provider management API.")
 namespace Microsoft.ContosoProviderHub;
@@ -44,7 +42,7 @@ model EmployeeProperties {
   @encode("base64url")
   profile?: bytes;
 
-  @visibility("read")
+  @visibility(Lifecycle.Read)
   @doc("The status of the last operation.")
   provisioningState?: ProvisioningState;
 }

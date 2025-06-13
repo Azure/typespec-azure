@@ -1,8 +1,10 @@
 import {
   BooleanLiteral,
+  compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
   getDeprecationDetails,
+  getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getVisibilityForClass,
@@ -10,6 +12,7 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -23,13 +26,18 @@ import {
   Value,
 } from "@typespec/compiler";
 import {
-  HttpOperation,
-  HttpOperationBody,
-  HttpOperationMultipartBody,
-  HttpOperationResponseContent,
-} from "@typespec/http";
-import { getAddedOnVersions, getRemovedOnVersions, getVersions } from "@typespec/versioning";
-import { getParamAlias } from "./decorators.js";
+  unsafe_mutateSubgraphWithNamespace,
+  unsafe_MutatorWithNamespace,
+} from "@typespec/compiler/experimental";
+import { $ } from "@typespec/compiler/typekit";
+import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
+import {
+  getAddedOnVersions,
+  getRemovedOnVersions,
+  getVersioningMutators,
+  getVersions,
+} from "@typespec/versioning";
+import { getClientDocExplicit, getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -49,12 +57,52 @@ import {
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
 
+export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
+  "emitter-name"?: string;
+}
+
+export interface UnbrandedSdkEmitterOptionsInterface {
+  "generate-protocol-methods"?: boolean;
+  "generate-convenience-methods"?: boolean;
+  "api-version"?: string;
+  license?: {
+    name: string;
+    company?: string;
+    link?: string;
+    header?: string;
+    description?: string;
+  };
+}
+
+export interface BrandedSdkEmitterOptionsInterface extends UnbrandedSdkEmitterOptionsInterface {
+  "examples-dir"?: string;
+  namespace?: string;
+}
+
 export const AllScopes = Symbol.for("@azure-core/typespec-client-generator-core/all-scopes");
 
 export const clientNameKey = createStateSymbol("clientName");
 export const clientNamespaceKey = createStateSymbol("clientNamespace");
 export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
+export const clientKey = createStateSymbol("client");
+export const operationGroupKey = createStateSymbol("operationGroup");
+
+export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
+  return (
+    listScopedDecoratorData(context, clientKey).length > 0 ||
+    listScopedDecoratorData(context, operationGroupKey).length > 0
+  );
+}
+
+function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
+  const retval = [...context.program.stateMap(key).values()];
+  return retval
+    .filter((targetEntry) => {
+      return targetEntry[context.emitterName] || targetEntry[AllScopes];
+    })
+    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
+}
 
 /**
  *
@@ -82,29 +130,6 @@ export function parseEmitterName(
   const language = match[1];
   if (["typescript", "ts"].includes(language)) return diagnostics.wrap("javascript");
   return diagnostics.wrap(language);
-}
-
-/**
- *
- * @param context
- * @param namespace If we know explicitly the namespace of the client, pass this in
- * @returns The name of the namespace
- */
-export function getClientNamespaceStringHelper(
-  context: TCGCContext,
-  namespace?: Namespace,
-): string | undefined {
-  let packageName = context.packageName;
-  if (packageName) {
-    packageName = packageName
-      .replace(/-/g, ".")
-      .replace(/\.([a-z])?/g, (match: string) => match.toUpperCase());
-    return packageName.charAt(0).toUpperCase() + packageName.slice(1);
-  }
-  if (namespace) {
-    return getNamespaceFullName(namespace);
-  }
-  return undefined;
 }
 
 /**
@@ -167,11 +192,6 @@ export function filterApiVersionsWithDecorators(
   return retval;
 }
 
-function sortAndRemoveDuplicates(a: string[], b: string[], apiVersions: string[]): string[] {
-  const union = Array.from(new Set([...a, ...b]));
-  return apiVersions.filter((item) => union.includes(item));
-}
-
 /**
  *
  * @param context
@@ -186,7 +206,7 @@ export function getAvailableApiVersions(
 ): string[] {
   let wrapperApiVersions: string[] = [];
   if (wrapper) {
-    wrapperApiVersions = context.__tspTypeToApiVersions.get(wrapper) || [];
+    wrapperApiVersions = context.getApiVersionsForType(wrapper);
   }
 
   const allApiVersions =
@@ -198,16 +218,11 @@ export function getAvailableApiVersions(
   if (!apiVersions) return [];
   const explicitlyDecorated = filterApiVersionsWithDecorators(context, type, apiVersions);
   if (explicitlyDecorated.length) {
-    context.__tspTypeToApiVersions.set(type, explicitlyDecorated);
+    context.setApiVersionsForType(type, explicitlyDecorated);
     return explicitlyDecorated;
   }
-  // we take the union of all of the api versions that the type is available on
-  // if it's called multiple times with diff wrappers, we want to make sure we have
-  // all of the possible api versions listed
-  const existing = context.__tspTypeToApiVersions.get(type) || [];
-  const retval = sortAndRemoveDuplicates(wrapperApiVersions, existing, allApiVersions);
-  context.__tspTypeToApiVersions.set(type, retval);
-  return retval;
+  context.setApiVersionsForType(type, wrapperApiVersions);
+  return context.getApiVersionsForType(type);
 }
 
 /**
@@ -382,9 +397,6 @@ export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[
   let nonBodyExists = false;
   for (const response of responses) {
     if (response.type) {
-      if (response.type.kind === "nullable") {
-        nonBodyExists = true;
-      }
       allResponseBodies.push(response.type);
     } else {
       nonBodyExists = true;
@@ -436,17 +448,6 @@ export function getAnyType(
     crossLanguageDefinitionId: "",
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
   });
-}
-
-export function getValidApiVersion(context: TCGCContext, versions: string[]): string | undefined {
-  let apiVersion = context.apiVersion;
-  if (apiVersion === "all") {
-    return apiVersion;
-  }
-  if (apiVersion === "latest" || apiVersion === undefined || !versions.includes(apiVersion)) {
-    apiVersion = versions[versions.length - 1];
-  }
-  return apiVersion;
 }
 
 export function getHttpOperationResponseHeaders(
@@ -511,8 +512,8 @@ export function twoParamsEquivalent(
  * @param parameters
  * @returns
  */
-export function isHttpBodySpread(httpBody: HttpOperationBody | HttpOperationMultipartBody) {
-  return httpBody.property === undefined;
+export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
+  return httpBody.bodyKind !== "file" && httpBody.property === undefined;
 }
 
 /**
@@ -590,4 +591,132 @@ export function hasNoneVisibility(context: TCGCContext, type: ModelProperty): bo
   const lifecycle = getLifecycleVisibilityEnum(context.program);
   const visibility = getVisibilityForClass(context.program, type, lifecycle);
   return visibility.size === 0;
+}
+
+export function listAllNamespaces(
+  context: TCGCContext,
+  namespace: Namespace,
+  retval?: Namespace[],
+): Namespace[] {
+  if (!retval) {
+    retval = [];
+  }
+  if (retval.includes(namespace)) return retval;
+  retval.push(namespace);
+  for (const ns of namespace.namespaces.values()) {
+    listAllNamespaces(context, ns, retval);
+  }
+  return retval;
+}
+
+export function listAllUserDefinedNamespaces(context: TCGCContext): Namespace[] {
+  return listAllNamespaces(context, context.getMutatedGlobalNamespace()).filter((ns) =>
+    $(context.program).type.isUserDefined(ns),
+  );
+}
+
+export function findRootSourceProperty(property: ModelProperty): ModelProperty {
+  while (property.sourceProperty) {
+    property = property.sourceProperty;
+  }
+  return property;
+}
+
+export function getStreamAsBytes(
+  context: TCGCContext,
+  type: Type,
+): [SdkBuiltInType, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const unknownType: SdkBuiltInType = {
+    ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "bytes")),
+    name: "bytes",
+    encode: "bytes",
+    crossLanguageDefinitionId: "",
+  };
+  return diagnostics.wrap(unknownType);
+}
+
+function getVersioningMutator(
+  context: TCGCContext,
+  service: Namespace,
+  apiVersion: string,
+): unsafe_MutatorWithNamespace {
+  const versionMutator = getVersioningMutators(context.program, service);
+  compilerAssert(
+    versionMutator !== undefined && versionMutator.kind !== "transient",
+    "Versioning service should not get undefined or transient versioning mutator",
+  );
+
+  const mutators = versionMutator.snapshots
+    .filter((snapshot) => apiVersion === snapshot.version.value)
+    .map((x) => x.mutator);
+  compilerAssert(mutators.length === 1, "One api version should not get multiple mutators");
+
+  return mutators[0];
+}
+
+export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
+  const globalNamespace = context.program.getGlobalNamespaceType();
+  const allApiVersions = context.getPackageVersions();
+  if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
+
+  const mutator = getVersioningMutator(
+    context,
+    listServices(context.program)[0].type,
+    allApiVersions[allApiVersions.length - 1],
+  );
+  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
+  compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
+  return subgraph.type;
+}
+
+export function resolveDuplicateGenearatedName(
+  context: TCGCContext,
+  type: Union | Model | TspLiteralType,
+  createName: string,
+): string {
+  let duplicateCount = 1;
+  const rawCreateName = createName;
+  const generatedNames = [...context.__generatedNames.values()];
+  while (generatedNames.includes(createName)) {
+    createName = `${rawCreateName}${duplicateCount++}`;
+  }
+  context.__generatedNames.set(type, createName);
+  return createName;
+}
+
+export function resolveConflictGeneratedName(context: TCGCContext) {
+  const userDefinedNames = [...context.__referencedTypeCache.values()]
+    .filter((x) => !x.isGeneratedName)
+    .map((x) => x.name);
+  const generatedNames = [...context.__generatedNames.values()];
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.__raw && sdkType.isGeneratedName && userDefinedNames.includes(sdkType.name)) {
+      const rawName = sdkType.name;
+      let duplicateCount = 1;
+      let createName = `${rawName}${duplicateCount++}`;
+      while (userDefinedNames.includes(createName) || generatedNames.includes(createName)) {
+        createName = `${rawName}${duplicateCount++}`;
+      }
+      sdkType.name = createName;
+      context.__generatedNames.set(sdkType.__raw, createName);
+      generatedNames.push(createName);
+    }
+  }
+}
+
+export function getClientDoc(context: TCGCContext, target: Type): string | undefined {
+  const clientDocExplicit = getClientDocExplicit(context, target);
+  const baseDoc = getDoc(context.program, target);
+  if (clientDocExplicit) {
+    switch (clientDocExplicit.mode) {
+      case "append":
+        return baseDoc
+          ? `${baseDoc}\n${clientDocExplicit.documentation}`
+          : clientDocExplicit.documentation;
+      case "replace":
+        return clientDocExplicit.documentation;
+    }
+  }
+  return baseDoc;
 }
