@@ -8,6 +8,7 @@ import {
   getService,
   interpolatePath,
   listServices,
+  normalizePath,
   NoTarget,
   Program,
   reportDeprecated,
@@ -79,14 +80,14 @@ export function resolveAutorestOptions(
     ...defaultOptions,
     ...options,
   };
-  const segments = getDirectoryPath(resolvedOptions["output-file"]).split("/");
+  const segments = normalizePath(program.projectRoot).split("/");
   const relativePath = segments.indexOf("specification");
-  
+
   const armTypesDir = interpolatePath(
     resolvedOptions["arm-types-dir"] ?? "{relativePath}common-types/resource-management",
     {
       "emitter-output-dir": emitterOutputDir,
-      "relativePath": "../".repeat(segments.length - relativePath - 1),
+      relativePath: "../".repeat(segments.length - relativePath + 1),
     },
   );
 
