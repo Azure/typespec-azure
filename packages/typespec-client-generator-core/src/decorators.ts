@@ -389,36 +389,60 @@ export const $usage: UsageDecorator = (
   value: EnumMember | Union,
   scope?: LanguageScopes,
 ) => {
-  const isValidValue = (value: number): boolean => value === 2 || value === 4;
+  const isValidValue = (value: number): boolean => {
+    // Allow the new usage values: input(2), output(4), json(256), xml(512)
+    return (
+      value === UsageFlags.Input ||
+      value === UsageFlags.Output ||
+      value === UsageFlags.Json ||
+      value === UsageFlags.Xml
+    );
+  };
+
+  let newUsage = 0;
 
   if (value.kind === "EnumMember") {
     if (typeof value.value === "number" && isValidValue(value.value)) {
-      setScopedDecoratorData(context, $usage, usageKey, entity, value.value, scope);
+      newUsage = value.value;
+    } else {
+      reportDiagnostic(context.program, {
+        code: "invalid-usage",
+        format: {},
+        target: entity,
+      });
       return;
     }
   } else {
-    let usage = 0;
     for (const variant of value.variants.values()) {
       if (variant.type.kind === "EnumMember" && typeof variant.type.value === "number") {
         if (isValidValue(variant.type.value)) {
-          usage |= variant.type.value;
+          newUsage |= variant.type.value;
         }
       } else {
-        break;
+        reportDiagnostic(context.program, {
+          code: "invalid-usage",
+          format: {},
+          target: entity,
+        });
+        return;
       }
     }
 
-    if (usage !== 0) {
-      setScopedDecoratorData(context, $usage, usageKey, entity, usage, scope);
+    if (newUsage === 0) {
+      reportDiagnostic(context.program, {
+        code: "invalid-usage",
+        format: {},
+        target: entity,
+      });
       return;
     }
   }
 
-  reportDiagnostic(context.program, {
-    code: "invalid-usage",
-    format: {},
-    target: entity,
-  });
+  // Get existing usage and combine with new usage (additive behavior)
+  const existingUsage = getScopedDecoratorData(context as any, usageKey, entity) || 0;
+  const combinedUsage = existingUsage | newUsage;
+
+  setScopedDecoratorData(context, $usage, usageKey, entity, combinedUsage, scope);
 };
 
 export function getUsageOverride(
