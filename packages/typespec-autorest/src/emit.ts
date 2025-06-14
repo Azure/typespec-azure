@@ -79,8 +79,12 @@ export function resolveAutorestOptions(
     ...defaultOptions,
     ...options,
   };
+  const segments = resolvePath(emitterOutputDir, resolvedOptions["output-file"]).split("/");
+  const specificationIndex = segments.indexOf("specification");
+
   const armTypesDir = interpolatePath(
-    resolvedOptions["arm-types-dir"] ?? "{project-root}/../../common-types/resource-management",
+    resolvedOptions["arm-types-dir"] ??
+      `${specificationIndex > -1 ? "../".repeat(segments.length - specificationIndex - 2) : "{project-root}/../../"}common-types/resource-management`,
     {
       "project-root": program.projectRoot,
       "emitter-output-dir": emitterOutputDir,
