@@ -1661,15 +1661,14 @@ Expected response body:
 
 - Endpoint: `patch https://management.azure.com`
 
-Resource PATCH operation using Legacy.CustomPatchAsync with no request body.
+Resource PATCH operation using Legacy.CustomPatchSync with no request body.
 This tests the optional body functionality where the request body is not sent.
 
 Expected verb: PATCH  
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
 Expected query parameter: api-version=2023-12-01-preview
 Expected request body: None (empty body)
-Expected status code: 202
-Expected response header: Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/patch_aao
+Expected status code: 200
 Expected response body:
 
 ```json
@@ -1681,7 +1680,7 @@ Expected response body:
   "properties": {
     "name": "widget1",
     "description": "A test widget",
-    "provisioningState": "InProgress"
+    "provisioningState": "Succeeded"
   },
   "systemData": {
     "createdBy": "AzureSDK",
