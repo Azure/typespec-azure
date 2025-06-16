@@ -423,7 +423,8 @@ const validWidget = {
   },
 };
 
-let patchPollCount = 0;
+let postPollCount = 0;
+let deletePollCount = 0;
 
 // GET operation
 Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSuccess({
@@ -447,99 +448,26 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSucc
 });
 
 // PATCH operation with optional body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody = passOnSuccess([
-  {
-    // PATCH initial request with no body
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
-    method: "patch",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        resourceGroup: RESOURCE_GROUP_EXPECTED,
-        widgetName: "widget1",
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      // No body expected for optional body scenarios
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
+  method: "patch",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      widgetName: "widget1",
     },
-    response: {
-      status: 202,
-      headers: {
-        "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/patch_aao`,
-      },
-      body: json({
-        ...validWidget,
-        properties: {
-          ...validWidget.properties,
-          provisioningState: "InProgress",
-        },
-      }),
+    query: {
+      "api-version": "2023-12-01-preview",
     },
-    handler: (req: MockRequest) => {
-      patchPollCount = 0;
-      return {
-        status: 202,
-        headers: {
-          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/patch_aao`,
-        },
-        body: json({
-          ...validWidget,
-          properties: {
-            ...validWidget.properties,
-            provisioningState: "InProgress",
-          },
-        }),
-      };
-    },
-    kind: "MockApiDefinition",
+    // No body expected for optional body scenarios
   },
-  {
-    // PATCH poll operation status
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/patch_aao",
-    method: "get",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 202,
-      body: json({
-        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/patch_aao`,
-        name: "patch_aao",
-        startTime: "2024-11-08T01:41:53.5508583+00:00",
-        status: "InProgress",
-      }),
-    },
-    handler: (req: MockRequest) => {
-      const aaoResponse = {
-        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/patch_aao`,
-        name: "patch_aao",
-        startTime: "2024-11-08T01:41:53.5508583+00:00",
-      };
-      const response =
-        patchPollCount > 0
-          ? {
-              ...aaoResponse,
-              status: "Succeeded",
-              endTime: "2024-11-08T01:42:41.5354192+00:00",
-              properties: validWidget,
-            }
-          : { ...aaoResponse, status: "InProgress" };
-      const statusCode = patchPollCount > 0 ? 200 : 202;
-      patchPollCount += 1;
-      return {
-        status: statusCode,
-        body: json(response),
-      };
-    },
-    kind: "MockApiDefinition",
+  response: {
+    status: 200,
+    body: json(validWidget),
   },
-]);
+  kind: "MockApiDefinition",
+});
 
 // POST action operation with no body
 Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBody = passOnSuccess({
