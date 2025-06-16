@@ -7,7 +7,7 @@ packages:
 feat: Add ARM optional body template test cases
 
 Add test scenarios for Azure Resource Manager legacy optional body templates including:
-- PATCH operation using Azure.ResourceManager.Legacy.CustomPatchAsync with optional empty body
+- PATCH operation using Azure.ResourceManager.Legacy.CustomPatchSync with optional empty body
 - POST action operation using Azure.ResourceManager.ArmResourceActionSync with optional empty body
 - GET operation using Azure.ResourceManager.ArmResourceRead for resource retrieval
 
