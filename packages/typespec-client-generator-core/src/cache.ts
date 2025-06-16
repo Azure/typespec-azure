@@ -112,7 +112,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
       // when there is explicitly `@operationGroup` or `@client`
       // operations under namespace or interface that are not decorated with `@operationGroup` or `@client`
-      // should be placed in the first accesster client or operation group
+      // should be placed in the first accessor client or operation group
       if (group.type.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
         const innerQueue: Namespace[] = [group.type];
         while (innerQueue.length > 0) {
