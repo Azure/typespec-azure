@@ -165,18 +165,23 @@ export const $client: ClientDecorator = (
   }
   const explicitName = options?.properties.get("name")?.type;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  const explicitService = options?.properties.get("service")?.type;
-  const service =
-    explicitService?.kind === "Namespace"
-      ? explicitService
-      : (findClientService(context.program, target) ?? (target as any));
+  let service = options?.properties.get("service")?.type;
 
-  if (!isService(context.program, service)) {
+  if (service?.kind !== "Namespace") {
+    service = findClientService(context.program, target);
+  }
+
+  if (
+    service === undefined ||
+    service.kind !== "Namespace" ||
+    !judgeService(context.program, service)
+  ) {
     reportDiagnostic(context.program, {
       code: "client-service",
       format: { name },
       target: context.decoratorTarget,
     });
+    return;
   }
 
   const client: SdkClient = {
@@ -190,13 +195,22 @@ export const $client: ClientDecorator = (
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
 
+function judgeService(program: Program, type: Namespace): boolean {
+  return (
+    isService(program, type) ||
+    type.decorators.some(
+      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+    )
+  );
+}
+
 function findClientService(
   program: Program,
   client: Namespace | Interface,
 ): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
-    if (isService(program, current)) {
+    if (judgeService(program, current)) {
       return current;
     }
     current = current.namespace;
