@@ -174,10 +174,7 @@ export const $client: ClientDecorator = (
   if (
     service === undefined ||
     service.kind !== "Namespace" ||
-    !isService(context.program, service) ||
-    !service.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
+    !judgeService(context.program, service)
   ) {
     reportDiagnostic(context.program, {
       code: "client-service",
@@ -198,18 +195,22 @@ export const $client: ClientDecorator = (
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
 
+function judgeService(program: Program, type: Namespace): boolean {
+  return (
+    isService(program, type) ||
+    type.decorators.some(
+      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+    )
+  );
+}
+
 function findClientService(
   program: Program,
   client: Namespace | Interface,
 ): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
-    if (
-      isService(program, current) ||
-      client.decorators.some(
-        (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-      )
-    ) {
+    if (judgeService(program, current)) {
       return current;
     }
     current = current.namespace;
