@@ -2,7 +2,7 @@ import { getNamespaceFullName, Namespace } from "@typespec/compiler";
 import { getVersions } from "@typespec/versioning";
 import { getExplicitClientApiVersions } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
-import { listAllNamespaces } from "../internal-utils.js";
+import { listAllUserDefinedNamespaces } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validatePackage(context: TCGCContext) {
@@ -10,7 +10,7 @@ export function validatePackage(context: TCGCContext) {
 }
 
 function validateNamespaces(context: TCGCContext) {
-  for (const namespace of listAllNamespaces(context, context.getMutatedGlobalNamespace())) {
+  for (const namespace of listAllUserDefinedNamespaces(context)) {
     validateDecoratorsAppliedToVersionedService(context, namespace);
     validateClientApiVersionsIncludesAllServiceVersions(context, namespace);
   }

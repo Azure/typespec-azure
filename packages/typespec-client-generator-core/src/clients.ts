@@ -35,7 +35,7 @@ import {
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods } from "./methods.js";
-import { getCrossLanguageDefinitionId, getLibraryName } from "./public-utils.js";
+import { getCrossLanguageDefinitionId } from "./public-utils.js";
 import {
   getSdkBuiltInType,
   getSdkCredentialParameter,
@@ -69,7 +69,7 @@ function getEndpointTypeFromSingleServer<
         correspondingMethodParams: [],
         type: getSdkBuiltInType(context, $(context.program).builtin.url),
         isApiVersionParam: false,
-        apiVersions: context.getApiVersionsForType(client.__raw.type),
+        apiVersions: context.getApiVersionsForType(client.__raw.type ?? client.__raw.service),
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
         decorators: [],
         access: "public",
@@ -89,7 +89,7 @@ function getEndpointTypeFromSingleServer<
       if (param.defaultValue) {
         sdkParam.clientDefaultValue = getValueTypeValue(param.defaultValue);
       }
-      const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw.type);
+      const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
       if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
@@ -170,7 +170,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     doc: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: context.getApiVersionsForType(rawClient.type),
+    apiVersions: context.getApiVersionsForType(rawClient.type ?? rawClient.service),
     optional: false,
     isApiVersionParam: false,
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
@@ -188,17 +188,17 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
-    name: client.kind === "SdkClient" ? client.name : getLibraryName(context, client.type),
-    doc: getClientDoc(context, client.type),
-    summary: getSummary(context.program, client.type),
+    name: client.kind === "SdkClient" ? client.name : client.groupPath.split(".").at(-1)!,
+    doc: client.type ? getClientDoc(context, client.type) : undefined,
+    summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
-    apiVersions: context.getApiVersionsForType(client.type),
-    namespace: getClientNamespace(context, client.type),
+    apiVersions: context.getApiVersionsForType(client.type ?? client.service),
+    namespace: getClientNamespace(context, client.type ?? client.service),
     clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
-    decorators: diagnostics.pipe(getTypeDecorators(context, client.type)),
+    decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type ?? client.service),
   };
   // NOTE: getSdkMethods recursively calls createSdkClientType
   sdkClientType.methods = diagnostics.pipe(
@@ -221,27 +221,29 @@ function addDefaultClientParameters<
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
-  let apiVersionParam = context.__clientToParameters
-    .get(client.__raw.type)
+  let apiVersionParam = context.__clientParametersCache
+    .get(client.__raw)
     ?.find((x) => x.isApiVersionParam);
   if (!apiVersionParam) {
     for (const sc of listOperationGroups(context, client.__raw, true)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
-      apiVersionParam = context.__clientToParameters.get(sc.type)?.find((x) => x.isApiVersionParam);
+      apiVersionParam = sc.type
+        ? context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam)
+        : undefined;
       if (apiVersionParam) break;
     }
   }
   if (apiVersionParam) {
     defaultClientParamters.push(apiVersionParam);
   }
-  let subId = context.__clientToParameters
-    .get(client.__raw.type)
+  let subId = context.__clientParametersCache
+    .get(client.__raw)
     ?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
     for (const sc of listOperationGroups(context, client.__raw, true)) {
       // if any sub operation groups have an subId param, the top level needs it as well
-      subId = context.__clientToParameters.get(sc.type)?.find((x) => isSubscriptionId(context, x));
+      subId = context.__clientParametersCache.get(sc)?.find((x) => isSubscriptionId(context, x));
       if (subId) break;
     }
   }
@@ -272,68 +274,70 @@ function createSdkClientInitializationType(
   };
 
   // customization
-  const initializationOptions = getClientInitializationOptions(context, client.type);
-  if (initializationOptions?.parameters) {
-    const model = diagnostics.pipe(
-      getSdkModelWithDiagnostics(context, initializationOptions.parameters),
-    );
-    result.doc = model.doc;
-    result.summary = model.summary;
-    result.name = model.name;
-    result.isGeneratedName = model.isGeneratedName;
-    result.decorators = model.decorators;
-    result.__raw = model.__raw;
-    result.parameters = model.properties.map(
-      (property: SdkModelPropertyType): SdkMethodParameter => {
-        property.onClient = true;
-        property.kind = "method";
-        return property as SdkMethodParameter;
-      },
-    );
-  }
-  if (initializationOptions?.initializedBy) {
-    if (
-      client.kind === "SdkClient" &&
-      (initializationOptions.initializedBy & InitializedByFlags.Parent) ===
-        InitializedByFlags.Parent
-    ) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "invalid-initialized-by",
-          target: client.type,
-          format: {
-            message:
-              "First level client must have `InitializedBy.individually` specified in `initializedBy`.",
-          },
-        }),
+  if (client.type) {
+    const initializationOptions = getClientInitializationOptions(context, client.type);
+    if (initializationOptions?.parameters) {
+      const model = diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, initializationOptions.parameters),
       );
-    } else if (
-      client.kind === "SdkOperationGroup" &&
-      initializationOptions.initializedBy === InitializedByFlags.Individually
-    ) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "invalid-initialized-by",
-          target: client.type,
-          format: {
-            message:
-              "Sub client must have `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
-          },
-        }),
+      result.doc = model.doc;
+      result.summary = model.summary;
+      result.name = model.name;
+      result.isGeneratedName = model.isGeneratedName;
+      result.decorators = model.decorators;
+      result.__raw = model.__raw;
+      result.parameters = model.properties.map(
+        (property: SdkModelPropertyType): SdkMethodParameter => {
+          property.onClient = true;
+          property.kind = "method";
+          return property as SdkMethodParameter;
+        },
       );
-    } else {
-      result.initializedBy = initializationOptions.initializedBy;
     }
-  }
-  if (initializationOptions?.parameters) {
-    // Cache elevated parameter, then we could use it to set `onClient` property for method parameters.
-    let clientParams = context.__clientToParameters.get(client.type);
-    if (!clientParams) {
-      clientParams = [];
-      context.__clientToParameters.set(client.type, clientParams);
+    if (initializationOptions?.initializedBy) {
+      if (
+        client.kind === "SdkClient" &&
+        (initializationOptions.initializedBy & InitializedByFlags.Parent) ===
+          InitializedByFlags.Parent
+      ) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "invalid-initialized-by",
+            target: client.type,
+            format: {
+              message:
+                "First level client must have `InitializedBy.individually` specified in `initializedBy`.",
+            },
+          }),
+        );
+      } else if (
+        client.kind === "SdkOperationGroup" &&
+        initializationOptions.initializedBy === InitializedByFlags.Individually
+      ) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "invalid-initialized-by",
+            target: client.type,
+            format: {
+              message:
+                "Sub client must have `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
+            },
+          }),
+        );
+      } else {
+        result.initializedBy = initializationOptions.initializedBy;
+      }
     }
-    for (const param of result.parameters) {
-      clientParams.push(param);
+    if (initializationOptions?.parameters) {
+      // Cache elevated parameter, then we could use it to set `onClient` property for method parameters.
+      let clientParams = context.__clientParametersCache.get(client);
+      if (!clientParams) {
+        clientParams = [];
+        context.__clientParametersCache.set(client, clientParams);
+      }
+      for (const param of result.parameters) {
+        clientParams.push(param);
+      }
     }
   }
 

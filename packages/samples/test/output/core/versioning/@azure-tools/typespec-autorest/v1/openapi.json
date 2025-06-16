@@ -102,8 +102,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/Library.PetToy"
-          },
-          "x-ms-identifiers": []
+          }
         }
       },
       "discriminator": "type",

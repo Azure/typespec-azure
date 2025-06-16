@@ -896,7 +896,7 @@ describe("typespec-azure-core: decorators", () => {
 `)) as { includePending: ModelProperty; nextLink: ModelProperty };
       assert.strictEqual(nextLink.type.kind, "Scalar");
       const templateArgs = getParameterizedNextLinkArguments(runner.program, nextLink.type);
-      assert.strictEqual(templateArgs.length, 1);
+      assert.strictEqual(templateArgs?.length, 1);
       assert.strictEqual(templateArgs[0], includePending);
     });
     it("multiple parameter", async () => {
@@ -916,7 +916,7 @@ describe("typespec-azure-core: decorators", () => {
 `)) as { includePending: ModelProperty; includeExpired: ModelProperty; nextLink: ModelProperty };
       assert.strictEqual(nextLink.type.kind, "Scalar");
       const templateArgs = getParameterizedNextLinkArguments(runner.program, nextLink.type);
-      assert.strictEqual(templateArgs.length, 2);
+      assert.strictEqual(templateArgs?.length, 2);
       assert.strictEqual(templateArgs[0], includePending);
       assert.strictEqual(templateArgs[1], includeExpired);
     });

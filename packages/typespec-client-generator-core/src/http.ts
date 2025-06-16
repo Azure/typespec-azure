@@ -52,12 +52,11 @@ import {
   TCGCContext,
 } from "./interfaces.js";
 import {
-  findRootSourceProperty,
+  compareModelProperties,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
-  getLocationOfOperation,
   getStreamAsBytes,
   getTypeDecorators,
   isAcceptHeader,
@@ -65,7 +64,6 @@ import {
   isHttpBodySpread,
   isNeverOrVoidType,
   isSubscriptionId,
-  twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from "./media-types.js";
@@ -601,16 +599,16 @@ export function getCorrespondingMethodParams(
   const diagnostics = createDiagnosticCollector();
 
   // 1. To see if the service parameter is a client parameter.
-  const operationLocation = getLocationOfOperation(operation)!;
-  let clientParams = context.__clientToParameters.get(operationLocation);
+  const client = context.getClientForOperation(operation);
+  let clientParams = context.__clientParametersCache.get(client);
   if (!clientParams) {
     clientParams = [];
-    context.__clientToParameters.set(operationLocation, clientParams);
+    context.__clientParametersCache.set(client, clientParams);
   }
 
   const correspondingClientParams = clientParams.filter(
     (x) =>
-      twoParamsEquivalent(context, x.__raw, serviceParam.__raw) ||
+      compareModelProperties(context, x.__raw, serviceParam.__raw) ||
       (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name),
   );
   if (correspondingClientParams.length > 0) {
@@ -619,7 +617,7 @@ export function getCorrespondingMethodParams(
 
   // 2. To see if the service parameter is api version parameter that has been elevated to client.
   if (serviceParam.isApiVersionParam && serviceParam.onClient) {
-    const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x));
+    const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x.__raw!));
     if (!existingApiVersion) {
       diagnostics.add(
         createDiagnostic({
@@ -656,7 +654,7 @@ export function getCorrespondingMethodParams(
   }
 
   // 4. To see if the service parameter is a method parameter or a property of a method parameter.
-  const directMapping = findMapping(methodParameters, serviceParam);
+  const directMapping = findMapping(context, methodParameters, serviceParam);
   if (directMapping) {
     return diagnostics.wrap([directMapping]);
   }
@@ -666,7 +664,7 @@ export function getCorrespondingMethodParams(
     const retVal = [];
     let optionalSkip = 0;
     for (const serviceParamProp of serviceParam.type.properties) {
-      const propertyMapping = findMapping(methodParameters, serviceParamProp);
+      const propertyMapping = findMapping(context, methodParameters, serviceParamProp);
       if (propertyMapping) {
         retVal.push(propertyMapping);
       } else if (serviceParamProp.optional) {
@@ -703,6 +701,7 @@ export function getCorrespondingMethodParams(
  * @returns
  */
 function findMapping(
+  context: TCGCContext,
   methodParameters: SdkModelPropertyType[],
   serviceParam: SdkHttpParameter | SdkModelPropertyType,
 ): SdkModelPropertyType | undefined {
@@ -714,7 +713,7 @@ function findMapping(
     if (
       methodParam.__raw &&
       serviceParam.__raw &&
-      findRootSourceProperty(methodParam.__raw) === findRootSourceProperty(serviceParam.__raw)
+      compareModelProperties(context, methodParam.__raw, serviceParam.__raw)
     ) {
       return methodParam;
     }

@@ -1,0 +1,10 @@
+{
+  "operationId": "clientLocation",
+  "title": "clientLocation",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "test"
+    }
+  }
+}
