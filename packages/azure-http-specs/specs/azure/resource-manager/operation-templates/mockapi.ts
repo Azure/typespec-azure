@@ -46,31 +46,29 @@ const validOperation = {
 const checkNameAvailabilityResponse = {
   nameAvailable: false,
   reason: "AlreadyExists",
-  message:
-    "Hostname 'checkName' already exists. Please select a different name.",
+  message: "Hostname 'checkName' already exists. Please select a different name.",
 };
 let createOrReplacePollCount = 0;
 let postPollCount = 0;
 let deletePollCount = 0;
 
 // operation list
-Scenarios.Azure_ResourceManager_OperationTemplates_ListAvailableOperations =
-  passOnSuccess({
-    uri: "/providers/Azure.ResourceManager.OperationTemplates/operations",
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
+Scenarios.Azure_ResourceManager_OperationTemplates_ListAvailableOperations = passOnSuccess({
+  uri: "/providers/Azure.ResourceManager.OperationTemplates/operations",
+  method: "get",
+  request: {
+    query: {
+      "api-version": "2023-12-01-preview",
     },
-    response: {
-      status: 200,
-      body: json({
-        value: [validOperation],
-      }),
-    },
-    kind: "MockApiDefinition",
-  });
+  },
+  response: {
+    status: 200,
+    body: json({
+      value: [validOperation],
+    }),
+  },
+  kind: "MockApiDefinition",
+});
 
 // Check Global Name Availability
 Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGlobal =
@@ -97,8 +95,8 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkGl
   });
 
 // Check Local Name Availability
-Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal =
-  passOnSuccess({
+Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLocal = passOnSuccess(
+  {
     uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/:location/checkNameAvailability",
     method: "post",
     request: {
@@ -119,36 +117,50 @@ Scenarios.Azure_ResourceManager_OperationTemplates_CheckNameAvailability_checkLo
       body: json(checkNameAvailabilityResponse),
     },
     kind: "MockApiDefinition",
-  });
+  },
+);
 
 // lro resource
-Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace =
-  passOnSuccess([
-    {
-      // LRO PUT initial request
-      uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
-      method: "put",
-      request: {
-        pathParams: {
-          subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-          resourceGroup: RESOURCE_GROUP_EXPECTED,
-          orderName: "order1",
-        },
-        query: {
-          "api-version": "2023-12-01-preview",
-        },
-        body: json({
-          location: "eastus",
-          properties: {
-            productId: "product1",
-            amount: 1,
-          },
-        }),
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnSuccess([
+  {
+    // LRO PUT initial request
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
+    method: "put",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        orderName: "order1",
       },
-      response: {
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        location: "eastus",
+        properties: {
+          productId: "product1",
+          amount: 1,
+        },
+      }),
+    },
+    response: {
+      status: 201,
+      headers: {
+        "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
+      },
+      body: json({
+        ...validOrder,
+        properties: {
+          provisioningState: "InProgress",
+        },
+      }),
+    },
+    handler: (req: MockRequest) => {
+      createOrReplacePollCount = 0;
+      return {
         status: 201,
         headers: {
-          "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
+          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
         },
         body: json({
           ...validOrder,
@@ -156,90 +168,76 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace =
             provisioningState: "InProgress",
           },
         }),
-      },
-      handler: (req: MockRequest) => {
-        createOrReplacePollCount = 0;
-        return {
-          status: 201,
-          headers: {
-            "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
-          },
-          body: json({
-            ...validOrder,
-            properties: {
-              provisioningState: "InProgress",
-            },
-          }),
-        };
-      },
-      kind: "MockApiDefinition",
+      };
     },
-    {
-      // LRO PUT poll intermediate/get final result
-      uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao",
-      method: "get",
-      request: {
-        pathParams: {
-          subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        },
-        query: {
-          "api-version": "2023-12-01-preview",
-        },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO PUT poll intermediate/get final result
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
       },
-      response: {
-        status: 202,
-        body: json({
-          id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
-          name: "lro_create_aao",
-          startTime: "2024-11-08T01:41:53.5508583+00:00",
-          status: "InProgress",
-        }),
+      query: {
+        "api-version": "2023-12-01-preview",
       },
-      handler: (req: MockRequest) => {
-        const aaoResponse = {
-          id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
-          name: "lro_create_aao",
-          startTime: "2024-11-08T01:41:53.5508583+00:00",
-        };
-        const response =
-          createOrReplacePollCount > 0
-            ? {
-                ...aaoResponse,
-                status: "Succeeded",
-                endTime: "2024-11-08T01:42:41.5354192+00:00",
-                properties: validOrder,
-              }
-            : { ...aaoResponse, status: "InProgress" };
-        const statusCode = createOrReplacePollCount > 0 ? 200 : 202;
-        createOrReplacePollCount += 1;
-        return {
-          status: statusCode,
-          body: json(response),
-        };
-      },
-      kind: "MockApiDefinition",
     },
-    {
-      // LRO PUT get final result through initial request uri
-      uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
-      method: "get",
-      request: {
-        pathParams: {
-          subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-          resourceGroup: RESOURCE_GROUP_EXPECTED,
-          orderName: "order1",
-        },
-        query: {
-          "api-version": "2023-12-01-preview",
-        },
-      },
-      response: {
-        status: 200,
-        body: json(validOrder),
-      },
-      kind: "MockApiDefinition",
+    response: {
+      status: 202,
+      body: json({
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
+        name: "lro_create_aao",
+        startTime: "2024-11-08T01:41:53.5508583+00:00",
+        status: "InProgress",
+      }),
     },
-  ]);
+    handler: (req: MockRequest) => {
+      const aaoResponse = {
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
+        name: "lro_create_aao",
+        startTime: "2024-11-08T01:41:53.5508583+00:00",
+      };
+      const response =
+        createOrReplacePollCount > 0
+          ? {
+              ...aaoResponse,
+              status: "Succeeded",
+              endTime: "2024-11-08T01:42:41.5354192+00:00",
+              properties: validOrder,
+            }
+          : { ...aaoResponse, status: "InProgress" };
+      const statusCode = createOrReplacePollCount > 0 ? 200 : 202;
+      createOrReplacePollCount += 1;
+      return {
+        status: statusCode,
+        body: json(response),
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO PUT get final result through initial request uri
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        orderName: "order1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validOrder),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
 
 Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
   {
@@ -426,71 +424,68 @@ const validWidget = {
 };
 
 // GET operation
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get =
-  passOnSuccess({
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
-    method: "get",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        resourceGroup: RESOURCE_GROUP_EXPECTED,
-        widgetName: "widget1",
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      widgetName: "widget1",
     },
-    response: {
-      status: 200,
-      body: json(validWidget),
+    query: {
+      "api-version": "2023-12-01-preview",
     },
-    kind: "MockApiDefinition",
-  });
+  },
+  response: {
+    status: 200,
+    body: json(validWidget),
+  },
+  kind: "MockApiDefinition",
+});
 
 // PATCH operation with optional body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody =
-  passOnSuccess({
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
-    method: "patch",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        resourceGroup: RESOURCE_GROUP_EXPECTED,
-        widgetName: "widget1",
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      // No body expected for optional body scenarios
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
+  method: "patch",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      widgetName: "widget1",
     },
-    response: {
-      status: 200,
-      body: json(validWidget),
+    query: {
+      "api-version": "2023-12-01-preview",
     },
-    kind: "MockApiDefinition",
-  });
+    // No body expected for optional body scenarios
+  },
+  response: {
+    status: 200,
+    body: json(validWidget),
+  },
+  kind: "MockApiDefinition",
+});
 
 // POST action operation with no body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBody =
-  passOnSuccess({
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/actionWithoutBody",
-    method: "post",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        resourceGroup: RESOURCE_GROUP_EXPECTED,
-        widgetName: "widget1",
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      // No body expected for optional body scenarios
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBody = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/actionWithoutBody",
+  method: "post",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      widgetName: "widget1",
     },
-    response: {
-      status: 200,
-      body: json({
-        result: "Action completed successfully",
-      }),
+    query: {
+      "api-version": "2023-12-01-preview",
     },
-    kind: "MockApiDefinition",
-  });
+    // No body expected for optional body scenarios
+  },
+  response: {
+    status: 200,
+    body: json({
+      result: "Action completed successfully",
+    }),
+  },
+  kind: "MockApiDefinition",
+});
