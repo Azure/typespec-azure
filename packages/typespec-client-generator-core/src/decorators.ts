@@ -8,7 +8,6 @@ import {
   ModelProperty,
   Namespace,
   Operation,
-  Program,
   RekeyableMap,
   Scalar,
   Type,
@@ -16,7 +15,6 @@ import {
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
-  isService,
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
@@ -165,18 +163,25 @@ export const $client: ClientDecorator = (
   }
   const explicitName = options?.properties.get("name")?.type;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  const explicitService = options?.properties.get("service")?.type;
-  const service =
-    explicitService?.kind === "Namespace"
-      ? explicitService
-      : (findClientService(context.program, target) ?? (target as any));
+  let service = options?.properties.get("service")?.type;
 
-  if (!isService(context.program, service)) {
+  if (service?.kind !== "Namespace") {
+    service = findClientService(target);
+  }
+
+  if (
+    service === undefined ||
+    service.kind !== "Namespace" ||
+    !service.decorators.some(
+      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+    )
+  ) {
     reportDiagnostic(context.program, {
       code: "client-service",
       format: { name },
       target: context.decoratorTarget,
     });
+    return;
   }
 
   const client: SdkClient = {
@@ -190,13 +195,14 @@ export const $client: ClientDecorator = (
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
 
-function findClientService(
-  program: Program,
-  client: Namespace | Interface,
-): Namespace | Interface | undefined {
+function findClientService(client: Namespace | Interface): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
-    if (isService(program, current)) {
+    if (
+      client.decorators.some(
+        (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+      )
+    ) {
       return current;
     }
     current = current.namespace;
