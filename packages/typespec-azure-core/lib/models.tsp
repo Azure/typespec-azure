@@ -369,7 +369,7 @@ scalar armResourceType extends string;
  *   otherArmId: armResourceIdentifier;
  *   networkId: armResourceIdentifier<[{type:"Microsoft.Network/vnet"}]>
  *   vmIds: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["*"]}]>
- *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["tenant", "resourceGroup"]}]>
+ *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["Tenant", "ResourceGroup"]}]>
  * }
  * ```
  */
