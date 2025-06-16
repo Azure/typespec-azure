@@ -101,7 +101,7 @@ interface OptionalBody {
     ```json
     {
       "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
-      "name": "widget1", 
+      "name": "widget1",
       "type": "Azure.ResourceManager.OperationTemplates/widgets",
       "location": "eastus",
       "properties": {
@@ -143,5 +143,10 @@ interface OptionalBody {
     }
     ```
     """)
-  actionWithoutBody is ArmResourceActionSync<Widget, ActionRequest, ActionResult, OptionalRequestBody = true>;
+  actionWithoutBody is ArmResourceActionSync<
+    Widget,
+    ActionRequest,
+    ActionResult,
+    OptionalRequestBody = true
+  >;
 }
