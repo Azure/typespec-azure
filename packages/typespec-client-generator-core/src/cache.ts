@@ -168,12 +168,6 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         }
       }
     }
-
-    if (group.type?.kind === "Namespace") {
-      [...group.type.namespaces.values()].filter(
-        (ns: Namespace) => !context.__rawClientsOperationGroupsCache!.has(ns),
-      );
-    }
     queue.push(...group.subOperationGroups);
   }
 
