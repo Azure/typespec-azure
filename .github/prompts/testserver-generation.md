@@ -1,5 +1,8 @@
 # Testserver Generation
 
+> ⚠️ **WARNING:** This task ONLY involves modifying files in the `packages/azure-http-specs/specs` directory or `cspell.yaml`. DO NOT modify any other packages or files.
+> 🚫 **DO NOT** start by searching for related terms across the entire repository. Begin your work ONLY in the `packages/azure-http-specs/specs` directory.
+
 ## REQUIRED STEPS (ALL MUST BE COMPLETED IN ORDER)
 
 1. **PREPARATION & RESEARCH**
@@ -9,12 +12,19 @@
      - Examine the `main.tsp` and `client.tsp` files in the [specs repository][spector-tests]
      - Review the `mockapi.ts` files in the [specs repository][spector-tests]
      - Read descriptions of existing tests and mockapis in the [spec summary][spector-description]
+  
+  > **IMPORTANT:** When researching or implementing a feature, ONLY look at examples within the `packages/azure-http-specs/specs` directory. DO NOT search for or use code from other packages as references for implementation.
 
 2. **IMPLEMENTATION REQUIREMENTS**
 
-   - Only modify code in:
+   - **IMPORTANT:** ONLY modify code in these specific locations:
      - `cspell.yaml` file OR
      - `packages/azure-http-specs/specs` folder
+   - DO NOT modify any files in other packages
+   - When searching for examples or patterns:
+     - RESTRICT your search to the `packages/azure-http-specs/specs` directory only
+     - If using `grep_search`, ALWAYS include `packages/azure-http-specs/specs` in the `includePattern`
+     - NEVER use examples from other packages as implementation references
    - For each scenario:
      - Add a `@scenario` and `@scenarioDoc` decorator
      - Make the `@scenarioDoc` explicit about input values and expected output
