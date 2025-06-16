@@ -1422,3 +1422,38 @@ describe("client hierarchy", () => {
     strictEqual(apiVersionParam.clientDefaultValue, "2025-01-05");
   });
 });
+
+it("operations under namespace or interface without @client or @operationGroup", async () => {
+  await runner.compile(`
+    @service
+    namespace Test;
+
+    @route("/a")
+    op a(): void;
+
+    namespace B {
+      @route("/b")
+      op b(): void;
+
+      interface C {
+        @route("/c")
+        op c(): void;
+      }
+    }
+
+    @operationGroup
+    interface D {
+      @route("/d")
+      op d(): void;
+    }
+  `);
+
+  const clients = listClients(runner.context);
+  strictEqual(clients.length, 1);
+  const client = clients[0];
+  strictEqual(listOperationsInOperationGroup(runner.context, client).length, 3);
+  const operationGroups = listOperationGroups(runner.context, client);
+  strictEqual(operationGroups.length, 1);
+  const operationGroup = operationGroups[0];
+  strictEqual(listOperationsInOperationGroup(runner.context, operationGroup).length, 1);
+});

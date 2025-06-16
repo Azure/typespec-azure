@@ -107,8 +107,32 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   while (queue.length > 0) {
     const group = queue.shift()!;
     if (group.type) {
+      // operations directly under the group
+      const operations = [...group.type.operations.values()];
+
+      // when there is explicitly `@operationGroup` or `@client`
+      // operations under namespace or interface that are not decoratored with `@operationGroup` or `@client`
+      // should be placed in the first accesster client or operation group
+      if (group.type.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
+        const innerQueue: Namespace[] = [group.type];
+        while (innerQueue.length > 0) {
+          const ns = innerQueue.shift()!;
+          for (const subNs of ns.namespaces.values()) {
+            if (!context.__rawClientsOperationGroupsCache.has(subNs)) {
+              operations.push(...subNs.operations.values());
+              innerQueue.push(subNs);
+            }
+          }
+          for (const iface of ns.interfaces.values()) {
+            if (!context.__rawClientsOperationGroupsCache.has(iface)) {
+              operations.push(...iface.operations.values());
+            }
+          }
+        }
+      }
+
       // add operations
-      for (const op of group.type.operations.values()) {
+      for (const op of operations) {
         // skip operations that are not in scope
         if (!isInScope(context, op)) {
           continue;
@@ -143,6 +167,12 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           context.__operationToClientCache.set(op, pushGroup);
         }
       }
+    }
+
+    if (group.type?.kind === "Namespace") {
+      [...group.type.namespaces.values()].filter(
+        (ns: Namespace) => !context.__rawClientsOperationGroupsCache!.has(ns),
+      );
     }
     queue.push(...group.subOperationGroups);
   }
