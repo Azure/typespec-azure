@@ -30,8 +30,22 @@ model WidgetProperties {
   provisioningState?: string;
 }
 
-// Empty model for optional body scenarios
-model EmptyRequest {}
+// Request models for optional body scenarios
+model UpdateRequest {
+  @doc("The name to update.")
+  name?: string;
+
+  @doc("The description to update.")
+  description?: string;
+}
+
+model ActionRequest {
+  @doc("The action type to perform.")
+  actionType?: string;
+
+  @doc("Additional action parameters.")
+  parameters?: string;
+}
 
 model ActionResult {
   @doc("The result of the action.")
@@ -108,7 +122,7 @@ interface OptionalBody {
     """)
   updateWithoutBody is Azure.ResourceManager.Legacy.CustomPatchSync<
     Widget,
-    EmptyRequest,
+    UpdateRequest,
     OptionalRequestBody = true
   >;
 
@@ -129,5 +143,5 @@ interface OptionalBody {
     }
     ```
     """)
-  actionWithoutBody is ArmResourceActionSync<Widget, void, ActionResult>;
+  actionWithoutBody is ArmResourceActionSync<Widget, ActionRequest, ActionResult, OptionalRequestBody = true>;
 }
