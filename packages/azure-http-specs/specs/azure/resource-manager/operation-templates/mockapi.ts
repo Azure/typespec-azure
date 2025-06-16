@@ -423,9 +423,6 @@ const validWidget = {
   },
 };
 
-let postPollCount = 0;
-let deletePollCount = 0;
-
 // GET operation
 Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSuccess({
   uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
