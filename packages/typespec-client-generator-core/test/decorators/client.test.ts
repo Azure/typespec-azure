@@ -1422,3 +1422,66 @@ describe("client hierarchy", () => {
     strictEqual(apiVersionParam.clientDefaultValue, "2025-01-05");
   });
 });
+
+it("operations under namespace or interface without @client or @operationGroup", async () => {
+  await runner.compile(`
+    @service
+    namespace Test;
+
+    @route("/a")
+    op a(): void;
+
+    namespace B {
+      @route("/b")
+      op b(): void;
+
+      interface C {
+        @route("/c")
+        op c(): void;
+      }
+    }
+
+    @operationGroup
+    interface D {
+      @route("/d")
+      op d(): void;
+    }
+  `);
+
+  const clients = listClients(runner.context);
+  strictEqual(clients.length, 1);
+  const client = clients[0];
+  strictEqual(listOperationsInOperationGroup(runner.context, client).length, 3);
+  const operationGroups = listOperationGroups(runner.context, client);
+  strictEqual(operationGroups.length, 1);
+  const operationGroup = operationGroups[0];
+  strictEqual(listOperationsInOperationGroup(runner.context, operationGroup).length, 1);
+});
+
+it("multiple @service with @client", async () => {
+  await runner.compile(`
+    @service
+    @client({ name: "MyService1Client" })
+    namespace MyService1 {
+      op foo(): void;
+    }
+
+    @service
+    @client({ name: "MyService2Client" })
+    namespace MyService2 {
+      op bar(): void;
+    }
+
+    @service
+    @client({ name: "MyService3Client" })
+    namespace MyService3 {
+      op bar(): void;
+    }
+  `);
+
+  const clients = listClients(runner.context);
+  deepStrictEqual(clients.length, 3);
+  deepStrictEqual(clients[0].name, "MyService1Client");
+  deepStrictEqual(clients[1].name, "MyService2Client");
+  deepStrictEqual(clients[2].name, "MyService3Client");
+});
