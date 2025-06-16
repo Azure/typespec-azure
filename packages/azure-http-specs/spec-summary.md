@@ -1603,6 +1603,97 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBody
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action operation using ArmResourceActionSync with no request body.
+This tests the optional body functionality where the request body is not sent.
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/actionWithoutBody
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body: None (empty body)
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "result": "Action completed successfully"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation to retrieve a widget.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation using Legacy.CustomPatchAsync with no request body.
+This tests the optional body functionality where the request body is not sent.
+
+Expected verb: PATCH  
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body: None (empty body)
+Expected status code: 202
+Expected response header: Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/patch_aao
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "InProgress"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
 ### Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate
 
 - Endpoint: `put https://management.azure.com`
