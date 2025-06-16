@@ -134,12 +134,6 @@
       "type": "object",
       "description": "Billing schedule.",
       "properties": {
-        "nextInvoiceDate": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Date when this resource is expected to be invoiced next.",
-          "readOnly": true
-        },
         "renewal": {
           "type": "string",
           "description": "Indicates the renewal behavior of this resource.",

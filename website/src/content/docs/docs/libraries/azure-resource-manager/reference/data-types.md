@@ -1148,11 +1148,10 @@ model Azure.ResourceManager.CommonTypes.BillingSchedule
 
 #### Properties
 
-| Name             | Type                                                                                         | Description                                              |
-| ---------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| nextInvoiceDate? | `utcDateTime`                                                                                | Date when this resource is expected to be invoiced next. |
-| renewal          | [`BillingRenewalType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingRenewalType) | Indicates the renewal behavior of this resource.         |
-| changes?         | `ResourceManager.CommonTypes.BillingScheduleChange[]`                                        | Schedules billing changes for this resource.             |
+| Name     | Type                                                                                         | Description                                      |
+| -------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| renewal  | [`BillingRenewalType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingRenewalType) | Indicates the renewal behavior of this resource. |
+| changes? | `ResourceManager.CommonTypes.BillingScheduleChange[]`                                        | Schedules billing changes for this resource.     |
 
 ### `BillingScheduleChange` {#Azure.ResourceManager.CommonTypes.BillingScheduleChange}
 

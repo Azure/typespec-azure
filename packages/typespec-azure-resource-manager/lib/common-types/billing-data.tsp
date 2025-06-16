@@ -75,12 +75,6 @@ model BillingData {
 @added(Versions.v6)
 model BillingSchedule {
   /**
-   * Date when this resource is expected to be invoiced next.
-   */
-  @visibility(Lifecycle.Read)
-  nextInvoiceDate?: utcDateTime;
-
-  /**
    * Indicates the renewal behavior of this resource.
    */
   renewal: BillingRenewalType = "Automatic";
@@ -145,6 +139,9 @@ union BillingState {
 
   /** Resource's billing is activated. */
   Active: "Active",
+
+  /** Resource's billing is warned. */
+  Warned: "Warned",
 
   /** Resource's billing is deactivated. */
   Inactive: "Inactive",
