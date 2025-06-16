@@ -8,6 +8,7 @@ import {
   ModelProperty,
   Namespace,
   Operation,
+  Program,
   RekeyableMap,
   Scalar,
   Type,
@@ -15,6 +16,7 @@ import {
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isService,
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
@@ -166,12 +168,13 @@ export const $client: ClientDecorator = (
   let service = options?.properties.get("service")?.type;
 
   if (service?.kind !== "Namespace") {
-    service = findClientService(target);
+    service = findClientService(context.program, target);
   }
 
   if (
     service === undefined ||
     service.kind !== "Namespace" ||
+    !isService(context.program, service) ||
     !service.decorators.some(
       (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
     )
@@ -195,10 +198,14 @@ export const $client: ClientDecorator = (
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
 
-function findClientService(client: Namespace | Interface): Namespace | Interface | undefined {
+function findClientService(
+  program: Program,
+  client: Namespace | Interface,
+): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
     if (
+      isService(program, current) ||
       client.decorators.some(
         (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
       )
