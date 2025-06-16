@@ -12,8 +12,8 @@
      - Examine the `main.tsp` and `client.tsp` files in the [specs repository][spector-tests]
      - Review the `mockapi.ts` files in the [specs repository][spector-tests]
      - Read descriptions of existing tests and mockapis in the [spec summary][spector-description]
-  
-  > **IMPORTANT:** When researching or implementing a feature, ONLY look at examples within the `packages/azure-http-specs/specs` directory. DO NOT search for or use code from other packages as references for implementation.
+
+> **IMPORTANT:** When researching or implementing a feature, ONLY look at examples within the `packages/azure-http-specs/specs` directory. DO NOT search for or use code from other packages as references for implementation.
 
 2. **IMPLEMENTATION REQUIREMENTS**
 
