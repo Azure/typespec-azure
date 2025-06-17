@@ -607,6 +607,7 @@ describe("typespec-autorest: operations", () => {
       `);
 
     strictEqual(res.paths["/test-interface"].get.operationId, "TargetInterface_TestOperation");
+    // Original operation in the target interface should use its interface name as prefix
     strictEqual(res.paths["/target-op"].get.operationId, "TargetInterface_TargetOperation");
   });
 
