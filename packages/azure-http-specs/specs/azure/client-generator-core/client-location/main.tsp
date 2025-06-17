@@ -21,7 +21,7 @@ namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation;
   - Interface AdminOperations should contain operations `getAdminInfo` and `deleteUser` (moved from UserOperations)
   """)
 @scenario
-namespace MoveToExistingGroup {
+namespace MoveToExistingSubClient {
   interface UserOperations {
     @route("/user")
     @get
@@ -44,14 +44,14 @@ namespace MoveToExistingGroup {
 @scenarioDoc("""
   Test moving an operation to a new sub client specified by string name.
   
-  Operation `archiveProduct` from interface `ProductOperations` should be moved to a new group named "ArchiveOperations" using @clientLocation("ArchiveOperations").
+  Operation `archiveProduct` from interface `ProductOperations` should be moved to a new sub client named "ArchiveOperations" using @clientLocation("ArchiveOperations").
   
   Expected client structure:
   - Interface ProductOperations should contain only operation `listProducts`  
-  - A new group "ArchiveOperations" should be created containing operation `archiveProduct`
+  - A new sub client "ArchiveOperations" should be created containing operation `archiveProduct`
   """)
 @scenario
-namespace MoveToNewGroup {
+namespace MoveToNewSubClient {
   interface ProductOperations {
     @route("/products")
     @get
