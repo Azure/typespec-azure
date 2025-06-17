@@ -124,15 +124,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
   // normal paging
   if (isList(context.program, operation)) {
-    const clientPagingMetadata = $(context.program).operation.getPagingClientMetadata(
+    const pagingMetadata = $(context.program).operation.getPagingMetadata(
       getOverriddenClientMethod(context, operation) ?? operation,
     );
 
-    if (
-      responseType?.__raw?.kind !== "Model" ||
-      responseType.kind !== "model" ||
-      !clientPagingMetadata
-    ) {
+    if (responseType?.__raw?.kind !== "Model" || responseType.kind !== "model" || !pagingMetadata) {
       diagnostics.add(
         createDiagnostic({
           code: "unexpected-pageable-operation-return-type",
@@ -151,15 +147,15 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     }
 
     const resultSegments = mapFirstSegmentForResultSegments(
-      clientPagingMetadata.pageItemsSegments,
+      pagingMetadata.output.pageItems.path,
       baseServiceMethod.response,
     );
     const nextLinkSegments = mapFirstSegmentForResultSegments(
-      clientPagingMetadata.nextLinkSegments,
+      pagingMetadata.output.nextLink?.path,
       baseServiceMethod.response,
     );
     const continuationTokenResponseSegments = mapFirstSegmentForResultSegments(
-      clientPagingMetadata.continuationTokenResponseSegments,
+      pagingMetadata.output.continuationToken?.path,
       baseServiceMethod.response,
     );
 
@@ -168,12 +164,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     );
 
     context.__pagedResultSet.add(responseType);
-    const pagingMetadata = $(context.program).operation.getPagingMetadata(operation);
     // tcgc will let all paging method return a list of items
     baseServiceMethod.response.type = diagnostics.pipe(
       getClientTypeWithDiagnostics(
         context,
-        pagingMetadata!.output.pageItems.property.type,
+        pagingMetadata.output.pageItems.property.type,
         operation,
       ),
     );
@@ -188,10 +183,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__responseHeaderCache.get(segment) ??
             context.__modelPropertyCache.get(segment)!,
         ),
-        continuationTokenParameterSegments:
-          clientPagingMetadata.continuationTokenParameterSegments?.map(
-            (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
-          ),
+        continuationTokenParameterSegments: pagingMetadata.input.continuationToken?.path.map(
+          (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
+        ),
         continuationTokenResponseSegments: continuationTokenResponseSegments?.map(
           (segment) =>
             context.__responseHeaderCache.get(segment) ??
@@ -610,7 +604,7 @@ export function getSdkMethodParameter(
   if (!property) {
     if (operation) {
       const clientParams = operation
-        ? context.__clientToParameters.get(getLocationOfOperation(operation))
+        ? context.__clientParametersCache.get(context.getClientForOperation(operation))
         : undefined;
       const correspondingClientParams = clientParams?.find((x) =>
         twoParamsEquivalent(context, x.__raw, type),
