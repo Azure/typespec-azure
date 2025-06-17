@@ -14,29 +14,29 @@ namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation;
 @scenarioDoc("""
   Test moving an operation from one operation group to another existing operation group.
   
-  Operation `a2` from interface `A` should be moved to interface `B` using @clientLocation(B).
+  Operation `deleteUser` from interface `UserOperations` should be moved to interface `AdminOperations` using @clientLocation(AdminOperations).
   
   Expected client structure:
-  - Interface A should contain only operation `a1`
-  - Interface B should contain operations `b` and `a2` (moved from A)
+  - Interface UserOperations should contain only operation `getUser`
+  - Interface AdminOperations should contain operations `getAdminInfo` and `deleteUser` (moved from UserOperations)
   """)
 @scenario
 namespace MoveToExistingGroup {
-  interface A {
-    @route("/a1")
+  interface UserOperations {
+    @route("/user")
     @get
-    a1(): void;
+    getUser(): void;
 
-    @route("/a2")
-    @get
-    @clientLocation(B)
-    a2(): void;
+    @route("/user")
+    @delete
+    @clientLocation(AdminOperations)
+    deleteUser(): void;
   }
 
-  interface B {
-    @route("/b")
+  interface AdminOperations {
+    @route("/admin")
     @get
-    b(): void;
+    getAdminInfo(): void;
   }
 }
 
@@ -44,23 +44,23 @@ namespace MoveToExistingGroup {
 @scenarioDoc("""
   Test moving an operation to a new operation group specified by string name.
   
-  Operation `a2` from interface `A` should be moved to a new group named "NewGroup" using @clientLocation("NewGroup").
+  Operation `archiveProduct` from interface `ProductOperations` should be moved to a new group named "ArchiveOperations" using @clientLocation("ArchiveOperations").
   
   Expected client structure:
-  - Interface A should contain only operation `a1`  
-  - A new group "NewGroup" should be created containing operation `a2`
+  - Interface ProductOperations should contain only operation `listProducts`  
+  - A new group "ArchiveOperations" should be created containing operation `archiveProduct`
   """)
 @scenario
 namespace MoveToNewGroup {
-  interface A {
-    @route("/move-to-new/a1")
+  interface ProductOperations {
+    @route("/products")
     @get
-    a1(): void;
+    listProducts(): void;
 
-    @route("/move-to-new/a2")
-    @get
-    @clientLocation("NewGroup")
-    a2(): void;
+    @route("/products/archive")
+    @post
+    @clientLocation("ArchiveOperations")
+    archiveProduct(): void;
   }
 }
 
@@ -68,22 +68,22 @@ namespace MoveToNewGroup {
 @scenarioDoc("""
   Test moving an operation to the root client.
   
-  Operation `a2` from interface `A` should be moved to the root client using @clientLocation(service namespace).
+  Operation `getHealthStatus` from interface `ResourceOperations` should be moved to the root client using @clientLocation(service namespace).
   
   Expected client structure:
-  - Interface A should contain only operation `a1`
-  - Root client should contain operation `a2` (moved from A)
+  - Interface ResourceOperations should contain only operation `getResource`
+  - Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
   """)
 @scenario
 namespace MoveToRootClient {
-  interface A {
-    @route("/move-to-root/a1")
+  interface ResourceOperations {
+    @route("/resource")
     @get
-    a1(): void;
+    getResource(): void;
 
-    @route("/move-to-root/a2")
+    @route("/health")
     @get
     @clientLocation(_Specs_.Azure.ClientGenerator.Core.ClientLocation)
-    a2(): void;
+    getHealthStatus(): void;
   }
 }

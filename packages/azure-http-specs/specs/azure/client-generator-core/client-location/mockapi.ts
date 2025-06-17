@@ -5,7 +5,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 // Scenario 1: Move to existing group - Mock responses
 Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingGroup = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/client-location/a1",
+    uri: "/azure/client-generator-core/client-location/user",
     method: "get",
     request: {},
     response: {
@@ -14,8 +14,8 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingGroup = passOn
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/client-location/a2",
-    method: "get",
+    uri: "/azure/client-generator-core/client-location/user",
+    method: "delete",
     request: {},
     response: {
       status: 204,
@@ -23,7 +23,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingGroup = passOn
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/client-location/b",
+    uri: "/azure/client-generator-core/client-location/admin",
     method: "get",
     request: {},
     response: {
@@ -36,7 +36,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingGroup = passOn
 // Scenario 2: Move to new group - Mock responses
 Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToNewGroup = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/client-location/move-to-new/a1",
+    uri: "/azure/client-generator-core/client-location/products",
     method: "get",
     request: {},
     response: {
@@ -45,8 +45,8 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToNewGroup = passOnSucce
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/client-location/move-to-new/a2",
-    method: "get",
+    uri: "/azure/client-generator-core/client-location/products/archive",
+    method: "post",
     request: {},
     response: {
       status: 204,
@@ -58,7 +58,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToNewGroup = passOnSucce
 // Scenario 3: Move to root client - Mock responses
 Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/client-location/move-to-root/a1",
+    uri: "/azure/client-generator-core/client-location/resource",
     method: "get",
     request: {},
     response: {
@@ -67,7 +67,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient = passOnSuc
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/client-location/move-to-root/a2",
+    uri: "/azure/client-generator-core/client-location/health",
     method: "get",
     request: {},
     response: {
