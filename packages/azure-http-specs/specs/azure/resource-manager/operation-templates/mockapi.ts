@@ -6,6 +6,7 @@ import {
   passOnSuccess,
   ScenarioMockApi,
   ValidationError,
+  withServiceKeys,
 } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
@@ -444,48 +445,150 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSucc
   kind: "MockApiDefinition",
 });
 
-// PATCH operation with optional body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody = passOnSuccess({
-  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
-  method: "patch",
-  request: {
-    pathParams: {
-      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-      resourceGroup: RESOURCE_GROUP_EXPECTED,
-      widgetName: "widget1",
+// PATCH operation with optional body - test both with and without body
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody = withServiceKeys(
+  ["EmptyBody", "WithBody"],
+).pass([
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
+    method: "patch",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        widgetName: "widget1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      // No body for empty body scenario
     },
-    query: {
-      "api-version": "2023-12-01-preview",
+    response: {
+      status: 200,
+      body: json(validWidget),
     },
-    // No body expected for optional body scenarios
+    handler: (req: MockRequest) => {
+      return {
+        pass: "EmptyBody",
+        status: 200,
+        body: json(validWidget),
+      };
+    },
+    kind: "MockApiDefinition",
   },
-  response: {
-    status: 200,
-    body: json(validWidget),
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
+    method: "patch",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        widgetName: "widget1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        name: "updated-widget",
+        description: "Updated description",
+      }),
+    },
+    response: {
+      status: 200,
+      body: json({
+        ...validWidget,
+        properties: {
+          ...validWidget.properties,
+          name: "updated-widget",
+          description: "Updated description",
+        },
+      }),
+    },
+    handler: (req: MockRequest) => {
+      return {
+        pass: "WithBody",
+        status: 200,
+        body: json({
+          ...validWidget,
+          properties: {
+            ...validWidget.properties,
+            name: "updated-widget",
+            description: "Updated description",
+          },
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
   },
-  kind: "MockApiDefinition",
-});
+]);
 
-// POST action operation with no body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBody = passOnSuccess({
-  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/actionWithoutBody",
-  method: "post",
-  request: {
-    pathParams: {
-      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-      resourceGroup: RESOURCE_GROUP_EXPECTED,
-      widgetName: "widget1",
+// POST action operation with optional body - test both with and without body
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBody = withServiceKeys(
+  ["EmptyBody", "WithBody"],
+).pass([
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/actionWithoutBody",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        widgetName: "widget1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      // No body for empty body scenario
     },
-    query: {
-      "api-version": "2023-12-01-preview",
+    response: {
+      status: 200,
+      body: json({
+        result: "Action completed successfully",
+      }),
     },
-    // No body expected for optional body scenarios
+    handler: (req: MockRequest) => {
+      return {
+        pass: "EmptyBody",
+        status: 200,
+        body: json({
+          result: "Action completed successfully",
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
   },
-  response: {
-    status: 200,
-    body: json({
-      result: "Action completed successfully",
-    }),
+  {
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/actionWithoutBody",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        widgetName: "widget1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        actionType: "perform",
+        parameters: "test-parameters",
+      }),
+    },
+    response: {
+      status: 200,
+      body: json({
+        result: "Action completed successfully with parameters",
+      }),
+    },
+    handler: (req: MockRequest) => {
+      return {
+        pass: "WithBody",
+        status: 200,
+        body: json({
+          result: "Action completed successfully with parameters",
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
   },
-  kind: "MockApiDefinition",
-});
+]);
