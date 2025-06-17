@@ -529,7 +529,7 @@ model MyModel {
   scoped: armResourceIdentifier<[
     {
       type: "Microsoft.Compute/vm";
-      scopes: ["tenant", "resourceGroup"];
+      scopes: ["Tenant", "ResourceGroup"];
     }
   ]>;
 }
