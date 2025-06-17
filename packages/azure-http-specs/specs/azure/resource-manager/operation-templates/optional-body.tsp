@@ -199,12 +199,7 @@ interface OptionalBody {
     }
     ```
     """)
-  post is ArmResourceActionSync<
-    Widget,
-    ActionRequest,
-    ActionResult,
-    OptionalRequestBody = true
-  >;
+  post is ArmResourceActionSync<Widget, ActionRequest, ActionResult, OptionalRequestBody = true>;
 
   @scenario
   @scenarioDoc("""

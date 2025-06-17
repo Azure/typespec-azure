@@ -1609,6 +1609,7 @@ Expected response body:
 
 Resource POST action operation using ArmResourceActionSync with optional request body.
 This tests the optional body functionality in two scenarios:
+
 1. Empty body scenario: Request body is not sent
 2. With body scenario: Request body contains action data
 
@@ -1642,6 +1643,7 @@ Expected response body (with body scenario):
 
 Provider POST action operation using ArmProviderActionSync with optional request body.
 This tests the optional body functionality for subscription-scoped provider actions in two scenarios:
+
 1. Empty body scenario: Request body is not sent (uses default allowance)
 2. With body scenario: Request body contains allowance change data
 
@@ -1711,6 +1713,7 @@ Expected response body:
 
 Resource PATCH operation using Legacy.CustomPatchSync with optional request body.
 This tests the optional body functionality in two scenarios:
+
 1. Empty body scenario: Request body is not sent
 2. With body scenario: Request body contains update data
 
