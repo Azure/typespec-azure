@@ -446,9 +446,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSucc
 });
 
 // PATCH operation with optional body - test both with and without body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServiceKeys(
-  ["EmptyBody", "WithBody"],
-).pass([
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServiceKeys([
+  "EmptyBody",
+  "WithBody",
+]).pass([
   {
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
     method: "patch",
@@ -523,9 +524,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
 ]);
 
 // POST action operation with optional body - test both with and without body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServiceKeys(
-  ["EmptyBody", "WithBody"],
-).pass([
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServiceKeys([
+  "EmptyBody",
+  "WithBody",
+]).pass([
   {
     uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/post",
     method: "post",
