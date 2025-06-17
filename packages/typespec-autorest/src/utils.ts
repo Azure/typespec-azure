@@ -90,21 +90,16 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
     if (typeof clientLocation === "string") {
       return pascalCaseForOperationId(`${clientLocation}_${operationName}`);
     }
-    
+
     // Case 1: If the target is an Interface, use the interface name as the prefix
     if (clientLocation.kind === "Interface") {
-      return pascalCaseForOperationId(
-        `${getClientName(context, clientLocation)}_${operationName}`,
-      );
+      return pascalCaseForOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
     }
-    
+
     // Case 2: If the target is a Namespace
     if (clientLocation.kind === "Namespace") {
       // If the target is the service namespace or global namespace, use the operation name as the operation ID
-      if (
-        isGlobalNamespace(program, clientLocation) ||
-        isService(program, clientLocation)
-      ) {
+      if (isGlobalNamespace(program, clientLocation) || isService(program, clientLocation)) {
         return pascalCase(operationName);
       }
       // If the target is not the service namespace or global namespace, use the namespace name as the prefix
