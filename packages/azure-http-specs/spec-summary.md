@@ -144,7 +144,7 @@ Expected response body:
 
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
-The other models are override to roundtrip, so they should be generated and exported as well.
+The other models are additive to roundtrip, so they should be generated and exported as well.
 
 ### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
 
