@@ -6,13 +6,13 @@ using Http;
 using Spector;
 using Azure.ClientGenerator.Core;
 
-@doc("Test for @clientLocation decorator - moving operations between client operation groups")
+@doc("Test for @clientLocation decorator - moving operations between clients")
 @scenarioService("/azure/client-generator-core/client-location")
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation;
 
-// Scenario 1: Move an operation to another operation group (existing interface)
+// Scenario 1: Move an operation to another sub client (existing interface)
 @scenarioDoc("""
-  Test moving an operation from one operation group to another existing operation group.
+  Test moving an operation from one sub client to another existing sub client.
   
   Operation `deleteUser` from interface `UserOperations` should be moved to interface `AdminOperations` using @clientLocation(AdminOperations).
   
@@ -40,9 +40,9 @@ namespace MoveToExistingGroup {
   }
 }
 
-// Scenario 2: Move an operation to a new operation group (string name)
+// Scenario 2: Move an operation to a new sub client (string name)
 @scenarioDoc("""
-  Test moving an operation to a new operation group specified by string name.
+  Test moving an operation to a new sub client specified by string name.
   
   Operation `archiveProduct` from interface `ProductOperations` should be moved to a new group named "ArchiveOperations" using @clientLocation("ArchiveOperations").
   
