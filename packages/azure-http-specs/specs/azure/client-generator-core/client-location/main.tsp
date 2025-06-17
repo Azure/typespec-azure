@@ -25,18 +25,18 @@ namespace MoveToExistingGroup {
   interface A {
     @route("/a1")
     @get
-    op a1(): void;
+    a1(): void;
 
     @route("/a2")
     @get
     @clientLocation(B)
-    op a2(): void;
+    a2(): void;
   }
 
   interface B {
     @route("/b")
     @get
-    op b(): void;
+    b(): void;
   }
 }
 
@@ -55,12 +55,12 @@ namespace MoveToNewGroup {
   interface A {
     @route("/move-to-new/a1")
     @get
-    op a1(): void;
+    a1(): void;
 
     @route("/move-to-new/a2")
     @get
     @clientLocation("NewGroup")
-    op a2(): void;
+    a2(): void;
   }
 }
 
@@ -79,11 +79,11 @@ namespace MoveToRootClient {
   interface A {
     @route("/move-to-root/a1")
     @get
-    op a1(): void;
+    a1(): void;
 
     @route("/move-to-root/a2")
     @get
     @clientLocation(_Specs_.Azure.ClientGenerator.Core.ClientLocation)
-    op a2(): void;
+    a2(): void;
   }
 }
