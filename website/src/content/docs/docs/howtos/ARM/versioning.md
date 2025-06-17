@@ -4,21 +4,6 @@ title: Versioning
 
 This document explains how to manage versioning in TypeSpec projects, including how to add, remove, or modify resources, operations, and properties across API versions.
 
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Declaring Versions](#declaring-versions)
-- [Versioning Decorators](#versioning-decorators)
-  - [@added](#added)
-  - [@removed](#removed)
-  - [@madeRequired and @madeOptional](#maderequired-and-madeoptional)
-  - [@typeChangedFrom](#typechangedfrom)
-  - [@renamedFrom](#renamedfrom)
-  - [@returnTypeChangedFrom](#returntypechangedfrom)
-- [Complex Scenarios](#complex-scenarios)
-
----
-
 ## Introduction
 
 Versioning allows you to evolve your API without breaking existing clients. By using versioning decorators, you can specify when resources, operations, or properties are added, removed, or changed.
@@ -42,7 +27,7 @@ enum Versions {
 }
 ```
 
-After defining your enum, link it to your namespace using the `@versioned` decorator:
+After defining your enum, link it to your namespace with the `@versioned` decorator:
 
 ```tsp
 @versioned(Versions)
@@ -55,14 +40,14 @@ namespace Microsoft.ContosoProviderHub;
 
 ### @added
 
-Use `@added(Versions.version)` to add resources, operations, or properties in a specific version and all subsequent versions.
+You can add new models, properties, or operations in a specific version and all subsequent versions using the `@added` decorator.
 
-- The `version` argument is the version where the element was introduced.
+- The `version` argument is the version where the element is introduced.
 - The element will be present in that version and all later versions.
 
 **Example: Adding a model and property across versions**
 
-Suppose you want to add a new model and then add a property to it in a later version:
+For example, suppose you want to add a new model and then add a property to it in a later version:
 
 ```tsp
 // v1: No Employee model exists
@@ -96,12 +81,14 @@ interface Employees {
 
 ### @removed
 
-Use `@removed(Versions.version)` to remove models, properties, or operations starting from a specific version.
+To remove models, properties, or operations starting from a specific version, use the `@removed` decorator.
 
 - The `version` argument is the version where the element is removed.
 - The element will not be present in that version or any later versions.
 
 **Example: Removing a property and a model across versions**
+
+For example:
 
 ```tsp
 // v1: Employee model with 'city' property
@@ -138,12 +125,14 @@ interface Employees {
 
 ### @madeRequired and @madeOptional
 
-Use these decorators to change a property’s required/optional status in a specific version.
+Use these decorators to change whether a property is required or optional in a specific version.
 
 - Use `@madeOptional(Versions.version)` to make a property optional starting in that version.
 - Use `@madeRequired(Versions.version)` to make a property required starting in that version.
 
 **Example: Changing a property from required to optional, then back to required**
+
+For example:
 
 ```tsp
 // v1: movingStatus is required
@@ -160,12 +149,14 @@ model MoveResponse {
 
 ### @renamedFrom
 
-Use `@renamedFrom(version, oldName)` to rename models, properties, operations, enums, etc.
+Use `@renamedFrom` to rename models, properties, operations, enums, etc., in a specific version.
 
 - The `version` argument is the version where the name changed.
 - The `oldName` argument is the previous name.
 
 **Example: Renaming a property and a model across versions**
+
+For example:
 
 ```tsp
 // v1: Model and property have original names
@@ -210,9 +201,11 @@ model Worker {
 
 ## Complex Scenarios
 
-### Adding decoration to an existing type
+---
 
-Decorators themselves do not directly support versioning, but you can use other approaches to achieve versioned changes in decorator usage.
+### Adding Decoration to an Existing Type
+
+This scenario demonstrates how to change a decorator’s usage across versions.
 
 Suppose you have a model property with a decorator:
 
@@ -223,7 +216,7 @@ model Employee {
 }
 ```
 
-In the next version (v2), the visibility changes so that the property can be read or created. To achieve this, you can use a combination of @removed, @added, and @renamedFrom decorators:
+In the next version (v2), the visibility changes so that the property can be read or created. To achieve this, you can use a combination of `@removed`, `@added`, and `@renamedFrom` decorators:
 
 ```tsp
 model Employee {
@@ -239,6 +232,8 @@ model Employee {
 ```
 
 ### Adding a Parameter to an Operation and Making Another Parameter Optional
+
+This scenario shows how to add a parameter and make another optional in an operation.
 
 Suppose you start with the following operation in v1:
 
@@ -275,3 +270,46 @@ interface Employees {
 
 - `@madeOptional(Versions.v2)` makes `identifier` optional starting in v2.
 - `@added(Versions.v2)` adds the `field` parameter in v2 and later.
+
+### Converting an Operation from Synchronous to Asynchronous
+
+This scenario illustrates converting a synchronous operation to an asynchronous one across versions.
+
+Suppose you start with the following synchronous operation in `v1`:
+
+```tsp
+@armResourceOperations
+interface Employees {
+  @sharedRoute
+  @put
+  createUpdateEmployee(@path id: string, @bodyRoot body: Employee): Employee | ErrorResponse;
+}
+```
+
+In version `v2`, you update this operation to be asynchronous as follows:
+
+```tsp
+@armResourceOperations
+interface Employees {
+  @removed(Versions.v2)
+  @renamedFrom(Versions.v2, "createUpdateEmployee")
+  @sharedRoute
+  @put
+  createUpdateEmployeeOld(@path id: string, @bodyRoot body: Employee): Employee | ErrorResponse;
+
+  @added(Versions.v2)
+  @sharedRoute
+  @put
+  createUpdateEmployee(
+    @path id: string,
+    @bodyRoot body: Employee,
+  ): ArmAcceptedLroResponse<"Resource operation accepted."> | ArmResourceUpdatedResponse<Employee> | ErrorResponse;
+}
+```
+
+**Explanation:**
+
+- `@removed(Versions.v2)` removes the original synchronous operation in v2 and later.
+- `@renamedFrom(Versions.v2, "createUpdateEmployee")` keeps the original name for v1.
+- `@added(Versions.v2)` adds the new asynchronous operation in v2 and later.
+- `@sharedRoute` ensures both operations can use the same route.
