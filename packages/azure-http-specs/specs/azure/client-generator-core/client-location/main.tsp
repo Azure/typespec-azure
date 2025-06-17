@@ -29,7 +29,7 @@ namespace MoveToExistingSubClient {
 
     @route("/user")
     @delete
-    @clientLocation(AdminOperations)
+    @global.Azure.ClientGenerator.Core.clientLocation(AdminOperations)
     deleteUser(): void;
   }
 
@@ -59,7 +59,7 @@ namespace MoveToNewSubClient {
 
     @route("/products/archive")
     @post
-    @clientLocation("ArchiveOperations")
+    @global.Azure.ClientGenerator.Core.clientLocation("ArchiveOperations")
     archiveProduct(): void;
   }
 }
@@ -83,7 +83,9 @@ namespace MoveToRootClient {
 
     @route("/health")
     @get
-    @clientLocation(_Specs_.Azure.ClientGenerator.Core.ClientLocation)
+    @global.Azure.ClientGenerator.Core.clientLocation(
+      _Specs_.Azure.ClientGenerator.Core.ClientLocation
+    )
     getHealthStatus(): void;
   }
 }
