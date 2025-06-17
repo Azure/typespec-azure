@@ -1,15 +1,19 @@
 import {
+  getClientLocation,
   getClientNameOverride,
+  hasExplicitClientOrOperationGroup,
   type TCGCContext,
 } from "@azure-tools/typespec-client-generator-core";
 import {
   getFriendlyName,
   getLifecycleVisibilityEnum,
   getVisibilityForClass,
+  Interface,
   isGlobalNamespace,
   isService,
   isTemplateInstance,
   ModelProperty,
+  Namespace,
   Operation,
   Program,
   Service,
@@ -61,6 +65,11 @@ export function shouldInline(program: Program, type: Type): boolean {
 /**
  * Resolve the OpenAPI operation ID for the given operation using the following logic:
  * - If @operationId was specified use that value
+ * - If @clientLocation was specified and there are no explicit @client or @operationGroup decorators:
+ *   - If the target is a string, use the string value as the prefix of the operation ID
+ *   - If the target is an Interface, use the interface name as the prefix
+ *   - If the target is a Namespace and it's not the service namespace or global namespace, use the namespace name as the prefix
+ *   - If the target is the service namespace or global namespace, use the operation name as the operation ID
  * - If operation is defined at the root or under the service namespace return `<operation.name>`
  * - Otherwise(operation is under another namespace or interface) return `<namespace/interface.name>_<operation.name>`
  *
@@ -76,6 +85,37 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
   }
 
   const operationName = getClientName(context, operation);
+
+  // Check for @clientLocation decorator if no explicit @client or @operationGroup decorators are present
+  const clientLocation = getClientLocation(context.tcgcSdkContext, operation);
+  if (!hasExplicitClientOrOperationGroup(context.tcgcSdkContext) && clientLocation) {
+    // Case 3: If the target is a string, use the string value as the prefix of the operation ID
+    if (typeof clientLocation === "string") {
+      return pascalCaseForOperationId(`${clientLocation}_${operationName}`);
+    }
+    
+    // Case 1: If the target is an Interface, use the interface name as the prefix
+    if (clientLocation.kind === "Interface") {
+      return pascalCaseForOperationId(
+        `${getClientName(context, clientLocation)}_${operationName}`,
+      );
+    }
+    
+    // Case 2: If the target is a Namespace
+    if (clientLocation.kind === "Namespace") {
+      // If the target is the service namespace or global namespace, use the operation name as the operation ID
+      if (
+        isGlobalNamespace(program, clientLocation) ||
+        isService(program, clientLocation)
+      ) {
+        return pascalCase(operationName);
+      }
+      // If the target is not the service namespace or global namespace, use the namespace name as the prefix
+      return pascalCaseForOperationId(`${clientLocation.name}_${operationName}`);
+    }
+  }
+
+  // Original logic: handle interface and namespace cases
   if (operation.interface) {
     return pascalCaseForOperationId(
       `${getClientName(context, operation.interface)}_${operationName}`,
