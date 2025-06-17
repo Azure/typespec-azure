@@ -28,7 +28,7 @@ namespace ModelInOperation {
   }
 
   @doc("""
-    Expected body parameter: 
+    Expected body parameter:
     ```json
     {
       "name": "Madge"
@@ -48,7 +48,7 @@ namespace ModelInOperation {
   }
 
   @doc("""
-    Expected response body: 
+    Expected response body:
     ```json
     {
       "name": "Madge"
@@ -70,14 +70,14 @@ namespace ModelInOperation {
 
   @doc("""
     "ResultModel" should be usage=output, as it is read-only and does not exist in request body.
-    
-    Expected body parameter: 
+
+    Expected body parameter:
     ```json
     {
     }
     ```
-    
-    Expected response body: 
+
+    Expected response body:
     ```json
     {
       "result": {
@@ -94,8 +94,8 @@ namespace ModelInOperation {
 
   @doc("""
     Serialize the 'OrphanModel' as request body.
-    
-    Expected body parameter: 
+
+    Expected body parameter:
     ```json
     {
       "name": "name",
@@ -116,6 +116,6 @@ model OrphanModel {
   @global.Azure.ClientGenerator.Core.clientName("modelName")
   name: string;
 
-  @encodedName("application/json", "desc")  
+  @encodedName("application/json", "desc")
   description: string;
 }
