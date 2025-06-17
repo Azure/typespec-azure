@@ -3,6 +3,7 @@ import {
   EmitContext,
   emitFile,
   Enum,
+  Interface,
   listServices,
   Model,
   ModelProperty,
@@ -16,12 +17,14 @@ import {
 import { HttpOperation } from "@typespec/http";
 import { getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
+import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
 import {
   getKnownScalars,
   SdkArrayType,
   SdkBodyModelPropertyType,
+  SdkClient,
   SdkContext,
   SdkDictionaryType,
   SdkEnumType,
@@ -29,6 +32,7 @@ import {
   SdkMethodParameter,
   SdkModelType,
   SdkNullableType,
+  SdkOperationGroup,
   SdkServiceOperation,
   SdkServiceResponseHeader,
   SdkUnionType,
@@ -76,9 +80,9 @@ export function createTCGCContext(
     __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
-    __clientToParameters: new Map(),
+    __clientParametersCache: new Map(),
     __tspTypeToApiVersions: new Map(),
-    __clientToApiVersionClientDefaultValue: new Map(),
+    __clientApiVersionDefaultValueCache: new Map(),
     __knownScalars: getKnownScalars(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
@@ -138,6 +142,34 @@ export function createTCGCContext(
         return undefined;
       }
       return getVersions(this.program, namespaces[0])[1]?.getVersions()?.[0].enumMember.enum;
+    },
+    getClients(): SdkClient[] {
+      if (!this.__rawClientsOperationGroupsCache) {
+        prepareClientAndOperationCache(this);
+      }
+      return Array.from(this.__rawClientsOperationGroupsCache!.values()).filter(
+        (item) => item.kind === "SdkClient",
+      );
+    },
+    getClientOrOperationGroup(
+      type: Namespace | Interface,
+    ): SdkClient | SdkOperationGroup | undefined {
+      if (!this.__rawClientsOperationGroupsCache) {
+        prepareClientAndOperationCache(this);
+      }
+      return this.__rawClientsOperationGroupsCache!.get(type);
+    },
+    getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[] {
+      if (!this.__clientToOperationsCache) {
+        prepareClientAndOperationCache(this);
+      }
+      return this.__clientToOperationsCache!.get(client)!;
+    },
+    getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup {
+      if (!this.__operationToClientCache) {
+        prepareClientAndOperationCache(this);
+      }
+      return this.__operationToClientCache!.get(operation)!;
     },
   };
 }

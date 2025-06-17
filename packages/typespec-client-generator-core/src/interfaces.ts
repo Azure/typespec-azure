@@ -61,11 +61,16 @@ export interface TCGCContext {
   __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
-  __clientToParameters: Map<Interface | Namespace, SdkMethodParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
-  __rawClients?: SdkClient[];
+  __rawClientsOperationGroupsCache?: Map<
+    Namespace | Interface | string,
+    SdkClient | SdkOperationGroup
+  >;
+  __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
+  __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
+  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
+  __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
@@ -77,6 +82,10 @@ export interface TCGCContext {
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): string[];
   getPackageVersionEnum(): Enum | undefined;
+  getClients(): SdkClient[];
+  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
+  getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
+  getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
 }
 
 export interface SdkContext<
@@ -94,16 +103,17 @@ export interface SdkClient {
   name: string;
   service: Namespace;
   type: Namespace | Interface;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  subOperationGroups: SdkOperationGroup[];
 }
 
 export interface SdkOperationGroup {
   kind: "SdkOperationGroup";
-  type: Namespace | Interface;
-  subOperationGroups?: SdkOperationGroup[];
+  type?: Namespace | Interface;
+  subOperationGroups: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
-  hasOperations?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -116,23 +126,23 @@ export enum UsageFlags {
   Input = 1 << 1,
   Output = 1 << 2,
   ApiVersionEnum = 1 << 3,
-  // Input and Json will also be set when JsonMergePatch is set.
+  /** Input and Json will also be set when JsonMergePatch is set. */
   JsonMergePatch = 1 << 4,
-  // Input will also be set when MultipartFormData is set.
+  /** Input will also be set when MultipartFormData is set. */
   MultipartFormData = 1 << 5,
-  // Used in spread.
+  /** Used in spread. */
   Spread = 1 << 6,
-  // Set when type is used in conjunction with an application/json content type.
+  /** Set when type is used in conjunction with an application/json content type. */
   Json = 1 << 8,
-  // Set when type is used in conjunction with an application/xml content type.
+  /** Set when type is used in conjunction with an application/xml content type. */
   Xml = 1 << 9,
-  // Set when type is used for exception output.
+  /** Set when type is used for exception output. */
   Exception = 1 << 10,
-  // Set when type is used as LRO initial response.
+  /** Set when type is used as LRO initial response. */
   LroInitial = 1 << 11,
-  // Set when type is used as LRO polling response.
+  /** Set when type is used as LRO polling response. */
   LroPolling = 1 << 12,
-  // Set when type is used as LRO final envelop response.
+  /** Set when type is used as LRO final envelop response. */
   LroFinalEnvelope = 1 << 13,
 }
 
@@ -161,44 +171,62 @@ export interface ClientInitializationOptions {
 // Types for TCGC specific type  graph
 
 interface DecoratedType {
-  // Client types sourced from TypeSpec decorated types will have this generic decoratores list.
-  // Only decorators in allowed list will be included in this list.
-  // Language's emitter could set `additionalDecorators` in the option when `createSdkContext` to extend the allowed list.
+  /**
+   * Client types sourced from TypeSpec decorated types will have this generic decoratores list.
+   * Only decorators in allowed list will be included in this list.
+   * Language's emitter could set `additionalDecorators` in the option when `createSdkContext` to extend the allowed list.
+   */
   decorators: DecoratorInfo[];
 }
 
 export interface DecoratorInfo {
-  // Fully qualified name of the decorator. For example, `TypeSpec.@encode`, `TypeSpec.Xml.@attribute`.
+  /**
+   * Fully qualified name of the decorator. For example, `TypeSpec.@encode`, `TypeSpec.Xml.@attribute`.
+   */
   name: string;
-  // A dict of the decorator's arguments. For example, `{ encoding: "base64url" }`.
+  /**
+   * A dict of the decorator's arguments. For example, `{ encoding: "base64url" }`.
+   */
   arguments: Record<string, any>;
 }
+
+/**
+ * Represents a client in the package.
+ */
 export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
+  /** Name of the client. */
   name: string;
-  /**
-   * Full qualified namespace.
-   */
+  /** Full qualified namespace. */
   namespace: string;
+  /** Document for the type. */
   doc?: string;
+  /** Summary for the type. */
   summary?: string;
+  /** Client initialization way. */
   clientInitialization: SdkClientInitializationType;
+  /** Methods of the client. */
   methods: SdkMethod<TServiceOperation>[];
+  /** API versions supported for current type. */
   apiVersions: string[];
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
-  // The parent client of this client. The structure follows the definition hierarchy.
+  /** The parent client of this client. The structure follows the definition hierarchy. */
   parent?: SdkClientType<TServiceOperation>;
-  // The children of this client. The structure follows the definition hierarchy.
+  /** The children of this client. The structure follows the definition hierarchy. */
   children?: SdkClientType<TServiceOperation>[];
 }
 
 interface SdkTypeBase extends DecoratedType {
   __raw?: Type;
   kind: string;
+  /** Whether the type is deprecated. */
   deprecation?: string;
+  /** Document for the type. */
   doc?: string;
+  /** Summary for the type. */
   summary?: string;
   __accessSet?: boolean;
 }
@@ -222,9 +250,13 @@ export type SdkType =
 export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
   extends SdkTypeBase {
   kind: TKind;
+  /** How to encode the type in wire. */
   encode?: string;
+  /** Client name for the type. */
   name: string;
+  /** Which type this type is derived from. */
   baseType?: SdkBuiltInType<TKind>;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
 }
 
@@ -335,6 +367,7 @@ interface SdkDateTimeTypeBase extends SdkTypeBase {
   baseType?: SdkDateTimeType;
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
 }
 
@@ -354,6 +387,7 @@ export interface SdkDurationType extends SdkTypeBase {
   baseType?: SdkDurationType;
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
 }
 
@@ -361,6 +395,7 @@ export interface SdkArrayType extends SdkTypeBase {
   kind: "array";
   name: string;
   valueType: SdkType;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
 }
 
@@ -378,32 +413,37 @@ export interface SdkDictionaryType extends SdkTypeBase {
 export interface SdkNullableType extends SdkTypeBase {
   kind: "nullable";
   name: string;
+  /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   type: SdkType;
+  /** Bitmap of the usage for the type. */
   usage: UsageFlags;
+  /** Whether the type has public or private accessibility */
   access: AccessFlags;
-  /**
-   * Full qualified namespace.
-   */
+  /** Full qualified namespace. */
   namespace: string;
 }
 
 export interface SdkEnumType extends SdkTypeBase {
   kind: "enum";
   name: string;
+  /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
-  /**
-   * Full qualified namespace.
-   */
+  /** Full qualified namespace. */
   namespace: string;
   valueType: SdkBuiltInType;
   values: SdkEnumValueType[];
   isFixed: boolean;
   isFlags: boolean;
+  /** Bitmap of the usage for the type. */
   usage: UsageFlags;
+  /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /** API versions supported for current type. */
   apiVersions: string[];
   isUnionAsEnum: boolean;
 }
@@ -422,20 +462,23 @@ export interface SdkConstantType extends SdkTypeBase {
   value: string | number | boolean;
   valueType: SdkBuiltInType;
   name: string;
+  /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
 }
 
 export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
+  /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
-  /**
-   * Full qualified namespace.
-   */
+  /** Full qualified namespace. */
   namespace: string;
   kind: "union";
   variantTypes: TValueType[];
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** Bitmap of the usage for the type. */
   usage: UsageFlags;
 }
 
@@ -443,57 +486,91 @@ export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkBodyModelPropertyType[];
   name: string;
+  /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
-  /**
-   * Full qualified namespace.
-   */
+  /** Full qualified namespace. */
   namespace: string;
+  /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** Bitmap of the usage for the type. */
   usage: UsageFlags;
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
   discriminatorProperty?: SdkBodyModelPropertyType;
   baseModel?: SdkModelType;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /** API versions supported for current type. */
   apiVersions: string[];
   serializationOptions: SerializationOptions;
 }
 
+/**
+ * Initialization info for a client.
+ */
 export interface SdkClientInitializationType extends SdkTypeBase {
   kind: "clientinitialization";
   name: string;
+  /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Initialization parameters. */
   parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
+  /** How to initialize a client. */
   initializedBy: InitializedByFlags;
 }
 
+/**
+ * Credential info.
+ */
 export interface SdkCredentialType extends SdkTypeBase {
   kind: "credential";
+  /** Auth scheme. Reuse TypeSpec Http types. */
   scheme: HttpAuth;
 }
 
+/**
+ * Endpoint info.
+ */
 export interface SdkEndpointType extends SdkTypeBase {
   kind: "endpoint";
-  serverUrl: string; // if not specified, we will use value "{endpoint}", and templateArguments will have one parameter called "endpoint"
+  /**
+   * The server URL for the endpoint.
+   * If spec author does not specify the endpoint, we will use value "{endpoint}", and templateArguments will have one parameter called "endpoint"
+   */
+  serverUrl: string;
+  /** Template arguments used in `serverUrl` string. */
   templateArguments: SdkPathParameter[];
 }
 
 export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   extends DecoratedType {
   __raw?: ModelProperty;
+  /** Parameter type. */
   type: TType;
+  /** Parameter client name. */
   name: string;
+  /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
+  /** Document for the type. */
   doc?: string;
+  /** Summary for the type. */
   summary?: string;
+  /** API versions supported for current type. */
   apiVersions: string[];
+  /** Whether the type is on client level. */
   onClient: boolean;
+  /** Client level default value for the type. */
   clientDefaultValue?: unknown;
+  /** Whether the type is an API version parameter */
   isApiVersionParam: boolean;
+  /** Whether the type is optional. */
   optional: boolean;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /** Visibility of the type. */
   visibility?: Visibility[];
+  /** Whether the type has public or private accessibility */
   access: AccessFlags;
 }
 
@@ -540,10 +617,15 @@ export interface XmlSerializationOptions {
   };
 }
 
+/**
+ * Endpoint parameter type for the client.
+ */
 export interface SdkEndpointParameter
   extends SdkModelPropertyTypeBase<SdkEndpointType | SdkUnionType<SdkEndpointType>> {
   kind: "endpoint";
+  /** Whether do url encode for the endpoint string. */
   urlEncode: boolean;
+  /** Endpoint parameter is always on client level. */
   onClient: true;
   /**
    * @deprecated This property is deprecated. Use `type.templateArguments[x].serializedName` or `type.variantTypes[x].templateArguments[x].serializedName` instead.
@@ -554,20 +636,21 @@ export interface SdkEndpointParameter
 export interface SdkCredentialParameter
   extends SdkModelPropertyTypeBase<SdkCredentialType | SdkUnionType<SdkCredentialType>> {
   kind: "credential";
+  /** Credential parameter is always on client level. */
   onClient: true;
 }
 
 export interface MultipartOptions {
   name: string;
-  // whether this part is for file
+  /** whether this part is for file */
   isFilePart: boolean;
-  // whether this part is multi in request payload
+  /** whether this part is multi in request payload */
   isMulti: boolean;
-  // undefined if filename is not set explicitly in Typespec
+  /** undefined if filename is not set explicitly in Typespec */
   filename?: SdkBodyModelPropertyType;
-  // undefined if contentType is not set explicitly in Typespec
+  /** undefined if contentType is not set explicitly in Typespec */
   contentType?: SdkBodyModelPropertyType;
-  // defined in Typespec or calculated by Typespec complier
+  /** defined in Typespec or calculated by Typespec complier */
   defaultContentTypes: string[];
 }
 
@@ -592,41 +675,66 @@ export interface SdkBodyModelPropertyType extends SdkModelPropertyTypeBase {
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
+/**
+ * Http header parameter.
+ */
 export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   kind: "header";
   collectionFormat?: CollectionFormat;
+  /** Name for the parameter in the payload */
   serializedName: string;
+  /** Corresponding method level parameter or model property for current parameter. */
   correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
+/**
+ * Http query parameter.
+ */
 export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   kind: "query";
   collectionFormat?: CollectionFormat;
+  /** Name for the parameter in the payload */
   serializedName: string;
+  /** Corresponding method level parameter or model property for current parameter. */
   correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
   explode: boolean;
 }
 
+/**
+ * Http path parameter.
+ */
 export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   kind: "path";
   explode: boolean;
   style: "simple" | "label" | "matrix" | "fragment" | "path";
   allowReserved: boolean;
+  /** Name for the parameter in the payload */
   serializedName: string;
+  /** Corresponding method level parameter or model property for current parameter. */
   correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
+/**
+ * Http cookie parameter.
+ */
 export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
   kind: "cookie";
+  /** Name for the parameter in the payload */
   serializedName: string;
+  /** Corresponding method level parameter or model property for current parameter. */
   correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
+/**
+ * Http body parameter.
+ */
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   kind: "body";
+  /** Name for the parameter in the payload */
   serializedName: string;
   contentTypes: string[];
   defaultContentType: string;
+  /** Corresponding method level parameter or model property for current parameter. */
   correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
@@ -659,6 +767,7 @@ export interface SdkMethodResponse {
 export interface SdkServiceResponse {
   type?: SdkType;
   headers: SdkServiceResponseHeader[];
+  /** API versions supported for current type. */
   apiVersions: string[];
 }
 
@@ -680,16 +789,27 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
 
 interface SdkServiceOperationBase {}
 
+/**
+ * Http operation.
+ */
 export interface SdkHttpOperation extends SdkServiceOperationBase {
   __raw: HttpOperation;
   kind: "http";
+  /** Route path. */
   path: string;
+  /** Route URI template string. */
   uriTemplate: string;
+  /** Http verb. */
   verb: HttpVerb;
+  /** Parameter lists. */
   parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
+  /** Body parameter. */
   bodyParam?: SdkBodyParameter;
+  /** Normal responses. */
   responses: SdkHttpResponse[];
+  /** Error responses */
   exceptions: SdkHttpErrorResponse[];
+  /** Operation usage examples. */
   examples?: SdkHttpOperationExample[];
 }
 
@@ -703,26 +823,45 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
   __raw?: Operation;
   name: string;
+  /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** API versions supported for current type. */
   apiVersions: string[];
+  /** Document for the type. */
   doc?: string;
+  /** Summary for the type. */
   summary?: string;
+  /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
+  /** Method's underlying protocol operation. */
   operation: TServiceOperation;
+  /** Method's parameters. */
   parameters: SdkMethodParameter[];
+  /** Method's normal responses. */
   response: SdkMethodResponse;
+  /** Method's error responses. */
   exception?: SdkMethodResponse;
+  /** Whether generate convenient API for this method. */
   generateConvenient: boolean;
+  /** Whether generate protocol API for this method. */
   generateProtocol: boolean;
+  /** Whether this method is overridded. */
   isOverride: boolean;
 }
 
+/**
+ * Basic method.
+ */
 export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation> {
   kind: "basic";
 }
 
+/**
+ * Paging operation info.
+ */
 interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
+  /** Paging info. */
   pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
 }
 
@@ -747,13 +886,20 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   pageItemsSegments?: SdkBodyModelPropertyType[];
 }
 
+/**
+ * Paging method.
+ */
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
     SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "paging";
 }
 
+/**
+ * LRO method info.
+ */
 interface SdkLroServiceMethodOptions {
+  /** LRO info */
   lroMetadata: SdkLroServiceMetadata;
 }
 
@@ -806,12 +952,18 @@ export interface SdkLroServiceFinalResponse {
   resultSegments?: SdkBodyModelPropertyType[];
 }
 
+/**
+ * Long running method.
+ */
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
+/**
+ * Long running method with paging.
+ */
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
@@ -828,14 +980,25 @@ export type SdkServiceMethod<TServiceOperation extends SdkServiceOperation> =
 export type SdkMethod<TServiceOperation extends SdkServiceOperation> =
   SdkServiceMethod<TServiceOperation>;
 
+/**
+ * Represents a client package, containing all clients, operations, and types.
+ */
 export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
+  /** First level clients of the package. */
   clients: SdkClientType<TServiceOperation>[];
+  /** All used models in the package. */
   models: SdkModelType[];
+  /** All used enumerations in the package. */
   enums: SdkEnumType[];
+  /** All used unions or nullable types in the package. */
   unions: (SdkUnionType | SdkNullableType)[];
+  /** Unique ID for the package. */
   crossLanguagePackageId: string;
+  /** Hierarchical structure for the package based on namespaces. */
   namespaces: SdkNamespace<TServiceOperation>[];
+  /** License details for client code comments or license file generation. */
   licenseInfo?: LicenseInfo;
+  /** Metadata for the package. */
   metadata: {
     /**
      * The version of the package.
@@ -847,21 +1010,39 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   };
 }
 
+/**
+ * License details for client code comments or license file generation.
+ */
 export interface LicenseInfo {
+  /** License name. */
   name: string;
+  /** Company name. */
   company: string;
+  /** License document link. */
   link: string;
+  /** Header comments. */
   header: string;
+  /** License file content. */
   description: string;
 }
 
+/**
+ * Represents a namespace in the package, containing all clients, operations, and types.
+ */
 export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
+  /** Namespace name. */
   name: string;
+  /** Namespace full qualified name. */
   fullName: string;
+  /** Clients under this namespace. */
   clients: SdkClientType<TServiceOperation>[];
+  /** Models used in package under this namespace. */
   models: SdkModelType[];
+  /** Enumerations used in package under this namespace. */
   enums: SdkEnumType[];
+  /** Unions or nullable types used in package under this namespace. */
   unions: (SdkUnionType | SdkNullableType)[];
+  /** Nested namespaces under this namespace. */
   namespaces: SdkNamespace<TServiceOperation>[];
 }
 

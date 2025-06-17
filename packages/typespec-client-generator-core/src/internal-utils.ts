@@ -9,7 +9,6 @@ import {
   getNamespaceFullName,
   getVisibilityForClass,
   ignoreDiagnostics,
-  Interface,
   isNeverType,
   isNullType,
   isVoidType,
@@ -47,6 +46,7 @@ import {
   SdkEnumType,
   SdkHeaderParameter,
   SdkHttpResponse,
+  SdkOperationGroup,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -89,6 +89,8 @@ export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
 export const clientKey = createStateSymbol("client");
 export const operationGroupKey = createStateSymbol("operationGroup");
+export const clientLocationKey = createStateSymbol("clientLocation");
+export const omitOperation = createStateSymbol("omitOperation");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
@@ -97,13 +99,38 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
   );
 }
 
-function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
+export function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
   const retval = [...context.program.stateMap(key).values()];
   return retval
     .filter((targetEntry) => {
       return targetEntry[context.emitterName] || targetEntry[AllScopes];
     })
     .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
+}
+
+export function getScopedDecoratorData(
+  context: TCGCContext,
+  key: symbol,
+  target: Type,
+  languageScope?: string | typeof AllScopes,
+): any {
+  const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
+  if (retval === undefined) return retval;
+  if (languageScope === AllScopes) {
+    return retval[languageScope];
+  }
+  if (languageScope === undefined || typeof languageScope === "string") {
+    const scope = languageScope ?? context.emitterName;
+    if (Object.keys(retval).includes(scope)) return retval[scope];
+
+    // if the scope is negated, we should return undefined
+    // if the scope is not negated, we should return the value for AllScopes
+    const negationScopes = retval[negationScopesKey];
+    if (negationScopes !== undefined && negationScopes.includes(scope)) {
+      return undefined;
+    }
+  }
+  return retval[AllScopes]; // in this case it applies to all languages
 }
 
 /**
@@ -143,7 +170,7 @@ export function parseEmitterName(
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: ModelProperty,
-  namespace?: Namespace | Interface,
+  client?: SdkClient | SdkOperationGroup,
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: string;
@@ -152,8 +179,8 @@ export function updateWithApiVersionInformation(
   return {
     isApiVersionParam,
     clientDefaultValue:
-      isApiVersionParam && namespace
-        ? context.__clientToApiVersionClientDefaultValue.get(namespace)
+      isApiVersionParam && client
+        ? context.__clientApiVersionDefaultValueCache.get(client)
         : undefined,
   };
 }
@@ -429,11 +456,6 @@ export function isSubscriptionId(context: TCGCContext, parameter: { name: string
   return Boolean(context.arm) && parameter.name === "subscriptionId";
 }
 
-export function getLocationOfOperation(operation: Operation): Namespace | Interface {
-  // have to check interface first, because interfaces are more granular than namespaces
-  return (operation.interface || operation.namespace)!;
-}
-
 export function isNeverOrVoidType(type: Type): boolean {
   return isNeverType(type) || isVoidType(type);
 }
@@ -549,14 +571,14 @@ export function isOnClient(
   operation?: Operation,
   versioning?: boolean,
 ): boolean {
-  const namespace = operation ? getLocationOfOperation(operation) : type.model?.namespace;
+  const client = operation ? context.getClientForOperation(operation) : undefined;
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
     Boolean(
-      namespace &&
-        context.__clientToParameters
-          .get(namespace)
+      client &&
+        context.__clientParametersCache
+          .get(client)
           ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
     )
   );
