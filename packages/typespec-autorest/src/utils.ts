@@ -83,7 +83,7 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
 
   const operationName = getClientName(context, operation);
 
-  // Check for @clientLocation decorator
+  // Check for `@clientLocation` decorator
   const clientLocation = getClientLocation(context.tcgcSdkContext, operation);
   if (clientLocation) {
     // Case 3: If the target is a string, use the string value as the prefix of the operation ID
