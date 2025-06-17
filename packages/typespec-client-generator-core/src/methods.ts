@@ -14,7 +14,6 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { isHeader } from "@typespec/http";
-import "@typespec/http-client/typekit";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
