@@ -120,7 +120,7 @@ interface OptionalBody {
     }
     ```
     """)
-  updateWithoutBody is Azure.ResourceManager.Legacy.CustomPatchSync<
+  patch is Azure.ResourceManager.Legacy.CustomPatchSync<
     Widget,
     UpdateRequest,
     OptionalRequestBody = true

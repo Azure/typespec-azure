@@ -1657,7 +1657,7 @@ Expected response body:
 }
 ```
 
-### Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody
+### Azure_ResourceManager_OperationTemplates_OptionalBody_patch
 
 - Endpoint: `patch https://management.azure.com`
 

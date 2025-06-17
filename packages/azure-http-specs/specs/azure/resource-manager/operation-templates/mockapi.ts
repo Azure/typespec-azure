@@ -446,7 +446,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSucc
 });
 
 // PATCH operation with optional body - test both with and without body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_updateWithoutBody = withServiceKeys(
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServiceKeys(
   ["EmptyBody", "WithBody"],
 ).pass([
   {
