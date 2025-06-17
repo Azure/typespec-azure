@@ -110,7 +110,7 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
         return pascalCase(operationName);
       }
       // If the target is not the service namespace or global namespace, use the namespace name as the prefix
-      return pascalCaseForOperationId(`${clientLocation.name}_${operationName}`);
+      return pascalCaseForOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
     }
   }
 
@@ -129,7 +129,7 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
     return pascalCase(operationName);
   }
 
-  return pascalCaseForOperationId(`${namespace.name}_${operationName}`);
+  return pascalCaseForOperationId(`${getClientName(context, namespace)}_${operationName}`);
 }
 
 /**
