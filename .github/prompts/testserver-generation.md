@@ -44,6 +44,11 @@
    - Keep route names consistent with scenario themes
    - Choose appropriate operation grouping (single vs. collection)
    - Group operations into interfaces when it makes sense (e.g., by `path`, `query`, etc.)
+   - Use interfaces to organize related scenarios logically:
+     - For example, in `ClientNamespace.Naming` namespace, create separate interfaces for `Header` and `Model`
+       to group header-related and model-related scenarios respectively
+     - This creates scenario names like `ClientNamespace.Naming.Header.checkHeaderName` and
+       `ClientNamespace.Naming.Model.validateModelProperty`
 
 3. **VALIDATION & QUALITY CHECKS** (MUST PERFORM ALL OF THESE CHECKS IN THIS EXACT ORDER)
 
