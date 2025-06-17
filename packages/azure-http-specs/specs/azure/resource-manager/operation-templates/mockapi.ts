@@ -594,3 +594,75 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
     kind: "MockApiDefinition",
   },
 ]);
+
+// Provider POST action operation with optional body - test both with and without body
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_changeAllowance = withServiceKeys([
+  "EmptyBody",
+  "WithBody",
+]).pass([
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/changeWidgetAllowance",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      // No body for empty body scenario
+    },
+    response: {
+      status: 200,
+      body: json({
+        totalAllowed: 50,
+        status: "Changed to default allowance",
+      }),
+    },
+    handler: (req: MockRequest) => {
+      return {
+        pass: "EmptyBody",
+        status: 200,
+        body: json({
+          totalAllowed: 50,
+          status: "Changed to default allowance",
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/changeWidgetAllowance",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        totalAllowed: 100,
+        reason: "Increased demand",
+      }),
+    },
+    response: {
+      status: 200,
+      body: json({
+        totalAllowed: 100,
+        status: "Changed to requested allowance",
+      }),
+    },
+    handler: (req: MockRequest) => {
+      return {
+        pass: "WithBody",
+        status: 200,
+        body: json({
+          totalAllowed: 100,
+          status: "Changed to requested allowance",
+        }),
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+]);

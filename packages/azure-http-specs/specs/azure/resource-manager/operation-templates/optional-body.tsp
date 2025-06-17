@@ -52,6 +52,22 @@ model ActionResult {
   result: string;
 }
 
+model ChangeAllowanceRequest {
+  @doc("The new total allowed widgets.")
+  totalAllowed?: int32;
+
+  @doc("The reason for the change.")
+  reason?: string;
+}
+
+model ChangeAllowanceResult {
+  @doc("The new total allowed widgets.")
+  totalAllowed: int32;
+
+  @doc("The status of the change.")
+  status: string;
+}
+
 @armResourceOperations
 interface OptionalBody {
   @scenario
@@ -187,6 +203,47 @@ interface OptionalBody {
     Widget,
     ActionRequest,
     ActionResult,
+    OptionalRequestBody = true
+  >;
+
+  @scenario
+  @scenarioDoc("""
+    Provider POST action operation using ArmProviderActionSync with optional request body.
+    This tests the optional body functionality for subscription-scoped provider actions in two scenarios:
+    1. Empty body scenario: Request body is not sent (uses default allowance)
+    2. With body scenario: Request body contains allowance change data
+    
+    Expected verb: POST
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/changeWidgetAllowance
+    Expected query parameter: api-version=2023-12-01-preview
+    
+    Scenario 1 - Expected request body: None (empty body)
+    Scenario 2 - Expected request body: {"totalAllowed": 100, "reason": "Increased demand"}
+    
+    Expected status code: 200
+    Expected response body (empty body scenario):
+    ```json
+    {
+      "totalAllowed": 50,
+      "status": "Changed to default allowance"
+    }
+    ```
+    
+    Expected response body (with body scenario):
+    ```json
+    {
+      "totalAllowed": 100,
+      "status": "Changed to requested allowance"
+    }
+    ```
+    """)
+  @action("changeWidgetAllowance")
+  changeAllowance is ArmProviderActionSync<
+    ChangeAllowanceRequest,
+    ChangeAllowanceResult,
+    SubscriptionActionScope,
+    {},
+    ErrorResponse,
     OptionalRequestBody = true
   >;
 }
