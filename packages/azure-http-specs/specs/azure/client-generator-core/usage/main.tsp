@@ -15,7 +15,7 @@ namespace _Specs_.Azure.ClientGenerator.Core.Usage;
 @scenarioDoc("""
   This scenario contains 4 public operations. All should be generated and exported.
   'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
-  The other models are additive to roundtrip, so they should be generated and exported as well.
+  The other models' usage is additive to roundtrip, so they should be generated and exported as well.
   """)
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
 namespace ModelInOperation {
