@@ -2,8 +2,8 @@ import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-// Scenario 1: Move to existing group - Mock responses
-Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingGroup = passOnSuccess([
+// Scenario 1: Move to existing sub client - Mock responses
+Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-location/user",
     method: "get",
@@ -33,8 +33,8 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingGroup = passOn
   },
 ]);
 
-// Scenario 2: Move to new group - Mock responses
-Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToNewGroup = passOnSuccess([
+// Scenario 2: Move to new sub client - Mock responses
+Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-location/products",
     method: "get",
