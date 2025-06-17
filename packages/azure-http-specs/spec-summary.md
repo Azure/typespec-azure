@@ -1607,19 +1607,32 @@ Expected response body:
 
 - Endpoint: `post https://management.azure.com`
 
-Resource POST action operation using ArmResourceActionSync with no request body.
-This tests the optional body functionality where the request body is not sent.
+Resource POST action operation using ArmResourceActionSync with optional request body.
+This tests the optional body functionality in two scenarios:
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains action data
 
 Expected verb: POST
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/post
 Expected query parameter: api-version=2023-12-01-preview
-Expected request body: None (empty body)
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"actionType": "perform", "parameters": "test-parameters"}
+
 Expected status code: 200
-Expected response body:
+Expected response body (empty body scenario):
 
 ```json
 {
   "result": "Action completed successfully"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "result": "Action completed successfully with parameters"
 }
 ```
 
@@ -1661,15 +1674,20 @@ Expected response body:
 
 - Endpoint: `patch https://management.azure.com`
 
-Resource PATCH operation using Legacy.CustomPatchSync with no request body.
-This tests the optional body functionality where the request body is not sent.
+Resource PATCH operation using Legacy.CustomPatchSync with optional request body.
+This tests the optional body functionality in two scenarios:
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains update data
 
 Expected verb: PATCH  
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
 Expected query parameter: api-version=2023-12-01-preview
-Expected request body: None (empty body)
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"name": "updated-widget", "description": "Updated description"}
+
 Expected status code: 200
-Expected response body:
+Expected response body (empty body scenario):
 
 ```json
 {
@@ -1680,6 +1698,30 @@ Expected response body:
   "properties": {
     "name": "widget1",
     "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "updated-widget",
+    "description": "Updated description",
     "provisioningState": "Succeeded"
   },
   "systemData": {
