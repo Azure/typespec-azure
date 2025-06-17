@@ -1,7 +1,6 @@
 import {
   getClientLocation,
   getClientNameOverride,
-  hasExplicitClientOrOperationGroup,
   type TCGCContext,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -65,7 +64,7 @@ export function shouldInline(program: Program, type: Type): boolean {
 /**
  * Resolve the OpenAPI operation ID for the given operation using the following logic:
  * - If @operationId was specified use that value
- * - If @clientLocation was specified and there are no explicit @client or @operationGroup decorators:
+ * - If @clientLocation was specified:
  *   - If the target is a string, use the string value as the prefix of the operation ID
  *   - If the target is an Interface, use the interface name as the prefix
  *   - If the target is a Namespace and it's not the service namespace or global namespace, use the namespace name as the prefix
@@ -86,9 +85,9 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
 
   const operationName = getClientName(context, operation);
 
-  // Check for @clientLocation decorator if no explicit @client or @operationGroup decorators are present
+  // Check for @clientLocation decorator
   const clientLocation = getClientLocation(context.tcgcSdkContext, operation);
-  if (!hasExplicitClientOrOperationGroup(context.tcgcSdkContext) && clientLocation) {
+  if (clientLocation) {
     // Case 3: If the target is a string, use the string value as the prefix of the operation ID
     if (typeof clientLocation === "string") {
       return pascalCaseForOperationId(`${clientLocation}_${operationName}`);
