@@ -42,8 +42,6 @@
    - Use existing spec files when possible, create new files/folders only when needed
    - Structure namespaces and interfaces carefully - this path becomes the dashboard scenario name
    - Keep route names consistent with scenario themes
-   - Choose appropriate operation grouping (single vs. collection)
-   - Group operations into interfaces when it makes sense (e.g., by `path`, `query`, etc.)
    - Use interfaces to organize related scenarios logically:
      - For example, in `ClientNamespace.Naming` namespace, create separate interfaces for `Header` and `Model`
        to group header-related and model-related scenarios respectively
