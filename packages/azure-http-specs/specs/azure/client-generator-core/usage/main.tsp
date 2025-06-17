@@ -3,7 +3,6 @@ import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using Http;
-using Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Test for internal decorator.")
@@ -70,13 +69,13 @@ namespace ModelInOperation {
 
   @doc("""
     "ResultModel" should be usage=output, as it is read-only and does not exist in request body.
-
+    
     Expected body parameter:
     ```json
     {
     }
     ```
-
+    
     Expected response body:
     ```json
     {
@@ -94,7 +93,7 @@ namespace ModelInOperation {
 
   @doc("""
     Serialize the 'OrphanModel' as request body.
-
+    
     Expected body parameter:
     ```json
     {
@@ -110,7 +109,9 @@ namespace ModelInOperation {
 }
 
 @doc("Not used anywhere, but access is override to public so still need to be generated and exported with serialization.")
-@global.Azure.ClientGenerator.Core.usage(global.Azure.ClientGenerator.Core.Usage.input | global.Azure.ClientGenerator.Core.Usage.json)
+@global.Azure.ClientGenerator.Core.usage(
+  global.Azure.ClientGenerator.Core.Usage.input | global.Azure.ClientGenerator.Core.Usage.json
+)
 @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
 model OrphanModel {
   @global.Azure.ClientGenerator.Core.clientName("modelName")
