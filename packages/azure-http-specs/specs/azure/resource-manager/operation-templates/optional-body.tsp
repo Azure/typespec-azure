@@ -132,7 +132,7 @@ interface OptionalBody {
     This tests the optional body functionality where the request body is not sent.
     
     Expected verb: POST
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/actionWithoutBody
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/post
     Expected query parameter: api-version=2023-12-01-preview
     Expected request body: None (empty body)
     Expected status code: 200
@@ -143,7 +143,7 @@ interface OptionalBody {
     }
     ```
     """)
-  actionWithoutBody is ArmResourceActionSync<
+  post is ArmResourceActionSync<
     Widget,
     ActionRequest,
     ActionResult,

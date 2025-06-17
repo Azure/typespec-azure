@@ -523,11 +523,11 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
 ]);
 
 // POST action operation with optional body - test both with and without body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBody = withServiceKeys(
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServiceKeys(
   ["EmptyBody", "WithBody"],
 ).pass([
   {
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/actionWithoutBody",
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/post",
     method: "post",
     request: {
       pathParams: {
@@ -558,7 +558,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_actionWithoutBod
     kind: "MockApiDefinition",
   },
   {
-    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/actionWithoutBody",
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/post",
     method: "post",
     request: {
       pathParams: {
