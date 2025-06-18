@@ -1637,7 +1637,7 @@ Expected response body (with body scenario):
 }
 ```
 
-### Azure_ResourceManager_OperationTemplates_OptionalBody_changeAllowance
+### Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost
 
 - Endpoint: `post https://management.azure.com`
 

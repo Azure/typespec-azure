@@ -232,8 +232,7 @@ interface OptionalBody {
     }
     ```
     """)
-  @action("changeWidgetAllowance")
-  changeAllowance is ArmProviderActionSync<
+  providerPost is ArmProviderActionSync<
     ChangeAllowanceRequest,
     ChangeAllowanceResult,
     SubscriptionActionScope,

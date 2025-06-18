@@ -596,7 +596,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
 ]);
 
 // Provider POST action operation with optional body - test both with and without body
-Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_changeAllowance = withServiceKeys([
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = withServiceKeys([
   "EmptyBody",
   "WithBody",
 ]).pass([
