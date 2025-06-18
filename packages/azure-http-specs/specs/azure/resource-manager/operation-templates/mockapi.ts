@@ -601,27 +601,36 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
 Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = withServiceKeys([
   "EmptyBody",
   "WithBody",
-]).pass([
-  {
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/providerPost",
-    method: "post",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      // No body for empty body scenario
+]).pass({
+  uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/providerPost",
+  method: "post",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
     },
-    response: {
-      status: 200,
-      body: json({
-        totalAllowed: 50,
-        status: "Changed to default allowance",
-      }),
+    query: {
+      "api-version": "2023-12-01-preview",
     },
-    handler: (req: MockRequest) => {
+  },
+  response: {
+    status: 200,
+  },
+  handler: (req: MockRequest) => {
+    // Check if request has a body with content
+    if (req.body && Object.keys(req.body).length > 0) {
+      // WithBody scenario - use totalAllowed from request
+      const requestBody = req.body as { totalAllowed?: number; reason?: string };
+      const totalAllowed = requestBody.totalAllowed || 100;
+      return {
+        pass: "WithBody",
+        status: 200,
+        body: json({
+          totalAllowed: totalAllowed,
+          status: "Changed to requested allowance",
+        }),
+      };
+    } else {
+      // EmptyBody scenario - use default allowance
       return {
         pass: "EmptyBody",
         status: 200,
@@ -630,41 +639,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
           status: "Changed to default allowance",
         }),
       };
-    },
-    kind: "MockApiDefinition",
+    }
   },
-  {
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/providerPost",
-    method: "post",
-    request: {
-      pathParams: {
-        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-      },
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        totalAllowed: 100,
-        reason: "Increased demand",
-      }),
-    },
-    response: {
-      status: 200,
-      body: json({
-        totalAllowed: 100,
-        status: "Changed to requested allowance",
-      }),
-    },
-    handler: (req: MockRequest) => {
-      return {
-        pass: "WithBody",
-        status: 200,
-        body: json({
-          totalAllowed: 100,
-          status: "Changed to requested allowance",
-        }),
-      };
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  kind: "MockApiDefinition",
+});
