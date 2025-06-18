@@ -29,12 +29,26 @@
      - Add a `@scenario` and `@scenarioDoc` decorator
      - Make the `@scenarioDoc` explicit about input values and expected output
      - Add a corresponding mockapi implementation in `mockapi.ts`
+   - **Scenario naming requirements:**
+     - Scenario names are automatically derived from the namespace path + optional interface + operation name
+     - The complete scenario name (namespace + interface + operation name) should form a clear, descriptive identifier
+     - Choose explicit namespaces that describe the feature area (e.g., `Azure.Core.Page`)
+     - Use interfaces to create logical groupings within a namespace (e.g., `Header`, `Model`)
+     - Use clear, descriptive operation names that explain the specific behavior being tested
+     - Avoid vague terms like "test" or generic descriptions like "success" when possible
+     - Include key parameters or conditions in the name when relevant (e.g., `listWithCustomPageModel`)
+     - Keep names concise while still being descriptive
+     - Use interfaces to organize related scenarios logically:
+       - For example, in `Client.Naming` namespace, create separate interfaces for `Header`, `Model` to group header-related and model-related scenarios respectively
+       - This creates scenario names like `Client.Naming.Header.changeHeaderName` and
+         `Client.Naming.Model.validateModelProperty`
+     - Examples of well-formed full scenario names:
+       - `Azure.Core.Page.listWithCustomPageModel` (testing pagination with custom page model)
+       - `Azure.ClientGenerator.Core.Access.InternalOperation` (testing internal operation access)
+       - `Client.Naming.Header.changeHeaderName` (change header client naming)
    - Use existing spec files when possible, create new files/folders only when needed
    - Structure namespaces and interfaces carefully - this path becomes the dashboard scenario name
-   - Make scenario names clear, descriptive, and concise
-   - Keep route names consistent with scenario names
-   - Choose appropriate operation grouping (single vs. collection)
-   - Group operations into interfaces when it makes sense (e.g., by `path`, `query`, etc.)
+   - Keep route names consistent with scenario themes
 
 3. **VALIDATION & QUALITY CHECKS** (MUST PERFORM ALL OF THESE CHECKS IN THIS EXACT ORDER)
 
