@@ -31,13 +31,6 @@ model WidgetProperties {
 }
 
 // Request models for optional body scenarios
-model UpdateRequest {
-  @doc("The name to update.")
-  name?: string;
-
-  @doc("The description to update.")
-  description?: string;
-}
 
 model ActionRequest {
   @doc("The action type to perform.")
@@ -166,7 +159,7 @@ interface OptionalBody {
     """)
   patch is Azure.ResourceManager.Legacy.CustomPatchSync<
     Widget,
-    UpdateRequest,
+    Widget,
     OptionalRequestBody = true
   >;
 

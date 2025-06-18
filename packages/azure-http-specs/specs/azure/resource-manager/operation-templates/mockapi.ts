@@ -490,8 +490,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
         "api-version": "2023-12-01-preview",
       },
       body: json({
-        name: "updated-widget",
-        description: "Updated description",
+        properties: {
+          name: "updated-widget",
+          description: "Updated description",
+        },
       }),
     },
     response: {
