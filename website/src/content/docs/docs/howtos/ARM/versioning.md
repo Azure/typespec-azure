@@ -27,7 +27,7 @@ enum Versions {
 }
 ```
 
-After defining your enum, link it to your namespace with the `@versioned` decorator:
+After defining your enum, link it to your namespace using the `@versioned` decorator:
 
 ```tsp
 @versioned(Versions)
@@ -35,6 +35,191 @@ namespace Microsoft.ContosoProviderHub;
 ```
 
 > **Note:** Add dependencies and common types for each version. After defining a new version, the emitter will produce outputs for all versions. You can then adapt your TypeSpec code for the latest version.
+
+## Simple Scenarios
+
+These examples show how to add models, operations, properties, and parameters in specific versions using TypeSpec versioning decorators.
+
+---
+
+### Add a model in v2
+
+```tsp
+@added(Versions.v2)
+model Employee {
+  name: string;
+}
+```
+
+### Add an operation in v2
+
+```tsp
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  @added(Versions.v2)
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+```
+
+### Add a property in v2
+
+```tsp
+model Employee {
+  name: string;
+
+  @added(Versions.v2)
+  city?: string;
+}
+```
+
+### Add a parameter to an operation in v2
+
+```tsp
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<
+    Employee,
+    Parameters = {
+      name: string;
+
+      @added(Versions.v2)
+      department?: string;
+    }
+  >;
+}
+```
+
+### Add a new operation in v2
+
+```tsp
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+
+  @added(Versions.v2)
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+}
+```
+
+## Complex Scenarios
+
+These scenarios demonstrate more advanced versioning patterns, such as changing decorators, adding and making parameters optional, and converting operations from synchronous to asynchronous.
+
+---
+
+### Adding Decoration to an Existing Type
+
+This scenario demonstrates how to change a decorator’s usage across versions.
+
+Suppose you have a model property with a decorator:
+
+```tsp
+model Employee {
+  @visibility(Lifecycle.Read)
+  experience: string;
+}
+```
+
+In the next version (v2), the visibility changes so that the property can be read or created. To achieve this, you can use a combination of `@removed`, `@added`, and `@renamedFrom` decorators:
+
+```tsp
+model Employee {
+  @removed(Versions.v2)
+  @visibility(Lifecycle.Read)
+  @renamedFrom(Versions.v2, "experience")
+  oldExperience: string;
+
+  @added(Versions.v2)
+  @visibility(Lifecycle.Read, Lifecycle.Create)
+  experience: string;
+}
+```
+
+### Adding a Parameter to an Operation and Making Another Parameter Optional
+
+This scenario shows how to add a parameter and make another optional in an operation.
+
+Suppose you start with the following operation in v1:
+
+```tsp
+@armResourceOperations
+interface Employees {
+  listBySubscription is ArmListBySubscription<
+    Employee,
+    Parameters = {
+      @header
+      location: string;
+    }
+  >;
+}
+```
+
+In version `v2`, you want to:
+
+- Make the `location` header parameter optional.
+- Add a new optional query parameter `orderBy`.
+
+You can achieve this using the `@madeOptional` and `@added` decorators:
+
+```tsp
+@armResourceOperations
+interface Employees {
+  listBySubscription is ArmListBySubscription<
+    Employee,
+    Parameters = {
+      @madeOptional(Versions.v2)
+      @header
+      location?: string;
+
+      @added(Versions.v2)
+      @query("order-by")
+      orderBy?: string;
+    }
+  >;
+}
+```
+
+**Explanation:**
+
+- `@madeOptional(Versions.v2)` makes `location` optional starting in v2.
+- `@added(Versions.v2)` adds the `orderBy` query parameter in v2 and later.
+
+### Converting an Operation from Synchronous to Asynchronous
+
+This scenario illustrates converting a synchronous operation to an asynchronous one across versions.
+
+Suppose you start with the following synchronous operation in `v1`:
+
+```tsp
+@armResourceOperations
+interface Employees {
+  createOrUpdate is ArmResourceCreateOrReplaceSync<Employee>;
+}
+```
+
+In version `v2`, you update this operation to be asynchronous as follows:
+
+```tsp
+@armResourceOperations
+interface Employees {
+  @removed(Versions.v2)
+  @renamedFrom(Versions.v2, "createOrUpdate")
+  @sharedRoute
+  createOrUpdateV1 is ArmResourceCreateOrReplaceSync<Employee>;
+
+  @added(Versions.v2)
+  @sharedRoute
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+}
+```
+
+**Explanation:**
+
+- `@removed(Versions.v2)` removes the original synchronous operation in v2 and later.
+- `@renamedFrom(Versions.v2, "createOrUpdate")` keeps the original name for v1.
+- `@added(Versions.v2)` adds the new asynchronous operation in v2 and later.
+- `@sharedRoute` ensures both operations can use the same route.
 
 ## Versioning Decorators
 
@@ -177,139 +362,3 @@ model EmployeeProperties {
   city?: string;
 }
 ```
-
-### @returnTypeChangedFrom
-
-Use this decorator to change the return type of an operation in a specific version.
-
-```tsp
-@armResourceOperations
-interface Employees {
-  @removed(Versions.v2)
-  @returnTypeChangedFrom(Versions.v2, Worker)
-  get is ArmResourceRead<Employee>;
-}
-
-model Employee {
-  name: string;
-}
-
-model Worker {
-  name: string;
-}
-```
-
-## Complex Scenarios
-
----
-
-### Adding Decoration to an Existing Type
-
-This scenario demonstrates how to change a decorator’s usage across versions.
-
-Suppose you have a model property with a decorator:
-
-```tsp
-model Employee {
-  @visibility(Lifecycle.Read)
-  experience: string;
-}
-```
-
-In the next version (v2), the visibility changes so that the property can be read or created. To achieve this, you can use a combination of `@removed`, `@added`, and `@renamedFrom` decorators:
-
-```tsp
-model Employee {
-  @removed(Versions.v2)
-  @visibility(Lifecycle.Read)
-  @renamedFrom(Versions.v2, "experience")
-  oldExperience: string;
-
-  @added(Versions.v2)
-  @visibility(Lifecycle.Read, Lifecycle.Create)
-  experience: string;
-}
-```
-
-### Adding a Parameter to an Operation and Making Another Parameter Optional
-
-This scenario shows how to add a parameter and make another optional in an operation.
-
-Suppose you start with the following operation in v1:
-
-```tsp
-@armResourceOperations
-interface Employees {
-  get(name: string, identifier: int32): Employee | ErrorResponse;
-}
-```
-
-In version `v2`, you want to:
-
-- Make the `identifier` parameter optional.
-- Add a new optional parameter `field`.
-
-You can achieve this using the `@madeOptional` and `@added` decorators:
-
-```tsp
-@armResourceOperations
-interface Employees {
-  get(
-    name: string,
-
-    @madeOptional(Versions.v2)
-    identifier?: int32,
-
-    @added(Versions.v2)
-    field?: string,
-  ): Employee | ErrorResponse;
-}
-```
-
-**Explanation:**
-
-- `@madeOptional(Versions.v2)` makes `identifier` optional starting in v2.
-- `@added(Versions.v2)` adds the `field` parameter in v2 and later.
-
-### Converting an Operation from Synchronous to Asynchronous
-
-This scenario illustrates converting a synchronous operation to an asynchronous one across versions.
-
-Suppose you start with the following synchronous operation in `v1`:
-
-```tsp
-@armResourceOperations
-interface Employees {
-  @sharedRoute
-  @put
-  createUpdateEmployee(@path id: string, @bodyRoot body: Employee): Employee | ErrorResponse;
-}
-```
-
-In version `v2`, you update this operation to be asynchronous as follows:
-
-```tsp
-@armResourceOperations
-interface Employees {
-  @removed(Versions.v2)
-  @renamedFrom(Versions.v2, "createUpdateEmployee")
-  @sharedRoute
-  @put
-  createUpdateEmployeeOld(@path id: string, @bodyRoot body: Employee): Employee | ErrorResponse;
-
-  @added(Versions.v2)
-  @sharedRoute
-  @put
-  createUpdateEmployee(
-    @path id: string,
-    @bodyRoot body: Employee,
-  ): ArmAcceptedLroResponse<"Resource operation accepted."> | ArmResourceUpdatedResponse<Employee> | ErrorResponse;
-}
-```
-
-**Explanation:**
-
-- `@removed(Versions.v2)` removes the original synchronous operation in v2 and later.
-- `@renamedFrom(Versions.v2, "createUpdateEmployee")` keeps the original name for v1.
-- `@added(Versions.v2)` adds the new asynchronous operation in v2 and later.
-- `@sharedRoute` ensures both operations can use the same route.

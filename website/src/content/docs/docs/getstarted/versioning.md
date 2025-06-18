@@ -68,12 +68,15 @@ model Employee {
 ```tsp
 @armResourceOperations
 interface Employees {
-  get(
-    name: string,
+  get is ArmResourceRead<
+    Employee,
+    Parameters = {
+      name: string;
 
-    @added(Versions.v2)
-    department?: string,
-  ): Employee | ErrorResponse;
+      @added(Versions.v2)
+      department?: string;
+    }
+  >;
 }
 ```
 
@@ -84,10 +87,12 @@ You can add new operations to an interface for a specific version:
 **Add a new operation in v2:**
 
 ```tsp
+@armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
+
   @added(Versions.v2)
-  promote is ArmResourceAction<Employee, PromotionResult>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 }
 ```
 
