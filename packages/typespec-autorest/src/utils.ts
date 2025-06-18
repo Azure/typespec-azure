@@ -102,7 +102,6 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
     }
   }
 
-  // Original logic: handle interface and namespace cases
   if (operation.interface) {
     return pascalCaseForOperationId(
       `${getClientName(context, operation.interface)}_${operationName}`,
