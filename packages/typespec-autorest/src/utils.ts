@@ -1,4 +1,5 @@
 import {
+  getClientLocation,
   getClientNameOverride,
   type TCGCContext,
 } from "@azure-tools/typespec-client-generator-core";
@@ -61,6 +62,11 @@ export function shouldInline(program: Program, type: Type): boolean {
 /**
  * Resolve the OpenAPI operation ID for the given operation using the following logic:
  * - If @operationId was specified use that value
+ * - If @clientLocation was specified:
+ *   - If the target is a string, use the string value as the prefix of the operation ID
+ *   - If the target is an Interface, use the interface name as the prefix
+ *   - If the target is a Namespace and it's not the service namespace or global namespace, use the namespace name as the prefix
+ *   - If the target is the service namespace or global namespace, use the operation name as the operation ID
  * - If operation is defined at the root or under the service namespace return `<operation.name>`
  * - Otherwise(operation is under another namespace or interface) return `<namespace/interface.name>_<operation.name>`
  *
@@ -76,6 +82,26 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
   }
 
   const operationName = getClientName(context, operation);
+
+  // Check for `@clientLocation` decorator
+  const clientLocation = getClientLocation(context.tcgcSdkContext, operation);
+  if (clientLocation) {
+    if (typeof clientLocation === "string") {
+      return pascalCaseForOperationId(`${clientLocation}_${operationName}`);
+    }
+
+    if (clientLocation.kind === "Interface") {
+      return pascalCaseForOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
+    }
+
+    if (clientLocation.kind === "Namespace") {
+      if (isGlobalNamespace(program, clientLocation) || isService(program, clientLocation)) {
+        return pascalCase(operationName);
+      }
+      return pascalCaseForOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
+    }
+  }
+
   if (operation.interface) {
     return pascalCaseForOperationId(
       `${getClientName(context, operation.interface)}_${operationName}`,
@@ -90,7 +116,7 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
     return pascalCase(operationName);
   }
 
-  return pascalCaseForOperationId(`${namespace.name}_${operationName}`);
+  return pascalCaseForOperationId(`${getClientName(context, namespace)}_${operationName}`);
 }
 
 /**
