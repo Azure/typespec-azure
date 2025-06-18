@@ -58,7 +58,12 @@ union WidgetColor {
 
 ❌ **DON'T** import or use templates `xxx.Private` namespaces
 
-✅ **DO** customizations that only impact client should be in a `client.tsp` file
+❌ **DON'T** import or use `@azure-tools/typespec-client-generator-core` in files other than `client.tsp` or `back-compat.tsp`
+❌ **DON'T** reference `client.tsp` in `main.tsp`
+✅ **DO** reference `back-compat.tsp` in `main.tsp`
+✅ **DO** add customizations for ARM APIs in `back-compat.tsp`
+✅ **DO** add customizations that impact only generated client SDKs in `client.tsp`
+✅ **DO** add customizations that impact both generated client SDKs and generated OpenAPI specs in `back-compat.tsp`
 
 ✅ **DO** customizations that impact both client and API shape should be in a `back-compatible.tsp` file, and be imported by `main.tsp`
 
