@@ -202,7 +202,7 @@ interface OptionalBody {
     2. With body scenario: Request body contains allowance change data
     
     Expected verb: POST
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/changeWidgetAllowance
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/providerPost
     Expected query parameter: api-version=2023-12-01-preview
     
     Scenario 1 - Expected request body: None (empty body)

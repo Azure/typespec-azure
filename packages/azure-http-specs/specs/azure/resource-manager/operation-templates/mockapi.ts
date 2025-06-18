@@ -603,7 +603,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
   "WithBody",
 ]).pass([
   {
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/changeWidgetAllowance",
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/providerPost",
     method: "post",
     request: {
       pathParams: {
@@ -634,7 +634,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
     kind: "MockApiDefinition",
   },
   {
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/changeWidgetAllowance",
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/providerPost",
     method: "post",
     request: {
       pathParams: {
