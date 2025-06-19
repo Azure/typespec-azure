@@ -34,6 +34,7 @@ import { camelCase } from "change-case";
 import { getParamAlias, getResponseAsBool } from "./decorators.js";
 import {
   CollectionFormat,
+  SdkBodyModelPropertyType,
   SdkBodyParameter,
   SdkCookieParameter,
   SdkHeaderParameter,
@@ -42,9 +43,7 @@ import {
   SdkHttpParameter,
   SdkHttpResponse,
   SdkMethodParameter,
-  SdkModelPropertyType,
   SdkModelType,
-  SdkParameter,
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceResponseHeader,
@@ -179,7 +178,7 @@ function getSdkHttpParameters(
   // add operation info onto body param
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
-  const correspondingMethodParams: SdkModelPropertyType[] = [];
+  const correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[] = [];
   if (tspBody) {
     if (tspBody.bodyKind === "file") {
       // file body is not supported yet
@@ -416,7 +415,6 @@ export function getSdkHttpParameter(
   const diagnostics = createDiagnosticCollector();
   const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, param, operation));
   const program = context.program;
-  const correspondingMethodParams: SdkParameter[] = []; // we set it later in the operation
   if (isPathParam(context.program, param) || location === "path") {
     return diagnostics.wrap({
       ...base,
@@ -428,7 +426,7 @@ export function getSdkHttpParameter(
         (httpParam as HttpOperationPathParameter)?.allowReserved ??
         $(program).type.isAssignableTo(param.type, $(program).builtin.url, param.type),
       serializedName: getPathParamName(program, param) ?? base.name,
-      correspondingMethodParams,
+      correspondingMethodParams: [],
       optional: param.optional,
     });
   }
@@ -437,7 +435,7 @@ export function getSdkHttpParameter(
       ...base,
       kind: "cookie",
       serializedName: getCookieParamOptions(program, param)?.name ?? base.name,
-      correspondingMethodParams,
+      correspondingMethodParams: [],
       optional: param.optional,
     });
   }
@@ -449,14 +447,14 @@ export function getSdkHttpParameter(
       contentTypes: ["application/json"],
       defaultContentType: "application/json",
       optional: param.optional,
-      correspondingMethodParams,
+      correspondingMethodParams: [],
     });
   }
   const headerQueryBase = {
     ...base,
     optional: param.optional,
     collectionFormat: diagnostics.pipe(getCollectionFormat(context, param)),
-    correspondingMethodParams,
+    correspondingMethodParams: [],
   };
   if (isQueryParam(context.program, param) || location === "query") {
     return diagnostics.wrap({
@@ -518,6 +516,7 @@ function getSdkHttpResponseAndExceptions(
           kind: "responseheader",
           serializedName: getHeaderFieldName(context.program, header),
         });
+        context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
         if (body && body !== innerResponse.body.type) {
@@ -593,9 +592,9 @@ function getSdkHttpResponseAndExceptions(
 export function getCorrespondingMethodParams(
   context: TCGCContext,
   operation: Operation,
-  methodParameters: SdkParameter[],
+  methodParameters: SdkMethodParameter[],
   serviceParam: SdkHttpParameter,
-): [SdkModelPropertyType[], readonly Diagnostic[]] {
+): [(SdkMethodParameter | SdkBodyModelPropertyType)[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
   // 1. To see if the service parameter is a client parameter.
@@ -702,10 +701,10 @@ export function getCorrespondingMethodParams(
  */
 function findMapping(
   context: TCGCContext,
-  methodParameters: SdkModelPropertyType[],
-  serviceParam: SdkHttpParameter | SdkModelPropertyType,
-): SdkModelPropertyType | undefined {
-  const queue: SdkModelPropertyType[] = [...methodParameters];
+  methodParameters: SdkMethodParameter[],
+  serviceParam: SdkHttpParameter | SdkBodyModelPropertyType,
+): SdkMethodParameter | SdkBodyModelPropertyType | undefined {
+  const queue: (SdkMethodParameter | SdkBodyModelPropertyType)[] = [...methodParameters];
   const visited: Set<SdkModelType> = new Set();
   while (queue.length > 0) {
     const methodParam = queue.shift()!;

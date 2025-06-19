@@ -56,7 +56,9 @@ export interface TCGCContext {
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
-  __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
+  __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
+  __modelPropertyCache: Map<ModelProperty, SdkBodyModelPropertyType>;
+  __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __tspTypeToApiVersions: Map<Type, string[]>;
@@ -67,7 +69,7 @@ export interface TCGCContext {
   >;
   __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
-  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkParameter[]>;
+  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
   __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
@@ -482,7 +484,7 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
 
 export interface SdkModelType extends SdkTypeBase {
   kind: "model";
-  properties: SdkModelPropertyType[];
+  properties: SdkBodyModelPropertyType[];
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
@@ -495,17 +497,13 @@ export interface SdkModelType extends SdkTypeBase {
   additionalProperties?: SdkType;
   discriminatorValue?: string;
   discriminatedSubtypes?: Record<string, SdkModelType>;
-  discriminatorProperty?: SdkModelPropertyType;
+  discriminatorProperty?: SdkBodyModelPropertyType;
   baseModel?: SdkModelType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** API versions supported for current type. */
   apiVersions: string[];
   serializationOptions: SerializationOptions;
-}
-
-export interface SdkInitializationType extends SdkModelType {
-  properties: SdkParameter[];
 }
 
 /**
@@ -517,7 +515,7 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
   /** Initialization parameters. */
-  parameters: SdkParameter[];
+  parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
   /** How to initialize a client. */
   initializedBy: InitializedByFlags;
 }
@@ -642,12 +640,6 @@ export interface SdkCredentialParameter
   onClient: true;
 }
 
-export type SdkModelPropertyType =
-  | SdkBodyModelPropertyType
-  | SdkParameter
-  | SdkHttpParameter
-  | SdkServiceResponseHeader;
-
 export interface MultipartOptions {
   name: string;
   /** whether this part is for file */
@@ -655,9 +647,9 @@ export interface MultipartOptions {
   /** whether this part is multi in request payload */
   isMulti: boolean;
   /** undefined if filename is not set explicitly in Typespec */
-  filename?: SdkModelPropertyType;
+  filename?: SdkBodyModelPropertyType;
   /** undefined if contentType is not set explicitly in Typespec */
-  contentType?: SdkModelPropertyType;
+  contentType?: SdkBodyModelPropertyType;
   /** defined in Typespec or calculated by Typespec complier */
   defaultContentTypes: string[];
 }
@@ -692,7 +684,7 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   /** Name for the parameter in the payload */
   serializedName: string;
   /** Corresponding method level parameter or model property for current parameter. */
-  correspondingMethodParams: SdkModelPropertyType[];
+  correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
 /**
@@ -704,7 +696,7 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   /** Name for the parameter in the payload */
   serializedName: string;
   /** Corresponding method level parameter or model property for current parameter. */
-  correspondingMethodParams: SdkModelPropertyType[];
+  correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
   explode: boolean;
 }
 
@@ -719,7 +711,7 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   /** Name for the parameter in the payload */
   serializedName: string;
   /** Corresponding method level parameter or model property for current parameter. */
-  correspondingMethodParams: SdkModelPropertyType[];
+  correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
 /**
@@ -730,7 +722,7 @@ export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
   /** Name for the parameter in the payload */
   serializedName: string;
   /** Corresponding method level parameter or model property for current parameter. */
-  correspondingMethodParams: SdkModelPropertyType[];
+  correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
 /**
@@ -743,7 +735,7 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   contentTypes: string[];
   defaultContentType: string;
   /** Corresponding method level parameter or model property for current parameter. */
-  correspondingMethodParams: SdkModelPropertyType[];
+  correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[];
 }
 
 export type SdkHttpParameter =
@@ -767,13 +759,9 @@ export interface SdkMethodResponse {
   kind: "method";
   type?: SdkType;
   /**
-   * @deprecated Use `resultSegments` instead.
-   */
-  resultPath?: string;
-  /**
    * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
-  resultSegments?: SdkModelPropertyType[];
+  resultSegments?: SdkBodyModelPropertyType[];
 }
 
 export interface SdkServiceResponse {
@@ -800,8 +788,6 @@ export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
 }
 
 interface SdkServiceOperationBase {}
-
-export type SdkParameter = SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter;
 
 /**
  * Http operation.
@@ -832,15 +818,13 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
  */
 
 export type SdkServiceOperation = SdkHttpOperation;
-export type SdkServiceParameter = SdkHttpParameter;
 
-interface SdkMethodBase extends DecoratedType {
+interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
   __raw?: Operation;
   name: string;
   /** Whether the type has public or private accessibility */
   access: AccessFlags;
-  /** Method's parameters. */
-  parameters: SdkParameter[];
   /** API versions supported for current type. */
   apiVersions: string[];
   /** Document for the type. */
@@ -849,10 +833,6 @@ interface SdkMethodBase extends DecoratedType {
   summary?: string;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
-}
-
-interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
-  extends SdkMethodBase {
   /** Method's underlying protocol operation. */
   operation: TServiceOperation;
   /** Method's parameters. */
@@ -881,18 +861,6 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
  * Paging operation info.
  */
 interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
-  /**
-   * @deprecated Use `pagingMetadata.__raw` instead.
-   */
-  __raw_paged_metadata?: PagedResultMetadata;
-  /**
-   * @deprecated Use `pagingMetadata.nextLinkSegments` instead.
-   */
-  nextLinkPath?: string;
-  /**
-   * @deprecated Use `pagingMetadata.nextLinkOperation` instead.
-   */
-  nextLinkOperation?: SdkServiceOperation;
   /** Paging info. */
   pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
 }
@@ -905,17 +873,17 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   __raw?: PagedResultMetadata | PagingOperation;
 
   /** Segments to indicate how to get next page link value from response. */
-  nextLinkSegments?: SdkModelPropertyType[];
+  nextLinkSegments?: (SdkServiceResponseHeader | SdkBodyModelPropertyType)[];
   /** Method used to get next page. If not defined, use the initial method. */
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
   /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
-  nextLinkReInjectedParametersSegments?: SdkModelPropertyType[][];
+  nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkBodyModelPropertyType)[][];
   /** Segments to indicate how to set continuation token for next page request. */
-  continuationTokenParameterSegments?: SdkModelPropertyType[];
+  continuationTokenParameterSegments?: (SdkMethodParameter | SdkBodyModelPropertyType)[];
   /** Segments to indicate how to get continuation token value from response. */
-  continuationTokenResponseSegments?: SdkModelPropertyType[];
+  continuationTokenResponseSegments?: (SdkServiceResponseHeader | SdkBodyModelPropertyType)[];
   /** Segments to indicate how to get page items from response. */
-  pageItemsSegments?: SdkModelPropertyType[];
+  pageItemsSegments?: SdkBodyModelPropertyType[];
 }
 
 /**
@@ -931,10 +899,6 @@ export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOper
  * LRO method info.
  */
 interface SdkLroServiceMethodOptions {
-  /**
-   * @deprecated This property will be removed in future releases. Use `lroMetadata` for synthesized LRO metadata. If you still want to access primitive LRO info, use `lroMetadata.__raw`.
-   */
-  __raw_lro_metadata: LroMetadata;
   /** LRO info */
   lroMetadata: SdkLroServiceMetadata;
 }
@@ -984,14 +948,8 @@ export interface SdkLroServiceFinalResponse {
   envelopeResult: SdkModelType;
   /** Meaningful result type */
   result: SdkModelType;
-  /**
-   * Property path to fetch {result} from {envelopeResult}. Note that this property is available only in some LRO patterns.
-   *
-   * @deprecated This property will be removed in future releases. Use `resultSegments` for synthesized property information.
-   */
-  resultPath?: string;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
-  resultSegments?: SdkModelPropertyType[];
+  resultSegments?: SdkBodyModelPropertyType[];
 }
 
 /**
