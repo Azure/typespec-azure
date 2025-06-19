@@ -1507,22 +1507,7 @@ export function updateUsageOrAccess(
 
   if (!options.skipFirst) {
     if (typeof value === "number") {
-      // usage set
-      if (options.isOverride) {
-        // when a type has usage, it could not be override to narrow usage
-        if (
-          ((type.usage & UsageFlags.Input) > 0 && (value & UsageFlags.Input) === 0) ||
-          ((type.usage & UsageFlags.Output) > 0 && (value & UsageFlags.Output) === 0)
-        ) {
-          diagnostics.add(
-            createDiagnostic({
-              code: "conflict-usage-override",
-              target: type.__raw!,
-            }),
-          );
-          return diagnostics.wrap(undefined);
-        }
-      }
+      // usage set is always additive
       type.usage |= value;
     } else {
       // access set
@@ -1567,7 +1552,10 @@ export function updateUsageOrAccess(
   if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.baseModel) {
     options.ignoreSubTypeStack.push(true);
-    if (context.disableUsageAccessPropagationToBase) {
+    if (
+      context.disableUsageAccessPropagationToBase &&
+      type.baseModel.discriminatorProperty === undefined // For models with discriminators, we should not disable propagation
+    ) {
       options.skipFirst = true;
     }
     diagnostics.pipe(updateUsageOrAccess(context, value, type.baseModel, options));
@@ -1815,6 +1803,14 @@ function updateUsageOverride(context: TCGCContext): [void, readonly Diagnostic[]
     const usageOverride = getUsageOverride(context, sdkType.__raw as any);
     if (usageOverride) {
       diagnostics.pipe(updateUsageOrAccess(context, usageOverride, sdkType, { isOverride: true }));
+      if (usageOverride & UsageFlags.Json) {
+        // if a type has Json usage, then it should have serialization options
+        updateSerializationOptions(context, sdkType, ["application/json"]);
+      }
+      if (usageOverride & UsageFlags.Xml) {
+        // if a type has Xml usage, then it should have serialization options
+        updateSerializationOptions(context, sdkType, ["application/xml"]);
+      }
     }
   }
   return diagnostics.wrap(undefined);
