@@ -4,19 +4,17 @@ title: Clients
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
-This page explains client behavior and how to customize clients. For an overview of the setup, please refer to the previous page.
+This page documents the default client hierarchy behavior as well as how to customize clients. To get a summary of the setup, please check out the previous page.
 
-> **NOTE:** JS RLC does not support customization. It will ignore `client.tsp`, and the following scenarios will not affect the JS RLC user experience. In this context, "TypeScript part" refers to the JS Modular Emitter.
+> **NOTE:** The JS RLC doesn't support client hierarchy customization and will ignore client.tsp. Therefore, the following scenarios won't affect the JS RLC user experience. In this context, the TypeScript part refers to the JS Modular Emitter.
 
 ## Default Behavior
 
 ### Basic Rules
 
-By default, the namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
+By default, each namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
 
-Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure.
-
-The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
+Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure. The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
 
 The root client's SDK namespace corresponds to the namespace decorated with `@service`. If an operation group originates from a sub-namespace, its SDK namespace corresponds to that sub-namespace. If it originates from an interface, its SDK namespace corresponds to the namespace containing the interface.
 
@@ -28,15 +26,18 @@ Different languages organize clients and operation groups differently. Refer to 
 
 <ClientTabs>
 
-```typespec title="main.tsp"
+```typespec
+@versioned(Versions)
 @service(#{ title: "Pet Store" })
 namespace PetStore;
 
-@route("/feed")
-op feed(): void;
+enum Versions {
+  v1,
+}
 
-@route("/op2")
-op pet(): void;
+@route("/feed") op feed(): void;
+
+@route("/pet") op pet(): void;
 ```
 
 ```python
@@ -48,9 +49,23 @@ client.pet()
 ```
 
 ```csharp
+namespace PetStore
+{
+  public partial class PetStoreClient
+  {
+      public PetStoreClient(Uri endpoint, PetStoreClientOptions options){}
+
+      public virtual async Task<Response> FeedAsync(RequestContext context = null) {}
+      public virtual Response Feed(RequestContext context = null) {}
+      public virtual async Task<Response> PetAsync(RequestContext context = null) {}
+      public virtual Response Pet(RequestContext context = null) {}
+  }
+}
+
+// Create the client and invoke the operations
 using PetStore;
 
-PetStoreClient client = new PetStoreClient();
+PetStoreClient client = new PetStoreClient(url, options);
 client.Feed();
 client.Pet();
 ```
@@ -73,24 +88,29 @@ client.pet();
 
 ### Client with One-Layer Child Operation Groups
 
-`PetStore` has two operation groups. The `Dogs` operation group comes from a sub-namespace, while `Cats` comes from an interface.
+The PetStore includes two operation groups: `Dogs`, which belongs to a subnamespace, and `Cats`, which is part of an interface.
 
 <ClientTabs>
 
 ```typespec
+@versioned(Versions)
 @service(#{ title: "Pet Store", version: "v1" })
 namespace PetStore;
 
+enum Versions {
+  v1,
+}
+
 @route("/dogs")
 interface Dogs {
-  feed(): void;
-  pet(): void;
+  @route("feed") feed(): void;
+  @route("pet") pet(): void;
 }
 
 @route("/cats")
 namespace Cats {
-  op feed(): void;
-  op pet(): void;
+  @route("feed") op feed(): void;
+  @route("pet") op pet(): void;
 }
 ```
 
@@ -144,35 +164,32 @@ catsClient.pet();
 
 <ClientTabs>
 
-```typespec title="main.tsp"
+```typespec
 @service(#{ title: "Pet Store", version: "v1" })
 namespace PetStore;
 
-@route("/info")
-op info(): void;
+@route("/info") op info(): void;
 
 @route("/billings")
 interface Billings {
-  @route("history")
-  history(): void;
+  @route("history") history(): void;
 }
 
 @route("/pets")
 namespace Pets {
-  @route("info")
-  op info(): void;
+  @route("info") op info(): void;
 
   @route("/actions")
   interface Actions {
-    feed(): void;
-    pet(): void;
+    @route("feed") feed(): void;
+    @route("pet") pet(): void;
   }
 }
 
 @route("/actions")
 interface Actions {
-  open(): void;
-  close(): void;
+  @route("open") open(): void;
+  @route("close") close(): void;
 }
 ```
 
