@@ -157,11 +157,7 @@ interface OptionalBody {
     }
     ```
     """)
-  patch is Azure.ResourceManager.Legacy.CustomPatchSync<
-    Widget,
-    Widget,
-    OptionalRequestBody = true
-  >;
+  patch is Azure.ResourceManager.Legacy.CustomPatchSync<Widget, Widget, OptionalRequestBody = true>;
 
   @scenario
   @scenarioDoc("""
