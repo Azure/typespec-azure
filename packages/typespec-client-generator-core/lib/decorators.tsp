@@ -3,31 +3,55 @@ using Reflection;
 namespace Azure.ClientGenerator.Core;
 
 /**
- * Changes the name of a method, parameter, property, or model generated in the client SDK
- * @param rename The rename you want applied to the object
+ * Changes the name of a client, method, parameter, union, model, enum, model property, etc. generated in the client SDK.
+ * @param target The type you want to rename.
+ * @param rename The rename you want applied to the object.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Rename a model
  * ```typespec
- * @clientName("nameInClient")
- * op nameInService: void;
+ * @clientName("RenamedModel")
+ * model TestModel {
+ *  prop: string;
+ * }
  * ```
  *
- * @example
+ * @example Rename a model property
+ * ```typespec
+ * model TestModel {
+ *  @clientName("renamedProp")
+ *  prop: string;
+ * }
+ * ```
+ *
+ * @example Rename a parameter
+ * ```typespec
+ * op example(@clientName("renamedParameter") parameter: string): void;
+ * ```
+ *
+ * @example Rename an operation
+ * ```typespec
+ * @clientName("nameInClient")
+ * op example(): void;
+ * ```
+ *
+ * @example Rename an operation for different language emitters
  * ```typespec
  * @clientName("nameForJava", "java")
  * @clientName("name_for_python", "python")
  * @clientName("nameForCsharp", "csharp")
  * @clientName("nameForJavascript", "javascript")
- * op nameInService: void;
+ * op example(): void;
  * ```
+ *
  */
 extern dec clientName(target: unknown, rename: valueof string, scope?: valueof string);
 
 /**
- * Whether you want to generate an operation as a convenient operation.
- * @param value Whether to generate the operation as convenience method or not.
+ * Whether you want to generate an operation as a convenient method.
+ * @param target The target operation.
+ * @param flag Whether to generate the operation as a convenience method or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -37,11 +61,12 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
  * op test: void;
  * ```
  */
-extern dec convenientAPI(target: Operation, value?: valueof boolean, scope?: valueof string);
+extern dec convenientAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
 
 /**
- * Whether you want to generate an operation as a protocol operation.
- * @param value Whether to generate the operation as protocol or not.
+ * Whether you want to generate an operation as a protocol method.
+ * @param target The target operation.
+ * @param flag Whether to generate the operation as a protocol method or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -51,21 +76,18 @@ extern dec convenientAPI(target: Operation, value?: valueof boolean, scope?: val
  * op test: void;
  * ```
  */
-extern dec protocolAPI(target: Operation, value?: valueof boolean, scope?: valueof string);
+extern dec protocolAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
 
 /**
- * Create a ClientGenerator.Core client out of a namespace or interface
- * @param value Optional configuration for the service.
+ * Define the client generated in the client SDK.
+ * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+ * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+ * @param target The target namespace or interface that you want to define as a client.
+ * @param options Optional configuration for the service.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example Basic client setting
- * ```typespec
- * @client
- * namespace MyService {}
- * ```
- *
- * @example Setting with other service
+ * @example Basic client definition
  * ```typespec
  * namespace MyService {}
  *
@@ -73,18 +95,39 @@ extern dec protocolAPI(target: Operation, value?: valueof boolean, scope?: value
  * interface MyInterface {}
  * ```
  *
- * @example Changing client name if you don't want <Interface/Namespace>Client
+ * @example Changing client name
  * ```typespec
- * @client({client: MySpecialClient})
+ * namespace MyService {}
+ *
+ * @client({service: MyService, name: "MySpecialClient"})
  * interface MyInterface {}
  * ```
  *
  * @example
  */
-extern dec client(target: Namespace | Interface, value?: Model, scope?: valueof string);
+extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?: valueof string);
 
 /**
- * Create a ClientGenerator.Core operation group out of a namespace or interface
+ * Client customization options.
+ */
+model ClientOptions {
+  /**
+   * The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
+   * The namespace should be decorated with `@service`.
+   */
+  service?: Namespace;
+
+  /**
+   * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
+   */
+  name?: string;
+}
+
+/**
+ * Define the sub client generated in the client SDK.
+ * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
+ * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
+ * @param target The target namespace or interface that you want to define as a sub client.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -124,17 +167,19 @@ enum Usage {
 /**
  * Add usage for models/enums.
  * A model/enum's default usage info is always calculated by the operations that use it.
- * You could use this decorator to add additional usage info.
+ * You can use this decorator to add additional usage info.
  * When setting usage for namespaces,
  * the usage info will be propagated to the models defined in the namespace.
- * If the model has an usage override, the model override takes precedence.
+ * If the model has a usage override, the model override takes precedence.
  * For example, with operation definition `op test(): OutputModel`,
  * the model `OutputModel` has default usage `Usage.output`.
  * After adding decorator `@@usage(OutputModel, Usage.input | Usage.json)`,
  * the final usage result for `OutputModel` is `Usage.input | Usage.output | Usage.json`.
  * The usage info for models will be propagated to models' properties,
  * parent models, discriminated sub models.
- * @param value The usage info you want to add for this model.
+ * @param target The target type you want to extend usage.
+ * @param value The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.
+ * For example, `Usage.input | Usage.output | Usage.json`.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -149,15 +194,15 @@ enum Usage {
  * }
  * ```
  *
- * @example Propagation of usage
+ * @example Propagation of usage, all usage will be propagated to the parent model, discriminated sub models, and model properties.
  * ```typespec
- * // Usage.output
+ * // usage result for `Fish` is `Usage.input | Usage.output | Usage.json`
  * @discriminator("kind")
  * model Fish {
  *   age: int32;
  * }
  *
- * // Usage.input | Usage.output | Usage.json
+ * // usage result for `Shark` is `Usage.input | Usage.output | Usage.json`
  * @discriminator("sharktype")
  * @usage(Usage.input | Usage.json)
  * model Shark extends Fish {
@@ -165,17 +210,17 @@ enum Usage {
  *   origin: Origin;
  * }
  *
- * // Usage.output
+ * // usage result for `Salmon` is `Usage.output | Usage.json`
  * model Salmon extends Fish {
  *   kind: "salmon";
  * }
  *
- * // Usage.output
+ * // usage result for `SawShark` is `Usage.input | Usage.output | Usage.json`
  * model SawShark extends Shark {
  *   sharktype: "saw";
  * }
  *
- * // Usage.output
+ * // usage result for `Origin` is `Usage.input | Usage.output | Usage.json`
  * model Origin {
  *   country: string;
  *   city: string;
@@ -208,7 +253,7 @@ enum Access {
 }
 
 /**
- * Override access for operations, models, enums and model property.
+ * Override access for operations, models, enums and model properties.
  * When setting access for namespaces,
  * the access info will be propagated to the models and operations defined in the namespace.
  * If the model has an access override, the model override takes precedence.
@@ -218,11 +263,12 @@ enum Access {
  * Models/enums that are only used in operations with `@access(Access.internal)` will be set to access "internal".
  * The access info for models will be propagated to models' properties,
  * parent models, discriminated sub models.
- * The override access should not be narrow than the access calculated by operation,
+ * The override access should not be narrower than the access calculated by operation,
  * and different override access should not conflict with each other,
- * otherwise a warning will be added to diagnostics list.
+ * otherwise a warning will be added to the diagnostics list.
  * Model property's access will default to public unless there is an override.
- * @param value The access info you want to set for this model or operation.
+ * @param target The target type you want to override access info.
+ * @param value The access info you want to set for this model or operation. It should be one of the `Access` enum values, either `Access.public` or `Access.internal`.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -358,6 +404,8 @@ extern dec access(
 
 /**
  * Set whether a model property should be flattened or not.
+ * This decorator is not recommended to use for green field services.
+ * @param target The target model property that you want to flatten.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -375,58 +423,58 @@ extern dec access(
 extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
 
 /**
- * Override the default client method generated by TCGC from your service definition
- * @param original: The original service definition
+ * Customize a method's signature in the generated client SDK.
+ * Currently, only parameter signature customization is supported.
+ * This decorator allows you to specify a different method signature for the client SDK than the original definition.
+ * @param target: The target operation that you want to override.
  * @param override: The override method definition that specifies the exact client method you want
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Customize parameters into an option bag
  * ```typespec
  * // main.tsp
+ * @service
  * namespace MyService;
+ *
+ * op myOperation(foo: string, bar: string): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
+ *
+ * // client.tsp
+ * namespace MyCustomizations;
  *
  * model Params {
  *  foo: string;
  *  bar: string;
  * }
- * op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
- *
- * // client.tsp
- * namespace MyCustomizations;
  *
  * op myOperationCustomization(params: MyService.Params): void;
  *
- * @@override(MyService.myOperation, myOperationCustomization);
- *
- * // method signature is now `op myOperation(params: Params)`
+ * @@override(MyService.myOperation, myOperationCustomization); // method signature is now `op myOperation(params: Params)`
  * ```
  *
- * @example
+ * @example Customize a parameter to be required
  * ```typespec
  * // main.tsp
+ * @service
  * namespace MyService;
  *
- * model Params {
- *  foo: string;
- *  bar: string;
- * }
- * op myOperation(...Params): void; // by default, we generate the method signature as `op myOperation(foo: string, bar: string)`;
+ * op myOperation(foo: string, bar?: string): void; // by default, we generate the method signature as `op myOperation(foo: string, bar?: string)`;
  *
  * // client.tsp
  * namespace MyCustomizations;
  *
- * op myOperationCustomization(params: MyService.Params): void;
+ * op myOperationCustomization(foo: string, bar: string): void;
  *
- * @@override(MyService.myOperation, myOperationCustomization, "csharp")
+ * @@override(MyService.myOperation, myOperationCustomization)
  *
- * // method signature is now `op myOperation(params: Params)` just for csharp
+ * // method signature is now `op myOperation(params: Params)` just for csharp // method signature is now `op myOperation(foo: string, bar: string)`
  * ```
  */
-extern dec override(original: Operation, override: Operation, scope?: valueof string);
+extern dec override(target: Operation, override: Operation, scope?: valueof string);
 
 /**
  * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
+ * @param target The target model that you want to set the custom JSON converter.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -456,11 +504,17 @@ enum InitializedBy {
 }
 
 /**
- * Customize the client initialization way.
+ * Customize the client initialization way in the generated client SDK.
+ * By default, the root client is initialized individually, and the sub clients are initialized by the parent client.
+ * By default, the initialization parameters include endpoint, credential, and API version.
+ * With `@clientInitialization` decorator, you can elevate operation level parameters to client level, and set how the client is initialized.
+ * This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
+ * @param target The target client that you want to customize client initialization for.
+ * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Add client initialization parameters
  * ```typespec
  * // main.tsp
  * namespace MyService;
@@ -475,7 +529,7 @@ enum InitializedBy {
  * }
  *
  * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
- * // The generated client will have `blobName` on its initialization method. We will also
+ * // The generated client will have `blobName` in its initialization method. We will also
  * // elevate the existing `blobName` parameter from method level to client level.
  * ```
  */
@@ -490,23 +544,25 @@ extern dec clientInitialization(
  */
 model ClientInitializationOptions {
   /**
-   * Redefine the client initialization parameters you would like to add to the client.
-   * By default, we apply endpoint, credential, and api-version parameters. If you specify parameters model, we will append the properties of the model to the parameters list of the client initialization.
+   * Redefine the client initialization parameters you would like to add to the client. All the model properties should have corresponding operation level parameters.
+   * By default, we apply endpoint, credential, and API version parameters. If you specify a parameters model, we will append the properties of the model to the parameters list of the client initialization.
    */
   parameters?: Model;
 
   /**
-   * Determines how the client could be initialized. Use `InitializedBy` enum to set the value. The value could be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent`.
+   * Determines how the client can be initialized. Use `InitializedBy` enum to set the value. The value can be `InitializedBy.individually`, `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent`.
    */
   initializedBy?: EnumMember | Union;
 }
 
 /**
- * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization then on individual methods and still refer to the same parameter.
+ * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization and the original parameter in the operation.
+ * @param target The target model property that you want to alias.
+ * @param paramAlias The alias name you want to apply to the target model property.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Elevate an operation parameter to client level and alias it to a different name
  * ```typespec
  * // main.tsp
  * namespace MyService;
@@ -522,32 +578,32 @@ model ClientInitializationOptions {
  * @@clientInitialization(MyService, MyServiceClientOptions)
  * @@paramAlias(MyServiceClientOptions.blob, "blobName")
  *
- * // The generated client will have `blobName` on it. We will also
+ * // The generated client will have `blobName` in it. We will also
  * // elevate the existing `blob` parameter to the client level.
  * ```
  */
-extern dec paramAlias(original: ModelProperty, paramAlias: valueof string, scope?: valueof string);
+extern dec paramAlias(target: ModelProperty, paramAlias: valueof string, scope?: valueof string);
 
 /**
  * Changes the namespace of a client, model, enum or union generated in the client SDK.
  * By default, the client namespace for them will follow the TypeSpec namespace.
+ * @param target The type you want to change the namespace for.
  * @param rename The rename you want applied to the object
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Change a namespace to a different name
  * ```typespec
  * @clientNamespace("ContosoClient")
  * namespace Contoso;
  * ```
  *
- * @example
+ * @example Move a model to a different namespace
  * ```typespec
- * @clientNamespace("ContosoJava", "java")
- * @clientNamespace("ContosoPython", "python")
- * @clientNamespace("ContosoCSharp", "csharp")
- * @clientNamespace("ContosoJavascript", "javascript")
- * namespace Contoso;
+ * @clientNamespace("ContosoClient.Models")
+ * model Test {
+ *  prop: string;
+ * }
  * ```
  */
 extern dec clientNamespace(
@@ -557,30 +613,32 @@ extern dec clientNamespace(
 );
 
 /**
- * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
- *
- * @param source The source type to which the alternate type will be applied.
+ * @param target The source type to which the alternate type will be applied.
  * @param alternate The alternate type to apply to the target.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
- * @example
+ * @example Change a model property to a different type
  * ```typespec
  * model Foo {
  *    date: utcDateTime;
  * }
  * @@alternateType(Foo.date, string);
  * ```
- * @example
+ *
+ * @example Change a Scalar type to a different type
  * ```typespec
- * scalar storageDateTime extends utcDataTime;
+ * scalar storageDateTime extends utcDateTime;
  * @@alternateType(storageDateTime, string, "python");
  * ```
- * @example
+ *
+ * @example Change a function parameter to a different type
  * ```typespec
  * op test(@param @alternateType(string) date: utcDateTime): void;
  * ```
- * @example
+ *
+ * @example Change a model property to a different type with language specific alternate type
  * ```typespec
  * model Test {
  *   @alternateType(unknown)
@@ -592,33 +650,44 @@ extern dec clientNamespace(
  * ```
  */
 extern dec alternateType(
-  source: ModelProperty | Scalar,
+  target: ModelProperty | Scalar,
   alternate: unknown,
   scope?: valueof string
 );
 
 /**
- * To define the client scope of an operation.
+ * Define the scope of an operation.
+ * By default, the operation will be applied to all language emitters.
+ * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
+ * @param target The target operation that you want to scope.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Omit an operation from a specific language
  * ```typespec
  * @scope("!csharp")
+ * op test: void;
+ * ```
+ *
+ * @example Apply an operation to specific languages
+ * ```typespec
+ * @scope("go")
  * op test: void;
  * ```
  */
 extern dec scope(target: Operation, scope?: valueof string);
 
 /**
- * Use to override default assumptions on whether a parameter is an api-version parameter or not.
- * By default, we do matches with the `api-version` or `apiversion` string in the parameter name. Since api versions are
- * a client parameter, we will also elevate this parameter up onto the client.
+ * Specify whether a parameter is an API version parameter or not.
+ * By default, we detect an API version parameter by matching the parameter name with `api-version` or `apiversion`, or if the type is referenced by the `@versioned` decorator.
+ * Since API versions are a client parameter, we will also elevate this parameter up onto the client.
+ * This decorator allows you to explicitly specify whether a parameter should be treated as an API version parameter or not.
+ * @param target The target parameter that you want to mark as an API version parameter.
  * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Mark a parameter as an API version parameter
  * ```typespec
  * namespace Contoso;
  *
@@ -628,6 +697,16 @@ extern dec scope(target: Operation, scope?: valueof string);
  *   version: string
  * ): void;
  * ```
+ *
+ * @example Mark a parameter as not an API version parameter
+ * ```typespec
+ * namespace Contoso;
+ * op test(
+ *   @apiVersion(false)
+ *   @query
+ *   api-version: string
+ * ): void;
+ * ```
  */
 extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: valueof string);
 
@@ -635,8 +714,12 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  * Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
  * This decorator is useful for extending the API version enum exposed by the client.
  * It is particularly beneficial when generating a complete API version enum without requiring the entire specification to be annotated with versioning decorators, as the generation process does not depend on versioning details.
+ * @param target The target client for which you want to define additional API versions.
+ * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
- * @example
+ * @example Add additional API versions to a client
  * ```typespec
  * // main.tsp
  * @versioned(Versions)
@@ -652,8 +735,10 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  * ```
  */
 extern dec clientApiVersions(target: Namespace, value: Enum, scope?: valueof string);
+
 /**
  * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
+ * @param target The target type that you want to apply this deserialization behavior to.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
@@ -674,11 +759,15 @@ extern dec clientApiVersions(target: Namespace, value: Enum, scope?: valueof str
 extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof string);
 
 /**
- * Indicates that a HEAD operation should be modeled as Response<bool>. 404 will not raise an error, instead the service method will return `false`. 2xx will return `true`. Everything else will still raise an error.
+ * Indicates that a HEAD operation should be modeled as Response<bool>.
+ * 404 will not raise an error, instead the service method will return `false`.
+ * 2xx will return `true`. Everything else will still raise an error.
+ * @param target The target operation that you want to apply this behavior to.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  *
  * @example
  * ```typespec
- *
  * @responseAsBool
  * @head
  * op headOperation(): void;
@@ -687,11 +776,71 @@ extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof s
 extern dec responseAsBool(target: Operation, scope?: valueof string);
 
 /**
- * Change the operation location in client. If the target client is not defined, use `string` to indicate the client name.
- *
+ * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name.
+ * This decorator allows you to change the client an operation belongs to in the client SDK.
+ * This decorator cannot be used along with `@client` or `@operationGroup` decorators.
  * @param source The operation to change location for.
- * @param target The target `Namespace`, `Interface` or a string which could indicate the client.
- * @param scope The language scope for this decorator
+ * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
+ * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
+ * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * 
+ * @example Move to existing sub client
+ * ```typespec
+ * @service
+ * namespace MoveToExistingSubClient;
+ * 
+ * interface UserOperations {
+ *   @route("/user")
+ *   @get
+ *   getUser(): void;
+
+ *   @route("/user")
+ *   @delete
+ *   @clientLocation(AdminOperations)
+ *   deleteUser(): void; // This operation will be moved to AdminOperations sub client.
+ * }
+
+ * interface AdminOperations {
+ *   @route("/admin")
+ *   @get
+ *   getAdminInfo(): void;
+ * }
+ * ```
+ * 
+ * @example Move to new sub client
+ * ```typespec
+ * @service
+ * namespace MoveToNewSubClient;
+ * 
+ * interface ProductOperations {
+ *   @route("/products")
+ *   @get
+ *   listProducts(): void;
+ *
+ *   @route("/products/archive")
+ *   @post
+ *   @clientLocation("ArchiveOperations")
+ *   archiveProduct(): void; // This operation will be moved to a new sub client named ArchiveOperations.
+ * }
+ * ```
+ * 
+ * @example Move operation to root client
+ * ```typespec
+ * @service
+ * namespace MoveToRootClient;
+ * 
+ * interface ResourceOperations {
+ *   @route("/resource")
+ *   @get
+ *   getResource(): void;
+ * 
+ *   @route("/health")
+ *   @get
+ *   @clientLocation(MoveToRootClient)
+ *   getHealthStatus(): void; // This operation will be moved to the root client of MoveToRootClient namespace.
+ * }
+
+ * ```
  */
 extern dec clientLocation(
   source: Operation,
@@ -716,7 +865,8 @@ enum DocumentationMode {
 
 /**
  * Override documentation for a type in client libraries. This allows you to
- * provide client-specific documentation that differs from the service-definition documentation.
+ * provide client-specific documentation that differs from the original documentation.
+ * @param target The target type (operation, model, enum, etc.) for which you want to apply client-specific documentation.
  * @param documentation The client-specific documentation to apply
  * @param mode Specifies how to apply the documentation (append or replace)
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
