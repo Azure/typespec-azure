@@ -6,6 +6,7 @@ import {
   passOnSuccess,
   ScenarioMockApi,
   ValidationError,
+  withServiceKeys,
 } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
@@ -401,3 +402,232 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
     kind: "MockApiDefinition",
   },
 ]);
+
+// Optional Body scenarios
+const validWidget = {
+  id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1`,
+  name: "widget1",
+  type: "Azure.ResourceManager.OperationTemplates/widgets",
+  location: "eastus",
+  properties: {
+    name: "widget1",
+    description: "A test widget",
+    provisioningState: "Succeeded",
+  },
+  systemData: {
+    createdBy: "AzureSDK",
+    createdByType: "User",
+    createdAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedBy: "AzureSDK",
+    lastModifiedAt: "2024-10-04T00:56:07.442Z",
+    lastModifiedByType: "User",
+  },
+};
+
+// GET operation
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_get = passOnSuccess({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
+  method: "get",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      widgetName: "widget1",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+    body: json(validWidget),
+  },
+  kind: "MockApiDefinition",
+});
+
+// PATCH operation with optional body - test both with and without body
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServiceKeys([
+  "EmptyBody",
+  "WithBody",
+]).pass({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName",
+  method: "patch",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      widgetName: "widget1",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+  },
+  handler: (req: MockRequest) => {
+    // Check if request has a body with content
+    if (req.body && Object.keys(req.body).length > 0) {
+      // WithBody scenario - validate and merge request body with existing widget
+      const requestBody = req.body as { properties?: { name?: string; description?: string } };
+
+      // Validate expected values
+      if (
+        requestBody.properties?.name === "updated-widget" &&
+        requestBody.properties?.description === "Updated description"
+      ) {
+        const updatedWidget = {
+          ...validWidget,
+          properties: {
+            ...validWidget.properties,
+            name: requestBody.properties.name,
+            description: requestBody.properties.description,
+          },
+        };
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json(updatedWidget),
+        };
+      } else {
+        // Invalid request body values
+        return {
+          pass: "WithBody",
+          status: 400,
+          body: json({
+            error:
+              "Invalid request body values. Expected properties: {name: 'updated-widget', description: 'Updated description'}",
+          }),
+        };
+      }
+    } else {
+      // EmptyBody scenario - return original widget
+      return {
+        pass: "EmptyBody",
+        status: 200,
+        body: json(validWidget),
+      };
+    }
+  },
+  kind: "MockApiDefinition",
+});
+
+// POST action operation with optional body - test both with and without body
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServiceKeys([
+  "EmptyBody",
+  "WithBody",
+]).pass({
+  uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/widgets/:widgetName/post",
+  method: "post",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      resourceGroup: RESOURCE_GROUP_EXPECTED,
+      widgetName: "widget1",
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+  },
+  handler: (req: MockRequest) => {
+    // Check if request has a body with content
+    if (req.body && Object.keys(req.body).length > 0) {
+      // WithBody scenario - validate request body values
+      const requestBody = req.body as { actionType?: string; parameters?: string };
+
+      // Validate expected values
+      if (requestBody.actionType === "perform" && requestBody.parameters === "test-parameters") {
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json({
+            result: "Action completed successfully with parameters",
+          }),
+        };
+      } else {
+        // Invalid request body values
+        return {
+          pass: "WithBody",
+          status: 400,
+          body: json({
+            error:
+              "Invalid request body values. Expected actionType: 'perform', parameters: 'test-parameters'",
+          }),
+        };
+      }
+    } else {
+      // EmptyBody scenario - action completed without parameters
+      return {
+        pass: "EmptyBody",
+        status: 200,
+        body: json({
+          result: "Action completed successfully",
+        }),
+      };
+    }
+  },
+  kind: "MockApiDefinition",
+});
+
+// Provider POST action operation with optional body - test both with and without body
+Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = withServiceKeys([
+  "EmptyBody",
+  "WithBody",
+]).pass({
+  uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/providerPost",
+  method: "post",
+  request: {
+    pathParams: {
+      subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+    },
+    query: {
+      "api-version": "2023-12-01-preview",
+    },
+  },
+  response: {
+    status: 200,
+  },
+  handler: (req: MockRequest) => {
+    // Check if request has a body with content
+    if (req.body && Object.keys(req.body).length > 0) {
+      // WithBody scenario - validate request body values
+      const requestBody = req.body as { totalAllowed?: number; reason?: string };
+
+      // Validate expected values
+      if (requestBody.totalAllowed === 100 && requestBody.reason === "Increased demand") {
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json({
+            totalAllowed: requestBody.totalAllowed,
+            status: "Changed to requested allowance",
+          }),
+        };
+      } else {
+        // Invalid request body values
+        return {
+          pass: "WithBody",
+          status: 400,
+          body: json({
+            error:
+              "Invalid request body values. Expected totalAllowed: 100, reason: 'Increased demand'",
+          }),
+        };
+      }
+    } else {
+      // EmptyBody scenario - use default allowance
+      return {
+        pass: "EmptyBody",
+        status: 200,
+        body: json({
+          totalAllowed: 50,
+          status: "Changed to default allowance",
+        }),
+      };
+    }
+  },
+  kind: "MockApiDefinition",
+});
