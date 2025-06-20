@@ -163,10 +163,10 @@ The target type you want to override access info.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `EnumMember`     | The access info you want to set for this model or operation. It should be one of the `Access` enum values, either `Access.public` or `Access.internal`.                                                |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember`     | The access info you want to set for this model or operation. It should be one of the `Access` enum values, either `Access.public` or `Access.internal`.                                                                                                    |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -294,10 +294,10 @@ The source type to which the alternate type will be applied.
 
 ##### Parameters
 
-| Name      | Type             | Description                                                                                                                                                                                            |
-| --------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| alternate | `unknown`        | The alternate type to apply to the target.                                                                                                                                                             |
-| scope     | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name      | Type             | Description                                                                                                                                                                                                                                                |
+| --------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| alternate | `unknown`        | The alternate type to apply to the target.                                                                                                                                                                                                                 |
+| scope     | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -353,10 +353,10 @@ The target parameter that you want to mark as an API version parameter.
 
 ##### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                            |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `valueof boolean` | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                             |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type              | Description                                                                                                                                                                                                                                                |
+| ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof boolean` | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                 |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -372,7 +372,7 @@ op test(
 ): void;
 ```
 
-###### Mark a parameter as not an API version parameter
+###### Mark a parameter as not presenting an API version parameter
 
 ```typespec
 namespace Contoso;
@@ -400,10 +400,10 @@ The target namespace or interface that you want to define as a client.
 
 ##### Parameters
 
-| Name    | Type                              | Description                                                                                                                                                                                            |
-| ------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| options | [`ClientOptions`](#clientoptions) | Optional configuration for the service.                                                                                                                                                                |
-| scope   | `valueof string`                  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name    | Type                              | Description                                                                                                                                                                                                                                                |
+| ------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | [`ClientOptions`](#clientoptions) | Optional configuration for the service.                                                                                                                                                                                                                    |
+| scope   | `valueof string`                  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -451,10 +451,10 @@ The target client for which you want to define additional API versions.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| value | `Enum`           | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                             |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `Enum`           | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                 |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -498,11 +498,11 @@ The target type (operation, model, enum, etc.) for which you want to apply clien
 
 ##### Parameters
 
-| Name          | Type             | Description                                                                                                                                                                                            |
-| ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| documentation | `valueof string` | The client-specific documentation to apply                                                                                                                                                             |
-| mode          | `EnumMember`     | Specifies how to apply the documentation (append or replace)                                                                                                                                           |
-| scope         | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name          | Type             | Description                                                                                                                                                                                                                                                |
+| ------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| documentation | `valueof string` | The client-specific documentation to apply                                                                                                                                                                                                                 |
+| mode          | `EnumMember`     | Specifies how to apply the documentation (append or replace)                                                                                                                                                                                               |
+| scope         | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -535,9 +535,9 @@ op myOperation(): void;
 
 #### `@clientInitialization`
 
-Customize the client initialization way in the generated client SDK.
-By default, the root client is initialized individually, and the sub clients are initialized by the parent client.
-By default, the initialization parameters include endpoint, credential, and API version.
+Allows customization of how clients are initialized in the generated SDK.
+By default, the root client is initialized independently, while sub clients are initialized through their parent client.
+Initialization parameters typically include endpoint, credential, and API version.
 With `@clientInitialization` decorator, you can elevate operation level parameters to client level, and set how the client is initialized.
 This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
 
@@ -552,10 +552,10 @@ The target client that you want to customize client initialization for.
 
 ##### Parameters
 
-| Name    | Type                                                          | Description                                                                                                                                                                                            |
-| ------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| options | [`ClientInitializationOptions`](#clientinitializationoptions) | The options for client initialization. You can use `ClientInitializationOptions` model to set the options.                                                                                             |
-| scope   | `valueof string`                                              | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name    | Type                                                          | Description                                                                                                                                                                                                                                                |
+| ------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options | [`ClientInitializationOptions`](#clientinitializationoptions) | The options for client initialization. You can use `ClientInitializationOptions` model to set the options.                                                                                                                                                 |
+| scope   | `valueof string`                                              | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -596,10 +596,10 @@ The operation to change location for.
 
 ##### Parameters
 
-| Name   | Type                                         | Description                                                                                                                                                                                            |
-| ------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                         |
-| scope  | `valueof string`                             | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name   | Type                                         | Description                                                                                                                                                                                                                                                |
+| ------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                             |
+| scope  | `valueof string`                             | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -678,10 +678,10 @@ The type you want to rename.
 
 ##### Parameters
 
-| Name   | Type             | Description                                                                                                                                                                                            |
-| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| rename | `valueof string` | The rename you want applied to the object.                                                                                                                                                             |
-| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name   | Type             | Description                                                                                                                                                                                                                                                |
+| ------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object.                                                                                                                                                                                                                 |
+| scope  | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -742,10 +742,10 @@ The type you want to change the namespace for.
 
 ##### Parameters
 
-| Name   | Type             | Description                                                                                                                                                                                            |
-| ------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| rename | `valueof string` | The rename you want applied to the object                                                                                                                                                              |
-| scope  | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name   | Type             | Description                                                                                                                                                                                                                                                |
+| ------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| rename | `valueof string` | The rename you want applied to the object                                                                                                                                                                                                                  |
+| scope  | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -780,10 +780,10 @@ The target operation.
 
 ##### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                            |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| flag  | `valueof boolean` | Whether to generate the operation as a convenience method or not.                                                                                                                                      |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type              | Description                                                                                                                                                                                                                                                |
+| ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| flag  | `valueof boolean` | Whether to generate the operation as a convenience method or not.                                                                                                                                                                                          |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -807,9 +807,9 @@ The target type that you want to apply this deserialization behavior to.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -844,9 +844,9 @@ The target model property that you want to flatten.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -875,9 +875,9 @@ The target namespace or interface that you want to define as a sub client.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -903,10 +903,10 @@ This decorator allows you to specify a different method signature for the client
 
 ##### Parameters
 
-| Name     | Type             | Description                                                                                                                                                                                            |
-| -------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| override | `Operation`      | : The override method definition that specifies the exact client method you want                                                                                                                       |
-| scope    | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name     | Type             | Description                                                                                                                                                                                                                                                |
+| -------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| override | `Operation`      | : The override method definition that specifies the exact client method you want                                                                                                                                                                           |
+| scope    | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -966,10 +966,10 @@ The target model property that you want to alias.
 
 ##### Parameters
 
-| Name       | Type             | Description                                                                                                                                                                                            |
-| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| paramAlias | `valueof string` | The alias name you want to apply to the target model property.                                                                                                                                         |
-| scope      | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name       | Type             | Description                                                                                                                                                                                                                                                |
+| ---------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| paramAlias | `valueof string` | The alias name you want to apply to the target model property.                                                                                                                                                                                             |
+| scope      | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -1009,10 +1009,10 @@ The target operation.
 
 ##### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                            |
-| ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| flag  | `valueof boolean` | Whether to generate the operation as a protocol method or not.                                                                                                                                         |
-| scope | `valueof string`  | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type              | Description                                                                                                                                                                                                                                                |
+| ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| flag  | `valueof boolean` | Whether to generate the operation as a protocol method or not.                                                                                                                                                                                             |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -1038,9 +1038,9 @@ The target operation that you want to apply this behavior to.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -1067,9 +1067,9 @@ The target operation that you want to scope.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -1113,10 +1113,10 @@ The target type you want to extend usage.
 
 ##### Parameters
 
-| Name  | Type                  | Description                                                                                                                                                                                                            |
-| ----- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| value | `EnumMember \| Union` | The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.<br />For example, `Usage.input \| Usage.output \| Usage.json`. |
-| scope | `valueof string`      | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python".                 |
+| Name  | Type                  | Description                                                                                                                                                                                                                                                |
+| ----- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `EnumMember \| Union` | The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.<br />For example, `Usage.input \| Usage.output \| Usage.json`.                                     |
+| scope | `valueof string`      | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -1125,7 +1125,7 @@ The target type you want to extend usage.
 ```typespec
 op test(): OutputModel;
 
-// usage result for `OutputModel` is `Usage.input | Usage.output | Usage.json`
+// The resolved usage  for `OutputModel` is `Usage.input | Usage.output | Usage.json`
 @usage(Usage.input | Usage.json)
 model OutputModel {
   prop: string;
@@ -1135,13 +1135,13 @@ model OutputModel {
 ###### Propagation of usage, all usage will be propagated to the parent model, discriminated sub models, and model properties.
 
 ```typespec
-// usage result for `Fish` is `Usage.input | Usage.output | Usage.json`
+// The resolved usage  for `Fish` is `Usage.input | Usage.output | Usage.json`
 @discriminator("kind")
 model Fish {
   age: int32;
 }
 
-// usage result for `Shark` is `Usage.input | Usage.output | Usage.json`
+// The resolved usage  for `Shark` is `Usage.input | Usage.output | Usage.json`
 @discriminator("sharktype")
 @usage(Usage.input | Usage.json)
 model Shark extends Fish {
@@ -1149,17 +1149,17 @@ model Shark extends Fish {
   origin: Origin;
 }
 
-// usage result for `Salmon` is `Usage.output | Usage.json`
+// The resolved usage  for `Salmon` is `Usage.output | Usage.json`
 model Salmon extends Fish {
   kind: "salmon";
 }
 
-// usage result for `SawShark` is `Usage.input | Usage.output | Usage.json`
+// The resolved usage  for `SawShark` is `Usage.input | Usage.output | Usage.json`
 model SawShark extends Shark {
   sharktype: "saw";
 }
 
-// usage result for `Origin` is `Usage.input | Usage.output | Usage.json`
+// The resolved usage  for `Origin` is `Usage.input | Usage.output | Usage.json`
 model Origin {
   country: string;
   city: string;
@@ -1185,9 +1185,9 @@ The target model that you want to set the custom JSON converter.
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                            |
-| ----- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| scope | `valueof string` | The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.<br />You can use "!" to specify negation such as "!(java, python)" or "!java, !python". |
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 

@@ -17,8 +17,8 @@ import type {
  *
  * @param target The type you want to rename.
  * @param rename The rename you want applied to the object.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Rename a model
  * ```typespec
  * @clientName("RenamedModel")
@@ -63,8 +63,8 @@ export type ClientNameDecorator = (
  *
  * @param target The target operation.
  * @param flag Whether to generate the operation as a convenience method or not.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example
  * ```typespec
  * @convenientAPI(false)
@@ -83,8 +83,8 @@ export type ConvenientAPIDecorator = (
  *
  * @param target The target operation.
  * @param flag Whether to generate the operation as a protocol method or not.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example
  * ```typespec
  * @protocolAPI(false)
@@ -105,8 +105,8 @@ export type ProtocolAPIDecorator = (
  *
  * @param target The target namespace or interface that you want to define as a client.
  * @param options Optional configuration for the service.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Basic client definition
  * ```typespec
  * namespace MyService {}
@@ -138,8 +138,8 @@ export type ClientDecorator = (
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  *
  * @param target The target namespace or interface that you want to define as a sub client.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example
  * ```typespec
  * @operationGroup
@@ -169,13 +169,13 @@ export type OperationGroupDecorator = (
  * @param target The target type you want to extend usage.
  * @param value The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.
  * For example, `Usage.input | Usage.output | Usage.json`.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Add usage for model
  * ```typespec
  * op test(): OutputModel;
  *
- * // usage result for `OutputModel` is `Usage.input | Usage.output | Usage.json`
+ * // The resolved usage  for `OutputModel` is `Usage.input | Usage.output | Usage.json`
  * @usage(Usage.input | Usage.json)
  * model OutputModel {
  *   prop: string
@@ -183,13 +183,13 @@ export type OperationGroupDecorator = (
  * ```
  * @example Propagation of usage, all usage will be propagated to the parent model, discriminated sub models, and model properties.
  * ```typespec
- * // usage result for `Fish` is `Usage.input | Usage.output | Usage.json`
+ * // The resolved usage  for `Fish` is `Usage.input | Usage.output | Usage.json`
  * @discriminator("kind")
  * model Fish {
  *   age: int32;
  * }
  *
- * // usage result for `Shark` is `Usage.input | Usage.output | Usage.json`
+ * // The resolved usage  for `Shark` is `Usage.input | Usage.output | Usage.json`
  * @discriminator("sharktype")
  * @usage(Usage.input | Usage.json)
  * model Shark extends Fish {
@@ -197,17 +197,17 @@ export type OperationGroupDecorator = (
  *   origin: Origin;
  * }
  *
- * // usage result for `Salmon` is `Usage.output | Usage.json`
+ * // The resolved usage  for `Salmon` is `Usage.output | Usage.json`
  * model Salmon extends Fish {
  *   kind: "salmon";
  * }
  *
- * // usage result for `SawShark` is `Usage.input | Usage.output | Usage.json`
+ * // The resolved usage  for `SawShark` is `Usage.input | Usage.output | Usage.json`
  * model SawShark extends Shark {
  *   sharktype: "saw";
  * }
  *
- * // usage result for `Origin` is `Usage.input | Usage.output | Usage.json`
+ * // The resolved usage  for `Origin` is `Usage.input | Usage.output | Usage.json`
  * model Origin {
  *   country: string;
  *   city: string;
@@ -243,8 +243,8 @@ export type UsageDecorator = (
  *
  * @param target The target type you want to override access info.
  * @param value The access info you want to set for this model or operation. It should be one of the `Access` enum values, either `Access.public` or `Access.internal`.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Set access
  * ```typespec
  * // Access.internal
@@ -381,8 +381,8 @@ export type AccessDecorator = (
  * This decorator is not recommended to use for green field services.
  *
  * @param target The target model property that you want to flatten.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example
  * ```typespec
  * model Foo {
@@ -406,8 +406,8 @@ export type FlattenPropertyDecorator = (
  *
  * @param target : The target operation that you want to override.
  * @param override : The override method definition that specifies the exact client method you want
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Customize parameters into an option bag
  * ```typespec
  * // main.tsp
@@ -457,8 +457,8 @@ export type OverrideDecorator = (
  * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
  *
  * @param target The target model that you want to set the custom JSON converter.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example
  * ```typespec
  * @useSystemTextJsonConverter
@@ -474,16 +474,16 @@ export type UseSystemTextJsonConverterDecorator = (
 ) => void;
 
 /**
- * Customize the client initialization way in the generated client SDK.
- * By default, the root client is initialized individually, and the sub clients are initialized by the parent client.
- * By default, the initialization parameters include endpoint, credential, and API version.
+ * Allows customization of how clients are initialized in the generated SDK.
+ * By default, the root client is initialized independently, while sub clients are initialized through their parent client.
+ * Initialization parameters typically include endpoint, credential, and API version.
  * With `@clientInitialization` decorator, you can elevate operation level parameters to client level, and set how the client is initialized.
  * This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
  *
  * @param target The target client that you want to customize client initialization for.
  * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Add client initialization parameters
  * ```typespec
  * // main.tsp
@@ -515,8 +515,8 @@ export type ClientInitializationDecorator = (
  *
  * @param target The target model property that you want to alias.
  * @param paramAlias The alias name you want to apply to the target model property.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Elevate an operation parameter to client level and alias it to a different name
  * ```typespec
  * // main.tsp
@@ -550,8 +550,8 @@ export type ParamAliasDecorator = (
  *
  * @param target The type you want to change the namespace for.
  * @param rename The rename you want applied to the object
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Change a namespace to a different name
  * ```typespec
  * @clientNamespace("ContosoClient")
@@ -578,8 +578,8 @@ export type ClientNamespaceDecorator = (
  *
  * @param target The source type to which the alternate type will be applied.
  * @param alternate The alternate type to apply to the target.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Change a model property to a different type
  * ```typespec
  * model Foo {
@@ -620,8 +620,8 @@ export type AlternateTypeDecorator = (
  * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
  *
  * @param target The target operation that you want to scope.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Omit an operation from a specific language
  * ```typespec
  * @scope("!csharp")
@@ -643,8 +643,8 @@ export type ScopeDecorator = (context: DecoratorContext, target: Operation, scop
  *
  * @param target The target parameter that you want to mark as an API version parameter.
  * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Mark a parameter as an API version parameter
  * ```typespec
  * namespace Contoso;
@@ -655,7 +655,7 @@ export type ScopeDecorator = (context: DecoratorContext, target: Operation, scop
  *   version: string
  * ): void;
  * ```
- * @example Mark a parameter as not an API version parameter
+ * @example Mark a parameter as not presenting an API version parameter
  * ```typespec
  * namespace Contoso;
  * op test(
@@ -679,8 +679,8 @@ export type ApiVersionDecorator = (
  *
  * @param target The target client for which you want to define additional API versions.
  * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Add additional API versions to a client
  * ```typespec
  * // main.tsp
@@ -707,8 +707,8 @@ export type ClientApiVersionsDecorator = (
  * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
  *
  * @param target The target type that you want to apply this deserialization behavior to.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example
  * ```typespec
  *
@@ -735,8 +735,8 @@ export type DeserializeEmptyStringAsNullDecorator = (
  * 2xx will return `true`. Everything else will still raise an error.
  *
  * @param target The target operation that you want to apply this behavior to.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example
  * ```typespec
  * @responseAsBool
@@ -757,8 +757,8 @@ export type ResponseAsBoolDecorator = (
  *
  * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Move to existing sub client
  * ```typespec
  * @service
@@ -829,8 +829,8 @@ export type ClientLocationDecorator = (
  * @param target The target type (operation, model, enum, etc.) for which you want to apply client-specific documentation.
  * @param documentation The client-specific documentation to apply
  * @param mode Specifies how to apply the documentation (append or replace)
- * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
- * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Replacing documentation
  * ```typespec
  * @doc("This is service documentation")
