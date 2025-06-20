@@ -471,21 +471,31 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
       // WithBody scenario - validate and merge request body with existing widget
       const requestBody = req.body as { name?: string; description?: string };
       
-      // Verify the request body matches expected structure
+      // Verify the request body matches expected structure and values
       if (typeof requestBody.name === "string" && typeof requestBody.description === "string") {
-        const updatedWidget = {
-          ...validWidget,
-          properties: {
-            ...validWidget.properties,
-            name: requestBody.name,
-            description: requestBody.description,
-          },
-        };
-        return {
-          pass: "WithBody",
-          status: 200,
-          body: json(updatedWidget),
-        };
+        // Validate expected values
+        if (requestBody.name === "updated-widget" && requestBody.description === "Updated description") {
+          const updatedWidget = {
+            ...validWidget,
+            properties: {
+              ...validWidget.properties,
+              name: requestBody.name,
+              description: requestBody.description,
+            },
+          };
+          return {
+            pass: "WithBody",
+            status: 200,
+            body: json(updatedWidget),
+          };
+        } else {
+          // Invalid request body values
+          return {
+            pass: "WithBody",
+            status: 400,
+            body: json({ error: "Invalid request body values. Expected name: 'updated-widget', description: 'Updated description'" }),
+          };
+        }
       } else {
         // Invalid request body structure
         return {
@@ -532,15 +542,25 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
       // WithBody scenario - validate request body structure
       const requestBody = req.body as { actionType?: string; parameters?: string };
       
-      // Verify the request body matches expected structure
+      // Verify the request body matches expected structure and values
       if (typeof requestBody.actionType === "string" && typeof requestBody.parameters === "string") {
-        return {
-          pass: "WithBody",
-          status: 200,
-          body: json({
-            result: "Action completed successfully with parameters",
-          }),
-        };
+        // Validate expected values
+        if (requestBody.actionType === "perform" && requestBody.parameters === "test-parameters") {
+          return {
+            pass: "WithBody",
+            status: 200,
+            body: json({
+              result: "Action completed successfully with parameters",
+            }),
+          };
+        } else {
+          // Invalid request body values
+          return {
+            pass: "WithBody",
+            status: 400,
+            body: json({ error: "Invalid request body values. Expected actionType: 'perform', parameters: 'test-parameters'" }),
+          };
+        }
       } else {
         // Invalid request body structure
         return {
@@ -587,16 +607,26 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
       // WithBody scenario - validate request body structure
       const requestBody = req.body as { totalAllowed?: number; reason?: string };
       
-      // Verify the request body matches expected structure
+      // Verify the request body matches expected structure and values
       if (typeof requestBody.totalAllowed === "number" && typeof requestBody.reason === "string") {
-        return {
-          pass: "WithBody",
-          status: 200,
-          body: json({
-            totalAllowed: requestBody.totalAllowed,
-            status: "Changed to requested allowance",
-          }),
-        };
+        // Validate expected values
+        if (requestBody.totalAllowed === 100 && requestBody.reason === "Increased demand") {
+          return {
+            pass: "WithBody",
+            status: 200,
+            body: json({
+              totalAllowed: requestBody.totalAllowed,
+              status: "Changed to requested allowance",
+            }),
+          };
+        } else {
+          // Invalid request body values
+          return {
+            pass: "WithBody",
+            status: 400,
+            body: json({ error: "Invalid request body values. Expected totalAllowed: 100, reason: 'Increased demand'" }),
+          };
+        }
       } else {
         // Invalid request body structure
         return {
