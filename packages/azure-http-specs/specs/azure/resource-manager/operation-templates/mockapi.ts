@@ -468,20 +468,32 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
   handler: (req: MockRequest) => {
     // Check if request has a body with content
     if (req.body && Object.keys(req.body).length > 0) {
-      // WithBody scenario - merge request body with existing widget
-      const requestBody = req.body as { properties?: { name?: string; description?: string } };
-      const updatedWidget = {
-        ...validWidget,
-        properties: {
-          ...validWidget.properties,
-          ...requestBody.properties,
-        },
-      };
-      return {
-        pass: "WithBody",
-        status: 200,
-        body: json(updatedWidget),
-      };
+      // WithBody scenario - validate and merge request body with existing widget
+      const requestBody = req.body as { name?: string; description?: string };
+      
+      // Verify the request body matches expected structure
+      if (typeof requestBody.name === "string" && typeof requestBody.description === "string") {
+        const updatedWidget = {
+          ...validWidget,
+          properties: {
+            ...validWidget.properties,
+            name: requestBody.name,
+            description: requestBody.description,
+          },
+        };
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json(updatedWidget),
+        };
+      } else {
+        // Invalid request body structure
+        return {
+          pass: "WithBody",
+          status: 400,
+          body: json({ error: "Invalid request body structure" }),
+        };
+      }
     } else {
       // EmptyBody scenario - return original widget
       return {
@@ -517,14 +529,26 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
   handler: (req: MockRequest) => {
     // Check if request has a body with content
     if (req.body && Object.keys(req.body).length > 0) {
-      // WithBody scenario - action completed with parameters
-      return {
-        pass: "WithBody",
-        status: 200,
-        body: json({
-          result: "Action completed successfully with parameters",
-        }),
-      };
+      // WithBody scenario - validate request body structure
+      const requestBody = req.body as { actionType?: string; parameters?: string };
+      
+      // Verify the request body matches expected structure
+      if (typeof requestBody.actionType === "string" && typeof requestBody.parameters === "string") {
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json({
+            result: "Action completed successfully with parameters",
+          }),
+        };
+      } else {
+        // Invalid request body structure
+        return {
+          pass: "WithBody",
+          status: 400,
+          body: json({ error: "Invalid request body structure" }),
+        };
+      }
     } else {
       // EmptyBody scenario - action completed without parameters
       return {
@@ -560,17 +584,27 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
   handler: (req: MockRequest) => {
     // Check if request has a body with content
     if (req.body && Object.keys(req.body).length > 0) {
-      // WithBody scenario - use totalAllowed from request
+      // WithBody scenario - validate request body structure
       const requestBody = req.body as { totalAllowed?: number; reason?: string };
-      const totalAllowed = requestBody.totalAllowed || 100;
-      return {
-        pass: "WithBody",
-        status: 200,
-        body: json({
-          totalAllowed: totalAllowed,
-          status: "Changed to requested allowance",
-        }),
-      };
+      
+      // Verify the request body matches expected structure
+      if (typeof requestBody.totalAllowed === "number" && typeof requestBody.reason === "string") {
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json({
+            totalAllowed: requestBody.totalAllowed,
+            status: "Changed to requested allowance",
+          }),
+        };
+      } else {
+        // Invalid request body structure
+        return {
+          pass: "WithBody",
+          status: 400,
+          body: json({ error: "Invalid request body structure" }),
+        };
+      }
     } else {
       // EmptyBody scenario - use default allowance
       return {
