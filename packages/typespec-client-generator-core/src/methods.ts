@@ -517,7 +517,12 @@ function getServiceMethodLroMetadata(
     finalStateVia: rawMetadata.finalStateVia,
     finalResponse: getFinalResponse(),
     finalStep:
-      rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,
+      rawMetadata.finalStep !== undefined ? { 
+        responseModel: diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, rawMetadata.finalStep.responseModel),
+        ) as SdkModelType,
+        kind: rawMetadata.finalStep.kind 
+      } : undefined,
     pollingStep: {
       responseBody: diagnostics.pipe(
         getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
