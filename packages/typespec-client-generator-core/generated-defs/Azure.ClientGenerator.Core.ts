@@ -42,7 +42,7 @@ import type {
  * @clientName("nameInClient")
  * op example(): void;
  * ```
- * @example Rename an operation for different language's emitters
+ * @example Rename an operation for different language emitters
  * ```typespec
  * @clientName("nameForJava", "java")
  * @clientName("name_for_python", "python")
@@ -62,7 +62,7 @@ export type ClientNameDecorator = (
  * Whether you want to generate an operation as a convenient method.
  *
  * @param target The target operation.
- * @param flag Whether to generate the operation as convenience method or not.
+ * @param flag Whether to generate the operation as a convenience method or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
@@ -82,7 +82,7 @@ export type ConvenientAPIDecorator = (
  * Whether you want to generate an operation as a protocol method.
  *
  * @param target The target operation.
- * @param flag Whether to generate the operation as protocol method or not.
+ * @param flag Whether to generate the operation as a protocol method or not.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example
@@ -101,7 +101,7 @@ export type ProtocolAPIDecorator = (
 /**
  * Define the client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
- * This decorator could not be used along with `@clientLocation`. This decorator could not be used as augmentation.
+ * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  *
  * @param target The target namespace or interface that you want to define as a client.
  * @param options Optional configuration for the service.
@@ -133,9 +133,9 @@ export type ClientDecorator = (
 ) => void;
 
 /**
- * Define the sub client genated in the client SDK.
+ * Define the sub client generated in the client SDK.
  * If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
- * This decorator could not be used along with `@clientLocation`. This decorator could not be used as augmentation.
+ * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  *
  * @param target The target namespace or interface that you want to define as a sub client.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
@@ -155,10 +155,10 @@ export type OperationGroupDecorator = (
 /**
  * Add usage for models/enums.
  * A model/enum's default usage info is always calculated by the operations that use it.
- * You could use this decorator to add additional usage info.
+ * You can use this decorator to add additional usage info.
  * When setting usage for namespaces,
  * the usage info will be propagated to the models defined in the namespace.
- * If the model has an usage override, the model override takes precedence.
+ * If the model has a usage override, the model override takes precedence.
  * For example, with operation definition `op test(): OutputModel`,
  * the model `OutputModel` has default usage `Usage.output`.
  * After adding decorator `@@usage(OutputModel, Usage.input | Usage.json)`,
@@ -167,7 +167,7 @@ export type OperationGroupDecorator = (
  * parent models, discriminated sub models.
  *
  * @param target The target type you want to extend usage.
- * @param value The usage info you want to add for this model. It could be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.
+ * @param value The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.
  * For example, `Usage.input | Usage.output | Usage.json`.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
@@ -226,7 +226,7 @@ export type UsageDecorator = (
 ) => void;
 
 /**
- * Override access for operations, models, enums and model property.
+ * Override access for operations, models, enums and model properties.
  * When setting access for namespaces,
  * the access info will be propagated to the models and operations defined in the namespace.
  * If the model has an access override, the model override takes precedence.
@@ -236,9 +236,9 @@ export type UsageDecorator = (
  * Models/enums that are only used in operations with `@access(Access.internal)` will be set to access "internal".
  * The access info for models will be propagated to models' properties,
  * parent models, discriminated sub models.
- * The override access should not be narrow than the access calculated by operation,
+ * The override access should not be narrower than the access calculated by operation,
  * and different override access should not conflict with each other,
- * otherwise a warning will be added to diagnostics list.
+ * otherwise a warning will be added to the diagnostics list.
  * Model property's access will default to public unless there is an override.
  *
  * @param target The target type you want to override access info.
@@ -474,11 +474,11 @@ export type UseSystemTextJsonConverterDecorator = (
 ) => void;
 
 /**
- * Customize the client initialization way in generated client SDK.
- * By default, the root client is initialized individually, and the sub clients are initialized by parent client.
- * Be default, the initialization parameters include endpoint, credential, API version.
- * With `@clientInitialization` decorator, you can elevate operation level parameter to client level, and set how the client is initialized.
- * This decorator could be combined with `@paramAlias` decorator to change the parameter name in client initialization.
+ * Customize the client initialization way in the generated client SDK.
+ * By default, the root client is initialized individually, and the sub clients are initialized by the parent client.
+ * By default, the initialization parameters include endpoint, credential, and API version.
+ * With `@clientInitialization` decorator, you can elevate operation level parameters to client level, and set how the client is initialized.
+ * This decorator can be combined with `@paramAlias` decorator to change the parameter name in client initialization.
  *
  * @param target The target client that you want to customize client initialization for.
  * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options.
@@ -499,7 +499,7 @@ export type UseSystemTextJsonConverterDecorator = (
  * }
  *
  * @@clientInitialization(MyService, {parameters: MyServiceClientOptions})
- * // The generated client will have `blobName` on its initialization method. We will also
+ * // The generated client will have `blobName` in its initialization method. We will also
  * // elevate the existing `blobName` parameter from method level to client level.
  * ```
  */
@@ -511,7 +511,7 @@ export type ClientInitializationDecorator = (
 ) => void;
 
 /**
- * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization and original parameter in operation.
+ * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization and the original parameter in the operation.
  *
  * @param target The target model property that you want to alias.
  * @param paramAlias The alias name you want to apply to the target model property.
@@ -533,7 +533,7 @@ export type ClientInitializationDecorator = (
  * @@clientInitialization(MyService, MyServiceClientOptions)
  * @@paramAlias(MyServiceClientOptions.blob, "blobName")
  *
- * // The generated client will have `blobName` on it. We will also
+ * // The generated client will have `blobName` in it. We will also
  * // elevate the existing `blob` parameter to the client level.
  * ```
  */
@@ -573,7 +573,7 @@ export type ClientNamespaceDecorator = (
 ) => void;
 
 /**
- * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in alternate type.
+ * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
  *
  * @param target The source type to which the alternate type will be applied.
@@ -589,7 +589,7 @@ export type ClientNamespaceDecorator = (
  * ```
  * @example Change a Scalar type to a different type
  * ```typespec
- * scalar storageDateTime extends utcDataTime;
+ * scalar storageDateTime extends utcDateTime;
  * @@alternateType(storageDateTime, string, "python");
  * ```
  * @example Change a function parameter to a different type
@@ -636,8 +636,8 @@ export type AlternateTypeDecorator = (
 export type ScopeDecorator = (context: DecoratorContext, target: Operation, scope?: string) => void;
 
 /**
- * Specify a parameter is an API version parameter or not.
- * By default, we detect an API version parameter by matcheing the parameter name with `api-version` or `apiversion`, or the type is referred by `@versioned` decorator.
+ * Specify whether a parameter is an API version parameter or not.
+ * By default, we detect an API version parameter by matching the parameter name with `api-version` or `apiversion`, or if the type is referenced by the `@versioned` decorator.
  * Since API versions are a client parameter, we will also elevate this parameter up onto the client.
  * This decorator allows you to explicitly specify whether a parameter should be treated as an API version parameter or not.
  *
@@ -751,12 +751,12 @@ export type ResponseAsBoolDecorator = (
 ) => void;
 
 /**
- * Change the operation location in client. If the target client is not defined, use `string` to indicate a new client name.
- * This decorator allows you to change the client an operation belong to in the client SDK.
- * This decorator could not be used along with `@client` or `@operationGroup` decorators.
+ * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name.
+ * This decorator allows you to change the client an operation belongs to in the client SDK.
+ * This decorator cannot be used along with `@client` or `@operationGroup` decorators.
  *
  * @param source The operation to change location for.
- * @param target The target `Namespace`, `Interface` or a string which could indicate the client.
+ * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
  * @param scope The language scope you want this decorator to apply to. If not specified, will apply to all language emitters.
  * You can use "!" to specify negation such as "!(java, python)" or "!java, !python".
  * @example Move to existing sub client
