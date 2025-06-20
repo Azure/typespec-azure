@@ -471,37 +471,27 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
       // WithBody scenario - validate and merge request body with existing widget
       const requestBody = req.body as { name?: string; description?: string };
       
-      // Verify the request body matches expected structure and values
-      if (typeof requestBody.name === "string" && typeof requestBody.description === "string") {
-        // Validate expected values
-        if (requestBody.name === "updated-widget" && requestBody.description === "Updated description") {
-          const updatedWidget = {
-            ...validWidget,
-            properties: {
-              ...validWidget.properties,
-              name: requestBody.name,
-              description: requestBody.description,
-            },
-          };
-          return {
-            pass: "WithBody",
-            status: 200,
-            body: json(updatedWidget),
-          };
-        } else {
-          // Invalid request body values
-          return {
-            pass: "WithBody",
-            status: 400,
-            body: json({ error: "Invalid request body values. Expected name: 'updated-widget', description: 'Updated description'" }),
-          };
-        }
+      // Validate expected values
+      if (requestBody.name === "updated-widget" && requestBody.description === "Updated description") {
+        const updatedWidget = {
+          ...validWidget,
+          properties: {
+            ...validWidget.properties,
+            name: requestBody.name,
+            description: requestBody.description,
+          },
+        };
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json(updatedWidget),
+        };
       } else {
-        // Invalid request body structure
+        // Invalid request body values
         return {
           pass: "WithBody",
           status: 400,
-          body: json({ error: "Invalid request body structure" }),
+          body: json({ error: "Invalid request body values. Expected name: 'updated-widget', description: 'Updated description'" }),
         };
       }
     } else {
@@ -539,34 +529,24 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
   handler: (req: MockRequest) => {
     // Check if request has a body with content
     if (req.body && Object.keys(req.body).length > 0) {
-      // WithBody scenario - validate request body structure
+      // WithBody scenario - validate request body values
       const requestBody = req.body as { actionType?: string; parameters?: string };
       
-      // Verify the request body matches expected structure and values
-      if (typeof requestBody.actionType === "string" && typeof requestBody.parameters === "string") {
-        // Validate expected values
-        if (requestBody.actionType === "perform" && requestBody.parameters === "test-parameters") {
-          return {
-            pass: "WithBody",
-            status: 200,
-            body: json({
-              result: "Action completed successfully with parameters",
-            }),
-          };
-        } else {
-          // Invalid request body values
-          return {
-            pass: "WithBody",
-            status: 400,
-            body: json({ error: "Invalid request body values. Expected actionType: 'perform', parameters: 'test-parameters'" }),
-          };
-        }
+      // Validate expected values
+      if (requestBody.actionType === "perform" && requestBody.parameters === "test-parameters") {
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json({
+            result: "Action completed successfully with parameters",
+          }),
+        };
       } else {
-        // Invalid request body structure
+        // Invalid request body values
         return {
           pass: "WithBody",
           status: 400,
-          body: json({ error: "Invalid request body structure" }),
+          body: json({ error: "Invalid request body values. Expected actionType: 'perform', parameters: 'test-parameters'" }),
         };
       }
     } else {
@@ -604,35 +584,25 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
   handler: (req: MockRequest) => {
     // Check if request has a body with content
     if (req.body && Object.keys(req.body).length > 0) {
-      // WithBody scenario - validate request body structure
+      // WithBody scenario - validate request body values
       const requestBody = req.body as { totalAllowed?: number; reason?: string };
       
-      // Verify the request body matches expected structure and values
-      if (typeof requestBody.totalAllowed === "number" && typeof requestBody.reason === "string") {
-        // Validate expected values
-        if (requestBody.totalAllowed === 100 && requestBody.reason === "Increased demand") {
-          return {
-            pass: "WithBody",
-            status: 200,
-            body: json({
-              totalAllowed: requestBody.totalAllowed,
-              status: "Changed to requested allowance",
-            }),
-          };
-        } else {
-          // Invalid request body values
-          return {
-            pass: "WithBody",
-            status: 400,
-            body: json({ error: "Invalid request body values. Expected totalAllowed: 100, reason: 'Increased demand'" }),
-          };
-        }
+      // Validate expected values
+      if (requestBody.totalAllowed === 100 && requestBody.reason === "Increased demand") {
+        return {
+          pass: "WithBody",
+          status: 200,
+          body: json({
+            totalAllowed: requestBody.totalAllowed,
+            status: "Changed to requested allowance",
+          }),
+        };
       } else {
-        // Invalid request body structure
+        // Invalid request body values
         return {
           pass: "WithBody",
           status: 400,
-          body: json({ error: "Invalid request body structure" }),
+          body: json({ error: "Invalid request body values. Expected totalAllowed: 100, reason: 'Increased demand'" }),
         };
       }
     } else {
