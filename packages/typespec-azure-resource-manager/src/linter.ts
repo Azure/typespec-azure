@@ -1,5 +1,6 @@
 import { defineLinter } from "@typespec/compiler";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
+import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
@@ -47,6 +48,7 @@ const rules = [
   armResourceOperationsRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
+  armCustomResourceNoKey,
   armCustomResourceUsageDiscourage,
   beyondNestingRule,
   coreOperationsRule,
