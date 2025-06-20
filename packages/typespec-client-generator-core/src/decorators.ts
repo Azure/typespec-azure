@@ -1234,11 +1234,18 @@ export function getClientLocation(
  */
 export function isInScope(context: TCGCContext, entity: Operation): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
-  if (scopes !== undefined && scopes.includes(context.emitterName)) {
-    return true;
+  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+
+  if (scopes !== undefined) {
+    if (scopes.includes(context.emitterName)) {
+      return true;
+    }
+
+    if (negationScopes === undefined) {
+      return false;
+    }
   }
 
-  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
   if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
     return false;
   }
