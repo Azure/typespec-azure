@@ -469,16 +469,16 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
     // Check if request has a body with content
     if (req.body && Object.keys(req.body).length > 0) {
       // WithBody scenario - validate and merge request body with existing widget
-      const requestBody = req.body as { name?: string; description?: string };
+      const requestBody = req.body as { properties?: { name?: string; description?: string } };
       
       // Validate expected values
-      if (requestBody.name === "updated-widget" && requestBody.description === "Updated description") {
+      if (requestBody.properties?.name === "updated-widget" && requestBody.properties?.description === "Updated description") {
         const updatedWidget = {
           ...validWidget,
           properties: {
             ...validWidget.properties,
-            name: requestBody.name,
-            description: requestBody.description,
+            name: requestBody.properties.name,
+            description: requestBody.properties.description,
           },
         };
         return {
@@ -491,7 +491,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
         return {
           pass: "WithBody",
           status: 400,
-          body: json({ error: "Invalid request body values. Expected name: 'updated-widget', description: 'Updated description'" }),
+          body: json({ error: "Invalid request body values. Expected properties: {name: 'updated-widget', description: 'Updated description'}" }),
         };
       }
     } else {

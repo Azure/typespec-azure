@@ -108,7 +108,7 @@ interface OptionalBody {
     Expected query parameter: api-version=2023-12-01-preview
     
     Scenario 1 - Expected request body: None (empty body)
-    Scenario 2 - Expected request body: {"name": "updated-widget", "description": "Updated description"}
+    Scenario 2 - Expected request body: {"properties": {"name": "updated-widget", "description": "Updated description"}}
     
     Expected status code: 200
     Expected response body (empty body scenario):
