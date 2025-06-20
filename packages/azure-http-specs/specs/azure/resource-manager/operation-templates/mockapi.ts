@@ -470,9 +470,12 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
     if (req.body && Object.keys(req.body).length > 0) {
       // WithBody scenario - validate and merge request body with existing widget
       const requestBody = req.body as { properties?: { name?: string; description?: string } };
-      
+
       // Validate expected values
-      if (requestBody.properties?.name === "updated-widget" && requestBody.properties?.description === "Updated description") {
+      if (
+        requestBody.properties?.name === "updated-widget" &&
+        requestBody.properties?.description === "Updated description"
+      ) {
         const updatedWidget = {
           ...validWidget,
           properties: {
@@ -491,7 +494,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_patch = withServ
         return {
           pass: "WithBody",
           status: 400,
-          body: json({ error: "Invalid request body values. Expected properties: {name: 'updated-widget', description: 'Updated description'}" }),
+          body: json({
+            error:
+              "Invalid request body values. Expected properties: {name: 'updated-widget', description: 'Updated description'}",
+          }),
         };
       }
     } else {
@@ -531,7 +537,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
     if (req.body && Object.keys(req.body).length > 0) {
       // WithBody scenario - validate request body values
       const requestBody = req.body as { actionType?: string; parameters?: string };
-      
+
       // Validate expected values
       if (requestBody.actionType === "perform" && requestBody.parameters === "test-parameters") {
         return {
@@ -546,7 +552,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_post = withServi
         return {
           pass: "WithBody",
           status: 400,
-          body: json({ error: "Invalid request body values. Expected actionType: 'perform', parameters: 'test-parameters'" }),
+          body: json({
+            error:
+              "Invalid request body values. Expected actionType: 'perform', parameters: 'test-parameters'",
+          }),
         };
       }
     } else {
@@ -586,7 +595,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
     if (req.body && Object.keys(req.body).length > 0) {
       // WithBody scenario - validate request body values
       const requestBody = req.body as { totalAllowed?: number; reason?: string };
-      
+
       // Validate expected values
       if (requestBody.totalAllowed === 100 && requestBody.reason === "Increased demand") {
         return {
@@ -602,7 +611,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
         return {
           pass: "WithBody",
           status: 400,
-          body: json({ error: "Invalid request body values. Expected totalAllowed: 100, reason: 'Increased demand'" }),
+          body: json({
+            error:
+              "Invalid request body values. Expected totalAllowed: 100, reason: 'Increased demand'",
+          }),
         };
       }
     } else {
