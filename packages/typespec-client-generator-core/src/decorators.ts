@@ -153,7 +153,7 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
 export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  options?: Model,
+  options?: Type,
   scope?: LanguageScopes,
 ) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
@@ -163,9 +163,10 @@ export const $client: ClientDecorator = (
     });
     return;
   }
-  const explicitName = options?.properties.get("name")?.type;
+  const explicitName =
+    options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service = options?.properties.get("service")?.type;
+  let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
   if (service?.kind !== "Namespace") {
     service = findClientService(context.program, target);
