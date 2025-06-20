@@ -94,7 +94,7 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 **Type:** `boolean`
 
-When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
+When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
 ### `partial-update`
 
@@ -125,6 +125,12 @@ Specify the package name for custom model classes.
 **Type:** `string`
 
 Specify the Java class that to be executed by emitter for [code customization](https://github.com/Azure/autorest.java/blob/main/customization-base/README.md), during post-process.
+
+### `rename-model`
+
+**Type:** `string,object`
+
+Rename the model classes, in case they cannot be renamed via TCGC. E.g., anonymous models or templated models. Format should be in key-value form, or a comma-separated string that follows 'BeforeRename:AfterRename' pattern. This option is for management-plane SDK.
 
 ### `skip-special-headers`
 
