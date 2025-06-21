@@ -18,6 +18,9 @@ enum ResourceHome {
 
   @doc("The resource is bound to an extension")
   Extension,
+
+  @doc("The resource is built in")
+  BuiltIn,
 }
 
 /** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */
