@@ -1384,6 +1384,30 @@ op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Res
 | Response            | The response model for the action                                         |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                  |
 
+### `Operations` {#Azure.ResourceManager.Legacy.Operations}
+
+This is the interface that implements the standard Azure Resource Manager operation that returns
+all supported RP operations. You should have exactly one declaration for each
+Azure Resource Manager service. It implements
+GET "/providers/Microsoft.ContosoProviderHub/operations"
+
+```typespec
+interface Azure.ResourceManager.Legacy.Operations<Response, Error>
+```
+
+#### Template Parameters
+
+| Name     | Description                                        |
+| -------- | -------------------------------------------------- |
+| Response | The response returned by the operation list.       |
+| Error    | the error response returned by the operation list. |
+
+#### `Operations.list` {#Azure.ResourceManager.Legacy.Operations.list}
+
+```typespec
+op Azure.ResourceManager.Legacy.Operations.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
 ### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.CustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous)
