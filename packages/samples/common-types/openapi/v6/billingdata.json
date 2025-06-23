@@ -23,6 +23,7 @@
           "enum": [
             "Pending",
             "Active",
+            "Warned",
             "Inactive"
           ],
           "x-ms-enum": {
@@ -38,6 +39,11 @@
                 "name": "Active",
                 "value": "Active",
                 "description": "Resource's billing is activated."
+              },
+              {
+                "name": "Warned",
+                "value": "Warned",
+                "description": "Resource's billing is warned."
               },
               {
                 "name": "Inactive",
@@ -164,8 +170,7 @@
           "description": "Schedules billing changes for this resource.",
           "items": {
             "$ref": "#/definitions/BillingScheduleChange"
-          },
-          "x-ms-identifiers": []
+          }
         }
       },
       "required": [
@@ -262,6 +267,7 @@
       "enum": [
         "Pending",
         "Active",
+        "Warned",
         "Inactive"
       ],
       "x-ms-enum": {
@@ -277,6 +283,11 @@
             "name": "Active",
             "value": "Active",
             "description": "Resource's billing is activated."
+          },
+          {
+            "name": "Warned",
+            "value": "Warned",
+            "description": "Resource's billing is warned."
           },
           {
             "name": "Inactive",
