@@ -100,7 +100,7 @@ function checkAllowedVirtualResource(
     case "delete":
       return true;
     default:
-      return false;
+      return true;
   }
 }
 
@@ -117,6 +117,7 @@ const $enforceConstraint: EnforceConstraintDecorator = (
       if (
         baseType === constraintType ||
         isCustomAzureResource(context.program, baseType) ||
+        getResourceBaseType(context.program, baseType) === ResourceBaseType.BuiltIn ||
         checkAllowedVirtualResource(context.program, entity, baseType)
       )
         return;
@@ -345,7 +346,7 @@ export function registerArmResource(context: DecoratorContext, resourceType: Mod
   }
 
   // Locate the ARM namespace in the namespace hierarchy
-  const armProviderNamespace = getArmProviderNamespace(program, resourceType.namespace);
+  const armProviderNamespace = getArmProviderNamespace(program, resourceType);
   const armLibraryNamespace = isArmLibraryNamespace(program, resourceType.namespace);
   const armExternalNamespace = getArmVirtualResourceDetails(program, resourceType)?.provider;
   if (!armProviderNamespace && !armLibraryNamespace && armExternalNamespace === undefined) {

@@ -13,15 +13,3 @@ model ResourceGroupTarget is ResourceGroupParameter;
 
 @builtInResource
 model SubscriptionTarget is SubscriptionIdParameter;
-
-/** Represents a management group */
-@tenantResource
-@armVirtualResource("Microsoft.Management")
-model ManagementGroup {
-  @path
-  @minLength(1)
-  @segment("managementGroups")
-  @key
-  @doc("The management group ID.")
-  managementGroupName: string;
-}

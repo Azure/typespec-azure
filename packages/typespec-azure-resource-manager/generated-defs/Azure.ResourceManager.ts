@@ -27,28 +27,6 @@ export type ArmResourceCollectionActionDecorator = (
 export type ArmProviderNameValueDecorator = (context: DecoratorContext, target: Operation) => void;
 
 /**
- * `@tenantResource` marks an Azure Resource Manager resource model as a Tenant resource/Root resource/Top-Level resource.
- *
- * Tenant resources have REST API paths like:
- * `/provider/Microsoft.Contoso/FooResources`
- *
- * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
- */
-export type TenantResourceDecorator = (context: DecoratorContext, target: Model) => void;
-
-/**
- * This decorator is used on Azure Resource Manager resources that are not based on
- * Azure.ResourceManager common types.
- *
- * @param propertiesType : The type of the resource properties.
- */
-export type ArmVirtualResourceDecorator = (
-  context: DecoratorContext,
-  target: Model,
-  provider?: string,
-) => void;
-
-/**
  * `@armProviderNamespace` sets the Azure Resource Manager provider name. It will default to use the
  * Namespace element value unless an override value is specified.
  *
@@ -109,6 +87,16 @@ export type SingletonDecorator = (
   target: Model,
   keyValue?: string | "default",
 ) => void;
+
+/**
+ * `@tenantResource` marks an Azure Resource Manager resource model as a Tenant resource/Root resource/Top-Level resource.
+ *
+ * Tenant resources have REST API paths like:
+ * `/provider/Microsoft.Contoso/FooResources`
+ *
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ */
+export type TenantResourceDecorator = (context: DecoratorContext, target: Model) => void;
 
 /**
  * `@subscriptionResource` marks an Azure Resource Manager resource model as a subscription resource.
@@ -255,6 +243,18 @@ export type ArmCommonTypesVersionDecorator = (
 ) => void;
 
 /**
+ * This decorator is used on Azure Resource Manager resources that are not based on
+ * Azure.ResourceManager common types.
+ *
+ * @param propertiesType : The type of the resource properties.
+ */
+export type ArmVirtualResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  provider?: string,
+) => void;
+
+/**
  * This decorator sets the base type of the given resource.
  *
  * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
@@ -287,12 +287,11 @@ export type IdentifiersDecorator = (
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
-  tenantResource: TenantResourceDecorator;
-  armVirtualResource: ArmVirtualResourceDecorator;
   armProviderNamespace: ArmProviderNamespaceDecorator;
   useLibraryNamespace: UseLibraryNamespaceDecorator;
   armLibraryNamespace: ArmLibraryNamespaceDecorator;
   singleton: SingletonDecorator;
+  tenantResource: TenantResourceDecorator;
   subscriptionResource: SubscriptionResourceDecorator;
   locationResource: LocationResourceDecorator;
   resourceGroupResource: ResourceGroupResourceDecorator;
@@ -305,6 +304,7 @@ export type AzureResourceManagerDecorators = {
   armResourceList: ArmResourceListDecorator;
   armResourceOperations: ArmResourceOperationsDecorator;
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
+  armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
   identifiers: IdentifiersDecorator;
 };

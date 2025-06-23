@@ -376,7 +376,8 @@ namespace Azure.ResourceManager.CommonTypes;
     ResourceHome.Subscription,
     ResourceHome.Location,
     ResourceHome.Tenant,
-    ResourceHome.Extension
+    ResourceHome.Extension,
+    ResourceHome.BuiltIn
   ]
 );
 

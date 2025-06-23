@@ -524,6 +524,7 @@ model LocationParameter {
  */
 model ResourceGroupNameParameter {
   /** The name of the resource group. The name is case insensitive. */
+  @key
   @path
   @minLength(1)
   @maxLength(90)
@@ -541,6 +542,7 @@ model SubscriptionIdParameter {
   @path
   @segment("subscriptions")
   @minLength(1)
+  @key
   subscriptionId: uuid;
 }
 

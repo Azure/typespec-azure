@@ -304,7 +304,7 @@ op DeleteAsync<
  */
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-op ArmResourceDeleteWithoutOkAsync<
+op DeleteWithoutOkAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &

@@ -586,6 +586,9 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
       case "Extension":
         resolvedType = ResourceBaseType.Extension;
         break;
+      case "BuiltIn":
+        resolvedType = ResourceBaseType.BuiltIn;
+        break;
     }
   }
   return resolvedType;
