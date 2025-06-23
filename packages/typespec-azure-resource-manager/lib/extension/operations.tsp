@@ -25,12 +25,13 @@ using Azure.ResourceManager.Private;
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op ListByTarget<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<ExtensionResource>>,
   Error extends {} = ErrorResponse
 > is ArmReadOperation<
-  ExtensionParentParameters<TargetResource, ExtensionResource> & Parameters,
+  ExtensionParentParameters<TargetResource, TargetNamespace, ExtensionResource> & Parameters,
   Response,
   Error
 >;
@@ -51,12 +52,13 @@ op ListByTarget<
 @armResourceRead(ExtensionResource)
 op Read<
   TargetResource extends SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ExtensionResource>,
   Error extends {} = ErrorResponse
 > is ArmReadOperation<
-  ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
+  ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource> & Parameters,
   Response,
   Error
 >;
@@ -76,12 +78,13 @@ op Read<
 @head
 op CheckExistence<
   TargetResource extends SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
   Error extends {} = ErrorResponse
 > is ArmReadOperation<
-  ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
+  ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource> & Parameters,
   Response,
   Error
 >;
@@ -104,6 +107,7 @@ op CheckExistence<
 @put
 op CreateOrUpdateAsync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
@@ -114,7 +118,7 @@ op CreateOrUpdateAsync<
   >,
   Error extends {} = ErrorResponse
 > is ArmCreateOperation<
-  ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
+  ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource> & Parameters,
   ExtensionResource,
   Response,
   Error
@@ -136,12 +140,13 @@ op CreateOrUpdateAsync<
 @put
 op CreateOrReplaceSync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedSyncResponse<ExtensionResource>,
   Error extends {} = ErrorResponse
 > is ArmCreateOperation<
-  ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
+  ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource> & Parameters,
   ExtensionResource,
   Response,
   Error
@@ -160,6 +165,7 @@ op CreateOrReplaceSync<
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op CreateOrReplaceAsync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
     Azure.Core.Foundations.RetryAfterHeader,
@@ -171,6 +177,7 @@ op CreateOrReplaceAsync<
   Error extends {} = ErrorResponse
 > is CreateOrUpdateAsync<
   TargetResource,
+  TargetNamespace,
   ExtensionResource,
   LroHeaders,
   Parameters,
@@ -196,6 +203,7 @@ op CreateOrReplaceAsync<
 @patch(#{ implicitOptionality: true })
 op CustomPatchAsync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<ExtensionResource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -211,7 +219,7 @@ op CustomPatchAsync<
   >,
   Error extends {} = ErrorResponse
 > is ArmUpdateOperation<
-  ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
+  ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource> & Parameters,
   PatchModel,
   Response,
   Error
@@ -234,13 +242,14 @@ op CustomPatchAsync<
 @patch(#{ implicitOptionality: true })
 op CustomPatchSync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<ExtensionResource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ExtensionResource>,
   Error extends {} = ErrorResponse
 > is ArmUpdateOperation<
-  ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
+  ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource> & Parameters,
   PatchModel,
   Response,
   Error
@@ -262,12 +271,13 @@ op CustomPatchSync<
 @delete
 op DeleteAsyncBase<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Response,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 >(
-  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
+  ...ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource>,
   ...Parameters,
 ): Response | Error;
 
@@ -285,13 +295,21 @@ op DeleteAsyncBase<
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op DeleteAsync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
-> is DeleteAsyncBase<TargetResource, ExtensionResource, Response, Parameters, Error>;
+> is DeleteAsyncBase<
+  TargetResource,
+  TargetNamespace,
+  ExtensionResource,
+  Response,
+  Parameters,
+  Error
+>;
 
 /**
  * @dev Delete a resource asynchronously
@@ -306,13 +324,21 @@ op DeleteAsync<
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op DeleteWithoutOkAsync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse
-> is DeleteAsyncBase<TargetResource, ExtensionResource, Response, Parameters, Error>;
+> is DeleteAsyncBase<
+  TargetResource,
+  TargetNamespace,
+  ExtensionResource,
+  Response,
+  Parameters,
+  Error
+>;
 
 /**
  * Delete a resource synchronously
@@ -330,12 +356,13 @@ op DeleteWithoutOkAsync<
 @delete
 op DeleteSync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
   Error = ErrorResponse
 >(
-  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
+  ...ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource>,
   ...Parameters,
 ): Response | Error;
 
@@ -356,6 +383,7 @@ op DeleteSync<
 @post
 op ActionAsyncBase<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
@@ -363,7 +391,7 @@ op ActionAsyncBase<
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 >(
-  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
+  ...ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource>,
   ...Parameters,
 
   @doc("The content of the action request")
@@ -386,6 +414,7 @@ op ActionAsyncBase<
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op ActionAsync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
@@ -400,6 +429,7 @@ op ActionAsync<
   OptionalRequestBody extends valueof boolean = false
 > is ActionAsyncBase<
   TargetResource,
+  TargetNamespace,
   ExtensionResource,
   Request,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response,
@@ -426,6 +456,7 @@ op ActionAsync<
 @returnsDoc("Azure operation completed successfully.")
 op ActionSync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
   Response extends TypeSpec.Reflection.Model | void,
@@ -433,7 +464,7 @@ op ActionSync<
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 >(
-  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
+  ...ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource>,
   ...Parameters,
 
   @doc("The content of the action request")
@@ -455,6 +486,7 @@ op ActionSync<
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op ActionNoResponseContentAsync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -468,6 +500,7 @@ op ActionNoResponseContentAsync<
   OptionalRequestBody extends valueof boolean = false
 > is ActionAsyncBase<
   TargetResource,
+  TargetNamespace,
   ExtensionResource,
   Request,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>,
@@ -492,13 +525,14 @@ op ActionNoResponseContentAsync<
 @post
 op ActionNoContentSync<
   TargetResource extends Foundations.SimpleResource,
+  TargetNamespace extends string,
   ExtensionResource extends Foundations.SimpleResource,
   Request extends TypeSpec.Reflection.Model | void,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
 >(
-  ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
+  ...ExtensionInstanceParameters<TargetResource, TargetNamespace, ExtensionResource>,
   ...Parameters,
 
   @doc("The content of the action request")

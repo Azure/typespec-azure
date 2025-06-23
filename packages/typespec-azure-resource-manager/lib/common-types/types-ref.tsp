@@ -377,7 +377,9 @@ namespace Azure.ResourceManager.CommonTypes;
     ResourceHome.Location,
     ResourceHome.Tenant,
     ResourceHome.Extension,
-    ResourceHome.BuiltIn
+    ResourceHome.BuiltIn,
+    ResourceHome.BuiltInSubscription,
+    ResourceHome.BuiltInResourceGroup
   ]
 );
 
@@ -399,7 +401,13 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 @@resourceParameterBaseFor(SubscriptionIdParameter.subscriptionId,
-  [ResourceHome.ResourceGroup, ResourceHome.Subscription, ResourceHome.Location]
+  [
+    ResourceHome.ResourceGroup,
+    ResourceHome.Subscription,
+    ResourceHome.Location,
+    ResourceHome.BuiltInSubscription,
+    ResourceHome.BuiltInResourceGroup
+  ]
 );
 
 /** ResourceGroupNameParameter */
@@ -420,7 +428,7 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v6
 );
 @@resourceParameterBaseFor(ResourceGroupNameParameter.resourceGroupName,
-  [ResourceHome.ResourceGroup]
+  [ResourceHome.ResourceGroup, ResourceHome.BuiltInResourceGroup]
 );
 
 /** ManagementGroupNameParameter */

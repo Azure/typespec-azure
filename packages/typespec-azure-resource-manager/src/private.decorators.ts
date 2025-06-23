@@ -6,7 +6,6 @@ import {
   ModelProperty,
   Operation,
   Program,
-  StringLiteral,
   Tuple,
   Type,
   addVisibilityModifiers,
@@ -17,6 +16,7 @@ import {
   isKey,
   sealVisibilityModifiers,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
@@ -24,6 +24,8 @@ import pluralize from "pluralize";
 import {
   AzureResourceManagerExtensionPrivateDecorators,
   BuiltInResourceDecorator,
+  BuiltInResourceGroupResourceDecorator,
+  BuiltInSubscriptionResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
 import {
   ArmBodyRootDecorator,
@@ -69,6 +71,24 @@ const $builtInResource: BuiltInResourceDecorator = (
 
   setResourceBaseType(program, resourceType, ResourceBaseType.BuiltIn);
 };
+
+const $builtInSubscriptionResource: BuiltInSubscriptionResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInSubscription);
+};
+
+const $builtInResourceGroupResource: BuiltInResourceGroupResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInResourceGroup);
+};
 const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
@@ -104,6 +124,13 @@ function checkAllowedVirtualResource(
   }
 }
 
+function isBuiltIn(baseType: ResourceBaseType): boolean {
+  return (
+    baseType === ResourceBaseType.BuiltIn ||
+    baseType === ResourceBaseType.BuiltInSubscription ||
+    baseType === ResourceBaseType.BuiltInResourceGroup
+  );
+}
 const $enforceConstraint: EnforceConstraintDecorator = (
   context: DecoratorContext,
   entity: Operation | Model,
@@ -117,7 +144,7 @@ const $enforceConstraint: EnforceConstraintDecorator = (
       if (
         baseType === constraintType ||
         isCustomAzureResource(context.program, baseType) ||
-        getResourceBaseType(context.program, baseType) === ResourceBaseType.BuiltIn ||
+        isBuiltIn(getResourceBaseType(context.program, baseType)) ||
         checkAllowedVirtualResource(context.program, entity, baseType)
       )
         return;
@@ -241,10 +268,13 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   resourceType: Model,
 ) => {
   const { program } = context;
-
-  const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
-  if (armProviderNamespace) {
-    (target.type as StringLiteral).value = armProviderNamespace;
+  const details = getArmVirtualResourceDetails(program, resourceType);
+  const armProviderNamespace =
+    details?.provider ?? getArmProviderNamespace(program, resourceType as Model);
+  if (armProviderNamespace && target.type.kind === "String") {
+    const targetType = $(program).realm.clone(target.type);
+    targetType.value = armProviderNamespace;
+    target.type = targetType;
   }
 };
 
@@ -529,5 +559,7 @@ export const $decorators = {
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,
+    builtInSubscriptionResource: $builtInSubscriptionResource,
+    builtInResourceGroupResource: $builtInResourceGroupResource,
   } satisfies AzureResourceManagerExtensionPrivateDecorators,
 };

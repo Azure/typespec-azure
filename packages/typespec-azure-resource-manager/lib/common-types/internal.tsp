@@ -21,6 +21,12 @@ enum ResourceHome {
 
   @doc("The resource is built in")
   BuiltIn,
+
+  @doc("The resource is built in")
+  BuiltInSubscription,
+
+  @doc("The resource is built in")
+  BuiltInResourceGroup,
 }
 
 /** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */

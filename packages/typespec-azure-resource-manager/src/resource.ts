@@ -365,6 +365,8 @@ export enum ResourceBaseType {
   ResourceGroup = "ResourceGroup",
   Extension = "Extension",
   BuiltIn = "BuiltIn",
+  BuiltInSubscription = "BuiltInSubscription",
+  BuiltInResourceGroup = "BuiltInResourceGroup",
 }
 
 export const $resourceBaseType: ResourceBaseTypeDecorator = (
@@ -588,6 +590,12 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
         break;
       case "BuiltIn":
         resolvedType = ResourceBaseType.BuiltIn;
+        break;
+      case "BuiltInSubscription":
+        resolvedType = ResourceBaseType.BuiltInSubscription;
+        break;
+      case "BuiltInResourceGroup":
+        resolvedType = ResourceBaseType.BuiltInResourceGroup;
         break;
     }
   }

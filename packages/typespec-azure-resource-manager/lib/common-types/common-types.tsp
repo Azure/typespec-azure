@@ -9,7 +9,6 @@ import "./customer-managed-keys-ref.tsp";
 import "./extended-location-ref.tsp";
 import "./internal.tsp";
 import "./commontypes.private.decorators.tsp";
-import "./commontypes.extension.models.tsp";
 import "./versions.tsp";
 import "./mobo-ref.tsp";
 import "./network-security-perimeter-ref.tsp";

@@ -67,21 +67,27 @@ union ProvisioningState {
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
-interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
-  get is Extension.Read<Scope, Employee>;
+interface EmplOps<
+  Scope extends Azure.ResourceManager.Foundations.SimpleResource,
+  Provider extends string = ""
+> {
+  get is Extension.Read<Scope, Provider, Employee>;
   #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" ""
-  create is Extension.CreateOrReplaceAsync<Scope, Employee>;
+  create is Extension.CreateOrReplaceAsync<Scope, Provider, Employee>;
   update is Extension.CustomPatchSync<
     Scope,
+    Provider,
     Employee,
     Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
   >;
-  delete is Extension.DeleteWithoutOkAsync<Scope, Employee>;
-  list is Extension.ListByTarget<Scope, Employee>;
-  move is Extension.ActionSync<Scope, Employee, MoveRequest, MoveResponse>;
+  delete is Extension.DeleteWithoutOkAsync<Scope, Provider, Employee>;
+  list is Extension.ListByTarget<Scope, Provider, Employee>;
+  move is Extension.ActionSync<Scope, Provider, Employee, MoveRequest, MoveResponse>;
 }
 
-model Mg is Extension.ManagementGroup;
+/** Virtual resource for a virtual machine */
+alias VirtualMachine = Extension.ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+
 @armResourceOperations
 interface Employees extends EmplOps<Extension.ScopeParameter> {}
 @armResourceOperations
@@ -90,9 +96,11 @@ interface Tenants extends EmplOps<Extension.Tenant> {}
 interface Subscriptions extends EmplOps<Extension.Subscription> {}
 @armResourceOperations
 interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response" ""
 @armResourceOperations
-interface ManagementGroups extends EmplOps<Mg> {}
+interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+#suppress "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation" ""
+@armResourceOperations
+interface VirtualMachines extends EmplOps<VirtualMachine> {}
 
 /** Employee move request */
 model MoveRequest {
