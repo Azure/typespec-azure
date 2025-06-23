@@ -2,7 +2,7 @@
 title: "Emitter usage"
 ---
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
@@ -46,7 +46,7 @@ Specifies the namespace you want to override for namespaces set in the spec. Wit
 
 **Type:** `string`
 
-Specify the human readable name of the service. The name will be used in `README.md` and entry class. This option is for management-plane SDK.
+Specify the human readable name of the service. The name will be used for classes like `<ServiceName>Manager` or `<ServiceName>ServiceVersion`
 
 ### `examples-dir`
 
@@ -125,12 +125,6 @@ Specify the package name for custom model classes.
 **Type:** `string`
 
 Specify the Java class that to be executed by emitter for [code customization](https://github.com/Azure/autorest.java/blob/main/customization-base/README.md), during post-process.
-
-### `rename-model`
-
-**Type:** `string,object`
-
-Rename the model classes, in case they cannot be renamed via TCGC. E.g., anonymous models or templated models. Format should be in key-value form, or a comma-separated string that follows 'BeforeRename:AfterRename' pattern. This option is for management-plane SDK.
 
 ### `skip-special-headers`
 
