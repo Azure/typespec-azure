@@ -18,6 +18,7 @@ import {
   SyntaxKind,
 } from "@typespec/compiler/ast";
 import { DuplicateTracker } from "@typespec/compiler/utils";
+import { Realm } from "../../../../core/packages/compiler/src/experimental/realm.js";
 import { getClientNameOverride } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
 import {
@@ -45,10 +46,21 @@ function validateNoDiscriminatedUnions(context: TCGCContext) {
   }
 }
 
+/**
+ * Validate naming with `@clientName` and `@clientLocation` decorators.
+ *
+ * This function checks for duplicate client names for types considering the impact of `@clientName` for all possible scopes.
+ * It also handles the movement of operations to new clients based on the `@clientLocation` decorators.
+ *
+ * @param tcgcContext The context for the TypeSpec Client Generator.
+ */
 function validateClientNames(tcgcContext: TCGCContext) {
   const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
+  // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
   const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(tcgcContext);
+  // Check all possible language scopes
   for (const scope of languageScopes) {
+    // Gather all moved operations and their targets
     const moved = new Set<Operation>();
     const movedTo = new Map<Namespace | Interface, Operation[]>();
     const newClients = new Map<string, Operation[]>();
@@ -59,6 +71,10 @@ function validateClientNames(tcgcContext: TCGCContext) {
         clientLocationKey,
         scope,
       ).entries()) {
+        if (Realm.realmForType.has(type)) {
+          // Skip `@clientName` on versioning types
+          continue;
+        }
         if (type.kind === "Operation") {
           moved.add(type);
           if (typeof target === "string") {
@@ -69,6 +85,7 @@ function validateClientNames(tcgcContext: TCGCContext) {
               newClients.get(target)!.push(type);
             }
           } else {
+            // Move to existing clients
             if (!movedTo.has(target)) {
               movedTo.set(target, [type]);
             } else {
@@ -79,6 +96,7 @@ function validateClientNames(tcgcContext: TCGCContext) {
       }
     }
 
+    // Validate client names for the current scope
     validateClientNamesPerNamespace(
       tcgcContext,
       scope,
@@ -87,6 +105,7 @@ function validateClientNames(tcgcContext: TCGCContext) {
       tcgcContext.program.getGlobalNamespaceType(),
     );
 
+    // Validate client names for new client's operations
     [...newClients.values()].map((operations) => {
       validateClientNamesCore(tcgcContext, scope, operations);
     });

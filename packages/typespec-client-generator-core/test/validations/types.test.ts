@@ -70,6 +70,27 @@ it("no duplicate operation with @clientLocation", async () => {
   expectDiagnosticEmpty(diagnostics);
 });
 
+it("no duplicate operation with @clientLocation another", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace StorageService;
+      
+    interface StorageTasks {
+      @route("/list")
+      op list(): void;
+
+      @clientLocation("StorageTaskAssignment")
+      @clientName("list")
+      @route("/assignments")
+      op storageTaskAssignmentList(): void;
+    }
+    `,
+  );
+
+  expectDiagnosticEmpty(diagnostics);
+});
+
 it("duplicate operation with @clientLocation to existed clients", async () => {
   const diagnostics = await runner.diagnose(
     `
