@@ -3,7 +3,12 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
+  Program,
   createDiagnosticCollector,
+  getAnyExtensionFromPath,
+  getRelativePathFromDirectory,
+  joinPaths,
+  normalizePath,
   resolvePath,
 } from "@typespec/compiler";
 import {
@@ -79,7 +84,7 @@ async function loadExamples(
   }
 
   const map = new Map<string, Record<string, LoadedExample>>();
-  const exampleFiles = await context.program.host.readDir(exampleDir);
+  const exampleFiles = await searchExampleJsonFiles(context.program, exampleDir);
   for (const fileName of exampleFiles) {
     try {
       const exampleFile = await context.program.host.readFile(resolvePath(exampleDir, fileName));
@@ -131,6 +136,33 @@ async function loadExamples(
     }
   }
   return diagnostics.wrap(map);
+}
+
+async function searchExampleJsonFiles(program: Program, exampleDir: string): Promise<string[]> {
+  const host = program.host;
+  const exampleFiles: string[] = [];
+
+  // Recursive file search
+  async function recursiveSearch(dir: string): Promise<void> {
+    const fileItems = await host.readDir(dir);
+
+    for (const item of fileItems) {
+      const fullPath = joinPaths(dir, item);
+      const relativePath = getRelativePathFromDirectory(exampleDir, fullPath, false);
+
+      if ((await host.stat(fullPath)).isDirectory()) {
+        await recursiveSearch(fullPath);
+      } else if (
+        (await host.stat(fullPath)).isFile() &&
+        getAnyExtensionFromPath(item) === ".json"
+      ) {
+        exampleFiles.push(normalizePath(relativePath));
+      }
+    }
+  }
+
+  await recursiveSearch(exampleDir);
+  return exampleFiles;
 }
 
 export async function handleClientExamples(
