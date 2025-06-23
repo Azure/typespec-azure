@@ -6,7 +6,7 @@ export const armCustomResourceNoKey = createRule({
   name: "arm-custom-resource-no-key",
   description: "Validate that custom resource contains a key property.",
   severity: "warning",
-  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-legacy-usage",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/arm-custom-resource-no-key",
   messages: {
     default: `Custom Azure resource models must define a key property using the @key decorator. Without a key, operation paths could be duplicated.`,
   },
