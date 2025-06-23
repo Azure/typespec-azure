@@ -205,6 +205,34 @@ describe("models", () => {
         },
       ]);
   });
+
+  it("empty model", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+          model Test {
+            prop: {};
+          }
+        `,
+      )
+      .toBeValid();
+  });
+
+  it("empty model array", async () => {
+    await tester
+      .expect(
+        `
+        @service
+        namespace TestService;
+          model Test {
+            prop: {}[];
+          }
+        `,
+      )
+      .toBeValid();
+  });
 });
 
 describe("unions", () => {
