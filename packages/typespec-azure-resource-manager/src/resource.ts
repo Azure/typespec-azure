@@ -60,6 +60,11 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
   resourceTypePath?: string;
 }
 
+export interface ArmVirtualResourceDetails {
+  kind: "Virtual";
+  provider?: string;
+}
+
 /**
  * Marks the given resource as an external resource
  * @param context The decorator context
@@ -69,10 +74,15 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
 export const $armVirtualResource: ArmVirtualResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
+  provider: string | undefined = undefined,
 ) => {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
-  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "Virtual");
+  const result: ArmVirtualResourceDetails = {
+    kind: "Virtual",
+    provider,
+  };
+  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, result);
   const pathProperty = getProperty(
     entity,
     (p) => isPathParam(program, p) && getSegment(program, p) !== undefined,
@@ -129,6 +139,27 @@ export function isArmVirtualResource(program: Program, target: Model): boolean {
   if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target) === true) return true;
   if (target.baseModel) return isArmVirtualResource(program, target.baseModel);
   return false;
+}
+
+/**
+ *
+ * @param program The program to process.
+ * @param target The model to get details for
+ * @returns The resource details if the model is an external resource, otherwise undefined.
+ */
+export function getArmVirtualResourceDetails(
+  program: Program,
+  target: Model,
+): ArmVirtualResourceDetails | undefined {
+  if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target)) {
+    return program
+      .stateMap(ArmStateKeys.armBuiltInResource)
+      .get(target) as ArmVirtualResourceDetails;
+  }
+  if (target.baseModel) {
+    return getArmVirtualResourceDetails(program, target.baseModel);
+  }
+  return undefined;
 }
 
 /**
@@ -333,6 +364,7 @@ export enum ResourceBaseType {
   Location = "Location",
   ResourceGroup = "ResourceGroup",
   Extension = "Extension",
+  BuiltIn = "BuiltIn",
 }
 
 export const $resourceBaseType: ResourceBaseTypeDecorator = (
@@ -508,7 +540,7 @@ function getServiceNamespace(program: Program, type: Type | undefined): string |
   }
 }
 
-function setResourceBaseType(program: Program, resource: Model, type: string) {
+export function setResourceBaseType(program: Program, resource: Model, type: string) {
   if (program.stateMap(ArmStateKeys.resourceBaseType).has(resource)) {
     reportDiagnostic(program, {
       code: "arm-resource-duplicate-base-parameter",

@@ -2,16 +2,17 @@ using Http;
 using Rest;
 using Azure.Core;
 using Azure.ResourceManager.Private;
+using Azure.ResourceManager.Extension.Private;
 
-namespace Azure.ResourceManager.Extension;
+namespace Azure.ResourceManager.CommonTypes.Extension;
 
 /** Represents an extension resource group */
-@parentResource(Subscription)
-@Private.builtInResource
-model ResourceGroup is CommonTypes.ResourceGroupNameParameter;
+@parentResource(SubscriptionTarget)
+@builtInResource
+model ResourceGroupTarget is ResourceGroupParameter;
 
-@Private.builtInResource
-model Subscription is CommonTypes.SubscriptionIdParameter;
+@builtInResource
+model SubscriptionTarget is SubscriptionIdParameter;
 
 /** Represents a management group */
 @tenantResource

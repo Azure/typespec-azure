@@ -22,6 +22,10 @@ import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import {
+  AzureResourceManagerExtensionPrivateDecorators,
+  BuiltInResourceDecorator,
+} from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
+import {
   ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
@@ -44,16 +48,27 @@ import {
   ArmResourceDetails,
   ResourceBaseType,
   getArmResourceKind,
+  getArmVirtualResourceDetails,
   getResourceBaseType,
   isArmVirtualResource,
   isCustomAzureResource,
   resolveResourceBaseType,
+  setResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
 /** @internal */
+
+const $builtInResource: BuiltInResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltIn);
+};
 const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
@@ -332,7 +347,8 @@ export function registerArmResource(context: DecoratorContext, resourceType: Mod
   // Locate the ARM namespace in the namespace hierarchy
   const armProviderNamespace = getArmProviderNamespace(program, resourceType.namespace);
   const armLibraryNamespace = isArmLibraryNamespace(program, resourceType.namespace);
-  if (!armProviderNamespace && !armLibraryNamespace) {
+  const armExternalNamespace = getArmVirtualResourceDetails(program, resourceType)?.provider;
+  if (!armProviderNamespace && !armLibraryNamespace && armExternalNamespace === undefined) {
     reportDiagnostic(program, { code: "arm-resource-missing-arm-namespace", target: resourceType });
     return;
   }
@@ -373,6 +389,7 @@ export function registerArmResource(context: DecoratorContext, resourceType: Mod
   let kind = getArmResourceKind(resourceType);
   if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
   if (isCustomAzureResource(program, resourceType)) kind = "Custom";
+
   if (!kind) {
     reportDiagnostic(program, {
       code: "arm-resource-invalid-base-type",
@@ -388,7 +405,7 @@ export function registerArmResource(context: DecoratorContext, resourceType: Mod
     typespecType: resourceType,
     collectionName,
     keyName,
-    armProviderNamespace: armProviderNamespace ?? "",
+    armProviderNamespace: armProviderNamespace ?? armExternalNamespace ?? "",
     operations: {
       lifecycle: {},
       lists: {},
@@ -509,4 +526,7 @@ export const $decorators = {
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
   } satisfies AzureResourceManagerPrivateDecorators,
+  "Azure.ResourceManager.Extension.Private": {
+    builtInResource: $builtInResource,
+  } satisfies AzureResourceManagerExtensionPrivateDecorators,
 };
