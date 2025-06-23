@@ -17,8 +17,8 @@ import {
   DecoratorExpressionNode,
   SyntaxKind,
 } from "@typespec/compiler/ast";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
-import { Realm } from "../../../../core/packages/compiler/src/experimental/realm.js";
 import { getClientNameOverride } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
 import {
@@ -71,7 +71,7 @@ function validateClientNames(tcgcContext: TCGCContext) {
         clientLocationKey,
         scope,
       ).entries()) {
-        if (Realm.realmForType.has(type)) {
+        if (unsafe_Realm.realmForType.has(type)) {
           // Skip `@clientName` on versioning types
           continue;
         }
