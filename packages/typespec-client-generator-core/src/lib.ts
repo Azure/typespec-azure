@@ -162,7 +162,7 @@ export const $lib = createTypeSpecLibrary({
     "invalid-usage": {
       severity: "error",
       messages: {
-        default: `Usage value must be 2 ("input") or 4 ("output").`,
+        default: `Usage value must be one of: 2 (input), 4 (output), 256 (json), or 512 (xml).`,
       },
     },
     "conflicting-multipart-model-usage": {
@@ -288,12 +288,6 @@ export const $lib = createTypeSpecLibrary({
         default: `@access override conflicts with the access calculated from operation or other @access override.`,
       },
     },
-    "conflict-usage-override": {
-      severity: "warning",
-      messages: {
-        default: `@usage override conflicts with the usage calculated from operation or other @usage override.`,
-      },
-    },
     "duplicate-decorator": {
       severity: "warning",
       messages: {
@@ -387,6 +381,27 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: paramMessage`Multiple param aliases applied to '${"originalName"}'. Only the first one '${"firstParamAlias"}' will be used.`,
+      },
+    },
+    "client-location-conflict": {
+      severity: "warning",
+      messages: {
+        default:
+          "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+      },
+    },
+    "client-location-wrong-type": {
+      severity: "warning",
+      messages: {
+        default:
+          "`@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
+      },
+    },
+    "client-location-duplicate": {
+      severity: "warning",
+      messages: {
+        default:
+          "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
       },
     },
   },
