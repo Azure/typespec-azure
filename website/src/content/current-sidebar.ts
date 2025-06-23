@@ -30,6 +30,7 @@ const sidebar: SidebarItem[] = [
     items: [
       "getstarted/installation",
       "getstarted/createproject",
+      "getstarted/versioning",
       {
         label: "Azure Data Plane Service",
         autogenerate: {

@@ -1523,7 +1523,10 @@ export function updateUsageOrAccess(
   if (!options.propagation) return diagnostics.wrap(undefined);
   if (type.baseModel) {
     options.ignoreSubTypeStack.push(true);
-    if (context.disableUsageAccessPropagationToBase) {
+    if (
+      context.disableUsageAccessPropagationToBase &&
+      type.baseModel.discriminatorProperty === undefined // For models with discriminators, we should not disable propagation
+    ) {
       options.skipFirst = true;
     }
     diagnostics.pipe(updateUsageOrAccess(context, value, type.baseModel, options));

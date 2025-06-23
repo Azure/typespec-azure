@@ -347,3 +347,25 @@ it("load example with @clientLocation root client", async () => {
   ok(operation);
   strictEqual(operation.examples?.length, 1);
 });
+
+it("nested examples", async () => {
+  runner = await createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": `./examples`,
+  });
+
+  await runner.host.addRealTypeSpecFile("./examples/nested/get.json", `${__dirname}/load/get.json`);
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op get(): string;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples![0].filePath, "nested/get.json");
+});

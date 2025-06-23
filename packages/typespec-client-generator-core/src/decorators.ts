@@ -150,7 +150,7 @@ function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string
 export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
-  options?: Model,
+  options?: Type,
   scope?: LanguageScopes,
 ) => {
   if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
@@ -160,9 +160,10 @@ export const $client: ClientDecorator = (
     });
     return;
   }
-  const explicitName = options?.properties.get("name")?.type;
+  const explicitName =
+    options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service = options?.properties.get("service")?.type;
+  let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
   if (service?.kind !== "Namespace") {
     service = findClientService(context.program, target);
@@ -1197,11 +1198,18 @@ export function getClientLocation(
  */
 export function isInScope(context: TCGCContext, entity: Operation): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
-  if (scopes !== undefined && scopes.includes(context.emitterName)) {
-    return true;
+  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+
+  if (scopes !== undefined) {
+    if (scopes.includes(context.emitterName)) {
+      return true;
+    }
+
+    if (negationScopes === undefined) {
+      return false;
+    }
   }
 
-  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
   if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
     return false;
   }

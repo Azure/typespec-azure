@@ -529,7 +529,7 @@ model MyModel {
   scoped: armResourceIdentifier<[
     {
       type: "Microsoft.Compute/vm";
-      scopes: ["tenant", "resourceGroup"];
+      scopes: ["Tenant", "ResourceGroup"];
     }
   ]>;
 }
@@ -809,7 +809,7 @@ model Azure.Core.Foundations.ErrorResponseBase<Error>
 
 ### `InnerError` {#Azure.Core.Foundations.InnerError}
 
-An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.
+An object containing more specific information about the error. As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
 
 ```typespec
 model Azure.Core.Foundations.InnerError
