@@ -1,5 +1,5 @@
 ---
-changeKind: fix
+changeKind: feature
 packages:
   - "@azure-tools/typespec-azure-resource-manager"
   - "@azure-tools/typespec-azure-rulesets"
