@@ -2705,18 +2705,19 @@ model Azure.ResourceManager.Extension.ExtensionProviderNamespace<Resource>
 An external child resource target, used when an extension targets a child resource from another provider namespace
 
 ```typespec
-model Azure.ResourceManager.Extension.ExternalChildResource<ParentModel, ResourceType, ResourceParameterName, NamePattern, NameType>
+model Azure.ResourceManager.Extension.ExternalChildResource<ParentModel, ResourceType, ResourceParameterName, NamePattern, NameType, Description>
 ```
 
 #### Template Parameters
 
-| Name                  | Description                                                              |
-| --------------------- | ------------------------------------------------------------------------ |
-| ParentModel           | The parent of this resource.                                             |
-| ResourceType          | The type of this resource.                                               |
-| ResourceParameterName | The name of the 'name' parameter of this resource.                       |
-| NamePattern           | The pattern restriction for the name of this resource (default is none). |
-| NameType              | The type of the name parameter of this resource (default is string).     |
+| Name                  | Description                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------- |
+| ParentModel           | The parent of this resource.                                                                    |
+| ResourceType          | The type of this resource.                                                                      |
+| ResourceParameterName | The name of the 'name' parameter of this resource.                                              |
+| NamePattern           | The pattern restriction for the name of this resource (default is none).                        |
+| NameType              | The type of the name parameter of this resource (default is string).                            |
+| Description           | The description of the name parameter of this resource (default is "The name of the resource"). |
 
 #### Examples
 
@@ -2740,27 +2741,28 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
 
 #### Properties
 
-| Name | Type       | Description              |
-| ---- | ---------- | ------------------------ |
-| name | `NameType` | The name of the resource |
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| name | `NameType` |             |
 
 ### `ExternalResource` {#Azure.ResourceManager.Extension.ExternalResource}
 
 An external resource target, used when an extension targets a resource from another provider namespace
 
 ```typespec
-model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType>
+model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType, Description>
 ```
 
 #### Template Parameters
 
-| Name                  | Description                                                                      |
-| --------------------- | -------------------------------------------------------------------------------- |
-| TargetNamespace       | The provider namespace for the external resource.                                |
-| ResourceType          | The type of the external resource.                                               |
-| ResourceParameterName | The name of the 'name' parameter of the external resource.                       |
-| NamePattern           | The pattern restriction for the name of the external resource (default is none). |
-| NameType              | The type of the name parameter of the external resource (default is string).     |
+| Name                  | Description                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| TargetNamespace       | The provider namespace for the external resource.                                                       |
+| ResourceType          | The type of the external resource.                                                                      |
+| ResourceParameterName | The name of the 'name' parameter of the external resource.                                              |
+| NamePattern           | The pattern restriction for the name of the external resource (default is none).                        |
+| NameType              | The type of the name parameter of the external resource (default is string).                            |
+| Description           | The description of the name parameter of the external resource (default is "The name of the resource"). |
 
 #### Examples
 
@@ -2778,9 +2780,9 @@ alias Scaleset = Extension.ExternalResource<
 
 #### Properties
 
-| Name | Type       | Description              |
-| ---- | ---------- | ------------------------ |
-| name | `NameType` | The name of the resource |
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| name | `NameType` |             |
 
 ### `ManagementGroup` {#Azure.ResourceManager.Extension.ManagementGroup}
 

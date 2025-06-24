@@ -1511,6 +1511,205 @@ op Azure.ResourceManager.Foundations.checkNameAvailability(apiVersion: string, b
 
 ## Azure.ResourceManager.Legacy
 
+### `ExtensionOperations` {#Azure.ResourceManager.Legacy.ExtensionOperations}
+
+An operation template used to build extension resource operations using non-standard paths.
+
+```typespec
+interface Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>
+```
+
+#### Template Parameters
+
+| Name                        | Description                                       |
+| --------------------------- | ------------------------------------------------- |
+| TargetParameters            | The path parameters for the target resource       |
+| ExtensionParentParameters   | Parent parameters of the extension resource       |
+| ExtensionInstanceParameters | The instance parameters of the extension resource |
+
+#### `ExtensionOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateAsync(resource: Resource): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                                             |
+| ------------------- | ----------------------------------------------------------------------- |
+| Resource            | the resource being created or updated                                   |
+| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters          | Optional. Additional parameters after the path parameters               |
+| Response            | Optional. The success response(s) for the PUT operation                 |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                |
+| ErrorType           | Optional. The error response, if non-standard.                          |
+
+#### `ExtensionOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateSync}
+
+A synchronous resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateSync(resource: Resource): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| Resource            | the resource being created or updated                     |
+| Parameters          | Optional. Additional parameters after the path parameters |
+| Response            | Optional. The success response(s) for the PUT operation   |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
+| ErrorType           | Optional. The error response, if non-standard.            |
+
+#### `ExtensionOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchAsync}
+
+A long-running resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchAsync(properties: PatchModel): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                                             |
+| ------------------- | ----------------------------------------------------------------------- |
+| Resource            | the resource being created or updated                                   |
+| PatchModel          | the PATCH request model                                                 |
+| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters          | Optional. Additional parameters after the path parameters               |
+| Response            | Optional. The success response(s) for the PATCH operation               |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                |
+| ErrorType           | Optional. The error response, if non-standard.                          |
+
+#### `ExtensionOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchSync}
+
+A synchronous resource Update (PATCH)
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchSync(properties: PatchModel): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| Resource            | the resource being created or updated                     |
+| PatchModel          | the PATCH request model                                   |
+| Parameters          | Optional. Additional parameters after the path parameters |
+| Response            | Optional. The success response(s) for the PATCH operation |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
+| ErrorType           | Optional. The error response, if non-standard.            |
+
+#### `ExtensionOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.DeleteWithoutOkAsync}
+
+Delete a resource asynchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.DeleteWithoutOkAsync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| LroHeaders | The lro headers for the operation                          |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+| ErrorType  | Optional. The error response, if non-standard.             |
+
+#### `ExtensionOperations.DeleteSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.DeleteSync}
+
+Delete a resource synchronously
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.DeleteSync(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                |
+| ---------- | ---------------------------------------------------------- |
+| Resource   | The resource being deleted                                 |
+| Parameters | Optional. Additional parameters after the path parameters  |
+| Response   | Optional. The success response(s) for the delete operation |
+| ErrorType  | Optional. The error response, if non-standard.             |
+
+#### `ExtensionOperations.Read` {#Azure.ResourceManager.Legacy.ExtensionOperations.Read}
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.Read(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being read                                   |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The success response for a get operation.       |
+| ErrorType  | Optional. The error response, if non-standard.            |
+
+#### `ExtensionOperations.List` {#Azure.ResourceManager.Legacy.ExtensionOperations.List}
+
+List a resource
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.List(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| Resource   | The resource being listed                                 |
+| Parameters | Optional. Additional parameters after the path parameters |
+| Response   | Optional. The response returned by the list               |
+| ErrorType  | Optional. The error response, if non-standard.            |
+
+#### `ExtensionOperations.ActionSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.ActionSync}
+
+A synchronous resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.ActionSync(body: Request): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| Resource            | The resource being acted upon                             |
+| Request             | The request model for the action                          |
+| Response            | The response model for the action                         |
+| Parameters          | Optional. Additional parameters after the path parameters |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
+| ErrorType           | Optional. The error response, if non-standard.            |
+
+#### `ExtensionOperations.ActionAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.ActionAsync}
+
+A long-running resource action.
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.ActionAsync(body: Request): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name                | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| Resource            | The resource being acted upon                                             |
+| Request             | The request model for the action                                          |
+| Result              | The result model for the action                                           |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                 |
+| Response            | The full response union of the action                                     |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                  |
+| ErrorType           | Optional. The error response, if non-standard.                            |
+
 ### `LegacyOperations` {#Azure.ResourceManager.Legacy.LegacyOperations}
 
 An operation template used to build resource operations in which the same resource type

@@ -3,6 +3,8 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
+using Http;
+using Rest;
 using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
@@ -134,4 +136,56 @@ model MoveRequest {
 model MoveResponse {
   /** The status of the move */
   movingStatus: string;
+}
+
+alias GenericResourceParameters = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+
+  /** the provider namespace */
+  @path
+  @segment("providers")
+  @key
+  providerNamespace: string;
+
+  /** the resource type of the parent */
+  @path @key parentType: string;
+
+  /** the name of the parent resource */
+  @path @key parentName: string;
+
+  /** the resource type of the target resource */
+  @path @key resourceType: string;
+
+  /** the name of the target resource */
+  @path @key resourceName: string;
+};
+
+alias ParentParameters = {
+  ...Extension.ExtensionProviderNamespace<Employee>;
+  ...ParentKeysOf<Employee>;
+};
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+interface GenericOps
+  extends Azure.ResourceManager.Legacy.ExtensionOperations<
+      GenericResourceParameters,
+      ParentParameters,
+      {
+        ...Extension.ExtensionProviderNamespace<Employee>,
+        ...KeysOf<Employee>,
+      }
+    > {}
+
+@armResourceOperations
+interface GenericResources {
+  get is GenericOps.Read<Employee>;
+  create is GenericOps.CreateOrUpdateAsync<Employee>;
+  update is GenericOps.CustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is GenericOps.DeleteWithoutOkAsync<Employee>;
+  list is GenericOps.List<Employee>;
 }
