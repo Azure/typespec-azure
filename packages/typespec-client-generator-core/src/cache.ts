@@ -75,7 +75,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // if no explicit `@client` or `@operationGroup`
   if (!hasExplicitClientOrOperationGroup(context)) {
     const newOperationGroupNames = new Set<string>();
-    listScopedDecoratorData(context, clientLocationKey).map((target) => {
+    [...listScopedDecoratorData(context, clientLocationKey).values()].map((target) => {
       if (typeof target === "string") {
         if (
           clients[0].subOperationGroups.some(
