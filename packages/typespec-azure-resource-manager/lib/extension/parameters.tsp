@@ -8,6 +8,7 @@ using Azure.ResourceManager.CommonTypes;
 
 /**
  * The default scope parameter for an extension resource.
+ * @template Type The type of the scope parameter (default is string). This can be used to specify `Azure.Core.armResourceIdentifier` type or other constrained type
  *
  * @example
  * ```typespec
@@ -17,11 +18,11 @@ using Azure.ResourceManager.CommonTypes;
  * ```
  */
 @builtInResource
-model ScopeParameter {
+model ScopeParameter<Type extends string = string> {
   @path(#{ allowReserved: true })
   @key
   @doc("The fully qualified Azure Resource manager identifier of the resource.")
-  scope: string;
+  scope: Type;
 }
 
 /**
@@ -124,6 +125,53 @@ model ManagementGroup<ParameterName extends valueof string = "managementGroupNam
  * @template TargetNamespace The provider namespace for the external resource.
  * @template ResourceType The type of the external resource.
  * @template ResourceParameterName The name of the 'name' parameter of the external resource.
+ * @template NamePattern The pattern restriction for the name of the external resource (default is none).
+ * @template NameType The type of the name parameter of the external resource (default is string).
+ * @template Description The description of the name parameter of the external resource (default is "The name of the resource").
+ *
+ * @example
+ * ```typespec
+ * alias VirtualMachine = ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+ *
+ * ```
+ *
+ * @example
+ * ```typespec
+ * alias Scaleset = Extension.ExternalResource<
+ *   "Microsoft.Compute",
+ *   "virtualMachineScaleSets",
+ *   "scaleSetName"
+ * >;
+ 
+ * ```
+ */
+@doc("")
+@armVirtualResource(TargetNamespace)
+@Http.Private.includeInapplicableMetadataInPayload(false)
+model ExternalResource<
+  TargetNamespace extends valueof string,
+  ResourceType extends valueof string,
+  ResourceParameterName extends valueof string,
+  NamePattern extends valueof string = "",
+  NameType extends string = string,
+  Description extends valueof string = "The name of the resource"
+> {
+  @doc(Description)
+  @visibility(Lifecycle.Read)
+  @path
+  @key(ResourceParameterName)
+  @segment(ResourceType)
+  @pattern(NamePattern)
+  name: NameType;
+}
+
+/** An external child resource target, used when an extension targets a child resource from another provider namespace
+ * @template ParentModel The parent of this resource.
+ * @template ResourceType The type of this resource.
+ * @template ResourceParameterName The name of the 'name' parameter of this resource.
+ * @template NamePattern The pattern restriction for the name of this resource (default is none).
+ * @template NameType The type of the name parameter of this resource (default is string).
+ * @template Description The description of the name parameter of this resource (default is "The name of the resource").
  *
  * @example
  * ```typespec
@@ -139,34 +187,33 @@ model ManagementGroup<ParameterName extends valueof string = "managementGroupNam
  *   "scaleSetName"
  * >;
  *
- * @parentResource(Scaleset)
- * model VirtualMachineScaleSetVm {
- *  @visibility(Lifecycle.Read)
- *  @path
- *  @segment("virtualMachineScaleSetVms")
- *  @key("scaleSetVmName")
- *  @pattern("^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$")
- *  @doc("Name of the scaleset VM")
- *  name: string;
- * }
+ * alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
+ *   Scaleset,
+ *   "virtualMachineScaleSetVms",
+ *   "scaleSetVmName"
+ * >;
  *
  * ```
  */
-@armVirtualResource(TargetNamespace)
+@doc("")
+@parentResource(ParentModel)
 @Http.Private.includeInapplicableMetadataInPayload(false)
-model ExternalResource<
-  TargetNamespace extends valueof string,
+model ExternalChildResource<
+  ParentModel extends {},
   ResourceType extends valueof string,
-  ResourceParameterName extends valueof string
+  ResourceParameterName extends valueof string,
+  NamePattern extends valueof string = "",
+  NameType extends string = string,
+  Description extends valueof string = "The name of the resource"
 > {
-  /** The name of the virtual machine */
+  @doc(Description)
   @visibility(Lifecycle.Read)
   @path
   @key(ResourceParameterName)
   @segment(ResourceType)
-  name: string;
+  @pattern(NamePattern)
+  name: NameType;
 }
-
 /** A subscription target for an extension resource */
 @builtInSubscriptionResource
 model Subscription {}

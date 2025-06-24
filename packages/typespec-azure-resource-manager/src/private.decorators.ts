@@ -277,23 +277,10 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   const { program } = context;
   const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
   if (armProviderNamespace && target.type.kind === "String") {
-    target.type = createOrGetProviderType(program, armProviderNamespace);
+    target.type = $(program).literal.createString(armProviderNamespace);
   }
 };
 
-function createOrGetProviderType(program: Program, provider: string): StringLiteral {
-  const cache = ((program as ProviderNameCache)[PROVIDER_NAME_CACHE] ??= new Map<
-    string,
-    StringLiteral
-  >());
-  if (cache.has(provider)) {
-    return cache.get(provider)!;
-  }
-
-  const newType = $(program).realm.typekit.literal.createString(provider);
-  cache.set(provider, newType);
-  return newType;
-}
 /**
  * Update the ARM provider namespace for a given entity.
  * @param {DecoratorContext} context DecoratorContext

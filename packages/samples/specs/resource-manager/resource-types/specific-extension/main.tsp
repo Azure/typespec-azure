@@ -3,8 +3,6 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using Http;
-using Rest;
 using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
@@ -82,24 +80,29 @@ interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource
 }
 
 /** Virtual resource for a virtual machine */
-alias VirtualMachine = Extension.ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+alias VirtualMachine = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachines",
+  "vmName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine"
+>;
 
 alias Scaleset = Extension.ExternalResource<
   "Microsoft.Compute",
   "virtualMachineScaleSets",
-  "scaleSetName"
+  "scaleSetName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine scale set"
 >;
-/** A scaleset VM */
-@parentResource(Scaleset)
-model VirtualMachineScaleSetVm {
-  /** Name of the scaleset VM */
-  @visibility(Lifecycle.Read)
-  @path
-  @segment("virtualMachineScaleSetVms")
-  @key("scaleSetVmName")
-  @pattern("^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$")
-  name: string;
-}
+
+alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
+  Scaleset,
+  "virtualMachineScaleSetVms",
+  "scaleSetVmName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine scale set VM"
+>;
 
 @armResourceOperations
 interface Employees extends EmplOps<Extension.ScopeParameter> {}

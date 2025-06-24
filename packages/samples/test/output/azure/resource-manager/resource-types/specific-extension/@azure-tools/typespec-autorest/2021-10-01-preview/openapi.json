@@ -1302,14 +1302,15 @@
           {
             "name": "scaleSetName",
             "in": "path",
-            "description": "The name of the virtual machine",
+            "description": "The name of the virtual machine scale set",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "scaleSetVmName",
             "in": "path",
-            "description": "Name of the scaleset VM",
+            "description": "The name of the virtual machine scale set VM",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
@@ -1354,14 +1355,15 @@
           {
             "name": "scaleSetName",
             "in": "path",
-            "description": "The name of the virtual machine",
+            "description": "The name of the virtual machine scale set",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "scaleSetVmName",
             "in": "path",
-            "description": "Name of the scaleset VM",
+            "description": "The name of the virtual machine scale set VM",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
@@ -1409,14 +1411,15 @@
           {
             "name": "scaleSetName",
             "in": "path",
-            "description": "The name of the virtual machine",
+            "description": "The name of the virtual machine scale set",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "scaleSetVmName",
             "in": "path",
-            "description": "Name of the scaleset VM",
+            "description": "The name of the virtual machine scale set VM",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
@@ -1494,14 +1497,15 @@
           {
             "name": "scaleSetName",
             "in": "path",
-            "description": "The name of the virtual machine",
+            "description": "The name of the virtual machine scale set",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "scaleSetVmName",
             "in": "path",
-            "description": "Name of the scaleset VM",
+            "description": "The name of the virtual machine scale set VM",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
@@ -1558,14 +1562,15 @@
           {
             "name": "scaleSetName",
             "in": "path",
-            "description": "The name of the virtual machine",
+            "description": "The name of the virtual machine scale set",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "scaleSetVmName",
             "in": "path",
-            "description": "Name of the scaleset VM",
+            "description": "The name of the virtual machine scale set VM",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
@@ -1630,14 +1635,15 @@
           {
             "name": "scaleSetName",
             "in": "path",
-            "description": "The name of the virtual machine",
+            "description": "The name of the virtual machine scale set",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "scaleSetVmName",
             "in": "path",
-            "description": "Name of the scaleset VM",
+            "description": "The name of the virtual machine scale set VM",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
@@ -1698,7 +1704,8 @@
             "in": "path",
             "description": "The name of the virtual machine",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           }
         ],
         "responses": {
@@ -1742,7 +1749,8 @@
             "in": "path",
             "description": "The name of the virtual machine",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "employeeName",
@@ -1789,7 +1797,8 @@
             "in": "path",
             "description": "The name of the virtual machine",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "employeeName",
@@ -1866,7 +1875,8 @@
             "in": "path",
             "description": "The name of the virtual machine",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "employeeName",
@@ -1922,7 +1932,8 @@
             "in": "path",
             "description": "The name of the virtual machine",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "employeeName",
@@ -1986,7 +1997,8 @@
             "in": "path",
             "description": "The name of the virtual machine",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "employeeName",
@@ -2506,21 +2518,6 @@
         ]
       },
       "readOnly": true
-    },
-    "VirtualMachineScaleSetVm": {
-      "type": "object",
-      "description": "A scaleset VM",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the scaleset VM",
-          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "name"
-      ]
     }
   },
   "parameters": {}

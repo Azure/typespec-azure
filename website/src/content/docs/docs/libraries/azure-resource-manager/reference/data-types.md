@@ -2700,21 +2700,23 @@ model Azure.ResourceManager.Extension.ExtensionProviderNamespace<Resource>
 | ----------------- | -------------------------------- | ----------- |
 | extensionProvider | `"Microsoft.ThisWillBeReplaced"` |             |
 
-### `ExternalResource` {#Azure.ResourceManager.Extension.ExternalResource}
+### `ExternalChildResource` {#Azure.ResourceManager.Extension.ExternalChildResource}
 
-An external resource target, used when an extension targets a resource from another provider namespace
+An external child resource target, used when an extension targets a child resource from another provider namespace
 
 ```typespec
-model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName>
+model Azure.ResourceManager.Extension.ExternalChildResource<ParentModel, ResourceType, ResourceParameterName, NamePattern, NameType>
 ```
 
 #### Template Parameters
 
-| Name                  | Description                                                |
-| --------------------- | ---------------------------------------------------------- |
-| TargetNamespace       | The provider namespace for the external resource.          |
-| ResourceType          | The type of the external resource.                         |
-| ResourceParameterName | The name of the 'name' parameter of the external resource. |
+| Name                  | Description                                                              |
+| --------------------- | ------------------------------------------------------------------------ |
+| ParentModel           | The parent of this resource.                                             |
+| ResourceType          | The type of this resource.                                               |
+| ResourceParameterName | The name of the 'name' parameter of this resource.                       |
+| NamePattern           | The pattern restriction for the name of this resource (default is none). |
+| NameType              | The type of the name parameter of this resource (default is string).     |
 
 #### Examples
 
@@ -2729,23 +2731,56 @@ alias Scaleset = Extension.ExternalResource<
   "scaleSetName"
 >;
 
-@parentResource(Scaleset)
-model VirtualMachineScaleSetVm {
-  @visibility(Lifecycle.Read)
-  @path
-  @segment("virtualMachineScaleSetVms")
-  @key("scaleSetVmName")
-  @pattern("^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$")
-  @doc("Name of the scaleset VM")
-  name: string;
-}
+alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
+  Scaleset,
+  "virtualMachineScaleSetVms",
+  "scaleSetVmName"
+>;
 ```
 
 #### Properties
 
-| Name | Type     | Description                     |
-| ---- | -------- | ------------------------------- |
-| name | `string` | The name of the virtual machine |
+| Name | Type       | Description              |
+| ---- | ---------- | ------------------------ |
+| name | `NameType` | The name of the resource |
+
+### `ExternalResource` {#Azure.ResourceManager.Extension.ExternalResource}
+
+An external resource target, used when an extension targets a resource from another provider namespace
+
+```typespec
+model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                                                      |
+| --------------------- | -------------------------------------------------------------------------------- |
+| TargetNamespace       | The provider namespace for the external resource.                                |
+| ResourceType          | The type of the external resource.                                               |
+| ResourceParameterName | The name of the 'name' parameter of the external resource.                       |
+| NamePattern           | The pattern restriction for the name of the external resource (default is none). |
+| NameType              | The type of the name parameter of the external resource (default is string).     |
+
+#### Examples
+
+```typespec
+alias VirtualMachine = ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+```
+
+```typespec
+alias Scaleset = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachineScaleSets",
+  "scaleSetName"
+>;
+```
+
+#### Properties
+
+| Name | Type       | Description              |
+| ---- | ---------- | ------------------------ |
+| name | `NameType` | The name of the resource |
 
 ### `ManagementGroup` {#Azure.ResourceManager.Extension.ManagementGroup}
 
@@ -2784,8 +2819,14 @@ None
 The default scope parameter for an extension resource.
 
 ```typespec
-model Azure.ResourceManager.Extension.ScopeParameter
+model Azure.ResourceManager.Extension.ScopeParameter<Type>
 ```
+
+#### Template Parameters
+
+| Name | Description                                                                                                                                        |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type | The type of the scope parameter (default is string). This can be used to specify `Azure.Core.armResourceIdentifier` type or other constrained type |
 
 #### Examples
 
@@ -2797,9 +2838,9 @@ model Employee {
 
 #### Properties
 
-| Name  | Type     | Description                                                            |
-| ----- | -------- | ---------------------------------------------------------------------- |
-| scope | `string` | The fully qualified Azure Resource manager identifier of the resource. |
+| Name  | Type   | Description |
+| ----- | ------ | ----------- |
+| scope | `Type` |             |
 
 ### `Subscription` {#Azure.ResourceManager.Extension.Subscription}
 
