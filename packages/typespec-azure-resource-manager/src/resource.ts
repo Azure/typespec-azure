@@ -136,9 +136,7 @@ function getProperty(
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
 export function isArmVirtualResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target) === true) return true;
-  if (target.baseModel) return isArmVirtualResource(program, target.baseModel);
-  return false;
+  return getArmVirtualResourceDetails(program, target) !== undefined;
 }
 
 /**
@@ -150,14 +148,23 @@ export function isArmVirtualResource(program: Program, target: Model): boolean {
 export function getArmVirtualResourceDetails(
   program: Program,
   target: Model,
+  visited: Set<Model> = new Set<Model>(),
 ): ArmVirtualResourceDetails | undefined {
+  if (visited.has(target)) return undefined;
+  visited.add(target);
   if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target)) {
     return program
       .stateMap(ArmStateKeys.armBuiltInResource)
       .get(target) as ArmVirtualResourceDetails;
   }
+
   if (target.baseModel) {
-    return getArmVirtualResourceDetails(program, target.baseModel);
+    const details = getArmVirtualResourceDetails(program, target.baseModel, visited);
+    if (details) return details;
+  }
+  const parent = getParentResource(program, target);
+  if (parent) {
+    return getArmVirtualResourceDetails(program, parent, visited);
   }
   return undefined;
 }

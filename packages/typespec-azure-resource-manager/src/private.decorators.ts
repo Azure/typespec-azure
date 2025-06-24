@@ -6,6 +6,7 @@ import {
   ModelProperty,
   Operation,
   Program,
+  StringLiteral,
   Tuple,
   Type,
   addVisibilityModifiers,
@@ -60,6 +61,12 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
+
+const PROVIDER_NAME_CACHE = Symbol.for("Azure.ResourceManager.Private.ProviderNameCache");
+
+interface ProviderNameCache {
+  [PROVIDER_NAME_CACHE]?: Map<string, StringLiteral>;
+}
 
 /** @internal */
 
@@ -268,16 +275,25 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   resourceType: Model,
 ) => {
   const { program } = context;
-  const details = getArmVirtualResourceDetails(program, resourceType);
-  const armProviderNamespace =
-    details?.provider ?? getArmProviderNamespace(program, resourceType as Model);
+  const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
   if (armProviderNamespace && target.type.kind === "String") {
-    const targetType = $(program).realm.clone(target.type);
-    targetType.value = armProviderNamespace;
-    target.type = targetType;
+    target.type = createOrGetProviderType(program, armProviderNamespace);
   }
 };
 
+function createOrGetProviderType(program: Program, provider: string): StringLiteral {
+  const cache = ((program as ProviderNameCache)[PROVIDER_NAME_CACHE] ??= new Map<
+    string,
+    StringLiteral
+  >());
+  if (cache.has(provider)) {
+    return cache.get(provider)!;
+  }
+
+  const newType = $(program).realm.typekit.literal.createString(provider);
+  cache.set(provider, newType);
+  return newType;
+}
 /**
  * Update the ARM provider namespace for a given entity.
  * @param {DecoratorContext} context DecoratorContext

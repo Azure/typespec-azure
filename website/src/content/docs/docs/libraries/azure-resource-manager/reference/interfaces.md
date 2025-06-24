@@ -1127,6 +1127,323 @@ op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscrip
 | Response         | the availability response, default to the standard response                                   |
 | AdditionalParams | A model specifying additional non-path parameters to the availability request                 |
 
+## Azure.ResourceManager.Extension
+
+### `ActionAsync` {#Azure.ResourceManager.Extension.ActionAsync}
+
+```typespec
+op Azure.ResourceManager.Extension.ActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | The resource being acted upon                                                                            |
+| Request             | The request model for the action                                                                         |
+| Response            | The response model for the action                                                                        |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                              |
+
+### `ActionAsyncBase` {#Azure.ResourceManager.Extension.ActionAsyncBase}
+
+A long-running resource action.
+
+```typespec
+op Azure.ResourceManager.Extension.ActionAsyncBase(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | The resource being acted upon                                                                            |
+| Request             | The request model for the action                                                                         |
+| Response            | The response type for the action                                                                         |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                                |
+
+### `ActionNoContentSync` {#Azure.ResourceManager.Extension.ActionNoContentSync}
+
+A synchronous resource action that returns no content.
+
+```typespec
+op Azure.ResourceManager.Extension.ActionNoContentSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | The resource being acted upon                                                                            |
+| Request             | The request model for the action                                                                         |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                                |
+
+### `ActionNoResponseContentAsync` {#Azure.ResourceManager.Extension.ActionNoResponseContentAsync}
+
+```typespec
+op Azure.ResourceManager.Extension.ActionNoResponseContentAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | The resource being acted upon                                                                            |
+| Request             | The request model for the action                                                                         |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                              |
+
+### `ActionSync` {#Azure.ResourceManager.Extension.ActionSync}
+
+A synchronous resource action.
+
+```typespec
+op Azure.ResourceManager.Extension.ActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | The resource being acted upon                                                                            |
+| Request             | The request model for the action                                                                         |
+| Response            | The response model for the action                                                                        |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                              |
+
+### `CheckExistence` {#Azure.ResourceManager.Extension.CheckExistence}
+
+Check a resource's existence via HEAD operation
+
+```typespec
+op Azure.ResourceManager.Extension.CheckExistence(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the extension resource being checked                                                                     |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response for the read operation                                                    |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `CreateOrReplaceAsync` {#Azure.ResourceManager.Extension.CreateOrReplaceAsync}
+
+```typespec
+op Azure.ResourceManager.Extension.CreateOrReplaceAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", resource: ExtensionResource): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the resource being created or replaced                                                                   |
+| LroHeaders        | Optional. Allows overriding the lro headers returned on resource create                                  |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response for the createOrReplace operation                                         |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `CreateOrReplaceSync` {#Azure.ResourceManager.Extension.CreateOrReplaceSync}
+
+Synchronous PUT operation for Azure Resource Manager resources
+
+```typespec
+op Azure.ResourceManager.Extension.CreateOrReplaceSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", resource: ExtensionResource): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the resource being created or replaced                                                                   |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response for the createOrUpdate operation                                          |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `CreateOrUpdateAsync` {#Azure.ResourceManager.Extension.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Extension.CreateOrUpdateAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", resource: ExtensionResource): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the resource being created or updated                                                                    |
+| LroHeaders        | Optional. Allows overriding the lro headers returned on resource create                                  |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response for the createOrUpdate operation                                          |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `CustomPatchAsync` {#Azure.ResourceManager.Extension.CustomPatchAsync}
+
+A long-running resource update using a custom PATCH payload (Asynchronous)
+
+```typespec
+op Azure.ResourceManager.Extension.CustomPatchAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the resource being patched                                                                               |
+| PatchModel        | The input model for the PATCH request                                                                    |
+| LroHeaders        | Optional. Allows overriding the lro headers returned in the Accepted response                            |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response for the patch operation                                                   |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `CustomPatchSync` {#Azure.ResourceManager.Extension.CustomPatchSync}
+
+A resource update using a custom PATCH payload (synchronous)
+
+```typespec
+op Azure.ResourceManager.Extension.CustomPatchSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the resource being patched                                                                               |
+| PatchModel        | The input model for the PATCH request                                                                    |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response for the patch operation                                                   |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `DeleteAsync` {#Azure.ResourceManager.Extension.DeleteAsync}
+
+:::caution
+**Deprecated**: Use 'DeleteWithoutOkAsync' instead
+:::
+
+```typespec
+op Azure.ResourceManager.Extension.DeleteAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | The resource being deleted                                                                               |
+| LroHeaders        | Optional. Allows overriding the headers in the Accepted response                                         |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response(s) for the delete operation                                               |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `DeleteAsyncBase` {#Azure.ResourceManager.Extension.DeleteAsyncBase}
+
+```typespec
+op Azure.ResourceManager.Extension.DeleteAsyncBase(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | The resource being deleted                                                                               |
+| Response          | The response type for the operation                                                                      |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `DeleteSync` {#Azure.ResourceManager.Extension.DeleteSync}
+
+Delete a resource synchronously
+
+```typespec
+op Azure.ResourceManager.Extension.DeleteSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | The resource being deleted                                                                               |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response(s) for the delete operation                                               |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `DeleteWithoutOkAsync` {#Azure.ResourceManager.Extension.DeleteWithoutOkAsync}
+
+```typespec
+op Azure.ResourceManager.Extension.DeleteWithoutOkAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | The resource being deleted                                                                               |
+| LroHeaders        | Optional. Allows overriding the headers returned in the Accepted response                                |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response(s) for the delete operation                                               |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
+### `ListByTarget` {#Azure.ResourceManager.Extension.ListByTarget}
+
+List an extension resource at the given target scope
+
+```typespec
+op Azure.ResourceManager.Extension.ListByTarget(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                                |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target to list at, e.g. Extension.Subscription or Extension>ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the resource being listed                                                                                  |
+| Parameters        | Optional. Additional parameters after the path parameters                                                  |
+| Response          | Optional. The success response for the list operation                                                      |
+| Error             | Optional. The error response, if non-standard.                                                             |
+
+### `Read` {#Azure.ResourceManager.Extension.Read}
+
+A resource GET operation
+
+```typespec
+op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource | the resource being rea                                                                                   |
+| Parameters        | Optional. Additional parameters after the path parameters                                                |
+| Response          | Optional. The success response for the read operation                                                    |
+| Error             | Optional. The error response, if non-standard.                                                           |
+
 ## Azure.ResourceManager.Foundations
 
 ### `ArmCreateOperation` {#Azure.ResourceManager.Foundations.ArmCreateOperation}

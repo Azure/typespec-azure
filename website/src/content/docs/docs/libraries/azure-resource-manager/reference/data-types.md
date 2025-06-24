@@ -2444,13 +2444,16 @@ An internal enum to indicate the resource support for various path types
 enum Azure.ResourceManager.CommonTypes.ResourceHome
 ```
 
-| Name          | Value | Description                               |
-| ------------- | ----- | ----------------------------------------- |
-| Tenant        |       | The resource is bound to a tenant         |
-| Subscription  |       | The resource is bound to a subscription   |
-| Location      |       | The resource is bound to a location       |
-| ResourceGroup |       | The resource is bound to a resource group |
-| Extension     |       | The resource is bound to an extension     |
+| Name                 | Value | Description                               |
+| -------------------- | ----- | ----------------------------------------- |
+| Tenant               |       | The resource is bound to a tenant         |
+| Subscription         |       | The resource is bound to a subscription   |
+| Location             |       | The resource is bound to a location       |
+| ResourceGroup        |       | The resource is bound to a resource group |
+| Extension            |       | The resource is bound to an extension     |
+| BuiltIn              |       | The resource is built in                  |
+| BuiltInSubscription  |       | The resource is built in                  |
+| BuiltInResourceGroup |       | The resource is built in                  |
 
 ### `Versions` {#Azure.ResourceManager.CommonTypes.Versions}
 
@@ -2624,6 +2627,269 @@ Type of managed service identity (either system assigned, or none).
 ```typespec
 union Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityType
 ```
+
+## Azure.ResourceManager.Extension
+
+### `ExtensionInstanceParameters` {#Azure.ResourceManager.Extension.ExtensionInstanceParameters}
+
+The path parameters for an extension resource at the given target
+
+```typespec
+model Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource, Resource>
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
+| Resource       | The extension resource.                                                                                                                                                   |
+
+#### Properties
+
+| Name              | Type                             | Description                                                   |
+| ----------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                         | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+| extensionProvider | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+
+### `ExtensionParentParameters` {#Azure.ResourceManager.Extension.ExtensionParentParameters}
+
+The path parameters for a collection of extension resources at the given target
+
+```typespec
+model Azure.ResourceManager.Extension.ExtensionParentParameters<TargetResource, ExtensionResource>
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
+| ExtensionResource | The extension resource.                                                                                                                                                   |
+
+#### Properties
+
+| Name              | Type                             | Description                                                   |
+| ----------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                         | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+| extensionProvider | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+
+### `ExtensionProviderNamespace` {#Azure.ResourceManager.Extension.ExtensionProviderNamespace}
+
+The provider namespace for an extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.ExtensionProviderNamespace<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                  |
+| -------- | ---------------------------- |
+| Resource | The extension resource model |
+
+#### Properties
+
+| Name              | Type                             | Description |
+| ----------------- | -------------------------------- | ----------- |
+| extensionProvider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `ExternalResource` {#Azure.ResourceManager.Extension.ExternalResource}
+
+An external resource target, used when an extension targets a resource from another provider namespace
+
+```typespec
+model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                                |
+| --------------------- | ---------------------------------------------------------- |
+| TargetNamespace       | The provider namespace for the external resource.          |
+| ResourceType          | The type of the external resource.                         |
+| ResourceParameterName | The name of the 'name' parameter of the external resource. |
+
+#### Examples
+
+```typespec
+alias VirtualMachine = ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+```
+
+```typespec
+alias Scaleset = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachineScaleSets",
+  "scaleSetName"
+>;
+
+@parentResource(Scaleset)
+model VirtualMachineScaleSetVm {
+  @visibility(Lifecycle.Read)
+  @path
+  @segment("virtualMachineScaleSetVms")
+  @key("scaleSetVmName")
+  @pattern("^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$")
+  @doc("Name of the scaleset VM")
+  name: string;
+}
+```
+
+#### Properties
+
+| Name | Type     | Description                     |
+| ---- | -------- | ------------------------------- |
+| name | `string` | The name of the virtual machine |
+
+### `ManagementGroup` {#Azure.ResourceManager.Extension.ManagementGroup}
+
+A management group
+
+```typespec
+model Azure.ResourceManager.Extension.ManagementGroup<ParameterName>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| ParameterName | The name of the 'name' parameter of the management group (usually managementGroupName or managementGroupId). |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
+### `ResourceGroup` {#Azure.ResourceManager.Extension.ResourceGroup}
+
+A resource group target for an extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.ResourceGroup
+```
+
+#### Properties
+
+None
+
+### `ScopeParameter` {#Azure.ResourceManager.Extension.ScopeParameter}
+
+The default scope parameter for an extension resource.
+
+```typespec
+model Azure.ResourceManager.Extension.ScopeParameter
+```
+
+#### Examples
+
+```typespec
+model Employee {
+  ...ResourceUriParameter;
+}
+```
+
+#### Properties
+
+| Name  | Type     | Description                                                            |
+| ----- | -------- | ---------------------------------------------------------------------- |
+| scope | `string` | The fully qualified Azure Resource manager identifier of the resource. |
+
+### `Subscription` {#Azure.ResourceManager.Extension.Subscription}
+
+A subscription target for an extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.Subscription
+```
+
+#### Properties
+
+None
+
+### `TargetBaseParameters` {#Azure.ResourceManager.Extension.TargetBaseParameters}
+
+Base parameters for an extension target.
+
+```typespec
+model Azure.ResourceManager.Extension.TargetBaseParameters<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+
+#### Properties
+
+| Name              | Type                             | Description                                                   |
+| ----------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                         | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+
+### `TargetParameters` {#Azure.ResourceManager.Extension.TargetParameters}
+
+The path parameters for a target resource for an extension
+
+```typespec
+model Azure.ResourceManager.Extension.TargetParameters<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+
+#### Properties
+
+| Name              | Type                             | Description                                                   |
+| ----------------- | -------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                         | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+
+### `TargetProviderNamespace` {#Azure.ResourceManager.Extension.TargetProviderNamespace}
+
+The provider namespace (if any) for a target resource for an extension
+
+```typespec
+model Azure.ResourceManager.Extension.TargetProviderNamespace<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                                                                                                                                                                |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource) |
+
+#### Properties
+
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `Tenant` {#Azure.ResourceManager.Extension.Tenant}
+
+A tenant target for the extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.Tenant
+```
+
+#### Properties
+
+None
 
 ## Azure.ResourceManager.Foundations
 
