@@ -947,7 +947,6 @@ interface SdkLroServiceMethodOptions {
 export interface SdkLroServiceMetadata {
   /** LRO metadata from TypeSpec core library */
   __raw: LroMetadata;
-
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;
   /** Polling step metadata */
@@ -956,6 +955,51 @@ export interface SdkLroServiceMetadata {
   finalStep?: SdkLroServiceFinalStep;
   /** Synthesized final response metadata */
   finalResponse?: SdkLroServiceFinalResponse;
+
+  /** extra metadata */
+  operation: SdkServiceOperation;
+  logicalResult: SdkModelType;
+  statusMonitorStep?: SdkNextOperationLink | SdkNextOperationReference;
+  pollingInfo: SdkPollingOperationStep;
+  envelopeResult: SdkModelType;
+  logicalPath?: string;
+  finalResult?: SdkModelType | "void";
+  finalEnvelopeResult?: SdkModelType | "void";
+  finalResultPath?: string;
+}
+
+export interface SdkNextOperationReference extends SdkLogicalOperationStep {
+  kind: "nextOperationReference";
+  responseModel: SdkModelType;
+  target: SdkOperationReference;
+}
+
+export interface SdkPollingOperationStep {
+  kind: "pollingOperationStep";
+  responseModel: SdkModelType;
+  terminationStatus: SdkTerminationStatus;
+  resultProperty?: SdkModelPropertyType;
+  errorProperty?: SdkModelPropertyType;
+}
+
+export type SdkTerminationStatus = SdkHttpOperationStatus | SdkModelPropertyTerminationStatus;
+
+interface SdkHttpOperationStatus {
+  kind: "status-code";
+}
+
+interface SdkModelPropertyTerminationStatus {
+  kind: "model-property";
+  property: SdkModelPropertyType;
+  succeededState: string[];
+  failedState: string[];
+  canceledState: string[];
+}
+
+export interface SdkNextOperationLink extends SdkLogicalOperationStep {
+  kind: "nextOperationLink";
+  responseModel: SdkModelType;
+  target: SdkOperationLink;
 }
 
 /**
@@ -979,13 +1023,13 @@ interface SdkLogicalOperationStep {
   responseModel?: SdkModelType;
 }
 
-interface SdkPropertyMap {
+export interface SdkPropertyMap {
   sourceKind: SourceKind;
   source: SdkModelPropertyType;
   target: SdkModelPropertyType;
 }
 
-interface SdkOperationReference {
+export interface SdkOperationReference {
   kind: "reference";
   /** The referenced operation */
   operation: SdkServiceOperation;
@@ -1029,7 +1073,8 @@ interface SdkPollingSuccessProperty extends SdkLogicalOperationStep {
 }
 
 interface SdkNoPollingSuccessProperty extends SdkLogicalOperationStep {
-  kind: "noPollingSuccessProperty";
+  kind: "noPollingResult";
+  responseModel: undefined;
 }
 
 /**
