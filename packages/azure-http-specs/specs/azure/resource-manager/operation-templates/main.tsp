@@ -7,6 +7,7 @@ import "@azure-tools/typespec-client-generator-core";
 import "./available-operations.tsp";
 import "./checkname-availability.tsp";
 import "./lro.tsp";
+import "./optional-body.tsp";
 
 using Http;
 using Rest;

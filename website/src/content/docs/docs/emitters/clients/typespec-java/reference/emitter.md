@@ -2,7 +2,7 @@
 title: "Emitter usage"
 ---
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
@@ -46,7 +46,7 @@ Specifies the namespace you want to override for namespaces set in the spec. Wit
 
 **Type:** `string`
 
-Specify the human readable name of the service. The name will be used in `README.md` and entry class. This option is for management-plane SDK.
+Specify the human readable name of the service. The name will be used for classes like `<ServiceName>Manager` or `<ServiceName>ServiceVersion`
 
 ### `examples-dir`
 
@@ -94,7 +94,7 @@ When set to `true`, the emitter will generate low-level protocol methods for eac
 
 **Type:** `boolean`
 
-When set to `true`, the emitter will generate low-level protocol methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
+When set to `true`, the emitter will generate convenience methods for each service operation if `@convenientAPI` is not set for an operation. Default value is `true`.
 
 ### `partial-update`
 
