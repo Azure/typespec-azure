@@ -1389,7 +1389,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Res
 This is the interface that implements the standard Azure Resource Manager operation that returns
 all supported RP operations. You should have exactly one declaration for each
 Azure Resource Manager service. It implements
-GET "/providers/Microsoft.ContosoProviderHub/operations"
+GET "/providers/{provider-namespace}/operations"
 
 ```typespec
 interface Azure.ResourceManager.Legacy.Operations<Response, Error>
