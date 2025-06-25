@@ -967,8 +967,8 @@ model MoveResponse {
     const employeesGet: Operation | undefined = Employees?.operations?.get("get");
     ok(employeesGet);
     expect(employeesGet?.kind).toBe("Operation");
-    const [emplGetHttp, _e] = getHttpOperation(program, employeesGet);
-    expect(emplGetHttp.path).toBe(
+    const [employeeGetHttp, _e] = getHttpOperation(program, employeesGet);
+    expect(employeeGetHttp.path).toBe(
       "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     );
     const managementGet: Operation | undefined = ManagementGroups?.operations?.get("get");
