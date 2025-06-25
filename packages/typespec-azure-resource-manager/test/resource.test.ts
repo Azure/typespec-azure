@@ -1,10 +1,11 @@
-import { Model } from "@typespec/compiler";
+import { Interface, Model, Operation } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { getHttpOperation } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
-import { checkFor } from "./test-host.js";
+import { checkFor, compileAndDiagnose } from "./test-host.js";
 
 function assertLifecycleOperation(
   resource: ArmResourceDetails,
@@ -848,6 +849,142 @@ interface RestorePointOperations {
     expect(restorePointCollection).toBeDefined();
     const diskRestorePoint = resources.find((r) => r.name === "DiskRestorePoint");
     expect(diskRestorePoint).toBeDefined();
+  });
+
+  it("allows extension of foreign resources", async () => {
+    const { program, types, diagnostics } = await compileAndDiagnose(`
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+namespace Microsoft.ContosoProviderHub;
+
+/** A ContosoProviderHub extension resource */
+model Employee is ExtensionResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  string,
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+
+  create is Extension.CreateOrReplaceAsync<Scope, Employee>;
+  update is Extension.CustomPatchSync<
+    Scope,
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is Extension.DeleteWithoutOkAsync<Scope, Employee>;
+  list is Extension.ListByTarget<Scope, Employee>;
+  move is Extension.ActionSync<Scope, Employee, MoveRequest, MoveResponse>;
+}
+
+/** Virtual resource for a virtual machine */
+alias VirtualMachine = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachines",
+  "vmName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine"
+>;
+
+
+@test
+@armResourceOperations
+interface Employees extends EmplOps<Extension.ScopeParameter> {}
+@test
+@armResourceOperations
+interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+@test
+@armResourceOperations
+interface VirtualMachines extends EmplOps<VirtualMachine> {}
+
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
+}
+
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    const { Employees, ManagementGroups, VirtualMachines } = types as {
+      Employees: Interface;
+      ManagementGroups: Interface;
+      VirtualMachines: Interface;
+    };
+    const employeesGet: Operation | undefined = Employees?.operations?.get("get");
+    ok(employeesGet);
+    expect(employeesGet?.kind).toBe("Operation");
+    const [emplGetHttp, _e] = getHttpOperation(program, employeesGet);
+    expect(emplGetHttp.path).toBe(
+      "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+    const managementGet: Operation | undefined = ManagementGroups?.operations?.get("get");
+    ok(managementGet);
+    expect(managementGet?.kind).toBe("Operation");
+    const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
+    expect(managementGetHttp.path).toBe(
+      "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+    const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
+    ok(virtualMachinesGet);
+    expect(virtualMachinesGet?.kind).toBe("Operation");
+    const [vmGetHttp, _v] = getHttpOperation(program, virtualMachinesGet);
+    expect(vmGetHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
   });
 
   it("emits diagnostics for non ARM resources", async () => {
