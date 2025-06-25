@@ -12,7 +12,7 @@ using Rest;
  * This is the interface that implements the standard Azure Resource Manager operation that returns
  * all supported RP operations. You should have exactly one declaration for each
  * Azure Resource Manager service. It implements
- *   GET "/providers/Microsoft.ContosoProviderHub/operations"
+ *   GET "/providers/{provider-namespace}/operations"
  *
  * @template Response The response returned by the operation list.
  * @template Error the error response returned by the operation list.
