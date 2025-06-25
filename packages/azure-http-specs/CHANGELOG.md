@@ -1,5 +1,17 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.20
+
+### Features
+
+- [#2852](https://github.com/Azure/typespec-azure/pull/2852) Update `@usage` decorator tests to adopt new additive logic and add JSON serialization support
+- [#2854](https://github.com/Azure/typespec-azure/pull/2854) Add comprehensive test scenarios for `@clientLocation` decorator
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
 ## 0.1.0-alpha.19
 
 ### Features
