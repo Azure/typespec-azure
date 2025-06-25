@@ -582,20 +582,23 @@ describe("typespec-autorest: operations", () => {
   });
 
   it(`@clientLocation with string target updates the operationId`, async () => {
-    const res = await compileOpenAPI(`
+    const res = await compileOpenAPI(
+      `
       @service namespace MyService;
       
       interface TestInterface {
         @route("/test-string") @clientLocation("CustomGroup") op testOperation(): void;
       }
-     
-      `);
+      `,
+      { preset: "azure" },
+    );
 
     strictEqual(res.paths["/test-string"].get?.operationId, "CustomGroup_TestOperation");
   });
 
   it(`@clientLocation with Interface target updates the operationId`, async () => {
-    const res: any = await compileOpenAPI(`
+    const res: any = await compileOpenAPI(
+      `
       @service namespace MyService;
       
       interface TargetInterface {
@@ -605,8 +608,9 @@ describe("typespec-autorest: operations", () => {
       interface SourceInterface {
         @route("/test-interface") @clientLocation(TargetInterface) op testOperation(): void;
       }
-     
-      `);
+      `,
+      { preset: "azure" },
+    );
 
     strictEqual(res.paths["/test-interface"].get.operationId, "TargetInterface_TestOperation");
     // Original operation in the target interface should use its interface name as prefix
@@ -614,7 +618,8 @@ describe("typespec-autorest: operations", () => {
   });
 
   it(`@clientLocation with Namespace target updates the operationId`, async () => {
-    const res: any = await compileOpenAPI(`
+    const res: any = await compileOpenAPI(
+      `
       @service namespace MyService;
       
       namespace CustomNamespace {
@@ -625,8 +630,9 @@ describe("typespec-autorest: operations", () => {
         @route("/test-namespace") @clientLocation(CustomNamespace) op testOperation(): void;
         @route("/test-service") @clientLocation(MyService) op serviceOperation(): void;
       }
-     
-      `);
+      `,
+      { preset: "azure" },
+    );
 
     // When target is a non-service namespace, use namespace name as prefix
     strictEqual(res.paths["/test-namespace"].get.operationId, "CustomNamespace_TestOperation");
@@ -901,6 +907,7 @@ describe("identifiers decorator", () => {
         name:string;
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], undefined);
   });
@@ -924,6 +931,7 @@ describe("identifiers decorator", () => {
         value:string;
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], ["foo/value"]);
   });

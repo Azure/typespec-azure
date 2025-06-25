@@ -398,7 +398,8 @@ it("excludes properties marked @invisible from the resource payload", async () =
 });
 
 it("allows resources with multiple endpoints using LegacyOperations", async () => {
-  const openApi = await compileOpenAPI(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
     namespace Microsoft.ContosoProviderhub;
@@ -532,7 +533,9 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       /** A sample HEAD operation to check resource existence */
       checkExistence is ArmResourceCheckExistence<Employee>;
     }
-      `);
+      `,
+    { preset: "azure" },
+  );
   ok(
     openApi.paths[
       "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees"
@@ -563,7 +566,8 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
 });
 
 it("allows action requests with optional body parameters", async () => {
-  const openApi = await compileOpenAPI(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
     namespace Microsoft.ContosoProviderhub;
@@ -647,7 +651,9 @@ it("allows action requests with optional body parameters", async () => {
       move is ArmResourceActionAsync<Employee, MoveRequest, MoveResponse, OptionalRequestBody = true>;
 
     }
-      `);
+      `,
+    { preset: "azure" },
+  );
 
   const resourceGroupPath =
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/employees/{employeeName}";

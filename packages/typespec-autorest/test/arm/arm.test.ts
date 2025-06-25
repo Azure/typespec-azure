@@ -199,6 +199,7 @@ it("verify resolution of private endpoints and private links with v5 version", a
         >;
       }
       `,
+    { preset: "azure" },
   );
 
   const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
