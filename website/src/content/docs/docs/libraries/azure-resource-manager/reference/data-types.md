@@ -2444,16 +2444,16 @@ An internal enum to indicate the resource support for various path types
 enum Azure.ResourceManager.CommonTypes.ResourceHome
 ```
 
-| Name                 | Value | Description                               |
-| -------------------- | ----- | ----------------------------------------- |
-| Tenant               |       | The resource is bound to a tenant         |
-| Subscription         |       | The resource is bound to a subscription   |
-| Location             |       | The resource is bound to a location       |
-| ResourceGroup        |       | The resource is bound to a resource group |
-| Extension            |       | The resource is bound to an extension     |
-| BuiltIn              |       | The resource is built in                  |
-| BuiltInSubscription  |       | The resource is built in                  |
-| BuiltInResourceGroup |       | The resource is built in                  |
+| Name                 | Value | Description                                        |
+| -------------------- | ----- | -------------------------------------------------- |
+| Tenant               |       | The resource is bound to a tenant                  |
+| Subscription         |       | The resource is bound to a subscription            |
+| Location             |       | The resource is bound to a location                |
+| ResourceGroup        |       | The resource is bound to a resource group          |
+| Extension            |       | The resource is bound to an extension              |
+| BuiltIn              |       | The resource is a built in tenant resource         |
+| BuiltInSubscription  |       | The resource is a built in subscription resource   |
+| BuiltInResourceGroup |       | The resource is a built in resource group resource |
 
 ### `Versions` {#Azure.ResourceManager.CommonTypes.Versions}
 

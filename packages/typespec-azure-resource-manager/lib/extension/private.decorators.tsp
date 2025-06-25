@@ -1,6 +1,3 @@
-using Http;
-using Rest;
-using Azure.Core;
 using Reflection;
 
 namespace Azure.ResourceManager.Extension.Private;
@@ -13,14 +10,14 @@ namespace Azure.ResourceManager.Extension.Private;
 extern dec builtInResource(target: Model);
 
 /**
- * `@builtInResource` marks a model as built-in to Azure ResourceManager at the Subscription level
+ * `@builtInSubscriptionResource` marks a model as built-in to Azure ResourceManager at the Subscription level
  *
  * @param target - The model that is marked as built-in.
  */
 extern dec builtInSubscriptionResource(target: Model);
 
 /**
- * `@builtInResource` marks a model as built-in to Azure ResourceManager at the ResourceGroup level
+ * `@builtInResourceGroupResource` marks a model as built-in to Azure ResourceManager at the ResourceGroup level
  *
  * @param target - The model that is marked as built-in.
  */

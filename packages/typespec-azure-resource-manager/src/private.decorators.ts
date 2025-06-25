@@ -6,7 +6,6 @@ import {
   ModelProperty,
   Operation,
   Program,
-  StringLiteral,
   Tuple,
   Type,
   addVisibilityModifiers,
@@ -61,12 +60,6 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
-
-const PROVIDER_NAME_CACHE = Symbol.for("Azure.ResourceManager.Private.ProviderNameCache");
-
-interface ProviderNameCache {
-  [PROVIDER_NAME_CACHE]?: Map<string, StringLiteral>;
-}
 
 /** @internal */
 

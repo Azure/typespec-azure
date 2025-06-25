@@ -8,7 +8,7 @@ import type { DecoratorContext, Model } from "@typespec/compiler";
 export type BuiltInResourceDecorator = (context: DecoratorContext, target: Model) => void;
 
 /**
- * `@builtInResource` marks a model as built-in to Azure ResourceManager at the Subscription level
+ * `@builtInSubscriptionResource` marks a model as built-in to Azure ResourceManager at the Subscription level
  *
  * @param target The model that is marked as built-in.
  */
@@ -18,7 +18,7 @@ export type BuiltInSubscriptionResourceDecorator = (
 ) => void;
 
 /**
- * `@builtInResource` marks a model as built-in to Azure ResourceManager at the ResourceGroup level
+ * `@builtInResourceGroupResource` marks a model as built-in to Azure ResourceManager at the ResourceGroup level
  *
  * @param target The model that is marked as built-in.
  */
