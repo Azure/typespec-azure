@@ -3,4 +3,4 @@ import "./operations.tsp";
 import "./parameters.tsp";
 import "./private.decorators.tsp";
 
-namespace Azure.resourceManager.Extension;
+namespace Azure.ResourceManager.Extension;
