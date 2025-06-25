@@ -334,7 +334,7 @@ it("@usage namespace override", async () => {
   );
 });
 
-it("usage conflict from operation", async () => {
+it("usage additive from operation", async () => {
   await runner.compileWithBuiltInService(
     `
       @usage(Usage.output)
@@ -345,13 +345,11 @@ it("usage conflict from operation", async () => {
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
-  strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
-  expectDiagnostics(runner.context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
-  });
+  // Should have Input + Json (from operation) + Output (from @usage)
+  strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 });
 
-it("usage conflict from propagation", async () => {
+it("usage additive from propagation", async () => {
   await runner.compileWithBuiltInService(
     `
       model A {
@@ -366,14 +364,13 @@ it("usage conflict from propagation", async () => {
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
+  // A should have Input + Json from operation
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
-  strictEqual(models[1].usage, UsageFlags.Input | UsageFlags.Json);
-  expectDiagnostics(runner.context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
-  });
+  // B should have Input + Json (from operation via propagation) + Output (from @usage)
+  strictEqual(models[1].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 });
 
-it("usage conflict from other override", async () => {
+it("usage additive from multiple sources", async () => {
   await runner.compileWithBuiltInService(
     `
       model A {
@@ -392,15 +389,15 @@ it("usage conflict from other override", async () => {
   );
   const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
+  // A should have Input + Json from operation
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
-  strictEqual(models[1].usage, UsageFlags.Input | UsageFlags.Json);
+  // B should have Input + Json (from A) + Output (from C)
+  strictEqual(models[1].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  // C should have Output from @usage
   strictEqual(models[2].usage, UsageFlags.Output);
-  expectDiagnostics(runner.context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
-  });
 });
 
-it("usage conflict from spread", async () => {
+it("usage additive from spread", async () => {
   await runner.compileWithBuiltInService(
     `
       model A {
@@ -426,13 +423,11 @@ it("usage conflict from spread", async () => {
     models.find((m) => m.name === "B")?.usage,
     UsageFlags.Spread | UsageFlags.Output | UsageFlags.Json,
   );
+  // X should have Input (from @usage) + Output + Json (from operations via propagation)
   strictEqual(
     models.find((m) => m.name === "X")?.usage,
     UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
   );
-  expectDiagnostics(runner.context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/conflict-usage-override",
-  });
 });
 
 it("orphan model in group", async () => {
