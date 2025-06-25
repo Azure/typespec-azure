@@ -1,83 +1,75 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { SdkTestLibrary as TcgcTestLibrary } from "@azure-tools/typespec-client-generator-core/testing";
-import { Diagnostic } from "@typespec/compiler";
+import { Diagnostic, resolvePath } from "@typespec/compiler";
 import {
-  TestHost,
-  createTestHost,
-  createTestWrapper,
+  createTester,
+  EmitterTesterInstance,
   expectDiagnosticEmpty,
   resolveVirtualPath,
 } from "@typespec/compiler/testing";
-import { HttpTestLibrary } from "@typespec/http/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { RestTestLibrary } from "@typespec/rest/testing";
-import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { ok } from "assert";
 import { AutorestEmitterOptions } from "../src/lib.js";
 import { OpenAPI2Document } from "../src/openapi2-document.js";
-import { AutorestTestLibrary } from "../src/testing/index.js";
 
-export async function createAutorestTestHost() {
-  return createTestHost({
-    libraries: [
-      HttpTestLibrary,
-      RestTestLibrary,
-      OpenAPITestLibrary,
-      AutorestTestLibrary,
-      VersioningTestLibrary,
-      AzureCoreTestLibrary,
-      AzureResourceManagerTestLibrary,
-      TcgcTestLibrary,
-    ],
-  });
-}
+export const ApiTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/openapi",
+    "@azure-tools/typespec-autorest",
+    "@typespec/versioning",
+    "@azure-tools/typespec-azure-core",
+    "@azure-tools/typespec-azure-resource-manager",
+    "@azure-tools/typespec-client-generator-core",
+  ],
+});
 
-export async function createAutorestTestRunner(
-  host?: TestHost,
-  emitterOptions?: AutorestEmitterOptions,
-) {
-  host ??= await createAutorestTestHost();
-  return createTestWrapper(host, {
-    autoUsings: [
-      "TypeSpec.Versioning",
-      "TypeSpec.Http",
-      "TypeSpec.Rest",
-      "TypeSpec.OpenAPI",
-      "Autorest",
-      "Azure.Core",
-      "Azure.ResourceManager",
-      "Azure.ClientGenerator.Core",
-    ],
-    compilerOptions: {
-      emit: ["@azure-tools/typespec-autorest"],
-      options: { [AutorestTestLibrary.name]: { ...emitterOptions } },
-      miscOptions: { "disable-linter": true },
-    },
-  });
-}
+export const BasicTester = ApiTester.import("@azure-tools/typespec-autorest").using("Autorest");
+
+const defaultOptions = {
+  "emitter-output-dir": resolveVirtualPath("./tsp-output"),
+};
+export const Tester = BasicTester.import(
+  "@typespec/http",
+  "@typespec/rest",
+  "@typespec/openapi",
+  "@typespec/versioning",
+)
+  .using("Http", "Rest", "OpenAPI", "Versioning")
+  .emit("@azure-tools/typespec-autorest", defaultOptions);
+
+/** Tester that will load Azure libraries. Only use if needed, will slow down the tests */
+export const AzureTester = ApiTester.importLibraries()
+  .using(
+    "Versioning",
+    "Http",
+    "Rest",
+    "OpenAPI",
+    "Autorest",
+    "Azure.Core",
+    "Azure.ResourceManager",
+    "Azure.ClientGenerator.Core",
+  )
+  .emit("@azure-tools/typespec-autorest", defaultOptions);
 
 export async function emitOpenApiWithDiagnostics(
   code: string,
   options: AutorestEmitterOptions = {},
 ): Promise<[OpenAPI2Document, readonly Diagnostic[]]> {
-  const runner = await createAutorestTestRunner();
-  const outputFile = resolveVirtualPath("openapi.json");
-  const diagnostics = await runner.diagnose(code, {
-    noEmit: false,
-    emit: ["@azure-tools/typespec-autorest"],
-    options: {
-      "@azure-tools/typespec-autorest": { ...options, "output-file": outputFile },
+  const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
+    compilerOptions: {
+      options: {
+        "@azure-tools/typespec-autorest": { ...options },
+      },
     },
   });
-  const content = runner.fs.get(outputFile);
+  const content = outputs["openapi.json"];
   ok(content, "Expected to have found openapi output");
   const doc = JSON.parse(content);
   return [doc, ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"])];
 }
 
 interface CompileOpenAPIOptions {
-  host?: TestHost;
+  preset?: "simple" | "azure";
+  tester?: EmitterTesterInstance<any>;
   options?: AutorestEmitterOptions;
 }
 
@@ -85,21 +77,19 @@ export async function compileOpenAPI(
   code: string,
   options: CompileOpenAPIOptions = {},
 ): Promise<OpenAPI2Document> {
-  const runner = await createAutorestTestRunner(options.host);
-  const diagnostics = await runner.diagnose(code, {
-    noEmit: false,
-    emit: ["@azure-tools/typespec-autorest"],
-    options: {
-      [AutorestTestLibrary.name]: {
-        ...options.options,
-        "emitter-output-dir": resolveVirtualPath("tsp-output"),
-      },
-    },
+  const tester =
+    options?.tester ?? (await (options.preset === "azure" ? AzureTester : Tester).createInstance());
+  const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(code, {
+    compilerOptions: options?.options
+      ? {
+          options: {
+            "@azure-tools/typespec-autorest": { ...defaultOptions, ...options.options },
+          },
+        }
+      : undefined,
   });
-
   expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
-  const outPath = resolveVirtualPath("tsp-output", "openapi.json");
-  return JSON.parse(runner.fs.get(outPath)!);
+  return JSON.parse(outputs["openapi.json"]);
 }
 
 export async function compileVersionedOpenAPI<K extends string>(
@@ -107,24 +97,20 @@ export async function compileVersionedOpenAPI<K extends string>(
   versions: K[],
   options: CompileOpenAPIOptions = {},
 ): Promise<Record<K, OpenAPI2Document>> {
-  const runner = await createAutorestTestRunner(options.host);
-  const diagnostics = await runner.diagnose(code, {
-    noEmit: false,
-    emit: ["@azure-tools/typespec-autorest"],
-    options: {
-      [AutorestTestLibrary.name]: {
-        ...options.options,
-        "emitter-output-dir": resolveVirtualPath("tsp-output"),
-      },
-    },
+  const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
+    compilerOptions: options?.options
+      ? {
+          options: {
+            "@azure-tools/typespec-autorest": { ...defaultOptions, ...options.options },
+          },
+        }
+      : undefined,
   });
   expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
 
   const output: any = {};
   for (const version of versions) {
-    output[version] = JSON.parse(
-      runner.fs.get(resolveVirtualPath("tsp-output", version, "openapi.json"))!,
-    );
+    output[version] = JSON.parse(outputs[resolvePath(version, "openapi.json")]);
   }
   return output;
 }
@@ -144,11 +130,11 @@ export async function openApiFor(
 }
 
 export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterOptions = {}) {
-  const runner = await createAutorestTestRunner();
-  return await runner.diagnose(code, {
-    emit: ["@azure-tools/typespec-autorest"],
-    options: {
-      "@azure-tools/typespec-autorest": options as any,
+  return await Tester.diagnose(code, {
+    compilerOptions: {
+      options: {
+        "@azure-tools/typespec-autorest": options as any,
+      },
     },
   });
 }
