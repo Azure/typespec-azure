@@ -40,13 +40,13 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
-  SdkBodyModelPropertyType,
   SdkBodyParameter,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
   SdkHttpOperationExample,
   SdkMethodParameter,
+  SdkModelPropertyType,
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
@@ -683,14 +683,14 @@ export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
  */
 export function getHttpOperationParameter(
   method: SdkServiceMethod<SdkHttpOperation>,
-  param: SdkMethodParameter | SdkBodyModelPropertyType,
+  param: SdkMethodParameter | SdkModelPropertyType,
 ):
   | SdkPathParameter
   | SdkQueryParameter
   | SdkHeaderParameter
   | SdkCookieParameter
   | SdkBodyParameter
-  | SdkBodyModelPropertyType
+  | SdkModelPropertyType
   | undefined {
   const operation = method.operation;
   // BFS to find the corresponding http parameter.
@@ -710,7 +710,7 @@ export function getHttpOperationParameter(
         if (operation.bodyParam.type.kind === "model" && operation.bodyParam.type !== param.type) {
           return operation.bodyParam.type.properties.find(
             (p) => p.kind === "property" && p.name === param.name,
-          ) as SdkBodyModelPropertyType | undefined;
+          ) as SdkModelPropertyType | undefined;
         }
         return operation.bodyParam;
       }
@@ -798,6 +798,6 @@ export function resolveOperationId(
  * @param property
  * @returns
  */
-export function isHttpMetadata(context: TCGCContext, property: SdkBodyModelPropertyType): boolean {
+export function isHttpMetadata(context: TCGCContext, property: SdkModelPropertyType): boolean {
   return property.__raw !== undefined && isMetadata(context.program, property.__raw);
 }

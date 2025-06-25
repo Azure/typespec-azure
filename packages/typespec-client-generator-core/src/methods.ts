@@ -26,7 +26,6 @@ import {
 } from "./decorators.js";
 import { getSdkHttpOperation } from "./http.js";
 import {
-  SdkBodyModelPropertyType,
   SdkClient,
   SdkClientType,
   SdkLroPagingServiceMethod,
@@ -36,6 +35,7 @@ import {
   SdkMethod,
   SdkMethodParameter,
   SdkMethodResponse,
+  SdkModelPropertyType,
   SdkModelType,
   SdkOperationGroup,
   SdkPagingServiceMethod,
@@ -230,10 +230,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
     responseType,
     (p) => p.__raw === pagedMetadata.itemsProperty,
-  ) as SdkBodyModelPropertyType[] | undefined;
+  ) as SdkModelPropertyType[] | undefined;
 
-  let nextLinkSegments: (SdkServiceResponseHeader | SdkBodyModelPropertyType)[] | undefined =
-    undefined;
+  let nextLinkSegments: (SdkServiceResponseHeader | SdkModelPropertyType)[] | undefined = undefined;
   let nextLinkReInjectedParametersSegments = undefined;
   if (pagedMetadata.nextLinkProperty) {
     if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
@@ -250,7 +249,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       nextLinkSegments = getPropertySegmentsFromModelOrParameters(
         responseType,
         (p) => p.__raw === pagedMetadata.nextLinkProperty,
-      ) as SdkBodyModelPropertyType[];
+      ) as SdkModelPropertyType[];
     }
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
@@ -326,10 +325,9 @@ function mapFirstSegmentForResultSegments(
 
 export function getPropertySegmentsFromModelOrParameters(
   source: SdkModelType | SdkMethodParameter[],
-  predicate: (property: SdkMethodParameter | SdkBodyModelPropertyType) => boolean,
-): (SdkMethodParameter | SdkBodyModelPropertyType)[] | undefined {
-  const queue: { model: SdkModelType; path: (SdkMethodParameter | SdkBodyModelPropertyType)[] }[] =
-    [];
+  predicate: (property: SdkMethodParameter | SdkModelPropertyType) => boolean,
+): (SdkMethodParameter | SdkModelPropertyType)[] | undefined {
+  const queue: { model: SdkModelType; path: (SdkMethodParameter | SdkModelPropertyType)[] }[] = [];
 
   if (!Array.isArray(source)) {
     if (source.baseModel) {
@@ -431,7 +429,7 @@ function getServiceMethodLroMetadata(
     ) as SdkModelType;
     const resultPath = rawMetadata.finalResultPath;
     // find the property inside the envelope result using the final result path
-    let sdkProperty: SdkBodyModelPropertyType | undefined = undefined;
+    let sdkProperty: SdkModelPropertyType | undefined = undefined;
     for (const property of envelopeResult.properties) {
       if (property.__raw === undefined || property.kind !== "property") {
         continue;

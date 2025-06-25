@@ -62,7 +62,6 @@ import {
 import {
   AccessFlags,
   SdkArrayType,
-  SdkBodyModelPropertyType,
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
@@ -74,6 +73,7 @@ import {
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
+  SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkNullableType,
@@ -759,7 +759,7 @@ function addDiscriminatorToModelType(
       discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
-    const discriminatorPropertyType: SdkBodyModelPropertyType = {
+    const discriminatorPropertyType: SdkModelPropertyType = {
       kind: "property",
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
@@ -1108,7 +1108,7 @@ export function getClientType(context: TCGCContext, type: Type, operation?: Oper
   return ignoreDiagnostics(getClientTypeWithDiagnostics(context, type, operation));
 }
 
-export function isReadOnly(property: SdkBodyModelPropertyType) {
+export function isReadOnly(property: SdkModelPropertyType) {
   if (
     property.visibility &&
     property.visibility.includes(Visibility.Read) &&
@@ -1307,7 +1307,7 @@ function getHttpOperationPart(
 function updateMultiPartInfo(
   context: TCGCContext,
   type: ModelProperty,
-  base: SdkBodyModelPropertyType,
+  base: SdkModelPropertyType,
   operation: Operation,
 ): [void, readonly Diagnostic[]] {
   const httpOperationPart = getHttpOperationPart(context, type, operation);
@@ -1318,17 +1318,11 @@ function updateMultiPartInfo(
       isFilePart: isFilePart(context, base.type),
       isMulti: httpOperationPart.multi,
       filename: httpOperationPart.filename
-        ? diagnostics.pipe(
-            getSdkBodyModelPropertyType(context, httpOperationPart.filename, operation),
-          )
+        ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
         : undefined,
       contentType: httpOperationPart.body.contentTypeProperty
         ? diagnostics.pipe(
-            getSdkBodyModelPropertyType(
-              context,
-              httpOperationPart.body.contentTypeProperty,
-              operation,
-            ),
+            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
           )
         : undefined,
       defaultContentTypes: httpOperationPart.body.contentTypes,
@@ -1348,11 +1342,11 @@ function updateMultiPartInfo(
   return diagnostics.wrap(undefined);
 }
 
-export function getSdkBodyModelPropertyType(
+export function getSdkModelPropertyType(
   context: TCGCContext,
   type: ModelProperty,
   operation?: Operation,
-): [SdkBodyModelPropertyType, readonly Diagnostic[]] {
+): [SdkModelPropertyType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
   let property = context.__modelPropertyCache?.get(type);
@@ -1403,9 +1397,7 @@ function addPropertiesToModelType(
     ) {
       continue;
     }
-    const clientProperty = diagnostics.pipe(
-      getSdkBodyModelPropertyType(context, property, operation),
-    );
+    const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
     if (sdkType.properties) {
       sdkType.properties.push(clientProperty);
     } else {
@@ -2027,7 +2019,7 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
@@ -2065,7 +2057,7 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
 ) {
   type.serializationOptions.json = {
     name:
@@ -2077,7 +2069,7 @@ function updateJsonSerializationOptions(
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
 ) {
   type.serializationOptions.xml = {
     name:

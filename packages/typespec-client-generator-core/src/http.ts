@@ -34,7 +34,6 @@ import { camelCase } from "change-case";
 import { getParamAlias, getResponseAsBool } from "./decorators.js";
 import {
   CollectionFormat,
-  SdkBodyModelPropertyType,
   SdkBodyParameter,
   SdkCookieParameter,
   SdkHeaderParameter,
@@ -43,6 +42,7 @@ import {
   SdkHttpParameter,
   SdkHttpResponse,
   SdkMethodParameter,
+  SdkModelPropertyType,
   SdkModelType,
   SdkPathParameter,
   SdkQueryParameter,
@@ -178,7 +178,7 @@ function getSdkHttpParameters(
   // add operation info onto body param
   const tspBody = httpOperation.parameters.body;
   // we add correspondingMethodParams after we create the type, since we need the info on the type
-  const correspondingMethodParams: (SdkMethodParameter | SdkBodyModelPropertyType)[] = [];
+  const correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[] = [];
   if (tspBody) {
     if (tspBody.bodyKind === "file") {
       // file body is not supported yet
@@ -594,7 +594,7 @@ export function getCorrespondingMethodParams(
   operation: Operation,
   methodParameters: SdkMethodParameter[],
   serviceParam: SdkHttpParameter,
-): [(SdkMethodParameter | SdkBodyModelPropertyType)[], readonly Diagnostic[]] {
+): [(SdkMethodParameter | SdkModelPropertyType)[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
   // 1. To see if the service parameter is a client parameter.
@@ -702,9 +702,9 @@ export function getCorrespondingMethodParams(
 function findMapping(
   context: TCGCContext,
   methodParameters: SdkMethodParameter[],
-  serviceParam: SdkHttpParameter | SdkBodyModelPropertyType,
-): SdkMethodParameter | SdkBodyModelPropertyType | undefined {
-  const queue: (SdkMethodParameter | SdkBodyModelPropertyType)[] = [...methodParameters];
+  serviceParam: SdkHttpParameter | SdkModelPropertyType,
+): SdkMethodParameter | SdkModelPropertyType | undefined {
+  const queue: (SdkMethodParameter | SdkModelPropertyType)[] = [...methodParameters];
   const visited: Set<SdkModelType> = new Set();
   while (queue.length > 0) {
     const methodParam = queue.shift()!;
