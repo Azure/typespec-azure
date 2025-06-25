@@ -1,4 +1,4 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
@@ -44,6 +44,153 @@ it("no-discriminated-unions", async () => {
     },
     {
       code: "@azure-tools/typespec-client-generator-core/no-discriminated-unions",
+    },
+  ]);
+});
+
+it("no duplicate operation with @clientLocation", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace StorageService;
+      
+    interface StorageTasks {
+      @clientLocation("StorageTasksReport")
+      @route("/list")
+      op list(): void;
+
+      @clientLocation("StorageTaskAssignment")
+      @clientName("list")
+      @route("/assignments")
+      op storageTaskAssignmentList(): void;
+    }
+    `,
+  );
+
+  expectDiagnosticEmpty(diagnostics);
+});
+
+it("no duplicate operation with @clientLocation another", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace StorageService;
+      
+    interface StorageTasks {
+      @route("/list")
+      op list(): void;
+
+      @clientLocation("StorageTaskAssignment")
+      @clientName("list")
+      @route("/assignments")
+      op storageTaskAssignmentList(): void;
+    }
+    `,
+  );
+
+  expectDiagnosticEmpty(diagnostics);
+});
+
+it("duplicate operation with @clientLocation to existed clients", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+      
+    interface A {
+      @clientLocation(B)
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+    }
+
+    interface B {
+      @route("/c")
+      @clientName("a")
+      op c(): void;
+    }
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "a" is duplicated in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+    },
+  ]);
+});
+
+it("duplicate operation with @clientLocation to existed clients with scope", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+      
+    interface A {
+      @clientLocation(B, "go")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+    }
+
+    interface B {
+      @route("/c")
+      @clientName("a")
+      op c(): void;
+    }
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "a" is duplicated in language scope: "go"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "go"',
+    },
+  ]);
+});
+
+it("duplicate operation with @clientLocation to new clients", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+      
+    interface A {
+      @clientLocation("B")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      @clientLocation("B")
+      @clientName("a")
+      op b(): void;
+    }
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "a" is duplicated in language scope: "AllScopes"',
     },
   ]);
 });

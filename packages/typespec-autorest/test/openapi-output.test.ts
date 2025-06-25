@@ -1,11 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { diagnoseOpenApiFor, oapiForModel, openApiFor } from "./test-host.js";
+import { compileOpenAPI, diagnoseOpenApiFor, oapiForModel } from "./test-host.js";
 
 describe("typespec-autorest: definitions", () => {
   it("defines models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Foo",
       `model Foo {
         x: int32;
@@ -50,7 +50,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("doesn't define anonymous or unconnected models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "{ ... Foo }",
       `model Foo {
         x: int32;
@@ -65,7 +65,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines templated models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Foo<int32>",
       `model Foo<T> {
         x: T;
@@ -83,7 +83,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines templated models when template param is in a namespace", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Foo<Test.M>",
       `
       namespace Test {
@@ -105,7 +105,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines models extended from models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Bar",
       `
       model Foo {
@@ -130,7 +130,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("emits models extended from models when parent is emitted", async () => {
-    const res = await openApiFor(
+    const res: any = await compileOpenAPI(
       `
       model Parent {
         x?: int32;
@@ -153,7 +153,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("ignore uninstantiated template types", async () => {
-    const res = await openApiFor(
+    const res: any = await compileOpenAPI(
       `
       model Parent {
         x?: int32;
@@ -187,7 +187,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("shouldn't emit instantiated template child types that are only used in is", async () => {
-    const res = await openApiFor(
+    const res: any = await compileOpenAPI(
       `
       model Parent {
         x?: int32;
@@ -208,7 +208,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines models with properties extended from models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Bar",
       `
       model Foo {
@@ -237,7 +237,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines models extended from templated models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Bar",
       `
       model Foo<T> {
@@ -257,7 +257,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines models with properties extended from templated models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Bar",
       `
       model Foo<T> {
@@ -285,7 +285,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines templated models with properties extended from templated models", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Bar<int32>",
       `
       @friendlyName("Foo_{name}", T)
@@ -316,7 +316,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("excludes response models with only headers", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Foo",
       `
       model Foo { @statusCode code: 200, @header x: string};`,
@@ -331,7 +331,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines models with no properties extended", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Bar",
       `
       model Foo { x?: string};
@@ -353,7 +353,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines models with no properties extended twice", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Baz",
       `
       model Foo { x: int32 };
@@ -388,7 +388,7 @@ describe("typespec-autorest: definitions", () => {
   });
 
   it("defines models with default properties", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Pet",
       `
       model Pet {
@@ -418,7 +418,7 @@ describe("typespec-autorest: definitions", () => {
     });
 
     it("produce an empty schema", async () => {
-      const res = await oapiForModel(
+      const res: any = await oapiForModel(
         "Pet",
         `
       model Pet {
@@ -438,8 +438,7 @@ describe("typespec-autorest: definitions", () => {
     });
 
     it("overrides x-ms-enum.name with @clientName", async () => {
-      const res = await oapiForModel(
-        "FooResponse",
+      const res: any = await compileOpenAPI(
         `
         @clientName("RenamedFoo")
         union Foo {
@@ -450,14 +449,15 @@ describe("typespec-autorest: definitions", () => {
         model FooResponse {
           foo: Foo;
         }`,
+        { preset: "azure" },
       );
-      const schema = res.defs.RenamedFoo;
+      const schema = res.definitions.RenamedFoo;
       deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
     });
   });
 
   it("recovers logical type name", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       model Thing {
         name?: string;
@@ -501,7 +501,7 @@ describe("typespec-autorest: literals", () => {
 
   for (const test of cases) {
     it("knows schema for " + test[0], async () => {
-      const res = await oapiForModel(
+      const res: any = await oapiForModel(
         "Pet",
         `
         model Pet { name: ${test[0]} };
@@ -516,7 +516,7 @@ describe("typespec-autorest: literals", () => {
 
 describe("typespec-autorest: operations", () => {
   it("define operations with param with defaults", async () => {
-    const res = await openApiFor(`
+    const res: any = await compileOpenAPI(`
       @get op read(@query queryWithDefault?: string = "defaultValue"): string;
     `);
 
@@ -524,7 +524,7 @@ describe("typespec-autorest: operations", () => {
   });
 
   it("define operations with param with decorators", async () => {
-    const res = await openApiFor(`
+    const res: any = await compileOpenAPI(`
       @get
       @route("/thing/{name}")
       op getThing(
@@ -551,7 +551,7 @@ describe("typespec-autorest: operations", () => {
   });
 
   it("deprecate operations with #deprecated", async () => {
-    const res = await openApiFor(
+    const res: any = await compileOpenAPI(
       `
       #deprecated "use something else"
       op read(@query query: string): string;
@@ -562,7 +562,8 @@ describe("typespec-autorest: operations", () => {
   });
 
   it(`@clientName(<>) updates the operationId`, async () => {
-    const res = await openApiFor(`
+    const res: any = await compileOpenAPI(
+      `
       @service namespace MyService;
       @route("/op-only") @clientName( "clientCall") op serviceName(): void;
 
@@ -571,8 +572,9 @@ describe("typespec-autorest: operations", () => {
         @route("/interface-only") same(): void;
         @route("/interface-and-op") @clientName( "clientCall") serviceName(): void;
       }
-     
-      `);
+      `,
+      { preset: "azure" },
+    );
 
     strictEqual(res.paths["/op-only"].get.operationId, "ClientCall");
     strictEqual(res.paths["/interface-only"].get.operationId, "ClientInterfaceName_Same");
@@ -580,20 +582,23 @@ describe("typespec-autorest: operations", () => {
   });
 
   it(`@clientLocation with string target updates the operationId`, async () => {
-    const res = await openApiFor(`
+    const res = await compileOpenAPI(
+      `
       @service namespace MyService;
       
       interface TestInterface {
         @route("/test-string") @clientLocation("CustomGroup") op testOperation(): void;
       }
-     
-      `);
+      `,
+      { preset: "azure" },
+    );
 
-    strictEqual(res.paths["/test-string"].get.operationId, "CustomGroup_TestOperation");
+    strictEqual(res.paths["/test-string"].get?.operationId, "CustomGroup_TestOperation");
   });
 
   it(`@clientLocation with Interface target updates the operationId`, async () => {
-    const res = await openApiFor(`
+    const res: any = await compileOpenAPI(
+      `
       @service namespace MyService;
       
       interface TargetInterface {
@@ -603,8 +608,9 @@ describe("typespec-autorest: operations", () => {
       interface SourceInterface {
         @route("/test-interface") @clientLocation(TargetInterface) op testOperation(): void;
       }
-     
-      `);
+      `,
+      { preset: "azure" },
+    );
 
     strictEqual(res.paths["/test-interface"].get.operationId, "TargetInterface_TestOperation");
     // Original operation in the target interface should use its interface name as prefix
@@ -612,7 +618,8 @@ describe("typespec-autorest: operations", () => {
   });
 
   it(`@clientLocation with Namespace target updates the operationId`, async () => {
-    const res = await openApiFor(`
+    const res: any = await compileOpenAPI(
+      `
       @service namespace MyService;
       
       namespace CustomNamespace {
@@ -623,8 +630,9 @@ describe("typespec-autorest: operations", () => {
         @route("/test-namespace") @clientLocation(CustomNamespace) op testOperation(): void;
         @route("/test-service") @clientLocation(MyService) op serviceOperation(): void;
       }
-     
-      `);
+      `,
+      { preset: "azure" },
+    );
 
     // When target is a non-service namespace, use namespace name as prefix
     strictEqual(res.paths["/test-namespace"].get.operationId, "CustomNamespace_TestOperation");
@@ -638,7 +646,7 @@ describe("typespec-autorest: operations", () => {
 describe("typespec-autorest: request", () => {
   describe("binary request", () => {
     it("bytes request should produce byte format with application/json", async () => {
-      const res = await openApiFor(`
+      const res: any = await compileOpenAPI(`
         @post op read(@body body: bytes): {};
       `);
       const operation = res.paths["/"].post;
@@ -650,7 +658,7 @@ describe("typespec-autorest: request", () => {
     });
 
     it("bytes request should respect @header contentType", async () => {
-      const res = await openApiFor(`
+      const res: any = await compileOpenAPI(`
         @post op read(@header contentType: "image/png", @body body: bytes): {};
       `);
 
@@ -671,7 +679,7 @@ describe("typespec-autorest: enums", () => {
   });
 
   it("create basic enum without values", async () => {
-    const res = await oapiForModel("Foo", `enum Foo {foo, bar}`);
+    const res: any = await oapiForModel("Foo", `enum Foo {foo, bar}`);
 
     const schema = res.defs.Foo;
     deepStrictEqual(schema, {
@@ -684,14 +692,14 @@ describe("typespec-autorest: enums", () => {
   });
 
   it("enums are marked with modelAsString false by default", async () => {
-    const res = await oapiForModel("Foo", `enum Foo {foo, bar}`);
+    const res: any = await oapiForModel("Foo", `enum Foo {foo, bar}`);
 
     const schema = res.defs.Foo;
     deepStrictEqual(schema["x-ms-enum"].modelAsString, false);
   });
 
   it("create enum with doc on a member", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Foo",
       `
         enum Foo {
@@ -724,7 +732,7 @@ describe("typespec-autorest: enums", () => {
   });
 
   it("create enum with custom name/value on a member", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Foo",
       `
         enum Foo {
@@ -755,7 +763,7 @@ describe("typespec-autorest: enums", () => {
   });
 
   it("create enum with numeric values", async () => {
-    const res = await oapiForModel(
+    const res: any = await oapiForModel(
       "Test",
       `
         enum Test {
@@ -787,15 +795,17 @@ describe("typespec-autorest: enums", () => {
   });
 
   it("overrides x-ms-enum.name with @clientName", async () => {
-    const res = await oapiForModel("Foo", `@clientName("RenamedFoo") enum Foo {foo, bar}`);
-    const schema = res.defs.RenamedFoo;
+    const res: any = await compileOpenAPI(`@clientName("RenamedFoo") enum Foo {foo, bar}`, {
+      preset: "azure",
+    });
+    const schema = res.definitions.RenamedFoo;
     deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
   });
 });
 
 describe("typespec-autorest: extension decorator", () => {
   it("adds an arbitrary extension to a model", async () => {
-    const oapi = await openApiFor(`
+    const oapi: any = await compileOpenAPI(`
       @extension("x-model-extension", "foobar")
       model Pet {
         name: string;
@@ -807,7 +817,7 @@ describe("typespec-autorest: extension decorator", () => {
   });
 
   it("adds an arbitrary extension to an operation", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       model Pet {
         name: string;
@@ -822,7 +832,7 @@ describe("typespec-autorest: extension decorator", () => {
   });
 
   it("adds an arbitrary extension to a parameter", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       model Pet {
         name: string;
@@ -843,7 +853,7 @@ describe("typespec-autorest: extension decorator", () => {
   });
 
   it("support x-ms-identifiers with null array ", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       model Pet {
         name: string;
@@ -862,7 +872,7 @@ describe("typespec-autorest: extension decorator", () => {
 
 describe("identifiers decorator", () => {
   it("ignores name/id keys for x-ms-identifiers", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       model Pet {
         @key
@@ -879,7 +889,7 @@ describe("identifiers decorator", () => {
   });
 
   it("ignores name/id keys for x-ms-identifiers when nested", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -897,12 +907,13 @@ describe("identifiers decorator", () => {
         name:string;
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], undefined);
   });
 
   it("key decorator in x-ms-identifiers for nested scenarios ", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -920,12 +931,13 @@ describe("identifiers decorator", () => {
         value:string;
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], ["foo/value"]);
   });
 
   it("ignores id property for x-ms-identifiers", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       model Pet {
         name: string;
@@ -939,7 +951,7 @@ describe("identifiers decorator", () => {
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
   it("uses identifiers decorator for properties", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -954,11 +966,12 @@ describe("identifiers decorator", () => {
         value: Pet[]
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
   it("identifies keys correctly as x-ms-identifiers", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -973,11 +986,12 @@ describe("identifiers decorator", () => {
         value: Pet[]
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["age"]);
   });
   it("x-ms-identifiers ignores keys for non armProviderNamespace", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       model Pet {
         name: string;
@@ -993,7 +1007,7 @@ describe("identifiers decorator", () => {
   });
 
   it("prioritizes identifiers decorator over keys", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1008,12 +1022,13 @@ describe("identifiers decorator", () => {
         value: Pet[]
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
   });
 
   it("prioritizes identifiers decorator over id prop", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1028,12 +1043,13 @@ describe("identifiers decorator", () => {
         value: Pet[]
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
   });
 
   it("supports multiple identifiers", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1048,11 +1064,12 @@ describe("identifiers decorator", () => {
         value: Pet[]
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name", "age"]);
   });
   it("supports inner properties in identifiers decorator", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
         @armProviderNamespace
         @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1071,11 +1088,12 @@ describe("identifiers decorator", () => {
           pets: Pet[]
         }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["dogs/breed"]);
   });
   it("support inner models in different namespace but route models should be on armProviderNamespace", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
         @armProviderNamespace
         @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1098,11 +1116,12 @@ describe("identifiers decorator", () => {
           }
         }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], ["age"]);
   });
   it("supports inner properties for keys", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
         @armProviderNamespace
         @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1133,6 +1152,7 @@ describe("identifiers decorator", () => {
           pets: Pet[]
         }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.pets["x-ms-identifiers"], [
       "dogs/breed",
@@ -1140,7 +1160,7 @@ describe("identifiers decorator", () => {
     ]);
   });
   it("`@identifiers` are assigned by model property", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1159,12 +1179,13 @@ describe("identifiers decorator", () => {
         value: Pet[]
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], ["name"]);
     deepStrictEqual(oapi.definitions.PetList2.properties.value["x-ms-identifiers"], ["id"]);
   });
   it("`@identifiers` are assigned to `armProviderNamespace` properties even when nested in another namespace", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -1197,6 +1218,7 @@ describe("identifiers decorator", () => {
         >;
       }
       `,
+      { preset: "azure" },
     );
     deepStrictEqual(oapi.definitions.PetResourceProperties.properties.pets["x-ms-identifiers"], [
       "key",
