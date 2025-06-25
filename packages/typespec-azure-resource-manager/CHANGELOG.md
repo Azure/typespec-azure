@@ -1,5 +1,37 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.57.0
+
+### Features
+
+- [#2621](https://github.com/Azure/typespec-azure/pull/2621) Adding a new `ExtensionResourceActionScope`. You can use it in `ArmProviderAction` operation template to describe an action operation for extension resource provider.
+- [#2763](https://github.com/Azure/typespec-azure/pull/2763) Add support for external resources #1428
+
+### Bug Fixes
+
+- [#2536](https://github.com/Azure/typespec-azure/pull/2536) Fix the `arm-resource-operation` rule to exclude `ArmProviderActionAsync` and `ArmProviderActionSync` operations, as they are not considered resource operations.
+- [#2691](https://github.com/Azure/typespec-azure/pull/2691) Fix `@key` decorator resolution for `x-ms-identifiers`: when `@key` is applied to a property named `id` or `name`, it will no longer add an identifier.
+- [#2749](https://github.com/Azure/typespec-azure/pull/2749) Relax constraints to allow resources that override properties of Foundations.Resource
+
+
+## 0.56.2
+
+### Bug Fixes
+
+- [#2724](https://github.com/Azure/typespec-azure/pull/2724) Fix `ErrorAdditionalInfo.info` in common types by changing its type from `{}` to `unknown`.
+- [#2727](https://github.com/Azure/typespec-azure/pull/2727) Change the body name of legacy operations
+- [#2722](https://github.com/Azure/typespec-azure/pull/2722) Support singleton key replacement in auto route for reusing case.
+
+
+## 0.56.1
+
+### Bug Fixes
+
+- [#2676](https://github.com/Azure/typespec-azure/pull/2676) Corrected the references for `PrivateEndpointConnectionListResultV5` and `PrivateLinkResourceListResultV5` in `common-types`.
+- [#2675](https://github.com/Azure/typespec-azure/pull/2675) Add support for resources with multiple operation paths
+- [#2674](https://github.com/Azure/typespec-azure/pull/2674) Allow optional request bodies in Resource actions templates
+
+
 ## 0.56.0
 
 ### Bug Fixes

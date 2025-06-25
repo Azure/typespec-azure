@@ -369,7 +369,7 @@ scalar armResourceType extends string;
  *   otherArmId: armResourceIdentifier;
  *   networkId: armResourceIdentifier<[{type:"Microsoft.Network/vnet"}]>
  *   vmIds: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["*"]}]>
- *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["tenant", "resourceGroup"]}]>
+ *   scoped: armResourceIdentifier<[{type:"Microsoft.Compute/vm", scopes: ["Tenant", "ResourceGroup"]}]>
  * }
  * ```
  */
@@ -383,19 +383,19 @@ scalar armResourceIdentifier<AllowedResourceTypes extends ArmResourceIdentifierA
 
 // Consider replacing `*`
 union ArmResourceDeploymentScope {
-  "tenant",
-  "subscription",
-  "resourceGroup",
-  "managementGroup",
-  "extension",
+  "Tenant",
+  "Subscription",
+  "ResourceGroup",
+  "ManagementGroup",
+  "Extension",
 }
 
 alias AllArmResourceDeploymentScopes = [
-  "tenant",
-  "subscription",
-  "resourceGroup",
-  "managementGroup",
-  "extension"
+  "Tenant",
+  "Subscription",
+  "ResourceGroup",
+  "ManagementGroup",
+  "Extension"
 ];
 
 model ArmResourceIdentifierAllowedResource {

@@ -144,7 +144,7 @@ Expected response body:
 
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
-The other models are override to roundtrip, so they should be generated and exported as well.
+The other models' usage is additive to roundtrip, so they should be generated and exported as well.
 
 ### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
 
@@ -333,7 +333,7 @@ Expected response body:
 
 ### Azure_Core_Basic_createOrUpdate
 
-- Endpoint: `get /azure/core/basic`
+- Endpoint: `patch /azure/core/basic`
 
 Should only generate models named User and UserOrder.
 
@@ -1191,6 +1191,80 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_LargeHeader_LargeHeaders_two6k
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation with long LRO headers(> 6KB + 6KB = 12KB).
+To pass the test, client should accept both:
+
+1. Single header size that's more than 6KB. 7KB is sure to pass the test.
+2. Total headers size that's more than 12KB. 13KB is sure to pass the test.
+
+Service returns both Location and Azure-AsyncOperation header on initial request.
+final-state-via: location
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.LargeHeader/largeHeaders/header1/two6k
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 202
+Expected response headers:
+
+- Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post?userContext=<6KB-string>
+- Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/operations/post?userContext=<6KB-string>
+  Expected no response body
+
+Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+
+AAO first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "InProgress",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00"
+}
+```
+
+AAO second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_aao?userContext=<6KB-string>",
+  "name": "post_aao",
+  "status": "Succeeded",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00",
+  "endTime": "2024-11-08T01:42:41.5354192+00:00"
+}
+```
+
+Location first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 202
+Expected no response body
+
+Location second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.LargeHeader/locations/eastus/operations/post_location?userContext=<6KB-string>
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "succeeded": true
+}
+```
+
 ### Azure_ResourceManager_NonResource_NonResourceOperations_create
 
 - Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
@@ -1526,6 +1600,176 @@ Expected response body:
 ```json
 {
   "content": "order1,product1,1"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_post
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action operation using ArmResourceActionSync with optional request body.
+This tests the optional body functionality in two scenarios:
+
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains action data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/post
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"actionType": "perform", "parameters": "test-parameters"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "result": "Action completed successfully"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "result": "Action completed successfully with parameters"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost
+
+- Endpoint: `post https://management.azure.com`
+
+Provider POST action operation using ArmProviderActionSync with optional request body.
+This tests the optional body functionality for subscription-scoped provider actions in two scenarios:
+
+1. Empty body scenario: Request body is not sent (uses default allowance)
+2. With body scenario: Request body contains allowance change data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/providerPost
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"totalAllowed": 100, "reason": "Increased demand"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "totalAllowed": 50,
+  "status": "Changed to default allowance"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "totalAllowed": 100,
+  "status": "Changed to requested allowance"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation to retrieve a widget.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_patch
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation using Legacy.CustomPatchSync with optional request body.
+This tests the optional body functionality in two scenarios:
+
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains update data
+
+Expected verb: PATCH  
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"properties": {"name": "updated-widget", "description": "Updated description"}}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "updated-widget",
+    "description": "Updated description",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
 }
 ```
 

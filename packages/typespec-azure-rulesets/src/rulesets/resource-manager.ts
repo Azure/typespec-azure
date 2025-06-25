@@ -66,6 +66,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": true,
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-legacy-operations-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-path-segment-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state": true,
@@ -89,6 +90,6 @@ export default {
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
-    "@azure-tools/typespec-client-generator-core/no-unnamed-types": true,
+    "@azure-tools/typespec-client-generator-core/no-unnamed-types": false, // Too bad performance https://github.com/Azure/typespec-azure/issues/2803
   },
 } satisfies LinterRuleSet;

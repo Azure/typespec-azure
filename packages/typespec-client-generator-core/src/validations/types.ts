@@ -17,18 +17,21 @@ import {
   DecoratorExpressionNode,
   SyntaxKind,
 } from "@typespec/compiler/ast";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
-import { AllScopes, clientNameKey } from "../internal-utils.js";
+import {
+  AllScopes,
+  clientLocationKey,
+  clientNameKey,
+  hasExplicitClientOrOperationGroup,
+  listScopedDecoratorData,
+} from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validateTypes(context: TCGCContext) {
-  const languageScopes = getDefinedLanguageScopes(context.program);
-  for (const scope of languageScopes) {
-    validateClientNamesPerNamespace(context, scope, context.program.getGlobalNamespaceType());
-  }
-
+  validateClientNames(context);
   validateNoDiscriminatedUnions(context);
 }
 
@@ -43,9 +46,77 @@ function validateNoDiscriminatedUnions(context: TCGCContext) {
   }
 }
 
+/**
+ * Validate naming with `@clientName` and `@clientLocation` decorators.
+ *
+ * This function checks for duplicate client names for types considering the impact of `@clientName` for all possible scopes.
+ * It also handles the movement of operations to new clients based on the `@clientLocation` decorators.
+ *
+ * @param tcgcContext The context for the TypeSpec Client Generator.
+ */
+function validateClientNames(tcgcContext: TCGCContext) {
+  const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
+  // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
+  const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(tcgcContext);
+  // Check all possible language scopes
+  for (const scope of languageScopes) {
+    // Gather all moved operations and their targets
+    const moved = new Set<Operation>();
+    const movedTo = new Map<Namespace | Interface, Operation[]>();
+    const newClients = new Map<string, Operation[]>();
+    if (needToConsiderClientLocation) {
+      // Cache all `@clientName` overrides for the current scope
+      for (const [type, target] of listScopedDecoratorData(
+        tcgcContext,
+        clientLocationKey,
+        scope,
+      ).entries()) {
+        if (unsafe_Realm.realmForType.has(type)) {
+          // Skip `@clientName` on versioning types
+          continue;
+        }
+        if (type.kind === "Operation") {
+          moved.add(type);
+          if (typeof target === "string") {
+            // Move to new clients
+            if (!newClients.has(target)) {
+              newClients.set(target, [type]);
+            } else {
+              newClients.get(target)!.push(type);
+            }
+          } else {
+            // Move to existing clients
+            if (!movedTo.has(target)) {
+              movedTo.set(target, [type]);
+            } else {
+              movedTo.get(target)!.push(type);
+            }
+          }
+        }
+      }
+    }
+
+    // Validate client names for the current scope
+    validateClientNamesPerNamespace(
+      tcgcContext,
+      scope,
+      moved,
+      movedTo,
+      tcgcContext.program.getGlobalNamespaceType(),
+    );
+
+    // Validate client names for new client's operations
+    [...newClients.values()].map((operations) => {
+      validateClientNamesCore(tcgcContext, scope, operations);
+    });
+  }
+}
+
 function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScopes> {
   const languageScopes = new Set<string | typeof AllScopes>();
-  for (const value of program.stateMap(clientNameKey).values()) {
+  const impacted = [...program.stateMap(clientNameKey).values()];
+  impacted.push(...program.stateMap(clientLocationKey).values());
+  for (const value of impacted) {
     if (value[AllScopes]) {
       languageScopes.add(AllScopes);
     }
@@ -56,9 +127,31 @@ function getDefinedLanguageScopes(program: Program): Set<string | typeof AllScop
   return languageScopes;
 }
 
+function* adjustOperations(
+  iterator: MapIterator<Operation>,
+  moved: Set<Operation>,
+  movedTo: Map<Namespace | Interface, Operation[]>,
+  container: Namespace | Interface,
+): MapIterator<Operation> {
+  for (const operation of iterator) {
+    if (moved.has(operation)) {
+      continue;
+    } else {
+      yield operation;
+    }
+  }
+  if (movedTo.has(container)) {
+    for (const operation of movedTo.get(container)!) {
+      yield operation;
+    }
+  }
+}
+
 function validateClientNamesPerNamespace(
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes,
+  moved: Set<Operation>,
+  movedTo: Map<Namespace | Interface, Operation[]>,
   namespace: Namespace,
 ) {
   // Check for duplicate client names for models, enums, and unions
@@ -69,11 +162,19 @@ function validateClientNamesPerNamespace(
   ]);
 
   // Check for duplicate client names for operations
-  validateClientNamesCore(tcgcContext, scope, namespace.operations.values());
+  validateClientNamesCore(
+    tcgcContext,
+    scope,
+    adjustOperations(namespace.operations.values(), moved, movedTo, namespace),
+  );
 
   // check for duplicate client names for operations in interfaces
   for (const item of namespace.interfaces.values()) {
-    validateClientNamesCore(tcgcContext, scope, item.operations.values());
+    validateClientNamesCore(
+      tcgcContext,
+      scope,
+      adjustOperations(item.operations.values(), moved, movedTo, item),
+    );
   }
 
   // Check for duplicate client names for interfaces
@@ -102,7 +203,7 @@ function validateClientNamesPerNamespace(
 
   // Check for duplicate client names for nested namespaces
   for (const item of namespace.namespaces.values()) {
-    validateClientNamesPerNamespace(tcgcContext, scope, item);
+    validateClientNamesPerNamespace(tcgcContext, scope, moved, movedTo, item);
   }
 }
 

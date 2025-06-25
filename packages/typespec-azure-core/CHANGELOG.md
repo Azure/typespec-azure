@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.57.0
+
+### Bug Fixes
+
+- [#2734](https://github.com/Azure/typespec-azure/pull/2734) Fix incorrect use of `templateArguments` in `parameterizedNextLink` decorator.
+- [#2670](https://github.com/Azure/typespec-azure/pull/2670) Correct casing of `ArmResourceDeploymentScope` and `AllArmResourceDeploymentScopes` values to follow camel case conventions.
+
+
 ## 0.56.0
 
 ### Features

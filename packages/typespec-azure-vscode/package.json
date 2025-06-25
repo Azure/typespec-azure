@@ -1,0 +1,44 @@
+{
+  "name": "typespec-azure-vscode",
+  "displayName": "typespec azure",
+  "description": "the extension for azure typespec",
+  "publisher": "typespec",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "extensionDependencies": [
+    "typespec.typespec-vscode"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:typespec",
+    "workspaceContains:**/tspconfig.yaml"
+  ],
+  "main": "./dist/src/extension.js",
+  "preview": true,
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compile": "pnpm check-types && tsx ./scripts/build.ts",
+    "check-types": "tsc --noEmit",
+    "build": "pnpm compile && pnpm package-vsix",
+    "package-vsix": "vsce package",
+    "watch": "tsx ./scripts/build.ts --watch",
+    "lint": "eslint .  --max-warnings=0",
+    "lint:fix": "eslint . --fix "
+  },
+  "devDependencies": {
+    "@types/vscode": "~1.100.0",
+    "@types/node": "~24.0.3",
+    "@vscode/vsce": "~3.5.0",
+    "esbuild": "^0.25.1",
+    "typescript": "~5.8.2"
+  }
+}

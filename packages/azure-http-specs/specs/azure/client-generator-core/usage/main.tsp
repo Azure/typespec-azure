@@ -3,7 +3,6 @@ import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using Http;
-using Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Test for internal decorator.")
@@ -15,11 +14,11 @@ namespace _Specs_.Azure.ClientGenerator.Core.Usage;
 @scenarioDoc("""
   This scenario contains 4 public operations. All should be generated and exported.
   'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
-  The other models are override to roundtrip, so they should be generated and exported as well.
+  The other models' usage is additive to roundtrip, so they should be generated and exported as well.
   """)
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
 namespace ModelInOperation {
-  @doc("Usage override to roundtrip.")
+  @doc("Usage additive to roundtrip.")
   @global.Azure.ClientGenerator.Core.usage(
     global.Azure.ClientGenerator.Core.Usage.input | global.Azure.ClientGenerator.Core.Usage.output
   )
@@ -28,7 +27,7 @@ namespace ModelInOperation {
   }
 
   @doc("""
-    Expected body parameter: 
+    Expected body parameter:
     ```json
     {
       "name": "Madge"
@@ -39,7 +38,7 @@ namespace ModelInOperation {
   @post
   op inputToInputOutput(@body body: InputModel): void;
 
-  @doc("Usage override to roundtrip.")
+  @doc("Usage additive to roundtrip.")
   @global.Azure.ClientGenerator.Core.usage(
     global.Azure.ClientGenerator.Core.Usage.input | global.Azure.ClientGenerator.Core.Usage.output
   )
@@ -48,7 +47,7 @@ namespace ModelInOperation {
   }
 
   @doc("""
-    Expected response body: 
+    Expected response body:
     ```json
     {
       "name": "Madge"
@@ -71,13 +70,13 @@ namespace ModelInOperation {
   @doc("""
     "ResultModel" should be usage=output, as it is read-only and does not exist in request body.
     
-    Expected body parameter: 
+    Expected body parameter:
     ```json
     {
     }
     ```
     
-    Expected response body: 
+    Expected response body:
     ```json
     {
       "result": {
@@ -95,7 +94,7 @@ namespace ModelInOperation {
   @doc("""
     Serialize the 'OrphanModel' as request body.
     
-    Expected body parameter: 
+    Expected body parameter:
     ```json
     {
       "name": "name",
@@ -110,7 +109,9 @@ namespace ModelInOperation {
 }
 
 @doc("Not used anywhere, but access is override to public so still need to be generated and exported with serialization.")
-@global.Azure.ClientGenerator.Core.usage(global.Azure.ClientGenerator.Core.Usage.input)
+@global.Azure.ClientGenerator.Core.usage(
+  global.Azure.ClientGenerator.Core.Usage.input | global.Azure.ClientGenerator.Core.Usage.json
+)
 @global.Azure.ClientGenerator.Core.access(global.Azure.ClientGenerator.Core.Access.public)
 model OrphanModel {
   @global.Azure.ClientGenerator.Core.clientName("modelName")

@@ -41,13 +41,13 @@ describe("when used as ref", () => {
 
   it("use with single type and scopes", async () => {
     const type = await compileAsRef(
-      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>`,
+      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}]>`,
     );
     expect(getArmResourceIdentifierConfig(runner.program, type)).toEqual({
       allowedResources: [
         {
           type: "Microsoft.RP/type",
-          scopes: ["tenant", "resourceGroup"],
+          scopes: ["Tenant", "ResourceGroup"],
         },
       ],
     });
@@ -55,15 +55,15 @@ describe("when used as ref", () => {
 
   it("use multiple single type and scopes", async () => {
     const type = await compileAsRef(
-      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>`,
+      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["Tenant", "ResourceGroup"]}]>`,
     );
     expect(getArmResourceIdentifierConfig(runner.program, type)).toEqual({
       allowedResources: [
         {
           type: "Microsoft.RP/type",
-          scopes: ["tenant", "resourceGroup"],
+          scopes: ["Tenant", "ResourceGroup"],
         },
-        { type: "Microsoft.RP/type2", scopes: ["tenant", "resourceGroup"] },
+        { type: "Microsoft.RP/type2", scopes: ["Tenant", "ResourceGroup"] },
       ],
     });
   });
@@ -96,13 +96,13 @@ describe("when used as scalar extends", () => {
 
   it("use with single type and scopes", async () => {
     const type = await compileOnScalar(
-      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>`,
+      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}]>`,
     );
     expect(getArmResourceIdentifierConfig(runner.program, type)).toEqual({
       allowedResources: [
         {
           type: "Microsoft.RP/type",
-          scopes: ["tenant", "resourceGroup"],
+          scopes: ["Tenant", "ResourceGroup"],
         },
       ],
     });
@@ -110,15 +110,15 @@ describe("when used as scalar extends", () => {
 
   it("use multiple single type and scopes", async () => {
     const type = await compileOnScalar(
-      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>`,
+      `armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["Tenant", "ResourceGroup"]}]>`,
     );
     expect(getArmResourceIdentifierConfig(runner.program, type)).toEqual({
       allowedResources: [
         {
           type: "Microsoft.RP/type",
-          scopes: ["tenant", "resourceGroup"],
+          scopes: ["Tenant", "ResourceGroup"],
         },
-        { type: "Microsoft.RP/type2", scopes: ["tenant", "resourceGroup"] },
+        { type: "Microsoft.RP/type2", scopes: ["Tenant", "ResourceGroup"] },
       ],
     });
   });

@@ -1,7 +1,7 @@
 import { Model } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
 import { checkFor } from "./test-host.js";
@@ -524,8 +524,8 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       model FooResourceProperties {
         simpleArmId: Azure.Core.armResourceIdentifier;
         armIdWithType: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type"}]>;
-        armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}]>;
-        armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["tenant", "resourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["tenant", "resourceGroup"]}]>;
+        armIdWithTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}]>;
+        armIdWithMultipleTypeAndScope: Azure.Core.armResourceIdentifier<[{type:"Microsoft.RP/type", scopes:["Tenant", "ResourceGroup"]}, {type:"Microsoft.RP/type2", scopes:["Tenant", "ResourceGroup"]}]>;
         provisioningState: ResourceState;
       }
 
@@ -715,6 +715,139 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     const nameProperty = resources[0].typespecType.properties.get("name");
     strictEqual(nameProperty?.type.kind, "Scalar");
     strictEqual(nameProperty?.type.name, "WidgetNameType");
+  });
+  it("allows foreign resources as parent resources", async () => {
+    const { program, diagnostics } = await checkFor(`
+using Azure.Core;
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+
+namespace Microsoft.ContosoProviderHub;
+/** Externally defined RestorePoint */
+@armVirtualResource
+@parentResource(RestorePointCollection)
+model RestorePoint {
+  ...ResourceNameParameter<RestorePoint, "restorePointName", "restorePoints">;
+}
+
+/** Externally defined RestorePointCollection */
+@armVirtualResource
+model RestorePointCollection {
+  ...ResourceNameParameter<
+    RestorePointCollection,
+    "collectionName",
+    "restorePointGroups"
+  >;
+}
+
+/** A ContosoProviderHub resource */
+@parentResource(RestorePoint)
+model DiskRestorePoint is TrackedResource<DiskRestorePointProperties> {
+  ...ResourceNameParameter<DiskRestorePoint>;
+}
+
+/** Employee properties */
+model DiskRestorePointProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+}
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@armResourceOperations
+interface DiskRestorePoints {
+  get is ArmResourceRead<DiskRestorePoint>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<DiskRestorePoint>;
+  update is ArmCustomPatchSync<
+    DiskRestorePoint,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      DiskRestorePoint,
+      DiskRestorePointProperties
+    >
+  >;
+  delete is ArmResourceDeleteWithoutOkAsync<DiskRestorePoint>;
+  list is ArmResourceListByParent<DiskRestorePoint>;
+
+  /** A sample resource action that move employee to different location */
+  move is ArmResourceActionSync<DiskRestorePoint, MoveRequest, MoveResponse>;
+
+  /** A sample HEAD operation to check resource existence */
+  checkExistence is ArmResourceCheckExistence<DiskRestorePoint>;
+}
+
+@armResourceOperations
+interface RestorePointOperations {
+  moveR is ArmResourceActionAsync<RestorePoint, MoveRequest, MoveResponse>;
+}
+
+    `);
+
+    const resources = getArmResources(program);
+    expectDiagnosticEmpty(diagnostics);
+    expect(resources.length).toBe(3);
+    const restorePoint = resources.find((r) => r.name === "RestorePoint");
+    expect(restorePoint).toBeDefined();
+    expect(restorePoint?.operations.actions.moveR).toBeDefined();
+    const restorePointCollection = resources.find((r) => r.name === "RestorePointCollection");
+    expect(restorePointCollection).toBeDefined();
+    const diskRestorePoint = resources.find((r) => r.name === "DiskRestorePoint");
+    expect(diskRestorePoint).toBeDefined();
   });
 
   it("emits diagnostics for non ARM resources", async () => {

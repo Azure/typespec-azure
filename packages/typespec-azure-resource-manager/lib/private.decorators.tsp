@@ -60,7 +60,7 @@ extern dec defaultResourceKeySegmentName(
  * Provides strict contraint type check.
  *
  * Due to TypeSpec language and all optional properties of `Foundations.Resource`,
- * the `Resource extends Foundations.Resource` on many of the standard ARM templates is
+ * the `Resource extends Foundations.SimpleResource` on many of the standard ARM templates is
  * essentially equal to `Resource extends {}` and does not enforce the containt.
  *
  * Note, this is intended for internal use only for now.
@@ -103,3 +103,6 @@ extern dec armRenameListByOperation(
  * This decorator is used to adjust optionality on ARM Resource's `properties` field for brownfield service conversion.
  */
 extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: valueof boolean);
+
+/** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
+extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);

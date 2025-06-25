@@ -580,6 +580,61 @@ describe("typespec-autorest: operations", () => {
     strictEqual(res.paths["/interface-only"].get.operationId, "ClientInterfaceName_Same");
     strictEqual(res.paths["/interface-and-op"].get.operationId, "ClientInterfaceName_ClientCall");
   });
+
+  it(`@clientLocation with string target updates the operationId`, async () => {
+    const res = await openApiFor(`
+      @service namespace MyService;
+      
+      interface TestInterface {
+        @route("/test-string") @clientLocation("CustomGroup") op testOperation(): void;
+      }
+     
+      `);
+
+    strictEqual(res.paths["/test-string"].get.operationId, "CustomGroup_TestOperation");
+  });
+
+  it(`@clientLocation with Interface target updates the operationId`, async () => {
+    const res = await openApiFor(`
+      @service namespace MyService;
+      
+      interface TargetInterface {
+        @route("/target-op") op targetOperation(): void;
+      }
+      
+      interface SourceInterface {
+        @route("/test-interface") @clientLocation(TargetInterface) op testOperation(): void;
+      }
+     
+      `);
+
+    strictEqual(res.paths["/test-interface"].get.operationId, "TargetInterface_TestOperation");
+    // Original operation in the target interface should use its interface name as prefix
+    strictEqual(res.paths["/target-op"].get.operationId, "TargetInterface_TargetOperation");
+  });
+
+  it(`@clientLocation with Namespace target updates the operationId`, async () => {
+    const res = await openApiFor(`
+      @service namespace MyService;
+      
+      namespace CustomNamespace {
+        @route("/custom-op") op customOperation(): void;
+      }
+      
+      interface TestInterface {
+        @route("/test-namespace") @clientLocation(CustomNamespace) op testOperation(): void;
+        @route("/test-service") @clientLocation(MyService) op serviceOperation(): void;
+      }
+     
+      `);
+
+    // When target is a non-service namespace, use namespace name as prefix
+    strictEqual(res.paths["/test-namespace"].get.operationId, "CustomNamespace_TestOperation");
+    // When target is the service namespace, use operation name only
+    strictEqual(res.paths["/test-service"].get.operationId, "ServiceOperation");
+    // Original operation in the custom namespace should still use namespace prefix
+    strictEqual(res.paths["/custom-op"].get.operationId, "CustomNamespace_CustomOperation");
+  });
 });
 
 describe("typespec-autorest: request", () => {
@@ -827,6 +882,52 @@ describe("identifiers decorator", () => {
     deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
 
+  it("ignores name/id keys for x-ms-identifiers when nested", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      model Bar {
+        foo:Foo;
+      }
+      model BarList {
+        value: Bar[]
+      }
+      model Foo
+      {
+        @key
+        name:string;
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], undefined);
+  });
+
+  it("key decorator in x-ms-identifiers for nested scenarios ", async () => {
+    const oapi = await openApiFor(
+      `
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Test;
+
+      model Bar {
+        foo:Foo;
+      }
+      model BarList {
+        value: Bar[]
+      }
+      model Foo
+      {
+        @key
+        value:string;
+      }
+      `,
+    );
+    deepStrictEqual(oapi.definitions.BarList.properties.value["x-ms-identifiers"], ["foo/value"]);
+  });
+
   it("ignores id property for x-ms-identifiers", async () => {
     const oapi: any = await compileOpenAPI(
       `
@@ -894,7 +995,7 @@ describe("identifiers decorator", () => {
       }
       `,
     );
-    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], []);
+    deepStrictEqual(oapi.definitions.PetList.properties.value["x-ms-identifiers"], undefined);
   });
 
   it("prioritizes identifiers decorator over keys", async () => {
