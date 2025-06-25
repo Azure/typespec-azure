@@ -1824,6 +1824,30 @@ A long-running resource action.
 op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Response | ErrorType
 ```
 
+### `Operations` {#Azure.ResourceManager.Legacy.Operations}
+
+This is the interface that implements the standard Azure Resource Manager operation that returns
+all supported RP operations. You should have exactly one declaration for each
+Azure Resource Manager service. It implements
+GET "/providers/{provider-namespace}/operations"
+
+```typespec
+interface Azure.ResourceManager.Legacy.Operations<Response, Error>
+```
+
+#### Template Parameters
+
+| Name     | Description                                        |
+| -------- | -------------------------------------------------- |
+| Response | The response returned by the operation list.       |
+| Error    | the error response returned by the operation list. |
+
+#### `Operations.list` {#Azure.ResourceManager.Legacy.Operations.list}
+
+```typespec
+op Azure.ResourceManager.Legacy.Operations.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
 ### `RoutedOperations` {#Azure.ResourceManager.Legacy.RoutedOperations}
 
 An operation template used to build resource operations in which the same resource type
@@ -2030,30 +2054,6 @@ op Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync(body: Request): Res
 | Parameters          | Optional. Additional parameters after the path parameters                 |
 | Response            | The union of successful responses for the action                          |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                  |
-
-### `Operations` {#Azure.ResourceManager.Legacy.Operations}
-
-This is the interface that implements the standard Azure Resource Manager operation that returns
-all supported RP operations. You should have exactly one declaration for each
-Azure Resource Manager service. It implements
-GET "/providers/{provider-namespace}/operations"
-
-```typespec
-interface Azure.ResourceManager.Legacy.Operations<Response, Error>
-```
-
-#### Template Parameters
-
-| Name     | Description                                        |
-| -------- | -------------------------------------------------- |
-| Response | The response returned by the operation list.       |
-| Error    | the error response returned by the operation list. |
-
-#### `Operations.list` {#Azure.ResourceManager.Legacy.Operations.list}
-
-```typespec
-op Azure.ResourceManager.Legacy.Operations.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Response | Error
-```
 
 ### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.CustomPatchAsync}
 
