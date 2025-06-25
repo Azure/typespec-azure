@@ -74,7 +74,7 @@
         "tags": [
           "Employees"
         ],
-        "description": "List Employee resources by subscription ID",
+        "description": "List Employee resources by scope",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -390,7 +390,7 @@
         "tags": [
           "Tenants"
         ],
-        "description": "List Employee resources by subscription ID",
+        "description": "List Employee resources by scope",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -689,7 +689,7 @@
         "tags": [
           "ManagementGroups"
         ],
-        "description": "List Employee resources by subscription ID",
+        "description": "List Employee resources by scope",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -1005,7 +1005,7 @@
         "tags": [
           "Subscriptions"
         ],
-        "description": "List Employee resources by subscription ID",
+        "description": "List Employee resources by scope",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -1719,7 +1719,7 @@
         "tags": [
           "ScaleSetVms"
         ],
-        "description": "List Employee resources by subscription ID",
+        "description": "List Employee resources by scope",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -2119,7 +2119,7 @@
         "tags": [
           "VirtualMachines"
         ],
-        "description": "List Employee resources by subscription ID",
+        "description": "List Employee resources by scope",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -2471,7 +2471,7 @@
         "tags": [
           "ResourceGroups"
         ],
-        "description": "List Employee resources by subscription ID",
+        "description": "List Employee resources by scope",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
