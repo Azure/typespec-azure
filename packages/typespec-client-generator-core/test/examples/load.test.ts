@@ -275,3 +275,75 @@ it("ensure ordering for multiple examples", async () => {
   strictEqual(operation.examples![1].filePath, "a_b.json");
   strictEqual(operation.examples![2].filePath, "a_b_c.json");
 });
+
+it("load example with @clientLocation existed interface", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/clientLocationAnotherInterface.json",
+    `${__dirname}/load/clientLocationAnotherInterface.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(AnotherInterface)
+        op clientLocation(): string;
+      }
+
+      interface AnotherInterface {
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const client = mainClient.children?.find((client) => client.name === "AnotherInterface");
+  ok(client);
+  const operation = (client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with @clientLocation new operation group", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/clientLocationNewOperationGroup.json",
+    `${__dirname}/load/clientLocationNewOperationGroup.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation("NewOperationGroup")
+        op clientLocation(): string;
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+
+  const client = mainClient.children?.find((client) => client.name === "NewOperationGroup");
+  ok(client);
+  const operation = (client.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});
+
+it("load example with @clientLocation root client", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/clientLocationRootClient.json",
+    `${__dirname}/load/clientLocationRootClient.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      interface OriginalInterface {
+        @clientLocation(TestClient)
+        op clientLocation(): string;
+      }
+    }
+  `);
+
+  const mainClient = runner.context.sdkPackage.clients[0];
+  const operation = (mainClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+});

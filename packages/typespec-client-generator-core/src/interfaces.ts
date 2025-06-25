@@ -59,11 +59,16 @@ export interface TCGCContext {
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
-  __clientToParameters: Map<Interface | Namespace, SdkParameter[]>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __clientToApiVersionClientDefaultValue: Map<Interface | Namespace, string | undefined>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
-  __rawClients?: SdkClient[];
+  __rawClientsOperationGroupsCache?: Map<
+    Namespace | Interface | string,
+    SdkClient | SdkOperationGroup
+  >;
+  __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
+  __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
+  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkParameter[]>;
+  __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
@@ -75,6 +80,10 @@ export interface TCGCContext {
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
   getPackageVersions(): string[];
   getPackageVersionEnum(): Enum | undefined;
+  getClients(): SdkClient[];
+  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
+  getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
+  getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
 }
 
 export interface SdkContext<
@@ -93,15 +102,15 @@ export interface SdkClient {
   service: Namespace;
   type: Namespace | Interface;
   crossLanguageDefinitionId: string;
+  subOperationGroups: SdkOperationGroup[];
 }
 
 export interface SdkOperationGroup {
   kind: "SdkOperationGroup";
-  type: Namespace | Interface;
-  subOperationGroups?: SdkOperationGroup[];
+  type?: Namespace | Interface;
+  subOperationGroups: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
-  hasOperations?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";
