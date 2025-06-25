@@ -55,7 +55,7 @@ export async function emitOpenApiWithDiagnostics(
   options: AutorestEmitterOptions = {},
 ): Promise<[OpenAPI2Document, readonly Diagnostic[]]> {
   const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
-    options: {
+    compilerOptions: {
       options: {
         "@azure-tools/typespec-autorest": { ...options },
       },
@@ -69,7 +69,7 @@ export async function emitOpenApiWithDiagnostics(
 
 interface CompileOpenAPIOptions {
   preset?: "simple" | "azure";
-  tester?: EmitterTesterInstance;
+  tester?: EmitterTesterInstance<any>;
   options?: AutorestEmitterOptions;
 }
 
@@ -80,7 +80,7 @@ export async function compileOpenAPI(
   const tester =
     options?.tester ?? (await (options.preset === "azure" ? AzureTester : Tester).createInstance());
   const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(code, {
-    options: options?.options
+    compilerOptions: options?.options
       ? {
           options: {
             "@azure-tools/typespec-autorest": { ...defaultOptions, ...options.options },
@@ -98,7 +98,7 @@ export async function compileVersionedOpenAPI<K extends string>(
   options: CompileOpenAPIOptions = {},
 ): Promise<Record<K, OpenAPI2Document>> {
   const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
-    options: options?.options
+    compilerOptions: options?.options
       ? {
           options: {
             "@azure-tools/typespec-autorest": { ...defaultOptions, ...options.options },
@@ -131,7 +131,7 @@ export async function openApiFor(
 
 export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterOptions = {}) {
   return await Tester.diagnose(code, {
-    options: {
+    compilerOptions: {
       options: {
         "@azure-tools/typespec-autorest": options as any,
       },

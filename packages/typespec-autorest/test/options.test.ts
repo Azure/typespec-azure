@@ -4,13 +4,14 @@ import {
   expectDiagnosticEmpty,
   expectDiagnostics,
   resolveVirtualPath,
+  TestEmitterCompileResult,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { AutorestEmitterOptions } from "../src/lib.js";
 import { ApiTester, compileOpenAPI, ignoreDiagnostics, Tester } from "./test-host.js";
 
-let runner: EmitterTesterInstance;
+let runner: EmitterTesterInstance<TestEmitterCompileResult>;
 
 beforeEach(async () => {
   runner = await Tester.createInstance();
@@ -27,7 +28,7 @@ describe("typespec-autorest: options", () => {
   describe("'new-line' option", () => {
     async function rawOpenApiFor(code: string, options: AutorestEmitterOptions): Promise<string> {
       const [{ outputs }, diagnostics] = await runner.compileAndDiagnose(code, {
-        options: {
+        compilerOptions: {
           options: {
             "@azure-tools/typespec-autorest": { ...options },
           },
@@ -93,7 +94,7 @@ describe("typespec-autorest: options", () => {
         #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
         op test(): void;`,
         {
-          options: {
+          compilerOptions: {
             options: {
               "@azure-tools/typespec-autorest": { "emitter-output-dir": emitterOutputDir },
             },
@@ -109,7 +110,7 @@ describe("typespec-autorest: options", () => {
         #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
         op test(): void;`,
         {
-          options: {
+          compilerOptions: {
             outputDir: "./my-output",
             options: {
               "@azure-tools/typespec-autorest": {
@@ -135,7 +136,7 @@ enum Versions {v1, v2}
 op test(): void;
       `,
         {
-          options: {
+          compilerOptions: {
             outputDir: "./my-output",
             options: {
               "@azure-tools/typespec-autorest": {
@@ -166,7 +167,7 @@ enum Versions {v1, "v2-preview"}
 op test(): void;
       `,
         {
-          options: {
+          compilerOptions: {
             outputDir: "./my-output",
             options: {
               "@azure-tools/typespec-autorest": {

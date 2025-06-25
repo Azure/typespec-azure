@@ -164,7 +164,7 @@ it("can use private endpoints with common-types references", async () => {
 });
 
 it("verify resolution of private endpoints and private links with v5 version", async () => {
-  const openapi = await openApiFor(
+  const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)

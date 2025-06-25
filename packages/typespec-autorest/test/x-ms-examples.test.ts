@@ -2,12 +2,13 @@ import {
   EmitterTesterInstance,
   expectDiagnostics,
   resolveVirtualPath,
+  TestEmitterCompileResult,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import { compileOpenAPI, ignoreUseStandardOps, Tester } from "./test-host.js";
 
-let tester: EmitterTesterInstance;
+let tester: EmitterTesterInstance<TestEmitterCompileResult>;
 
 beforeEach(async () => {
   tester = await Tester.createInstance();

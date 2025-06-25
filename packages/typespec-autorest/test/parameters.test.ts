@@ -72,7 +72,9 @@ describe("path parameters", () => {
   });
 
   it("report unsupported-param-type diagnostic on the parameter when using unsupported types", async () => {
-    const { /*pos, end,*/ source } = extractSquiggles(
+    const offset = 223; // hard coding, need better solution in new tester
+
+    const { pos, end, source } = extractSquiggles(
       `op test(~~~@path myParam: Record<string>~~~): void;`,
     );
     const diagnostics = await Tester.diagnose(source);
@@ -80,22 +82,22 @@ describe("path parameters", () => {
       code: "@azure-tools/typespec-autorest/unsupported-param-type",
       message:
         "Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part 'myParam'.",
-      // TODO: find equivalent for this
-      // pos: pos + runner.autoCodeOffset,
-      // end: end + runner.autoCodeOffset,
+      pos: pos + offset,
+      end: end + offset,
     });
   });
 
   it("report unsupported-optional-path-param diagnostic on the parameter when using optional path parameters", async () => {
+    const offset = 223; // hard coding, need better solution in new tester
     const { pos, end, source } = extractSquiggles(`op test(~~~@path myParam?: string~~~): void;`);
-    const runner = await createAutorestTestRunner();
+    const runner = await Tester.createInstance();
     const diagnostics = await runner.diagnose(source);
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-autorest/unsupported-optional-path-param",
       message:
         "Path parameter 'myParam' is optional, but swagger 2.0 does not support optional path parameters. It will be emitted as required.",
-      pos: pos + runner.autoCodeOffset,
-      end: end + runner.autoCodeOffset,
+      pos: pos + offset,
+      end: end + offset,
     });
   });
 });

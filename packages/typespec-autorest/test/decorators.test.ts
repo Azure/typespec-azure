@@ -78,7 +78,7 @@ describe("typespec-autorest: decorators", () => {
             "emitter-output-dir": outputDir,
           },
         ).compileAndDiagnose(code, {
-          options: {
+          compilerOptions: {
             config: resolveVirtualPath("specification/org/service/tspconfig.json"),
           },
         });

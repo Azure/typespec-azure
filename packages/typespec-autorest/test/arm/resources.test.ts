@@ -398,7 +398,7 @@ it("excludes properties marked @invisible from the resource payload", async () =
 });
 
 it("allows resources with multiple endpoints using LegacyOperations", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(`
     @armProviderNamespace
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
     namespace Microsoft.ContosoProviderhub;
@@ -561,8 +561,9 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
   ok(resourceGroupOperations.put);
   ok(resourceGroupOperations.head);
 });
+
 it("allows action requests with optional body parameters", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(`
     @armProviderNamespace
     @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
     namespace Microsoft.ContosoProviderhub;

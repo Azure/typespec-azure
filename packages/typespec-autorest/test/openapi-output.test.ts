@@ -582,7 +582,7 @@ describe("typespec-autorest: operations", () => {
   });
 
   it(`@clientLocation with string target updates the operationId`, async () => {
-    const res = await openApiFor(`
+    const res = await compileOpenAPI(`
       @service namespace MyService;
       
       interface TestInterface {
@@ -591,11 +591,11 @@ describe("typespec-autorest: operations", () => {
      
       `);
 
-    strictEqual(res.paths["/test-string"].get.operationId, "CustomGroup_TestOperation");
+    strictEqual(res.paths["/test-string"].get?.operationId, "CustomGroup_TestOperation");
   });
 
   it(`@clientLocation with Interface target updates the operationId`, async () => {
-    const res = await openApiFor(`
+    const res: any = await compileOpenAPI(`
       @service namespace MyService;
       
       interface TargetInterface {
@@ -614,7 +614,7 @@ describe("typespec-autorest: operations", () => {
   });
 
   it(`@clientLocation with Namespace target updates the operationId`, async () => {
-    const res = await openApiFor(`
+    const res: any = await compileOpenAPI(`
       @service namespace MyService;
       
       namespace CustomNamespace {
@@ -883,7 +883,7 @@ describe("identifiers decorator", () => {
   });
 
   it("ignores name/id keys for x-ms-identifiers when nested", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
@@ -906,7 +906,7 @@ describe("identifiers decorator", () => {
   });
 
   it("key decorator in x-ms-identifiers for nested scenarios ", async () => {
-    const oapi = await openApiFor(
+    const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
       @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
