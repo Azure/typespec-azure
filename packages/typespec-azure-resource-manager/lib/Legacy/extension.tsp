@@ -204,6 +204,26 @@ interface ExtensionOperations<
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
+   * Check a resource's existence via HEAD operation
+   * * @template Resource The resource being checked
+   * @template Parameters Optional. Additional parameters after the path parameters
+   * @template Response Optional. The success response for a head operation (by default NoContent or NotFound response).
+   * @template ErrorType Optional. The error response, if non-standard.
+   */
+  @autoRoute
+  @doc("Check for the existence of a {name}", Resource)
+  @head
+  CheckExistence<
+    Resource extends Foundations.SimpleResource,
+    Parameters extends {} = {},
+    Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
+    ErrorType extends {} = ErrorResponse
+  > is Foundations.ArmReadOperation<
+    TargetParameters & ExtensionInstanceParameters & Parameters,
+    Response,
+    ErrorType
+  >;
+  /**
    * List a resource
    * @template Resource The resource being listed
    * @template Parameters Optional. Additional parameters after the path parameters

@@ -16,7 +16,7 @@ using Azure.ResourceManager.Private;
  * @template Error Optional. The error response, if non-standard.
  */
 @autoRoute
-@doc("List {name} resources by subscription ID", ExtensionResource)
+@doc("List {name} resources by scope", ExtensionResource)
 @listsResource(ExtensionResource)
 @segmentOf(ExtensionResource)
 @armResourceList(ExtensionResource)

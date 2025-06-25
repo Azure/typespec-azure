@@ -1653,6 +1653,25 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.Read(): Response | ErrorType
 | Response   | Optional. The success response for a get operation.       |
 | ErrorType  | Optional. The error response, if non-standard.            |
 
+#### `ExtensionOperations.CheckExistence` {#Azure.ResourceManager.Legacy.ExtensionOperations.CheckExistence}
+
+Check a resource's existence via HEAD operation
+
+-
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.CheckExistence(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------ |
+| Resource   | The resource being checked                                                                       |
+| Parameters | Optional. Additional parameters after the path parameters                                        |
+| Response   | Optional. The success response for a head operation (by default NoContent or NotFound response). |
+| ErrorType  | Optional. The error response, if non-standard.                                                   |
+
 #### `ExtensionOperations.List` {#Azure.ResourceManager.Legacy.ExtensionOperations.List}
 
 List a resource
@@ -1846,6 +1865,22 @@ op Azure.ResourceManager.Legacy.LegacyOperations.Read(): Response | ErrorType
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for a get operation.       |
 
+#### `LegacyOperations.CheckExistence` {#Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence}
+
+Check a resource's existence via HEAD operation
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name       | Description                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------ |
+| Resource   | The resource being checked                                                                       |
+| Parameters | Optional. Additional parameters after the path parameters                                        |
+| Response   | Optional. The success response for a head operation (by default NoContent or NotFound response). |
+
 #### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations.List}
 
 List a resource
@@ -1894,10 +1929,10 @@ op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Res
 | ------------------- | ------------------------------------------------------------------------- |
 | Resource            | The resource being acted upon                                             |
 | Request             | The request model for the action                                          |
-| Result              |                                                                           |
+| Result              | The result model for the action when the operation is successful          |
 | LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
 | Parameters          | Optional. Additional parameters after the path parameters                 |
-| Response            | The response model for the action                                         |
+| Response            | The union of successful responses for the action                          |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                  |
 
 ### `Operations` {#Azure.ResourceManager.Legacy.Operations}

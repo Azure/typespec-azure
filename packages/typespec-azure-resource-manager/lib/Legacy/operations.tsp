@@ -192,6 +192,25 @@ interface LegacyOperations<
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
 
   /**
+   * Check a resource's existence via HEAD operation
+   * @template Resource The resource being checked
+   * @template Parameters Optional. Additional parameters after the path parameters
+   * @template Response Optional. The success response for a head operation (by default NoContent or NotFound response).
+   */
+  @autoRoute
+  @doc("Check for the existence of a {name}", Resource)
+  @head
+  CheckExistence<
+    Resource extends Foundations.SimpleResource,
+    Parameters extends {} = {},
+    Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse
+  > is Foundations.ArmReadOperation<
+    ParentParameters & ResourceTypeParameter & Parameters,
+    Response,
+    ErrorType
+  >;
+
+  /**
    * List a resource
    * @template Resource The resource being listed
    * @template Parameters Optional. Additional parameters after the path parameters
@@ -243,8 +262,9 @@ interface LegacyOperations<
    * A long-running resource action.
    * @template Resource The resource being acted upon
    * @template Request The request model for the action
+   * @template Result The result model for the action when the operation is successful
    * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
-   * @template Response The response model for the action
+   * @template Response The union of successful responses for the action
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
