@@ -2647,13 +2647,13 @@ model Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource
 
 #### Properties
 
-| Name              | Type                             | Description                                                   |
-| ----------------- | -------------------------------- | ------------------------------------------------------------- |
-| apiVersion        | `string`                         | The API version to use for this operation.                    |
-| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
-| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
-| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
-| extensionProvider | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+| Name              | Type                                     | Description                                                   |
+| ----------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                                 | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                              | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                                 | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"`    |                                                               |
+| extensionProvider | `"Microsoft.ExtensionProviderNamespace"` |                                                               |
 
 ### `ExtensionParentParameters` {#Azure.ResourceManager.Extension.ExtensionParentParameters}
 
@@ -2672,13 +2672,13 @@ model Azure.ResourceManager.Extension.ExtensionParentParameters<TargetResource, 
 
 #### Properties
 
-| Name              | Type                             | Description                                                   |
-| ----------------- | -------------------------------- | ------------------------------------------------------------- |
-| apiVersion        | `string`                         | The API version to use for this operation.                    |
-| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
-| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
-| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
-| extensionProvider | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+| Name              | Type                                     | Description                                                   |
+| ----------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                                 | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                              | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                                 | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"`    |                                                               |
+| extensionProvider | `"Microsoft.ExtensionProviderNamespace"` |                                                               |
 
 ### `ExtensionProviderNamespace` {#Azure.ResourceManager.Extension.ExtensionProviderNamespace}
 
@@ -2696,9 +2696,9 @@ model Azure.ResourceManager.Extension.ExtensionProviderNamespace<Resource>
 
 #### Properties
 
-| Name              | Type                             | Description |
-| ----------------- | -------------------------------- | ----------- |
-| extensionProvider | `"Microsoft.ThisWillBeReplaced"` |             |
+| Name              | Type                                     | Description |
+| ----------------- | ---------------------------------------- | ----------- |
+| extensionProvider | `"Microsoft.ExtensionProviderNamespace"` |             |
 
 ### `ExternalChildResource` {#Azure.ResourceManager.Extension.ExternalChildResource}
 
@@ -2872,12 +2872,12 @@ model Azure.ResourceManager.Extension.TargetBaseParameters<Resource>
 
 #### Properties
 
-| Name              | Type                             | Description                                                   |
-| ----------------- | -------------------------------- | ------------------------------------------------------------- |
-| apiVersion        | `string`                         | The API version to use for this operation.                    |
-| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
-| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
-| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+| Name              | Type                                  | Description                                                   |
+| ----------------- | ------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                              | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                           | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                              | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"` |                                                               |
 
 ### `TargetParameters` {#Azure.ResourceManager.Extension.TargetParameters}
 
@@ -2895,12 +2895,12 @@ model Azure.ResourceManager.Extension.TargetParameters<Resource>
 
 #### Properties
 
-| Name              | Type                             | Description                                                   |
-| ----------------- | -------------------------------- | ------------------------------------------------------------- |
-| apiVersion        | `string`                         | The API version to use for this operation.                    |
-| subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID. |
-| resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive. |
-| provider          | `"Microsoft.ThisWillBeReplaced"` |                                                               |
+| Name              | Type                                  | Description                                                   |
+| ----------------- | ------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                              | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                           | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                              | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"` |                                                               |
 
 ### `TargetProviderNamespace` {#Azure.ResourceManager.Extension.TargetProviderNamespace}
 
@@ -2918,9 +2918,9 @@ model Azure.ResourceManager.Extension.TargetProviderNamespace<Resource>
 
 #### Properties
 
-| Name     | Type                             | Description |
-| -------- | -------------------------------- | ----------- |
-| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+| Name     | Type                                  | Description |
+| -------- | ------------------------------------- | ----------- |
+| provider | `"Microsoft.TargetProviderNamespace"` |             |
 
 ### `Tenant` {#Azure.ResourceManager.Extension.Tenant}
 
@@ -3325,6 +3325,24 @@ model Azure.ResourceManager.Legacy.Provider<Resource>
 | Name     | Description                                               |
 | -------- | --------------------------------------------------------- |
 | Resource | Optional. The resource to get the provider namespace for. |
+
+#### Properties
+
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `ProviderParameter` {#Azure.ResourceManager.Legacy.ProviderParameter}
+
+```typespec
+model Azure.ResourceManager.Legacy.ProviderParameter<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                     |
+| -------- | ----------------------------------------------- |
+| Resource | The resource to get the provider namespace for. |
 
 #### Properties
 

@@ -34,6 +34,7 @@ import {
   ArmResourcePropertiesOptionalityDecorator,
   ArmUpdateProviderNamespaceDecorator,
   AssignProviderNameValueDecorator,
+  AssignUniqueProviderNameValueDecorator,
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
   ConditionalClientFlattenDecorator,
@@ -269,7 +270,42 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
 ) => {
   const { program } = context;
   const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
-  if (armProviderNamespace && target.type.kind === "String") {
+  if (
+    armProviderNamespace &&
+    target.type.kind === "String" &&
+    target.type.value === "Microsoft.ThisWillBeReplaced"
+  ) {
+    target.type.value = armProviderNamespace;
+  }
+};
+
+/**
+ * This decorator allows setting a unique provider name value, for scenarios in which
+ * multiple providers are allowed.
+ * @param {DecoratorContext} context DecoratorContext
+ * @param {Type} target Target of this decorator. Must be a string `ModelProperty`.
+ * @param {Type} resourceType Must be a `Model`.
+ */
+const $assignUniqueProviderNameValue: AssignUniqueProviderNameValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  resourceType: Model,
+) => {
+  const { program } = context;
+  const armProviderNamespace = getArmProviderNamespace(program, resourceType);
+  if (!armProviderNamespace && !isBuiltIn(getResourceBaseType(program, resourceType))) {
+    reportDiagnostic(program, {
+      code: "resource-without-provider-namespace",
+      format: { resourceName: resourceType.name },
+      target: resourceType,
+    });
+    return;
+  }
+  if (
+    armProviderNamespace &&
+    target.type.kind === "String" &&
+    target.type.value !== armProviderNamespace
+  ) {
     target.type = $(program).literal.createString(armProviderNamespace);
   }
 };
@@ -302,8 +338,9 @@ const $armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator = (
           });
           return;
         }
-
-        providerParam.type.value = armProviderNamespace;
+        if (providerParam.type.value === "Microsoft.ThisWillBeReplaced") {
+          providerParam.type.value = armProviderNamespace;
+        }
       }
     }
   }
@@ -544,6 +581,7 @@ export const $decorators = {
     azureResourceBase: $azureResourceBase,
     omitIfEmpty: $omitIfEmpty,
     conditionalClientFlatten: $conditionalClientFlatten,
+    assignUniqueProviderNameValue: $assignUniqueProviderNameValue,
     assignProviderNameValue: $assignProviderNameValue,
     armUpdateProviderNamespace: $armUpdateProviderNamespace,
     armResourceInternal: $armResourceInternal,

@@ -32,6 +32,7 @@ interface LegacyOperations<
   @autoRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
+  @Private.armUpdateProviderNamespace
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
   @put
   CreateOrUpdateAsync<
@@ -62,6 +63,7 @@ interface LegacyOperations<
   @autoRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
+  @Private.armUpdateProviderNamespace
   @put
   CreateOrUpdateSync<
     Resource extends Foundations.SimpleResource,
@@ -87,6 +89,7 @@ interface LegacyOperations<
   @autoRoute
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
+  @Private.armUpdateProviderNamespace
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
     Resource extends Foundations.SimpleResource,
@@ -121,6 +124,7 @@ interface LegacyOperations<
   @autoRoute
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
+  @Private.armUpdateProviderNamespace
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
     Resource extends Foundations.SimpleResource,
@@ -147,6 +151,7 @@ interface LegacyOperations<
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
+  @Private.armUpdateProviderNamespace
   @armResourceDelete(Resource)
   DeleteWithoutOkAsync<
     Resource extends Foundations.SimpleResource,
@@ -168,6 +173,7 @@ interface LegacyOperations<
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
+  @Private.armUpdateProviderNamespace
   DeleteSync<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
@@ -185,6 +191,7 @@ interface LegacyOperations<
   @get
   @readsResource(Resource)
   @armResourceRead(Resource)
+  @Private.armUpdateProviderNamespace
   Read<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
@@ -199,6 +206,7 @@ interface LegacyOperations<
    */
   @autoRoute
   @doc("Check for the existence of a {name}", Resource)
+  @Private.armUpdateProviderNamespace
   @head
   CheckExistence<
     Resource extends Foundations.SimpleResource,
@@ -222,6 +230,7 @@ interface LegacyOperations<
   @listsResource(Resource)
   @segmentOf(Resource)
   @armResourceList(Resource)
+  @Private.armUpdateProviderNamespace
   List<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
@@ -241,6 +250,7 @@ interface LegacyOperations<
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
+  @Private.armUpdateProviderNamespace
   @returnsDoc("Azure operation completed successfully.")
   ActionSync<
     Resource extends Foundations.SimpleResource,
@@ -273,6 +283,7 @@ interface LegacyOperations<
   @autoRoute
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
+  @Private.armUpdateProviderNamespace
   @post
   @returnsDoc("Azure operation completed successfully.")
   ActionAsync<
@@ -302,10 +313,18 @@ interface LegacyOperations<
   ): Response | ErrorType;
 }
 /**
- * @dev Get the provider namespace key-value pair
+ * @dev DEPRECATED: Use ProviderParameter instead. Get the provider namespace key-value pair
  * @template Resource Optional.  The resource to get the provider namespace for.
  */
 model Provider<Resource extends {} = TenantActionScope> {
+  ...ProviderNamespace<Resource>;
+}
+
+/**
+ * @dev Get the provider namespace key-value pair
+ * @template Resource The resource to get the provider namespace for.
+ */
+model ProviderParameter<Resource extends {}> {
   ...ProviderNamespace<Resource>;
 }
 

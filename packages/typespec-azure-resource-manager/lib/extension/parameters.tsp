@@ -58,9 +58,9 @@ model TargetParameters<Resource extends {}> {
 model ExtensionProviderNamespace<Resource extends {}> {
   @path
   @segment("providers")
-  @assignProviderNameValue(Resource)
+  @assignUniqueProviderNameValue(Resource)
   @doc("The provider namespace for the resource.")
-  extensionProvider: "Microsoft.ThisWillBeReplaced";
+  extensionProvider: "Microsoft.ExtensionProviderNamespace";
 }
 
 /** The provider namespace (if any) for a target resource for an extension
@@ -79,8 +79,8 @@ model TargetProviderNamespace<Resource extends {}> {
   @path
   @segment("providers")
   @doc("The provider namespace for the resource.")
-  @assignProviderNameValue(Resource)
-  provider: "Microsoft.ThisWillBeReplaced";
+  @assignUniqueProviderNameValue(Resource)
+  provider: "Microsoft.TargetProviderNamespace";
 }
 
 /** The path parameters for an extension resource at the given target

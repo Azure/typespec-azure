@@ -1132,7 +1132,7 @@ op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscrip
 ### `ActionAsync` {#Azure.ResourceManager.Extension.ActionAsync}
 
 ```typespec
-op Azure.ResourceManager.Extension.ActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
+op Azure.ResourceManager.Extension.ActionAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
 ```
 
 #### Template Parameters
@@ -1153,7 +1153,7 @@ op Azure.ResourceManager.Extension.ActionAsync(apiVersion: string, subscriptionI
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Extension.ActionAsyncBase(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+op Azure.ResourceManager.Extension.ActionAsyncBase(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", body: Request): Response | Error
 ```
 
 #### Template Parameters
@@ -1173,7 +1173,7 @@ op Azure.ResourceManager.Extension.ActionAsyncBase(apiVersion: string, subscript
 A synchronous resource action that returns no content.
 
 ```typespec
-op Azure.ResourceManager.Extension.ActionNoContentSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
+op Azure.ResourceManager.Extension.ActionNoContentSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", body: Request): Azure.ResourceManager.ArmNoContentResponse<"Action completed successfully."> | Error
 ```
 
 #### Template Parameters
@@ -1190,7 +1190,7 @@ op Azure.ResourceManager.Extension.ActionNoContentSync(apiVersion: string, subsc
 ### `ActionNoResponseContentAsync` {#Azure.ResourceManager.Extension.ActionNoResponseContentAsync}
 
 ```typespec
-op Azure.ResourceManager.Extension.ActionNoResponseContentAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
+op Azure.ResourceManager.Extension.ActionNoResponseContentAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
 ```
 
 #### Template Parameters
@@ -1210,7 +1210,7 @@ op Azure.ResourceManager.Extension.ActionNoResponseContentAsync(apiVersion: stri
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Extension.ActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+op Azure.ResourceManager.Extension.ActionSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", body: Request): Response | Error
 ```
 
 #### Template Parameters
@@ -1230,7 +1230,7 @@ op Azure.ResourceManager.Extension.ActionSync(apiVersion: string, subscriptionId
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.Extension.CheckExistence(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Extension.CheckExistence(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
 
 #### Template Parameters
@@ -1246,7 +1246,7 @@ op Azure.ResourceManager.Extension.CheckExistence(apiVersion: string, subscripti
 ### `CreateOrReplaceAsync` {#Azure.ResourceManager.Extension.CreateOrReplaceAsync}
 
 ```typespec
-op Azure.ResourceManager.Extension.CreateOrReplaceAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", resource: ExtensionResource): Response | Error
+op Azure.ResourceManager.Extension.CreateOrReplaceAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", resource: ExtensionResource): Response | Error
 ```
 
 #### Template Parameters
@@ -1265,7 +1265,7 @@ op Azure.ResourceManager.Extension.CreateOrReplaceAsync(apiVersion: string, subs
 Synchronous PUT operation for Azure Resource Manager resources
 
 ```typespec
-op Azure.ResourceManager.Extension.CreateOrReplaceSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", resource: ExtensionResource): Response | Error
+op Azure.ResourceManager.Extension.CreateOrReplaceSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", resource: ExtensionResource): Response | Error
 ```
 
 #### Template Parameters
@@ -1283,7 +1283,7 @@ op Azure.ResourceManager.Extension.CreateOrReplaceSync(apiVersion: string, subsc
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Extension.CreateOrUpdateAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", resource: ExtensionResource): Response | Error
+op Azure.ResourceManager.Extension.CreateOrUpdateAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", resource: ExtensionResource): Response | Error
 ```
 
 #### Template Parameters
@@ -1302,7 +1302,7 @@ op Azure.ResourceManager.Extension.CreateOrUpdateAsync(apiVersion: string, subsc
 A long-running resource update using a custom PATCH payload (Asynchronous)
 
 ```typespec
-op Azure.ResourceManager.Extension.CustomPatchAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+op Azure.ResourceManager.Extension.CustomPatchAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", properties: PatchModel): Response | Error
 ```
 
 #### Template Parameters
@@ -1322,7 +1322,7 @@ op Azure.ResourceManager.Extension.CustomPatchAsync(apiVersion: string, subscrip
 A resource update using a custom PATCH payload (synchronous)
 
 ```typespec
-op Azure.ResourceManager.Extension.CustomPatchSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
+op Azure.ResourceManager.Extension.CustomPatchSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", properties: PatchModel): Response | Error
 ```
 
 #### Template Parameters
@@ -1343,7 +1343,7 @@ op Azure.ResourceManager.Extension.CustomPatchSync(apiVersion: string, subscript
 :::
 
 ```typespec
-op Azure.ResourceManager.Extension.DeleteAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Extension.DeleteAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
 
 #### Template Parameters
@@ -1360,7 +1360,7 @@ op Azure.ResourceManager.Extension.DeleteAsync(apiVersion: string, subscriptionI
 ### `DeleteAsyncBase` {#Azure.ResourceManager.Extension.DeleteAsyncBase}
 
 ```typespec
-op Azure.ResourceManager.Extension.DeleteAsyncBase(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Extension.DeleteAsyncBase(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
 
 #### Template Parameters
@@ -1378,7 +1378,7 @@ op Azure.ResourceManager.Extension.DeleteAsyncBase(apiVersion: string, subscript
 Delete a resource synchronously
 
 ```typespec
-op Azure.ResourceManager.Extension.DeleteSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Extension.DeleteSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
 
 #### Template Parameters
@@ -1394,7 +1394,7 @@ op Azure.ResourceManager.Extension.DeleteSync(apiVersion: string, subscriptionId
 ### `DeleteWithoutOkAsync` {#Azure.ResourceManager.Extension.DeleteWithoutOkAsync}
 
 ```typespec
-op Azure.ResourceManager.Extension.DeleteWithoutOkAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Extension.DeleteWithoutOkAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
 
 #### Template Parameters
@@ -1413,7 +1413,7 @@ op Azure.ResourceManager.Extension.DeleteWithoutOkAsync(apiVersion: string, subs
 List an extension resource at the given target scope
 
 ```typespec
-op Azure.ResourceManager.Extension.ListByTarget(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Extension.ListByTarget(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
 
 #### Template Parameters
@@ -1431,7 +1431,7 @@ op Azure.ResourceManager.Extension.ListByTarget(apiVersion: string, subscription
 A resource GET operation
 
 ```typespec
-op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.ThisWillBeReplaced", extensionProvider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace"): Response | Error
 ```
 
 #### Template Parameters
