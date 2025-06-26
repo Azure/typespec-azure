@@ -449,6 +449,46 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 ## Azure.ResourceManager.Legacy
 
+### `@armOperationRoute` {#@Azure.ResourceManager.Legacy.armOperationRoute}
+
+Signifies that an operation is an Azure Resource Manager operation
+and optionally associates the operation with a route template.
+
+```typespec
+@Azure.ResourceManager.Legacy.armOperationRoute(route?: valueof string)
+```
+
+#### Target
+
+The operation to associate the model with
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                    |
+| ----- | ---------------- | ---------------------------------------------- |
+| route | `valueof string` | Optional route to associate with the operation |
+
+### `@armResourceRoute` {#@Azure.ResourceManager.Legacy.armResourceRoute}
+
+Signifies that an interface contains resource operations
+and optionally associates the operations with a route template.
+
+```typespec
+@Azure.ResourceManager.Legacy.armResourceRoute(routeOptions?: valueof Azure.ResourceManager.Legacy.ArmRouteOptions)
+```
+
+#### Target
+
+The interface to associate the model with
+`Interface`
+
+#### Parameters
+
+| Name         | Type                                                                                      | Description                                    |
+| ------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| routeOptions | [valueof `ArmRouteOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmRouteOptions) | Optional route to associate with the interface |
+
 ### `@customAzureResource` {#@Azure.ResourceManager.Legacy.customAzureResource}
 
 This decorator is used on resources that do not satisfy the definition of a resource

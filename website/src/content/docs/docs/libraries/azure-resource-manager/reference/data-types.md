@@ -3269,6 +3269,21 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 
 ## Azure.ResourceManager.Legacy
 
+### `ArmRouteOptions` {#Azure.ResourceManager.Legacy.ArmRouteOptions}
+
+Route options for an interface
+
+```typespec
+model Azure.ResourceManager.Legacy.ArmRouteOptions
+```
+
+#### Properties
+
+| Name            | Type      | Description                            |
+| --------------- | --------- | -------------------------------------- |
+| useStaticRoute? | `boolean` | Should a static route be used          |
+| route?          | `string`  | The status route for operations to use |
+
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
 Managed service identity (system assigned and/or user assigned identities)

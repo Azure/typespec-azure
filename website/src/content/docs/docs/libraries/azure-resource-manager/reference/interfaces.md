@@ -1800,6 +1800,14 @@ op Azure.ResourceManager.Legacy.LegacyOperations.DeleteSync(): Response | ErrorT
 op Azure.ResourceManager.Legacy.LegacyOperations.Read(): Response | ErrorType
 ```
 
+#### `LegacyOperations.CheckExistence` {#Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence}
+
+Check a resource's existence via HEAD operation
+
+```typespec
+op Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence(): Response | ErrorType
+```
+
 #### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations.List}
 
 List a resource
@@ -1985,12 +1993,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations.Read(): Response | ErrorType
 | Parameters | Optional. Additional parameters after the path parameters |
 | Response   | Optional. The success response for a get operation.       |
 
-#### `LegacyOperations.CheckExistence` {#Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence}
+#### `RoutedOperations.CheckExistence` {#Azure.ResourceManager.Legacy.RoutedOperations.CheckExistence}
 
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence(): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.CheckExistence(): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -2001,7 +2009,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence(): Response | Er
 | Parameters | Optional. Additional parameters after the path parameters                                        |
 | Response   | Optional. The success response for a head operation (by default NoContent or NotFound response). |
 
-#### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations.List}
+#### `RoutedOperations.List` {#Azure.ResourceManager.Legacy.RoutedOperations.List}
 
 List a resource
 
