@@ -18,8 +18,8 @@ import {
 } from "@typespec/compiler";
 
 import { $ } from "@typespec/compiler/typekit";
-import { $bodyRoot, $route, getHttpOperation } from "@typespec/http";
-import { $autoRoute, $segment, getSegment } from "@typespec/rest";
+import { $bodyRoot, getHttpOperation } from "@typespec/http";
+import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import {
@@ -30,11 +30,9 @@ import {
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
 import {
   ArmBodyRootDecorator,
-  ArmOperationRouteDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
   ArmResourcePropertiesOptionalityDecorator,
-  ArmResourceRouteDecorator,
   ArmUpdateProviderNamespaceDecorator,
   AssignProviderNameValueDecorator,
   AssignUniqueProviderNameValueDecorator,
@@ -576,40 +574,6 @@ const $armBodyRoot: ArmBodyRootDecorator = (
   context.call($bodyRoot, target);
 };
 
-const $armResourceRoute: ArmResourceRouteDecorator = (
-  context: DecoratorContext,
-  target: Interface,
-  route?: string,
-) => {
-  if (route && route.length > 0) {
-    context.program.stateMap(ArmStateKeys.armResourceRoute).set(target, route);
-  }
-};
-
-const $armOperationRoute: ArmOperationRouteDecorator = (
-  context: DecoratorContext,
-  target: Operation,
-  route?: string,
-) => {
-  if (target.sourceOperation?.interface?.sourceInterfaces[0]) {
-    route =
-      route ||
-      context.program
-        .stateMap(ArmStateKeys.armResourceRoute)
-        .get(target.sourceOperation.interface.sourceInterfaces[0]);
-  }
-  if (target.sourceOperation?.interface) {
-    route =
-      route ||
-      context.program.stateMap(ArmStateKeys.armResourceRoute).get(target.sourceOperation.interface);
-  }
-  if (!route || route.length === 0) {
-    context.call($autoRoute, target);
-  } else {
-    context.call($route, target, route);
-  }
-};
-
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -627,8 +591,6 @@ export const $decorators = {
     armRenameListByOperation: $armRenameListByOperation,
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
-    armResourceRoute: $armResourceRoute,
-    armOperationRoute: $armOperationRoute,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

@@ -31,12 +31,12 @@ interface LegacyOperations<
  * @template ResourceRoute Optional. The resource route to use for operations in the interface.
  */
 @doc("")
-@Private.armResourceRoute(ResourceRoute)
+@armResourceRoute(ResourceRoute)
 interface RoutedOperations<
   ParentParameters extends {},
   ResourceTypeParameter extends {},
   ErrorType extends {} = ErrorResponse,
-  ResourceRoute extends valueof string = ""
+  ResourceRoute extends valueof ArmRouteOptions = #{ useStaticRoute: false }
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
@@ -47,7 +47,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("Create a {name}", Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @armResourceCreateOrUpdate(Resource)
   @Private.armUpdateProviderNamespace
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
@@ -77,7 +77,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
-  @Private.armOperationRoute
+  @armOperationRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
   @Private.armUpdateProviderNamespace
@@ -104,7 +104,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("Update a {name}", Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @armResourceUpdate(Resource)
   @Private.armUpdateProviderNamespace
   @patch(#{ implicitOptionality: false })
@@ -139,7 +139,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    */
   @doc("Update a {name}", Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @armResourceUpdate(Resource)
   @Private.armUpdateProviderNamespace
   @patch(#{ implicitOptionality: false })
@@ -165,7 +165,7 @@ interface RoutedOperations<
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @doc("Delete a {name}", Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @delete
   @deletesResource(Resource)
   @Private.armUpdateProviderNamespace
@@ -186,7 +186,7 @@ interface RoutedOperations<
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @doc("Delete a {name}", Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
@@ -204,7 +204,7 @@ interface RoutedOperations<
    * @template Response Optional. The success response for a get operation.
    */
   @doc("Get a {name}", Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @get
   @readsResource(Resource)
   @armResourceRead(Resource)
@@ -245,7 +245,7 @@ interface RoutedOperations<
   @get
   @listsResource(Resource)
   @segmentOf(Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @armResourceList(Resource)
   @Private.armUpdateProviderNamespace
   List<
@@ -264,7 +264,7 @@ interface RoutedOperations<
    */
   @doc("")
   @armResourceAction(Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
   @Private.armUpdateProviderNamespace
@@ -298,7 +298,7 @@ interface RoutedOperations<
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
   @armResourceAction(Resource)
-  @Private.armOperationRoute
+  @armOperationRoute
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @Private.armUpdateProviderNamespace
   @post

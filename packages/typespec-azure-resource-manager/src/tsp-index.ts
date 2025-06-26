@@ -4,12 +4,14 @@ import { AzureResourceManagerLegacyDecorators } from "../generated-defs/Azure.Re
 import { $armCommonTypesVersion, $externalTypeRef } from "./common-types.js";
 import { $armLibraryNamespace, $armProviderNamespace, $useLibraryNamespace } from "./namespace.js";
 import {
+  $armOperationRoute,
   $armResourceAction,
   $armResourceCollectionAction,
   $armResourceCreateOrUpdate,
   $armResourceDelete,
   $armResourceList,
   $armResourceRead,
+  $armResourceRoute,
   $armResourceUpdate,
 } from "./operations.js";
 import {
@@ -58,6 +60,8 @@ export const $decorators = {
   "Azure.ResourceManager.Legacy": {
     customAzureResource: $customAzureResource,
     externalTypeRef: $externalTypeRef,
+    armOperationRoute: $armOperationRoute,
+    armResourceRoute: $armResourceRoute,
   } satisfies AzureResourceManagerLegacyDecorators,
 };
 

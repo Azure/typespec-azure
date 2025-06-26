@@ -111,18 +111,3 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 
 /** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
-
-/** Signifies that an interface contains resource operations
- * and optionally associates the operations with a route template.
- * @param target The interface to associate the model with
- * @param route Optional route to associate with the interface
- */
-extern dec armResourceRoute(target: Interface, route?: valueof string);
-
-/**
- * Signifies that an operation is an Azure Resource Manager operation
- * and optionally associates the operation with a route template.
- * @param target The operation to associate the model with
- * @param route Optional route to associate with the operation
- */
-extern dec armOperationRoute(target: Operation, route?: valueof string);

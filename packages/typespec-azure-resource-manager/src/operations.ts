@@ -3,13 +3,16 @@ import {
   DecoratorContext,
   getFriendlyName,
   ignoreDiagnostics,
+  Interface,
+  isTemplateDeclaration,
   Model,
   Operation,
   Program,
 } from "@typespec/compiler";
-import { getHttpOperation, HttpOperation } from "@typespec/http";
+import { $route, getHttpOperation, HttpOperation } from "@typespec/http";
 import {
   $actionSegment,
+  $autoRoute,
   $createsOrReplacesResource,
   $deletesResource,
   $readsResource,
@@ -27,6 +30,11 @@ import {
   ArmResourceReadDecorator,
   ArmResourceUpdateDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
+import {
+  ArmOperationRouteDecorator,
+  ArmResourceRouteDecorator,
+  ArmRouteOptions,
+} from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
 import {
@@ -366,4 +374,62 @@ export const $armResourceCollectionAction: ArmResourceCollectionActionDecorator 
 
 export function isArmCollectionAction(program: Program, target: Operation): boolean {
   return program.stateMap(ArmStateKeys.armResourceCollectionAction).get(target) === true;
+}
+
+export const $armResourceRoute: ArmResourceRouteDecorator = (
+  context: DecoratorContext,
+  target: Interface,
+  routeOptions?: ArmRouteOptions,
+) => {
+  if (routeOptions) {
+    context.program.stateMap(ArmStateKeys.armResourceRoute).set(target, routeOptions);
+    if (isTemplateDeclaration(target)) {
+      return;
+    }
+    if (routeOptions.useStaticRoute === false) {
+      context.call($autoRoute, target);
+    }
+  }
+};
+
+export const $armOperationRoute: ArmOperationRouteDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  route?: string,
+) => {
+  const options = getRouteOptions(context.program, target);
+  route = route || options?.route;
+
+  if (!route && !options?.useStaticRoute) {
+    context.call($autoRoute, target);
+    return;
+  }
+  if (route && route.length > 0) {
+    context.call($route, target, route);
+  }
+};
+
+export function getRouteOptions(program: Program, target: Operation): ArmRouteOptions {
+  let options: ArmRouteOptions | undefined = undefined;
+  if (target.interface) {
+    options = options || program.stateMap(ArmStateKeys.armResourceRoute).get(target.interface);
+    if (options) return options;
+  }
+  if (target.sourceOperation?.interface) {
+    options =
+      options ||
+      program.stateMap(ArmStateKeys.armResourceRoute).get(target.sourceOperation.interface);
+  }
+  if (target.sourceOperation?.interface?.sourceInterfaces[0]) {
+    options =
+      options ||
+      program
+        .stateMap(ArmStateKeys.armResourceRoute)
+        .get(target.sourceOperation.interface.sourceInterfaces[0]);
+  }
+
+  if (options) return options;
+  return {
+    useStaticRoute: false,
+  };
 }
