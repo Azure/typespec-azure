@@ -239,7 +239,7 @@ This decorator is used on Azure Resource Manager resources that are not based on
 Azure.ResourceManager common types.
 
 ```typespec
-@Azure.ResourceManager.armVirtualResource
+@Azure.ResourceManager.armVirtualResource(provider?: valueof string)
 ```
 
 #### Target
@@ -248,7 +248,9 @@ Azure.ResourceManager common types.
 
 #### Parameters
 
-None
+| Name     | Type             | Description |
+| -------- | ---------------- | ----------- |
+| provider | `valueof string` |             |
 
 ### `@extensionResource` {#@Azure.ResourceManager.extensionResource}
 

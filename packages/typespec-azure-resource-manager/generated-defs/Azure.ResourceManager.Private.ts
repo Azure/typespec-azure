@@ -80,6 +80,18 @@ export type ArmUpdateProviderNamespaceDecorator = (
 ) => void;
 
 /**
+ *
+ *
+ *
+ * @param resource Resource model
+ */
+export type AssignUniqueProviderNameValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  resource: Model,
+) => void;
+
+/**
  * This decorator is used to identify Azure Resource Manager resource types and extract their
  * metadata.  It is *not* meant to be used directly by a spec author, it instead
  * gets implicitly applied when the spec author defines a model type in this form:
@@ -170,6 +182,7 @@ export type AzureResourceManagerPrivateDecorators = {
   assignProviderNameValue: AssignProviderNameValueDecorator;
   azureResourceBase: AzureResourceBaseDecorator;
   armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator;
+  assignUniqueProviderNameValue: AssignUniqueProviderNameValueDecorator;
   armResourceInternal: ArmResourceInternalDecorator;
   defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator;
   enforceConstraint: EnforceConstraintDecorator;

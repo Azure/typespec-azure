@@ -4,22 +4,20 @@ import "@typespec/http";
 namespace Azure.ResourceManager.Legacy;
 
 using Http;
-using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 using Rest;
 
 /**
- * An operation template used to build resource operations in which the same resource type
- * is accessible at multiple, fixed resource paths.
- * @template ParentParameters The path parameters for the resource parent
- * @template ResourceTypeParameter The path parameter for the resource name
- * @template ErrorType Optional. The type of error models used in operations created form this template
+ * An operation template used to build extension resource operations using non-standard paths.
+ * @template TargetParameters The path parameters for the target resource
+ * @template ExtensionParentParameters Parent parameters of the extension resource
+ * @template ExtensionInstanceParameters The instance parameters of the extension resource
  */
 @doc("")
-interface LegacyOperations<
-  ParentParameters extends {},
-  ResourceTypeParameter extends {},
-  ErrorType extends {} = ErrorResponse
+interface ExtensionOperations<
+  TargetParameters extends {},
+  ExtensionParentParameters extends {},
+  ExtensionInstanceParameters extends {}
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
@@ -28,11 +26,11 @@ interface LegacyOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PUT operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   @autoRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
-  @Private.armUpdateProviderNamespace
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
   @put
   CreateOrUpdateAsync<
@@ -44,10 +42,11 @@ interface LegacyOperations<
       Resource,
       LroHeaders
     >,
-    OptionalRequestBody extends valueof boolean = false
+    OptionalRequestBody extends valueof boolean = false,
+    ErrorType extends {} = ErrorResponse
   >(
-    ...ParentParameters,
-    ...ResourceTypeParameter,
+    ...TargetParameters,
+    ...ExtensionInstanceParameters,
     ...Parameters,
     @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
   ): Response | ErrorType;
@@ -58,21 +57,22 @@ interface LegacyOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PUT operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
   @autoRoute
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
-  @Private.armUpdateProviderNamespace
   @put
   CreateOrUpdateSync<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
-    OptionalRequestBody extends valueof boolean = false
+    OptionalRequestBody extends valueof boolean = false,
+    ErrorType extends {} = ErrorResponse
   >(
-    ...ParentParameters,
-    ...ResourceTypeParameter,
+    ...TargetParameters,
+    ...ExtensionInstanceParameters,
     ...Parameters,
     @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
   ): Response | ErrorType;
@@ -85,11 +85,11 @@ interface LegacyOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   @autoRoute
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
-  @Private.armUpdateProviderNamespace
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
     Resource extends Foundations.SimpleResource,
@@ -105,10 +105,11 @@ interface LegacyOperations<
       "Resource update request accepted.",
       LroHeaders
     >,
-    OptionalRequestBody extends valueof boolean = false
+    OptionalRequestBody extends valueof boolean = false,
+    ErrorType extends {} = ErrorResponse
   >(
-    ...ParentParameters,
-    ...ResourceTypeParameter,
+    ...TargetParameters,
+    ...ExtensionInstanceParameters,
     ...Parameters,
     @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) properties: PatchModel,
   ): Response | ErrorType;
@@ -120,21 +121,22 @@ interface LegacyOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   @autoRoute
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
-  @Private.armUpdateProviderNamespace
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
     Resource extends Foundations.SimpleResource,
     PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
-    OptionalRequestBody extends valueof boolean = false
+    OptionalRequestBody extends valueof boolean = false,
+    ErrorType extends {} = ErrorResponse
   >(
-    ...ParentParameters,
-    ...ResourceTypeParameter,
+    ...TargetParameters,
+    ...ExtensionInstanceParameters,
     ...Parameters,
     @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) properties: PatchModel,
   ): Response | ErrorType;
@@ -145,27 +147,29 @@ interface LegacyOperations<
    * @template LroHeaders The lro headers for the operation
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the delete operation
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @autoRoute
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
-  @Private.armUpdateProviderNamespace
   @armResourceDelete(Resource)
   DeleteWithoutOkAsync<
     Resource extends Foundations.SimpleResource,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
       Azure.Core.Foundations.RetryAfterHeader,
     Parameters extends {} = {},
-    Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse
-  >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
+    Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
+    ErrorType extends {} = ErrorResponse
+  >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
    * Delete a resource synchronously
    * @template Resource The resource being deleted
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the delete operation
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @autoRoute
@@ -173,69 +177,70 @@ interface LegacyOperations<
   @delete
   @deletesResource(Resource)
   @armResourceDelete(Resource)
-  @Private.armUpdateProviderNamespace
   DeleteSync<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
-    Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse
-  >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
+    Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
+    ErrorType extends {} = ErrorResponse
+  >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
    * @dev Get a resource
    * @template Resource The resource being read
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   @autoRoute
   @doc("Get a {name}", Resource)
   @get
   @readsResource(Resource)
   @armResourceRead(Resource)
-  @Private.armUpdateProviderNamespace
   Read<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
-    Response extends {} = ArmResponse<Resource>
-  >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | ErrorType;
+    Response extends {} = ArmResponse<Resource>,
+    ErrorType extends {} = ErrorResponse
+  >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
    * Check a resource's existence via HEAD operation
-   * @template Resource The resource being checked
+   * * @template Resource The resource being checked
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a head operation (by default NoContent or NotFound response).
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   @autoRoute
   @doc("Check for the existence of a {name}", Resource)
-  @Private.armUpdateProviderNamespace
   @head
   CheckExistence<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
-    Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse
+    Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
+    ErrorType extends {} = ErrorResponse
   > is Foundations.ArmReadOperation<
-    ParentParameters & ResourceTypeParameter & Parameters,
+    TargetParameters & ExtensionInstanceParameters & Parameters,
     Response,
     ErrorType
   >;
-
   /**
    * List a resource
    * @template Resource The resource being listed
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The response returned by the list
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   @autoRoute
   @doc("List a {name}", Resource)
   @get
   @listsResource(Resource)
-  @segmentOf(Resource)
   @armResourceList(Resource)
-  @Private.armUpdateProviderNamespace
   List<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
-    Response extends {} = ArmResponse<ResourceListResult<Resource>>
-  >(...ParentParameters, ...Parameters): Response | ErrorType;
+    Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+    ErrorType extends {} = ErrorResponse
+  >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
 
   /**
    * A synchronous resource action.
@@ -244,23 +249,24 @@ interface LegacyOperations<
    * @template Response The response model for the action
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   @doc("")
   @autoRoute
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
-  @Private.armUpdateProviderNamespace
   @returnsDoc("Azure operation completed successfully.")
   ActionSync<
     Resource extends Foundations.SimpleResource,
     Request extends TypeSpec.Reflection.Model | void,
     Response extends TypeSpec.Reflection.Model | void,
     Parameters extends {} = {},
-    OptionalRequestBody extends valueof boolean = false
+    OptionalRequestBody extends valueof boolean = false,
+    ErrorType extends {} = ErrorResponse
   >(
-    ...ParentParameters,
-    ...ResourceTypeParameter,
+    ...TargetParameters,
+    ...ExtensionInstanceParameters,
     ...Parameters,
 
     @doc("The content of the action request")
@@ -272,18 +278,18 @@ interface LegacyOperations<
    * A long-running resource action.
    * @template Resource The resource being acted upon
    * @template Request The request model for the action
-   * @template Result The result model for the action when the operation is successful
+   * @template Result The result model for the action
    * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
-   * @template Response The union of successful responses for the action
+   * @template Response The full response union of the action
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+   * @template ErrorType Optional. The error response, if non-standard.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
   @autoRoute
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
-  @Private.armUpdateProviderNamespace
   @post
   @returnsDoc("Azure operation completed successfully.")
   ActionAsync<
@@ -301,10 +307,11 @@ interface LegacyOperations<
       "Resource operation accepted.",
       LroHeaders
     > | Result,
-    OptionalRequestBody extends valueof boolean = false
+    OptionalRequestBody extends valueof boolean = false,
+    ErrorType extends {} = ErrorResponse
   >(
-    ...ParentParameters,
-    ...ResourceTypeParameter,
+    ...TargetParameters,
+    ...ExtensionInstanceParameters,
     ...Parameters,
 
     @doc("The content of the action request")
@@ -312,112 +319,3 @@ interface LegacyOperations<
     body: Request,
   ): Response | ErrorType;
 }
-/**
- * @dev DEPRECATED: Use ProviderParameter instead. Get the provider namespace key-value pair
- * @template Resource Optional.  The resource to get the provider namespace for.
- */
-model Provider<Resource extends {} = TenantActionScope> {
-  ...ProviderNamespace<Resource>;
-}
-
-/**
- * @dev Get the provider namespace key-value pair
- * @template Resource The resource to get the provider namespace for.
- */
-model ProviderParameter<Resource extends {}> {
-  ...ProviderNamespace<Resource>;
-}
-
-/**
- * A long-running resource update using a custom PATCH payload (Asynchronous)
- * @template Resource the resource being patched
- * @template PatchModel The input model for the PATCH request
- * @template BaseParameters Optional. Allows overriding the operation parameters
- * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
- * @template Parameters Optional. Additional parameters after the path parameters
- * @template Response Optional. The success response for the patch operation
- * @template Error Optional. The error response, if non-standard.
- * @template OptionalRequestBody Optional. Indicates whether the request body is optional
- */
-@autoRoute
-@doc("Update a {name}", Resource)
-@armResourceUpdate(Resource)
-@Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
-op CustomPatchAsync<
-  Resource extends Foundations.SimpleResource,
-  PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
-  BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
-    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-    Resource,
-    string
-  > &
-    Azure.Core.Foundations.RetryAfterHeader,
-  Parameters extends {} = {},
-  Response extends {} = ArmResponse<Resource> | ArmAcceptedLroResponse<
-    "Resource update request accepted.",
-    LroHeaders
-  >,
-  Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
-> is UpdateOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
-  PatchModel,
-  Response,
-  Error,
-  OptionalRequestBody
->;
-
-/**
- * A resource update using a custom PATCH payload (synchronous)
- * @template Resource the resource being patched
- * @template PatchModel The input model for the PATCH request
- * @template BaseParameters Optional. Allows overriding the operation parameters
- * @template Parameters Optional. Additional parameters after the path parameters
- * @template Response Optional. The success response for the patch operation
- * @template Error Optional. The error response, if non-standard.
- * @template OptionalRequestBody Optional. Indicates whether the request body is optional
- */
-@autoRoute
-@doc("Update a {name}", Resource)
-@armResourceUpdate(Resource)
-@Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
-op CustomPatchSync<
-  Resource extends Foundations.SimpleResource,
-  PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
-  BaseParameters = DefaultBaseParameters<Resource>,
-  Parameters extends {} = {},
-  Response extends {} = ArmResponse<Resource>,
-  Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
-> is UpdateOperation<
-  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
-  PatchModel,
-  Response,
-  Error,
-  OptionalRequestBody
->;
-
-/**
- * @dev The base template for Legacy Azure Resource Manager PATCH Operations.
- * @template HttpParameters The parameter object for the operation.
- * @template BodyParameter The body parameter
- * @template Response The response or union of responses for success.
- * @template ErrorResponse The error response.
- * @template OptionalRequestBody Optional. Indicates whether the request body is optional
- */
-op UpdateOperation<
-  HttpParameters extends {},
-  BodyParameter extends {},
-  Response extends {},
-  ErrorResponse extends {},
-  OptionalRequestBody extends valueof boolean = false
->(
-  ...HttpParameters,
-
-  @doc("The resource properties to be updated.")
-  @armBodyRoot(OptionalRequestBody)
-  properties: BodyParameter,
-): Response | ErrorResponse;
