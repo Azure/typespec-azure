@@ -1,14 +1,14 @@
 ---
-title: Understanding the Must-have Breaking Changes
+title: Understanding the Swagger Changes
 ---
 
-To fully leverage the benefits of TypeSpec and follow best practices, there are some unavoidable breaking changes you will encounter after migrating from Swagger to TypeSpec.
+To fully leverage the benefits of TypeSpec and follow best practices, there are some unavoidable changes you will encounter after migrating from Swagger to TypeSpec.
 
 ## Using Resources from Common Types
 
 If your resource definition already extends from a resource type in [common-types](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/common-types/resource-management), you can skip this section. Otherwise, you should understand how we identify resource models and select appropriate base models from the TypeSpec resource manager library.
 
-A model is identified as a resource when it meets **all** of the following criteria:
+An ARM Resource model should extend one of the typespec common-types Resource models when it meets **all** of the following criteria:
 
 1. There is a GET operation for the model.
 2. At least one operation returns a 200 response containing this model.
@@ -59,7 +59,7 @@ model YourPageableModel is Azure.Core.Page<YourItemType>;
 
 This makes the `value` property in `YourPageableModel` required, and the type of the `nextLink` property becomes `url`. If you need to keep the previous shape, define `YourPageableModel` as a regular model.
 
-## Misuse of "readOnly" on Model
+## Handling "readOnly" in Model Schemas
 
 The `"readOnly": true` property should only be used on properties, not on models. If you mistakenly mark a model as readOnly and have other models refer to it, like:
 

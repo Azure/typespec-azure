@@ -27,16 +27,6 @@ move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 This produces the route:  
 `/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/customizedAction`
 
-By default, the `@action` decorator converts the segment to camel case. If you want to preserve the exact casing, use `@Rest.Private.actionSegment`:
-
-```tsp
-@Rest.Private.actionSegment("UpperCase")
-move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
-```
-
-This produces the route:  
-`/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/UpperCase`
-
 ### Customizing Scope Parameter Name for Extension Resources
 
 // TO-DO
