@@ -4,19 +4,17 @@ title: Clients
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
-This page explains client behavior and how to customize clients. For an overview of the setup, please refer to the previous page.
+This page documents the client behavior as well as how to customize clients.
 
-> **NOTE:** JS RLC does not support customization. It will ignore `client.tsp`, and the following scenarios will not affect the JS RLC user experience. In this context, "TypeScript part" refers to the JS Modular Emitter.
+> **NOTE:** The JS RLC doesn't support client hierarchy customization and will ignore client.tsp. Therefore, the following scenarios won't affect the JS RLC user experience. In this context, the TypeScript part refers to the JS Modular Emitter.
 
 ## Default Behavior
 
 ### Basic Rules
 
-By default, the namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
+By default, the first namespace with the `@service` decorator is generated as a root client. The client name is the namespace name with `Client` appended as a suffix.
 
-Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure.
-
-The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
+Sub-namespaces and interfaces under each root client are generated as operation groups with a hierarchical structure. The sequence of operation groups is determined by the order of namespace declarations, followed by interface declarations.
 
 The root client's SDK namespace corresponds to the namespace decorated with `@service`. If an operation group originates from a sub-namespace, its SDK namespace corresponds to that sub-namespace. If it originates from an interface, its SDK namespace corresponds to the namespace containing the interface.
 
@@ -28,15 +26,18 @@ Different languages organize clients and operation groups differently. Refer to 
 
 <ClientTabs>
 
-```typespec title="main.tsp"
+```typespec
+@versioned(Versions)
 @service(#{ title: "Pet Store" })
 namespace PetStore;
 
-@route("/feed")
-op feed(): void;
+enum Versions {
+  v1,
+}
 
-@route("/op2")
-op pet(): void;
+@route("/feed") op feed(): void;
+
+@route("/pet") op pet(): void;
 ```
 
 ```python
@@ -48,9 +49,23 @@ client.pet()
 ```
 
 ```csharp
+namespace PetStore
+{
+  public partial class PetStoreClient
+  {
+      public PetStoreClient(Uri endpoint, PetStoreClientOptions options){}
+
+      public virtual async Task<Response> FeedAsync(RequestContext context = null) {}
+      public virtual Response Feed(RequestContext context = null) {}
+      public virtual async Task<Response> PetAsync(RequestContext context = null) {}
+      public virtual Response Pet(RequestContext context = null) {}
+  }
+}
+
+// Create the client and invoke the operations
 using PetStore;
 
-PetStoreClient client = new PetStoreClient();
+PetStoreClient client = new PetStoreClient(url, options);
 client.Feed();
 client.Pet();
 ```
@@ -73,24 +88,29 @@ client.pet();
 
 ### Client with One-Layer Child Operation Groups
 
-`PetStore` has two operation groups. The `Dogs` operation group comes from a sub-namespace, while `Cats` comes from an interface.
+The PetStore includes two operation groups: `Dogs`, which belongs to a subnamespace, and `Cats`, which is part of an interface.
 
 <ClientTabs>
 
 ```typespec
+@versioned(Versions)
 @service(#{ title: "Pet Store", version: "v1" })
 namespace PetStore;
 
+enum Versions {
+  v1,
+}
+
 @route("/dogs")
 interface Dogs {
-  feed(): void;
-  pet(): void;
+  @route("feed") feed(): void;
+  @route("pet") pet(): void;
 }
 
 @route("/cats")
 namespace Cats {
-  op feed(): void;
-  op pet(): void;
+  @route("feed") op feed(): void;
+  @route("pet") op pet(): void;
 }
 ```
 
@@ -144,35 +164,32 @@ catsClient.pet();
 
 <ClientTabs>
 
-```typespec title="main.tsp"
+```typespec
 @service(#{ title: "Pet Store", version: "v1" })
 namespace PetStore;
 
-@route("/info")
-op info(): void;
+@route("/info") op info(): void;
 
 @route("/billings")
 interface Billings {
-  @route("history")
-  history(): void;
+  @route("history") history(): void;
 }
 
 @route("/pets")
 namespace Pets {
-  @route("info")
-  op info(): void;
+  @route("info") op info(): void;
 
   @route("/actions")
   interface Actions {
-    feed(): void;
-    pet(): void;
+    @route("feed") feed(): void;
+    @route("pet") pet(): void;
   }
 }
 
 @route("/actions")
 interface Actions {
-  open(): void;
-  close(): void;
+  @route("open") open(): void;
+  @route("close") close(): void;
 }
 ```
 
@@ -242,19 +259,96 @@ actionsClient.close();
 
 Customizations SHOULD always be made in a file named `client.tsp` alongside `main.tsp`.
 
-You can use `@client` and `@operationGroup` to restructure the client hierarchy. However, if any customizations are made, the client hierarchy will only reflect those customizations. The default behavior logic will no longer apply.
+There are two ways to customize the client hierarchy: using `@clientLocation` to change the location of the operations, or use `@client` and `@operationGroup` to restructure the client hierarchy.
+These two ways should not be used together. If so, `@client` and `@operationGroup` will take precedence over `@clientLocation`.
 
-If customizations are made, the client's SDK namespace will follow the namespace decorated with `@client` or the namespace containing the interface decorated with `@client`. Similarly, the operation group's SDK namespace follows the same logic for `@operationGroup`. You can override this using `@clientNamespace` if needed.
+The `@clientLocaton` decorator allows you to change the location of the operations in the client hierarchy.
+It can be used to move operations to an existed sub client defined by `Interface` or `Namespace`, or move the the root client of namespace with `@service` decorator.
+This decorator is useful when you want to keep the default client hierarchy but need to change the location of some operations.
+
+The `@client` and `@operationGroup` decorators allow you to totally restructure the client hierarchy.
+However, if any customizations are made, the client hierarchy will only reflect those customizations. The default behavior logic will no longer apply.
+
+If customizations are made, the client's SDK namespace will follow the namespace decorated with `@client` or the namespace containing the interface decorated with `@client`.
+Similarly, the operation group's SDK namespace follows the same logic for `@operationGroup`. You can override this using `@clientNamespace` if needed.
 
 The sequence of clients and operation groups is determined by the order of the `@client` and `@operationGroup` decorators.
 
-For this section, we assume you have a service called `PetStore` in the `PetStore` namespace, defining two operations: `feed` and `pet`.
+### Move All Operations to Root client
+
+This can be achieved with the augment decorator: `@clientLocation` from `typespec-client-generator-core`.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace PetStore;
+
+interface Feeds {
+  @route("/feed") feed(): void;
+}
+
+interface Pets {
+  @route("/pet") pet(): void;
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@clientLocation(Feeds.feed, PetStore);
+@@clientLocation(Pets.pet, PetStore);
+```
+
+```python
+from pet_store import PetStoreClient
+
+client = PetStoreClient()
+client.feed()
+client.pet()
+```
+
+```csharp
+using PetStore;
+
+PetStoreClient client = new PetStoreClient();
+client.Feed();
+client.Pet();
+```
+
+```typescript
+import { PetStoreClient } from "@azure/package-name";
+
+const client = new PetStoreClient();
+client.feed();
+client.pet();
+```
+
+```java
+PetStoreClient client = new PetStoreClientBuilder().buildClient();
+client.feed();
+client.pet();
+```
+
+</ClientTabs>
 
 ### Renaming the Client Name
 
 This can be achieved with the augment decorator: `@clientName` from `typespec-client-generator-core`.
 
 <ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace PetStore;
+
+@route("/feed") feed(): void;
+
+@route("/pet") pet(): void;
+```
 
 ```typespec title="client.tsp"
 import "./main.tsp";
@@ -302,6 +396,15 @@ client.pet();
 This can be achieved with the augment decorator: `@clientNamespace` from `typespec-client-generator-core`.
 
 <ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace PetStore;
+
+@route("/feed") feed(): void;
+
+@route("/pet") pet(): void;
+```
 
 ```typespec title="client.tsp"
 import "./main.tsp";
@@ -351,6 +454,15 @@ client.pet();
 Two clients that separate the operations can be declared using the `@client` decorator from `typespec-client-generator-core`.
 
 <ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace PetStore;
+
+@route("/feed") feed(): void;
+
+@route("/pet") pet(): void;
+```
 
 ```typespec
 import "./main.tsp";
@@ -424,6 +536,15 @@ Two clients that separate the operations can be declared using the `@client` dec
 
 <ClientTabs>
 
+```typespec title="main.tsp"
+@service
+namespace PetStore;
+
+@route("/feed") feed(): void;
+
+@route("/pet") pet(): void;
+```
+
 ```typespec title="client.tsp"
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
@@ -491,6 +612,15 @@ opGrp2Client.pet();
 
 <ClientTabs>
 
+```typespec title="main.tsp"
+@service
+namespace PetStore;
+
+@route("/feed") feed(): void;
+
+@route("/pet") pet(): void;
+```
+
 ```typespec title="client.tsp"
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
@@ -555,6 +685,15 @@ petActionClient.pet();
 Two clients that separate the operations can be declared using the `client` decorator of `typespec-client-generator-core`:
 
 <ClientTabs>
+
+```typespec title="main.tsp"
+@service
+namespace PetStore;
+
+@route("/feed") feed(): void;
+
+@route("/pet") pet(): void;
+```
 
 ```typespec title="client.tsp"
 import "./main.tsp";

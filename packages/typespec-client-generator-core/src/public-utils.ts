@@ -14,6 +14,7 @@ import {
   getFriendlyName,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isGlobalNamespace,
   isService,
   resolveEncodedName,
 } from "@typespec/compiler";
@@ -25,10 +26,12 @@ import {
   isMetadata,
   isVisible,
 } from "@typespec/http";
+import { getOperationId } from "@typespec/openapi";
 import { Version, getVersions } from "@typespec/versioning";
 import { pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
+  getClientLocation,
   getClientNameOverride,
   getIsApiVersion,
   getOverriddenClientMethod,
@@ -55,6 +58,7 @@ import {
   TspLiteralType,
   getHttpBodySpreadModel,
   getHttpOperationResponseHeaders,
+  hasExplicitClientOrOperationGroup,
   hasNoneVisibility,
   isAzureCoreTspModel,
   isHttpBodySpread,
@@ -101,6 +105,7 @@ export function isApiVersion(context: TCGCContext, type: { name: string }): bool
     }
   }
   return (
+    (isModelProperty(type) && type.type === context.getPackageVersionEnum()) ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
@@ -732,4 +737,57 @@ export function listAllServiceNamespaces(context: TCGCContext): Namespace[] {
     }
   }
   return serviceNamespaces;
+}
+
+/**
+ * Calculate the operation ID for a given operation.
+ *
+ * @param context TCGC context
+ * @param operation
+ * @param honorRenaming
+ * @returns
+ */
+export function resolveOperationId(
+  context: TCGCContext,
+  operation: Operation,
+  honorRenaming: boolean = false,
+) {
+  const { program } = context;
+  // if @operationId was specified use that value
+  const explicitOperationId = getOperationId(program, operation);
+  if (explicitOperationId) {
+    return explicitOperationId;
+  }
+
+  const operationName = honorRenaming ? getLibraryName(context, operation) : operation.name;
+
+  let operationInterface: Interface | undefined = operation.interface;
+  let operationNamespace: Namespace | undefined = operation.namespace;
+
+  const clientLocation = getClientLocation(context, operation);
+
+  if (!hasExplicitClientOrOperationGroup(context) && clientLocation) {
+    if (typeof clientLocation === "string") {
+      return `${clientLocation}_${operationName}`;
+    }
+    if (clientLocation.kind === "Interface") {
+      operationInterface = clientLocation;
+    } else {
+      operationInterface = undefined;
+      operationNamespace = clientLocation;
+    }
+  }
+
+  if (operationInterface) {
+    return `${honorRenaming ? getLibraryName(context, operationInterface) : operationInterface.name}_${operationName}`;
+  }
+  if (
+    operationNamespace === undefined ||
+    isGlobalNamespace(program, operationNamespace) ||
+    isService(program, operationNamespace)
+  ) {
+    return operationName;
+  }
+
+  return `${honorRenaming ? getLibraryName(context, operationNamespace) : operationNamespace.name}_${operationName}`;
 }

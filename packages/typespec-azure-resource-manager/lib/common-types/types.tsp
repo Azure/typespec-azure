@@ -298,7 +298,7 @@ model ErrorAdditionalInfo {
 
   /** The additional info. */
   @visibility(Lifecycle.Read)
-  info?: {};
+  info?: unknown;
 }
 
 /**
@@ -473,6 +473,13 @@ model LocationData {
 
 /**
  * The default api-version parameter type.
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ *  ...ResourceNameParameter<Employee>;
+ * }
+ * ```
  */
 model ApiVersionParameter {
   /** The API version to use for this operation. */
@@ -493,6 +500,16 @@ model OperationIdParameter {
 
 /**
  * The default location parameter type.
+ *
+ * @example
+ * ```typespec
+ * op employee is ArmProviderActionSync<
+ *  Request = Employee,
+ *  Response = Employee,
+ *  Scope = SubscriptionActionScope,
+ *  Parameters = LocationParameter
+ * >;
+ * ```
  */
 model LocationParameter {
   /** The name of Azure region. */

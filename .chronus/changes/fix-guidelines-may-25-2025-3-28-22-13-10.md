@@ -1,8 +1,8 @@
 ---
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
-changeKind: internal
+changeKind: fix
 packages:
-  - "@azure-tools/typespec-autorest-canonical"
+  - "@azure-tools/typespec-azure-core"
 ---
 
-Remove dup test with autorest emitter
+Fix old reference to api guidelines in Azure.Core

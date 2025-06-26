@@ -3,13 +3,14 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
-  Operation,
+  Program,
   createDiagnosticCollector,
-  isGlobalNamespace,
-  isService,
+  getAnyExtensionFromPath,
+  getRelativePathFromDirectory,
+  joinPaths,
+  normalizePath,
   resolvePath,
 } from "@typespec/compiler";
-import { getOperationId } from "@typespec/openapi";
 import {
   SdkArrayExampleValue,
   SdkArrayType,
@@ -34,7 +35,7 @@ import {
   isSdkIntKind,
 } from "./interfaces.js";
 import { createDiagnostic } from "./lib.js";
-import { getLibraryName } from "./public-utils.js";
+import { resolveOperationId } from "./public-utils.js";
 
 interface LoadedExample {
   readonly relativePath: string;
@@ -83,7 +84,7 @@ async function loadExamples(
   }
 
   const map = new Map<string, Record<string, LoadedExample>>();
-  const exampleFiles = await context.program.host.readDir(exampleDir);
+  const exampleFiles = await searchExampleJsonFiles(context.program, exampleDir);
   for (const fileName of exampleFiles) {
     try {
       const exampleFile = await context.program.host.readFile(resolvePath(exampleDir, fileName));
@@ -137,28 +138,31 @@ async function loadExamples(
   return diagnostics.wrap(map);
 }
 
-function resolveOperationId(context: TCGCContext, operation: Operation, honorRenaming: boolean) {
-  const { program } = context;
-  // if @operationId was specified use that value
-  const explicitOperationId = getOperationId(program, operation);
-  if (explicitOperationId) {
-    return explicitOperationId;
+async function searchExampleJsonFiles(program: Program, exampleDir: string): Promise<string[]> {
+  const host = program.host;
+  const exampleFiles: string[] = [];
+
+  // Recursive file search
+  async function recursiveSearch(dir: string): Promise<void> {
+    const fileItems = await host.readDir(dir);
+
+    for (const item of fileItems) {
+      const fullPath = joinPaths(dir, item);
+      const relativePath = getRelativePathFromDirectory(exampleDir, fullPath, false);
+
+      if ((await host.stat(fullPath)).isDirectory()) {
+        await recursiveSearch(fullPath);
+      } else if (
+        (await host.stat(fullPath)).isFile() &&
+        getAnyExtensionFromPath(item) === ".json"
+      ) {
+        exampleFiles.push(normalizePath(relativePath));
+      }
+    }
   }
 
-  const operationName = honorRenaming ? getLibraryName(context, operation) : operation.name;
-  if (operation.interface) {
-    return `${honorRenaming ? getLibraryName(context, operation.interface) : operation.interface.name}_${operationName}`;
-  }
-  const namespace = operation.namespace;
-  if (
-    namespace === undefined ||
-    isGlobalNamespace(program, namespace) ||
-    isService(program, namespace)
-  ) {
-    return operationName;
-  }
-
-  return `${honorRenaming ? getLibraryName(context, namespace) : namespace.name}_${operationName}`;
+  await recursiveSearch(exampleDir);
+  return exampleFiles;
 }
 
 export async function handleClientExamples(

@@ -54,7 +54,6 @@ import {
   getAvailableApiVersions,
   getClientDoc,
   getHashForType,
-  getLocationOfOperation,
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
@@ -324,15 +323,16 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
     if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
       nextLinkReInjectedParametersSegments = (
-        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ||
+        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ??
         []
-      ).map((t: ModelProperty) =>
-        getPropertySegmentsFromModelOrParameters(
-          baseServiceMethod.parameters,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-        ),
+      ).map(
+        (t: ModelProperty) =>
+          getPropertySegmentsFromModelOrParameters(
+            baseServiceMethod.parameters,
+            (p) =>
+              p.__raw?.kind === "ModelProperty" &&
+              findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+          )!,
       );
     }
   }
@@ -621,13 +621,16 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   const methodParameters: SdkMethodParameter[] = [];
   // we have to calculate apiVersions first, so that the information is put
   // in __tspTypeToApiVersions before we call parameters since method wraps parameter
-  const operationLocation = getLocationOfOperation(operation);
-  const apiVersions = getAvailableApiVersions(context, operation, operationLocation);
+  const apiVersions = getAvailableApiVersions(
+    context,
+    operation,
+    client.__raw.type ?? client.__raw.service,
+  );
 
-  let clientParams = context.__clientToParameters.get(operationLocation);
+  let clientParams = context.__clientParametersCache.get(client.__raw);
   if (!clientParams) {
     clientParams = [];
-    context.__clientToParameters.set(operationLocation, clientParams);
+    context.__clientParametersCache.set(client.__raw, clientParams);
   }
 
   const override = getOverriddenClientMethod(context, operation);
@@ -637,16 +640,16 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     if (isNeverOrVoidType(param.type)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
-      const operationLocation = getLocationOfOperation(operation);
+      const operationLocation = context.getClientForOperation(operation);
       if (sdkMethodParam.isApiVersionParam) {
         if (
-          !context.__clientToParameters.get(operationLocation)?.find((x) => x.isApiVersionParam)
+          !context.__clientParametersCache.get(operationLocation)?.find((x) => x.isApiVersionParam)
         ) {
           clientParams.push(sdkMethodParam);
         }
       } else if (isSubscriptionId(context, param)) {
         if (
-          !context.__clientToParameters
+          !context.__clientParametersCache
             .get(operationLocation)
             ?.find((x) => isSubscriptionId(context, x))
         ) {

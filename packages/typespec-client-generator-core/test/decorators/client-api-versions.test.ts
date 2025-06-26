@@ -163,6 +163,8 @@ it("with `api-version` flag", async () => {
       model MyModel {
         id: string;
       };
+
+      op test(): void;
     }
   `,
     `
@@ -198,6 +200,8 @@ it("with service versions defined with separate name and value", async () => {
       model MyModel {
         id: string;
       };
+
+      op test(): void;
     }
   `,
     `

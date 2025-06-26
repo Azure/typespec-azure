@@ -7,16 +7,17 @@ import {
   OpenAPI2QueryParameter,
 } from "../src/openapi2-document.js";
 import {
-  createAutorestTestRunner,
+  compileOpenAPI,
   diagnoseOpenApiFor,
   ignoreUseStandardOps,
   openApiFor,
+  Tester,
 } from "./test-host.js";
 
 describe("path parameters", () => {
   async function getPathParam(code: string, name = "myParam"): Promise<OpenAPI2PathParameter> {
-    const res = await openApiFor(code);
-    return res.paths[`/{${name}}`].get.parameters[0];
+    const res = await compileOpenAPI(code, { preset: "azure" });
+    return res.paths[`/{${name}}`].get?.parameters[0] as any;
   }
 
   it("figure out the route parameter from the name of the param", async () => {
@@ -39,6 +40,20 @@ describe("path parameters", () => {
     });
   });
 
+  it("is always required", async () => {
+    const res = await openApiFor(`
+      #suppress "@azure-tools/typespec-autorest/unsupported-optional-path-param" "For tests"
+      op test(@path myParam?: string): void;
+    `);
+    const param = res.paths[`{myParam}`].get.parameters[0];
+    expect(param).toMatchObject({
+      in: "path",
+      name: "myParam",
+      required: true,
+      type: "string",
+    });
+  });
+
   describe("setting reserved expansion attribute applies the x-ms-skip-url-encoding property", () => {
     it("with option", async () => {
       const param = await getPathParam(
@@ -57,25 +72,40 @@ describe("path parameters", () => {
   });
 
   it("report unsupported-param-type diagnostic on the parameter when using unsupported types", async () => {
+    const offset = 223; // hard coding, need better solution in new tester
+
     const { pos, end, source } = extractSquiggles(
       `op test(~~~@path myParam: Record<string>~~~): void;`,
     );
-    const runner = await createAutorestTestRunner();
-    const diagnostics = await runner.diagnose(source);
+    const diagnostics = await Tester.diagnose(source);
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-autorest/unsupported-param-type",
       message:
         "Parameter can only be represented as primitive types in swagger 2.0. Information is lost for part 'myParam'.",
-      pos: pos + runner.autoCodeOffset,
-      end: end + runner.autoCodeOffset,
+      pos: pos + offset,
+      end: end + offset,
+    });
+  });
+
+  it("report unsupported-optional-path-param diagnostic on the parameter when using optional path parameters", async () => {
+    const offset = 223; // hard coding, need better solution in new tester
+    const { pos, end, source } = extractSquiggles(`op test(~~~@path myParam?: string~~~): void;`);
+    const runner = await Tester.createInstance();
+    const diagnostics = await runner.diagnose(source);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unsupported-optional-path-param",
+      message:
+        "Path parameter 'myParam' is optional, but swagger 2.0 does not support optional path parameters. It will be emitted as required.",
+      pos: pos + offset,
+      end: end + offset,
     });
   });
 });
 
 describe("query parameters", () => {
   async function getQueryParam(code: string): Promise<OpenAPI2QueryParameter> {
-    const res = await openApiFor(code);
-    const param = res.paths[`/`].get.parameters[0];
+    const res = await compileOpenAPI(code, { preset: "azure" });
+    const param: any = res.paths[`/`].get?.parameters[0];
     strictEqual(param.in, "query");
     return param;
   }
@@ -319,10 +349,11 @@ describe("header parameters", () => {
   });
 
   it("set x-ms-client-name with @clientName", async () => {
-    const res = await openApiFor(
+    const res = await compileOpenAPI(
       `op test(@clientName("myParamClient") @header myParam: string): void;`,
+      { preset: "azure" },
     );
-    expect(res.paths["/"].get.parameters[0]).toMatchObject({
+    expect(res.paths["/"].get?.parameters[0]).toMatchObject({
       name: "my-param",
       "x-ms-client-name": "myParamClient",
     });
@@ -374,22 +405,25 @@ describe("header parameters", () => {
 
 describe("body parameters", () => {
   it("omit request body if type is void", async () => {
-    const res = await openApiFor(`op test(@body foo: void): void;`);
-    deepStrictEqual(res.paths["/"].post.parameters, []);
+    const res = await compileOpenAPI(`op test(@body foo: void): void;`, { preset: "azure" });
+    deepStrictEqual(res.paths["/"].post?.parameters, []);
   });
 
   it("set name with @clientName", async () => {
-    const res = await openApiFor(`op test(@body @clientName("bar") foo: string): void;`);
-    expect(res.paths["/"].post.parameters[0]).toMatchObject({ in: "body", name: "bar" });
+    const res = await compileOpenAPI(`op test(@body @clientName("bar") foo: string): void;`, {
+      preset: "azure",
+    });
+    expect(res.paths["/"].post?.parameters[0]).toMatchObject({ in: "body", name: "bar" });
   });
 
   it("set x-ms-client-name with @clientName when also using encodedName", async () => {
-    const res = await openApiFor(
+    const res = await compileOpenAPI(
       `
-      #suppress "deprecated" "For tests"
+      #suppress "deprecated" "For testing"
       op test(@body @encodedName("application/json", "jsonName") @clientName("bar") foo: string): void;`,
+      { preset: "azure" },
     );
-    expect(res.paths["/"].post.parameters[0]).toMatchObject({
+    expect(res.paths["/"].post?.parameters[0]).toMatchObject({
       in: "body",
       name: "jsonName",
       "x-ms-client-name": "bar",

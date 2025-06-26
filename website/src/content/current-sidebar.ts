@@ -30,6 +30,7 @@ const sidebar: SidebarItem[] = [
     items: [
       "getstarted/installation",
       "getstarted/createproject",
+      "getstarted/versioning",
       {
         label: "Azure Data Plane Service",
         autogenerate: {
@@ -97,6 +98,16 @@ const sidebar: SidebarItem[] = [
     label: "🖨️ Emitters",
     items: [
       createLibraryReferenceStructure("emitters/typespec-autorest", "Autorest / Swagger", false),
+      {
+        label: "Clients",
+        items: [
+          createLibraryReferenceStructure("emitters/clients/typespec-java", "Java", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-go", "Go", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-python", "Python", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-csharp", "CSharp", false),
+          createLibraryReferenceStructure("emitters/clients/typespec-ts", "JavaScript", false),
+        ],
+      },
     ],
   },
   {
