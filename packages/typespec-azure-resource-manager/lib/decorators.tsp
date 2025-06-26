@@ -180,7 +180,7 @@ extern dec armCommonTypesVersion(
  *
  * @param propertiesType: The type of the resource properties.
  */
-extern dec armVirtualResource(target: Model);
+extern dec armVirtualResource(target: Model, provider?: valueof string);
 
 /**
  * This decorator sets the base type of the given resource.

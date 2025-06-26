@@ -248,7 +248,11 @@ export type ArmCommonTypesVersionDecorator = (
  *
  * @param propertiesType : The type of the resource properties.
  */
-export type ArmVirtualResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type ArmVirtualResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  provider?: string,
+) => void;
 
 /**
  * This decorator sets the base type of the given resource.
