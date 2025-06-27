@@ -4,7 +4,6 @@ import {
   getFriendlyName,
   ignoreDiagnostics,
   Interface,
-  isTemplateDeclaration,
   Model,
   Operation,
   Program,
@@ -383,9 +382,6 @@ export const $armResourceRoute: ArmResourceRouteDecorator = (
 ) => {
   if (routeOptions) {
     context.program.stateMap(ArmStateKeys.armResourceRoute).set(target, routeOptions);
-    if (isTemplateDeclaration(target)) {
-      return;
-    }
     if (routeOptions.useStaticRoute === false) {
       context.call($autoRoute, target);
     }
@@ -395,10 +391,9 @@ export const $armResourceRoute: ArmResourceRouteDecorator = (
 export const $armOperationRoute: ArmOperationRouteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  route?: string,
+  options?: ArmRouteOptions,
 ) => {
-  const options = getRouteOptions(context.program, target);
-  route = route || options?.route;
+  const route: string | undefined = options?.route;
 
   if (!route && !options?.useStaticRoute) {
     context.call($autoRoute, target);

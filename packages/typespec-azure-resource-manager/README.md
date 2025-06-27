@@ -543,7 +543,7 @@ Signifies that an operation is an Azure Resource Manager operation
 and optionally associates the operation with a route template.
 
 ```typespec
-@Azure.ResourceManager.Legacy.armOperationRoute(route?: valueof string)
+@Azure.ResourceManager.Legacy.armOperationRoute(route?: valueof Azure.ResourceManager.Legacy.ArmRouteOptions)
 ```
 
 ##### Target
@@ -553,9 +553,9 @@ The operation to associate the model with
 
 ##### Parameters
 
-| Name  | Type             | Description                                    |
-| ----- | ---------------- | ---------------------------------------------- |
-| route | `valueof string` | Optional route to associate with the operation |
+| Name  | Type                                          | Description                                    |
+| ----- | --------------------------------------------- | ---------------------------------------------- |
+| route | [valueof `ArmRouteOptions`](#armrouteoptions) | Optional route to associate with the operation |
 
 #### `@armResourceRoute`
 

@@ -1092,6 +1092,109 @@ interface Employees {
     );
   });
 
+  it("uses route override in routed operations", async () => {
+    const { program, types, diagnostics } = await compileAndDiagnose(`
+using Azure.Core;
+
+#suppress "@azure-tools/typespec-azure-core/require-versioned"
+#suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+namespace Microsoft.ContosoProviderHub;
+
+/** A ContosoProviderHub resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+interface EmplOps extends Azure.ResourceManager.Legacy.RoutedOperations<
+BaseParams & {...ParentKeysOf<Employee>},
+{...KeysOf<Employee>}, ErrorResponse, #{useStaticRoute: true, route: "/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees"}> {}
+
+alias BaseParams = {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+  };
+
+@Azure.ResourceManager.Legacy.armResourceRoute(#{useStaticRoute: true})
+interface Employees {
+  @test
+  get is EmplOps.Read<Employee>;
+  
+  /** A sample HEAD operation to check resource existence */
+  @test
+  checkExistence is Azure.ResourceManager.ArmResourceCheckExistence<Employee>;
+}
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    const { get, checkExistence } = types as {
+      get: Operation;
+      checkExistence: Operation;
+    };
+    ok(get);
+    expect(get?.kind).toBe("Operation");
+    const [employeeGetHttp, _e] = getHttpOperation(program, get);
+    expect(employeeGetHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees/{employeeName}",
+    );
+
+    ok(checkExistence);
+    expect(checkExistence?.kind).toBe("Operation");
+    const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
+    expect(existenceHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+  });
+
   it("overrides provider namespace in custom operations", async () => {
     const { program, types, diagnostics } = await compileAndDiagnose(`
 using Azure.Core;

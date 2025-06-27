@@ -51,7 +51,7 @@ export type ArmResourceRouteDecorator = (
 export type ArmOperationRouteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  route?: string,
+  route?: ArmRouteOptions,
 ) => void;
 
 export type AzureResourceManagerLegacyDecorators = {

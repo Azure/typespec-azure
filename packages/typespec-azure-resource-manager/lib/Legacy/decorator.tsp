@@ -37,4 +37,4 @@ extern dec armResourceRoute(target: Interface, routeOptions?: valueof ArmRouteOp
  * @param target The operation to associate the model with
  * @param route Optional route to associate with the operation
  */
-extern dec armOperationRoute(target: Operation, route?: valueof string);
+extern dec armOperationRoute(target: Operation, route?: valueof ArmRouteOptions);
