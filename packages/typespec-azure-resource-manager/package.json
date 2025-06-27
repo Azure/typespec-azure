@@ -67,7 +67,7 @@
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
-    "@types/node": "~22.13.11",
+    "@types/node": "~24.0.3",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
