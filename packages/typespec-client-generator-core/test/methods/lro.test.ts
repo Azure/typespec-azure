@@ -810,13 +810,19 @@ describe("data plane LRO templates", () => {
     strictEqual(pollingInfo.kind, "pollingOperationStep");
     strictEqual(pollingInfo.responseModel, analyzeOperationModel);
     strictEqual(pollingInfo.resultProperty, analyzeResultProp);
-    strictEqual(pollingInfo.errorProperty, analyzeOperationModel.properties.find((p => p.name === "error")));
+    strictEqual(
+      pollingInfo.errorProperty,
+      analyzeOperationModel.properties.find((p) => p.name === "error"),
+    );
     const terminationStatus = pollingInfo.terminationStatus;
     strictEqual(terminationStatus.kind, "model-property");
     deepStrictEqual(terminationStatus.canceledState, ["canceled", "skipped"]);
     deepStrictEqual(terminationStatus.failedState, ["failed"]);
     deepStrictEqual(terminationStatus.succeededState, ["succeeded"]);
-    strictEqual(terminationStatus.property, analyzeOperationModel.properties.find((p => p.name === "status")));
+    strictEqual(
+      terminationStatus.property,
+      analyzeOperationModel.properties.find((p) => p.name === "status"),
+    );
     strictEqual(lroMetadata.pollingStep.responseBody, analyzeOperationModel);
   });
 });
