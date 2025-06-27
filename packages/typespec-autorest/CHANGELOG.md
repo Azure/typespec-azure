@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.57.1
+
+### Bug Fixes
+
+- [#2898](https://github.com/Azure/typespec-azure/pull/2898) Add `@clientLocation` support to `resolveOperationId` function
+
+
 ## 0.57.0
 
 ### Bump dependencies
