@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.57.1
+
+### Bug Fixes
+
+- [#2896](https://github.com/Azure/typespec-azure/pull/2896) Add a legacy operation template for `Operations_List` that enables customization of both the response and error response types. This provides flexibility to specify custom response or error as needed.
+  
+  For example:
+  ```tsp
+  interface Operations
+    extends Azure.ResourceManager.Legacy.Operations<Response = ArmResponse<Azure.Core.Page<CustomResponse>> {}
+  ```
+- [#2897](https://github.com/Azure/typespec-azure/pull/2897) Added a linter rule to warn when a `@Azure.ResourceManager.Legacy.customAzureResource` does not contain a `@key` property, as this can cause duplicate operations.
+- [#2892](https://github.com/Azure/typespec-azure/pull/2892) Fix #2764 Add advanced extension resource support
+
+
 ## 0.57.0
 
 ### Features

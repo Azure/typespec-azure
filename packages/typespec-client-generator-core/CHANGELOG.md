@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.57.2
+
+### Bug Fixes
+
+- [#2898](https://github.com/Azure/typespec-azure/pull/2898) Add `@clientLocation` decorator to support moving an operation to another client or sub-client.
+- [#2898](https://github.com/Azure/typespec-azure/pull/2898) Fix operations missing problem after introducing `@clientLocation`.
+- [#2898](https://github.com/Azure/typespec-azure/pull/2898) Extend `@usage` to accept `json` and `xml` usage. `@usage` now is used to add usage for type and namespace, instead of override the usage calculated by operation. Also, the serialization options will include JSON or XML info if new usage is added.
+
+
 ## 0.57.0
 
 No changes, version bump only.
