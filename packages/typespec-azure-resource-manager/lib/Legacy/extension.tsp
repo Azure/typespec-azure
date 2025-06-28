@@ -27,9 +27,9 @@ interface ExtensionOperations<
    * @template Response Optional. The success response(s) for the PUT operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
@@ -45,7 +45,7 @@ interface ExtensionOperations<
     >,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -60,10 +60,10 @@ interface ExtensionOperations<
    * @template Response Optional. The success response(s) for the PUT operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Create a {name}", Resource)
   @armResourceCreateOrUpdate(Resource)
   @put
@@ -73,7 +73,7 @@ interface ExtensionOperations<
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -90,9 +90,9 @@ interface ExtensionOperations<
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
@@ -112,7 +112,7 @@ interface ExtensionOperations<
     >,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -128,9 +128,9 @@ interface ExtensionOperations<
    * @template Response Optional. The success response(s) for the PATCH operation
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Update a {name}", Resource)
   @armResourceUpdate(Resource)
   @patch(#{ implicitOptionality: false })
@@ -141,7 +141,7 @@ interface ExtensionOperations<
     Response extends {} = ArmResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -156,10 +156,10 @@ interface ExtensionOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the delete operation
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
@@ -171,7 +171,7 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -180,10 +180,10 @@ interface ExtensionOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the delete operation
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
@@ -193,7 +193,7 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -202,9 +202,9 @@ interface ExtensionOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a get operation.
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Get a {name}", Resource)
   @get
   @readsResource(Resource)
@@ -214,7 +214,7 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -223,9 +223,9 @@ interface ExtensionOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for a head operation (by default NoContent or NotFound response).
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("Check for the existence of a {name}", Resource)
   @head
   CheckExistence<
@@ -233,7 +233,7 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   > is Foundations.ArmReadOperation<
     TargetParameters & ExtensionInstanceParameters & Parameters,
     Response,
@@ -245,9 +245,9 @@ interface ExtensionOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The response returned by the list
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @doc("List a {name}", Resource)
   @get
   @listsResource(Resource)
@@ -257,7 +257,7 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -268,10 +268,10 @@ interface ExtensionOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
   @doc("")
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
@@ -283,7 +283,7 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -304,11 +304,11 @@ interface ExtensionOperations<
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
-   * @template RouteOptions Optional. The route options for the operation.
+   * @template OperationOptions Optional. The route options for the operation.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
-  @armOperationRoute(RouteOptions)
+  @armOperationRoute(OperationOptions)
   @armResourceAction(Resource)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
@@ -330,7 +330,7 @@ interface ExtensionOperations<
     > | Result,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    RouteOptions extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,

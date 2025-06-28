@@ -1,12 +1,6 @@
-import type {
-  DecoratorContext,
-  Interface,
-  Model,
-  ModelProperty,
-  Operation,
-} from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
 
-export interface ArmRouteOptions {
+export interface ArmOperationOptions {
   readonly useStaticRoute?: boolean;
   readonly route?: string;
 }
@@ -29,19 +23,6 @@ export type ExternalTypeRefDecorator = (
 ) => void;
 
 /**
- * Signifies that an interface contains resource operations
- * and optionally associates the operations with a route template.
- *
- * @param target The interface to associate the model with
- * @param routeOptions Optional route to associate with the interface
- */
-export type ArmResourceRouteDecorator = (
-  context: DecoratorContext,
-  target: Interface,
-  routeOptions?: ArmRouteOptions,
-) => void;
-
-/**
  * Signifies that an operation is an Azure Resource Manager operation
  * and optionally associates the operation with a route template.
  *
@@ -51,12 +32,11 @@ export type ArmResourceRouteDecorator = (
 export type ArmOperationRouteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  route?: ArmRouteOptions,
+  route?: ArmOperationOptions,
 ) => void;
 
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
-  armResourceRoute: ArmResourceRouteDecorator;
   armOperationRoute: ArmOperationRouteDecorator;
 };

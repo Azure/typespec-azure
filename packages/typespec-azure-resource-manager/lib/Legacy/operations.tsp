@@ -31,12 +31,11 @@ interface LegacyOperations<
  * @template ResourceRoute Optional. The resource route to use for operations in the interface.
  */
 @doc("")
-@armResourceRoute(ResourceRoute)
 interface RoutedOperations<
   ParentParameters extends {},
   ResourceTypeParameter extends {},
   ErrorType extends {} = ErrorResponse,
-  ResourceRoute extends valueof ArmRouteOptions = #{ useStaticRoute: false }
+  ResourceRoute extends valueof ArmOperationOptions = #{ useStaticRoute: false }
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
@@ -65,7 +64,7 @@ interface RoutedOperations<
     >,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrortype extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -94,7 +93,7 @@ interface RoutedOperations<
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrortype extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -134,7 +133,7 @@ interface RoutedOperations<
     >,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrortype extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -164,7 +163,7 @@ interface RoutedOperations<
     Response extends {} = ArmResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrortype extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -195,7 +194,7 @@ interface RoutedOperations<
     Parameters extends {} = {},
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     OverrideErrorType extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -218,7 +217,7 @@ interface RoutedOperations<
     Parameters extends {} = {},
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
     OverrideErrorType extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -240,7 +239,7 @@ interface RoutedOperations<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     OverrideErrorType extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -260,7 +259,7 @@ interface RoutedOperations<
     Parameters extends {} = {},
     Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
     OverrideErrorType extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   > is Foundations.ArmReadOperation<
     ParentParameters & ResourceTypeParameter & Parameters,
     Response,
@@ -287,7 +286,7 @@ interface RoutedOperations<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     OverrideErrorType extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(...ParentParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -314,7 +313,7 @@ interface RoutedOperations<
     Parameters extends {} = {},
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrortype extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -362,7 +361,7 @@ interface RoutedOperations<
     > | Result,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrortype extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmRouteOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,

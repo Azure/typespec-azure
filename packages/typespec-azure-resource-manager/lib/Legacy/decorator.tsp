@@ -3,9 +3,9 @@ using Reflection;
 namespace Azure.ResourceManager.Legacy;
 
 /**
- * Route options for an interface
+ * Route options for an operation
  */
-model ArmRouteOptions {
+model ArmOperationOptions {
   /** Should a static route be used */
   useStaticRoute?: boolean;
 
@@ -24,17 +24,10 @@ extern dec customAzureResource(target: Model);
  */
 extern dec externalTypeRef(entity: Model | ModelProperty, jsonRef: valueof string);
 
-/** Signifies that an interface contains resource operations
- * and optionally associates the operations with a route template.
- * @param target The interface to associate the model with
- * @param routeOptions Optional route to associate with the interface
- */
-extern dec armResourceRoute(target: Interface, routeOptions?: valueof ArmRouteOptions);
-
 /**
  * Signifies that an operation is an Azure Resource Manager operation
  * and optionally associates the operation with a route template.
  * @param target The operation to associate the model with
  * @param route Optional route to associate with the operation
  */
-extern dec armOperationRoute(target: Operation, route?: valueof ArmRouteOptions);
+extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOptions);

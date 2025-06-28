@@ -28,6 +28,7 @@ import {
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
   ResourceGroupResourceDecorator,
+  ResourceOperationOptions,
   SingletonDecorator,
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
@@ -318,6 +319,21 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
   return undefined;
 }
 
+function getResourceOperationOptions(
+  type: ResourceOperationOptions | unknown,
+): ResourceOperationOptions {
+  const defaultOptions: ResourceOperationOptions = {
+    allowStaticRoutes: false,
+    omitTags: false,
+  };
+
+  const options = type as ResourceOperationOptions;
+  if (options === undefined || typeof options !== "object") {
+    return defaultOptions;
+  }
+  return options;
+}
+
 /**
  * This decorator is used to identify interfaces containing resource operations.
  * When applied, it marks the interface with the `@autoRoute` decorator so that
@@ -331,15 +347,21 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
 export const $armResourceOperations: ArmResourceOperationsDecorator = (
   context: DecoratorContext,
   interfaceType: Interface,
+  resourceOperationsOptions?: ResourceOperationOptions | unknown,
 ) => {
   const { program } = context;
+  const options = getResourceOperationOptions(resourceOperationsOptions);
 
-  // All resource interfaces should use @autoRoute
-  context.call($autoRoute, interfaceType);
+  if (!options.allowStaticRoutes) {
+    // All resource interfaces should use @autoRoute
+    context.call($autoRoute, interfaceType);
+  }
 
-  // If no tag is given for the interface, tag it with the interface name
-  if (getTags(program, interfaceType).length === 0) {
-    context.call($tag, interfaceType, interfaceType.name);
+  if (!options.omitTags) {
+    // If no tag is given for the interface, tag it with the interface name
+    if (getTags(program, interfaceType).length === 0) {
+      context.call($tag, interfaceType, interfaceType.name);
+    }
   }
 };
 

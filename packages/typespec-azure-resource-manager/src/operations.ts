@@ -3,7 +3,6 @@ import {
   DecoratorContext,
   getFriendlyName,
   ignoreDiagnostics,
-  Interface,
   Model,
   Operation,
   Program,
@@ -30,9 +29,8 @@ import {
   ArmResourceUpdateDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
 import {
+  ArmOperationOptions,
   ArmOperationRouteDecorator,
-  ArmResourceRouteDecorator,
-  ArmRouteOptions,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
@@ -375,23 +373,10 @@ export function isArmCollectionAction(program: Program, target: Operation): bool
   return program.stateMap(ArmStateKeys.armResourceCollectionAction).get(target) === true;
 }
 
-export const $armResourceRoute: ArmResourceRouteDecorator = (
-  context: DecoratorContext,
-  target: Interface,
-  routeOptions?: ArmRouteOptions,
-) => {
-  if (routeOptions) {
-    context.program.stateMap(ArmStateKeys.armResourceRoute).set(target, routeOptions);
-    if (routeOptions.useStaticRoute === false) {
-      context.call($autoRoute, target);
-    }
-  }
-};
-
 export const $armOperationRoute: ArmOperationRouteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  options?: ArmRouteOptions,
+  options?: ArmOperationOptions,
 ) => {
   const route: string | undefined = options?.route;
 
@@ -404,8 +389,8 @@ export const $armOperationRoute: ArmOperationRouteDecorator = (
   }
 };
 
-export function getRouteOptions(program: Program, target: Operation): ArmRouteOptions {
-  let options: ArmRouteOptions | undefined = undefined;
+export function getRouteOptions(program: Program, target: Operation): ArmOperationOptions {
+  let options: ArmOperationOptions | undefined = undefined;
   if (target.interface) {
     options = options || program.stateMap(ArmStateKeys.armResourceRoute).get(target.interface);
     if (options) return options;
