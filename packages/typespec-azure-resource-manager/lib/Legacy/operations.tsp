@@ -15,7 +15,6 @@ using Rest;
  * @template ResourceTypeParameter The path parameter for the resource name
  * @template ErrorType Optional. The type of error models used in operations created form this template
  */
-@autoRoute
 interface LegacyOperations<
   ParentParameters extends {},
   ResourceTypeParameter extends {},
