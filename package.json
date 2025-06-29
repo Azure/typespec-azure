@@ -77,11 +77,6 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@playwright/browser-chromium",
-      "@vscode/vsce-sign",
-      "autorest",
-      "esbuild",
-      "sharp",
       "tree-sitter"
     ],
     "overrides": {
