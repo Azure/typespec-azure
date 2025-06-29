@@ -151,31 +151,6 @@ export function getScopedDecoratorData(
   return retval[AllScopes]; // in this case it applies to all languages
 }
 
-export function getScopedDecoratorData(
-  context: TCGCContext,
-  key: symbol,
-  target: Type,
-  languageScope?: string | typeof AllScopes,
-): any {
-  const retval: Record<string | symbol, any> = context.program.stateMap(key).get(target);
-  if (retval === undefined) return retval;
-  if (languageScope === AllScopes) {
-    return retval[languageScope];
-  }
-  if (languageScope === undefined || typeof languageScope === "string") {
-    const scope = languageScope ?? context.emitterName;
-    if (Object.keys(retval).includes(scope)) return retval[scope];
-
-    // if the scope is negated, we should return undefined
-    // if the scope is not negated, we should return the value for AllScopes
-    const negationScopes = retval[negationScopesKey];
-    if (negationScopes !== undefined && negationScopes.includes(scope)) {
-      return undefined;
-    }
-  }
-  return retval[AllScopes]; // in this case it applies to all languages
-}
-
 /**
  *
  * @param emitterName Full emitter name
