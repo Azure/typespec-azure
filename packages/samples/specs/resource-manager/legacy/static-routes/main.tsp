@@ -14,9 +14,16 @@ using Azure.ResourceManager;
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
-@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+enum Versions {
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  `2025-06-01-preview`,
+}
 
 /** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
@@ -79,7 +86,7 @@ interface EmplOps
       ErrorResponse,
       #{
         useStaticRoute: true,
-        route: "/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees",
+        route: "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees",
       }
     > {}
 
@@ -113,16 +120,15 @@ interface EmployeeSubscriptions {
   get is EmplOps.Read<Employee>;
   create is EmplOps.CreateOrUpdateAsync<Employee>;
   update is EmplOps.CustomPatchSync<Employee>;
-  @route("/subscriptions/{subscriptionId}/providers/Microsoft.OverriddenForDelete/employees")
   delete is EmplOps.DeleteSync<Employee, OverrideRouteOptions = #{ useStaticRoute: true }>;
   listBySubscription is EmplOps.List<Employee>;
   checkExistence is EmplOps.CheckExistence<Employee>;
   /** start the employee */
-  @route("/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees/{employeeName}/start")
+  @route("/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/start")
   start is EmplOps.ActionSync<Employee, void, void>;
 }
 
-@route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OverriddenThrice/employees")
+@route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees")
 @armResourceOperations(#{ allowStaticRoutes: true })
 interface EmployeeResourceGroups {
   get is EmplOps2.Read<Employee>;
