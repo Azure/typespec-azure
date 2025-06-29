@@ -242,7 +242,7 @@ export type ArmResourceListDecorator = (
 export type ArmResourceOperationsDecorator = (
   context: DecoratorContext,
   target: Interface,
-  resourceOperationOptions?: ResourceOperationOptions | unknown,
+  resourceOperationOptions?: Type | ResourceOperationOptions,
 ) => void;
 
 /**

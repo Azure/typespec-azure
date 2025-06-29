@@ -1164,7 +1164,7 @@ alias BaseParams = {
     ...SubscriptionIdParameter;
   };
 
-@Azure.ResourceManager.Legacy.armResourceRoute(#{useStaticRoute: true})
+@armResourceOperations(#{ allowStaticRoutes: true})
 interface Employees {
   @test
   get is EmplOps.Read<Employee>;

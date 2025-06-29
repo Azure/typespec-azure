@@ -174,7 +174,7 @@ extern dec armResourceList(target: Operation, resourceType: Model);
  */
 extern dec armResourceOperations(
   target: Interface,
-  resourceOperationOptions?: valueof ResourceOperationOptions | unknown
+  resourceOperationOptions?: (valueof ResourceOperationOptions) | unknown
 );
 
 /** Interface-level operation options */
