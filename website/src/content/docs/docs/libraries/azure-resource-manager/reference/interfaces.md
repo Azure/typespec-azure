@@ -1545,7 +1545,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateAsync(resource
 | Response            | Optional. The success response(s) for the PUT operation                 |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                |
 | ErrorType           | Optional. The error response, if non-standard.                          |
-| RouteOptions        | Optional. The route options for the operation.                          |
+| OperationOptions    | Optional. The route options for the operation.                          |
 
 #### `ExtensionOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateSync}
 
@@ -1564,7 +1564,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateSync(resource:
 | Response            | Optional. The success response(s) for the PUT operation   |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 | ErrorType           | Optional. The error response, if non-standard.            |
-| RouteOptions        | Optional. The route options for the operation.            |
+| OperationOptions    | Optional. The route options for the operation.            |
 
 #### `ExtensionOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchAsync}
 
@@ -1585,7 +1585,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchAsync(properties:
 | Response            | Optional. The success response(s) for the PATCH operation               |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                |
 | ErrorType           | Optional. The error response, if non-standard.                          |
-| RouteOptions        | Optional. The route options for the operation.                          |
+| OperationOptions    | Optional. The route options for the operation.                          |
 
 #### `ExtensionOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchSync}
 
@@ -1605,7 +1605,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchSync(properties: 
 | Response            | Optional. The success response(s) for the PATCH operation |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 | ErrorType           | Optional. The error response, if non-standard.            |
-| RouteOptions        | Optional. The route options for the operation.            |
+| OperationOptions    | Optional. The route options for the operation.            |
 
 #### `ExtensionOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.DeleteWithoutOkAsync}
 
@@ -1617,14 +1617,14 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.DeleteWithoutOkAsync(): Resp
 
 ##### Template Parameters
 
-| Name         | Description                                                |
-| ------------ | ---------------------------------------------------------- |
-| Resource     | The resource being deleted                                 |
-| LroHeaders   | The lro headers for the operation                          |
-| Parameters   | Optional. Additional parameters after the path parameters  |
-| Response     | Optional. The success response(s) for the delete operation |
-| ErrorType    | Optional. The error response, if non-standard.             |
-| RouteOptions | Optional. The route options for the operation.             |
+| Name             | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| Resource         | The resource being deleted                                 |
+| LroHeaders       | The lro headers for the operation                          |
+| Parameters       | Optional. Additional parameters after the path parameters  |
+| Response         | Optional. The success response(s) for the delete operation |
+| ErrorType        | Optional. The error response, if non-standard.             |
+| OperationOptions | Optional. The route options for the operation.             |
 
 #### `ExtensionOperations.DeleteSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.DeleteSync}
 
@@ -1636,13 +1636,13 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.DeleteSync(): Response | Err
 
 ##### Template Parameters
 
-| Name         | Description                                                |
-| ------------ | ---------------------------------------------------------- |
-| Resource     | The resource being deleted                                 |
-| Parameters   | Optional. Additional parameters after the path parameters  |
-| Response     | Optional. The success response(s) for the delete operation |
-| ErrorType    | Optional. The error response, if non-standard.             |
-| RouteOptions | Optional. The route options for the operation.             |
+| Name             | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| Resource         | The resource being deleted                                 |
+| Parameters       | Optional. Additional parameters after the path parameters  |
+| Response         | Optional. The success response(s) for the delete operation |
+| ErrorType        | Optional. The error response, if non-standard.             |
+| OperationOptions | Optional. The route options for the operation.             |
 
 #### `ExtensionOperations.Read` {#Azure.ResourceManager.Legacy.ExtensionOperations.Read}
 
@@ -1652,13 +1652,13 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.Read(): Response | ErrorType
 
 ##### Template Parameters
 
-| Name         | Description                                               |
-| ------------ | --------------------------------------------------------- |
-| Resource     | The resource being read                                   |
-| Parameters   | Optional. Additional parameters after the path parameters |
-| Response     | Optional. The success response for a get operation.       |
-| ErrorType    | Optional. The error response, if non-standard.            |
-| RouteOptions | Optional. The route options for the operation.            |
+| Name             | Description                                               |
+| ---------------- | --------------------------------------------------------- |
+| Resource         | The resource being read                                   |
+| Parameters       | Optional. Additional parameters after the path parameters |
+| Response         | Optional. The success response for a get operation.       |
+| ErrorType        | Optional. The error response, if non-standard.            |
+| OperationOptions | Optional. The route options for the operation.            |
 
 #### `ExtensionOperations.CheckExistence` {#Azure.ResourceManager.Legacy.ExtensionOperations.CheckExistence}
 
@@ -1670,13 +1670,13 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.CheckExistence(): Response |
 
 ##### Template Parameters
 
-| Name         | Description                                                                                      |
-| ------------ | ------------------------------------------------------------------------------------------------ |
-| Resource     | The resource being checked                                                                       |
-| Parameters   | Optional. Additional parameters after the path parameters                                        |
-| Response     | Optional. The success response for a head operation (by default NoContent or NotFound response). |
-| ErrorType    | Optional. The error response, if non-standard.                                                   |
-| RouteOptions | Optional. The route options for the operation.                                                   |
+| Name             | Description                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| Resource         | The resource being checked                                                                       |
+| Parameters       | Optional. Additional parameters after the path parameters                                        |
+| Response         | Optional. The success response for a head operation (by default NoContent or NotFound response). |
+| ErrorType        | Optional. The error response, if non-standard.                                                   |
+| OperationOptions | Optional. The route options for the operation.                                                   |
 
 #### `ExtensionOperations.List` {#Azure.ResourceManager.Legacy.ExtensionOperations.List}
 
@@ -1688,13 +1688,13 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.List(): Response | ErrorType
 
 ##### Template Parameters
 
-| Name         | Description                                               |
-| ------------ | --------------------------------------------------------- |
-| Resource     | The resource being listed                                 |
-| Parameters   | Optional. Additional parameters after the path parameters |
-| Response     | Optional. The response returned by the list               |
-| ErrorType    | Optional. The error response, if non-standard.            |
-| RouteOptions | Optional. The route options for the operation.            |
+| Name             | Description                                               |
+| ---------------- | --------------------------------------------------------- |
+| Resource         | The resource being listed                                 |
+| Parameters       | Optional. Additional parameters after the path parameters |
+| Response         | Optional. The response returned by the list               |
+| ErrorType        | Optional. The error response, if non-standard.            |
+| OperationOptions | Optional. The route options for the operation.            |
 
 #### `ExtensionOperations.ActionSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.ActionSync}
 
@@ -1714,7 +1714,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.ActionSync(body: Request): R
 | Parameters          | Optional. Additional parameters after the path parameters |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 | ErrorType           | Optional. The error response, if non-standard.            |
-| RouteOptions        | Optional. The route options for the operation.            |
+| OperationOptions    | Optional. The route options for the operation.            |
 
 #### `ExtensionOperations.ActionAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.ActionAsync}
 
@@ -1736,7 +1736,7 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.ActionAsync(body: Request): 
 | Response            | The full response union of the action                                     |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                  |
 | ErrorType           | Optional. The error response, if non-standard.                            |
-| RouteOptions        | Optional. The route options for the operation.                            |
+| OperationOptions    | Optional. The route options for the operation.                            |
 
 ### `LegacyOperations` {#Azure.ResourceManager.Legacy.LegacyOperations}
 

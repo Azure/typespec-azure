@@ -1030,6 +1030,22 @@ model Employee is TrackedResource<EmployeeProperties> {
 | ---- | ------ | ----------- |
 | name | `Type` |             |
 
+### `ResourceOperationOptions` {#Azure.ResourceManager.ResourceOperationOptions}
+
+Interface-level operation options
+
+```typespec
+model Azure.ResourceManager.ResourceOperationOptions
+```
+
+#### Properties
+
+| Name               | Type      | Description                                                                                                                                |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| resourceType?      | `Model`   | The resource type for the operations in the interface                                                                                      |
+| allowStaticRoutes? | `boolean` | If true, turns off autoRoute for the interface, so individual operations can choose static (`@route`) or automatic (`@autoRoute`) routing. |
+| omitTags?          | `boolean` | If true, turns off the default tagging of operations in the interface, so that individual operations must be individually tagged           |
+
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
 The dynamic parameters of a list call for a resource instance - pass in the proper base type to indicate
@@ -3269,12 +3285,12 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 
 ## Azure.ResourceManager.Legacy
 
-### `ArmRouteOptions` {#Azure.ResourceManager.Legacy.ArmRouteOptions}
+### `ArmOperationOptions` {#Azure.ResourceManager.Legacy.ArmOperationOptions}
 
-Route options for an interface
+Route options for an operation
 
 ```typespec
-model Azure.ResourceManager.Legacy.ArmRouteOptions
+model Azure.ResourceManager.Legacy.ArmOperationOptions
 ```
 
 #### Properties

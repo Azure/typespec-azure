@@ -176,7 +176,7 @@ interface RoutedOperations<
    * @template LroHeaders The lro headers for the operation
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response(s) for the delete operation
-   * @template OverrideErrortype Optional. The error response, if non-standard.
+   * @template OverrideErrorType Optional. The error response, if non-standard.
    * @template OverrideRouteOptions Optional. The route options for the operation.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
