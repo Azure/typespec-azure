@@ -1979,7 +1979,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.DeleteWithoutOkAsync(): Respons
 | LroHeaders           | The lro headers for the operation                          |
 | Parameters           | Optional. Additional parameters after the path parameters  |
 | Response             | Optional. The success response(s) for the delete operation |
-| OverrideErrorType    |                                                            |
+| OverrideErrorType    | Optional. The error response, if non-standard.             |
 | OverrideRouteOptions | Optional. The route options for the operation.             |
 
 #### `RoutedOperations.DeleteSync` {#Azure.ResourceManager.Legacy.RoutedOperations.DeleteSync}
