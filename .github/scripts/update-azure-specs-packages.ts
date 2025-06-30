@@ -22,17 +22,8 @@ async function main() {
 
   const packageJsonPath = path.join(azureSpecsDir, 'package.json');
   
-  // Initialize package.json if it doesn't exist
-  let packageJson: PackageJson = {};
-  if (fs.existsSync(packageJsonPath)) {
-    packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-  } else {
-    packageJson = {
-      name: 'azure-rest-api-specs-validation',
-      version: '1.0.0',
-      private: true
-    };
-  }
+  // Read existing package.json
+  const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
   // Ensure dependencies object exists
   packageJson.dependencies = packageJson.dependencies || {};
