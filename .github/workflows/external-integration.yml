@@ -1,4 +1,4 @@
-name: TypeSpec Latest Validation
+name: External Integration
 
 on:
   pull_request:
@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  typespec-latest-validation:
-    name: Validate against TypeSpec Latest
+  azure-rest-api-specs:
+    name: Validate against Azure REST API Specs
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'workflow_dispatch') ||
@@ -47,58 +47,32 @@ jobs:
 
       - name: Build and pack TypeSpec Azure packages
         run: |
-          # Build the azure packages first
-          pnpm build || echo "Build completed with some issues, continuing with validation"
+          pnpm build --filter "!@azure-tools/typespec-azure-website" --filter "!@azure-tools/typespec-azure-playground-*"
           
-          # Create tgz packages for all TypeSpec Azure packages
-          echo "Creating tgz packages..."
-          
-          # Pack all TypeSpec Azure packages using chronus
           pnpm chronus pack --pack-destination ./tgz-packages
           
-          # List the created packages
           echo "Created tgz packages:"
           ls -la ./tgz-packages/
-        continue-on-error: true
 
       - name: Update azure-rest-api-specs package.json
         run: |
-          # Move to azure-rest-api-specs directory
           cd azure-rest-api-specs
           
-          # Update package.json with all dependencies and install
           echo "Updating package.json with TypeSpec dependencies..."
           pnpm tsx ../.github/scripts/update-azure-specs-packages.ts . ../tgz-packages
           
           echo "Installing dependencies..."
-          npm install
-        continue-on-error: true
+          npm install --no-package-lock
 
       - name: Run TypeSpec validation in azure-rest-api-specs
         run: |
           cd azure-rest-api-specs
-          
-          # Find TypeSpec main files and validate a sample
-          echo "Looking for TypeSpec files in azure-rest-api-specs..."
-          find specification -name "main.tsp" -o -name "client.tsp" 2>/dev/null | head -5 | while read tsp_file; do
-            echo "Validating $tsp_file"
-            npx tsp compile "$tsp_file" --output-dir ./temp-output || echo "Validation completed with issues for $tsp_file (this is expected for integration testing)"
-          done
-          
-          # If no main.tsp files found, look for any .tsp files
-          if ! find specification -name "main.tsp" -o -name "client.tsp" 2>/dev/null | head -1 | grep -q .; then
-            echo "No main.tsp or client.tsp files found, looking for any .tsp files..."
-            find specification -name "*.tsp" 2>/dev/null | head -3 | while read tsp_file; do
-              echo "Validating $tsp_file"
-              npx tsp compile "$tsp_file" --output-dir ./temp-output || echo "Validation completed with issues for $tsp_file (this is expected for integration testing)"
-            done
-          fi
-        continue-on-error: true
+          pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
 
       - name: Generate compatibility report
         if: always()
         run: |
-          echo "## TypeSpec Azure Integration Validation Report" >> $GITHUB_STEP_SUMMARY
+          echo "## External Integration Validation Report" >> $GITHUB_STEP_SUMMARY
           echo "This validation tests the current TypeSpec Azure packages against TypeSpec files in the Azure REST API specs repository." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
@@ -107,4 +81,4 @@ jobs:
           echo "- ℹ️ **Build**: Check individual step results above" >> $GITHUB_STEP_SUMMARY
           echo "- ℹ️ **TypeSpec Validation**: Check validation results above" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "💡 **Note**: This workflow uses \`continue-on-error\` to provide feedback even when compatibility issues exist." >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Note**: This workflow validates TypeSpec Azure packages against actual Azure REST API specifications." >> $GITHUB_STEP_SUMMARY
