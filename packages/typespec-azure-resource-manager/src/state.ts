@@ -6,6 +6,7 @@ function azureResourceManagerCreateStateSymbol(name: string): symbol {
 }
 
 export const ArmStateKeys = {
+  armProviderCache: azureResourceManagerCreateStateSymbol("armProviderCache"),
   armProviderNamespaces: azureResourceManagerCreateStateSymbol("armProviderNamespaces"),
   armResourceOperations: azureResourceManagerCreateStateSymbol("armResourceOperations"),
   armResourceCollectionAction: azureResourceManagerCreateStateSymbol("armResourceCollectionAction"),
