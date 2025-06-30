@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
-import * as fs from 'fs';
-import * as path from 'path';
+import { readFileSync, writeFileSync, readdirSync } from 'fs';
+import { join, resolve, relative } from 'path';
 
 interface PackageJson {
   name?: string;
@@ -20,23 +20,23 @@ async function main() {
     process.exit(1);
   }
 
-  const packageJsonPath = path.join(azureSpecsDir, 'package.json');
+  const packageJsonPath = join(azureSpecsDir, 'package.json');
   
   // Read existing package.json
-  const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const packageJson: PackageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 
   // Ensure dependencies object exists
   packageJson.dependencies = packageJson.dependencies || {};
 
   // Find all tgz files
-  const tgzFiles = fs.readdirSync(tgzDir).filter(f => f.endsWith('.tgz'));
+  const tgzFiles = readdirSync(tgzDir).filter(f => f.endsWith('.tgz'));
   
   console.log('Found tgz files:', tgzFiles);
   
   // Update dependencies to point to tgz files
   for (const tgzFile of tgzFiles) {
-    const fullPath = path.resolve(tgzDir, tgzFile);
-    const relativePath = path.relative(azureSpecsDir, fullPath);
+    const fullPath = resolve(tgzDir, tgzFile);
+    const relativePath = relative(azureSpecsDir, fullPath);
     
     // Extract package name from tgz filename
     // Format is typically: azure-tools-typespec-azure-core-1.0.0.tgz or typespec-compiler-1.1.0.tgz
@@ -63,7 +63,7 @@ async function main() {
   }
   
   // Write updated package.json
-  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
   console.log('Updated package.json successfully');
 }
 

@@ -52,17 +52,9 @@ jobs:
           
           # Create tgz packages for all TypeSpec Azure packages
           echo "Creating tgz packages..."
-          mkdir -p ./tgz-packages
           
           # Pack all TypeSpec Azure packages using chronus
           pnpm chronus pack --pack-destination ./tgz-packages
-          
-          # Build and pack TypeSpec compiler from core submodule
-          echo "Building and packing TypeSpec compiler..."
-          cd core
-          pnpm install --frozen-lockfile
-          pnpm build --filter @typespec/compiler
-          cd packages/compiler && npm pack --pack-destination ../../../tgz-packages && cd ../../..
           
           # List the created packages
           echo "Created tgz packages:"
