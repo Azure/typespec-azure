@@ -45,9 +45,11 @@ for (const tgzFile of tgzFiles) {
     const withoutPrefix = tgzFile.replace('azure-tools-', '');
     const withoutVersion = withoutPrefix.replace(/-\d+\.\d+\.\d+.*\.tgz$/, '');
     packageName = `@azure-tools/${withoutVersion}`;
-  } else if (tgzFile.startsWith('typespec-compiler-')) {
-    // Extract name for compiler: typespec-compiler-1.1.0.tgz -> @typespec/compiler
-    packageName = '@typespec/compiler';
+  } else if (tgzFile.startsWith('typespec-')) {
+    // Extract name for @typespec packages: typespec-compiler-1.1.0.tgz -> @typespec/compiler, typespec-http-1.0.0.tgz -> @typespec/http
+    const withoutPrefix = tgzFile.replace('typespec-', '');
+    const withoutVersion = withoutPrefix.replace(/-\d+\.\d+\.\d+.*\.tgz$/, '');
+    packageName = `@typespec/${withoutVersion}`;
   } else if (tgzFile.startsWith('typespec-azure-vscode-')) {
     // Handle special case for vscode extension
     packageName = 'typespec-azure-vscode';

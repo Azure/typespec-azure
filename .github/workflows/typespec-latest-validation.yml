@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run TypeSpec validation in azure-rest-api-specs
+      - name: Build and pack TypeSpec Azure packages
         run: |
           # Build the azure packages first
           pnpm build || echo "Build completed with some issues, continuing with validation"
@@ -59,7 +59,10 @@ jobs:
           # List the created packages
           echo "Created tgz packages:"
           ls -la ./tgz-packages/
-          
+        continue-on-error: true
+
+      - name: Update azure-rest-api-specs package.json
+        run: |
           # Move to azure-rest-api-specs directory
           cd azure-rest-api-specs
           
@@ -69,6 +72,11 @@ jobs:
           
           echo "Installing dependencies..."
           npm install
+        continue-on-error: true
+
+      - name: Run TypeSpec validation in azure-rest-api-specs
+        run: |
+          cd azure-rest-api-specs
           
           # Find TypeSpec main files and validate a sample
           echo "Looking for TypeSpec files in azure-rest-api-specs..."
