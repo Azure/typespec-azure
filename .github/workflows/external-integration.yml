@@ -65,20 +65,17 @@ jobs:
           npm install --no-package-lock
 
       - name: Run TypeSpec validation in azure-rest-api-specs
-        run: |
-          cd azure-rest-api-specs
-          pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
+        run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
+        working-directory: azure-rest-api-specs
 
-      - name: Generate compatibility report
-        if: always()
+      - name: Check for git changes
         run: |
-          echo "## External Integration Validation Report" >> $GITHUB_STEP_SUMMARY
-          echo "This validation tests the current TypeSpec Azure packages against TypeSpec files in the Azure REST API specs repository." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "### Validation Steps" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Dependencies**: Installed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "- ℹ️ **Build**: Check individual step results above" >> $GITHUB_STEP_SUMMARY
-          echo "- ℹ️ **TypeSpec Validation**: Check validation results above" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "💡 **Note**: This workflow validates TypeSpec Azure packages against actual Azure REST API specifications." >> $GITHUB_STEP_SUMMARY
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "❌ Git changes detected after validation:"
+            git status --porcelain
+            git diff
+            exit 1
+          else
+            echo "✅ No git changes detected"
+          fi
+        working-directory: azure-rest-api-specs
