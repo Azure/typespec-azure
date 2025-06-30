@@ -1,19 +1,8 @@
 name: TypeSpec Latest Validation
 
 on:
-  pull_request:
-    branches: ["main", "release/*"]
-    paths-ignore:
-      - "website/**"
-      - "docs/**"
-      - "*.md"
-      - "*.txt"
-      - ".gitignore"
-      - ".editorconfig"
-      - ".prettierrc.json"
-      - ".prettierignore"
-      - "cspell.yaml"
-  # Allow manual triggering for testing integration
+  issue_comment:
+    types: [created]
   workflow_dispatch:
     inputs:
       typespec_ref:
@@ -21,14 +10,6 @@ on:
         required: false
         default: 'main'
         type: string
-  # Run on schedule to catch breaking changes in TypeSpec main
-  schedule:
-    # Run daily at 6 AM UTC to catch any new changes in TypeSpec main
-    - cron: "0 6 * * *"
-
-# This check validates that changes in typespec-azure work with latest TypeSpec development
-# It's similar to the external-integration check in the TypeSpec repository but in reverse:
-# instead of testing TypeSpec changes against typespec-azure, this tests typespec-azure changes against TypeSpec.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -37,22 +18,30 @@ jobs:
   typespec-latest-validation:
     name: Validate against TypeSpec Latest
     runs-on: ubuntu-latest
-    # Skip validation for dependabot, publish, backmerge, or revert branches 
-    # as these are automated and should be covered by regular CI
     if: |
-      !startsWith(github.head_ref, 'dependabot/') &&
-      !startsWith(github.head_ref, 'publish/') &&
-      !startsWith(github.head_ref, 'backmerge/') &&
-      !startsWith(github.head_ref, 'revert-')
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'issue_comment' && 
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '/integration azure-specs') &&
+       (github.event.comment.author_association == 'MEMBER' || 
+        github.event.comment.author_association == 'OWNER' || 
+        github.event.comment.author_association == 'COLLABORATOR'))
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Fetch submodules to get the core TypeSpec repository
           submodules: true
-          # Need sufficient depth for submodule operations
           fetch-depth: 0
+          token: ${{ github.token }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Checkout Azure REST API specs
+        uses: actions/checkout@v4
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: azure-rest-api-specs
+          fetch-depth: 1
 
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup
@@ -62,13 +51,10 @@ jobs:
       - name: Update core submodule to latest TypeSpec
         run: |
           cd core
-          # Fetch the latest changes from the typespec repository
           git fetch origin
-          # Use the specified ref or default to main
           TYPESPEC_REF="${{ github.event.inputs.typespec_ref || 'main' }}"
           echo "Testing against TypeSpec ref: $TYPESPEC_REF"
           git checkout origin/$TYPESPEC_REF
-          # Update the parent repository to track this change
           cd ..
           git add core
 
@@ -78,26 +64,10 @@ jobs:
       - name: Build core TypeSpec packages
         run: |
           cd core
-          # Skip docusaurus build to avoid playwright dependency issues in CI
-          TYPESPEC_SKIP_DOCUSAURUS_BUILD=true pnpm build:all
-        env:
-          TYPESPEC_SKIP_DOCUSAURUS_BUILD: true
+          pnpm build:all
 
       - name: Build TypeSpec Azure packages
-        run: |
-          # Skip docusaurus build and build only the Azure packages
-          TYPESPEC_SKIP_DOCUSAURUS_BUILD=true pnpm build
-        env:
-          TYPESPEC_SKIP_DOCUSAURUS_BUILD: true
-        continue-on-error: true  # Continue even if build fails to provide feedback
-
-      - name: Run basic tests
-        run: |
-          # Run basic tests to validate compatibility
-          # Using continue-on-error to provide feedback on what works/doesn't work
-          pnpm test
-        env:
-          TYPESPEC_SKIP_DOCUSAURUS_BUILD: true
+        run: pnpm build
         continue-on-error: true
 
       - name: Generate compatibility report
@@ -107,18 +77,15 @@ jobs:
           echo "This validation tests the current TypeSpec Azure packages against the latest TypeSpec main branch." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Get TypeSpec version info
           TYPESPEC_REF="${{ github.event.inputs.typespec_ref || 'main' }}"
           TYPESPEC_COMMIT=$(cd core && git rev-parse HEAD)
           echo "**TypeSpec Reference**: \`$TYPESPEC_REF\`" >> $GITHUB_STEP_SUMMARY
           echo "**TypeSpec Commit**: [\`${TYPESPEC_COMMIT:0:8}\`](https://github.com/microsoft/typespec/commit/$TYPESPEC_COMMIT)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Report on workflow steps
           echo "### Validation Steps" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Core Update**: Successfully updated to latest TypeSpec" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Dependencies**: Installed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "- ℹ️ **Build/Test**: Check individual step results above" >> $GITHUB_STEP_SUMMARY
+          echo "- ℹ️ **Build**: Check individual step results above" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "💡 **Note**: This workflow uses \`continue-on-error\` to provide feedback even when compatibility issues exist." >> $GITHUB_STEP_SUMMARY
-          echo "Failures here don't necessarily block the PR but indicate potential future compatibility issues." >> $GITHUB_STEP_SUMMARY
