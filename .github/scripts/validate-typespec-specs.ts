@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+/* eslint-disable no-console */
 
 import { readdir, stat } from 'fs/promises';
 import { join } from 'path';
@@ -89,6 +90,7 @@ async function main() {
   
   let successCount = 0;
   let failureCount = 0;
+  const failedFolders: string[] = [];
   
   for (const dir of tspConfigDirs) {
     console.log(`\n=== Compiling TypeSpec project in ${dir} ===`);
@@ -101,6 +103,7 @@ async function main() {
     } else {
       console.log('❌ Compilation failed');
       failureCount++;
+      failedFolders.push(dir);
     }
     
     if (result.output.trim()) {
@@ -115,6 +118,8 @@ async function main() {
   console.log(`Failed: ${failureCount}`);
   
   if (failureCount > 0) {
+    console.log('\nFailed folders:');
+    failedFolders.forEach(folder => console.log(`  - ${folder}`));
     console.log('\nNote: Some failures are expected during integration testing');
   }
 }

@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   azure-rest-api-specs:
-    name: Validate against Azure REST API Specs
+    name: Azure REST API Specs
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'workflow_dispatch') ||
@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and pack TypeSpec Azure packages
         run: |
-          pnpm --filter "!@azure-tools/typespec-azure-website" --filter "!@azure-tools/typespec-azure-playground-*" -r build
+          pnpm --filter "!@azure-tools/typespec-azure-website" --filter "!@azure-tools/typespec-azure-playground-*" --filter "!@typespec/playground-website" -r build
           
           pnpm chronus pack --pack-destination ./tgz-packages
           
