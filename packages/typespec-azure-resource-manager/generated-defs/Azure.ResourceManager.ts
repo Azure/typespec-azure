@@ -10,6 +10,12 @@ import type {
   Type,
 } from "@typespec/compiler";
 
+export interface ResourceOperationOptions {
+  readonly resourceType?: Record<string, unknown>;
+  readonly allowStaticRoutes?: boolean;
+  readonly omitTags?: boolean;
+}
+
 /**
  * Marks the operation as being a collection action
  */
@@ -214,20 +220,29 @@ export type ArmResourceListDecorator = (
 
 /**
  * This decorator is used to identify interfaces containing resource operations.
- * When applied, it marks the interface with the `@autoRoute` decorator so that
+ * By default, it marks the interface with the `@autoRoute` decorator so that
  * all of its contained operations will have their routes generated
  * automatically.
  *
- * It also adds a `@tag` decorator bearing the name of the interface so that all
+ * The decorator also adds a `@tag` decorator bearing the name of the interface so that all
  * of the operations will be grouped based on the interface name in generated
  * clients.
  *
- * @param _ DEPRECATED
+ * The optional `resourceOperationOptions` parameter provides additional options.
+ * `allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+ * choose static (`@route`) or automatic (`@autoRoute`) routing.
+ *
+ * `resourceType: Model` specifies the resource type for the operations in the interface
+ *
+ * `omitTags: true`: turns off the default tagging of operations in the interface, so that individual operations must be
+ * individually tagged
+ *
+ * @param resourceOperationOptions Options for routing the operations in the interface and associating them with a specific resource
  */
 export type ArmResourceOperationsDecorator = (
   context: DecoratorContext,
   target: Interface,
-  _?: Type,
+  resourceOperationOptions?: Type | ResourceOperationOptions,
 ) => void;
 
 /**
@@ -262,7 +277,7 @@ export type ArmVirtualResourceDecorator = (
 export type ResourceBaseTypeDecorator = (
   context: DecoratorContext,
   target: Model,
-  baseType: Type,
+  baseTypeIt: Type,
 ) => void;
 
 /**

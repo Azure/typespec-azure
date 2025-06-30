@@ -18,7 +18,11 @@ export const interfacesRule = createRule({
           !isArmOperationsListInterface(context.program, interfaceContext)
         ) {
           if (
-            !interfaceContext.decorators.some((d) => d.decorator.name === "$armResourceOperations")
+            !interfaceContext.decorators.some(
+              (d) =>
+                d.decorator.name === "$armResourceOperations" ||
+                d.decorator.name === "$armResourceRoute",
+            )
           ) {
             context.reportDiagnostic({
               target: interfaceContext,
