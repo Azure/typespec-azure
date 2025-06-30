@@ -8,6 +8,8 @@ interface PackageJson {
   version?: string;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  overrides?: Record<string, string>;
   [key: string]: any;
 }
 
@@ -24,8 +26,11 @@ const packageJsonPath = join(azureSpecsDir, 'package.json');
 // Read existing package.json
 const packageJson: PackageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 
-// Ensure dependencies object exists
+// Ensure dependency objects exist
 packageJson.dependencies = packageJson.dependencies || {};
+packageJson.devDependencies = packageJson.devDependencies || {};
+packageJson.peerDependencies = packageJson.peerDependencies || {};
+packageJson.overrides = packageJson.overrides || {};
 
 // Find all tgz files
 const tgzFiles = readdirSync(tgzDir).filter(f => f.endsWith('.tgz'));
@@ -56,8 +61,25 @@ for (const tgzFile of tgzFiles) {
   }
   
   if (packageName) {
-    packageJson.dependencies[packageName] = `file:${relativePath}`;
-    console.log(`Added dependency: ${packageName} -> file:${relativePath}`);
+    const filePath = `file:${relativePath}`;
+    
+    // Replace in all dependency types if the package exists
+    if (packageJson.dependencies?.[packageName]) {
+      packageJson.dependencies[packageName] = filePath;
+      console.log(`Updated dependency: ${packageName} -> ${filePath}`);
+    }
+    if (packageJson.devDependencies?.[packageName]) {
+      packageJson.devDependencies[packageName] = filePath;
+      console.log(`Updated devDependency: ${packageName} -> ${filePath}`);
+    }
+    if (packageJson.peerDependencies?.[packageName]) {
+      packageJson.peerDependencies[packageName] = filePath;
+      console.log(`Updated peerDependency: ${packageName} -> ${filePath}`);
+    }
+    
+    // Also set in overrides to ensure all nested dependencies use our version
+    packageJson.overrides[packageName] = filePath;
+    console.log(`Set override: ${packageName} -> ${filePath}`);
   } else {
     console.warn(`Could not determine package name for: ${tgzFile}`);
   }

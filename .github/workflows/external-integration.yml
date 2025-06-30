@@ -51,6 +51,13 @@ jobs:
           
           pnpm chronus pack --pack-destination ./tgz-packages
           
+          # Also pack TypeSpec core packages
+          cd core
+          pnpm install
+          pnpm build
+          pnpm chronus pack --pack-destination ../tgz-packages
+          cd ..
+          
           echo "Created tgz packages:"
           ls -la ./tgz-packages/
 
