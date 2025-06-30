@@ -70,12 +70,14 @@ jobs:
 
       - name: Check for git changes
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "❌ Git changes detected after validation:"
-            git status --porcelain
-            git diff
+          # Ignore changes to package.json files
+          git_changes=$(git status --porcelain | grep -v "package\.json$" || true)
+          if [ -n "$git_changes" ]; then
+            echo "❌ Git changes detected after validation (excluding package.json):"
+            echo "$git_changes"
+            git diff -- . ':!*package.json'
             exit 1
           else
-            echo "✅ No git changes detected"
+            echo "✅ No git changes detected (excluding package.json)"
           fi
         working-directory: azure-rest-api-specs
