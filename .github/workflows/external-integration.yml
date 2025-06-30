@@ -75,16 +75,21 @@ jobs:
         run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
         working-directory: azure-rest-api-specs
 
+      - name: Revert package.json changes
+        run: |
+          echo "Reverting package.json changes..."
+          git checkout -- package.json || true
+        working-directory: azure-rest-api-specs
+
       - name: Check for git changes
         run: |
-          # Ignore changes to package.json files
-          git_changes=$(git status --porcelain | grep -v "package\.json$" || true)
+          git_changes=$(git status --porcelain)
           if [ -n "$git_changes" ]; then
-            echo "❌ Git changes detected after validation (excluding package.json):"
+            echo "❌ Git changes detected after validation:"
             echo "$git_changes"
-            git diff -- . ':!*package.json'
+            git diff
             exit 1
           else
-            echo "✅ No git changes detected (excluding package.json)"
+            echo "✅ No git changes detected"
           fi
         working-directory: azure-rest-api-specs
