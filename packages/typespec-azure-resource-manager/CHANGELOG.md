@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.57.2
+
+### Bug Fixes
+
+- [#2772](https://github.com/Azure/typespec-azure/pull/2772) Allow toggling `@autoRoute` in legacy operations
+
+
 ## 0.57.1
 
 ### Bug Fixes
