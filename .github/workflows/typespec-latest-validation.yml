@@ -42,6 +42,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install tsx for script execution
+        run: npm install -g tsx
+
       - name: Run TypeSpec validation in azure-rest-api-specs
         run: |
           # Build the azure packages first
@@ -51,13 +54,15 @@ jobs:
           echo "Creating tgz packages..."
           mkdir -p ./tgz-packages
           
-          # Pack the main TypeSpec Azure packages
-          cd packages/typespec-azure-core && npm pack --pack-destination ../../tgz-packages && cd ../..
-          cd packages/typespec-azure-resource-manager && npm pack --pack-destination ../../tgz-packages && cd ../..
-          cd packages/typespec-autorest && npm pack --pack-destination ../../tgz-packages && cd ../..
-          cd packages/typespec-client-generator-core && npm pack --pack-destination ../../tgz-packages && cd ../..
-          cd packages/typespec-azure-rulesets && npm pack --pack-destination ../../tgz-packages && cd ../..
-          cd packages/typespec-azure-portal-core && npm pack --pack-destination ../../tgz-packages && cd ../..
+          # Pack all TypeSpec Azure packages using chronus
+          pnpm chronus pack --pack-destination ./tgz-packages
+          
+          # Build and pack TypeSpec compiler from core submodule
+          echo "Building and packing TypeSpec compiler..."
+          cd core
+          pnpm install --frozen-lockfile
+          pnpm build --filter @typespec/compiler
+          cd packages/compiler && npm pack --pack-destination ../../../tgz-packages && cd ../../..
           
           # List the created packages
           echo "Created tgz packages:"
@@ -66,28 +71,18 @@ jobs:
           # Move to azure-rest-api-specs directory
           cd azure-rest-api-specs
           
-          # Install TypeSpec compiler
-          npm install -g @typespec/compiler
+          # Update package.json with all dependencies and install
+          echo "Updating package.json with TypeSpec dependencies..."
+          tsx ../.github/scripts/update-azure-specs-packages.ts . ../tgz-packages
           
-          # Initialize package.json if it doesn't exist
-          if [ ! -f package.json ]; then
-            npm init -y
-          fi
-          
-          # Install our local packages using the tgz files
-          echo "Installing TypeSpec Azure packages from local tgz files..."
-          npm install ../tgz-packages/azure-tools-typespec-azure-core-*.tgz || echo "azure-core not found, continuing..."
-          npm install ../tgz-packages/azure-tools-typespec-azure-resource-manager-*.tgz || echo "resource-manager not found, continuing..."
-          npm install ../tgz-packages/azure-tools-typespec-autorest-*.tgz || echo "autorest not found, continuing..."
-          npm install ../tgz-packages/azure-tools-typespec-client-generator-core-*.tgz || echo "client-generator-core not found, continuing..."
-          npm install ../tgz-packages/azure-tools-typespec-azure-rulesets-*.tgz || echo "rulesets not found, continuing..."
-          npm install ../tgz-packages/azure-tools-typespec-azure-portal-core-*.tgz || echo "portal-core not found, continuing..."
+          echo "Installing dependencies..."
+          npm install
           
           # Find TypeSpec main files and validate a sample
           echo "Looking for TypeSpec files in azure-rest-api-specs..."
           find specification -name "main.tsp" -o -name "client.tsp" 2>/dev/null | head -5 | while read tsp_file; do
             echo "Validating $tsp_file"
-            tsp compile "$tsp_file" --output-dir ./temp-output || echo "Validation completed with issues for $tsp_file (this is expected for integration testing)"
+            npx tsp compile "$tsp_file" --output-dir ./temp-output || echo "Validation completed with issues for $tsp_file (this is expected for integration testing)"
           done
           
           # If no main.tsp files found, look for any .tsp files
@@ -95,7 +90,7 @@ jobs:
             echo "No main.tsp or client.tsp files found, looking for any .tsp files..."
             find specification -name "*.tsp" 2>/dev/null | head -3 | while read tsp_file; do
               echo "Validating $tsp_file"
-              tsp compile "$tsp_file" --output-dir ./temp-output || echo "Validation completed with issues for $tsp_file (this is expected for integration testing)"
+              npx tsp compile "$tsp_file" --output-dir ./temp-output || echo "Validation completed with issues for $tsp_file (this is expected for integration testing)"
             done
           fi
         continue-on-error: true

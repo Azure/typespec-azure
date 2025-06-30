@@ -1,0 +1,79 @@
+#!/usr/bin/env tsx
+
+import * as fs from 'fs';
+import * as path from 'path';
+
+interface PackageJson {
+  name?: string;
+  version?: string;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  [key: string]: any;
+}
+
+async function main() {
+  const azureSpecsDir = process.argv[2];
+  const tgzDir = process.argv[3];
+  
+  if (!azureSpecsDir || !tgzDir) {
+    console.error('Usage: tsx update-azure-specs-packages.ts <azure-specs-dir> <tgz-dir>');
+    process.exit(1);
+  }
+
+  const packageJsonPath = path.join(azureSpecsDir, 'package.json');
+  
+  // Initialize package.json if it doesn't exist
+  let packageJson: PackageJson = {};
+  if (fs.existsSync(packageJsonPath)) {
+    packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  } else {
+    packageJson = {
+      name: 'azure-rest-api-specs-validation',
+      version: '1.0.0',
+      private: true
+    };
+  }
+
+  // Ensure dependencies object exists
+  packageJson.dependencies = packageJson.dependencies || {};
+
+  // Find all tgz files
+  const tgzFiles = fs.readdirSync(tgzDir).filter(f => f.endsWith('.tgz'));
+  
+  console.log('Found tgz files:', tgzFiles);
+  
+  // Update dependencies to point to tgz files
+  for (const tgzFile of tgzFiles) {
+    const fullPath = path.resolve(tgzDir, tgzFile);
+    const relativePath = path.relative(azureSpecsDir, fullPath);
+    
+    // Extract package name from tgz filename
+    // Format is typically: azure-tools-typespec-azure-core-1.0.0.tgz or typespec-compiler-1.1.0.tgz
+    let packageName = '';
+    if (tgzFile.startsWith('azure-tools-')) {
+      // Extract name for azure packages: azure-tools-typespec-azure-core-1.0.0.tgz -> @azure-tools/typespec-azure-core
+      const withoutPrefix = tgzFile.replace('azure-tools-', '');
+      const withoutVersion = withoutPrefix.replace(/-\d+\.\d+\.\d+.*\.tgz$/, '');
+      packageName = `@azure-tools/${withoutVersion}`;
+    } else if (tgzFile.startsWith('typespec-compiler-')) {
+      // Extract name for compiler: typespec-compiler-1.1.0.tgz -> @typespec/compiler
+      packageName = '@typespec/compiler';
+    } else if (tgzFile.startsWith('typespec-azure-vscode-')) {
+      // Handle special case for vscode extension
+      packageName = 'typespec-azure-vscode';
+    }
+    
+    if (packageName) {
+      packageJson.dependencies[packageName] = `file:${relativePath}`;
+      console.log(`Added dependency: ${packageName} -> file:${relativePath}`);
+    } else {
+      console.warn(`Could not determine package name for: ${tgzFile}`);
+    }
+  }
+  
+  // Write updated package.json
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  console.log('Updated package.json successfully');
+}
+
+main().catch(console.error);
