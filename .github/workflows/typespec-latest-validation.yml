@@ -1,6 +1,8 @@
 name: TypeSpec Latest Validation
 
 on:
+  pull_request:
+    branches: [main, release/*]
   issue_comment:
     types: [created]
   workflow_dispatch:
@@ -14,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'pull_request') ||
       (github.event_name == 'issue_comment' && 
        github.event.issue.pull_request &&
        contains(github.event.comment.body, '/integration azure-specs') &&
@@ -42,9 +45,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install tsx for script execution
-        run: npm install -g tsx
-
       - name: Run TypeSpec validation in azure-rest-api-specs
         run: |
           # Build the azure packages first
@@ -65,7 +65,7 @@ jobs:
           
           # Update package.json with all dependencies and install
           echo "Updating package.json with TypeSpec dependencies..."
-          tsx ../.github/scripts/update-azure-specs-packages.ts . ../tgz-packages
+          pnpm tsx ../.github/scripts/update-azure-specs-packages.ts . ../tgz-packages
           
           echo "Installing dependencies..."
           npm install
