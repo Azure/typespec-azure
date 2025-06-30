@@ -27,7 +27,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          token: ${{ github.token }}
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Checkout Azure REST API specs
@@ -45,22 +44,44 @@ jobs:
 
       - name: Run TypeSpec validation in azure-rest-api-specs
         run: |
-          # First build the azure packages
+          # Build the azure packages first
           pnpm build || echo "Build completed with some issues, continuing with validation"
           
+          # Create tgz packages for all TypeSpec Azure packages
+          echo "Creating tgz packages..."
+          mkdir -p ./tgz-packages
+          
+          # Pack the main TypeSpec Azure packages
+          cd packages/typespec-azure-core && npm pack --pack-destination ../../tgz-packages && cd ../..
+          cd packages/typespec-azure-resource-manager && npm pack --pack-destination ../../tgz-packages && cd ../..
+          cd packages/typespec-autorest && npm pack --pack-destination ../../tgz-packages && cd ../..
+          cd packages/typespec-client-generator-core && npm pack --pack-destination ../../tgz-packages && cd ../..
+          cd packages/typespec-azure-rulesets && npm pack --pack-destination ../../tgz-packages && cd ../..
+          cd packages/typespec-azure-portal-core && npm pack --pack-destination ../../tgz-packages && cd ../..
+          
+          # List the created packages
+          echo "Created tgz packages:"
+          ls -la ./tgz-packages/
+          
+          # Move to azure-rest-api-specs directory
           cd azure-rest-api-specs
           
-          # Install TypeSpec compiler globally
+          # Install TypeSpec compiler
           npm install -g @typespec/compiler
           
-          # Set up local packages by creating symlinks to our built packages
-          mkdir -p node_modules/@azure-tools
+          # Initialize package.json if it doesn't exist
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
           
-          # Link our built packages
-          ln -sf "../../../packages/typespec-azure-core" "node_modules/@azure-tools/typespec-azure-core"
-          ln -sf "../../../packages/typespec-azure-resource-manager" "node_modules/@azure-tools/typespec-azure-resource-manager"
-          ln -sf "../../../packages/typespec-autorest" "node_modules/@azure-tools/typespec-autorest"
-          ln -sf "../../../packages/typespec-client-generator-core" "node_modules/@azure-tools/typespec-client-generator-core"
+          # Install our local packages using the tgz files
+          echo "Installing TypeSpec Azure packages from local tgz files..."
+          npm install ../tgz-packages/azure-tools-typespec-azure-core-*.tgz || echo "azure-core not found, continuing..."
+          npm install ../tgz-packages/azure-tools-typespec-azure-resource-manager-*.tgz || echo "resource-manager not found, continuing..."
+          npm install ../tgz-packages/azure-tools-typespec-autorest-*.tgz || echo "autorest not found, continuing..."
+          npm install ../tgz-packages/azure-tools-typespec-client-generator-core-*.tgz || echo "client-generator-core not found, continuing..."
+          npm install ../tgz-packages/azure-tools-typespec-azure-rulesets-*.tgz || echo "rulesets not found, continuing..."
+          npm install ../tgz-packages/azure-tools-typespec-azure-portal-core-*.tgz || echo "portal-core not found, continuing..."
           
           # Find TypeSpec main files and validate a sample
           echo "Looking for TypeSpec files in azure-rest-api-specs..."
