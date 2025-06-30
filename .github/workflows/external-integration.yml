@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and pack TypeSpec Azure packages
         run: |
-          pnpm build --filter "!@azure-tools/typespec-azure-website" --filter "!@azure-tools/typespec-azure-playground-*"
+          pnpm --filter "!@azure-tools/typespec-azure-website" --filter "!@azure-tools/typespec-azure-playground-*" -r build
           
           pnpm chronus pack --pack-destination ./tgz-packages
           
