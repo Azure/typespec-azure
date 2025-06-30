@@ -93,7 +93,7 @@ async function main() {
   const failedFolders: string[] = [];
   
   for (const dir of tspConfigDirs) {
-    console.log(`\n=== Compiling TypeSpec project in ${dir} ===`);
+    console.log(`::group::Compiling TypeSpec project in ${dir}`);
     
     const result = await runTspCompile(dir);
     
@@ -110,6 +110,8 @@ async function main() {
       console.log('Output:');
       console.log(result.output);
     }
+    
+    console.log('::endgroup::');
   }
   
   console.log(`\n=== Summary ===`);
