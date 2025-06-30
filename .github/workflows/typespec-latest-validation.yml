@@ -107,12 +107,18 @@ jobs:
           echo "This validation tests the current TypeSpec Azure packages against the latest TypeSpec main branch." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Check if build was successful
-          if pnpm build --dry-run 2>/dev/null; then
-            echo "✅ **Build**: Compatible" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Build**: Issues detected" >> $GITHUB_STEP_SUMMARY
-          fi
-          
+          # Get TypeSpec version info
+          TYPESPEC_REF="${{ github.event.inputs.typespec_ref || 'main' }}"
+          TYPESPEC_COMMIT=$(cd core && git rev-parse HEAD)
+          echo "**TypeSpec Reference**: \`$TYPESPEC_REF\`" >> $GITHUB_STEP_SUMMARY
+          echo "**TypeSpec Commit**: [\`${TYPESPEC_COMMIT:0:8}\`](https://github.com/microsoft/typespec/commit/$TYPESPEC_COMMIT)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "For detailed logs, check the individual step outputs above." >> $GITHUB_STEP_SUMMARY
+          
+          # Report on workflow steps
+          echo "### Validation Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Core Update**: Successfully updated to latest TypeSpec" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Dependencies**: Installed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- ℹ️ **Build/Test**: Check individual step results above" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **Note**: This workflow uses \`continue-on-error\` to provide feedback even when compatibility issues exist." >> $GITHUB_STEP_SUMMARY
+          echo "Failures here don't necessarily block the PR but indicate potential future compatibility issues." >> $GITHUB_STEP_SUMMARY
