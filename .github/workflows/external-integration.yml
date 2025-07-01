@@ -53,7 +53,7 @@ jobs:
           
           # Also pack TypeSpec core packages
           cd core
-          pnpm chronus pack --pack-destination ../tgz-packages
+          pnpm chronus pack --pack-destination ../tgz-packages --exclude standalone
           cd ..
           
           echo "Created tgz packages:"
