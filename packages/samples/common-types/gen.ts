@@ -89,6 +89,7 @@ function cleanupDocument(original: OpenAPI2Document): OpenAPI2Document {
   replaceUuidRefs(document, "Azure.Core.uuid");
   replaceUuidRefs(document, "Azure.Core.azureLocation");
   replaceUuidRefs(document, "Azure.Core.armResourceType");
+  replaceUuidRefs(document, "Azure.Core.eTag");
   replaceParameterName(
     document,
     "PrivateEndpointConnectionParameter",
