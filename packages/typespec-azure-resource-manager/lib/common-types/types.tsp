@@ -45,7 +45,7 @@ model TrackedResource extends Resource {
 
   /** The geo-location where the resource lives */
   @visibility(Lifecycle.Read, Lifecycle.Create)
-  location: string;
+  location: azureLocation;
 }
 
 /**
