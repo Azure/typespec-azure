@@ -20,6 +20,7 @@ namespace Microsoft.UpdateTests;
 enum Versions {
   /** 2023-03-01-preview version */
   @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2023-03-01-preview`,
 }
