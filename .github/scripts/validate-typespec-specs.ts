@@ -41,14 +41,9 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
   return directories;
 }
 
-async function runTspCompile(directory: string, useColor: boolean = false): Promise<{ success: boolean; output: string }> {
+async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
   return new Promise((resolve) => {
-    const args = ['tsp', 'compile', '.'];
-    if (useColor) {
-      args.push('--color=always');
-    }
-    
-    const process = spawn('npx', args, {
+    const process = spawn('npx', ['tsp', 'compile', '.'], {
       cwd: directory,
       stdio: 'pipe'
     });
@@ -74,10 +69,9 @@ async function runTspCompile(directory: string, useColor: boolean = false): Prom
 
 async function main() {
   const azureSpecsDir = process.argv[2];
-  const colorFlag = process.argv.includes('--color=always');
   
   if (!azureSpecsDir) {
-    console.error('Usage: tsx validate-typespec-specs.ts <azure-specs-dir> [--color=always]');
+    console.error('Usage: tsx validate-typespec-specs.ts <azure-specs-dir>');
     process.exit(1);
   }
   
@@ -101,7 +95,7 @@ async function main() {
   for (const dir of tspConfigDirs) {
     console.log(`::group::Compiling TypeSpec project in ${dir}`);
     
-    const result = await runTspCompile(dir, colorFlag);
+    const result = await runTspCompile(dir);
     
     if (result.success) {
       console.log('✅ Compilation successful');

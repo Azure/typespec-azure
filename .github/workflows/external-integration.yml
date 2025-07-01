@@ -71,7 +71,7 @@ jobs:
           npm install --no-package-lock
 
       - name: Run TypeSpec validation in azure-rest-api-specs
-        run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts . --color=always
+        run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
         working-directory: azure-rest-api-specs
 
       - name: Revert package.json changes
