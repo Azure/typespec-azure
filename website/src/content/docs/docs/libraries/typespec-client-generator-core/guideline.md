@@ -181,6 +181,8 @@ A [`SdkBuiltInType`](../reference/js-api/interfaces/sdkbuiltintype/) represents 
 
 [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) type represents a TCGC model type. It is typically converted from a TypeSpec [`Model`](https://typespec.io/docs/language-basics/models/) type.
 
+[`SdkModelPropertyType`](../references/js-api/interfaces/sdkmodelpropertytype/) type represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model. It has `flatten`, `additionalProperties` to indicate if the property could be flatten and the model could accept additional properties with specific type. If a model is a discriminated model, `discriminatorProperty` is the property that is used as a discriminator and `discriminatedSubtype` is the list of all the subtypes of this discriminated model. For all sub types of the discriminated model, `discriminatorValue` is the instance value for the discriminator for this sub type.
+
 ### Example types
 
 Example types help model the examples that TypeSpec authors define to help users understand how to use the API. TCGC currently only supports examples based on HTTP payload, so the examples are available in `SdkHttpOperation.examples`.
