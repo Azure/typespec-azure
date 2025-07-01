@@ -37,6 +37,7 @@ jobs:
         with:
           repository: Azure/azure-rest-api-specs
           path: azure-rest-api-specs
+          ref: typespec-next
           fetch-depth: 1
 
       - name: Setup Node.js and pnpm
@@ -70,7 +71,7 @@ jobs:
           npm install --no-package-lock
 
       - name: Run TypeSpec validation in azure-rest-api-specs
-        run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
+        run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts . --color=always
         working-directory: azure-rest-api-specs
 
       - name: Revert package.json changes
