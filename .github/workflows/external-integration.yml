@@ -53,8 +53,6 @@ jobs:
           
           # Also pack TypeSpec core packages
           cd core
-          pnpm install
-          pnpm build
           pnpm chronus pack --pack-destination ../tgz-packages
           cd ..
           
