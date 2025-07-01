@@ -114,21 +114,25 @@ async function main() {
 
   // Create a processor function that handles the compilation and logging
   const processDirectory = async (dir: string) => {
-    console.log(`::group::Compiling TypeSpec project in ${dir}`);
-
     const result = await runTspCompile(dir);
 
+    // Buffer all output to log as a complete group
+    let groupOutput = "";
+    
     if (result.success) {
-      console.log("✅ Compilation successful");
+      groupOutput += "✅ Compilation successful\n";
     } else {
-      console.log("❌ Compilation failed");
+      groupOutput += "❌ Compilation failed\n";
     }
 
     if (result.output.trim()) {
-      console.log("Output:");
-      console.log(result.output);
+      groupOutput += "Output:\n";
+      groupOutput += result.output + "\n";
     }
 
+    // Log the complete group all at once
+    console.log(`::group::Compiling TypeSpec project in ${dir}`);
+    console.log(groupOutput.trim());
     console.log("::endgroup::");
 
     return { dir, result };
