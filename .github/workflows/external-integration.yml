@@ -39,24 +39,24 @@ jobs:
       - name: Build and pack TypeSpec Azure packages
         run: |
           pnpm --filter "!@azure-tools/typespec-azure-website" --filter "!@azure-tools/typespec-azure-playground-*" --filter "!@typespec/playground-website" --filter="!./core/" -r build
-          
+
           pnpm chronus pack --pack-destination ./tgz-packages
-          
+
           # Also pack TypeSpec core packages
           cd core
           pnpm chronus pack --pack-destination ../tgz-packages --exclude standalone
           cd ..
-          
+
           echo "Created tgz packages:"
           ls -la ./tgz-packages/
 
       - name: Update azure-rest-api-specs package.json
         run: |
           cd azure-rest-api-specs
-          
+
           echo "Updating package.json with TypeSpec dependencies..."
           pnpm tsx ../.github/scripts/update-azure-specs-packages.ts . ../tgz-packages
-          
+
           echo "Installing dependencies..."
           npm install --no-package-lock
 
