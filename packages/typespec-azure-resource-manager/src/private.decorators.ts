@@ -16,6 +16,7 @@ import {
   isKey,
   sealVisibilityModifiers,
 } from "@typespec/compiler";
+
 import { $ } from "@typespec/compiler/typekit";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
