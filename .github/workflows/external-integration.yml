@@ -86,7 +86,7 @@ jobs:
           if [ -n "$git_changes" ]; then
             echo "❌ Git changes detected after validation:"
             echo "$git_changes"
-            git diff
+            git diff --color=always
             exit 1
           else
             echo "✅ No git changes detected"
