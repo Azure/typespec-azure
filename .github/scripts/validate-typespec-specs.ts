@@ -26,11 +26,7 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
         const fullPath = join(dir, entry);
         try {
           const stats = await stat(fullPath);
-          if (
-            stats.isDirectory() &&
-            !entry.startsWith(".") &&
-            entry !== "node_modules"
-          ) {
+          if (stats.isDirectory() && !entry.startsWith(".") && entry !== "node_modules") {
             await searchDirectory(fullPath);
           }
         } catch (error) {
@@ -48,9 +44,7 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
   return directories;
 }
 
-async function runTspCompile(
-  directory: string,
-): Promise<{ success: boolean; output: string }> {
+async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
   return new Promise((resolve) => {
     const process = spawn("npx", ["tsp", "compile", "."], {
       cwd: directory,
@@ -103,9 +97,7 @@ async function main() {
 
   console.log(`Looking for TypeSpec projects in ${azureSpecsDir}...`);
 
-  const tspConfigDirs = await findTspConfigDirectories(
-    join(azureSpecsDir, "specification"),
-  );
+  const tspConfigDirs = await findTspConfigDirectories(join(azureSpecsDir, "specification"));
 
   if (tspConfigDirs.length === 0) {
     console.log("No tspconfig.yaml files found in specification directory");
