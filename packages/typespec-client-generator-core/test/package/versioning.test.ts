@@ -1169,7 +1169,7 @@ it("multiple operation groups", async () => {
   ok(client);
   let ops = listOperationGroups(runnerWithVersion.context, client);
   strictEqual(ops.length, 1);
-  let aOp = ops.find((x) => x.type.name === "A");
+  let aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
   let aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
   strictEqual(aOps.length, 1);
@@ -1189,13 +1189,13 @@ it("multiple operation groups", async () => {
   ok(client);
   ops = listOperationGroups(runnerWithVersion.context, client);
   strictEqual(ops.length, 2);
-  aOp = ops.find((x) => x.type.name === "A");
+  aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
   aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
   strictEqual(aOps.length, 1);
   a = aOps.find((x) => x.name === "a");
   ok(a);
-  const bOp = ops.find((x) => x.type.name === "B");
+  const bOp = ops.find((x) => x.type?.name === "B");
   ok(bOp);
   const bOps = listOperationsInOperationGroup(runnerWithVersion.context, bOp);
   strictEqual(bOps.length, 1);
@@ -1215,7 +1215,7 @@ it("multiple operation groups", async () => {
   ok(client);
   ops = listOperationGroups(runnerWithVersion.context, client);
   strictEqual(ops.length, 1);
-  aOp = ops.find((x) => x.type.name === "A");
+  aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
   aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
   strictEqual(aOps.length, 1);

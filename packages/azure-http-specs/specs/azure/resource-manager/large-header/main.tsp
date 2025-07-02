@@ -118,6 +118,7 @@ interface LargeHeaders {
     void,
     CancelResult,
     LroHeaders = ArmCombinedLroHeaders<FinalResult = CancelResult> &
-      Azure.Core.Foundations.RetryAfterHeader
+      Azure.Core.Foundations.RetryAfterHeader,
+    OptionalRequestBody = true
   >;
 }

@@ -14,6 +14,9 @@ export const propertyNameConflictRule = createRule({
     const tcgcContext = createTCGCContext(
       context.program,
       "@azure-tools/typespec-client-generator-core",
+      {
+        mutateNamespace: false,
+      },
     );
     return {
       modelProperty: (property: ModelProperty) => {

@@ -633,6 +633,8 @@ it("versioned enums", async () => {
         v1,
         v2,
       }
+
+      op test(): void;
     `,
   );
   const enums = runner.context.sdkPackage.enums;
@@ -661,6 +663,8 @@ it("versioned enums with all", async () => {
         v1,
         v2,
       }
+
+      op test(): void;
     `,
   );
   const enums = runner.context.sdkPackage.enums;
@@ -690,6 +694,8 @@ it("versioned enums with latest", async () => {
         v1,
         v2,
       }
+
+      op test(): void;
     `,
   );
   const enums = runner.context.sdkPackage.enums;
@@ -719,6 +725,8 @@ it("versioned enums with specific version", async () => {
         v1,
         v2,
       }
+
+      op test(): void;
     `,
   );
   const enums = runner.context.sdkPackage.enums;

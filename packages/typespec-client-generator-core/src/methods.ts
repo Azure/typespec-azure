@@ -1,13 +1,21 @@
 import {
+  FinalOperationStep,
   getLroMetadata,
   getPagedResult,
   getParameterizedNextLinkArguments,
+  NextOperationLink,
+  NextOperationReference,
+  OperationLink,
+  OperationReference,
+  PollingOperationStep,
+  TerminationStatus,
 } from "@azure-tools/typespec-azure-core";
 import {
   createDiagnosticCollector,
   Diagnostic,
   getPagingOperation,
   getSummary,
+  ignoreDiagnostics,
   isList,
   Model,
   ModelProperty,
@@ -32,6 +40,7 @@ import {
   SdkClientType,
   SdkLroPagingServiceMethod,
   SdkLroServiceFinalResponse,
+  SdkLroServiceFinalStep,
   SdkLroServiceMetadata,
   SdkLroServiceMethod,
   SdkMethod,
@@ -39,10 +48,17 @@ import {
   SdkMethodResponse,
   SdkModelPropertyType,
   SdkModelType,
+  SdkNextOperationLink,
+  SdkNextOperationReference,
   SdkOperationGroup,
+  SdkOperationLink,
+  SdkOperationReference,
   SdkPagingServiceMethod,
+  SdkPollingOperationStep,
+  SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkTerminationStatus,
   SdkType,
   TCGCContext,
   UsageFlags,
@@ -54,7 +70,6 @@ import {
   getAvailableApiVersions,
   getClientDoc,
   getHashForType,
-  getLocationOfOperation,
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
@@ -68,6 +83,7 @@ import {
 import {
   getClientTypeWithDiagnostics,
   getSdkBuiltInType,
+  getSdkModel,
   getSdkModelPropertyType,
 } from "./types.js";
 
@@ -476,7 +492,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const metadata = getServiceMethodLroMetadata(context, operation)!;
+  const metadata = getServiceMethodLroMetadata(context, operation, client)!;
   const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
@@ -502,29 +518,164 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   });
 }
 
-function getServiceMethodLroMetadata(
+function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): SdkLroServiceMetadata | undefined {
   const rawMetadata = getLroMetadata(context.program, operation);
   if (rawMetadata === undefined) {
     return undefined;
   }
 
+  let finalEnvelopeResult: SdkModelType | "void" | undefined = undefined;
   const diagnostics = createDiagnosticCollector();
-
+  if (rawMetadata.finalEnvelopeResult === "void") {
+    finalEnvelopeResult = "void";
+  } else if (rawMetadata.finalEnvelopeResult) {
+    finalEnvelopeResult = getSdkModel(context, rawMetadata.finalEnvelopeResult);
+  }
   return {
     __raw: rawMetadata,
     finalStateVia: rawMetadata.finalStateVia,
     finalResponse: getFinalResponse(),
-    finalStep:
-      rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,
+    finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
       responseBody: diagnostics.pipe(
         getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
       ) as SdkModelType,
     },
+    operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
+      .operation,
+    logicalResult: getSdkModel(context, rawMetadata.logicalResult),
+    statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
+    pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
+    envelopeResult: getSdkModel(context, rawMetadata.envelopeResult),
+    logicalPath: rawMetadata.logicalPath,
+    finalEnvelopeResult,
+    finalResultPath: rawMetadata.finalResultPath,
   };
+
+  function getSdkLroServiceFinalStep(
+    context: TCGCContext,
+    step: FinalOperationStep | undefined,
+  ): SdkLroServiceFinalStep | undefined {
+    if (!step) return undefined;
+    switch (step.kind) {
+      case "finalOperationLink": {
+        return {
+          kind: "finalOperationLink",
+          target: getSdkOperationLink(context, step.target),
+        };
+      }
+      case "finalOperationReference": {
+        return {
+          kind: "finalOperationReference",
+          target: getSdkOperationReference(context, step.target, client),
+        };
+      }
+      case "pollingSuccessProperty": {
+        return {
+          kind: "pollingSuccessProperty",
+          responseModel: getSdkModel(context, step.responseModel),
+          target: ignoreDiagnostics(getSdkModelPropertyType(context, step.target)),
+          sourceProperty: step.sourceProperty
+            ? ignoreDiagnostics(getSdkModelPropertyType(context, step.sourceProperty))
+            : undefined,
+        };
+      }
+      case "noPollingResult": {
+        return {
+          kind: "noPollingResult",
+          responseModel: undefined,
+        };
+      }
+    }
+  }
+
+  function getStatusMonitorStep(
+    context: TCGCContext,
+    statusMonitorStep: NextOperationLink | NextOperationReference | undefined,
+  ): SdkNextOperationLink | SdkNextOperationReference | undefined {
+    if (!statusMonitorStep) return undefined;
+    if (statusMonitorStep.kind === "nextOperationLink") {
+      return {
+        kind: "nextOperationLink",
+        responseModel: getSdkModel(context, statusMonitorStep.responseModel),
+        target: getSdkOperationLink(context, statusMonitorStep.target),
+      };
+    }
+    return {
+      kind: "nextOperationReference",
+      responseModel: getSdkModel(context, statusMonitorStep.responseModel),
+      target: getSdkOperationReference(context, statusMonitorStep.target, client),
+    };
+  }
+
+  function getSdkOperationLink(context: TCGCContext, link: OperationLink): SdkOperationLink {
+    return {
+      kind: "link",
+      location: link.location,
+      property: ignoreDiagnostics(getSdkModelPropertyType(context, link.property)),
+    };
+  }
+
+  function getSdkOperationReference<TServiceOperation extends SdkServiceOperation>(
+    context: TCGCContext,
+    reference: OperationReference,
+    client: SdkClientType<TServiceOperation>,
+  ): SdkOperationReference {
+    const parameters: Map<string, SdkPropertyMap> = new Map();
+    for (const [key, p] of reference.parameters?.entries() ?? []) {
+      parameters.set(key, {
+        sourceKind: p.sourceKind,
+        source: ignoreDiagnostics(getSdkModelPropertyType(context, p.source)),
+        target: ignoreDiagnostics(getSdkModelPropertyType(context, p.target)),
+      });
+    }
+    return {
+      kind: "reference",
+      operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, reference.operation, client))
+        .operation,
+      parameterMap: reference.parameterMap,
+      parameters,
+      link: reference.link ? getSdkOperationLink(context, reference.link) : undefined,
+    };
+  }
+
+  function getPollingInfo(
+    context: TCGCContext,
+    pollingInfo: PollingOperationStep,
+  ): SdkPollingOperationStep {
+    const resultProperty = pollingInfo.resultProperty
+      ? ignoreDiagnostics(getSdkModelPropertyType(context, pollingInfo.resultProperty))
+      : undefined;
+    const errorProperty = pollingInfo.errorProperty
+      ? ignoreDiagnostics(getSdkModelPropertyType(context, pollingInfo.errorProperty))
+      : undefined;
+    return {
+      kind: "pollingOperationStep",
+      responseModel: getSdkModel(context, pollingInfo.responseModel),
+      terminationStatus: getTerminationStatus(context, pollingInfo.terminationStatus),
+      resultProperty,
+      errorProperty,
+    };
+  }
+
+  function getTerminationStatus(
+    context: TCGCContext,
+    terminationStatus: TerminationStatus,
+  ): SdkTerminationStatus {
+    switch (terminationStatus.kind) {
+      case "status-code":
+        return terminationStatus;
+      case "model-property":
+        return {
+          ...terminationStatus,
+          property: ignoreDiagnostics(getSdkModelPropertyType(context, terminationStatus.property)),
+        };
+    }
+  }
 
   function getFinalResponse(): SdkLroServiceFinalResponse | undefined {
     if (
@@ -622,13 +773,16 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   const methodParameters: SdkMethodParameter[] = [];
   // we have to calculate apiVersions first, so that the information is put
   // in __tspTypeToApiVersions before we call parameters since method wraps parameter
-  const operationLocation = getLocationOfOperation(operation);
-  const apiVersions = getAvailableApiVersions(context, operation, operationLocation);
+  const apiVersions = getAvailableApiVersions(
+    context,
+    operation,
+    client.__raw.type ?? client.__raw.service,
+  );
 
-  let clientParams = context.__clientToParameters.get(operationLocation);
+  let clientParams = context.__clientParametersCache.get(client.__raw);
   if (!clientParams) {
     clientParams = [];
-    context.__clientToParameters.set(operationLocation, clientParams);
+    context.__clientParametersCache.set(client.__raw, clientParams);
   }
 
   const override = getOverriddenClientMethod(context, operation);
@@ -638,16 +792,16 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     if (isNeverOrVoidType(param.type)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
-      const operationLocation = getLocationOfOperation(operation);
+      const operationLocation = context.getClientForOperation(operation);
       if (sdkMethodParam.isApiVersionParam) {
         if (
-          !context.__clientToParameters.get(operationLocation)?.find((x) => x.isApiVersionParam)
+          !context.__clientParametersCache.get(operationLocation)?.find((x) => x.isApiVersionParam)
         ) {
           clientParams.push(sdkMethodParam);
         }
       } else if (isSubscriptionId(context, param)) {
         if (
-          !context.__clientToParameters
+          !context.__clientParametersCache
             .get(operationLocation)
             ?.find((x) => isSubscriptionId(context, x))
         ) {

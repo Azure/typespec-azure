@@ -6,7 +6,6 @@ import {
   ModelProperty,
   Operation,
   Program,
-  StringLiteral,
   Tuple,
   Type,
   addVisibilityModifiers,
@@ -14,12 +13,21 @@ import {
   getKeyName,
   getLifecycleVisibilityEnum,
   getTypeName,
+  isKey,
   sealVisibilityModifiers,
 } from "@typespec/compiler";
-import { $bodyRoot } from "@typespec/http";
+
+import { $ } from "@typespec/compiler/typekit";
+import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
+import {
+  AzureResourceManagerExtensionPrivateDecorators,
+  BuiltInResourceDecorator,
+  BuiltInResourceGroupResourceDecorator,
+  BuiltInSubscriptionResourceDecorator,
+} from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
 import {
   ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
@@ -27,6 +35,7 @@ import {
   ArmResourcePropertiesOptionalityDecorator,
   ArmUpdateProviderNamespaceDecorator,
   AssignProviderNameValueDecorator,
+  AssignUniqueProviderNameValueDecorator,
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
   ConditionalClientFlattenDecorator,
@@ -43,16 +52,45 @@ import {
   ArmResourceDetails,
   ResourceBaseType,
   getArmResourceKind,
+  getArmVirtualResourceDetails,
   getResourceBaseType,
   isArmVirtualResource,
   isCustomAzureResource,
   resolveResourceBaseType,
+  setResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
 export const namespace = "Azure.ResourceManager.Private";
 
 /** @internal */
+
+const $builtInResource: BuiltInResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltIn);
+};
+
+const $builtInSubscriptionResource: BuiltInSubscriptionResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInSubscription);
+};
+
+const $builtInResourceGroupResource: BuiltInResourceGroupResourceDecorator = (
+  context: DecoratorContext,
+  resourceType: Model,
+) => {
+  const { program } = context;
+
+  setResourceBaseType(program, resourceType, ResourceBaseType.BuiltInResourceGroup);
+};
 const $omitIfEmpty: OmitIfEmptyDecorator = (
   context: DecoratorContext,
   entity: Model,
@@ -69,6 +107,32 @@ const $omitIfEmpty: OmitIfEmptyDecorator = (
   }
 };
 
+function checkAllowedVirtualResource(
+  program: Program,
+  target: Model | Operation,
+  type: Model,
+): boolean {
+  if (target.kind === "Model") return false;
+  if (!isArmVirtualResource(program, type)) return false;
+  const [httpOp, _] = getHttpOperation(program, target);
+  if (httpOp === undefined) return false;
+  const method = httpOp.verb;
+  switch (method) {
+    case "post":
+    case "delete":
+      return true;
+    default:
+      return true;
+  }
+}
+
+function isBuiltIn(baseType: ResourceBaseType): boolean {
+  return (
+    baseType === ResourceBaseType.BuiltIn ||
+    baseType === ResourceBaseType.BuiltInSubscription ||
+    baseType === ResourceBaseType.BuiltInResourceGroup
+  );
+}
 const $enforceConstraint: EnforceConstraintDecorator = (
   context: DecoratorContext,
   entity: Operation | Model,
@@ -79,7 +143,13 @@ const $enforceConstraint: EnforceConstraintDecorator = (
     // walk the baseModel chain until find a match or fail
     let baseType: Model | undefined = sourceType;
     do {
-      if (baseType === constraintType || isCustomAzureResource(context.program, baseType)) return;
+      if (
+        baseType === constraintType ||
+        isCustomAzureResource(context.program, baseType) ||
+        isBuiltIn(getResourceBaseType(context.program, baseType)) ||
+        checkAllowedVirtualResource(context.program, entity, baseType)
+      )
+        return;
     } while ((baseType = baseType.baseModel) !== undefined);
 
     reportDiagnostic(context.program, {
@@ -200,10 +270,44 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   resourceType: Model,
 ) => {
   const { program } = context;
-
   const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
-  if (armProviderNamespace) {
-    (target.type as StringLiteral).value = armProviderNamespace;
+  if (
+    armProviderNamespace &&
+    target.type.kind === "String" &&
+    target.type.value === "Microsoft.ThisWillBeReplaced"
+  ) {
+    target.type.value = armProviderNamespace;
+  }
+};
+
+/**
+ * This decorator allows setting a unique provider name value, for scenarios in which
+ * multiple providers are allowed.
+ * @param {DecoratorContext} context DecoratorContext
+ * @param {Type} target Target of this decorator. Must be a string `ModelProperty`.
+ * @param {Type} resourceType Must be a `Model`.
+ */
+const $assignUniqueProviderNameValue: AssignUniqueProviderNameValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  resourceType: Model,
+) => {
+  const { program } = context;
+  const armProviderNamespace = getArmProviderNamespace(program, resourceType);
+  if (!armProviderNamespace && !isBuiltIn(getResourceBaseType(program, resourceType))) {
+    reportDiagnostic(program, {
+      code: "resource-without-provider-namespace",
+      format: { resourceName: resourceType.name },
+      target: resourceType,
+    });
+    return;
+  }
+  if (
+    armProviderNamespace &&
+    target.type.kind === "String" &&
+    target.type.value !== armProviderNamespace
+  ) {
+    target.type = $(program).literal.createString(armProviderNamespace);
   }
 };
 
@@ -235,8 +339,9 @@ const $armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator = (
           });
           return;
         }
-
-        providerParam.type.value = armProviderNamespace;
+        if (providerParam.type.value === "Microsoft.ThisWillBeReplaced") {
+          providerParam.type.value = armProviderNamespace;
+        }
       }
     }
   }
@@ -274,8 +379,19 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   resourceType: Model,
   propertiesType: Model,
 ) => {
-  const { program } = context;
+  registerArmResource(context, resourceType);
+};
 
+function getPrimaryKeyProperty(program: Program, resource: Model): ModelProperty | undefined {
+  const nameProperty = resource.properties.get("name");
+  if (nameProperty !== undefined) return nameProperty;
+  const keyProps = [...resource.properties.values()].filter((prop) => isKey(program, prop));
+  if (keyProps.length !== 1) return undefined;
+  return keyProps[0];
+}
+
+export function registerArmResource(context: DecoratorContext, resourceType: Model): void {
+  const { program } = context;
   if (resourceType.namespace && getTypeName(resourceType.namespace) === "Azure.ResourceManager") {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
@@ -294,27 +410,30 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   }
 
   // Locate the ARM namespace in the namespace hierarchy
-  const armProviderNamespace = getArmProviderNamespace(program, resourceType.namespace);
+  const armProviderNamespace = getArmProviderNamespace(program, resourceType);
   const armLibraryNamespace = isArmLibraryNamespace(program, resourceType.namespace);
-  if (!armProviderNamespace && !armLibraryNamespace) {
+  const armExternalNamespace = getArmVirtualResourceDetails(program, resourceType)?.provider;
+  if (!armProviderNamespace && !armLibraryNamespace && armExternalNamespace === undefined) {
     reportDiagnostic(program, { code: "arm-resource-missing-arm-namespace", target: resourceType });
     return;
   }
 
   // Ensure the resource type has defined a name property that has a segment
-  const nameProperty = resourceType.properties.get("name");
-  if (!nameProperty) {
+  const primaryKeyProperty = getPrimaryKeyProperty(program, resourceType);
+  if (!primaryKeyProperty) {
     reportDiagnostic(program, { code: "arm-resource-missing-name-property", target: resourceType });
     return;
   }
 
   // Set the name property to be read only
-  const Lifecycle = getLifecycleVisibilityEnum(program);
-  clearVisibilityModifiersForClass(program, nameProperty, Lifecycle, context);
-  addVisibilityModifiers(program, nameProperty, [Lifecycle.members.get("Read")!], context);
-  sealVisibilityModifiers(program, nameProperty, Lifecycle);
+  if (primaryKeyProperty.name === "name") {
+    const Lifecycle = getLifecycleVisibilityEnum(program);
+    clearVisibilityModifiersForClass(program, primaryKeyProperty, Lifecycle, context);
+    addVisibilityModifiers(program, primaryKeyProperty, [Lifecycle.members.get("Read")!], context);
+    sealVisibilityModifiers(program, primaryKeyProperty, Lifecycle);
+  }
 
-  const keyName = getKeyName(program, nameProperty);
+  const keyName = getKeyName(program, primaryKeyProperty);
   if (!keyName) {
     reportDiagnostic(program, {
       code: "arm-resource-missing-name-key-decorator",
@@ -323,7 +442,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
     return;
   }
 
-  const collectionName = getSegment(program, nameProperty);
+  const collectionName = getSegment(program, primaryKeyProperty);
   if (!collectionName) {
     reportDiagnostic(program, {
       code: "arm-resource-missing-name-segment-decorator",
@@ -335,6 +454,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   let kind = getArmResourceKind(resourceType);
   if (isArmVirtualResource(program, resourceType)) kind = "Virtual";
   if (isCustomAzureResource(program, resourceType)) kind = "Custom";
+
   if (!kind) {
     reportDiagnostic(program, {
       code: "arm-resource-invalid-base-type",
@@ -350,7 +470,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
     typespecType: resourceType,
     collectionName,
     keyName,
-    armProviderNamespace: armProviderNamespace ?? "",
+    armProviderNamespace: armProviderNamespace ?? armExternalNamespace ?? "",
     operations: {
       lifecycle: {},
       lists: {},
@@ -359,7 +479,7 @@ const $armResourceInternal: ArmResourceInternalDecorator = (
   };
 
   program.stateMap(ArmStateKeys.armResources).set(resourceType, armResourceDetails);
-};
+}
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
   return [...program.stateMap(ArmStateKeys.armResources).values()];
@@ -462,6 +582,7 @@ export const $decorators = {
     azureResourceBase: $azureResourceBase,
     omitIfEmpty: $omitIfEmpty,
     conditionalClientFlatten: $conditionalClientFlatten,
+    assignUniqueProviderNameValue: $assignUniqueProviderNameValue,
     assignProviderNameValue: $assignProviderNameValue,
     armUpdateProviderNamespace: $armUpdateProviderNamespace,
     armResourceInternal: $armResourceInternal,
@@ -471,4 +592,9 @@ export const $decorators = {
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
   } satisfies AzureResourceManagerPrivateDecorators,
+  "Azure.ResourceManager.Extension.Private": {
+    builtInResource: $builtInResource,
+    builtInSubscriptionResource: $builtInSubscriptionResource,
+    builtInResourceGroupResource: $builtInResourceGroupResource,
+  } satisfies AzureResourceManagerExtensionPrivateDecorators,
 };

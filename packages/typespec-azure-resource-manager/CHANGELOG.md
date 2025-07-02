@@ -1,5 +1,41 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.57.2
+
+### Bug Fixes
+
+- [#2772](https://github.com/Azure/typespec-azure/pull/2772) Allow toggling `@autoRoute` in legacy operations
+
+
+## 0.57.1
+
+### Bug Fixes
+
+- [#2896](https://github.com/Azure/typespec-azure/pull/2896) Add a legacy operation template for `Operations_List` that enables customization of both the response and error response types. This provides flexibility to specify custom response or error as needed.
+  
+  For example:
+  ```tsp
+  interface Operations
+    extends Azure.ResourceManager.Legacy.Operations<Response = ArmResponse<Azure.Core.Page<CustomResponse>> {}
+  ```
+- [#2897](https://github.com/Azure/typespec-azure/pull/2897) Added a linter rule to warn when a `@Azure.ResourceManager.Legacy.customAzureResource` does not contain a `@key` property, as this can cause duplicate operations.
+- [#2892](https://github.com/Azure/typespec-azure/pull/2892) Fix #2764 Add advanced extension resource support
+
+
+## 0.57.0
+
+### Features
+
+- [#2621](https://github.com/Azure/typespec-azure/pull/2621) Adding a new `ExtensionResourceActionScope`. You can use it in `ArmProviderAction` operation template to describe an action operation for extension resource provider.
+- [#2763](https://github.com/Azure/typespec-azure/pull/2763) Add support for external resources #1428
+
+### Bug Fixes
+
+- [#2536](https://github.com/Azure/typespec-azure/pull/2536) Fix the `arm-resource-operation` rule to exclude `ArmProviderActionAsync` and `ArmProviderActionSync` operations, as they are not considered resource operations.
+- [#2691](https://github.com/Azure/typespec-azure/pull/2691) Fix `@key` decorator resolution for `x-ms-identifiers`: when `@key` is applied to a property named `id` or `name`, it will no longer add an identifier.
+- [#2749](https://github.com/Azure/typespec-azure/pull/2749) Relax constraints to allow resources that override properties of Foundations.Resource
+
+
 ## 0.56.2
 
 ### Bug Fixes

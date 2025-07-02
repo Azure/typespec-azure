@@ -1,5 +1,69 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.57.3
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2859](https://github.com/Azure/typespec-azure/pull/2859) Add support for other lro metadata
+
+
+## 0.57.2
+
+### Features
+
+- [#2890](https://github.com/Azure/typespec-azure/pull/2890) Support load examples in nested folders.
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2889](https://github.com/Azure/typespec-azure/pull/2889) Consider `@clientLocation` when validate client name collision.
+- [#2871](https://github.com/Azure/typespec-azure/pull/2871) Fix scope calculation logic.
+- [#2861](https://github.com/Azure/typespec-azure/pull/2861) Fix `disableUsageAccessPropagationToBase` issue for discriminated model.
+
+
+## 0.57.1
+
+### Bug Fixes
+
+- [#2785](https://github.com/Azure/typespec-azure/pull/2785) Add `@clientLocation` decorator to support moving an operation to another client or sub-client.
+- [#2841](https://github.com/Azure/typespec-azure/pull/2841) Fix operations missing problem after introducing `@clientLocation`.
+- [#2815](https://github.com/Azure/typespec-azure/pull/2815) Extend `@usage` to accept `json` and `xml` usage. `@usage` now is used to add usage for type and namespace, instead of override the usage calculated by operation. Also, the serialization options will include JSON or XML info if new usage is added.
+
+
+## 0.57.0
+
+No changes, version bump only.
+
+## 0.56.4
+
+### Bug Fixes
+
+- [#2796](https://github.com/Azure/typespec-azure/pull/2796) Ignore empty `{}` definitions from `no-unnamed-types` rule
+
+
+## 0.56.3
+
+### Bump dependencies
+
+- [#2667](https://github.com/Azure/typespec-azure/pull/2667) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2750](https://github.com/Azure/typespec-azure/pull/2750) Refine API version parameter judgement with checking the service's API version enum.
+- [#2755](https://github.com/Azure/typespec-azure/pull/2755) Fix `no-unnamed-types` linter warning not being applied to versioned namespaces
+- [#2755](https://github.com/Azure/typespec-azure/pull/2755) Fix linter perf for `@azure-tools/typespec-client-generator-core` linter warnings
+- [#2770](https://github.com/Azure/typespec-azure/pull/2770) Don't raise `no-unnamed-types` for nullable types
+- [#2690](https://github.com/Azure/typespec-azure/pull/2690) loosen requirements to link method to service params
+- [#2707](https://github.com/Azure/typespec-azure/pull/2707) Fix documentation on generate-convenience-methods option.
+
+
 ## 0.56.2
 
 ### Bug Fixes

@@ -1,5 +1,26 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.57.1
+
+### Bug Fixes
+
+- [#2898](https://github.com/Azure/typespec-azure/pull/2898) Add `@clientLocation` support to `resolveOperationId` function
+
+
+## 0.57.0
+
+### Bump dependencies
+
+- [#2667](https://github.com/Azure/typespec-azure/pull/2667) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2762](https://github.com/Azure/typespec-azure/pull/2762) Emits all path parameters as required even if optional in TypeSpec. Reports a new warning if an optional path parameter is found: `@azure-tools/typespec-autorest/unsupported-optional-path-param`.
+- [#2756](https://github.com/Azure/typespec-azure/pull/2756) Fix HttpPart<File> correctly render as `type:file`
+- [#2607](https://github.com/Azure/typespec-azure/pull/2607) Fix `x-ms-identifiers` being automatically populated, which caused default values to be overwritten unexpectedly. Now, it is only set when explicitly defined.
+- [#2775](https://github.com/Azure/typespec-azure/pull/2775) Models used to construct a multipart body will not be omitted from the definitions
+
+
 ## 0.56.0
 
 ### Breaking Changes

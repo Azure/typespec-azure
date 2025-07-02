@@ -1,0 +1,1733 @@
+---
+title: Basic methods
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This page documents the default generation logic for client's basic method as well as how to customize it.
+For advanced paging, long-running or multipart operations, see the [Paging Operations](../05pagingoperations/), [Long-Running Operations](../06longrunningoperations/) and [Multipart Operations](../07multipart/) pages.
+
+## Convenience and protocol methods
+
+### Default behaviors
+
+By default, any language code generator will generate both protocol methods and convenient methods for an operation.
+
+> **NOTE:** Python and Typescript don't have a separation of convenient/protocol methods.
+
+<ClientTabs>
+
+```typespec title=main.tsp
+namespace PetStoreNamespace;
+
+/** This is the input I need */
+@resource("output")
+model OutputModel {
+  /** Id of this object */
+  @key
+  @visibility(Lifecycle.Read)
+  name: string;
+}
+
+/** Read my resource */
+op GetModel is ResourceRead<OutputModel>;
+```
+
+```python
+class OutputModel:
+  name: str = rest_field(readonly=True)
+response: OutputModel = client.get(name="name")
+```
+
+```csharp
+namespace PetStoreNamespace.Models
+{
+  public partial class OutputModel
+  {
+    public string Name { get; }
+  }
+}
+
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
+    public virtual Response GetModel(string name, RequestContext context) {}
+    // convenience method
+    public virtual async Task<Response<OutputModel>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
+    public virtual Response<OutputModel> GetModel(string name, CancellationToken cancellationToken = default) {}
+  }
+}
+```
+
+```typescript
+interface OutputModel {
+  name: string;
+}
+
+const model: OutputModel = await client.path("/petStore/model/{name}").get();
+```
+
+```java
+package petstorenamespace.models;
+public final class OutputModel {
+    public String getName()
+}
+
+package petstorenamespace;
+public final class PetStoreNamespaceClient {
+    // protocol method
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    // convenient method
+    public OutputModel getModel(String name)
+}
+```
+
+</ClientTabs>
+
+### Customizations
+
+The detailed generation configuration of protocol and/or convenient methods that can be done:
+
+As emitters global parameters:
+
+- `generate-protocol-methods`: boolean flag to shift the entire generation for the process (`true` by default)
+- `generate-convenience-methods`: boolean flag to shift the entire generation for the process (`true` by default)
+
+To set global emitters parameters, read the documentation of [emitters configuration](https://microsoft.github.io/typespec/introduction/configuration#configuration-file).
+
+For fine tuning, the set of decorators `@protocolAPI` and `@convenientAPI` can be used. They take a required boolean as parameter.
+
+#### Shifting the generation of protocol and convenience on and off
+
+This can be achieved with the augment operator and the emitter package
+
+<ClientTabs>
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@convenientAPI(PetStoreNamespace.GetModel, false);
+```
+
+```python
+# Python do not change behavior based on protocolAPI or convenientAPI
+```
+
+```csharp
+// Model class is not generated.
+// Convenient method is not generated.
+
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
+    public virtual Response GetModel(string name, RequestContext context) {}
+  }
+}
+```
+
+```typescript
+// Typescript do not change behavior based on protocolAPI or convenientAPI
+```
+
+```java
+// Model class is not generated.
+// Convenient method is not generated.
+
+public final class PetStoreNamespaceClient {
+    // protocol method
+    public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+}
+```
+
+</ClientTabs>
+
+#### Make methods private/internal
+
+Sometimes it may be useful to still generate the method, but to make it private, so it can be re-used by a manual code wrapper.
+
+The two possible value for the `Access` enum are `internal` and `public`.
+
+<ClientTabs>
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@access(PetStoreNamespace.GetModel, "internal");
+```
+
+```python
+# can't import form models directly
+from petstorenamespace.models import GetModel # will report error
+```
+
+```csharp
+// Model class is internal
+namespace PetStoreNamespace.Models
+{
+  internal partial class OutputModel
+  {
+    public string Name { get; }
+  }
+}
+// Client method is internal
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    //protocol method
+    internal virtual async Task<Response> GetModelAsync(string name, RequestContext context) {}
+    internal virtual Response GetModel(string name, RequestContext context) {}
+    //convenience method
+    internal virtual async Task<Response<OutputModel>> GetModelAsync(string name, CancellationToken cancellationToken = default) {}
+    internal virtual Response<OutputModel> GetModel(string name, CancellationToken cancellationToken = default) {}
+  }
+}
+```
+
+```typescript
+// Typescript do not change behavior based on protocolAPI or convenientAPI
+```
+
+```java
+// Model class resides in implementation package.
+// Client method is package private.
+
+package petstorenamespace.implementation.models;
+public final class OutputModel {
+    public String getName()
+}
+
+package petstorenamespace;
+public final class PetStoreNamespaceClient {
+    // protocol method
+    Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
+    // convenient method
+    OutputModel getModel(String name)
+}
+```
+
+</ClientTabs>
+
+#### Decide the usage of a model
+
+Models can be used for input, output, or both at the same time. In some languages, this
+changes the way the API is exposed for those models.
+
+By default, the code generator will infer the usage based on the TypeSpec. If this inference doesn't
+correspond to expectation, this can be customized with the `usage` decorator. Possible values are
+`input` and `output`, and can be combined with `Usage.input | Usage.output`.
+
+> **NOTE:** If a model is never used, it will not be generated. Assigning a usage will force generation.
+
+<ClientTabs>
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// This model is input only
+@@usage(Azure.OpenAI.AzureCognitiveSearchIndexFieldMappingOptions, Usage.input);
+// This models is input/output
+@@usage(Azure.OpenAI.ImageGenerations, Usage.input | Usage.output);
+```
+
+```python
+# Python doesn't generate different code based on usage
+# However, the model may not be generated if it's never used
+# In that case, set a usage for the model
+```
+
+```csharp
+// If a model is input-only, it has one public constructor with all required properties as parameters.
+// The required properties only have getter. Optional properties have both getter and setter.
+// A collection property which is not nullable only has getter whatever it is required or not.
+namespace Azure.AI.OpenAI.Models
+{
+  public partial class AzureCognitiveSearchIndexFieldMappingOptions
+  {
+    public AzureCognitiveSearchIndexFieldMappingOptions()
+
+    public string TitleFieldName { get; set; }
+    public string UrlFieldName { get; set; }
+    public string FilepathFieldName { get; set; }
+    public IList<string> ContentFieldNames { get; }
+    public string ContentFieldSeparator { get; set; }
+    public IList<string> VectorFieldNames { get; }
+    public IList<string> ImageVectorFieldNames { get; }
+  }
+}
+// If a model is output-only, it does not have any public constructor, and all properties only have getter, no setter.
+
+// If a model is roundtrip (input + output), it has one public constructor with all required properties as parameters.
+// All properties except colletion properties which are not nullable will have both getter and setter.
+// A collection property which is not nullable only has getter.
+namespace Azure.AI.OpenAI.Models
+{
+  public partial class ImageGenerations
+  {
+    public ImageGenerations(DateTimeOffset created, IEnumerable<ImageGenerationData> data)
+
+    public DateTimeOffset Created { get; set; }
+    public IList<ImageGenerationData> Data { get; }
+  }
+}
+```
+
+```typescript
+// JS doesn't generate different code based on usage
+// However, the model may not be generated if it's never used
+// In that case, set a usage for the model
+```
+
+```java
+// If a model class is output-only, its constructor is not public.
+// Adding Usage.input to it would make its constructor public.
+
+package azure.openai.models;
+
+public final class AzureCognitiveSearchIndexFieldMappingOptions {
+    public AzureCognitiveSearchIndexFieldMappingOptions()
+    public String getTitleField()
+    public AzureCognitiveSearchIndexFieldMappingOptions setTitleField(String titleField)
+    ...
+}
+
+public final class ImageGenerations {
+    public ImageGenerations(OffsetDateTime createdAt, List<ImageGenerationData> data)
+    public OffsetDateTime getCreatedAt()
+    public List<ImageGenerationData> getData()
+}
+```
+
+</ClientTabs>
+
+## Basic method signature
+
+### Simple methods
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
+@get
+op get(): User;
+
+@post
+op post(@body body: User): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+
+```python
+def get() -> User:
+  ...
+
+@overload
+def post(body: User, **kwargs: Any) -> None:
+  ...
+
+@overload
+def post(body: JSON, **kwargs: Any) -> None:
+  ...
+
+@overload
+def post(body: IO[bytes], **kwargs: Any) -> None:
+  ...
+
+def post(body: [User, JSON, IO[bytes]], **kwargs: Any) -> None:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+//protocol method
+public virtual async Task<Response> GetUserAsync(RequestContext context){}
+public virtual Response GetUser(RequestContext context){}
+//convenience method
+public virtual async Task<Response<User>> GetUser(CancellationToken cancellationToken = default)
+public virtual Response<User> GetUser(CancellationToken cancellationToken = default)
+
+//protocol method
+public virtual async Task<Response> PostAsync(RequestContent content, RequestContext context = null)
+public virtual Response Post(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> PostAsync(User user, CancellationToken cancellationToken = default)
+public virtual Response Post(User user, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+// RLC
+export interface GetUser200Response extends HttpResponse {
+  status: "200";
+  body: User;
+}
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/users' has methods for the following verbs: get */
+    (path: "/users"): {
+      get(
+        options: RequestParameters,
+      ): StreamableMethod<GetUser200Response | GetUserDefaultResponse>;
+    };
+
+    /** Resource for '/users' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: User;
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export async function get(): Promise<User>;
+export async function post(body: User, options: PostOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  get(options: GetUserOptionalParams): Promise<User>;
+  post(body: User, options: PostOptionalParams): Promise<void>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public User get();
+public void post(User user);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type ClientGetOptions struct {
+}
+
+type ClientGetResponse struct {
+}
+
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+
+type ClientPostOptions struct {
+}
+
+type ClientPostResponse struct {
+}
+
+func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
+
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Spread cases
+
+Please exercise caution when using the _spread_ feature.
+
+- The model to be spread should have fewer than 6 settable properties. See [simple methods](https://azure.github.io/azure-sdk/dotnet_introduction.html#dotnet-parameters).
+- The model to be spread should remain stable across api-versions. Adding an optional property across api-versions could result in one additional method overload in SDK client.
+- The model to be spread should not be used in [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386).
+
+#### Alias
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+alias User = {
+  firstName: string;
+  lastName: string;
+};
+
+@post
+op upload(...User): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+def upload(first_name: str, last_name: str) -> None:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+//protocol method
+public virtual async Task<Response> UploadAsync(RequestContent content, RequestContext context = null)
+public virtual Response Upload(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(string firstName, string lastName, CancellationToken cancellationToken = default)
+public virtual Response Upload(string firstName, string lastName, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: {
+            firstName: string;
+            lastName: string;
+          };
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export async function upload(
+  firstName: string,
+  lastName: string,
+  options: UploadOptionalParams,
+): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public void upload(String firstName, String lastName);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### Alias with @header/@query/@path properties
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+alias User = {
+  @path id: string;
+  firstName: string;
+  lastName: string;
+};
+
+op upload(...User): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+def upload(self, id: str, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+//protocol method
+public virtual async Task<Response> UploadAsync(string id, RequestContent content, RequestContext context = null)
+public virtual Response Upload(string id, RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(string id, string firstName, string lastName, CancellationToken cancellationToken = default)
+public virtual Response Upload(string id, string firstName, string lastName, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (
+      path: "/users/{id}",
+      id,
+    ): {
+      post(
+        options: {
+          body: {
+            firstName: string;
+            lastName: string;
+          };
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export async function upload(
+  id: string,
+  firstName: string,
+  lastName: string,
+  options: UploadOptionalParams,
+): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(
+    id: string,
+    firstName: string,
+    lastName: string,
+    options: UploadOptionalParams,
+  ): Promise<void>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public void upload(String id, String firstName, String lastName);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### Named model
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
+op upload(...User): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+def upload(self, first_name: str, last_name: str, *, content_type: str = "application/json") -> None:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+public partial class User
+{
+  public User(string firstName, string lastName) { }
+  public string FirstName { get; }
+  public string LastName { get; }
+}
+//protocol method
+public virtual async Task<Response> UploadAsync(RequestContent content, RequestContext context = null)
+public virtual Response Upload(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
+public virtual Response Upload(string firstName, string lastName, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: {
+            firstName: string;
+            lastName: string;
+          };
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export async function upload(
+  firstName: string,
+  lastName: string,
+  options: UploadOptionalParams,
+): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public void upload(String firstName, String lastName);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### Model with `@body` property
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model User {
+  firstName: string;
+  lastName: string;
+}
+
+model UserRequest {
+  @body user: User;
+}
+
+op upload(...UserRequest): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+def upload(self, body: [User, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
+  ...
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="csharp" >
+
+```csharp
+public partial class User
+{
+  public User(string firstName, string lastName){}
+  public string FirstName { get; }
+  public string LastName { get; }
+}
+//protocol method
+public virtual async Task<Response> UploadAsync(RequestContent content, RequestContext context = null)
+public virtual Response Upload(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> UploadAsync(User user, CancellationToken cancellationToken = default)
+public virtual Response Upload(User user, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/users"): {
+      post(
+        options: {
+          body: User;
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Api Layer
+export async function upload(user: User, options: UploadOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  upload(user: User, options: UploadOptionalParams): Promise<void>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// Model class
+@Immutable
+public final class User implements JsonSerializable<User> {
+    public User(String firstName, String lastName);
+    public String getFirstName();
+    public String getLastName();
+}
+
+// Client API
+public void upload(User user);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type User struct {
+	firstName *string
+  lastName *string
+}
+
+type ClientUploadOptions struct {
+}
+
+type ClientUploadResponse struct {
+}
+
+func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### Model with @header/@query/@path properties
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model BlobProperties {
+  @path
+  name: string;
+
+  @header
+  testHeader: string;
+}
+
+@route("blob_properties/{name}")
+op getBlobProperties(...BlobProperties): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+
+def get_blob_properties(self, name: str, *, test_header: string, content_type: str = "application/json") -> None:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+//protocol method
+public virtual async Task<Response> GetBlobPropertiesAsync(string name, string testHeader, RequestContext context = null)
+public virtual Response GetBlobProperties(string name, string testHeader, RequestContext context = null)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/blob_properties/{name}", name): {
+      post(
+        options: {
+          headers: {
+            "test-header": string;
+          } & RawHttpHeaders
+        } & RequestParameters
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular Options
+export interface GetBlobPropertiesOptionalParams extends OperationOptions {
+  requestOptions: {
+    headers: {
+      test-header: string
+    } & RawHttpHeadersInput
+  }
+}
+
+// Modular api layer
+export async function getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public void getBlobProperties(String name, String testHeader);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type ClientGetBlobPropertiesOptions struct {
+}
+
+type ClientGetBlobPropertiesResponse struct {
+}
+
+func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### Model mixed with normal and @header/@query/@path properties
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model Schema {
+  @header contentType: "application/json";
+  schema: bytes;
+}
+
+@post
+op register(...Schema): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+class Schema:
+  schema: bytes
+
+def register(self, body: [Schema, JSON, IO[bytes]], *, content_type: str = "application/json") -> None:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+public partial class Schema
+{
+  public Schema(BinaryData schemaProperty){}
+  public BinaryData SchemaProperty { get; }
+}
+//protocol method
+public virtual async Task<Response> RegisterAsync(RequestContent content, RequestContext context = null)
+public virtual Response Register(RequestContent content, RequestContext context = null)
+//convenience method
+public virtual async Task<Response> RegisterAsync(Schema schema, CancellationToken cancellationToken = default)
+public virtual Response Register(Schema schema, CancellationToken cancellationToken = default)
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/schemaRegister"): {
+      post(
+        options: {
+          headers: {
+            "content-type": "application/json";
+          } & RawHttpHeaders;
+          body: {
+            schema: string;
+          };
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular model
+export interface Schema {
+  schema: string;
+}
+
+// Modular api layer
+export async function register(
+  body: Schema,
+  options: GetBlobPropertiesOptionalParams,
+): Promise<void>;
+
+// Modular classical client layer
+export class DemoServiceClient {
+  getBlobProperties(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// Model class
+@Immutable
+public final class Schema implements JsonSerializable<Schema> {
+    public Schema(byte[] schema);
+    public byte[] getSchema();
+}
+
+// Client API
+public void register(Schema schema);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type ClientRegisterOptions struct {
+}
+
+type ClientRegisterResponse struct {
+}
+
+func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+#### Using Azure.Core.ResourceOperations template
+
+Resource create and update operations are not impacted by spread since they all have explicit defined body parameter.
+Only resource action operations are impacted by spread.
+
+If the action parameter is a model, then the model will be spread.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+@resource("widgets")
+model Widget {
+  @key("widgetName")
+  name: string;
+}
+
+model RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+model RepairResult {
+  reason: string;
+  info: string;
+}
+
+alias Operations = Azure.Core.ResourceOperations<{}>;
+
+op scheduleRepairs is Operations.ResourceAction<Widget, RepairInfo, RepairResult>;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+class RepairInfo:
+  problem: str
+  contact: str
+
+class RepairResult:
+  reason: str
+  info: str
+
+def scheduleRepairs(self, widget_name: str, problem: str, contact: str, *, content_type: str = "application/json") -> RepairResult:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export interface RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+export type WidgetServiceContext = Client & {
+  path: {
+    (
+      path: "/widgets/{widgetName}:scheduleRepairs",
+      widgetName: string,
+    ): {
+      post(
+        options: {
+          body: RepairInfo;
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular api layer
+export async function scheduleRepairs(
+  context: Client,
+  widgetName: string,
+  problem: string,
+  contact: string,
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} },
+): Promise<RepairResult>;
+
+// Modular classical client layer
+export class WidgetServiceClient {
+  scheduleRepairs(
+    widgetName: string,
+    problem: string,
+    contact: string,
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} },
+  ): Promise<RepairResult>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+public RepairResult scheduleRepairs(String widgetName, String problem, String contact);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type ClientScheduleRepairsOptions struct {
+}
+
+type RepairResult struct {
+	reason *string
+  info *string
+}
+
+type ClientScheduleRepairsResponse struct {
+  RepairResult
+}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+If you want to keep the model, you have two options to prevent spreading:
+
+- `@override`
+- If you don't want to do client customizations, you could use a wrapper to explicitly set the body to prevent spread.
+
+<ClientTabs>
+
+<ClientTabItem lang="typespec" >
+
+1. `@override`
+
+The `@override` decorator allows you to replace the client method with the one in your service definition.
+
+If your service definition spreads a model into the method signature, but you prefer that the generated client SDKs maintain the model intact, the `@override` decorator provides a solution.
+
+Additionally, you can specify a language `scope` to limit the changes to a specific language emitter.
+
+```tsp title=client.tsp
+namespace Widget.Client;
+
+op scheduleRepairs(
+  body: RepairInfo,
+  `api-version`: Azure.Core.Foundations.ApiVersionParameter,
+): RepairResult;
+
+@@override(Widget.Service.scheduleRepairs, Widget.Client.scheduleRepairs);
+```
+
+2. wrapper
+
+If you prefer not to implement customizations in `client.tsp`, you can add `@bodyRoot` to the input in `main.tsp` prior to passing the model to the template.
+
+```typespec title=main.tsp
+namespace Widget.Service;
+
+@resource("widgets")
+model Widget {
+  @key("widgetName")
+  name: string;
+}
+
+model RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+model RepairResult {
+  reason: string;
+  info: string;
+}
+
+alias Operations = Azure.Core.ResourceOperations<{}>;
+
+alias BodyParameter<
+  T,
+  TName extends valueof string = "body",
+  TDoc extends valueof string = "Body parameter."
+> = {
+  @doc(TDoc)
+  @friendlyName(TName)
+  @bodyRoot
+  body: T;
+};
+
+op scheduleRepairs is Operations.ResourceAction<Widget, BodyParameter<RepairInfo>, RepairResult>;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python" >
+For Python, we will also generate the overloads described in the HTTP Post section, but will omit them for brevity.
+
+```python
+class RepairInfo:
+  problem: str
+  contact: str
+
+class RepairResult:
+  reason: str
+  info: str
+
+def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str = "application/json") -> RepairResult:
+  ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" label="Typescript" >
+
+```typescript
+// from user experience perspective
+
+export interface RepairInfo {
+  problem: string;
+  contact: string;
+}
+
+export type WidgetServiceContext = Client & {
+  path: {
+    (
+      path: "/widgets/{widgetName}:scheduleRepairs",
+      widgetName: string,
+    ): {
+      post(
+        options: {
+          body: RepairInfo;
+        } & RequestParameters,
+      ): StreamableMethod<PostUserDefaultResponse>;
+    };
+  };
+};
+
+// Modular api layer
+export async function scheduleRepairs(
+  context: Client,
+  widgetName: string,
+  body: RepairInfo,
+  options: ScheduleRepairsOptionalParams = { requestOptions: {} },
+): Promise<RepairResult>;
+
+// Modular classical client layer
+export class WidgetServiceClient {
+  scheduleRepairs(
+    widgetName: string,
+    body: RepairInfo,
+    options: ScheduleRepairsOptionalParams = { requestOptions: {} },
+  ): Promise<RepairResult>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// Model class
+@Immutable
+public final class RepairInfo implements JsonSerializable<RepairInfo> {
+    public RepairInfo(String problem, String contact);
+    public String getProblem();
+    public String getContact();
+}
+
+@Immutable
+public final class RepairResult implements JsonSerializable<RepairResult> {
+    public String getReason();
+    public String getInfo();
+}
+
+// Client API
+public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go"  >
+
+```go
+type RepairInfo struct {
+	problem *string
+  contact *string
+}
+
+type ClientScheduleRepairsOptions struct {
+}
+
+type RepairResult struct {
+	reason *string
+  info *string
+}
+
+type ClientScheduleRepairsResponse struct {
+  RepairResult
+}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+## One path for multiple input/output
+
+The following sections documents emitter behavior and customization when you use union operator `|` or `@sharedRoute` to express multiple input/output for a given path.
+
+### Default behaviors
+
+The simplest way to express a combination of input in TypeSpec is to use the union operator `|`.
+At a glance, JS and Python supports natively union, while Java and C# will use overloads.
+
+<ClientTabs>
+
+```typespec title=client.tsp
+@service(#{ title: "Analyze", version: "v1" })
+namespace Analyze;
+@route("/analyze")
+@post
+op analyze(@query mode: "strict" | "lenient", @body image: bytes): AnalyzeResult;
+
+model CompletionInput {
+  input: string | string[];
+}
+
+@route("/completions")
+@post
+op completions(@body input: CompletionInput): CompletionResult;
+```
+
+```python
+def analyze(image: bytes, *, mode: Literal["strict", "lenient"]) -> AnalyzeResult:
+  ...
+
+class CompletionInput:
+  input: Union[str, List[str]] = rest_field(readonly=True)
+
+def completions(input: CompletionInput) -> CompletionResult:
+  ...
+```
+
+```csharp
+// Union "strict" | "lenient" will be generate as extensible enum
+namespace Analyze.Models
+{
+  public readonly partial struct Mode : IEquatable<Mode>
+  {
+    public static Mode Strict { get; } = new Mode(StrictValue);
+    public static Mode Lenient { get; } = new Mode(LenientValue);
+  }
+}
+
+// other union which cannot be convert to enum will generate as BinaryData
+namespace Analyze.Models
+{
+  public partial class CompletionInput
+  {
+    public CompletionInput(BinaryData input)
+    public BinaryData Input { get; }
+  }
+}
+namespace Analyze
+{
+  public partial class AnalyzeClient
+  {
+    //protocol method
+    public virtual async Task<Response> AnalyzeAsync(string mode, RequestContent content, RequestContext context = null) {}
+    public virtual Response Analyze(string mode, RequestContent content, RequestContext context = null) {}
+    //convenience method
+    public virtual async Task<Response<AnalyzeResult>> AnalyzeAsync(Mode mode, BinaryData image, CancellationToken cancellationToken = default) {}
+    public virtual Response<AnalyzeResult> Analyze(Mode mode, BinaryData image, CancellationToken cancellationToken = default) {}
+
+
+    //protocol method
+    public virtual async Task<Response> CompletionsAsync(RequestContent content, RequestContext context = null) {}
+    public virtual Response Completions(RequestContent content, RequestContext context = null) {}
+    //convenience method
+    public virtual async Task<Response<CompletionResult>> CompletionsAsync(CompletionInput input, CancellationToken cancellationToken = default) {}
+    public virtual Response<CompletionResult> Completions(CompletionInput input, CancellationToken cancellationToken = default) {}
+
+  }
+}
+```
+
+```typescript
+// from user experience perspective
+
+export interface CompletionInput {
+  input: string | string[];
+}
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/analyze' has methods for the following verbs: post */
+    (path: "/analyze"): {
+      post(
+        options: {
+          body: string;
+          queryParameters: {
+            mode: "strict" | "lenient";
+          };
+        } & RequestParameters,
+      ): StreamableMethod<Analyze200Response | AnalyzeDefaultResponse>;
+    };
+    /** Resource for '/completions' has methods for the following verbs: post */
+    (path: "/completions"): {
+      post(
+        options: {
+          body: CompletionInput;
+        } & RequestParameters,
+      ): StreamableMethod<Completions200Response | CompletionsDefaultResponse>;
+    };
+  };
+};
+```
+
+```java
+public enum Mode {
+    STRICT("strict"),
+    LENIENT("lenient");
+}
+
+public final class CompletionInput {
+    public CompletionInput(BinaryData input)
+    public BinaryData getInput()
+}
+
+public final class AnalyzeClient {
+    public Response<BinaryData> analyzeWithResponse(String mode, BinaryData image, RequestOptions requestOptions)
+    public Response<BinaryData> completionsWithResponse(BinaryData input, RequestOptions requestOptions)
+    public AnalyzeResult analyze(Mode mode, byte[] image)
+    public CompletionResult completions(CompletionInput input)
+}
+```
+
+</ClientTabs>
+
+Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
+you must use `@sharedRoute`. By default, codegen will generate one method per operation name.
+
+<ClientTabs>
+
+```typespec title=client.tsp
+@sharedRoute
+@route("/foo")
+op a(x: int32): float;
+
+@sharedRoute
+@route("/foo")
+op b(x: string): int64;
+```
+
+```python
+def a(x: int) -> float:
+  # code
+
+def b(x: string) -> int:
+  # code
+```
+
+```csharp
+//protocol
+public Response A(RequestContent content, RequestContext context);
+public Response B(RequestContent content, RequestContext context);
+
+//convenience
+public Response<float> A(int x, CancellationToken token);
+public Response<long> B(string x, Cancellation token);
+```
+
+```typescript
+// from user experience perspective
+
+export type DemoServiceContext = Client & {
+  path: {
+    /** Resource for '/foo' has methods for the following verbs: post */
+    (path: "/foo"): {
+      post(
+        options?: {
+          body?: {
+            x: number;
+          };
+        } & RequestParameters,
+      ): StreamableMethod<A200Response>;
+      post(
+        options?: {
+          body?: {
+            x: string;
+          };
+        } & RequestParameters,
+      ): StreamableMethod<B200Response>;
+    };
+  };
+};
+```
+
+```java
+public final class Client {
+    public Response<BinaryData> aWithResponse(BinaryData request, RequestOptions requestOptions)
+    public Response<BinaryData> bWithResponse(BinaryData request, RequestOptions requestOptions)
+    public double a(int x)
+    public long b(String x)
+}
+```
+
+</ClientTabs>
+
+### Customizations
+
+#### Merge `@sharedRoute` operations into one.
+
+If your shared routes are actually one unique semantic operation, you may want to configure codegen to use a unique name. This is simply done by renaming both operations to the same name using `@clientName`
+
+<ClientTabs>
+
+```typespec
+// main.tsp
+@sharedRoute
+@route("/foo")
+op a(x: int) : float
+
+@sharedRoute
+@route("/foo")
+op b(x: string) : int64
+
+// client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@@clientName(a, "Foo");
+@@clientName(b, "Foo");
+```
+
+```python
+@overload
+def foo(x: int) -> float:
+   ...
+
+@overload
+def foo(x: string) -> int:
+   ...
+
+def foo(x: string | int) -> float | int:
+   # Code here
+```
+
+```csharp
+//protocol
+public Response Foo(RequestContent content, RequestContext context);
+
+//convenience
+public Response<float> Foo(int x, CancellationToken token);
+public Response<long> Foo(string x, Cancellation token);
+```
+
+```typescript
+JS RLC is not in the business of customization with client.tsp
+```
+
+```java
+NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+## Conditional request headers
+
+The following sections document how to generate client libraries for conditional request headers such as `If-Match` and `If-None-Match`.
+
+<ClientTabs>
+
+```typespec
+model Response {
+  name: string;
+}
+
+@get
+op get(
+  /** The request should only proceed if an entity matches this string. */
+  @header("If-Match")
+  ifMatch?: string,
+
+  /** The request should only proceed if no entity matches this string. */
+  @header("If-None-Match")
+  ifNoneMatch?: string,
+): Response;
+```
+
+```python
+from azure.core import MatchConditions
+
+def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchConditions] = None) -> Response:
+```
+
+```csharp
+# TODO
+```
+
+```typescript
+# TODO
+```
+
+```java
+import com.azure.core.http.MatchConditions;
+
+public Response get(MatchConditions matchConditions);
+```
+
+```go
+type ClientGetOptions struct {
+	// The request should only proceed if an entity matches this string.
+	IfMatch *string
+
+	// The request should only proceed if no entity matches this string.
+	IfNoneMatch *string
+}
+
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+```
+
+</ClientTabs>

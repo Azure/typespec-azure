@@ -10,7 +10,7 @@ title: arm-resource-provisioning-state
 
 - optional
 - readonly
-- must at least contain `Succeeded`, `Canceled`, and `Canceled`
+- must at least contain `Succeeded`, `Canceled`, and `Failed`
 
 #### ❌ Incorrect
 
