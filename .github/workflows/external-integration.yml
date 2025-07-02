@@ -1,0 +1,84 @@
+name: External Integration
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  azure-rest-api-specs:
+    name: Azure REST API Specs
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'int:azure-specs') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Checkout Azure REST API specs
+        uses: actions/checkout@v4
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: azure-rest-api-specs
+          ref: typespec-next
+          fetch-depth: 1
+
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build and pack TypeSpec Azure packages
+        run: |
+          pnpm --filter "!@azure-tools/typespec-azure-website" --filter "!@azure-tools/typespec-azure-playground-*" --filter "!@typespec/playground-website" --filter="!./core/" -r build
+
+          pnpm chronus pack --pack-destination ./tgz-packages
+
+          # Also pack TypeSpec core packages
+          cd core
+          pnpm chronus pack --pack-destination ../tgz-packages --exclude standalone
+          cd ..
+
+          echo "Created tgz packages:"
+          ls -la ./tgz-packages/
+
+      - name: Update azure-rest-api-specs package.json
+        run: |
+          cd azure-rest-api-specs
+
+          echo "Updating package.json with TypeSpec dependencies..."
+          pnpm tsx ../.github/scripts/update-azure-specs-packages.ts . ../tgz-packages
+
+          echo "Installing dependencies..."
+          npm install --no-package-lock
+
+      - name: Run TypeSpec validation in azure-rest-api-specs
+        run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
+        working-directory: azure-rest-api-specs
+
+      - name: Revert package.json changes
+        run: |
+          echo "Reverting package.json changes..."
+          git checkout -- package.json || true
+        working-directory: azure-rest-api-specs
+
+      - name: Check for git changes
+        run: |
+          git_changes=$(git status --porcelain)
+          if [ -n "$git_changes" ]; then
+            echo "❌ Git changes detected after validation:"
+            echo "$git_changes"
+            git diff --color=always
+            exit 1
+          else
+            echo "✅ No git changes detected"
+          fi
+        working-directory: azure-rest-api-specs
