@@ -367,6 +367,10 @@
     }
   },
   "definitions": {
+    "Azure.Core.eTag": {
+      "type": "string",
+      "description": "The ETag (or entity tag) HTTP response header is an identifier for a specific version of a resource.\nIt lets caches be more efficient and save bandwidth, as a web server does not need to resend a full response if the content was not changed.\n\nIt is a string of ASCII characters placed between double quotes, like \"675af34563dc-tr34\"."
+    },
     "Azure.ResourceManager.CommonTypes.ExtendedLocation": {
       "type": "object",
       "description": "The complex type of the extended location.",
@@ -506,7 +510,7 @@
           "readOnly": true
         },
         "eTag": {
-          "type": "string",
+          "$ref": "#/definitions/Azure.Core.eTag",
           "description": "If eTag is provided in the response body, it may also be provided as a header per the normal etag convention.  Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields.",
           "readOnly": true
         },
