@@ -1,5 +1,17 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.22
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2901](https://github.com/Azure/typespec-azure/pull/2901) - Fixed ARM test template for large headers.
+  - Fixed ARM mockapi for user-defined error case.
+
+
 ## 0.1.0-alpha.21
 
 ### Features
