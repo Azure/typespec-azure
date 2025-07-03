@@ -46,7 +46,7 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
 
 async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
   return new Promise((resolve) => {
-    const process = spawn("npx", ["tsp", "compile", "."], {
+    const process = spawn("npx", ["tsp", "compile", ".", "--warn-as-error"], {
       cwd: directory,
       stdio: "pipe",
     });
