@@ -208,8 +208,6 @@ it("string fixed", async function () {
   });
   await runner.compileWithBuiltInAzureCoreService(`
     #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
-    @doc(".")
-    @fixed
     @usage(Usage.input | Usage.output)
     enum DaysOfWeekFixedEnum {
       @doc("Monday") Monday,
@@ -221,10 +219,8 @@ it("string fixed", async function () {
       @doc("Sunday") Sunday,
     }
 
-    @doc(".")
     @usage(Usage.input | Usage.output)
     model Test {
-      @doc(".")
       prop: DaysOfWeekFixedEnum
     }
   `);
