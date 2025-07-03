@@ -111,7 +111,6 @@ describe("data plane LRO templates", () => {
         "roundtrip model should have the usage of LroFinalEnvelope",
       );
       strictEqual(roundtripModel.serializationOptions.json?.name, "User");
-      assert.isUndefined(metadata.finalResponse?.resultPath);
       assert.isUndefined(metadata.finalResponse?.resultSegments);
     });
 
@@ -237,7 +236,6 @@ describe("data plane LRO templates", () => {
 
       strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
       strictEqual(metadata.finalResponse?.result, returnModel);
-      strictEqual(metadata.finalResponse?.resultPath, "result");
       // find the property
       const resultProperty = pollingModel.properties.find((p) => p.name === "result");
       ok(metadata.finalResponse?.resultSegments);
@@ -333,7 +331,6 @@ describe("data plane LRO templates", () => {
       ok(returnModel);
       strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
       strictEqual(metadata.finalResponse?.result, returnModel);
-      strictEqual(metadata.finalResponse?.resultPath, "result");
       // find the property
       const resultProperty = pollingModel.properties.find((p) => p.name === "result");
       ok(metadata.finalResponse?.resultSegments);
@@ -408,7 +405,6 @@ describe("data plane LRO templates", () => {
       strictEqual(lroMethod.kind, "lro");
       const lroMetadata = lroMethod.lroMetadata;
       ok(lroMetadata);
-      strictEqual(lroMetadata.finalResponse?.resultPath, "result"); // this is showing the typespec name, which is neither client name nor wire name
       // find the model
       const envelopeResult = runner.context.sdkPackage.models.find(
         (m) => m.name === "OperationDetails",
@@ -924,7 +920,6 @@ describe("Arm LRO templates", () => {
 
     strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
     strictEqual(metadata.finalResponse?.result, roundtripModel);
-    assert.isUndefined(metadata.finalResponse.resultPath);
     assert.isUndefined(metadata.finalResponse.resultSegments);
   });
 

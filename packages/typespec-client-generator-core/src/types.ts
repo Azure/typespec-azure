@@ -62,7 +62,6 @@ import {
 import {
   AccessFlags,
   SdkArrayType,
-  SdkBodyModelPropertyType,
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
@@ -74,7 +73,6 @@ import {
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
-  SdkInitializationType,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
@@ -106,7 +104,6 @@ import {
   isOnClient,
   listAllUserDefinedNamespaces,
   resolveConflictGeneratedName,
-  twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -121,7 +118,6 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
-import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
@@ -763,7 +759,7 @@ function addDiscriminatorToModelType(
       discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
-    model.properties.splice(0, 0, {
+    const discriminatorPropertyType: SdkModelPropertyType = {
       kind: "property",
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
@@ -785,8 +781,9 @@ function addDiscriminatorToModelType(
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
       decorators: [],
       access: "public",
-    });
-    model.discriminatorProperty = model.properties[0];
+    };
+    model.properties.splice(0, 0, discriminatorPropertyType);
+    model.discriminatorProperty = discriminatorPropertyType;
   }
   return diagnostics.wrap(undefined);
 }
@@ -797,18 +794,6 @@ export function getSdkModel(
   operation?: Operation,
 ): SdkModelType {
   return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
-}
-
-export function getInitializationType(
-  context: TCGCContext,
-  type: Model,
-  operation?: Operation,
-): SdkInitializationType {
-  const model = ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
-  for (const property of model.properties) {
-    property.kind = "method";
-  }
-  return model as SdkInitializationType;
 }
 
 export function getSdkModelWithDiagnostics(
@@ -1123,7 +1108,7 @@ export function getClientType(context: TCGCContext, type: Type, operation?: Oper
   return ignoreDiagnostics(getClientTypeWithDiagnostics(context, type, operation));
 }
 
-export function isReadOnly(property: SdkBodyModelPropertyType) {
+export function isReadOnly(property: SdkModelPropertyType) {
   if (
     property.visibility &&
     property.visibility.includes(Visibility.Read) &&
@@ -1322,7 +1307,7 @@ function getHttpOperationPart(
 function updateMultiPartInfo(
   context: TCGCContext,
   type: ModelProperty,
-  base: SdkBodyModelPropertyType,
+  base: SdkModelPropertyType,
   operation: Operation,
 ): [void, readonly Diagnostic[]] {
   const httpOperationPart = getHttpOperationPart(context, type, operation);
@@ -1367,19 +1352,8 @@ export function getSdkModelPropertyType(
   let property = context.__modelPropertyCache?.get(type);
 
   if (!property) {
-    const clientParams = operation
-      ? context.__clientParametersCache.get(context.getClientForOperation(operation))
-      : undefined;
-    const correspondingClientParams = clientParams?.find((x) =>
-      twoParamsEquivalent(context, x.__raw, type),
-    );
-    if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
-    const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
-
-    if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
-
     property = {
-      ...base,
+      ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
       kind: "property",
       optional: type.optional,
       discriminator: false,
@@ -1388,7 +1362,7 @@ export function getSdkModelPropertyType(
       flatten: shouldFlattenProperty(context, type),
       serializationOptions: {},
     };
-    updateReferencedPropertyMap(context, type, property);
+    context.__modelPropertyCache.set(type, property);
     if (operation && type.model) {
       const httpOperation = getHttpOperationWithCache(context, operation);
       const httpBody = httpOperation.parameters.body;
@@ -1431,17 +1405,6 @@ function addPropertiesToModelType(
     }
   }
   return diagnostics.wrap(undefined);
-}
-
-function updateReferencedPropertyMap(
-  context: TCGCContext,
-  type: ModelProperty,
-  sdkType: SdkModelPropertyType,
-) {
-  if (sdkType.kind !== "property") {
-    return;
-  }
-  context.__modelPropertyCache.set(type, sdkType);
 }
 
 function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkType) {
@@ -2056,7 +2019,7 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
@@ -2094,7 +2057,7 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
 ) {
   type.serializationOptions.json = {
     name:
@@ -2106,7 +2069,7 @@ function updateJsonSerializationOptions(
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
 ) {
   type.serializationOptions.xml = {
     name:

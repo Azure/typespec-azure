@@ -408,7 +408,7 @@ function handleHttpResponse(
 }
 
 function getSdkTypeExample(
-  type: SdkType | SdkModelPropertyType,
+  type: SdkType,
   example: any,
   relativePath: string,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
