@@ -163,7 +163,7 @@ async function main() {
   if (failureCount > 0) {
     console.log("\nFailed folders:");
     failedFolders.forEach((folder) => console.log(`  - ${folder}`));
-    
+
     // Exit with failure code to make the GitHub Actions job fail
     process.exit(1);
   }
