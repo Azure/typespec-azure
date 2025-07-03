@@ -220,10 +220,12 @@ Scenarios.Azure_ResourceManager_CommonProperties_Error_createForUserDefinedError
   response: {
     status: 400,
     body: json({
-      code: "BadRequest",
-      message: "Username should not contain only numbers.",
-      innererror: {
-        exceptiontype: "general",
+      error: {
+        code: "BadRequest",
+        message: "Username should not contain only numbers.",
+        innererror: {
+          exceptiontype: "general",
+        },
       },
     }),
   },

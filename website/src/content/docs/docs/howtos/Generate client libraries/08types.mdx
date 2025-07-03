@@ -409,7 +409,7 @@ type Point struct {
 
 The `@clientDoc` decorator can be used on everything that the `@doc` decorator can be applied to.
 
-When both `@doc` and `@clientDoc` are present, TCGC outputs the final documentation depending on the mode that you called `@clientDoc` with.
+When both `@doc` and `@clientDoc` are present, the generated code outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
 
 ## Models
@@ -431,42 +431,6 @@ model Properties {
 model Foo {
   @flattenProperty
   prop: Properties;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "model",
-  "name": "Foo",
-  "properties": [
-    {
-      "kind": "property",
-      "name": "prop",
-      "serializedName": "prop",
-      "flatten": true,
-      "optional": false,
-      "type": {
-        "kind": "model",
-        "name": "Properties",
-        "properties": [
-          {
-            "kind": "property",
-            "name": "name",
-            "serializedName": "name",
-            "flatten": false,
-            "optional": false,
-            "type": {
-              "kind": "string",
-              "encode": "string"
-            }
-          }
-        ]
-      }
-    }
-  ]
 }
 ```
 
@@ -619,41 +583,6 @@ model Animal is Record<unknown> {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "model",
-  "name": "Animal",
-  "properties": [
-    {
-      "kind": "property",
-      "name": "name",
-      "serializedName": "name",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    },
-    {
-      "kind": "property",
-      "name": "kind",
-      "serializedName": "kind",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    }
-  ],
-  "additionalProperties": {
-    "kind": "any"
-  }
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 Python models are designed to support adding any additional properties.
@@ -741,64 +670,6 @@ model Animal {
   name: string;
   kind: string;
   ...Record<AnimalProperty>;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "model",
-  "name": "Animal",
-  "properties": [
-    {
-      "kind": "property",
-      "name": "name",
-      "serializedName": "name",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    },
-    {
-      "kind": "property",
-      "name": "kind",
-      "serializedName": "kind",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    }
-  ],
-  "additionalProperties": {
-    "kind": "model",
-    "name": "AnimalProperty",
-    "properties": [
-      {
-        "kind": "property",
-        "name": "category",
-        "serializedName": "category",
-        "optional": false,
-        "type": {
-          "kind": "string",
-          "encode": "string"
-        }
-      },
-      {
-        "kind": "property",
-        "name": "value",
-        "serializedName": "value",
-        "optional": false,
-        "type": {
-          "kind": "any"
-        }
-      }
-    ],
-    "additionalProperties": undefined
-  }
 }
 ```
 
@@ -959,52 +830,6 @@ model Animal {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "model",
-  "name": "Animal",
-  "properties": [
-    {
-      "kind": "property",
-      "name": "name",
-      "serializedName": "name",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    },
-    {
-      "kind": "property",
-      "name": "kind",
-      "serializedName": "kind",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    }
-  ],
-  "additionalProperties": {
-    "kind": "union",
-    "name": "AnimalAdditionalProperty",
-    "generatedName": true,
-    "values": [
-      {
-        "kind": "string",
-        "encode": "string"
-      },
-      {
-        "kind": "int32"
-      }
-    ]
-  }
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 Python models are designed to support adding any additional properties.
@@ -1082,45 +907,6 @@ model Animal {
   name: string;
   kind: string;
   ...Record<string | null>;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "model",
-  "name": "Animal",
-  "properties": [
-    {
-      "kind": "property",
-      "name": "name",
-      "serializedName": "name",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    },
-    {
-      "kind": "property",
-      "name": "kind",
-      "serializedName": "kind",
-      "optional": false,
-      "type": {
-        "kind": "string",
-        "encode": "string"
-      }
-    }
-  ],
-  "additionalProperties": {
-    "kind": "nullable",
-    "valueType": {
-      "kind": "string",
-      "encode": "string"
-    }
-  }
 }
 ```
 
@@ -1240,57 +1026,6 @@ model Siamese extends Cat {
 
 model Ragdoll extends Cat {
   kind: CatKind.Ragdoll;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-TCGC currently only supports the discriminated set based on models, discriminated union is not supported yet.
-
-This is a brief structure of the models in a discriminated set in the output of TCGC.
-
-```json
-{
-  "models": [
-    {
-      "kind": "model",
-      "name": "Cat",
-      "properties": [
-        {
-          "kind": "property",
-          "name": "kind",
-          "type": {
-            "kind": "string"
-          },
-          "discriminator": true
-        }
-      ],
-      "discriminatorProperty": {
-        // the same instance of the property in the properties list here
-      },
-      "discriminatedSubtype": {
-        "siamese": {
-          "kind": "model",
-          "name": "Siamese",
-          "properties": [],
-          "discriminatorValue": "siamese"
-        },
-        "ragdoll": {
-          "kind": "model",
-          "name": "Ragdoll",
-          "properties": [],
-          "discriminatorValue": "ragdoll"
-        }
-      }
-    },
-    {
-      // the same instance of the model Siamese as we have above in `discriminatedSubtype` property
-    },
-    {
-      // the same instance of the model Ragdoll as we have above in `discriminatedSubtype` property
-    }
-  ]
 }
 ```
 
@@ -1488,89 +1223,6 @@ enum LR {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-A nullable type has kind `nullable` and property `valueType`. The kind of the type tells you the property is nullable, while the `valueType` tells you the underlying type you want to generate.
-
-```json
-{
-  "kind": "model",
-  "name": "Foo",
-  "properties": [
-    {
-      "kind": "property",
-      "name": "basicNullableProperty",
-      "serializedName": "basicNullableProperty",
-      "optional": false,
-      "type": {
-        "kind": "nullable",
-        "valueType": {
-          "kind": "string",
-          "encode": "string"
-        }
-      }
-    },
-    {
-      "kind": "property",
-      "name": "modelNullableProperty",
-      "serializedName": "modelNullableProperty",
-      "optional": false,
-      "type": {
-        "kind": "nullable",
-        "valueType": {
-          "kind": "model",
-          "name": "Bar",
-          "properties": [
-            {
-              "kind": "property",
-              "name": "prop",
-              "serializedName": "prop",
-              "optional": false,
-              "type": {
-                "kind": "string",
-                "encode": "string"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "kind": "property",
-      "name": "enumNullableProperty",
-      "serializedName": "enumNullableProperty",
-      "optional": false,
-      "type": {
-        "kind": "nullable",
-        "valueType": {
-          "kind": "enum",
-          "name": "LR",
-          "generatedName": false,
-          "valueType": {
-            "kind": "string"
-          },
-          "values": [
-            {
-              "kind": "enumvalue",
-              "name": "left",
-              "value": "left"
-            },
-            {
-              "kind": "enumvalue",
-              "name": "right",
-              "value": "right"
-            }
-          ],
-          "isFixed": true,
-          "isUnionAsEnum": false
-        }
-      }
-    }
-  ]
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 Python treat nullable as optional. If you actually want to send the value `null` to the service without the property being ignored, you can send in `corehttp.serialization.NULL`. Python does not restrict you from setting any property to this value.
@@ -1624,34 +1276,6 @@ All emitters will generate their version of a closed enum.
 union LR {
   left: "left",
   right: "right",
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "enum",
-  "name": "LR",
-  "generatedName": false,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "left",
-      "value": "left"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "right",
-      "value": "right"
-    }
-  ],
-  "isFixed": true,
-  "isUnionAsEnum": true
 }
 ```
 
@@ -1712,34 +1336,6 @@ This is union defined inline at point of usage.
 ```typespec
 model Widget {
   horizontal: "left" | "right";
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "enum",
-  "name": "WidgetHorizontals",
-  "generatedName": true,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "left",
-      "value": "left"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "right",
-      "value": "right"
-    }
-  ],
-  "isFixed": true,
-  "isUnionAsEnum": true
 }
 ```
 
@@ -1808,34 +1404,6 @@ union Colors {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "enum",
-  "name": "Colors",
-  "generatedName": false,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "red",
-      "value": "red"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "blue",
-      "value": "blue"
-    }
-  ],
-  "isFixed": false,
-  "isUnionAsEnum": true
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 Python generates open enum again here.
@@ -1892,34 +1460,6 @@ This is union defined inline at point of usage which include the base type as an
 ```typespec
 model Widget {
   color: "red" | "blue" | string;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "enum",
-  "name": "WidgetColors",
-  "generatedName": true,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "red",
-      "value": "red"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "blue",
-      "value": "blue"
-    }
-  ],
-  "isFixed": false,
-  "isUnionAsEnum": true
 }
 ```
 
@@ -1986,96 +1526,6 @@ union ProvisioningState {
   string,
   "InProgress",
   Azure.ResourceManager.ResourceProvisioningState,
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-For union of other union or enum. TCGC will do the flatten according to the flag.
-
-With `flatten-union-as-enum` flagged `true`:
-
-```json
-{
-  "kind": "enum",
-  "name": "ProvisioningState",
-  "generatedName": false,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "InProgress",
-      "value": "InProgress"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "Succeeded",
-      "value": "Succeeded"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "Failed",
-      "value": "Failed"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "Canceled",
-      "value": "Canceled"
-    }
-  ],
-  "isFixed": false,
-  "isUnionAsEnum": true
-}
-```
-
-With `flatten-union-as-enum` flagged `false`:
-
-```json
-{
-  "kind": "union",
-  "name": "ProvisioningState",
-  "generatedName": false,
-  "values": [
-    {
-      "kind": "string"
-    },
-    {
-      "kind": "constant",
-      "value": "InProgress",
-      "valueType": {
-        "kind": "string"
-      }
-    },
-    {
-      "kind": "enum",
-      "name": "ResourceProvisioningState",
-      "generatedName": false,
-      "valueType": {
-        "kind": "string"
-      },
-      "values": [
-        {
-          "kind": "enumvalue",
-          "name": "Succeeded",
-          "value": "Succeeded"
-        },
-        {
-          "kind": "enumvalue",
-          "name": "Failed",
-          "value": "Failed"
-        },
-        {
-          "kind": "enumvalue",
-          "name": "Canceled",
-          "value": "Canceled"
-        }
-      ],
-      "isFixed": true,
-      "isUnionAsEnum": false
-    }
-  ]
 }
 ```
 
@@ -2160,103 +1610,6 @@ union Orientation {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-For union of other union or enum. TCGC will do the flatten according to the flag.
-
-With `flatten-union-as-enum` flagged `true`:
-
-```json
-{
-  "kind": "enum",
-  "name": "Orientation",
-  "generatedName": false,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "left",
-      "value": "left"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "right",
-      "value": "right"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "up",
-      "value": "up"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "down",
-      "value": "down"
-    }
-  ],
-  "isFixed": true,
-  "isUnionAsEnum": true
-}
-```
-
-With `flatten-union-as-enum` flagged `false`:
-
-```json
-{
-  "kind": "union",
-  "name": "Orientation",
-  "generatedName": false,
-  "values": [
-    {
-      "kind": "enum",
-      "name": "LR",
-      "generatedName": false,
-      "valueType": {
-        "kind": "string"
-      },
-      "values": [
-        {
-          "kind": "enumvalue",
-          "name": "left",
-          "value": "left"
-        },
-        {
-          "kind": "enumvalue",
-          "name": "right",
-          "value": "right"
-        }
-      ],
-      "isFixed": true,
-      "isUnionAsEnum": true
-    },
-    {
-      "kind": "enum",
-      "name": "UD",
-      "generatedName": false,
-      "valueType": {
-        "kind": "string"
-      },
-      "values": [
-        {
-          "kind": "enumvalue",
-          "name": "up",
-          "value": "up"
-        },
-        {
-          "kind": "enumvalue",
-          "name": "down",
-          "value": "down"
-        }
-      ],
-      "isFixed": true,
-      "isUnionAsEnum": true
-    }
-  ]
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 ```python
@@ -2325,103 +1678,6 @@ union UD {
 
 model Widget {
   orientation: LR | UD;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-For union of other union or enum. TCGC will do the flatten according to the flag.
-
-With `flatten-union-as-enum` flagged `true`:
-
-```json
-{
-  "kind": "enum",
-  "name": "WidgetOrientations",
-  "generatedName": true,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "left",
-      "value": "left"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "right",
-      "value": "right"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "up",
-      "value": "up"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "down",
-      "value": "down"
-    }
-  ],
-  "isFixed": true,
-  "isUnionAsEnum": true
-}
-```
-
-With `flatten-union-as-enum` flagged `false`:
-
-```json
-{
-  "kind": "union",
-  "name": "WidgetOrientations",
-  "generatedName": true,
-  "values": [
-    {
-      "kind": "enum",
-      "name": "LR",
-      "generatedName": false,
-      "valueType": {
-        "kind": "string"
-      },
-      "values": [
-        {
-          "kind": "enumvalue",
-          "name": "left",
-          "value": "left"
-        },
-        {
-          "kind": "enumvalue",
-          "name": "right",
-          "value": "right"
-        }
-      ],
-      "isFixed": true,
-      "isUnionAsEnum": true
-    },
-    {
-      "kind": "enum",
-      "name": "UD",
-      "generatedName": false,
-      "valueType": {
-        "kind": "string"
-      },
-      "values": [
-        {
-          "kind": "enumvalue",
-          "name": "up",
-          "value": "up"
-        },
-        {
-          "kind": "enumvalue",
-          "name": "down",
-          "value": "down"
-        }
-      ],
-      "isFixed": true,
-      "isUnionAsEnum": true
-    }
-  ]
 }
 ```
 
@@ -2500,34 +1756,6 @@ enum LR {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "enum",
-  "name": "LR",
-  "generatedName": false,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "left",
-      "value": "left"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "right",
-      "value": "right"
-    }
-  ],
-  "isFixed": true,
-  "isUnionAsEnum": false
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 Python never generates closed enums by design. We will always permit users to pass in additional values.
@@ -2589,35 +1817,6 @@ enum Versions {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "enum",
-  "name": "Versions",
-  "generatedName": false,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "v1",
-      "value": "v1"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "v2",
-      "value": "v2"
-    }
-  ],
-  "isFixed": true,
-  "isUnionAsEnum": false,
-  "usage": 8
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 ```
@@ -2672,44 +1871,6 @@ enum UD {
 enum Orientation {
   ...LR,
   ...UD,
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "enum",
-  "name": "Orientation",
-  "generatedName": false,
-  "valueType": {
-    "kind": "string"
-  },
-  "values": [
-    {
-      "kind": "enumvalue",
-      "name": "left",
-      "value": "left"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "right",
-      "value": "right"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "up",
-      "value": "up"
-    },
-    {
-      "kind": "enumvalue",
-      "name": "down",
-      "value": "down"
-    }
-  ],
-  "isFixed": true,
-  "isUnionAsEnum": false
 }
 ```
 
@@ -2781,23 +1942,6 @@ model Test {
 ```
 
 </ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "property",
-  "name": "prop",
-  "type": {
-    "kind": "utcDateTime",
-    "encode": "rfc3339",
-    "wireType": {
-      "kind": "string"
-    }
-  }
-}
-```
-
-</ClientTabItem>
 <ClientTabItem lang="python">
 
 ```python
@@ -2840,23 +1984,6 @@ When you specify an encoding type, say that you want to encode an integer as a s
 model Test {
   @encode(string)
   prop: int64;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="tcgc">
-
-```json
-{
-  "kind": "property",
-  "name": "prop",
-  "type": {
-    "kind": "int64",
-    "encode": "string",
-    "wireType": {
-      "kind": "string"
-    }
-  }
 }
 ```
 

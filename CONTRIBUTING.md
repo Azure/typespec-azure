@@ -383,9 +383,10 @@ Process labels
 
 Misc labels
 
-| Name               | Color   | Description        |
-| ------------------ | ------- | ------------------ |
-| `good first issue` | #7057ff | Good for newcomers |
+| Name               | Color   | Description                                        |
+| ------------------ | ------- | -------------------------------------------------- |
+| `good first issue` | #7057ff | Good for newcomers                                 |
+| `int:azure-specs`  | #0e8a16 | Run integration tests against azure-rest-api-specs |
 
 #### external
 

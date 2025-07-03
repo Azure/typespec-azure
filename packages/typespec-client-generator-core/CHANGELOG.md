@@ -1,5 +1,16 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.57.3
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2859](https://github.com/Azure/typespec-azure/pull/2859) Add support for other lro metadata
+
+
 ## 0.57.2
 
 ### Features
