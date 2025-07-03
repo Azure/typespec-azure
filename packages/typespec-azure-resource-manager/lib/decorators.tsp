@@ -152,16 +152,48 @@ extern dec armResourceList(target: Operation, resourceType: Model);
 
 /**
  * This decorator is used to identify interfaces containing resource operations.
- * When applied, it marks the interface with the `@autoRoute` decorator so that
+ * By default, it marks the interface with the `@autoRoute` decorator so that
  * all of its contained operations will have their routes generated
  * automatically.
  *
- * It also adds a `@tag` decorator bearing the name of the interface so that all
+ * The decorator also adds a `@tag` decorator bearing the name of the interface so that all
  * of the operations will be grouped based on the interface name in generated
  * clients.
- * @param _ DEPRECATED
+ *
+ * The optional `resourceOperationOptions` parameter provides additional options.
+ * `allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+ * choose static (`@route`) or automatic (`@autoRoute`) routing.
+ *
+ * `resourceType: Model` specifies the resource type for the operations in the interface
+ *
+ * `omitTags: true`: turns off the default tagging of operations in the interface, so that individual operations must be
+ * individually tagged
+ *
+ *
+ * @param resourceOperationOptions Options for routing the operations in the interface and associating them with a specific resource
  */
-extern dec armResourceOperations(target: Interface, _?: unknown);
+extern dec armResourceOperations(
+  target: Interface,
+  resourceOperationOptions?: (valueof ResourceOperationOptions) | unknown
+);
+
+/** Interface-level operation options */
+model ResourceOperationOptions {
+  /**
+   * The resource type for the operations in the interface
+   */
+  resourceType?: Model;
+
+  /**
+   * If true, turns off autoRoute for the interface, so individual operations can choose static (`@route`) or automatic (`@autoRoute`) routing.
+   */
+  allowStaticRoutes?: boolean;
+
+  /**
+   * If true, turns off the default tagging of operations in the interface, so that individual operations must be individually tagged
+   */
+  omitTags?: boolean;
+}
 
 /**
  * This decorator is used either on a namespace or a version enum value to indicate
@@ -180,7 +212,7 @@ extern dec armCommonTypesVersion(
  *
  * @param propertiesType: The type of the resource properties.
  */
-extern dec armVirtualResource(target: Model);
+extern dec armVirtualResource(target: Model, provider?: valueof string);
 
 /**
  * This decorator sets the base type of the given resource.
@@ -189,7 +221,7 @@ extern dec armVirtualResource(target: Model);
  */
 extern dec resourceBaseType(
   target: Model,
-  baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension"
+  baseTypeIt: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension"
 );
 
 /**

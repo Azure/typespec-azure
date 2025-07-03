@@ -1,10 +1,11 @@
-import { Model } from "@typespec/compiler";
+import { Interface, Model, Operation } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { getHttpOperation } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
-import { checkFor } from "./test-host.js";
+import { checkFor, compileAndDiagnose } from "./test-host.js";
 
 function assertLifecycleOperation(
   resource: ArmResourceDetails,
@@ -850,6 +851,552 @@ interface RestorePointOperations {
     expect(diskRestorePoint).toBeDefined();
   });
 
+  it("allows extension of foreign resources", async () => {
+    const { program, types, diagnostics } = await compileAndDiagnose(`
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+namespace Microsoft.ContosoProviderHub;
+
+/** A ContosoProviderHub extension resource */
+model Employee is ExtensionResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  string,
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  get is Extension.Read<Scope, Employee>;
+
+  create is Extension.CreateOrReplaceAsync<Scope, Employee>;
+  update is Extension.CustomPatchSync<
+    Scope,
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is Extension.DeleteWithoutOkAsync<Scope, Employee>;
+  list is Extension.ListByTarget<Scope, Employee>;
+  move is Extension.ActionSync<Scope, Employee, MoveRequest, MoveResponse>;
+}
+
+/** Virtual resource for a virtual machine */
+alias VirtualMachine = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachines",
+  "vmName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine"
+>;
+
+
+@test
+@armResourceOperations
+interface Employees extends EmplOps<Extension.ScopeParameter> {}
+@test
+@armResourceOperations
+interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+@test
+@armResourceOperations
+interface VirtualMachines extends EmplOps<VirtualMachine> {}
+
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
+}
+
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    const { Employees, ManagementGroups, VirtualMachines } = types as {
+      Employees: Interface;
+      ManagementGroups: Interface;
+      VirtualMachines: Interface;
+    };
+    const employeesGet: Operation | undefined = Employees?.operations?.get("get");
+    ok(employeesGet);
+    expect(employeesGet?.kind).toBe("Operation");
+    const [employeeGetHttp, _e] = getHttpOperation(program, employeesGet);
+    expect(employeeGetHttp.path).toBe(
+      "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+    const managementGet: Operation | undefined = ManagementGroups?.operations?.get("get");
+    ok(managementGet);
+    expect(managementGet?.kind).toBe("Operation");
+    const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
+    expect(managementGetHttp.path).toBe(
+      "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+    const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
+    ok(virtualMachinesGet);
+    expect(virtualMachinesGet?.kind).toBe("Operation");
+    const [vmGetHttp, _v] = getHttpOperation(program, virtualMachinesGet);
+    expect(vmGetHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+  });
+
+  it("overrides provider namespace in mixed legacy and resource operations", async () => {
+    const { program, types, diagnostics } = await compileAndDiagnose(`
+using Azure.Core;
+
+#suppress "@azure-tools/typespec-azure-core/require-versioned"
+#suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+namespace Microsoft.ContosoProviderHub;
+
+/** A ContosoProviderHub resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+interface EmplOps extends Azure.ResourceManager.Legacy.LegacyOperations<
+BaseParams & {...ParentKeysOf<Employee>},
+{...KeysOf<Employee>}> {}
+
+alias BaseParams = {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  };
+
+
+@armResourceOperations
+interface Employees {
+  @test
+  get is EmplOps.Read<Employee>;
+  
+  /** A sample HEAD operation to check resource existence */
+  @test
+  checkExistence is Azure.ResourceManager.ArmResourceCheckExistence<Employee>;
+}
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    const { get, checkExistence } = types as {
+      get: Operation;
+      checkExistence: Operation;
+    };
+    ok(get);
+    expect(get?.kind).toBe("Operation");
+    const [employeeGetHttp, _e] = getHttpOperation(program, get);
+    expect(employeeGetHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+
+    ok(checkExistence);
+    expect(checkExistence?.kind).toBe("Operation");
+    const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
+    expect(existenceHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+  });
+
+  it("uses route override in routed operations", async () => {
+    const { program, types, diagnostics } = await compileAndDiagnose(`
+using Azure.Core;
+
+#suppress "@azure-tools/typespec-azure-core/require-versioned"
+#suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+namespace Microsoft.ContosoProviderHub;
+
+/** A ContosoProviderHub resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+interface EmplOps extends Azure.ResourceManager.Legacy.RoutedOperations<
+BaseParams & {...ParentKeysOf<Employee>},
+{...KeysOf<Employee>}, ErrorResponse, #{useStaticRoute: true, route: "/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees"}> {}
+
+alias BaseParams = {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+  };
+
+@armResourceOperations(#{ allowStaticRoutes: true})
+interface Employees {
+  @test
+  get is EmplOps.Read<Employee>;
+  
+  /** A sample HEAD operation to check resource existence */
+  @test
+  checkExistence is Azure.ResourceManager.ArmResourceCheckExistence<Employee>;
+}
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    const { get, checkExistence } = types as {
+      get: Operation;
+      checkExistence: Operation;
+    };
+    ok(get);
+    expect(get?.kind).toBe("Operation");
+    const [employeeGetHttp, _e] = getHttpOperation(program, get);
+    expect(employeeGetHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees/{employeeName}",
+    );
+
+    ok(checkExistence);
+    expect(checkExistence?.kind).toBe("Operation");
+    const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
+    expect(existenceHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+  });
+
+  it("overrides provider namespace in custom operations", async () => {
+    const { program, types, diagnostics } = await compileAndDiagnose(`
+using Azure.Core;
+
+#suppress "@azure-tools/typespec-azure-core/require-versioned"
+#suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+namespace Microsoft.ContosoProviderHub;
+
+/** A ContosoProviderHub resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+interface EmplOps extends Azure.ResourceManager.Legacy.LegacyOperations<
+BaseParams & {...ParentKeysOf<Employee>},
+{...KeysOf<Employee>}> {}
+
+alias BaseParams = {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  };
+
+
+@armResourceOperations
+interface Employees {
+  @test
+  /** a simple get */
+  @armResourceRead(Employee)
+  @get op get(...BaseParams, ...KeysOf<Employee>): Employee;
+  
+  /** A sample HEAD operation to check resource existence */
+  @test
+  checkExistence is Azure.ResourceManager.ArmResourceCheckExistence<Employee>;
+}
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    const { get, checkExistence } = types as {
+      get: Operation;
+      checkExistence: Operation;
+    };
+    ok(get);
+    expect(get?.kind).toBe("Operation");
+    const [employeeGetHttp, _e] = getHttpOperation(program, get);
+    expect(employeeGetHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+
+    ok(checkExistence);
+    expect(checkExistence?.kind).toBe("Operation");
+    const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
+    expect(existenceHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+  });
+
+  it("overrides provider namespace in legacy operations", async () => {
+    const { program, types, diagnostics } = await compileAndDiagnose(`
+using Azure.Core;
+
+
+#suppress "@azure-tools/typespec-azure-core/require-versioned"
+#suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+namespace Microsoft.ContosoProviderHub;
+
+/** A ContosoProviderHub resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  string,
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** Resource has been created. */
+  Succeeded: "Succeeded",
+
+  /** Resource creation failed. */
+  Failed: "Failed",
+
+  /** Resource creation was canceled. */
+  Canceled: "Canceled",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
+interface EmplOps extends Azure.ResourceManager.Legacy.LegacyOperations<
+BaseParams & {...ParentKeysOf<Employee>},
+{...KeysOf<Employee>}> {}
+
+alias BaseParams = {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  };
+
+
+@armResourceOperations
+interface Employees {
+  @test
+  get is EmplOps.Read<Employee>;
+}
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+    const { get } = types as {
+      get: Operation;
+      checkExistence: Operation;
+    };
+    ok(get);
+    expect(get?.kind).toBe("Operation");
+    const [employeeGetHttp, _] = getHttpOperation(program, get);
+    expect(employeeGetHttp.path).toBe(
+      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    );
+  });
+
   it("emits diagnostics for non ARM resources", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
@@ -1085,6 +1632,50 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
         code: "@azure-tools/typespec-azure-resource-manager/decorator-param-wrong-type",
         message:
           "The @identifiers decorator must be applied to a property that is an array of objects",
+      },
+    ]);
+  });
+
+  it("emits diagnostics when a provider cannot be updated", async () => {
+    const { diagnostics } = await checkFor(`
+    using Azure.Core;
+#suppress "@azure-tools/typespec-azure-core/require-versioned"
+#suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+namespace Microsoft.ContosoProviderHub {
+
+  @armResourceOperations
+  interface VirtualMachines {
+    @armResourceRead(Azure.ResourceManager.Extension.VirtualMachine)
+    @get op read(
+     ...ApiVersionParameter;
+     ...Extension.TargetProviderNamespace<Azure.ResourceManager.Extension.VirtualMachine>;
+     ...KeysOf<Azure.ResourceManager.Extension.VirtualMachine>): void;
+  }
+
+}
+
+namespace Azure.ResourceManager.Extension {
+  model VirtualMachine {
+    /** The vm Name */
+   @visibility(Lifecycle.Read) @path @key @segment("virtualMachines") vmName: string;
+  }
+}
+
+`);
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/resource-without-provider-namespace",
+        message: `The resource "VirtualMachine" does not have a provider namespace.  Please use a resource in a namespace marked with '@armProviderNamespace' or a virtual resource with a specific namespace`,
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/resource-without-provider-namespace",
+        message: `The resource "VirtualMachine" does not have a provider namespace.  Please use a resource in a namespace marked with '@armProviderNamespace' or a virtual resource with a specific namespace`,
       },
     ]);
   });

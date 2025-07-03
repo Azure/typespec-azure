@@ -6,6 +6,7 @@ function azureResourceManagerCreateStateSymbol(name: string): symbol {
 }
 
 export const ArmStateKeys = {
+  armProviderCache: azureResourceManagerCreateStateSymbol("armProviderCache"),
   armProviderNamespaces: azureResourceManagerCreateStateSymbol("armProviderNamespaces"),
   armResourceOperations: azureResourceManagerCreateStateSymbol("armResourceOperations"),
   armResourceCollectionAction: azureResourceManagerCreateStateSymbol("armResourceCollectionAction"),
@@ -32,4 +33,5 @@ export const ArmStateKeys = {
   armCommonDefinitions: azureResourceManagerCreateStateSymbol("armCommonDefinitions"),
   armCommonParameters: azureResourceManagerCreateStateSymbol("armCommonParameters"),
   armCommonTypesVersions: azureResourceManagerCreateStateSymbol("armCommonTypesVersions"),
+  armResourceRoute: azureResourceManagerCreateStateSymbol("armResourceRoute"),
 };

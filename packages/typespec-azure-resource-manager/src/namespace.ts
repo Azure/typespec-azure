@@ -23,7 +23,7 @@ import {
 } from "../generated-defs/Azure.ResourceManager.js";
 import { $armCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
-import { getSingletonResourceKey } from "./resource.js";
+import { getArmVirtualResourceDetails, getSingletonResourceKey } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
 function getArmCommonTypesVersion(
@@ -271,19 +271,30 @@ export function getArmProviderNamespace(
   program: Program,
   entity: Namespace | Model,
 ): string | undefined {
-  let currentNamespace: Namespace | undefined =
-    entity.kind === "Namespace" ? entity : entity.namespace;
+  if (entity.kind === "Model") {
+    const details = getArmVirtualResourceDetails(program, entity);
+    if (details?.provider !== undefined) {
+      return details.provider;
+    }
+  }
 
+  const currentNamespace: Namespace | undefined =
+    entity.kind === "Namespace" ? entity : entity.namespace;
+  return getArmProviderFromNamespace(program, currentNamespace);
+}
+
+function getArmProviderFromNamespace(
+  program: Program,
+  ns: Namespace | undefined,
+): string | undefined {
   let armProviderNamespace: string | undefined;
-  while (currentNamespace) {
-    armProviderNamespace = program
-      .stateMap(ArmStateKeys.armProviderNamespaces)
-      .get(currentNamespace);
+  while (ns) {
+    armProviderNamespace = program.stateMap(ArmStateKeys.armProviderNamespaces).get(ns);
     if (armProviderNamespace) {
       return armProviderNamespace;
     }
 
-    currentNamespace = currentNamespace.namespace;
+    ns = ns.namespace;
   }
 
   return undefined;

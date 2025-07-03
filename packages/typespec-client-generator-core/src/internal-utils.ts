@@ -94,18 +94,37 @@ export const omitOperation = createStateSymbol("omitOperation");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
-    listScopedDecoratorData(context, clientKey).length > 0 ||
-    listScopedDecoratorData(context, operationGroupKey).length > 0
+    listScopedDecoratorData(context, clientKey).size > 0 ||
+    listScopedDecoratorData(context, operationGroupKey).size > 0
   );
 }
 
-export function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
-  const retval = [...context.program.stateMap(key).values()];
-  return retval
-    .filter((targetEntry) => {
-      return targetEntry[context.emitterName] || targetEntry[AllScopes];
-    })
-    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
+export function listScopedDecoratorData(
+  context: TCGCContext,
+  key: symbol,
+  languageScope?: string | typeof AllScopes,
+): Map<Type, any> {
+  const scope = languageScope ?? context.emitterName;
+  const retval: Map<Type, any> = new Map();
+  for (const [type, data] of context.program.stateMap(key).entries()) {
+    if (data[scope]) {
+      // positive scope case
+      retval.set(type, data[scope]);
+    } else if (data[negationScopesKey]) {
+      // negative scope case
+      if (data[negationScopesKey].includes(scope)) {
+        // if the scope is negated, we should not include it
+        continue;
+      } else {
+        // if the scope is not negated, we should include it
+        retval.set(type, data[AllScopes]);
+      }
+    } else if (data[AllScopes]) {
+      // all scopes case
+      retval.set(type, data[AllScopes]);
+    }
+  }
+  return retval;
 }
 
 export function getScopedDecoratorData(
@@ -759,4 +778,15 @@ export function compareModelProperties(
   const sdkA = ignoreDiagnostics(getSdkHttpParameter(context, modelPropA));
   const sdkB = ignoreDiagnostics(getSdkHttpParameter(context, modelPropB));
   return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
+}
+
+export function* filterMapValuesIterator<V>(
+  iterator: MapIterator<V>,
+  predicate: (value: V) => boolean,
+): MapIterator<V> {
+  for (const value of iterator) {
+    if (predicate(value)) {
+      yield value;
+    }
+  }
 }

@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix `disableUsageAccessPropagationToBase` issue for discriminated model.
+Add support for other lro metadata

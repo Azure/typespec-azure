@@ -768,7 +768,58 @@ describe("data plane LRO templates", () => {
     strictEqual(models.length, 4);
     const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
     ok(analyzeOperationModel);
+    const analyzeResultProp = analyzeOperationModel.properties.find(
+      (p) => p.name === "analyzeResult",
+    );
+    ok(analyzeResultProp);
+    const analyzeResultModel = models.find((m) => m.name === "AnalyzeResult");
+    strictEqual(analyzeResultProp.type, analyzeResultModel);
+    ok(analyzeResultModel);
     strictEqual(analyzeOperationModel.usage, UsageFlags.LroFinalEnvelope | UsageFlags.LroPolling);
+    const analyzeDocument = runnerWithCore.context.sdkPackage.clients[0].methods[0];
+    strictEqual(analyzeDocument.kind, "lro");
+    const lroMetadata = analyzeDocument.lroMetadata;
+    strictEqual(lroMetadata.envelopeResult, analyzeOperationModel);
+    strictEqual(lroMetadata.finalEnvelopeResult, analyzeOperationModel);
+    const finalResponse = lroMetadata.finalResponse;
+    ok(finalResponse);
+    strictEqual(finalResponse.envelopeResult, analyzeOperationModel);
+    strictEqual(finalResponse.result, analyzeResultModel);
+    strictEqual(finalResponse.resultSegments?.length, 1);
+    strictEqual(finalResponse.resultSegments[0], analyzeResultProp);
+    strictEqual(lroMetadata.finalResultPath, "analyzeResult");
+    strictEqual(lroMetadata.finalStateVia, FinalStateValue.operationLocation);
+    const finalStep = lroMetadata.finalStep;
+    ok(finalStep);
+    strictEqual(finalStep.kind, "pollingSuccessProperty");
+    strictEqual(finalStep.responseModel, analyzeResultModel);
+    strictEqual(finalStep.sourceProperty, analyzeResultProp);
+    strictEqual(finalStep.target, analyzeResultProp);
+    strictEqual(lroMetadata.logicalPath, "analyzeResult");
+    strictEqual(lroMetadata.logicalResult, analyzeResultModel);
+    const operation = lroMetadata.operation;
+    strictEqual(operation.kind, "http");
+    strictEqual(operation.path, "/documentModels/{modelId}:analyze");
+    ok(operation.bodyParam);
+    strictEqual(operation.verb, "post");
+    const pollingInfo = lroMetadata.pollingInfo;
+    strictEqual(pollingInfo.kind, "pollingOperationStep");
+    strictEqual(pollingInfo.responseModel, analyzeOperationModel);
+    strictEqual(pollingInfo.resultProperty, analyzeResultProp);
+    strictEqual(
+      pollingInfo.errorProperty,
+      analyzeOperationModel.properties.find((p) => p.name === "error"),
+    );
+    const terminationStatus = pollingInfo.terminationStatus;
+    strictEqual(terminationStatus.kind, "model-property");
+    deepStrictEqual(terminationStatus.canceledState, ["canceled", "skipped"]);
+    deepStrictEqual(terminationStatus.failedState, ["failed"]);
+    deepStrictEqual(terminationStatus.succeededState, ["succeeded"]);
+    strictEqual(
+      terminationStatus.property,
+      analyzeOperationModel.properties.find((p) => p.name === "status"),
+    );
+    strictEqual(lroMetadata.pollingStep.responseBody, analyzeOperationModel);
   });
 });
 

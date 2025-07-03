@@ -28,6 +28,7 @@ import {
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
   ResourceGroupResourceDecorator,
+  ResourceOperationOptions,
   SingletonDecorator,
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
@@ -60,6 +61,11 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
   resourceTypePath?: string;
 }
 
+export interface ArmVirtualResourceDetails {
+  kind: "Virtual";
+  provider?: string;
+}
+
 /**
  * Marks the given resource as an external resource
  * @param context The decorator context
@@ -69,10 +75,15 @@ export interface ArmResourceDetails extends ArmResourceDetailsBase {
 export const $armVirtualResource: ArmVirtualResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
+  provider: string | undefined = undefined,
 ) => {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
-  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, "Virtual");
+  const result: ArmVirtualResourceDetails = {
+    kind: "Virtual",
+    provider,
+  };
+  program.stateMap(ArmStateKeys.armBuiltInResource).set(entity, result);
   const pathProperty = getProperty(
     entity,
     (p) => isPathParam(program, p) && getSegment(program, p) !== undefined,
@@ -126,9 +137,37 @@ function getProperty(
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
 export function isArmVirtualResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target) === true) return true;
-  if (target.baseModel) return isArmVirtualResource(program, target.baseModel);
-  return false;
+  return getArmVirtualResourceDetails(program, target) !== undefined;
+}
+
+/**
+ *
+ * @param program The program to process.
+ * @param target The model to get details for
+ * @returns The resource details if the model is an external resource, otherwise undefined.
+ */
+export function getArmVirtualResourceDetails(
+  program: Program,
+  target: Model,
+  visited: Set<Model> = new Set<Model>(),
+): ArmVirtualResourceDetails | undefined {
+  if (visited.has(target)) return undefined;
+  visited.add(target);
+  if (program.stateMap(ArmStateKeys.armBuiltInResource).has(target)) {
+    return program
+      .stateMap(ArmStateKeys.armBuiltInResource)
+      .get(target) as ArmVirtualResourceDetails;
+  }
+
+  if (target.baseModel) {
+    const details = getArmVirtualResourceDetails(program, target.baseModel, visited);
+    if (details) return details;
+  }
+  const parent = getParentResource(program, target);
+  if (parent) {
+    return getArmVirtualResourceDetails(program, parent, visited);
+  }
+  return undefined;
 }
 
 /**
@@ -280,6 +319,21 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
   return undefined;
 }
 
+function getResourceOperationOptions(
+  type: ResourceOperationOptions | unknown,
+): ResourceOperationOptions {
+  const defaultOptions: ResourceOperationOptions = {
+    allowStaticRoutes: false,
+    omitTags: false,
+  };
+
+  const options = type as ResourceOperationOptions;
+  if (options === undefined || typeof options !== "object") {
+    return defaultOptions;
+  }
+  return options;
+}
+
 /**
  * This decorator is used to identify interfaces containing resource operations.
  * When applied, it marks the interface with the `@autoRoute` decorator so that
@@ -293,15 +347,21 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
 export const $armResourceOperations: ArmResourceOperationsDecorator = (
   context: DecoratorContext,
   interfaceType: Interface,
+  resourceOperationsOptions?: ResourceOperationOptions | unknown,
 ) => {
   const { program } = context;
+  const options = getResourceOperationOptions(resourceOperationsOptions);
 
-  // All resource interfaces should use @autoRoute
-  context.call($autoRoute, interfaceType);
+  if (!options.allowStaticRoutes) {
+    // All resource interfaces should use @autoRoute
+    context.call($autoRoute, interfaceType);
+  }
 
-  // If no tag is given for the interface, tag it with the interface name
-  if (getTags(program, interfaceType).length === 0) {
-    context.call($tag, interfaceType, interfaceType.name);
+  if (!options.omitTags) {
+    // If no tag is given for the interface, tag it with the interface name
+    if (getTags(program, interfaceType).length === 0) {
+      context.call($tag, interfaceType, interfaceType.name);
+    }
   }
 };
 
@@ -333,6 +393,9 @@ export enum ResourceBaseType {
   Location = "Location",
   ResourceGroup = "ResourceGroup",
   Extension = "Extension",
+  BuiltIn = "BuiltIn",
+  BuiltInSubscription = "BuiltInSubscription",
+  BuiltInResourceGroup = "BuiltInResourceGroup",
 }
 
 export const $resourceBaseType: ResourceBaseTypeDecorator = (
@@ -508,7 +571,7 @@ function getServiceNamespace(program: Program, type: Type | undefined): string |
   }
 }
 
-function setResourceBaseType(program: Program, resource: Model, type: string) {
+export function setResourceBaseType(program: Program, resource: Model, type: string) {
   if (program.stateMap(ArmStateKeys.resourceBaseType).has(resource)) {
     reportDiagnostic(program, {
       code: "arm-resource-duplicate-base-parameter",
@@ -553,6 +616,15 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
         break;
       case "Extension":
         resolvedType = ResourceBaseType.Extension;
+        break;
+      case "BuiltIn":
+        resolvedType = ResourceBaseType.BuiltIn;
+        break;
+      case "BuiltInSubscription":
+        resolvedType = ResourceBaseType.BuiltInSubscription;
+        break;
+      case "BuiltInResourceGroup":
+        resolvedType = ResourceBaseType.BuiltInResourceGroup;
         break;
     }
   }

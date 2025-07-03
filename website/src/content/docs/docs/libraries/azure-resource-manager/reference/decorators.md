@@ -179,16 +179,25 @@ None
 ### `@armResourceOperations` {#@Azure.ResourceManager.armResourceOperations}
 
 This decorator is used to identify interfaces containing resource operations.
-When applied, it marks the interface with the `@autoRoute` decorator so that
+By default, it marks the interface with the `@autoRoute` decorator so that
 all of its contained operations will have their routes generated
 automatically.
 
-It also adds a `@tag` decorator bearing the name of the interface so that all
+The decorator also adds a `@tag` decorator bearing the name of the interface so that all
 of the operations will be grouped based on the interface name in generated
 clients.
 
+The optional `resourceOperationOptions` parameter provides additional options.
+`allowStaticRoutes` turns off autoRout for the interface, so individual operations can
+choose static (`@route`) or automatic (`@autoRoute`) routing.
+
+`resourceType: Model` specifies the resource type for the operations in the interface
+
+`omitTags: true`: turns off the default tagging of operations in the interface, so that individual operations must be
+individually tagged
+
 ```typespec
-@Azure.ResourceManager.armResourceOperations(_?: unknown)
+@Azure.ResourceManager.armResourceOperations(resourceOperationOptions?: unknown | valueof Azure.ResourceManager.ResourceOperationOptions)
 ```
 
 #### Target
@@ -197,9 +206,9 @@ clients.
 
 #### Parameters
 
-| Name | Type      | Description |
-| ---- | --------- | ----------- |
-| \_   | `unknown` | DEPRECATED  |
+| Name                     | Type                                                                                                              | Description                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| resourceOperationOptions | `unknown` \| [valueof `ResourceOperationOptions`](./data-types.md#Azure.ResourceManager.ResourceOperationOptions) | Options for routing the operations in the interface and associating them with a specific resource |
 
 ### `@armResourceRead` {#@Azure.ResourceManager.armResourceRead}
 
@@ -239,7 +248,7 @@ This decorator is used on Azure Resource Manager resources that are not based on
 Azure.ResourceManager common types.
 
 ```typespec
-@Azure.ResourceManager.armVirtualResource
+@Azure.ResourceManager.armVirtualResource(provider?: valueof string)
 ```
 
 #### Target
@@ -248,7 +257,9 @@ Azure.ResourceManager common types.
 
 #### Parameters
 
-None
+| Name     | Type             | Description |
+| -------- | ---------------- | ----------- |
+| provider | `valueof string` |             |
 
 ### `@extensionResource` {#@Azure.ResourceManager.extensionResource}
 
@@ -326,7 +337,7 @@ None
 This decorator sets the base type of the given resource.
 
 ```typespec
-@Azure.ResourceManager.resourceBaseType(baseType: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
+@Azure.ResourceManager.resourceBaseType(baseTypeIt: "Tenant" | "Subscription" | "ResourceGroup" | "Location" | "Extension")
 ```
 
 #### Target
@@ -335,9 +346,9 @@ This decorator sets the base type of the given resource.
 
 #### Parameters
 
-| Name     | Type                                                                         | Description                                                                                                            |
-| -------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| baseType | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
+| Name       | Type                                                                         | Description |
+| ---------- | ---------------------------------------------------------------------------- | ----------- |
+| baseTypeIt | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` |             |
 
 ### `@resourceGroupResource` {#@Azure.ResourceManager.resourceGroupResource}
 
@@ -446,6 +457,26 @@ This allows sharing Azure Resource Manager resource types across specifications
 | namespaces | `Namespace[]` | The namespaces of Azure Resource Manager libraries used in this provider |
 
 ## Azure.ResourceManager.Legacy
+
+### `@armOperationRoute` {#@Azure.ResourceManager.Legacy.armOperationRoute}
+
+Signifies that an operation is an Azure Resource Manager operation
+and optionally associates the operation with a route template.
+
+```typespec
+@Azure.ResourceManager.Legacy.armOperationRoute(route?: valueof Azure.ResourceManager.Legacy.ArmOperationOptions)
+```
+
+#### Target
+
+The operation to associate the model with
+`Operation`
+
+#### Parameters
+
+| Name  | Type                                                                                              | Description                                    |
+| ----- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| route | [valueof `ArmOperationOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmOperationOptions) | Optional route to associate with the operation |
 
 ### `@customAzureResource` {#@Azure.ResourceManager.Legacy.customAzureResource}
 
