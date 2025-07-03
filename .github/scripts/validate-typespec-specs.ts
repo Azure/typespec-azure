@@ -46,7 +46,7 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
 
 async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
   return new Promise((resolve) => {
-    const process = spawn("npx", ["tsp", "compile", "."], {
+    const process = spawn("npx", ["tsp", "compile", ".", "--warn-as-error"], {
       cwd: directory,
       stdio: "pipe",
     });
@@ -163,6 +163,9 @@ async function main() {
   if (failureCount > 0) {
     console.log("\nFailed folders:");
     failedFolders.forEach((folder) => console.log(`  - ${folder}`));
+
+    // Exit with failure code to make the GitHub Actions job fail
+    process.exit(1);
   }
 }
 
