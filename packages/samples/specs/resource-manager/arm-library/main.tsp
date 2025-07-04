@@ -21,6 +21,7 @@ namespace Microsoft.LibraryTest;
 enum Versions {
   /** 2021-09-21-preview version */
   @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2021-09-21-preview`,
 }

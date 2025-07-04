@@ -370,6 +370,7 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
 it("generates PATCH bodies for custom patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;
@@ -464,6 +465,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
 it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
     `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;
