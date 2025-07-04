@@ -16,8 +16,8 @@ import {
   Service,
   Type,
 } from "@typespec/compiler";
+import { capitalize } from "@typespec/compiler/casing";
 import { getOperationId } from "@typespec/openapi";
-import { pascalCase } from "change-case";
 
 export interface AutorestEmitterContext {
   readonly program: Program;
@@ -87,23 +87,23 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
   const clientLocation = getClientLocation(context.tcgcSdkContext, operation);
   if (clientLocation) {
     if (typeof clientLocation === "string") {
-      return pascalCaseForOperationId(`${clientLocation}_${operationName}`);
+      return standardizeOperationId(`${clientLocation}_${operationName}`);
     }
 
     if (clientLocation.kind === "Interface") {
-      return pascalCaseForOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
+      return standardizeOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
     }
 
     if (clientLocation.kind === "Namespace") {
       if (isGlobalNamespace(program, clientLocation) || isService(program, clientLocation)) {
-        return pascalCase(operationName);
+        return standardizeOperationId(operationName);
       }
-      return pascalCaseForOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
+      return standardizeOperationId(`${getClientName(context, clientLocation)}_${operationName}`);
     }
   }
 
   if (operation.interface) {
-    return pascalCaseForOperationId(
+    return standardizeOperationId(
       `${getClientName(context, operation.interface)}_${operationName}`,
     );
   }
@@ -113,10 +113,10 @@ export function resolveOperationId(context: AutorestEmitterContext, operation: O
     isGlobalNamespace(program, namespace) ||
     isService(program, namespace)
   ) {
-    return pascalCase(operationName);
+    return standardizeOperationId(operationName);
   }
 
-  return pascalCaseForOperationId(`${getClientName(context, namespace)}_${operationName}`);
+  return standardizeOperationId(`${getClientName(context, namespace)}_${operationName}`);
 }
 
 /**
@@ -139,9 +139,9 @@ export function isReadonlyProperty(program: Program, property: ModelProperty) {
   return visibility.size === 1 && visibility.has(read);
 }
 
-function pascalCaseForOperationId(name: string) {
+function standardizeOperationId(name: string) {
   return name
     .split("_")
-    .map((s) => pascalCase(s))
+    .map((s) => capitalize(s))
     .join("_");
 }
