@@ -168,7 +168,8 @@ client.cats.pet();
 // Client builder class
 package petstore;
 
-@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+@ServiceClientBuilder(
+    serviceClients = { CatsClient.class, DogsClient.class, CatsAsyncClient.class, DogsAsyncClient.class })
 public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
     ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
 
@@ -284,7 +285,17 @@ client.actions.close();
 package petstore;
 
 @ServiceClientBuilder(
-    serviceClients = { CatsClient.class, DogsClient.class, CatsAsyncClient.class, DogsAsyncClient.class })
+    serviceClients = {
+        PetStoreClient.class,
+        PetsClient.class,
+        PetsActionsClient.class,
+        BillingsClient.class,
+        ActionsClient.class,
+        PetStoreAsyncClient.class,
+        PetsAsyncClient.class,
+        PetsActionsAsyncClient.class,
+        BillingsAsyncClient.class,
+        ActionsAsyncClient.class })
 public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
     ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
 
@@ -292,7 +303,7 @@ public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuil
 
     public PetStoreClient buildClient();
     public PetsActionsClient buildPetsActionsClient();
-    public DogsClient buildPetsClient();
+    public PetsClient buildPetsClient();
     public BillingsClient buildBillingsClient();
     public ActionsClient buildActionsClient();
 }
