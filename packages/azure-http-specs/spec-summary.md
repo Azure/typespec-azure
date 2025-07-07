@@ -57,6 +57,52 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/admin`
+  - `get /azure/client-generator-core/client-location/user`
+  - `get /azure/client-generator-core/client-location/user`
+
+Test moving an operation from one sub client to another existing sub client.
+
+Operation `deleteUser` from interface `UserOperations` should be moved to interface `AdminOperations` using @clientLocation(AdminOperations).
+
+Expected client structure:
+
+- Interface UserOperations should contain only operation `getUser`
+- Interface AdminOperations should contain operations `getAdminInfo` and `deleteUser` (moved from UserOperations)
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/products`
+  - `get /azure/client-generator-core/client-location/products/archive`
+
+Test moving an operation to a new sub client specified by string name.
+
+Operation `archiveProduct` from interface `ProductOperations` should be moved to a new sub client named "ArchiveOperations" using @clientLocation("ArchiveOperations").
+
+Expected client structure:
+
+- Interface ProductOperations should contain only operation `listProducts`
+- A new sub client "ArchiveOperations" should be created containing operation `archiveProduct`
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/resource`
+  - `get /azure/client-generator-core/client-location/health`
+
+Test moving an operation to the root client.
+
+Operation `getHealthStatus` from interface `ResourceOperations` should be moved to the root client using @clientLocation(service namespace).
+
+Expected client structure:
+
+- Interface ResourceOperations should contain only operation `getResource`
+- Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
+
 ### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
@@ -133,6 +179,30 @@ Expected response body:
   }
 }
 ```
+
+### Azure_ClientGenerator_Core_Override_GroupParameters_group
+
+- Endpoint: `get /azure/client-generator-core/override/group`
+
+Verify that after `@override` the parameters are grouped correctly to `GroupParametersOptions` in the client method signature.
+
+Expected query parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_ReorderParameters_reorder
+
+- Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
+
+Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
 
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
@@ -1603,76 +1673,6 @@ Expected response body:
 }
 ```
 
-### Azure_ResourceManager_OperationTemplates_OptionalBody_post
-
-- Endpoint: `post https://management.azure.com`
-
-Resource POST action operation using ArmResourceActionSync with optional request body.
-This tests the optional body functionality in two scenarios:
-
-1. Empty body scenario: Request body is not sent
-2. With body scenario: Request body contains action data
-
-Expected verb: POST
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/post
-Expected query parameter: api-version=2023-12-01-preview
-
-Scenario 1 - Expected request body: None (empty body)
-Scenario 2 - Expected request body: {"actionType": "perform", "parameters": "test-parameters"}
-
-Expected status code: 200
-Expected response body (empty body scenario):
-
-```json
-{
-  "result": "Action completed successfully"
-}
-```
-
-Expected response body (with body scenario):
-
-```json
-{
-  "result": "Action completed successfully with parameters"
-}
-```
-
-### Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost
-
-- Endpoint: `post https://management.azure.com`
-
-Provider POST action operation using ArmProviderActionSync with optional request body.
-This tests the optional body functionality for subscription-scoped provider actions in two scenarios:
-
-1. Empty body scenario: Request body is not sent (uses default allowance)
-2. With body scenario: Request body contains allowance change data
-
-Expected verb: POST
-Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/providerPost
-Expected query parameter: api-version=2023-12-01-preview
-
-Scenario 1 - Expected request body: None (empty body)
-Scenario 2 - Expected request body: {"totalAllowed": 100, "reason": "Increased demand"}
-
-Expected status code: 200
-Expected response body (empty body scenario):
-
-```json
-{
-  "totalAllowed": 50,
-  "status": "Changed to default allowance"
-}
-```
-
-Expected response body (with body scenario):
-
-```json
-{
-  "totalAllowed": 100,
-  "status": "Changed to requested allowance"
-}
-```
-
 ### Azure_ResourceManager_OperationTemplates_OptionalBody_get
 
 - Endpoint: `get https://management.azure.com`
@@ -1770,6 +1770,76 @@ Expected response body (with body scenario):
     "lastModifiedAt": <any date>,
     "lastModifiedByType": "User"
   }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_post
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action operation using ArmResourceActionSync with optional request body.
+This tests the optional body functionality in two scenarios:
+
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains action data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/post
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"actionType": "perform", "parameters": "test-parameters"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "result": "Action completed successfully"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "result": "Action completed successfully with parameters"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost
+
+- Endpoint: `post https://management.azure.com`
+
+Provider POST action operation using ArmProviderActionSync with optional request body.
+This tests the optional body functionality for subscription-scoped provider actions in two scenarios:
+
+1. Empty body scenario: Request body is not sent (uses default allowance)
+2. With body scenario: Request body contains allowance change data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/providerPost
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"totalAllowed": 100, "reason": "Increased demand"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "totalAllowed": 50,
+  "status": "Changed to default allowance"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "totalAllowed": 100,
+  "status": "Changed to requested allowance"
 }
 ```
 
