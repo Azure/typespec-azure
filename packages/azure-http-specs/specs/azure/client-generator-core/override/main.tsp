@@ -13,36 +13,30 @@ interface ReorderParameters {
   @scenario
   @scenarioDoc("""
     Verify that after `@override` the parameters are reordered correctly in the client method signature.
-
+    
     Expected path parameter:
     param1: param1
     param2: param2
-
+    
     Expected response: 204 No Content
     """)
   @route("/reorder/{param2}/{param1}")
   @get
-  op reorder(
-    @path param2: string,
-    @path param1: string,
-  ): void;
+  reorder(@path param2: string, @path param1: string): void;
 }
 
 interface GroupParameters {
   @scenario
   @scenarioDoc("""
     Verify that after `@override` the parameters are grouped correctly to `GroupParametersOptions` in the client method signature.
-
+    
     Expected query parameter:
     param1: param1
     param2: param2
-
+    
     Expected response: 204 No Content
     """)
   @route("/group")
   @get
-  op group(
-    @query param1: string,
-    @query param2: string,
-  ): void;
+  group(@query param1: string, @query param2: string): void;
 }
