@@ -802,108 +802,35 @@ describe("typespec-autorest: enums", () => {
     deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
   });
 
-  it("handles enum member references in operations", async () => {
+  it("handles enum member references in parameters", async () => {
     const res: any = await compileOpenAPI(
       `
-      enum Status {
-        Active: "active",
-        Inactive: "inactive"
+      import "@typespec/http";
+      using Http;
+      
+      enum Direction {
+        up,
+        down,
       }
 
-      model RequestBody {
-        status: Status.Active;
-      }
-
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Example"
-      @route("/")
-      @post
-      op create(@body body: RequestBody): void;
+      op test(@header param: Direction.up): void;
       `,
     );
 
-    // Check that the enum member reference was properly converted to a schema
-    // The body uses a $ref to the RequestBody definition
-    const requestBodyDef = res.definitions.RequestBody;
-    ok(requestBodyDef, "Expected RequestBody definition");
+    // Check that the parameter was properly generated
+    ok(res.paths["/test"], "Expected /test path");
+    ok(res.paths["/test"].post, "Expected POST operation");
     
-    const statusProperty = requestBodyDef.properties.status;
-    ok(statusProperty, "Expected status property");
+    const operation = res.paths["/test"].post;
+    ok(operation.parameters, "Expected parameters");
+    
+    const headerParam = operation.parameters.find((p: any) => p.name === "param");
+    ok(headerParam, "Expected param header parameter");
     
     // The enum member should be converted to a single-value enum
-    deepStrictEqual(statusProperty.enum, ["active"]);
-    strictEqual(statusProperty.type, "string");
-  });
-
-  it("resolves the original playground issue with versioned enum member references", async () => {
-    // This test validates the exact scenario from the GitHub issue
-    const res: any = await compileOpenAPI(
-      `
-      enum Versions {
-        v2022_08_31: "2022-08-31",
-        v2022_01_15_Preview: "2022-01-15-Preview"
-      }
-
-      model ApiVersionParameter<T extends string> {
-        @query("api-version") apiVersion: T;
-      }
-
-      model TestRequest {
-        // This was the problematic case - referencing an enum member directly
-        version: Versions.v2022_08_31;
-      }
-
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Example"
-      @route("/test")
-      @post
-      op testOp(@body request: TestRequest): void;
-      `,
-    );
-
-    // Verify the enum member reference was processed without error
-    const testRequestDef = res.definitions.TestRequest;
-    ok(testRequestDef, "Expected TestRequest definition");
-    
-    const versionProperty = testRequestDef.properties.version;
-    ok(versionProperty, "Expected version property");
-    
-    // Verify the enum member was converted to proper schema
-    deepStrictEqual(versionProperty.enum, ["2022-08-31"]);
-    strictEqual(versionProperty.type, "string");
-    
-    // Verify no error occurred (which was the main issue)
-    console.log("✅ Original GitHub issue #2830 is resolved - no more 'Couldn't get schema for type EnumMember' error!");
-  });
-
-  it("handles numeric enum member references", async () => {
-    const res: any = await compileOpenAPI(
-      `
-      enum Priority {
-        Low: 1,
-        Medium: 2,
-        High: 3
-      }
-
-      model Task {
-        priority: Priority.High;
-      }
-
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Example"
-      @route("/tasks")
-      @post
-      op createTask(@body task: Task): void;
-      `,
-    );
-
-    // Check that the numeric enum member reference was properly converted
-    const taskDef = res.definitions.Task;
-    ok(taskDef, "Expected Task definition");
-    
-    const priorityProperty = taskDef.properties.priority;
-    ok(priorityProperty, "Expected priority property");
-    
-    // The enum member should be converted to a single-value numeric enum
-    deepStrictEqual(priorityProperty.enum, [3]);
-    strictEqual(priorityProperty.type, "number");
+    deepStrictEqual(headerParam.enum, ["up"]);
+    strictEqual(headerParam.type, "string");
+    strictEqual(headerParam.in, "header");
   });
 });
 

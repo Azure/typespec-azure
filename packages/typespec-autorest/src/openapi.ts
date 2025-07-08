@@ -999,11 +999,17 @@ export async function getOpenAPIForService(
 
     if (type.kind === "EnumMember") {
       // Enum members are just the OA representation of their values.
-      if (typeof type.value === "number") {
-        return { type: "number", enum: [type.value] };
-      } else {
-        return { type: "string", enum: [type.value ?? type.name] };
+      const value = type.value ?? type.name;
+      const schema = typeof value === "number" 
+        ? { type: "number" as const, enum: [value] }
+        : { type: "string" as const, enum: [value] };
+      
+      const doc = getDoc(program, type);
+      if (doc) {
+        schema.description = doc;
       }
+      
+      return schema;
     }
 
     if (type.kind === "ModelProperty") {
@@ -1676,7 +1682,7 @@ export async function getOpenAPIForService(
       case "Enum":
         return getSchemaForEnum(type);
       case "EnumMember":
-        return getSchemaForEnumMember(type);
+        return getSchemaOrRef(type, schemaContext);
       case "Tuple":
         return { type: "array", items: {} };
     }
@@ -1776,16 +1782,6 @@ export async function getOpenAPIForService(
     function reportUnsupportedUnion(messageId: "default" | "empty" = "default") {
       reportDiagnostic(program, { code: "union-unsupported", messageId, target: e });
     }
-  }
-
-  function getSchemaForEnumMember(member: EnumMember): OpenAPI2Schema {
-    const value = member.value ?? member.name;
-    const type = typeof value === "number" ? "number" : "string";
-    return { 
-      type, 
-      enum: [value],
-      description: getDoc(program, member)
-    };
   }
 
   function getSchemaForUnionEnum(union: Union, e: UnionEnum): OpenAPI2Schema {
