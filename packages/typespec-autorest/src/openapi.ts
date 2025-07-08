@@ -1675,6 +1675,8 @@ export async function getOpenAPIForService(
         return getSchemaForUnionVariant(type, schemaContext);
       case "Enum":
         return getSchemaForEnum(type);
+      case "EnumMember":
+        return getSchemaForEnumMember(type);
       case "Tuple":
         return { type: "array", items: {} };
     }
@@ -1774,6 +1776,16 @@ export async function getOpenAPIForService(
     function reportUnsupportedUnion(messageId: "default" | "empty" = "default") {
       reportDiagnostic(program, { code: "union-unsupported", messageId, target: e });
     }
+  }
+
+  function getSchemaForEnumMember(member: EnumMember): OpenAPI2Schema {
+    const value = member.value ?? member.name;
+    const type = typeof value === "number" ? "number" : "string";
+    return { 
+      type, 
+      enum: [value],
+      description: getDoc(program, member)
+    };
   }
 
   function getSchemaForUnionEnum(union: Union, e: UnionEnum): OpenAPI2Schema {

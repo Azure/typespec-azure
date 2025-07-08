@@ -801,6 +801,70 @@ describe("typespec-autorest: enums", () => {
     const schema = res.definitions.RenamedFoo;
     deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
   });
+
+  it("handles enum member references in operations", async () => {
+    const res: any = await compileOpenAPI(
+      `
+      enum Status {
+        Active: "active",
+        Inactive: "inactive"
+      }
+
+      model RequestBody {
+        status: Status.Active;
+      }
+
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Example"
+      @route("/")
+      @post
+      op create(@body body: RequestBody): void;
+      `,
+    );
+
+    // Check that the enum member reference was properly converted to a schema
+    // The body uses a $ref to the RequestBody definition
+    const requestBodyDef = res.definitions.RequestBody;
+    ok(requestBodyDef, "Expected RequestBody definition");
+    
+    const statusProperty = requestBodyDef.properties.status;
+    ok(statusProperty, "Expected status property");
+    
+    // The enum member should be converted to a single-value enum
+    deepStrictEqual(statusProperty.enum, ["active"]);
+    strictEqual(statusProperty.type, "string");
+  });
+
+  it("handles numeric enum member references", async () => {
+    const res: any = await compileOpenAPI(
+      `
+      enum Priority {
+        Low: 1,
+        Medium: 2,
+        High: 3
+      }
+
+      model Task {
+        priority: Priority.High;
+      }
+
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Example"
+      @route("/tasks")
+      @post
+      op createTask(@body task: Task): void;
+      `,
+    );
+
+    // Check that the numeric enum member reference was properly converted
+    const taskDef = res.definitions.Task;
+    ok(taskDef, "Expected Task definition");
+    
+    const priorityProperty = taskDef.properties.priority;
+    ok(priorityProperty, "Expected priority property");
+    
+    // The enum member should be converted to a single-value numeric enum
+    deepStrictEqual(priorityProperty.enum, [3]);
+    strictEqual(priorityProperty.type, "number");
+  });
 });
 
 describe("typespec-autorest: extension decorator", () => {
