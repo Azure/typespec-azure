@@ -61,7 +61,7 @@ it("emit warnings if TrackedResource is missing a delete operation", async () =>
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation",
-      message: `The resource 'Foo' must have a delete operation.`,
+      message: `Resource 'Foo' must have a delete operation.`,
     });
 });
 
@@ -89,6 +89,6 @@ it("emit warnings if the delete operation is for another resource", async () => 
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/no-resource-delete-operation",
-      message: `The resource 'Foo' must have a delete operation.`,
+      message: `Resource 'Foo' must have a delete operation.`,
     });
 });
