@@ -21,6 +21,7 @@ options:
     model-namespace: false
   "@azure-tools/typespec-ts":
     package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
+    is-modular-library: false
     package-details:
       name: "@azure-rest/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
       description: "{{parameters.ServiceNamespace}} Service"
