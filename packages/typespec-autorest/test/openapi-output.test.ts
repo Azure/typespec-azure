@@ -834,6 +834,46 @@ describe("typespec-autorest: enums", () => {
     strictEqual(statusProperty.type, "string");
   });
 
+  it("resolves the original playground issue with versioned enum member references", async () => {
+    // This test validates the exact scenario from the GitHub issue
+    const res: any = await compileOpenAPI(
+      `
+      enum Versions {
+        v2022_08_31: "2022-08-31",
+        v2022_01_15_Preview: "2022-01-15-Preview"
+      }
+
+      model ApiVersionParameter<T extends string> {
+        @query("api-version") apiVersion: T;
+      }
+
+      model TestRequest {
+        // This was the problematic case - referencing an enum member directly
+        version: Versions.v2022_08_31;
+      }
+
+      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "Example"
+      @route("/test")
+      @post
+      op testOp(@body request: TestRequest): void;
+      `,
+    );
+
+    // Verify the enum member reference was processed without error
+    const testRequestDef = res.definitions.TestRequest;
+    ok(testRequestDef, "Expected TestRequest definition");
+    
+    const versionProperty = testRequestDef.properties.version;
+    ok(versionProperty, "Expected version property");
+    
+    // Verify the enum member was converted to proper schema
+    deepStrictEqual(versionProperty.enum, ["2022-08-31"]);
+    strictEqual(versionProperty.type, "string");
+    
+    // Verify no error occurred (which was the main issue)
+    console.log("✅ Original GitHub issue #2830 is resolved - no more 'Couldn't get schema for type EnumMember' error!");
+  });
+
   it("handles numeric enum member references", async () => {
     const res: any = await compileOpenAPI(
       `
