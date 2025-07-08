@@ -73,7 +73,10 @@ model Pet {
 ```tsp
 model Pet {
   @extension("x-ms-identifiers", #["customId"])
-  name: string;
+  names: Name[];
+}
+model Name {
+  customId: string;
 }
 ```
 
@@ -82,7 +85,10 @@ model Pet {
 ```tsp
 model Pet {
   @identifiers(#["customId"])
-  name: string;
+  names: Name[];
+}
+model Name {
+  customId: string;
 }
 ```
 
