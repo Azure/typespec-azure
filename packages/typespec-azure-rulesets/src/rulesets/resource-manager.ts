@@ -88,6 +88,9 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/retry-after": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
 
+    // HTTP rules
+    "@typespec/http/conflicting-route": true,
+
     // TCGC rules
     "@azure-tools/typespec-client-generator-core/require-client-suffix": true,
     "@azure-tools/typespec-client-generator-core/property-name-conflict": true,
