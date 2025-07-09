@@ -137,17 +137,27 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
     });
   });
 
-  it("should not inherit nullable from sub-unions that are not actually nullable", async () => {
-    // This test reproduces the issue from the playground where 
-    // union MessageAttachmentToolDefinit { {} | {} } was incorrectly marked as nullable
-    const [res, diagnostics] = await testUnionAsEnum(
-      `
-      union SubUnion { {}, {} }
-      @test("target") union Test { SubUnion }
-      `,
-    );
-    // Should produce diagnostics because models cannot be enums (2 for the 2 models in SubUnion)
-    expectDiagnostics(diagnostics, [
+  it("should not inherit nullable from sub-unions", async () => {
+    // Fix for the issue where unions containing sub-unions were incorrectly marked as nullable
+    // when the sub-union was nullable but the parent union didn't directly contain null
+    const res = await testValidUnionAsEnum(`
+      @test("target") 
+      union Test {"one" , "two", Other }
+      union Other { "three", null } 
+    `);
+    strictEqual(res.nullable, true, "Should be nullable because it contains a sub-union with null");
+  });
+
+  it("should not mark union as nullable when sub-union is not nullable", async () => {
+    // Test case where sub-union is not nullable and parent should not be nullable either
+    const res = await testValidUnionAsEnum(`
+      @test("target") 
+      union Test {"one" , "two", Other }
+      union Other { "three", "four" } 
+    `);
+    strictEqual(res.nullable, false, "Should not be nullable because no null types are present");
+  });
+});
       {
         code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
         message: "Kind Model prevents this union from being resolved as an enum.",

@@ -132,9 +132,8 @@ function getUnionAsEnumInternal(
           if (parentUnion.open) {
             open = true;
           }
-          if (parentUnion.nullable) {
-            nullable = true;
-          }
+          // Do not propagate nullable from sub-unions - nullable should only be set
+          // when the current union directly contains a null type
           for (const [key, value] of parentUnion.flattenedMembers) {
             flattenedMembers.set(key, value);
           }
