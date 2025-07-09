@@ -136,4 +136,62 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
       message: "Union is referencing itself and cannot be resolved as an enum.",
     });
   });
+
+  it("should not inherit nullable from sub-unions that are not actually nullable", async () => {
+    // This test reproduces the issue from the playground where 
+    // union MessageAttachmentToolDefinit { {} | {} } was incorrectly marked as nullable
+    const [res, diagnostics] = await testUnionAsEnum(
+      `
+      union SubUnion { {}, {} }
+      @test("target") union Test { SubUnion }
+      `,
+    );
+    // Should produce diagnostics because models cannot be enums (2 for the 2 models in SubUnion)
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+        message: "Kind Model prevents this union from being resolved as an enum.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+        message: "Kind Model prevents this union from being resolved as an enum.",
+      }
+    ]);
+    strictEqual(res, undefined); // Should return undefined because it contains non-enum types
+    
+    // Let's also test the specific playground case with empty models
+    const [res2, diagnostics2] = await testUnionAsEnum(
+      `
+      @test("target") union MessageAttachmentToolDefinit { {} | {} }
+      `,
+    );
+    expectDiagnostics(diagnostics2, [
+      {
+        code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+        message: "Kind Model prevents this union from being resolved as an enum.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-core/union-enums-invalid-kind",
+        message: "Kind Model prevents this union from being resolved as an enum.",
+      }
+    ]);
+    strictEqual(res2, undefined); // Should return undefined because models are not enum-like
+  });
+
+  it("debug playground union structure", async () => {
+    // Debug the exact playground structure to understand the issue
+    const runner = await createTestRunner();
+    const { target } = await runner.compile(`
+      @test("target") union MessageAttachmentToolDefinit { {} | {} }
+    `);
+
+    strictEqual(target.kind, "Union");
+    // Check if the union has the expected structure
+    strictEqual(target.variants.size, 1); // Should have 1 variant which is a sub-union
+    
+    const firstVariant = [...target.variants.values()][0];
+    // The first variant should itself be a union of two empty models
+    strictEqual(firstVariant.type.kind, "Union");
+    strictEqual(firstVariant.type.variants.size, 2); // Two empty models {} | {}
+  });
 });

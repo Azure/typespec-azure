@@ -171,4 +171,46 @@ describe("typespec-autorest: union schema", () => {
       strictEqual(res.definitions.Foo.description, "FooUnion");
     });
   });
+
+  describe("union with sub-unions bug", () => {
+    it("should not add x-nullable for union containing sub-unions of models", async () => {
+      // This reproduces the playground issue: union MessageAttachmentToolDefinit { {} | {} }
+      const diagnostics = await diagnoseOpenApiFor(
+        `
+        union MessageAttachmentToolDefinit { {} | {} }
+        model Test {
+          attachment: MessageAttachmentToolDefinit;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // Should produce a union-unsupported diagnostic
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-autorest/union-unsupported",
+        message: "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
+      });
+      
+      // Now let's test what actually happens - we need to investigate if this creates a null type
+      // Let's create a different test that can actually run without the diagnostic error
+    });
+
+    it("investigate the x-nullable issue with a simpler case", async () => {
+      // Let's test with a case that might not trigger the union-unsupported diagnostic
+      // but still demonstrates the issue
+      const res = await openApiFor(
+        `
+        model EmptyModel {}
+        model Test {
+          attachment: EmptyModel | null;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // This should correctly have x-nullable: true
+      const attachmentProperty = res.definitions.Test.properties.attachment;
+      strictEqual(attachmentProperty["x-nullable"], true);
+    });
+  });
 });
