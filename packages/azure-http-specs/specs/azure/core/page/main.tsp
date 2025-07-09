@@ -212,9 +212,8 @@ model IncludePendingOptions {
   includePending?: boolean;
 }
 
-@global.Azure.Core.pagedResult
 model ParameterizedNextLinkPagingResult {
-  @global.Azure.Core.items
+  @pageItems
   values: User[];
 
   @nextLink
@@ -254,6 +253,7 @@ model ParameterizedNextLinkPagingResult {
     
     Note that the nextLink preserves the original filter and select parameters.
   """)
+@list
 op withParameterizedNextLink(
   ...IncludePendingOptions,
   @query select: string,
