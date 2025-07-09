@@ -212,5 +212,114 @@ describe("typespec-autorest: union schema", () => {
       const attachmentProperty = res.definitions.Test.properties.attachment;
       strictEqual(attachmentProperty["x-nullable"], true);
     });
+
+    it("test union with sub-union that does contain null", async () => {
+      // Test case: union with sub-union that actually contains null
+      const res = await openApiFor(
+        `
+        union SubUnion { "a", null }
+        model Test {
+          attachment: SubUnion;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // The SubUnion should be marked as nullable in its own definition
+      strictEqual(res.definitions.SubUnion["x-nullable"], true);
+    });
+
+    it("reproduce the exact playground issue with union of empty models", async () => {
+      // This is tricky because the playground example would trigger union-unsupported
+      // Let's try a variation that might reproduce the issue
+      const diagnostics = await diagnoseOpenApiFor(
+        `
+        union MessageAttachmentToolDefinit { {} | {} }
+        model Test {
+          attachment: MessageAttachmentToolDefinit;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // Should produce a union-unsupported diagnostic
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-autorest/union-unsupported",
+        message: "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
+      });
+    });
+
+    it("test a case that might trigger incorrect nullable behavior", async () => {
+      // Let's try to understand if there's a bug with how sub-unions are processed
+      // when they fail to convert to enums
+      const res = await openApiFor(
+        `
+        union SubUnion { "a" | null, "b" }
+        model Test {
+          attachment: SubUnion;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // The SubUnion should be marked as nullable because it has a sub-union with null
+      // This is actually CORRECT behavior
+      strictEqual(res.definitions.SubUnion["x-nullable"], true);
+    });
+
+    it("test union that should NOT be nullable", async () => {
+      // Test a case where there's no null anywhere, but it might incorrectly get nullable
+      const res = await openApiFor(
+        `
+        union SubUnion { "a", "b" }
+        union ParentUnion { SubUnion, "c" }
+        model Test {
+          attachment: ParentUnion;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // This should NOT be nullable since there's no null anywhere
+      strictEqual(res.definitions.ParentUnion["x-nullable"], undefined);
+    });
+
+    it("investigate potential issue with model sub-unions", async () => {
+      // Maybe the issue is with unions that contain models that fail to be enums?
+      // Let's test a simpler case that might reproduce the issue
+      const diagnostics = await diagnoseOpenApiFor(
+        `
+        union SubUnion { {a: string}, {b: string} }
+        union ParentUnion { SubUnion }
+        model Test {
+          attachment: ParentUnion;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // This should produce union-unsupported diagnostic
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-autorest/union-unsupported",
+        message: "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
+      });
+    });
+
+    it("test union with sub-union that does NOT contain null", async () => {
+      // Test case: union with sub-union that does NOT contain null
+      const res = await openApiFor(
+        `
+        union SubUnion { "a", "b" }
+        model Test {
+          attachment: SubUnion;
+        }
+        op test(): Test;
+        `,
+      );
+      
+      // This should NOT have x-nullable because sub-union doesn't contain null
+      const attachmentProperty = res.definitions.Test.properties.attachment;
+      strictEqual(attachmentProperty["x-nullable"], undefined);
+    });
   });
 });

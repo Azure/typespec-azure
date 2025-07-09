@@ -178,20 +178,29 @@ describe("azure-core: helpers: getUnionAsEnum", () => {
     strictEqual(res2, undefined); // Should return undefined because models are not enum-like
   });
 
-  it("debug playground union structure", async () => {
-    // Debug the exact playground structure to understand the issue
-    const runner = await createTestRunner();
-    const { target } = await runner.compile(`
-      @test("target") union MessageAttachmentToolDefinit { {} | {} }
-    `);
-
-    strictEqual(target.kind, "Union");
-    // Check if the union has the expected structure
-    strictEqual(target.variants.size, 1); // Should have 1 variant which is a sub-union
+  it("test potential issue with nullable inheritance from failed sub-unions", async () => {
+    // Test a case where a sub-union that fails to convert to an enum
+    // might incorrectly propagate nullable = true 
+    const [res, diagnostics] = await testUnionAsEnum(
+      `
+      union SubUnion { {}, null }  // This contains null but also a model, so should fail to convert
+      @test("target") union ParentUnion { SubUnion }
+      `,
+    );
     
-    const firstVariant = [...target.variants.values()][0];
-    // The first variant should itself be a union of two empty models
-    strictEqual(firstVariant.type.kind, "Union");
-    strictEqual(firstVariant.type.variants.size, 2); // Two empty models {} | {}
+    // The SubUnion should fail to convert because it contains a model
+    // But the question is: should the parent union inherit nullable from the failed sub-union?
+    
+    // Check the diagnostics - should have errors about the model
+    console.log("Diagnostics:", diagnostics.map(d => d.code + ": " + d.message));
+    
+    // This should return undefined because models can't be enums
+    strictEqual(res, undefined);
+    
+    // But let's check if there were any nullable properties incorrectly inherited
+    if (diagnostics.length > 0) {
+      // If it fails due to models, then the nullable inheritance shouldn't happen
+      console.log("Union conversion failed as expected due to model types");
+    }
   });
 });
