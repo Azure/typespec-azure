@@ -43,7 +43,6 @@ it("define a custom paged operation with custom next link", async () => {
 it("value is default item name for x-ms-pageable", async () => {
   const res = await compileOpenAPI(
     `
-    @route("t")
     @list
     op test(): {
       @pageItems value: string[];
