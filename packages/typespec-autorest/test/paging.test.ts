@@ -52,9 +52,7 @@ it("value is default item name for x-ms-pageable", async () => {
     `,
   );
 
-  const get = res.paths["/t"].get;
-  ok(get);
-  deepStrictEqual(get["x-ms-pageable"], {
+  deepStrictEqual(res.paths["/t"].get!.["x-ms-pageable"], {
     nextLinkName: "next",
   });
 });
