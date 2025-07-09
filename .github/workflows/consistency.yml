@@ -96,6 +96,23 @@ jobs:
       - run: pnpm run lint
         name: Lint
 
+  # Check version mismatch
+  lint:
+    name: Versions consitency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup
+
+      - run: pnpm install
+        name: Install dependencies
+
+      - run: pnpm run check-version-mismatch
+        name: Check version mismatch
+
   # Verify Arm OpenAPI common types are up to date
   common-types-up-to-date:
     name: Common types up to date
