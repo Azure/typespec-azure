@@ -51,7 +51,7 @@ it("value is default item name for x-ms-pageable", async () => {
     `,
   );
 
-  deepStrictEqual(res.paths["/t"].get!.["x-ms-pageable"], {
+  deepStrictEqual(res.paths["/"].get!["x-ms-pageable"], {
     nextLinkName: "next",
   });
 });
