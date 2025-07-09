@@ -142,9 +142,8 @@ op listWithParameters is global.Azure.Core.Foundations.Operation<
 >;
 
 @friendlyName("{name}ListResults", T)
-@global.Azure.Core.pagedResult
 model CustomPageModel<T> {
-  @global.Azure.Core.items
+  @pageItems
   @doc("List of items.")
   items: T[];
 
@@ -175,6 +174,7 @@ model CustomPageModel<T> {
   }
   ```
   """)
+@list
 op listWithCustomPageModel is global.Azure.Core.Foundations.Operation<{}, CustomPageModel<User>>;
 
 @doc("First item.")
