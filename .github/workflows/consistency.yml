@@ -97,7 +97,7 @@ jobs:
         name: Lint
 
   # Check version mismatch
-  lint:
+  version-consitency:
     name: Versions consitency
     runs-on: ubuntu-latest
     steps:
