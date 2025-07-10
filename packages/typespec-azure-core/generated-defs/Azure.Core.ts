@@ -60,6 +60,19 @@ export type PagedResultDecorator = (context: DecoratorContext, entity: Model) =>
  * This is used to indicate that the version is not yet stable and may change in future releases.
  *
  * @param target The EnumMember that represents the preview version.
+ * @example
+ * ```typespec
+ * @versioned(Versions)
+ * @service(#{ title: "Widget Service" })
+ * namespace DemoService;
+ *
+ * enum Versions {
+ *   v1,
+ *   v2,
+ *   @previewVersion
+ *   v3Preview
+ * }
+ * ```
  */
 export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
