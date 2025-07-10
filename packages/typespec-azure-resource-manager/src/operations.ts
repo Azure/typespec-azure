@@ -7,9 +7,10 @@ import {
   Operation,
   Program,
 } from "@typespec/compiler";
-import { getHttpOperation, HttpOperation } from "@typespec/http";
+import { $route, getHttpOperation, HttpOperation } from "@typespec/http";
 import {
   $actionSegment,
+  $autoRoute,
   $createsOrReplacesResource,
   $deletesResource,
   $readsResource,
@@ -27,6 +28,10 @@ import {
   ArmResourceReadDecorator,
   ArmResourceUpdateDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
+import {
+  ArmOperationOptions,
+  ArmOperationRouteDecorator,
+} from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
 import {
@@ -132,7 +137,6 @@ function setResourceLifecycleOperation(
   target: Operation,
   resourceType: Model,
   kind: ArmLifecycleOperationKind,
-  decoratorName: string,
 ) {
   // Only register methods from non-templated interface types
   if (
@@ -162,7 +166,7 @@ export const $armResourceRead: ArmResourceReadDecorator = (
   resourceType: Model,
 ) => {
   context.call($readsResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "read", "@armResourceRead");
+  setResourceLifecycleOperation(context, target, resourceType, "read");
 };
 
 export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
@@ -171,13 +175,7 @@ export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   resourceType: Model,
 ) => {
   context.call($createsOrReplacesResource, target, resourceType);
-  setResourceLifecycleOperation(
-    context,
-    target,
-    resourceType,
-    "createOrUpdate",
-    "@armResourceCreateOrUpdate",
-  );
+  setResourceLifecycleOperation(context, target, resourceType, "createOrUpdate");
 };
 
 export const $armResourceUpdate: ArmResourceUpdateDecorator = (
@@ -186,7 +184,7 @@ export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   resourceType: Model,
 ) => {
   context.call($updatesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "update", "@armResourceUpdate");
+  setResourceLifecycleOperation(context, target, resourceType, "update");
 };
 
 export const $armResourceDelete: ArmResourceDeleteDecorator = (
@@ -195,7 +193,7 @@ export const $armResourceDelete: ArmResourceDeleteDecorator = (
   resourceType: Model,
 ) => {
   context.call($deletesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "delete", "@armResourceDelete");
+  setResourceLifecycleOperation(context, target, resourceType, "delete");
 };
 
 export const $armResourceList: ArmResourceListDecorator = (
@@ -366,4 +364,45 @@ export const $armResourceCollectionAction: ArmResourceCollectionActionDecorator 
 
 export function isArmCollectionAction(program: Program, target: Operation): boolean {
   return program.stateMap(ArmStateKeys.armResourceCollectionAction).get(target) === true;
+}
+
+export const $armOperationRoute: ArmOperationRouteDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  options?: ArmOperationOptions,
+) => {
+  const route: string | undefined = options?.route;
+
+  if (!route && !options?.useStaticRoute) {
+    context.call($autoRoute, target);
+    return;
+  }
+  if (route && route.length > 0) {
+    context.call($route, target, route);
+  }
+};
+
+export function getRouteOptions(program: Program, target: Operation): ArmOperationOptions {
+  let options: ArmOperationOptions | undefined = undefined;
+  if (target.interface) {
+    options = options || program.stateMap(ArmStateKeys.armResourceRoute).get(target.interface);
+    if (options) return options;
+  }
+  if (target.sourceOperation?.interface) {
+    options =
+      options ||
+      program.stateMap(ArmStateKeys.armResourceRoute).get(target.sourceOperation.interface);
+  }
+  if (target.sourceOperation?.interface?.sourceInterfaces[0]) {
+    options =
+      options ||
+      program
+        .stateMap(ArmStateKeys.armResourceRoute)
+        .get(target.sourceOperation.interface.sourceInterfaces[0]);
+  }
+
+  if (options) return options;
+  return {
+    useStaticRoute: false,
+  };
 }

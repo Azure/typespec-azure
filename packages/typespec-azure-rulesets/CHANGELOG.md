@@ -1,5 +1,12 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.57.1
+
+### Bug Fixes
+
+- [#2897](https://github.com/Azure/typespec-azure/pull/2897) Added a linter rule to warn when a `@Azure.ResourceManager.Legacy.customAzureResource` does not contain a `@key` property, as this can cause duplicate operations.
+
+
 ## 0.57.0
 
 No changes, version bump only.

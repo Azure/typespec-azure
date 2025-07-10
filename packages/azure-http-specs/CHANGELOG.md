@@ -1,5 +1,48 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.22
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2901](https://github.com/Azure/typespec-azure/pull/2901) - Fixed ARM test template for large headers.
+  - Fixed ARM mockapi for user-defined error case.
+
+
+## 0.1.0-alpha.21
+
+### Features
+
+- [#2840](https://github.com/Azure/typespec-azure/pull/2840) feat: Add comprehensive ARM optional body template test cases
+  
+  Add test scenarios for Azure Resource Manager optional body templates including:
+  - GET operation using Azure.ResourceManager.ArmResourceRead for resource retrieval
+  - PATCH operation using Azure.ResourceManager.Legacy.CustomPatchSync with OptionalRequestBody = true
+  - POST action operation using Azure.ResourceManager.ArmResourceActionSync with OptionalRequestBody = true  
+  - POST provider action operation using Azure.ResourceManager.ArmProviderActionSync with OptionalRequestBody = true
+  
+  Each PATCH and POST operation tests both empty body and with-body scenarios using withServiceKeys to validate the optional request body functionality where operations can be called with or without sending a request body.
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
+## 0.1.0-alpha.20
+
+### Features
+
+- [#2852](https://github.com/Azure/typespec-azure/pull/2852) Update `@usage` decorator tests to adopt new additive logic and add JSON serialization support
+- [#2854](https://github.com/Azure/typespec-azure/pull/2854) Add comprehensive test scenarios for `@clientLocation` decorator
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
 ## 0.1.0-alpha.19
 
 ### Features

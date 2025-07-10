@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add comprehensive test scenarios for `@clientLocation` decorator
+Add test case for TCGC override

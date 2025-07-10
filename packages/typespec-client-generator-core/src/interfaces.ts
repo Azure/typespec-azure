@@ -2,6 +2,7 @@ import {
   FinalStateValue,
   LroMetadata,
   PagedResultMetadata,
+  ParameterSource,
 } from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
@@ -27,6 +28,7 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
+import { SourceKind } from "../../typespec-azure-core/src/lro-info.js";
 
 // Types for TCGC lib
 
@@ -945,7 +947,6 @@ interface SdkLroServiceMethodOptions {
 export interface SdkLroServiceMetadata {
   /** LRO metadata from TypeSpec core library */
   __raw: LroMetadata;
-
   /** Legacy `finalStateVia` value */
   finalStateVia: FinalStateValue;
   /** Polling step metadata */
@@ -954,6 +955,51 @@ export interface SdkLroServiceMetadata {
   finalStep?: SdkLroServiceFinalStep;
   /** Synthesized final response metadata */
   finalResponse?: SdkLroServiceFinalResponse;
+
+  /** extra metadata */
+  operation: SdkServiceOperation;
+  logicalResult: SdkModelType;
+  statusMonitorStep?: SdkNextOperationLink | SdkNextOperationReference;
+  pollingInfo: SdkPollingOperationStep;
+  envelopeResult: SdkModelType;
+  logicalPath?: string;
+  finalResult?: SdkModelType | "void";
+  finalEnvelopeResult?: SdkModelType | "void";
+  finalResultPath?: string;
+}
+
+export interface SdkNextOperationReference extends SdkLogicalOperationStep {
+  kind: "nextOperationReference";
+  responseModel: SdkModelType;
+  target: SdkOperationReference;
+}
+
+export interface SdkPollingOperationStep {
+  kind: "pollingOperationStep";
+  responseModel: SdkModelType;
+  terminationStatus: SdkTerminationStatus;
+  resultProperty?: SdkModelPropertyType;
+  errorProperty?: SdkModelPropertyType;
+}
+
+export type SdkTerminationStatus = SdkHttpOperationStatus | SdkModelPropertyTerminationStatus;
+
+interface SdkHttpOperationStatus {
+  kind: "status-code";
+}
+
+interface SdkModelPropertyTerminationStatus {
+  kind: "model-property";
+  property: SdkModelPropertyType;
+  succeededState: string[];
+  failedState: string[];
+  canceledState: string[];
+}
+
+export interface SdkNextOperationLink extends SdkLogicalOperationStep {
+  kind: "nextOperationLink";
+  responseModel: SdkModelType;
+  target: SdkOperationLink;
 }
 
 /**
@@ -964,16 +1010,71 @@ export interface SdkLroServicePollingStep {
   responseBody?: SdkModelType;
 }
 
+export interface SdkOperationLink {
+  kind: "link";
+  /** Indicates whether the link is in the response header or response body */
+  location: "ResponseHeader" | "ResponseBody" | "Self";
+  /** The property that contains the link */
+  property: SdkModelPropertyType;
+}
+
+interface SdkLogicalOperationStep {
+  /** The TypeSpec type that is returned by following a link or calling a lined operation */
+  responseModel?: SdkModelType;
+}
+
+export interface SdkPropertyMap {
+  sourceKind: SourceKind;
+  source: SdkModelPropertyType;
+  target: SdkModelPropertyType;
+}
+
+export interface SdkOperationReference {
+  kind: "reference";
+  /** The referenced operation */
+  operation: SdkServiceOperation;
+  /** information on how to construct the operation parameters from the original request and response */
+  parameterMap?: Map<string, ParameterSource>;
+
+  parameters?: Map<string, SdkPropertyMap>;
+
+  /** headers linking to the operation */
+  link?: SdkOperationLink;
+}
+
 /**
  * Long running operation final step metadata.
  */
-export interface SdkLroServiceFinalStep {
-  /** Final step kind */
-  kind:
-    | "finalOperationLink"
-    | "finalOperationReference"
-    | "pollingSuccessProperty"
-    | "noPollingResult";
+export type SdkLroServiceFinalStep =
+  | SdkFinalOperationLink
+  | SdkFinalOperationReference
+  | SdkPollingSuccessProperty
+  | SdkNoPollingSuccessProperty;
+
+interface SdkFinalOperationLink extends SdkLogicalOperationStep {
+  kind: "finalOperationLink";
+  /** if a link must be followed to get the result after polling completes, contains information about how to get the uri from the STatusMonitor */
+  target: SdkOperationLink;
+}
+
+interface SdkFinalOperationReference extends SdkLogicalOperationStep {
+  kind: "finalOperationReference";
+  /** if a link must be followed to get the result after polling completes, contains information about how to get the uri from the STatusMonitor */
+  target: SdkOperationReference;
+}
+
+interface SdkPollingSuccessProperty extends SdkLogicalOperationStep {
+  kind: "pollingSuccessProperty";
+  responseModel: SdkModelType;
+  /** The property containing the results of success */
+  target: SdkModelPropertyType;
+  /** The property in the response that contained a url to the status monitor */
+  sourceProperty: SdkModelPropertyType | undefined;
+}
+
+interface SdkNoPollingSuccessProperty extends SdkLogicalOperationStep {
+  kind: "noPollingResult";
+  responseModel: undefined;
 }
 
 /**

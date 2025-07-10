@@ -1,5 +1,33 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.57.3
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2859](https://github.com/Azure/typespec-azure/pull/2859) Add support for other lro metadata
+
+
+## 0.57.2
+
+### Features
+
+- [#2890](https://github.com/Azure/typespec-azure/pull/2890) Support load examples in nested folders.
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2889](https://github.com/Azure/typespec-azure/pull/2889) Consider `@clientLocation` when validate client name collision.
+- [#2871](https://github.com/Azure/typespec-azure/pull/2871) Fix scope calculation logic.
+- [#2861](https://github.com/Azure/typespec-azure/pull/2861) Fix `disableUsageAccessPropagationToBase` issue for discriminated model.
+
+
 ## 0.57.1
 
 ### Bug Fixes

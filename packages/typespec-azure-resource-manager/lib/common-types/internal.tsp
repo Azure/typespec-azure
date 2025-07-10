@@ -18,6 +18,15 @@ enum ResourceHome {
 
   @doc("The resource is bound to an extension")
   Extension,
+
+  @doc("The resource is a built in tenant resource")
+  BuiltIn,
+
+  @doc("The resource is a built in subscription resource")
+  BuiltInSubscription,
+
+  @doc("The resource is a built in resource group resource")
+  BuiltInResourceGroup,
 }
 
 /** Alias of keyEncryptionKeyIdentity for back compatibility. Please change to keyEncryptionKeyIdentity. */
