@@ -2,6 +2,14 @@ using Reflection;
 
 namespace Azure.Core {
   /**
+   * Decorator that marks a Version EnumMember as a preview version.
+   * This is used to indicate that the version is not yet stable and may change in future releases.
+
+   * @param target The EnumMember that represents the preview version.
+   */
+  extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
+
+  /**
    * Marks an Enum as being fixed since enums in Azure are
    * assumed to be extensible.
    */

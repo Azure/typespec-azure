@@ -225,6 +225,18 @@ export const $lib = createTypeSpecLibrary({
         default: `Union is referencing itself and cannot be resolved as an enum.`,
       },
     },
+    "preview-version-invalid-enum-member": {
+      severity: "error",
+      messages: {
+        default: `@previewVersion can only be applied to members of a Version enum.`,
+      },
+    },
+    "preview-version-last-member": {
+      severity: "error",
+      messages: {
+        default: `@previewVersion can only be applied to the last member of a Version enum.`,
+      },
+    },
   },
 
   state: {
@@ -258,6 +270,9 @@ export const $lib = createTypeSpecLibrary({
     traitLocation: { description: "Data for `@traitLocation` decorator" },
     parameterizedNextLinkConfig: {
       description: "Data for `@parameterizedNextLinkConfig` decorator",
+    },
+    previewVersion: {
+      description: "Data for `@previewVersion` decorator",
     },
   },
   // AzureCoreStateKeys.traitLocation

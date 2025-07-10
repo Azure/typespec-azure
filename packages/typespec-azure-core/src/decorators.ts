@@ -38,6 +38,7 @@ import {
   HttpOperationResponse,
 } from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
+import { getVersionForEnumMember } from "@typespec/versioning";
 import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
 import {
   ArmResourceIdentifierConfigDecorator,
@@ -66,6 +67,7 @@ import {
   PollingLocationDecorator,
   PollingOperationDecorator,
   PollingOperationParameterDecorator,
+  PreviewVersionDecorator,
   UseFinalStateViaDecorator,
 } from "../generated-defs/Azure.Core.js";
 import { FinalStateValue, OperationLink } from "./lro-helpers.js";
@@ -89,6 +91,46 @@ export const FinalOperationKey = "final";
 export const $fixed: FixedDecorator = (context: DecoratorContext, target: Enum) => {
   context.program.stateMap(AzureCoreStateKeys.fixed).set(target, true);
 };
+
+export const $previewVersion: PreviewVersionDecorator = (
+  context: DecoratorContext,
+  target: EnumMember,
+) => {
+  context.program.stateMap(AzureCoreStateKeys.previewVersion).set(target, true);
+};
+
+export function checkPreviewVersion(program: Program) {
+  const previewVersions: MapIterator<EnumMember> = program
+    .stateMap(AzureCoreStateKeys.previewVersion)
+    .keys() as MapIterator<EnumMember>;
+
+  for (const target of previewVersions) {
+    const resolvedVersion = getVersionForEnumMember(program, target);
+
+    // Validate that the target is a member of a Version enum
+    if (!resolvedVersion) {
+      program.reportDiagnostic(
+        createDiagnostic({
+          code: "preview-version-invalid-enum-member",
+          target,
+        }),
+      );
+      return;
+    }
+
+    // Validate that the target is the last member of the Version enum
+    const totalMembers = resolvedVersion.enumMember.enum.members.size;
+    if (resolvedVersion.index !== totalMembers - 1) {
+      program.reportDiagnostic(
+        createDiagnostic({
+          code: "preview-version-last-member",
+          target,
+        }),
+      );
+      return;
+    }
+  }
+}
 
 export function isFixed(program: Program, target: Enum): boolean {
   return program.stateMap(AzureCoreStateKeys.fixed).get(target) !== undefined;
