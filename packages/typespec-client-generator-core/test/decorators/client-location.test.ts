@@ -1,8 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 
 let runner: SdkTestRunner;
 
@@ -423,4 +426,72 @@ it("move an operation to root client with api version", async () => {
     a2Method.operation.parameters[0].correspondingMethodParams[0],
     rootClientApiVersionParam,
   );
+});
+
+it("client level signatures by default", async () => {
+  const runnerWithArm = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithArm.compileWithCustomization(
+    `
+    @armProviderNamespace("My.Service")
+    @service(#{title: "My.Service"})
+    @versioned(Versions)
+    @armCommonTypesVersion(CommonTypes.Versions.v5)
+    namespace My.Service;
+
+    /** Api versions */
+    enum Versions {
+      /** 2024-04-01-preview api version */
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      V2024_04_01_PREVIEW: "2024-04-01-preview",
+    }
+
+    model MyProperties {
+      @visibility(Lifecycle.Read)
+      @doc("Display name of the Azure Extended Zone.")
+      displayName: string;
+    }
+
+    @subscriptionResource
+    model MyModel is ProxyResource<MyProperties> {
+      @key("extendedZoneName")
+      @segment("extendedZones")
+      @path
+      name: string;
+    }
+
+    namespace MyClient {
+      interface Operations extends Azure.ResourceManager.Operations {}
+
+      @armResourceOperations
+      interface MyInterface {
+        get is ArmResourceRead<MyModel>;
+        put is ArmResourceCreateOrReplaceAsync<MyModel>;
+      }
+    }
+
+    `,
+    `
+    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.MyClient.MyInterface.put);
+    `
+    );
+
+  const sdkPackage = runnerWithArm.context.sdkPackage;
+  const client = sdkPackage.clients[0].children?.[0];
+  ok(client);
+  for (const p of client.clientInitialization.parameters) {
+    ok(p.onClient);
+  }
+  ok(client.clientInitialization.parameters.some((p) => p.name === "subscriptionId"));
+  const myInterface = client.children?.find((c) => c.name === "MyInterface");
+  ok(myInterface);
+  strictEqual(myInterface.methods.length, 1);
+  const getOperation = myInterface.methods.find((m) => m.name === "get");
+  ok(getOperation);
+  strictEqual(getOperation.parameters.length, 1);
+
+  strictEqual(getOperation.parameters.length, 0);
 });

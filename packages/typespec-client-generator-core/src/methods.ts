@@ -804,8 +804,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
           clientParams.push(sdkMethodParam);
         }
       } else if (
-        isSubscriptionId(context, param) &&
-        getClientLocation(context, param) !== operation
+        isSubscriptionId(context, param)
       ) {
         if (
           !context.__clientParametersCache
