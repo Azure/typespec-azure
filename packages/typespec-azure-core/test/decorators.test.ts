@@ -1,10 +1,10 @@
-import { Enum, EnumMember, Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
+import { Enum, Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
 import {
   BasicTestRunner,
   expectDiagnosticEmpty,
   expectDiagnostics,
+  t,
 } from "@typespec/compiler/testing";
-import { useStateMap } from "@typespec/compiler/utils";
 import assert, { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -14,9 +14,9 @@ import {
   getPagedResult,
   getParameterizedNextLinkArguments,
   isFixed,
+  isPreviewVersion,
   OperationLinkMetadata,
 } from "../src/decorators.js";
-import { AzureCoreStateKeys } from "../src/lib.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
 import { createAzureCoreTestRunner, Tester } from "./test-host.js";
 
@@ -79,7 +79,7 @@ describe("typespec-azure-core: decorators", () => {
     });
 
     it("succeeds to decorate the last enum member", async () => {
-      const { program } = await Tester.compile(`
+      const { program, v2Preview } = await Tester.compile(t.code`
         import "@typespec/versioning";
         import "@azure-tools/typespec-azure-core";
 
@@ -92,14 +92,12 @@ describe("typespec-azure-core: decorators", () => {
         enum Versions {
           v1,
           @Azure.Core.previewVersion
-          v2Preview: "2.0-preview",
+          ${t.enumMember("v2Preview")}: "2.0-preview",
         }
       `);
 
-      const [_, __, previewVersionsMap] = useStateMap(AzureCoreStateKeys.previewVersion);
-      const previews = [...previewVersionsMap(program).keys()] as EnumMember[];
-      assert(previews.length === 1);
-      assert(previews[0].name === "v2Preview");
+      assert(v2Preview.name === "v2Preview");
+      assert(isPreviewVersion(program, v2Preview));
     });
   });
 

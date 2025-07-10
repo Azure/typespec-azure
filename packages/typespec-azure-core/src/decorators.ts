@@ -30,7 +30,7 @@ import {
   walkPropertiesInherited,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { useStateMap } from "@typespec/compiler/utils";
+import { useStateMap, useStateSet } from "@typespec/compiler/utils";
 import {
   getHttpOperation,
   getRoutePath,
@@ -92,19 +92,23 @@ export const $fixed: FixedDecorator = (context: DecoratorContext, target: Enum) 
   context.program.stateMap(AzureCoreStateKeys.fixed).set(target, true);
 };
 
+const [isPreviewVersion, markPreviewVersion] = useStateSet<EnumMember>(
+  AzureCoreStateKeys.previewVersion,
+);
+
+export { isPreviewVersion };
+
 export const $previewVersion: PreviewVersionDecorator = (
   context: DecoratorContext,
   target: EnumMember,
 ) => {
-  const [_, setPreviewVersion] = useStateMap(AzureCoreStateKeys.previewVersion);
-  setPreviewVersion(context.program, target, true);
+  markPreviewVersion(context.program, target);
 };
 
 export function checkPreviewVersion(program: Program) {
-  const [_, __, versionsMap] = useStateMap(AzureCoreStateKeys.previewVersion);
-  const previewVersions: MapIterator<EnumMember> = versionsMap(
-    program,
-  ).keys() as MapIterator<EnumMember>;
+  const previewVersions = program.stateSet(
+    AzureCoreStateKeys.previewVersion,
+  ) as Iterable<EnumMember>;
 
   for (const target of previewVersions) {
     const resolvedVersion = getVersionForEnumMember(program, target);
