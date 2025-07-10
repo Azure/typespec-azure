@@ -2,7 +2,7 @@
 title: How to define a preview version
 ---
 
-See [`@typespec/versioning` documentation](https://typespec.io/docs/libraries/http/content-types/#content-type-negotiation) for the general versioning concept. This guide expands on how Azure Services should define Preview versions.
+See [`@typespec/versioning` documentation](https://typespec.io/docs/libraries/versioning/guide) for the general versioning concept. This guide expands on how Azure Services should define Preview versions.
 
 ## Preview Versioning Rules
 
@@ -17,7 +17,7 @@ See [`@typespec/versioning` documentation](https://typespec.io/docs/libraries/ht
 
 In the following example we introduce a new preview version called `v3Preview` which includes everything from `v2` plus adds a new property to the `Widget` resource.
 
-```diff
+```diff lang=tsp
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
@@ -68,7 +68,7 @@ model Widget {
 
 This example builds on the previous one, where `v3` is introduced which GA's the `nickname` property introduced in `v3Preview`
 
-```diff
+```diff lang=tsp
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
