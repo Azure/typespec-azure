@@ -96,13 +96,15 @@ export const $previewVersion: PreviewVersionDecorator = (
   context: DecoratorContext,
   target: EnumMember,
 ) => {
-  context.program.stateMap(AzureCoreStateKeys.previewVersion).set(target, true);
+  const [_, setPreviewVersion] = useStateMap(AzureCoreStateKeys.previewVersion);
+  setPreviewVersion(context.program, target, true);
 };
 
 export function checkPreviewVersion(program: Program) {
-  const previewVersions: MapIterator<EnumMember> = program
-    .stateMap(AzureCoreStateKeys.previewVersion)
-    .keys() as MapIterator<EnumMember>;
+  const [_, __, versionsMap] = useStateMap(AzureCoreStateKeys.previewVersion);
+  const previewVersions: MapIterator<EnumMember> = versionsMap(
+    program,
+  ).keys() as MapIterator<EnumMember>;
 
   for (const target of previewVersions) {
     const resolvedVersion = getVersionForEnumMember(program, target);

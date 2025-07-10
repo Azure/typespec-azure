@@ -1,24 +1,24 @@
 import { Enum, EnumMember, Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
 import {
   BasicTestRunner,
-  createTestWrapper,
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "@typespec/compiler/testing";
+import { useStateMap } from "@typespec/compiler/utils";
 import assert, { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  OperationLinkMetadata,
   getFinalStateOverride,
   getLongRunningStates,
   getOperationLinks,
   getPagedResult,
   getParameterizedNextLinkArguments,
   isFixed,
+  OperationLinkMetadata,
 } from "../src/decorators.js";
 import { AzureCoreStateKeys } from "../src/lib.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
-import { createAzureCoreTestHost, createAzureCoreTestRunner } from "./test-host.js";
+import { createAzureCoreTestRunner, Tester } from "./test-host.js";
 
 describe("typespec-azure-core: decorators", () => {
   let runner: BasicTestRunner;
@@ -54,13 +54,7 @@ describe("typespec-azure-core: decorators", () => {
     });
 
     it("emit diagnostic if use on enum member that is not the last member", async () => {
-      const host = await createAzureCoreTestHost();
-      runner = createTestWrapper(host, {
-        compilerOptions: {
-          miscOptions: { "disable-linter": true },
-        },
-      });
-      const diagnostics = await runner.diagnose(`
+      const diagnostics = await Tester.diagnose(`
         import "@typespec/versioning";
         import "@azure-tools/typespec-azure-core";
 
@@ -84,13 +78,7 @@ describe("typespec-azure-core: decorators", () => {
     });
 
     it("succeeds to decorate the last enum member", async () => {
-      const host = await createAzureCoreTestHost();
-      runner = createTestWrapper(host, {
-        compilerOptions: {
-          miscOptions: { "disable-linter": true },
-        },
-      });
-      await runner.diagnose(`
+      const { program } = await Tester.compile(`
         import "@typespec/versioning";
         import "@azure-tools/typespec-azure-core";
 
@@ -107,9 +95,8 @@ describe("typespec-azure-core: decorators", () => {
         }
       `);
 
-      const previews = [
-        ...runner.program.stateMap(AzureCoreStateKeys.previewVersion).keys(),
-      ] as EnumMember[];
+      const [_, __, previewVersionsMap] = useStateMap(AzureCoreStateKeys.previewVersion);
+      const previews = [...previewVersionsMap(program).keys()] as EnumMember[];
       assert(previews.length === 1);
       assert(previews[0].name === "v2Preview");
     });
