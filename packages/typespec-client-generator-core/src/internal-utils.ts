@@ -800,3 +800,33 @@ export function* filterMapValuesIterator<V>(
     }
   }
 }
+
+/**
+ * Find all entries in a scoped decorator state map where the target matches a specific value
+ */
+export function findEntriesWithTarget<TSource extends Type, TTarget>(
+  context: TCGCContext,
+  stateKey: symbol,
+  targetValue: TTarget,
+  sourceKind?: TSource["kind"],
+): TSource[] {
+  const results: TSource[] = [];
+  const stateMap = context.program.stateMap(stateKey);
+
+  for (const [source, scopedData] of stateMap.entries()) {
+    // Filter by source type if specified
+    if (sourceKind && source.kind !== sourceKind) {
+      continue;
+    }
+
+    // Check all scopes for matching target
+    for (const [scope, target] of Object.entries(scopedData)) {
+      if (target === targetValue) {
+        results.push(source as TSource);
+        break; // Found match, no need to check other scopes
+      }
+    }
+  }
+
+  return results;
+}

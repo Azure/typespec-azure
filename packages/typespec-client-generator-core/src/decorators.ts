@@ -20,6 +20,7 @@ import {
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { $ } from "@typespec/compiler/typekit";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -60,6 +61,7 @@ import {
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
+  findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
@@ -858,7 +860,11 @@ export function getClientInitialization(
 export function getClientInitializationOptions(
   context: TCGCContext,
   entity: Namespace | Interface,
+  inputOptions: {
+    addParametersFromClientLocation?: boolean;
+  } = {},
 ): ClientInitializationOptions | undefined {
+  const { addParametersFromClientLocation = true } = inputOptions;
   const options = getScopedDecoratorData(context, clientInitializationKey, entity);
   if (options === undefined) return undefined;
 
@@ -885,8 +891,36 @@ export function getClientInitializationOptions(
     }
   }
 
+  let parametersModel = options.properties.get("parameters")?.type as Model | undefined;
+  if (addParametersFromClientLocation) {
+    const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
+      context,
+      clientLocationKey,
+      entity,
+      "ModelProperty",
+    );
+    const tk = $(context.program);
+    if (movedParameters.length > 0) {
+      if (parametersModel) {
+        // If the parameters model already exists, we will merge the moved parameters into it.
+        for (const movedParameter of movedParameters) {
+          parametersModel.properties.set(movedParameter.name, movedParameter);
+        }
+      } else {
+        parametersModel = tk.model.create({
+          name: "ClientInitializationParameters",
+          properties: {
+            ...Object.fromEntries(
+              movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+            ),
+          },
+        });
+      }
+    }
+  }
+
   return {
-    parameters: options.properties.get("parameters")?.type,
+    parameters: parametersModel,
     initializedBy: initializedBy,
   };
 }
@@ -1225,7 +1259,9 @@ export const $clientLocation = (
         "@azure-tools/typespec-client-generator-core",
         { mutateNamespace: false },
       );
-      const clientInitialization = getClientInitializationOptions(tcgcContext, target);
+      const clientInitialization = getClientInitializationOptions(tcgcContext, target, {
+        addParametersFromClientLocation: false,
+      });
       if (clientInitialization?.parameters?.properties.has(source.name)) {
         reportDiagnostic(context.program, {
           code: "client-location-conflict",
