@@ -44,7 +44,34 @@ model Food {
 ```
 
 ```java
-// TODO
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void feed(Food food);
+}
+
+// Model class
+package petstore.models;
+
+@Immutable
+public final class Food implements JsonSerializable<Food> {
+    public Food(String name, int quantity);
+
+    public String getName();
+    public int getQuantity();
+}
 ```
 
 </ClientTabs>
@@ -90,7 +117,34 @@ namespace Customization;
 ```
 
 ```java
-// TODO
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void feed(Food food);
+}
+
+// Model class
+package petstore.models;
+
+@Immutable
+public final class Food implements JsonSerializable<Food> {
+    public Food(String name, int quantity);
+
+    public String getName();
+    public int getQuantity();
+}
 ```
 
 </ClientTabs>
