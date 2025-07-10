@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Introduce @previewVersion decorator
+Introduce `@previewVersion` decorator
