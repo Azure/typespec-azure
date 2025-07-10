@@ -8,8 +8,8 @@ See [`@typespec/versioning` documentation](https://typespec.io/docs/libraries/ve
 
 - Always make the last enum the preview and apply `@previewVersion` to it.
 - Apply `@added(Versions.PreviewVersion)` to all preview items - these items will not show up in any GA Version
-- For a new GA, add a new version enum **BEFORE** the preview enum value. Manually change all __preview__ items that are GA'ing so that the `@added` version value matches the new GA enum value
-- For any items remaining in __preview__, rename the __old preview__ enum value to the __new preview__ enum value.
+- For a new GA, add a new version enum **BEFORE** the preview enum value. Manually change all **preview** items that are GA'ing so that the `@added` version value matches the new GA enum value
+- For any items remaining in **preview**, rename the **old preview** enum value to the **new preview** enum value.
 
 ## Usage Examples
 

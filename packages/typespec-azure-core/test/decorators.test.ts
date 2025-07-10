@@ -73,7 +73,8 @@ describe("typespec-azure-core: decorators", () => {
       `);
       expectDiagnostics(diagnostics, {
         code: "@azure-tools/typespec-azure-core/preview-version-last-member",
-        message: "@previewVersion can only be applied to the last member of a Version enum.",
+        message:
+          "@previewVersion can only be applied to the last member of a Version enum. Having it on other members will cause unstable apis to show up in subsequent stable versions.",
       });
     });
 

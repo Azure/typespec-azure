@@ -232,9 +232,9 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "preview-version-last-member": {
-      severity: "error",
+      severity: "warning",
       messages: {
-        default: `@previewVersion can only be applied to the last member of a Version enum.`,
+        default: `@previewVersion can only be applied to the last member of a Version enum. Having it on other members will cause unstable apis to show up in subsequent stable versions.`,
       },
     },
   },
