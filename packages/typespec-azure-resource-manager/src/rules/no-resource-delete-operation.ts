@@ -1,5 +1,4 @@
-import { Model, createRule } from "@typespec/compiler";
-
+import { Model, createRule, paramMessage } from "@typespec/compiler";
 import { getArmResources } from "../resource.js";
 import { getInterface } from "./utils.js";
 
@@ -9,9 +8,10 @@ import { getInterface } from "./utils.js";
 export const deleteOperationMissingRule = createRule({
   name: "no-resource-delete-operation",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-resource-delete-operation",
   description: "Check for resources that must have a delete operation.",
   messages: {
-    default: `The resource must have a delete operation.`,
+    default: paramMessage`Resource '${"name"}' must have a delete operation.`,
   },
   create(context) {
     return {
@@ -25,7 +25,10 @@ export const deleteOperationMissingRule = createRule({
         ) {
           const resourceInterface = getInterface(armResource);
           context.reportDiagnostic({
-            target: resourceInterface || model,
+            target: resourceInterface ?? model,
+            format: {
+              name: armResource.name,
+            },
           });
         }
       },
