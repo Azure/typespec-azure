@@ -139,6 +139,7 @@ export function getLroOperationInfo(
   program: Program,
   sourceOperation: Operation,
   targetOperation: Operation,
+  linkType: string,
   parameters?: Model,
 ): [LroOperationInfo | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -166,14 +167,14 @@ export function getLroOperationInfo(
   if (sourceParameters.body && sourceParameters.body.type.kind === "Model") {
     for (const [sourceName, sourceProp] of getAllProperties(sourceParameters.body.type)) {
       sourceBodyProperties.set(sourceName, sourceProp);
-      const result = handleExplicitParameterMap(sourceProp, "RequestBody");
+      const result = handleExplicitPollingParameterMap(sourceProp, "RequestBody");
       result.forEach((d) => diagnostics.add(d));
     }
   }
   const sourceParamProperties = new Map<string, ModelProperty>();
   for (const parameter of sourceParameters.parameters) {
     sourceParamProperties.set(parameter.name, parameter.param);
-    const result = handleExplicitParameterMap(parameter.param, "RequestParameter");
+    const result = handleExplicitPollingParameterMap(parameter.param, "RequestParameter");
     result.forEach((d) => diagnostics.add(d));
   }
   const sourceResponseProperties = new Map<string, ModelProperty>();
@@ -195,7 +196,7 @@ export function getLroOperationInfo(
   for (const response of sourceResponses) {
     visitResponse(program, response, undefined, (name, prop) => {
       sourceResponseProperties.set(name, prop);
-      const result = handleExplicitParameterMap(prop, "ResponseBody");
+      const result = handleExplicitPollingParameterMap(prop, "ResponseBody");
       result.forEach((d) => diagnostics.add(d));
       const link = extractPollinglink(prop);
       if (link && !pollingLink) {
@@ -261,10 +262,11 @@ export function getLroOperationInfo(
     return diagnostics.wrap(result);
   }
 
-  function handleExplicitParameterMap(
+  function handleExplicitPollingParameterMap(
     source: ModelProperty,
     kind: SourceKind,
   ): readonly Diagnostic[] {
+    if (linkType !== "polling") return [];
     const directMapping = getPollingOperationParameter(program, source);
     if (directMapping === undefined) return [];
     let targetName: string;

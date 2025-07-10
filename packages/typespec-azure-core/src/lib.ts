@@ -30,7 +30,7 @@ export const $lib = createTypeSpecLibrary({
     "invalid-polling-operation-parameter": {
       severity: "error",
       messages: {
-        default: `The @pollingOperationParameter '${"name"}' does not reference a valid parameter in the polling operation.`,
+        default: paramMessage`The @pollingOperationParameter '${"name"}' does not reference a valid parameter in the polling operation.`,
       },
     },
     "invalid-final-state": {

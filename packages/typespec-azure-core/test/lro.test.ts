@@ -28,7 +28,7 @@ describe("validate @pollingOperationParameter reference a valid parameter", () =
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-core/invalid-polling-operation-parameter",
       message:
-        "The @pollingOperationParameter 'name' does not reference a valid parameter in the polling operation.",
+        "The @pollingOperationParameter 'bar' does not reference a valid parameter in the polling operation.",
     });
   });
 
@@ -51,7 +51,7 @@ describe("validate @pollingOperationParameter reference a valid parameter", () =
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-azure-core/invalid-polling-operation-parameter",
       message:
-        "The @pollingOperationParameter 'name' does not reference a valid parameter in the polling operation.",
+        "The @pollingOperationParameter 'baz' does not reference a valid parameter in the polling operation.",
     });
   });
 });
