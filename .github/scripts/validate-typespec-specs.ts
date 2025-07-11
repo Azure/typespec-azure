@@ -64,9 +64,9 @@ async function findTspEntrypoint(directory: string): Promise<string | null> {
 }
 
 async function verifyProject(dir: string): Promise<{ success: boolean; output: string }> {
-  const entryPoint = await findTspEntrypoint(dir);
+  const entrypoint = await findTspEntrypoint(dir);
 
-  if (!entryPoint) {
+  if (!entrypoint) {
     const result = {
       success: false,
       output: "No main.tsp or client.tsp file found in directory",
@@ -76,13 +76,14 @@ async function verifyProject(dir: string): Promise<{ success: boolean; output: s
     return result;
   }
 
-  return runTspCompile2(dir, entryPoint);
+  return execTspCompile(dir, entrypoint, entrypoint === "client.tsp" ? ["--dry-run"] : []);
 }
-async function runTspCompile2(
+async function execTspCompile(
   directory: string,
   file: string,
+  args: string[] = [],
 ): Promise<{ success: boolean; output: string }> {
-  return execAsync("npx", ["tsp", "compile", file, "--warn-as-error"], {
+  return execAsync("npx", ["tsp", "compile", file, "--warn-as-error", ...args], {
     cwd: directory,
   });
 }
