@@ -1,11 +1,11 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
+import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 
 let runner: SdkTestRunner;
 
@@ -476,8 +476,8 @@ it("client level signatures by default", async () => {
     `,
     `
     @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.MyClient.MyInterface.put);
-    `
-    );
+    `,
+  );
 
   const sdkPackage = runnerWithArm.context.sdkPackage;
   const client = sdkPackage.clients[0].children?.[0];
@@ -494,4 +494,51 @@ it("client level signatures by default", async () => {
   strictEqual(getOperation.parameters.length, 1);
 
   strictEqual(getOperation.parameters.length, 0);
+});
+it("all operations have been moved", async () => {
+  await runner.compile(
+    `
+    @service
+    @versioned(Versions)
+    namespace TestService;
+    enum Versions {
+      v1: "v1",
+      v2: "v2",
+    }
+
+    interface A {
+      @route("/a1")
+      @clientLocation("B")
+      op a1(@query apiVersion: string): void;
+
+      @route("/a2")
+      @clientLocation("C")
+      op a2(@query apiVersion: string): void;
+    }
+  `,
+  );
+
+  const sdkPackage = runner.context.sdkPackage;
+  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+  ok(rootClient);
+  const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(rootClientApiVersionParam);
+
+  strictEqual(rootClient.children?.length, 2);
+
+  const bClient = rootClient.children.find((c) => c.name === "B");
+  ok(bClient);
+  const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(bClientApiVersionParam);
+
+  const cClient = rootClient.children.find((c) => c.name === "C");
+  ok(cClient);
+  const cClientApiVersionParam = cClient.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(cClientApiVersionParam);
 });
