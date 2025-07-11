@@ -54,31 +54,8 @@ async function findTypeSpecProjects(startDir: string): Promise<string[]> {
 }
 
 async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
-  // Check if this directory has a tspconfig.yaml
-  const entries = await readdir(directory);
-  const hasTspConfig = entries.includes("tspconfig.yaml");
-  
-  let compileArgs: string[];
-  if (hasTspConfig) {
-    // Use tsp compile . when there's a tspconfig.yaml
-    compileArgs = ["tsp", "compile", ".", "--warn-as-error"];
-  } else {
-    // Determine entry point when there's no tspconfig.yaml
-    const hasMainTsp = entries.includes("main.tsp");
-    const hasClientTsp = entries.includes("client.tsp");
-    
-    if (hasMainTsp) {
-      compileArgs = ["tsp", "compile", "main.tsp", "--warn-as-error"];
-    } else if (hasClientTsp) {
-      compileArgs = ["tsp", "compile", "client.tsp", "--warn-as-error"];
-    } else {
-      // This shouldn't happen since we only call this function for directories with TypeSpec files
-      compileArgs = ["tsp", "compile", ".", "--warn-as-error"];
-    }
-  }
-
   return new Promise((resolve) => {
-    const process = spawn("npx", compileArgs, {
+    const process = spawn("npx", ["tsp", "compile", ".", "--warn-as-error"], {
       cwd: directory,
       stdio: "pipe",
     });
