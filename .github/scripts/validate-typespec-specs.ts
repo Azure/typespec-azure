@@ -1,9 +1,11 @@
 #!/usr/bin/env tsx
 /* eslint-disable no-console */
 
-import { spawn } from "child_process";
+import { spawn, SpawnOptions } from "child_process";
 import { readdir, stat } from "fs/promises";
 import { join } from "path";
+import pc from "picocolors";
+
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = 4;
 
@@ -44,9 +46,19 @@ async function findTspProjects(startDir: string): Promise<string[]> {
 }
 
 async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
+  return execAsync("npx", ["tsp", "compile", ".", "--warn-as-error"], {
+    cwd: directory,
+  });
+}
+
+async function execAsync(
+  command: string,
+  args: string[],
+  options: SpawnOptions = {},
+): Promise<{ success: boolean; output: string }> {
   return new Promise((resolve) => {
-    const process = spawn("npx", ["tsp", "compile", ".", "--warn-as-error"], {
-      cwd: directory,
+    const process = spawn(command, args, {
+      ...options,
       stdio: "pipe",
     });
 
@@ -103,9 +115,10 @@ async function main() {
     return;
   }
 
-  console.log(`Found ${tspConfigDirs.length} TypeSpec projects:`);
-  tspConfigDirs.forEach((dir) => console.log(`  - ${dir}`));
-  console.log("");
+  logGroup(
+    `Found ${pc.yellow(tspConfigDirs.length)} TypeSpec projects`,
+    tspConfigDirs.map((dir) => pc.bold(dir)).join("\n"),
+  );
 
   let successCount = 0;
   let failureCount = 0;
@@ -114,11 +127,9 @@ async function main() {
   // Create a processor function that handles the compilation and logging
   const processDirectory = async (dir: string) => {
     const result = await runTspCompile(dir);
-    const status = result.success ? "✅" : "❌";
+    const status = result.success ? pc.green("pass") : pc.red("fail");
 
-    console.log(`::group::${status} ${dir}`);
-    console.log(result);
-    console.log("::endgroup::");
+    logGroup(`${status} ${dir}`, result.output);
 
     return { dir, result };
   };
@@ -154,4 +165,10 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+function logGroup(name: string, content: string) {
+  console.log(`::group::${name}`);
+  console.log(content);
+  console.log("::endgroup::");
+}
+
+await main();
