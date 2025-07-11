@@ -45,8 +45,44 @@ async function findTspProjects(startDir: string): Promise<string[]> {
   return directories;
 }
 
-async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
-  return execAsync("npx", ["tsp", "compile", ".", "--warn-as-error"], {
+async function findTspEntrypoint(directory: string): Promise<string | null> {
+  try {
+    const entries = await readdir(directory);
+
+    // Prefer main.tsp, fall back to client.tsp
+    if (entries.includes("main.tsp")) {
+      return "main.tsp";
+    }
+    if (entries.includes("client.tsp")) {
+      return "client.tsp";
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function verifyProject(dir: string): Promise<{ success: boolean; output: string }> {
+  const entryPoint = await findTspEntrypoint(dir);
+
+  if (!entryPoint) {
+    const result = {
+      success: false,
+      output: "No main.tsp or client.tsp file found in directory",
+    };
+    const status = pc.red("fail");
+    logGroup(`${status} ${dir}`, result.output);
+    return result;
+  }
+
+  return runTspCompile2(dir, entryPoint);
+}
+async function runTspCompile2(
+  directory: string,
+  file: string,
+): Promise<{ success: boolean; output: string }> {
+  return execAsync("npx", ["tsp", "compile", file, "--warn-as-error"], {
     cwd: directory,
   });
 }
@@ -122,11 +158,9 @@ async function main() {
 
   let successCount = 0;
   let failureCount = 0;
-  const failedFolders: string[] = [];
-
-  // Create a processor function that handles the compilation and logging
-  const processDirectory = async (dir: string) => {
-    const result = await runTspCompile(dir);
+  const failedFolders: string[] = []; // Create a processor function that handles the compilation and logging
+  const processProject = async (dir: string) => {
+    const result = await verifyProject(dir);
     const status = result.success ? pc.green("pass") : pc.red("fail");
 
     logGroup(`${status} ${dir}`, result.output);
@@ -135,11 +169,7 @@ async function main() {
   };
 
   // Run compilations in parallel with limited concurrency
-  const results = await runWithConcurrency(
-    tspConfigDirs,
-    COMPILATION_CONCURRENCY,
-    processDirectory,
-  );
+  const results = await runWithConcurrency(tspConfigDirs, COMPILATION_CONCURRENCY, processProject);
 
   // Count successes and failures
   for (const { dir, result } of results) {
