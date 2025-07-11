@@ -8,7 +8,7 @@ import { join } from "path";
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = 4;
 
-async function findTspConfigDirectories(startDir: string): Promise<string[]> {
+async function findTypeSpecProjects(startDir: string): Promise<string[]> {
   const directories: string[] = [];
 
   async function searchDirectory(dir: string): Promise<void> {
@@ -19,6 +19,15 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
       if (entries.includes("tspconfig.yaml")) {
         directories.push(dir);
         return; // Don't search subdirectories if we found a tspconfig.yaml
+      }
+
+      // Check if this directory has TypeSpec files but no tspconfig.yaml
+      const hasMainTsp = entries.includes("main.tsp");
+      const hasClientTsp = entries.includes("client.tsp");
+      
+      if (hasMainTsp || hasClientTsp) {
+        directories.push(dir);
+        return; // Don't search subdirectories if we found TypeSpec files
       }
 
       // Search subdirectories
@@ -45,8 +54,31 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
 }
 
 async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
+  // Check if this directory has a tspconfig.yaml
+  const entries = await readdir(directory);
+  const hasTspConfig = entries.includes("tspconfig.yaml");
+  
+  let compileArgs: string[];
+  if (hasTspConfig) {
+    // Use tsp compile . when there's a tspconfig.yaml
+    compileArgs = ["tsp", "compile", ".", "--warn-as-error"];
+  } else {
+    // Determine entry point when there's no tspconfig.yaml
+    const hasMainTsp = entries.includes("main.tsp");
+    const hasClientTsp = entries.includes("client.tsp");
+    
+    if (hasMainTsp) {
+      compileArgs = ["tsp", "compile", "main.tsp", "--warn-as-error"];
+    } else if (hasClientTsp) {
+      compileArgs = ["tsp", "compile", "client.tsp", "--warn-as-error"];
+    } else {
+      // This shouldn't happen since we only call this function for directories with TypeSpec files
+      compileArgs = ["tsp", "compile", ".", "--warn-as-error"];
+    }
+  }
+
   return new Promise((resolve) => {
-    const process = spawn("npx", ["tsp", "compile", ".", "--warn-as-error"], {
+    const process = spawn("npx", compileArgs, {
       cwd: directory,
       stdio: "pipe",
     });
@@ -97,15 +129,15 @@ async function main() {
 
   console.log(`Looking for TypeSpec projects in ${azureSpecsDir}...`);
 
-  const tspConfigDirs = await findTspConfigDirectories(join(azureSpecsDir, "specification"));
+  const tspProjects = await findTypeSpecProjects(join(azureSpecsDir, "specification"));
 
-  if (tspConfigDirs.length === 0) {
-    console.log("No tspconfig.yaml files found in specification directory");
+  if (tspProjects.length === 0) {
+    console.log("No TypeSpec projects found in specification directory");
     return;
   }
 
-  console.log(`Found ${tspConfigDirs.length} TypeSpec projects:`);
-  tspConfigDirs.forEach((dir) => console.log(`  - ${dir}`));
+  console.log(`Found ${tspProjects.length} TypeSpec projects:`);
+  tspProjects.forEach((dir) => console.log(`  - ${dir}`));
   console.log("");
 
   let successCount = 0;
@@ -140,7 +172,7 @@ async function main() {
 
   // Run compilations in parallel with limited concurrency
   const results = await runWithConcurrency(
-    tspConfigDirs,
+    tspProjects,
     COMPILATION_CONCURRENCY,
     processDirectory,
   );
@@ -156,7 +188,7 @@ async function main() {
   }
 
   console.log(`\n=== Summary ===`);
-  console.log(`Total projects: ${tspConfigDirs.length}`);
+  console.log(`Total projects: ${tspProjects.length}`);
   console.log(`Successful: ${successCount}`);
   console.log(`Failed: ${failureCount}`);
 

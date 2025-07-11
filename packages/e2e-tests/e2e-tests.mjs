@@ -150,25 +150,13 @@ function getMainTspFiles(dir) {
   const files = subdirs
     .map((subdir) => {
       const res = resolve(dir, subdir);
-      if (statSync(res).isDirectory()) {
-        return getMainTspFiles(res);
-      } else {
-        return undefined;
-      }
+      return statSync(res).isDirectory()
+        ? getMainTspFiles(res)
+        : subdir === "main.tsp"
+          ? res
+          : undefined;
     })
     .filter((x) => x !== undefined);
-  
-  // Check if this directory has main.tsp or client.tsp
-  const hasMainTsp = subdirs.includes("main.tsp");
-  const hasClientTsp = subdirs.includes("client.tsp");
-  
-  // Prefer main.tsp, but use client.tsp if main.tsp is not found
-  if (hasMainTsp) {
-    files.push(resolve(dir, "main.tsp"));
-  } else if (hasClientTsp) {
-    files.push(resolve(dir, "client.tsp"));
-  }
-  
   return files.reduce((a, f) => a.concat(f), []);
 }
 
