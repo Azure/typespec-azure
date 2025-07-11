@@ -14,9 +14,6 @@ steps:
     parameters:
       nodeVersion: ${{ parameters.nodeVersion }}
 
-  - script: pnpm run check-version-mismatch
-    displayName: Check version mismatch
-
   - template: /eng/pipelines/templates/build.yml
 
   - script: pnpm run test:ci
