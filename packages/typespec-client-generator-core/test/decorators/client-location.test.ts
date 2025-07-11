@@ -486,45 +486,107 @@ describe("Parameter", () => {
         @route("/a")
         op a(@query @clientLocation(TestService) apiKey: string, data: string): void;
       }
-      `
+      `,
     );
 
     const sdkPackage = runner.context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
-    
+
     // apiKey should be moved to client initialization
     const clientApiKeyParam = rootClient.clientInitialization.parameters.find(
-      (p) => p.name === "apiKey"
+      (p) => p.name === "apiKey",
     );
     ok(clientApiKeyParam);
     ok(clientApiKeyParam.onClient);
-    
+
     // Operation should not have apiKey as method parameter
     const aClient = rootClient.children?.find((c) => c.name === "A");
     ok(aClient);
-    const aMethod = aClient.methods.find((m) => m.name === "a") as SdkServiceMethod<SdkHttpOperation>;
+    const aMethod = aClient.methods.find(
+      (m) => m.name === "a",
+    ) as SdkServiceMethod<SdkHttpOperation>;
     ok(aMethod);
-    
+
     // Should only have 'data' parameter, not 'apiKey'
     strictEqual(aMethod.parameters.length, 2);
     strictEqual(aMethod.parameters[0].name, "data");
     strictEqual(aMethod.parameters[1].name, "contentType");
-    
+
     // But the HTTP operation should still reference the client parameter
     const httpApiKeyParam = aMethod.operation.parameters.find((p) => p.name === "apiKey");
     ok(httpApiKeyParam);
     strictEqual(httpApiKeyParam.correspondingMethodParams.length, 1);
     strictEqual(httpApiKeyParam.correspondingMethodParams[0], clientApiKeyParam);
   });
-  it("subId from client to operation", async () => {
-  const runnerWithArm = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
+
+  it("move parameter from client to operation", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace MyClient {
+        interface Operations {
+          @route("/test")
+          op test(data: string): void;
+        }
+      }
+      `,
+      `
+      model MyClientOptions {
+        apiKey: string;
+        subscriptionId: string;
+      }
+      
+      @@clientInitialization(MyClient, {parameters: MyClientOptions});
+      @@clientLocation(MyClientOptions.apiKey, MyClient.Operations.test);
+      `,
+    );
+
+    const sdkPackage = runner.context.sdkPackage;
+
+    const myClient = sdkPackage.clients.find((c) => c.name === "MyClient");
+    ok(myClient);
+
+    // apiKey should be removed from client initialization
+    const clientApiKeyParam = myClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiKey",
+    );
+    ok(clientApiKeyParam);
+
+    // subscriptionId should still be in client initialization
+    const clientSubscriptionIdParam = myClient.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(clientSubscriptionIdParam);
+    ok(clientSubscriptionIdParam.onClient);
+
+    // Operation should now have apiKey as method parameter
+    const operationsClient = myClient.children?.find((c) => c.name === "Operations");
+    ok(operationsClient);
+    const testMethod = operationsClient.methods.find(
+      (m) => m.name === "test",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(testMethod);
+
+    // Should have both 'data' and 'apiKey' parameters
+    strictEqual(testMethod.parameters.length, 2);
+    const methodApiKeyParam = testMethod.parameters.find((p) => p.name === "apiKey");
+    ok(methodApiKeyParam);
+    strictEqual(methodApiKeyParam.onClient, false);
+
+    const methodDataParam = testMethod.parameters.find((p) => p.name === "data");
+    ok(methodDataParam);
+    strictEqual(methodDataParam.onClient, false);
   });
-  await runnerWithArm.compileWithCustomization(
-    `
+
+  it("subId from client to operation", async () => {
+    const runnerWithArm = await createSdkTestRunner({
+      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithArm.compileWithCustomization(
+      `
     @armProviderNamespace("My.Service")
     @service(#{title: "My.Service"})
     @versioned(Versions)
@@ -553,27 +615,25 @@ describe("Parameter", () => {
     }
 
     `,
-    `
+      `
     @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.Operations.get);
     `,
-  );
+    );
 
-  const sdkPackage = runnerWithArm.context.sdkPackage;
-  const client = sdkPackage.clients[0].children?.[0];
-  ok(client);
-  for (const p of client.clientInitialization.parameters) {
-    ok(p.onClient);
-  }
-  ok(client.clientInitialization.parameters.some((p) => p.name === "subscriptionId"));
-  const myInterface = client.children?.find((c) => c.name === "MyInterface");
-  ok(myInterface);
-  strictEqual(myInterface.methods.length, 1);
-  const getOperation = myInterface.methods.find((m) => m.name === "get");
-  ok(getOperation);
-  strictEqual(getOperation.parameters.length, 1);
+    const sdkPackage = runnerWithArm.context.sdkPackage;
+    const client = sdkPackage.clients[0].children?.[0];
+    ok(client);
+    for (const p of client.clientInitialization.parameters) {
+      ok(p.onClient);
+    }
+    ok(client.clientInitialization.parameters.some((p) => p.name === "subscriptionId"));
+    const myInterface = client.children?.find((c) => c.name === "MyInterface");
+    ok(myInterface);
+    strictEqual(myInterface.methods.length, 1);
+    const getOperation = myInterface.methods.find((m) => m.name === "get");
+    ok(getOperation);
+    strictEqual(getOperation.parameters.length, 1);
 
-  strictEqual(getOperation.parameters.length, 0);
+    strictEqual(getOperation.parameters.length, 0);
+  });
 });
-})
-
-
