@@ -3,7 +3,7 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -13,40 +13,41 @@ beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
 
-it("@clientLocation along with @client", async () => {
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(
-      `
+describe("Operation", () => {
+  it("@clientLocation along with @client", async () => {
+    const diagnostics = (
+      await runner.compileAndDiagnoseWithCustomization(
+        `
     @service
     namespace MyService;
 
     op test(): string;
   `,
-      `
+        `
     @client({service: MyService})
     namespace MyServiceClient;
 
     @clientLocation("Inner")
     op test is MyService.test;
   `,
-    )
-  )[1];
+      )
+    )[1];
 
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+    });
   });
-});
 
-it("@clientLocation along with @operationGroup", async () => {
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(
-      `
+  it("@clientLocation along with @operationGroup", async () => {
+    const diagnostics = (
+      await runner.compileAndDiagnoseWithCustomization(
+        `
     @service
     namespace MyService;
 
     op test(): string;
   `,
-      `
+        `
     namespace Customization;
 
     @operationGroup
@@ -55,17 +56,17 @@ it("@clientLocation along with @operationGroup", async () => {
       op test is MyService.test;
     }
   `,
-    )
-  )[1];
+      )
+    )[1];
 
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+    });
   });
-});
 
-it("@clientLocation client-location-wrong-type", async () => {
-  const [_, diagnostics] = await runner.compileAndDiagnose(
-    `
+  it("@clientLocation client-location-wrong-type", async () => {
+    const [_, diagnostics] = await runner.compileAndDiagnose(
+      `
     @service
     namespace TestService{
       @clientLocation(Test)
@@ -75,22 +76,22 @@ it("@clientLocation client-location-wrong-type", async () => {
     namespace Test{
     }
   `,
-  );
+    );
 
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/client-location-wrong-type",
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-location-wrong-type",
+    });
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children, undefined);
+    strictEqual(rootClient.methods.length, 1);
+    strictEqual(rootClient.methods[0].name, "test");
   });
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children, undefined);
-  strictEqual(rootClient.methods.length, 1);
-  strictEqual(rootClient.methods[0].name, "test");
-});
 
-it("@clientLocation client-location-duplicate", async () => {
-  const [_, diagnostics] = await runner.compileAndDiagnose(
-    `
+  it("@clientLocation client-location-duplicate", async () => {
+    const [_, diagnostics] = await runner.compileAndDiagnose(
+      `
     @service
     namespace TestService;
 
@@ -108,30 +109,30 @@ it("@clientLocation client-location-duplicate", async () => {
       op b(): void;
     }
   `,
-  );
+    );
 
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/client-location-duplicate",
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/client-location-duplicate",
+    });
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 2);
+    const aClient = rootClient.children.find((c) => c.name === "A");
+    ok(aClient);
+    strictEqual(aClient.methods.length, 2);
+    strictEqual(aClient.methods[0].name, "a1");
+    strictEqual(aClient.methods[1].name, "a2");
+
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    strictEqual(bClient.methods.length, 1);
+    strictEqual(bClient.methods[0].name, "b");
   });
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 2);
-  const aClient = rootClient.children.find((c) => c.name === "A");
-  ok(aClient);
-  strictEqual(aClient.methods.length, 2);
-  strictEqual(aClient.methods[0].name, "a1");
-  strictEqual(aClient.methods[1].name, "a2");
 
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  strictEqual(bClient.methods.length, 1);
-  strictEqual(bClient.methods[0].name, "b");
-});
-
-it("move an operation to another operation group", async () => {
-  await runner.compileWithBuiltInService(
-    `
+  it("move an operation to another operation group", async () => {
+    await runner.compileWithBuiltInService(
+      `
     interface A {
       @route("/a1")
       op a1(): void;
@@ -146,26 +147,26 @@ it("move an operation to another operation group", async () => {
       op b(): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 2);
-  const aClient = rootClient.children.find((c) => c.name === "A");
-  ok(aClient);
-  strictEqual(aClient.methods.length, 1);
-  strictEqual(aClient.methods[0].name, "a1");
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  strictEqual(bClient.methods.length, 2);
-  strictEqual(bClient.methods[0].name, "b");
-  strictEqual(bClient.methods[1].name, "a2");
-});
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 2);
+    const aClient = rootClient.children.find((c) => c.name === "A");
+    ok(aClient);
+    strictEqual(aClient.methods.length, 1);
+    strictEqual(aClient.methods[0].name, "a1");
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    strictEqual(bClient.methods.length, 2);
+    strictEqual(bClient.methods[0].name, "b");
+    strictEqual(bClient.methods[1].name, "a2");
+  });
 
-it("move an operation to another operation group and omit the original operation group", async () => {
-  await runner.compileWithBuiltInService(
-    `
+  it("move an operation to another operation group and omit the original operation group", async () => {
+    await runner.compileWithBuiltInService(
+      `
     interface A {
       @route("/a")
       @clientLocation(B)
@@ -177,22 +178,22 @@ it("move an operation to another operation group and omit the original operation
       op b(): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 1);
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  strictEqual(bClient.methods.length, 2);
-  strictEqual(bClient.methods[0].name, "b");
-  strictEqual(bClient.methods[1].name, "a");
-});
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 1);
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    strictEqual(bClient.methods.length, 2);
+    strictEqual(bClient.methods[0].name, "b");
+    strictEqual(bClient.methods[1].name, "a");
+  });
 
-it("move an operation to a new opeartion group", async () => {
-  await runner.compileWithBuiltInService(
-    `
+  it("move an operation to a new opeartion group", async () => {
+    await runner.compileWithBuiltInService(
+      `
     interface A {
       @route("/a1")
       op a1(): void;
@@ -202,46 +203,46 @@ it("move an operation to a new opeartion group", async () => {
       op a2(): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 2);
-  const aClient = rootClient.children.find((c) => c.name === "A");
-  ok(aClient);
-  strictEqual(aClient.methods.length, 1);
-  strictEqual(aClient.methods[0].name, "a1");
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  strictEqual(bClient.methods.length, 1);
-  strictEqual(bClient.methods[0].name, "a2");
-});
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 2);
+    const aClient = rootClient.children.find((c) => c.name === "A");
+    ok(aClient);
+    strictEqual(aClient.methods.length, 1);
+    strictEqual(aClient.methods[0].name, "a1");
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    strictEqual(bClient.methods.length, 1);
+    strictEqual(bClient.methods[0].name, "a2");
+  });
 
-it("move an operation to a new operation group and omit the original operation group", async () => {
-  await runner.compileWithBuiltInService(
-    `
+  it("move an operation to a new operation group and omit the original operation group", async () => {
+    await runner.compileWithBuiltInService(
+      `
     interface A {
       @route("/a")
       @clientLocation("B")
       op a(): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 1);
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  strictEqual(bClient.methods.length, 1);
-  strictEqual(bClient.methods[0].name, "a");
-});
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 1);
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    strictEqual(bClient.methods.length, 1);
+    strictEqual(bClient.methods[0].name, "a");
+  });
 
-it("move an operation to root client", async () => {
-  await runner.compileWithBuiltInService(
-    `
+  it("move an operation to root client", async () => {
+    await runner.compileWithBuiltInService(
+      `
     interface A {
       @route("/a1")
       op a1(): void;
@@ -251,42 +252,42 @@ it("move an operation to root client", async () => {
       op a2(): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 1);
-  const aClient = rootClient.children.find((c) => c.name === "A");
-  ok(aClient);
-  strictEqual(aClient.methods.length, 1);
-  strictEqual(aClient.methods[0].name, "a1");
-  strictEqual(rootClient.methods.length, 1);
-  strictEqual(rootClient.methods[0].name, "a2");
-});
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 1);
+    const aClient = rootClient.children.find((c) => c.name === "A");
+    ok(aClient);
+    strictEqual(aClient.methods.length, 1);
+    strictEqual(aClient.methods[0].name, "a1");
+    strictEqual(rootClient.methods.length, 1);
+    strictEqual(rootClient.methods[0].name, "a2");
+  });
 
-it("move an operation to root client and omit the original operation group", async () => {
-  await runner.compileWithBuiltInService(
-    `
+  it("move an operation to root client and omit the original operation group", async () => {
+    await runner.compileWithBuiltInService(
+      `
     interface A {
       @route("/a")
       @clientLocation(TestService)
       op a(): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children, undefined);
-  strictEqual(rootClient.methods.length, 1);
-  strictEqual(rootClient.methods[0].name, "a");
-});
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children, undefined);
+    strictEqual(rootClient.methods.length, 1);
+    strictEqual(rootClient.methods[0].name, "a");
+  });
 
-it("move an operation to another operation group with api version", async () => {
-  await runner.compile(
-    `
+  it("move an operation to another operation group with api version", async () => {
+    await runner.compile(
+      `
     @service
     @versioned(Versions)
     namespace TestService;
@@ -309,36 +310,36 @@ it("move an operation to another operation group with api version", async () => 
       op b(@query apiVersion: string): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 2);
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
-    (p) => p.name === "apiVersion",
-  );
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 2);
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiVersion",
+    );
 
-  strictEqual(bClient.methods.length, 2);
-  const a2Method = bClient.methods.find(
-    (m) => m.name === "a2",
-  ) as SdkServiceMethod<SdkHttpOperation>;
-  ok(a2Method);
-  strictEqual(a2Method.parameters.length, 0);
-  strictEqual(a2Method.operation.parameters.length, 1);
-  strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-  strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
-  strictEqual(
-    a2Method.operation.parameters[0].correspondingMethodParams[0],
-    bClientApiVersionParam,
-  );
-});
+    strictEqual(bClient.methods.length, 2);
+    const a2Method = bClient.methods.find(
+      (m) => m.name === "a2",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(a2Method);
+    strictEqual(a2Method.parameters.length, 0);
+    strictEqual(a2Method.operation.parameters.length, 1);
+    strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
+    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(
+      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      bClientApiVersionParam,
+    );
+  });
 
-it("move an operation to a new opeartion group with api version", async () => {
-  await runner.compile(
-    `
+  it("move an operation to a new opeartion group with api version", async () => {
+    await runner.compile(
+      `
     @service
     @versioned(Versions)
     namespace TestService;
@@ -356,36 +357,36 @@ it("move an operation to a new opeartion group with api version", async () => {
       op a2(@query apiVersion: string): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  strictEqual(rootClient.children?.length, 2);
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
-    (p) => p.name === "apiVersion",
-  );
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    strictEqual(rootClient.children?.length, 2);
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiVersion",
+    );
 
-  strictEqual(bClient.methods.length, 1);
-  const a2Method = bClient.methods.find(
-    (m) => m.name === "a2",
-  ) as SdkServiceMethod<SdkHttpOperation>;
-  ok(a2Method);
-  strictEqual(a2Method.parameters.length, 0);
-  strictEqual(a2Method.operation.parameters.length, 1);
-  strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-  strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
-  strictEqual(
-    a2Method.operation.parameters[0].correspondingMethodParams[0],
-    bClientApiVersionParam,
-  );
-});
+    strictEqual(bClient.methods.length, 1);
+    const a2Method = bClient.methods.find(
+      (m) => m.name === "a2",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(a2Method);
+    strictEqual(a2Method.parameters.length, 0);
+    strictEqual(a2Method.operation.parameters.length, 1);
+    strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
+    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(
+      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      bClientApiVersionParam,
+    );
+  });
 
-it("move an operation to root client with api version", async () => {
-  await runner.compile(
-    `
+  it("move an operation to root client with api version", async () => {
+    await runner.compile(
+      `
     @service
     @versioned(Versions)
     namespace TestService;
@@ -403,32 +404,82 @@ it("move an operation to root client with api version", async () => {
       op a2(@query apiVersion: string): void;
     }
   `,
-  );
+    );
 
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
-    (p) => p.name === "apiVersion",
-  );
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiVersion",
+    );
 
-  strictEqual(rootClient.methods.length, 1);
-  strictEqual(rootClient.methods[0].name, "a2");
-  const a2Method = rootClient.methods.find(
-    (m) => m.name === "a2",
-  ) as SdkServiceMethod<SdkHttpOperation>;
-  ok(a2Method);
-  strictEqual(a2Method.parameters.length, 0);
-  strictEqual(a2Method.operation.parameters.length, 1);
-  strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-  strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
-  strictEqual(
-    a2Method.operation.parameters[0].correspondingMethodParams[0],
-    rootClientApiVersionParam,
-  );
+    strictEqual(rootClient.methods.length, 1);
+    strictEqual(rootClient.methods[0].name, "a2");
+    const a2Method = rootClient.methods.find(
+      (m) => m.name === "a2",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(a2Method);
+    strictEqual(a2Method.parameters.length, 0);
+    strictEqual(a2Method.operation.parameters.length, 1);
+    strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
+    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(
+      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      rootClientApiVersionParam,
+    );
+  });
+
+  it("all operations have been moved", async () => {
+    await runner.compile(
+      `
+    @service
+    @versioned(Versions)
+    namespace TestService;
+    enum Versions {
+      v1: "v1",
+      v2: "v2",
+    }
+
+    interface A {
+      @route("/a1")
+      @clientLocation("B")
+      op a1(@query apiVersion: string): void;
+
+      @route("/a2")
+      @clientLocation("C")
+      op a2(@query apiVersion: string): void;
+    }
+  `,
+    );
+
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiVersion",
+    );
+    ok(rootClientApiVersionParam);
+
+    strictEqual(rootClient.children?.length, 2);
+
+    const bClient = rootClient.children.find((c) => c.name === "B");
+    ok(bClient);
+    const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiVersion",
+    );
+    ok(bClientApiVersionParam);
+
+    const cClient = rootClient.children.find((c) => c.name === "C");
+    ok(cClient);
+    const cClientApiVersionParam = cClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiVersion",
+    );
+    ok(cClientApiVersionParam);
+  });
 });
 
-it("client level signatures by default", async () => {
+describe("Parameter", () => {
+  it("subId from client to operation", async () => {
   const runnerWithArm = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
@@ -449,33 +500,23 @@ it("client level signatures by default", async () => {
       V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
-    model MyProperties {
-      @visibility(Lifecycle.Read)
-      @doc("Display name of the Azure Extended Zone.")
-      displayName: string;
-    }
-
     @subscriptionResource
-    model MyModel is ProxyResource<MyProperties> {
+    model MyModel is ProxyResource<{}> {
       @key("extendedZoneName")
       @segment("extendedZones")
       @path
       name: string;
     }
 
-    namespace MyClient {
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @armResourceOperations
-      interface MyInterface {
-        get is ArmResourceRead<MyModel>;
-        put is ArmResourceCreateOrReplaceAsync<MyModel>;
-      }
+    @armResourceOperations
+    interface Operations extends Azure.ResourceManager.Operations {
+      get is ArmResourceRead<MyModel>;
+      put is ArmResourceCreateOrReplaceAsync<MyModel>;
     }
 
     `,
     `
-    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.MyClient.MyInterface.put);
+    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.Operations.get);
     `,
   );
 
@@ -495,50 +536,6 @@ it("client level signatures by default", async () => {
 
   strictEqual(getOperation.parameters.length, 0);
 });
-it("all operations have been moved", async () => {
-  await runner.compile(
-    `
-    @service
-    @versioned(Versions)
-    namespace TestService;
-    enum Versions {
-      v1: "v1",
-      v2: "v2",
-    }
+})
 
-    interface A {
-      @route("/a1")
-      @clientLocation("B")
-      op a1(@query apiVersion: string): void;
 
-      @route("/a2")
-      @clientLocation("C")
-      op a2(@query apiVersion: string): void;
-    }
-  `,
-  );
-
-  const sdkPackage = runner.context.sdkPackage;
-  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
-  ok(rootClient);
-  const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
-    (p) => p.name === "apiVersion",
-  );
-  ok(rootClientApiVersionParam);
-
-  strictEqual(rootClient.children?.length, 2);
-
-  const bClient = rootClient.children.find((c) => c.name === "B");
-  ok(bClient);
-  const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
-    (p) => p.name === "apiVersion",
-  );
-  ok(bClientApiVersionParam);
-
-  const cClient = rootClient.children.find((c) => c.name === "C");
-  ok(cClient);
-  const cClientApiVersionParam = cClient.clientInitialization.parameters.find(
-    (p) => p.name === "apiVersion",
-  );
-  ok(cClientApiVersionParam);
-});

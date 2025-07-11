@@ -1307,21 +1307,7 @@ export function getClientLocation(
   if (hasExplicitClientOrOperationGroup(context)) {
     return undefined;
   }
-  if (input.kind === "ModelProperty") {
-    return getScopedDecoratorData(context, clientLocationKey, input) as
-      | Namespace
-      | Interface
-      | Operation
-      | string
-      | undefined;
-  } else {
-    // can't move an operation to another operation
-    return getScopedDecoratorData(context, clientLocationKey, input) as
-      | Namespace
-      | Interface
-      | string
-      | undefined;
-  }
+  return getScopedDecoratorData(context, clientLocationKey, input);
 }
 
 /**
