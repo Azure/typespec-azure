@@ -88,6 +88,7 @@ Available ruleSets:
 - [`@pollingLocation`](#@pollinglocation)
 - [`@pollingOperation`](#@pollingoperation)
 - [`@pollingOperationParameter`](#@pollingoperationparameter)
+- [`@previewVersion`](#@previewversion)
 - [`@useFinalStateVia`](#@usefinalstatevia)
 
 #### `@finalLocation`
@@ -374,6 +375,40 @@ Used to define how to call custom polling operations for long-running operations
 | Name            | Type                      | Description                                                                                                                                                                                        |
 | --------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | targetParameter | `ModelProperty \| string` | A reference to the polling operation parameter this parameter<br />provides a value for, or the name of that parameter. The default value is the name of<br />the decorated parameter or property. |
+
+#### `@previewVersion`
+
+Decorator that marks a Version EnumMember as a preview version.
+This is used to indicate that the version is not yet stable and may change in future releases.
+
+```typespec
+@Azure.Core.previewVersion
+```
+
+##### Target
+
+The EnumMember that represents the preview version.
+`EnumMember`
+
+##### Parameters
+
+None
+
+##### Examples
+
+```typespec
+@versioned(Versions)
+@service(#{ title: "Widget Service" })
+namespace DemoService;
+
+enum Versions {
+  v1,
+  v2,
+
+  @previewVersion
+  v3Preview,
+}
+```
 
 #### `@useFinalStateVia`
 

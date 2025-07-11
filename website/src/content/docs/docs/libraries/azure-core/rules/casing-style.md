@@ -6,7 +6,7 @@ title: "casing-style"
 @azure-tools/typespec-azure-core/casing-style
 ```
 
-Validate names follow the [TypeSpec Style guide](https://typespec.io/docs/next/handbook/style-guide)
+Validate names follow the [TypeSpec Style guide](https://typespec.io/docs/handbook/style-guide)
 
 #### ❌ Incorrect
 
