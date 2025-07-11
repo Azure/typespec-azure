@@ -5,4 +5,3 @@ packages:
 ---
 
 `location` in `TrackedResource` should be `azureLocation` instead of `string`.
-`eTag` in `EntityTagProperty` should be `eTag` instead of `string`.
