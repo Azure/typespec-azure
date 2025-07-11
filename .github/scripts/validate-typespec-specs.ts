@@ -1,14 +1,15 @@
 #!/usr/bin/env tsx
 /* eslint-disable no-console */
 
-import { spawn } from "child_process";
+import { spawn, SpawnOptions } from "child_process";
 import { readdir, stat } from "fs/promises";
 import { join } from "path";
+import pc from "picocolors";
 
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = 4;
 
-async function findTspConfigDirectories(startDir: string): Promise<string[]> {
+async function findTspProjects(startDir: string): Promise<string[]> {
   const directories: string[] = [];
 
   async function searchDirectory(dir: string): Promise<void> {
@@ -44,10 +45,57 @@ async function findTspConfigDirectories(startDir: string): Promise<string[]> {
   return directories;
 }
 
-async function runTspCompile(directory: string): Promise<{ success: boolean; output: string }> {
+async function findTspEntrypoint(directory: string): Promise<string | null> {
+  try {
+    const entries = await readdir(directory);
+
+    // Prefer main.tsp, fall back to client.tsp
+    if (entries.includes("main.tsp")) {
+      return "main.tsp";
+    }
+    if (entries.includes("client.tsp")) {
+      return "client.tsp";
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function verifyProject(dir: string): Promise<{ success: boolean; output: string }> {
+  const entrypoint = await findTspEntrypoint(dir);
+
+  if (!entrypoint) {
+    const result = {
+      success: false,
+      output: "No main.tsp or client.tsp file found in directory",
+    };
+    const status = pc.red("fail");
+    logGroup(`${status} ${dir}`, result.output);
+    return result;
+  }
+
+  return execTspCompile(dir, entrypoint, entrypoint === "client.tsp" ? ["--dry-run"] : []);
+}
+async function execTspCompile(
+  directory: string,
+  file: string,
+  args: string[] = [],
+): Promise<{ success: boolean; output: string }> {
+  return execAsync("npx", ["tsp", "compile", file, "--warn-as-error", ...args], {
+    cwd: directory,
+  });
+}
+
+async function execAsync(
+  command: string,
+  args: string[],
+  options: SpawnOptions = {},
+): Promise<{ success: boolean; output: string }> {
   return new Promise((resolve) => {
-    const process = spawn("npx", ["tsp", "compile", ".", "--warn-as-error"], {
-      cwd: directory,
+    const process = spawn(command, args, {
+      ...options,
       stdio: "pipe",
     });
 
@@ -97,53 +145,32 @@ async function main() {
 
   console.log(`Looking for TypeSpec projects in ${azureSpecsDir}...`);
 
-  const tspConfigDirs = await findTspConfigDirectories(join(azureSpecsDir, "specification"));
+  const tspConfigDirs = await findTspProjects(join(azureSpecsDir, "specification"));
 
   if (tspConfigDirs.length === 0) {
     console.log("No tspconfig.yaml files found in specification directory");
     return;
   }
 
-  console.log(`Found ${tspConfigDirs.length} TypeSpec projects:`);
-  tspConfigDirs.forEach((dir) => console.log(`  - ${dir}`));
-  console.log("");
+  logGroup(
+    `Found ${pc.yellow(tspConfigDirs.length)} TypeSpec projects`,
+    tspConfigDirs.map((dir) => pc.bold(dir)).join("\n"),
+  );
 
   let successCount = 0;
   let failureCount = 0;
-  const failedFolders: string[] = [];
+  const failedFolders: string[] = []; // Create a processor function that handles the compilation and logging
+  const processProject = async (dir: string) => {
+    const result = await verifyProject(dir);
+    const status = result.success ? pc.green("pass") : pc.red("fail");
 
-  // Create a processor function that handles the compilation and logging
-  const processDirectory = async (dir: string) => {
-    const result = await runTspCompile(dir);
-
-    // Buffer all output to log as a complete group
-    let groupOutput = "";
-
-    if (result.success) {
-      groupOutput += "✅ Compilation successful\n";
-    } else {
-      groupOutput += "❌ Compilation failed\n";
-    }
-
-    if (result.output.trim()) {
-      groupOutput += "Output:\n";
-      groupOutput += result.output + "\n";
-    }
-
-    // Log the complete group all at once
-    console.log(`::group::Compiling TypeSpec project in ${dir}`);
-    console.log(groupOutput.trim());
-    console.log("::endgroup::");
+    logGroup(`${status} ${dir}`, result.output);
 
     return { dir, result };
   };
 
   // Run compilations in parallel with limited concurrency
-  const results = await runWithConcurrency(
-    tspConfigDirs,
-    COMPILATION_CONCURRENCY,
-    processDirectory,
-  );
+  const results = await runWithConcurrency(tspConfigDirs, COMPILATION_CONCURRENCY, processProject);
 
   // Count successes and failures
   for (const { dir, result } of results) {
@@ -169,4 +196,10 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+function logGroup(name: string, content: string) {
+  console.log(`::group::${name}`);
+  console.log(content);
+  console.log("::endgroup::");
+}
+
+await main();
