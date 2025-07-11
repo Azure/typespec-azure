@@ -228,9 +228,7 @@ function addDefaultClientParameters<
     for (const sc of listOperationGroups(context, client.__raw, true)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
-      apiVersionParam = sc.type
-        ? context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam)
-        : undefined;
+      apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
       if (apiVersionParam) break;
     }
   }
