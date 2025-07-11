@@ -813,6 +813,12 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
         ) {
           clientParams.push(sdkMethodParam);
         }
+      } else {
+        if (!context.__clientParametersCache
+            .get(operationLocation)
+            ?.find((x) => x === sdkMethodParam)) {
+          clientParams.push(sdkMethodParam);
+        }
       }
     } else {
       methodParameters.push(sdkMethodParam);

@@ -479,6 +479,44 @@ describe("Operation", () => {
 });
 
 describe("Parameter", () => {
+  it("move parameter from operation to client", async () => {
+    await runner.compileWithBuiltInService(
+      `
+      interface A {
+        @route("/a")
+        op a(@query @clientLocation(TestService) apiKey: string, data: string): void;
+      }
+      `
+    );
+
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+    ok(rootClient);
+    
+    // apiKey should be moved to client initialization
+    const clientApiKeyParam = rootClient.clientInitialization.parameters.find(
+      (p) => p.name === "apiKey"
+    );
+    ok(clientApiKeyParam);
+    ok(clientApiKeyParam.onClient);
+    
+    // Operation should not have apiKey as method parameter
+    const aClient = rootClient.children?.find((c) => c.name === "A");
+    ok(aClient);
+    const aMethod = aClient.methods.find((m) => m.name === "a") as SdkServiceMethod<SdkHttpOperation>;
+    ok(aMethod);
+    
+    // Should only have 'data' parameter, not 'apiKey'
+    strictEqual(aMethod.parameters.length, 2);
+    strictEqual(aMethod.parameters[0].name, "data");
+    strictEqual(aMethod.parameters[1].name, "contentType");
+    
+    // But the HTTP operation should still reference the client parameter
+    const httpApiKeyParam = aMethod.operation.parameters.find((p) => p.name === "apiKey");
+    ok(httpApiKeyParam);
+    strictEqual(httpApiKeyParam.correspondingMethodParams.length, 1);
+    strictEqual(httpApiKeyParam.correspondingMethodParams[0], clientApiKeyParam);
+  });
   it("subId from client to operation", async () => {
   const runnerWithArm = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],

@@ -215,15 +215,15 @@ function addDefaultClientParameters<
 >(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
   const diagnostics = createDiagnosticCollector();
   const defaultClientParamters = [];
+  const additionalClientParameters = [];
   // there will always be an endpoint property
   defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
   const credentialParam = getSdkCredentialParameter(context, client.__raw);
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
-  let apiVersionParam = context.__clientParametersCache
-    .get(client.__raw)
-    ?.find((x) => x.isApiVersionParam);
+  const clientParamCache = context.__clientParametersCache.get(client.__raw);
+  let apiVersionParam = clientParamCache?.find((x) => x.isApiVersionParam);
   if (!apiVersionParam) {
     for (const sc of listOperationGroups(context, client.__raw, true)) {
       // if any sub operation groups have an api version param, the top level needs
@@ -235,9 +235,7 @@ function addDefaultClientParameters<
   if (apiVersionParam) {
     defaultClientParamters.push(apiVersionParam);
   }
-  let subId = context.__clientParametersCache
-    .get(client.__raw)
-    ?.find((x) => isSubscriptionId(context, x));
+  let subId = clientParamCache?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
     for (const sc of listOperationGroups(context, client.__raw, true)) {
       // if any sub operation groups have an subId param, the top level needs it as well
@@ -248,9 +246,24 @@ function addDefaultClientParameters<
   if (subId) {
     defaultClientParamters.push(subId);
   }
+  for (const param of clientParamCache ?? []) {
+    if (!defaultClientParamters.includes(param)) {
+      additionalClientParameters.push(param);
+    }
+  }
+  for (const sc of listOperationGroups(context, client.__raw, true)) {
+    // if any sub operation groups have an subId param, the top level needs it as well
+    const subClientParamCache = context.__clientParametersCache.get(sc);
+    for (const subParam of subClientParamCache ?? []) {
+      if (!defaultClientParamters.includes(subParam)) {
+        additionalClientParameters.push(subParam);
+      }
+    }
+  }
   client.clientInitialization.parameters = [
     ...defaultClientParamters,
     ...client.clientInitialization.parameters,
+    ...additionalClientParameters,
   ];
 }
 

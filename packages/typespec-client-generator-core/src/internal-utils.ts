@@ -37,7 +37,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getClientDocExplicit, getParamAlias } from "./decorators.js";
+import { getClientDocExplicit, getClientLocation, getParamAlias } from "./decorators.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
@@ -590,6 +590,18 @@ export function isOnClient(
   versioning?: boolean,
 ): boolean {
   const client = operation ? context.getClientForOperation(operation) : undefined;
+  const clientLocation = getClientLocation(context, type);
+  let movedToClient = false;
+  if (clientLocation && client) {
+    let currClient = client.type;
+    while (currClient) {
+      if (currClient === clientLocation) {
+        movedToClient = true;
+        break;
+      }
+      currClient = currClient.namespace;
+    }
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
@@ -598,7 +610,8 @@ export function isOnClient(
         context.__clientParametersCache
           .get(client)
           ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
-    )
+    ) ||
+    movedToClient
   );
 }
 
